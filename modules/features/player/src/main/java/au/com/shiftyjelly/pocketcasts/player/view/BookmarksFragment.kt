@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -134,6 +136,7 @@ private fun Content(
                 backgroundColor = backgroundColor,
             )
             is UiState.Empty -> NoBookmarksView()
+            is UiState.PlusUpsell -> PlusUpsellView()
         }
     }
 }
@@ -286,6 +289,38 @@ private fun PlayButton(
 
 @Composable
 private fun NoBookmarksView() {
+    MessageView(
+        titleView = {
+            TextH20(
+                text = stringResource(LR.string.bookmarks_not_found),
+                color = MaterialTheme.theme.colors.playerContrast01,
+            )
+        },
+        buttonTitleRes = LR.string.bookmarks_headphone_settings,
+        buttonAction = { /* TODO */ },
+    )
+}
+
+@Composable
+private fun PlusUpsellView() {
+    MessageView(
+        titleView = {
+            Image(
+                painter = painterResource(IR.drawable.pocket_casts_plus_logo),
+                contentDescription = stringResource(LR.string.pocket_casts),
+            )
+        },
+        buttonTitleRes = LR.string.subscribe, // TODO: Bookmarks update upsell button title based on subscription status
+        buttonAction = { /* TODO */ },
+    )
+}
+
+@Composable
+private fun MessageView(
+    titleView: @Composable () -> Unit = {},
+    @StringRes buttonTitleRes: Int,
+    buttonAction: () -> Unit = {},
+) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -300,36 +335,42 @@ private fun NoBookmarksView() {
                 )
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 24.dp)
+                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp)
             ) {
-                TextH20(
-                    text = stringResource(LR.string.bookmarks_not_found),
-                    color = MaterialTheme.theme.colors.playerContrast01,
-                )
+                titleView()
                 TextP40(
                     text = stringResource(LR.string.bookmarks_create_instructions),
                     color = MaterialTheme.theme.colors.playerContrast02,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 12.dp)
                 )
-                HeadphoneSettingsButton()
+                TextButton(
+                    buttonTitleRes = buttonTitleRes,
+                    buttonAction = buttonAction,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun HeadphoneSettingsButton() {
+private fun TextButton(
+    @StringRes buttonTitleRes: Int,
+    buttonAction: () -> Unit = {},
+    modifier: Modifier,
+) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .minimumInteractiveComponentSize()
-            .clickable { /* TODO */ }
+            .clickable { buttonAction() }
     ) {
         TextH40(
-            text = stringResource(LR.string.bookmarks_headphone_settings),
+            text = stringResource(buttonTitleRes),
             color = MaterialTheme.theme.colors.playerContrast01,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp)
@@ -398,6 +439,19 @@ private fun NoBookmarksPreview(
     AppTheme(theme) {
         Content(
             state = UiState.Empty,
+            backgroundColor = Color.Black,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PlusUpsellPreview(
+    theme: Theme.ThemeType = Theme.ThemeType.DARK,
+) {
+    AppTheme(theme) {
+        Content(
+            state = UiState.PlusUpsell,
             backgroundColor = Color.Black,
         )
     }
