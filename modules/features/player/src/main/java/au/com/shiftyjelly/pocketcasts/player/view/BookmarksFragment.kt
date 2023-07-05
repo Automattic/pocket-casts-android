@@ -249,7 +249,7 @@ private fun PlayButton(
             tint = Color.Black,
             modifier = Modifier
                 .padding(start = 10.dp, end = 16.dp)
-                .size(10.dp, 16.dp)
+                .size(10.dp, 13.dp)
         )
     }
 }
