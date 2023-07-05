@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,22 +23,24 @@ class BookmarksViewModel
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Empty)
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
 
     fun loadBookmarks(episodeUuid: String) {
         viewModelScope.launch(ioDispatcher) {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                _uiState.value = UiState.Loading
                 bookmarkManager.findEpisodeBookmarks(episode)
                     .stateIn(viewModelScope)
                     .collect { bookmarks ->
-                        _uiState.value = if (bookmarks.isNotEmpty()) {
-                            UiState.Loaded(bookmarks)
-                        } else {
+                        _uiState.value = if (bookmarks.isEmpty()) {
                             UiState.Empty
+                        } else {
+                            UiState.Loaded(bookmarks)
                         }
                     }
+            } ?: run { // This shouldn't happen in the ideal world
+                Timber.e("Episode not found.")
+                _uiState.value = UiState.Empty
             }
         }
     }
