@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -187,7 +188,7 @@ private fun BookmarkItem(
             val createdAtText by remember {
                 mutableStateOf(
                     bookmark.createdAt.toLocalizedFormatPattern(
-                        pattern = "MMM d, YYYY 'at' h:mm a"
+                        bookmark.createdAtDatePattern()
                     )
                 )
             }
@@ -251,6 +252,19 @@ private fun PlayButton(
                 .padding(start = 10.dp, end = 16.dp)
                 .size(10.dp, 13.dp)
         )
+    }
+}
+
+private fun Bookmark.createdAtDatePattern(): String {
+    val calendar = Calendar.getInstance()
+    val currentYear = calendar.get(Calendar.YEAR)
+    calendar.time = createdAt
+    val createdAtYear = calendar.get(Calendar.YEAR)
+
+    return if (createdAtYear == currentYear) {
+        "MMM d 'at' h:mm a"
+    } else {
+        "MMM d, YYYY 'at' h:mm a"
     }
 }
 
