@@ -5,6 +5,8 @@
         ([#1139](https://github.com/Automattic/pocket-casts-android/pull/1139))
     * Adds +- 1 increments to the sleep timer if the custom timer is less than 5 Min
         ([#1144](https://github.com/Automattic/pocket-casts-android/pull/1144)).
+    * Adds Long Press Click listener to the playback effect icon, which turns custom effects on.
+        ([#1150](https://github.com/Automattic/pocket-casts-android/pull/1150)).
 
 
 7.42

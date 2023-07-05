@@ -152,6 +152,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
 
         binding.effects.setOnClickListener { onEffectsClick() }
+        binding.effects.setOnLongClickListener {
+            onEnableLocalPlayBackEffects()
+            true
+        }
         binding.previousChapter.setOnClickListener { onPreviousChapter() }
         binding.nextChapter.setOnClickListener { onNextChapter() }
         binding.sleep.setOnClickListener { onSleepClick() }
@@ -442,6 +446,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onSkipForwardLongPress() {
         LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
+    }
+
+    override fun onEnableLocalPlayBackEffects() {
+        trackShelfAction(ShelfItem.Effects.analyticsValue)
+        viewModel.updateOverrideGlobalEffects(true)
+        viewModel.toggleNotifications(requireContext())
     }
 
     override fun onEffectsClick() {
