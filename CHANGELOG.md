@@ -2,10 +2,12 @@
 -----
 *   New Feature:
     *   Add capability to add +1 minute on the sleep timer
-        ([#1139](https://github.com/Automattic/pocket-casts-android/pull/1139))
+        ([#1139](https://github.com/Automattic/pocket-casts-android/pull/1139)).
     * Adds +- 1 increments to the sleep timer if the custom timer is less than 5 Min
         ([#1144](https://github.com/Automattic/pocket-casts-android/pull/1144)).
-
+*   Bug Fixes:
+    *   Fixed crash that could occur when rearranging shelf items on the full screen player
+        ([#1155](https://github.com/Automattic/pocket-casts-android/pull/1155)).
 
 7.42
 -----
