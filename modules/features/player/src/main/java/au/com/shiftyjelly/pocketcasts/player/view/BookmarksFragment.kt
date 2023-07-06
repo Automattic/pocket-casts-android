@@ -3,12 +3,16 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,10 +20,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.progressSemantics
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,13 +39,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
@@ -43,8 +56,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -73,9 +88,13 @@ class BookmarksFragment : BaseFragment() {
         setContent {
             AppTheme(theme.activeTheme) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                BookmarksPage(
-                    playerViewModel = playerViewModel
-                )
+                // Hack to allow nested scrolling inside bottom sheet viewpager
+                // https://stackoverflow.com/a/70195667/193545
+                Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
+                    BookmarksPage(
+                        playerViewModel = playerViewModel
+                    )
+                }
             }
         }
     }
@@ -89,17 +108,10 @@ private fun BookmarksPage(
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
     val listData = playerViewModel.listDataLive.asFlow().collectAsState(initial = null)
     listData.value?.let {
-        val backgroundColor = Color(it.podcastHeader.backgroundColor)
-        when (state) {
-            is UiState.Empty,
-            is UiState.Loading,
-            -> Unit
-
-            is UiState.Loaded -> Content(
-                bookmarks = (state as UiState.Loaded).bookmarks,
-                backgroundColor = backgroundColor,
-            )
-        }
+        Content(
+            state = state,
+            backgroundColor = Color(it.podcastHeader.backgroundColor),
+        )
         LaunchedEffect(Unit) {
             bookmarksViewModel.loadBookmarks(
                 episodeUuid = it.podcastHeader.episodeUuid
@@ -110,13 +122,33 @@ private fun BookmarksPage(
 
 @Composable
 private fun Content(
+    state: UiState,
+    backgroundColor: Color,
+) {
+    Box(
+        modifier = Modifier
+            .background(color = backgroundColor)
+    ) {
+        when (state) {
+            is UiState.Loading -> LoadingView()
+            is UiState.Loaded -> BookmarksView(
+                bookmarks = state.bookmarks,
+                backgroundColor = backgroundColor,
+            )
+            is UiState.Empty -> NoBookmarksView()
+            is UiState.PlusUpsell -> PlusUpsellView()
+        }
+    }
+}
+
+@Composable
+private fun BookmarksView(
     bookmarks: List<Bookmark>,
     backgroundColor: Color,
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = backgroundColor)
     ) {
         item {
             val title = stringResource(
@@ -255,6 +287,112 @@ private fun PlayButton(
     }
 }
 
+@Composable
+private fun NoBookmarksView() {
+    MessageView(
+        titleView = {
+            TextH20(
+                text = stringResource(LR.string.bookmarks_not_found),
+                color = MaterialTheme.theme.colors.playerContrast01,
+            )
+        },
+        buttonTitleRes = LR.string.bookmarks_headphone_settings,
+        buttonAction = { /* TODO */ },
+    )
+}
+
+@Composable
+private fun PlusUpsellView() {
+    MessageView(
+        titleView = {
+            Image(
+                painter = painterResource(IR.drawable.pocket_casts_plus_logo),
+                contentDescription = stringResource(LR.string.pocket_casts),
+            )
+        },
+        buttonTitleRes = LR.string.subscribe, // TODO: Bookmarks update upsell button title based on subscription status
+        buttonAction = { /* TODO */ },
+    )
+}
+
+@Composable
+private fun MessageView(
+    titleView: @Composable () -> Unit = {},
+    @StringRes buttonTitleRes: Int,
+    buttonAction: () -> Unit = {},
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(
+                    color = MaterialTheme.theme.colors.playerContrast06,
+                    shape = RoundedCornerShape(size = 4.dp)
+                )
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp)
+            ) {
+                titleView()
+                TextP40(
+                    text = stringResource(LR.string.bookmarks_create_instructions),
+                    color = MaterialTheme.theme.colors.playerContrast02,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+                TextButton(
+                    buttonTitleRes = buttonTitleRes,
+                    buttonAction = buttonAction,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TextButton(
+    @StringRes buttonTitleRes: Int,
+    buttonAction: () -> Unit = {},
+    modifier: Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .minimumInteractiveComponentSize()
+            .clickable { buttonAction() }
+    ) {
+        TextH40(
+            text = stringResource(buttonTitleRes),
+            color = MaterialTheme.theme.colors.playerContrast01,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
+}
+
+@Composable
+private fun LoadingView() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .progressSemantics()
+                .size(24.dp),
+            strokeWidth = 2.dp,
+        )
+    }
+}
+
 private fun Bookmark.createdAtDatePattern(): String {
     val calendar = Calendar.getInstance()
     val currentYear = calendar.get(Calendar.YEAR)
@@ -275,17 +413,45 @@ private fun BookmarksPreview(
 ) {
     AppTheme(theme) {
         Content(
-            bookmarks = listOf(
-                Bookmark(
-                    uuid = UUID.randomUUID().toString(),
-                    episodeUuid = UUID.randomUUID().toString(),
-                    podcastUuid = UUID.randomUUID().toString(),
-                    timeSecs = 10,
-                    createdAt = Date(),
-                    syncStatus = 1,
-                    title = "Funny bit",
+            state = UiState.Loaded(
+                bookmarks = listOf(
+                    Bookmark(
+                        uuid = UUID.randomUUID().toString(),
+                        episodeUuid = UUID.randomUUID().toString(),
+                        podcastUuid = UUID.randomUUID().toString(),
+                        timeSecs = 10,
+                        createdAt = Date(),
+                        syncStatus = 1,
+                        title = "Funny bit",
+                    )
                 )
             ),
+            backgroundColor = Color.Black,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun NoBookmarksPreview(
+    theme: Theme.ThemeType = Theme.ThemeType.DARK,
+) {
+    AppTheme(theme) {
+        Content(
+            state = UiState.Empty,
+            backgroundColor = Color.Black,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PlusUpsellPreview(
+    theme: Theme.ThemeType = Theme.ThemeType.DARK,
+) {
+    AppTheme(theme) {
+        Content(
+            state = UiState.PlusUpsell,
             backgroundColor = Color.Black,
         )
     }
