@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -11,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -37,6 +41,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
+import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxCompletable
@@ -53,6 +58,7 @@ class PodcastSyncProcess(
     var episodeManager: EpisodeManager,
     var podcastManager: PodcastManager,
     var playlistManager: PlaylistManager,
+    var bookmarkManager: BookmarkManager,
     var statsManager: StatsManager,
     var fileStorage: FileStorage,
     var playbackManager: PlaybackManager,
@@ -278,6 +284,7 @@ class PodcastSyncProcess(
         val episodes = uploadEpisodesChanges(records)
         uploadPlaylistChanges(records)
         uploadFolderChanges(records)
+        uploadBookmarksChanges(records)
         uploadStatChanges(records)
 
         val data = JSONObject()
@@ -492,6 +499,49 @@ class PodcastSyncProcess(
         }
     }
 
+    private fun uploadBookmarksChanges(records: JSONArray) {
+        if (!FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            return
+        }
+        try {
+            val bookmarks = bookmarkManager.findBookmarksToSync()
+            bookmarks.forEach { bookmark ->
+                uploadBookmarkChanges(bookmark, records)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Unable to load bookmarks to sync.")
+            throw PocketCastsSyncException(e)
+        }
+    }
+
+    private fun uploadBookmarkChanges(bookmark: Bookmark, records: JSONArray) {
+        try {
+            val fields = JSONObject().apply {
+                put("uuid", bookmark.uuid)
+                put("podcast_uuid", bookmark.podcastUuid)
+                put("episode_uuid", bookmark.episodeUuid)
+                put("time", bookmark.timeSecs)
+                put("created_at", bookmark.createdAt.toIsoString())
+            }
+            bookmark.titleModified?.let { titleModified ->
+                fields.put("title", bookmark.title)
+                fields.put("title_modified", titleModified)
+            }
+            bookmark.deletedModified?.let { deletedModified ->
+                fields.put("is_deleted", if (bookmark.deleted) "1" else "0")
+                fields.put("is_deleted_modified", deletedModified)
+            }
+            val record = JSONObject().apply {
+                put("fields", fields)
+                put("type", "UserBookmark")
+            }
+            records.put(record)
+        } catch (e: JSONException) {
+            Sentry.captureException(e)
+            Timber.e(e, "Unable to save bookmark")
+        }
+    }
+
     private fun processServerResponse(response: SyncUpdateResponse, episodes: List<PodcastEpisode>): Single<String> {
         if (response.lastModified == null) {
             return Single.error(Exception("Server response doesn't return a last modified"))
@@ -502,6 +552,7 @@ class PodcastSyncProcess(
             .andThen(importPodcasts(response.podcasts))
             .andThen(importFilters(response.playlists))
             .andThen(importFolders(response.folders))
+            .andThen(importBookmarks(response.bookmarks))
             .andThen(updateSettings(response))
             .andThen(updateShortcuts(response.playlists))
             .andThen(cacheStats())
@@ -577,6 +628,14 @@ class PodcastSyncProcess(
     private fun importFolders(folders: List<Folder>): Completable {
         return Observable.fromIterable(folders)
             .flatMapCompletable { folder -> importFolder(folder) }
+    }
+
+    private fun importBookmarks(bookmarks: List<Bookmark>): Completable {
+        return if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            Observable.fromIterable(bookmarks).flatMapCompletable { bookmark -> importBookmark(bookmark) }
+        } else {
+            Completable.complete()
+        }
     }
 
     private fun importFolder(sync: Folder): Completable {
@@ -780,6 +839,16 @@ class PodcastSyncProcess(
             episodeManager.update(episode)
 
             episode
+        }
+    }
+
+    private fun importBookmark(bookmark: Bookmark): Completable {
+        return rxCompletable {
+            if (bookmark.deleted) {
+                bookmarkManager.deleteSynced(bookmark.uuid)
+            } else {
+                bookmarkManager.upsertSynced(bookmark)
+            }
         }
     }
 }

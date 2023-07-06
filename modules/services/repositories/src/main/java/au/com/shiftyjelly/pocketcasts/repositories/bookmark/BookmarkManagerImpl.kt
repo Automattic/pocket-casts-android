@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -23,15 +24,24 @@ class BookmarkManagerImpl @Inject constructor(
     /**
      * Add a bookmark for the given episode.
      */
-    override suspend fun add(episode: BaseEpisode, timeSecs: Int): Bookmark {
+    override suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String): Bookmark {
+        // Prevent adding more than one bookmark at the same place
+        val existingBookmark = bookmarkDao.findByEpisodeTime(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid, timeSecs = timeSecs)
+        if (existingBookmark != null) {
+            return existingBookmark
+        }
+        val modifiedAt = System.currentTimeMillis()
         val bookmark = Bookmark(
             uuid = UUID.randomUUID().toString(),
             episodeUuid = episode.uuid,
             podcastUuid = episode.podcastOrSubstituteUuid,
             timeSecs = timeSecs,
             createdAt = Date(),
-            syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
-            title = ""
+            title = title,
+            titleModified = modifiedAt,
+            deleted = false,
+            deletedModified = modifiedAt,
+            syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
         return bookmark
@@ -47,15 +57,27 @@ class BookmarkManagerImpl @Inject constructor(
     /**
      * Find all bookmarks for the given episode.
      */
-    override suspend fun findEpisodeBookmarks(episode: BaseEpisode): Flow<List<Bookmark>> {
-        return bookmarkDao.findByPodcastAndEpisodeFlow(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid)
+    override suspend fun findEpisodeBookmarks(episode: BaseEpisode): List<Bookmark> {
+        return bookmarkDao.findByEpisode(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid)
+    }
+
+    /**
+     * Find all bookmarks for the given episode. The flow will be updated when the bookmarks change.
+     */
+    override suspend fun findEpisodeBookmarksFlow(episode: BaseEpisode): Flow<List<Bookmark>> {
+        return bookmarkDao.findByEpisodeFlow(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid)
     }
 
     /**
      * Mark the bookmark as deleted so it can be synced to other devices.
      */
     override suspend fun deleteToSync(bookmarkUuid: String) {
-        bookmarkDao.updateDeleted(uuid = bookmarkUuid, deleted = true, syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED)
+        bookmarkDao.updateDeleted(
+            uuid = bookmarkUuid,
+            deleted = true,
+            deletedModified = System.currentTimeMillis(),
+            syncStatus = SyncStatus.NOT_SYNCED
+        )
     }
 
     /**
@@ -63,5 +85,20 @@ class BookmarkManagerImpl @Inject constructor(
      */
     override suspend fun deleteSynced(bookmarkUuid: String) {
         bookmarkDao.deleteByUuid(bookmarkUuid)
+    }
+
+    /**
+     * Find all bookmarks that need to be synced.
+     */
+    override fun findBookmarksToSync(): List<Bookmark> {
+        return bookmarkDao.findNotSynced()
+    }
+
+    /**
+     * Upsert the bookmarks from the server. The insert will replace the bookmark if the UUID already exists.
+     */
+    override suspend fun upsertSynced(bookmark: Bookmark): Bookmark {
+        bookmarkDao.insert(bookmark)
+        return bookmark
     }
 }

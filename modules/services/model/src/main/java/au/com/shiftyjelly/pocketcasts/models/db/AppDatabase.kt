@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
@@ -74,8 +75,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     PodcastAutoUpNextConverter::class,
     PodcastLicensingEnumConverter::class,
     PodcastsSortTypeConverter::class,
-    UserEpisodeServerStatusConverter::class,
+    SyncStatusConverter::class,
     TrimModeTypeConverter::class,
+    UserEpisodeServerStatusConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -442,10 +444,12 @@ abstract class AppDatabase : RoomDatabase() {
                         `podcast_uuid` TEXT NOT NULL,
                         `episode_uuid` TEXT NOT NULL,
                         `time` INTEGER NOT NULL, 
-                        `title` TEXT NOT NULL,
-                        `created_at` INTEGER NOT NULL,
-                        `deleted` INTEGER NOT NULL,
-                        `sync_status` INTEGER NOT NULL,
+                        `created_at` INTEGER NOT NULL, 
+                        `title` TEXT NOT NULL, 
+                        `title_modified` INTEGER, 
+                        `deleted` INTEGER NOT NULL, 
+                        `deleted_modified` INTEGER,
+                        `sync_status` INTEGER NOT NULL, 
                         PRIMARY KEY(`uuid`)
                     );
                 """.trimIndent()
