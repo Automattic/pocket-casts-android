@@ -1197,6 +1197,7 @@
     <string name="settings_title_auto_archive" translatable="false">@string/auto_archive</string>
     <string name="settings_title_auto_download" translatable="false">@string/auto_download</string>
     <string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
+    <string name="settings_title_headphone_controls">Headphone controls</string>
     <string name="settings_title_help">Help &amp; feedback</string>
     <string name="settings_title_import_export">Import &amp; export OPML</string>
     <string name="settings_title_privacy">Privacy</string>

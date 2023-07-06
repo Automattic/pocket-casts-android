@@ -96,6 +96,9 @@ fun SettingsFragmentPage(
             AutoArchiveRow(onClick = { openFragment(AutoArchiveFragment()) })
             AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment.newInstance()) })
             AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                HeadphoneControlsRow(onClick = { /* TODO */ })
+            }
             HelpAndFeedbackRow(onClick = { openFragment(HelpFragment()) })
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
             AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
@@ -225,6 +228,15 @@ private fun AutoAddToUpNextRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_auto_add_to_up_next),
         icon = GradientIconData(IR.drawable.ic_upnext_playlast),
+        modifier = rowModifier(onClick)
+    )
+}
+
+@Composable
+private fun HeadphoneControlsRow(onClick: () -> Unit) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_title_headphone_controls),
+        icon = GradientIconData(IR.drawable.ic_headphone),
         modifier = rowModifier(onClick)
     )
 }
