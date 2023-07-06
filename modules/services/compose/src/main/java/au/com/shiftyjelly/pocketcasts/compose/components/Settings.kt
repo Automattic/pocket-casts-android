@@ -83,6 +83,7 @@ fun <T> SettingRadioDialogRow(
     primaryText: String,
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
+    icon: GradientIconData? = null,
     options: List<T>,
     savedOption: T,
     optionToLocalisedString: (T) -> String,
@@ -93,6 +94,7 @@ fun <T> SettingRadioDialogRow(
     SettingRow(
         primaryText = primaryText,
         secondaryText = secondaryText,
+        icon = icon,
         modifier = modifier.clickable { showDialog = true }
     ) {
         if (showDialog) {

@@ -97,7 +97,7 @@ fun SettingsFragmentPage(
             AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment.newInstance()) })
             AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
             if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                HeadphoneControlsRow(onClick = { /* TODO */ })
+                HeadphoneControlsRow(onClick = { openFragment(HeadphoneControlsSettingsFragment()) })
             }
             HelpAndFeedbackRow(onClick = { openFragment(HelpFragment()) })
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })

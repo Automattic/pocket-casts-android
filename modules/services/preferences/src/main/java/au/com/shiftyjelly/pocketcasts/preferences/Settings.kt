@@ -187,6 +187,14 @@ interface Settings {
         ONLY_ADD_TO_TOP
     }
 
+    enum class HeadphoneAction {
+        ADD_BOOKMARK,
+        SKIP_BACK,
+        SKIP_FORWARD,
+        NEXT_CHAPTER,
+        PREVIOUS_CHAPTER,
+    }
+
     sealed class AutoArchiveAfterPlaying(val timeSeconds: Int) {
         companion object {
             fun fromString(context: Context, value: String?): AutoArchiveAfterPlaying {
@@ -307,6 +315,9 @@ interface Settings {
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
     val customMediaActionsVisibilityFlow: StateFlow<Boolean>
     val autoPlayNextEpisodeOnEmptyFlow: StateFlow<Boolean>
+    val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
+    val headphoneNextActionFlow: StateFlow<HeadphoneAction>
+    val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -488,6 +499,13 @@ interface Settings {
     fun setUpNextSwipeAction(action: UpNextAction)
     fun getTapOnUpNextShouldPlay(): Boolean
     fun setTapOnUpNextShouldPlay(value: Boolean)
+
+    fun getHeadphoneControlsNextAction(): HeadphoneAction
+    fun setHeadphoneControlsNextAction(action: HeadphoneAction)
+    fun getHeadphoneControlsPreviousAction(): HeadphoneAction
+    fun setHeadphoneControlsPreviousAction(action: HeadphoneAction)
+    fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean
+    fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean)
 
     // Firebase remote config
     fun getPeriodicSaveTimeMs(): Long
