@@ -13,7 +13,7 @@ enum class Feature(
     SHOW_RATINGS_ENABLED(
         key = "show_ratings_enabled",
         title = "Show Ratings",
-        defaultValue = false
+        defaultValue = true
     ),
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",

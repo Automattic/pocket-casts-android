@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 /**
  * Used to set feature flag values in release builds.
- * Any changes to the feature flags through FeatureFlagManager are not applied to feature flags
+ * Any changes to the feature flags through FeatureFlag are not applied to feature flags
  * provided through this provider.
  */
 @Singleton
@@ -19,11 +19,10 @@ class DefaultReleaseFeatureProvider @Inject constructor() : FeatureProvider {
 
     override fun isEnabled(feature: Feature) =
         when (feature) {
-            Feature.END_OF_YEAR_ENABLED,
-            Feature.SHOW_RATINGS_ENABLED,
-            Feature.ADD_PATRON_ENABLED,
-            Feature.AUTO_PLAY_UP_NEXT_SETTING,
-            Feature.BOOKMARKS_ENABLED,
-            -> false
+            Feature.END_OF_YEAR_ENABLED -> Feature.END_OF_YEAR_ENABLED.defaultValue
+            Feature.SHOW_RATINGS_ENABLED -> Feature.SHOW_RATINGS_ENABLED.defaultValue
+            Feature.ADD_PATRON_ENABLED -> Feature.ADD_PATRON_ENABLED.defaultValue
+            Feature.AUTO_PLAY_UP_NEXT_SETTING -> Feature.AUTO_PLAY_UP_NEXT_SETTING.defaultValue
+            Feature.BOOKMARKS_ENABLED -> Feature.BOOKMARKS_ENABLED.defaultValue
         }
 }
