@@ -1,19 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.wear.compose.material.Icon
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import com.google.android.horologist.composables.MarqueeText
@@ -42,10 +45,12 @@ fun MarqueeTextMediaDisplay(
         )
         Row(modifier = Modifier.fillMaxWidth(0.8f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             if (isPlaybackError) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = IR.drawable.ic_playback_error),
+                Image(
+                    modifier = Modifier.size(16.dp),
+                    painter = painterResource(id = IR.drawable.playback_error),
                     contentDescription = stringResource(id = LR.string.podcast_episode_playback_error),
                 )
+                Spacer(Modifier.width(4.dp))
             }
             Text(
                 text = artist.orEmpty(),
@@ -65,6 +70,6 @@ fun MarqueeTextMediaDisplayPreview() {
     MarqueeTextMediaDisplay(
         title = "Title",
         artist = "Artist",
-        isPlaybackError = false
+        isPlaybackError = true
     )
 }
