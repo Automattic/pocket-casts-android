@@ -3,8 +3,10 @@ package au.com.shiftyjelly.pocketcasts.models.to
 import android.content.Context
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping.Season.getSeasonGroupId
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((PodcastEpisode) -> Int)?) {
@@ -43,8 +45,8 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
             return groupTitlesList.getOrNull(index) ?: context.getString(LR.string.podcast_no_season)
         }
 
-        override fun formGroups(episodes: List<PodcastEpisode>, reversedSort: Boolean, resources: Resources): List<List<PodcastEpisode>> {
-            val list = super.formGroups(episodes, reversedSort, resources)
+        override fun formGroups(episodes: List<PodcastEpisode>, podcast: Podcast, resources: Resources): List<List<PodcastEpisode>> {
+            val list = super.formGroups(episodes, podcast, resources)
             val titleList = mutableListOf<String>()
             list.forEach {
                 val firstEpisode = it.firstOrNull()
@@ -81,7 +83,9 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
      * @param episodes A sorted list of episodes
      * @return A pair of episodes and their group indexes
      */
-    open fun formGroups(episodes: List<PodcastEpisode>, reversedSort: Boolean = false, resources: Resources): List<List<PodcastEpisode>> {
+    open fun formGroups(episodes: List<PodcastEpisode>, podcast: Podcast, resources: Resources): List<List<PodcastEpisode>> {
+        val reversedSort = podcast.podcastGrouping is Season &&
+            podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
         val sortFunction = this.sortFunction ?: return listOf(episodes)
         val groups = mutableListOf<MutableList<PodcastEpisode>>()
 

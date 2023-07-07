@@ -26,7 +26,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -1159,7 +1161,7 @@ open class PlaybackManager @Inject constructor(
 
             // First check if it is a podcast uuid, then check if it is from a filter
             else -> podcastManager.findPodcastByUuid(lastPodcastOrFilterUuid)?.let { podcast ->
-                episodeManager.findEpisodesByPodcastOrdered(podcast)
+                autoPlayOrderForPodcastEpisodes(podcast)
             } ?: playlistManager.findByUuid(lastPodcastOrFilterUuid)?.let { playlist ->
                 playlistManager.findEpisodes(playlist, episodeManager, this)
             }
@@ -1186,6 +1188,37 @@ open class PlaybackManager @Inject constructor(
             AppPlatform.Phone,
             AppPlatform.WearOs -> null
         }
+    }
+
+    private fun autoPlayOrderForPodcastEpisodes(podcast: Podcast): List<PodcastEpisode> {
+        val episodes = episodeManager
+            .findEpisodesByPodcastOrdered(podcast)
+
+        val modifiedEpisodes = when (podcast.podcastGrouping) {
+            PodcastGrouping.None,
+            PodcastGrouping.Season,
+            PodcastGrouping.Starred -> episodes
+
+            // Move just played episode back to downloaded group for purposes of finding the next episode to play
+            PodcastGrouping.Downloaded ->
+                episodes.map {
+                    if (it.uuid == lastPlayedEpisodeUuid) {
+                        it.copy(episodeStatus = EpisodeStatusEnum.DOWNLOADED)
+                    } else it
+                }
+
+            // Move just played episode back to unplayed group for purposes of finding the next episode to play
+            PodcastGrouping.Unplayed ->
+                episodes.map {
+                    if (it.uuid == lastPlayedEpisodeUuid) {
+                        it.copy(playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+                    } else it
+                }
+        }
+
+        return podcast.podcastGrouping
+            .formGroups(modifiedEpisodes, podcast, application.resources)
+            .flatten()
     }
 
     private suspend fun sleep(episode: BaseEpisode?) {
