@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,9 +45,13 @@ fun MarqueeTextMediaDisplay(
             textAlign = TextAlign.Center
         )
         Row(modifier = Modifier.fillMaxWidth(0.8f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            val textStyle = MaterialTheme.typography.caption3
             if (isPlaybackError) {
+                val imageSize = with(LocalDensity.current) {
+                    textStyle.fontSize.toDp()
+                }
                 Image(
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(imageSize),
                     painter = painterResource(id = IR.drawable.playback_error),
                     contentDescription = stringResource(id = LR.string.podcast_episode_playback_error),
                 )
@@ -58,7 +63,7 @@ fun MarqueeTextMediaDisplay(
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                style = MaterialTheme.typography.caption3
+                style = textStyle
             )
         }
     }
