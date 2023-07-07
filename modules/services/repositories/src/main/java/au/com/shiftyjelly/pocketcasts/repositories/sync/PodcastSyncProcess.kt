@@ -325,7 +325,7 @@ class PodcastSyncProcess(
         }
     }
 
-    fun uploadPlaylistChanges(records: JSONArray) {
+    private fun uploadPlaylistChanges(records: JSONArray) {
         try {
             val playlists = playlistManager.findPlaylistsToSync()
             for (playlist in playlists) {
@@ -406,7 +406,7 @@ class PodcastSyncProcess(
         }
     }
 
-    fun uploadPodcastChanges(records: JSONArray) {
+    private fun uploadPodcastChanges(records: JSONArray) {
         try {
             val podcasts = podcastManager.findPodcastsToSync()
             for (podcast in podcasts) {
@@ -437,7 +437,7 @@ class PodcastSyncProcess(
         }
     }
 
-    fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
+    private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
             val episodes = episodeManager.findEpisodesToSync()
             episodes.forEach { episode ->
@@ -648,7 +648,7 @@ class PodcastSyncProcess(
         }
     }
 
-    fun importPlaylist(sync: Playlist): Maybe<Playlist> {
+    private fun importPlaylist(sync: Playlist): Maybe<Playlist> {
         return Maybe.fromCallable<Playlist> {
             val uuid = sync.uuid
             if (uuid.isBlank()) {
@@ -844,7 +844,6 @@ class PodcastSyncProcess(
 
     private fun importBookmark(bookmark: Bookmark): Completable {
         return rxCompletable {
-            Timber.i("PHILIP $bookmark")
             if (bookmark.deleted) {
                 bookmarkManager.deleteSynced(bookmark.uuid)
             } else {
