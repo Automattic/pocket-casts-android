@@ -25,8 +25,7 @@ object AccountConstants {
     }
 }
 
-@JvmInline
-value class AccessToken(val value: String) {
+data class AccessToken(val value: String) {
     object Adapter : JsonAdapter<AccessToken>() {
         override fun fromJson(reader: JsonReader) = AccessToken(reader.nextString())
 

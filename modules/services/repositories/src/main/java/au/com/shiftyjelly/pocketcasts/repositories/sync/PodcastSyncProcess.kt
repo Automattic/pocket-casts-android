@@ -25,7 +25,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.FolderResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
@@ -62,7 +62,7 @@ class PodcastSyncProcess(
     var statsManager: StatsManager,
     var fileStorage: FileStorage,
     var playbackManager: PlaybackManager,
-    var podcastCacheServerManager: PodcastCacheServerManagerImpl,
+    var podcastCacheServerManager: PodcastCacheServerManager,
     var userEpisodeManager: UserEpisodeManager,
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
@@ -116,7 +116,7 @@ class PodcastSyncProcess(
             }
     }
 
-    private fun performIncrementalSync(lastModified: String): Completable {
+    fun performIncrementalSync(lastModified: String): Completable {
         val uploadData = uploadChanges()
         val uploadObservable = syncManager.syncUpdate(uploadData.first, lastModified)
         val downloadObservable = uploadObservable.flatMap {
@@ -325,7 +325,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun uploadPlaylistChanges(records: JSONArray) {
+    fun uploadPlaylistChanges(records: JSONArray) {
         try {
             val playlists = playlistManager.findPlaylistsToSync()
             for (playlist in playlists) {
@@ -406,7 +406,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun uploadPodcastChanges(records: JSONArray) {
+    fun uploadPodcastChanges(records: JSONArray) {
         try {
             val podcasts = podcastManager.findPodcastsToSync()
             for (podcast in podcasts) {
@@ -437,7 +437,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
+    fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
             val episodes = episodeManager.findEpisodesToSync()
             episodes.forEach { episode ->
@@ -648,7 +648,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun importPlaylist(sync: Playlist): Maybe<Playlist> {
+    fun importPlaylist(sync: Playlist): Maybe<Playlist> {
         return Maybe.fromCallable<Playlist> {
             val uuid = sync.uuid
             if (uuid.isBlank()) {
@@ -757,7 +757,7 @@ class PodcastSyncProcess(
         return Maybe.just(podcast)
     }
 
-    private fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
+    fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
         val uuid = episodeSync.uuid ?: return Maybe.empty()
 
         // check if the episode already exists
@@ -844,6 +844,7 @@ class PodcastSyncProcess(
 
     private fun importBookmark(bookmark: Bookmark): Completable {
         return rxCompletable {
+            Timber.i("PHILIP $bookmark")
             if (bookmark.deleted) {
                 bookmarkManager.deleteSynced(bookmark.uuid)
             } else {

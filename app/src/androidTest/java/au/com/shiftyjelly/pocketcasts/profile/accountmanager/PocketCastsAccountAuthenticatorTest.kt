@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
@@ -68,7 +68,7 @@ class PocketCastsAccountAuthenticatorTest {
             on { getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY) } doReturn AccountConstants.SignInType.Tokens.value
         }
         val tokenErrorNotification = mock<TokenErrorNotification>()
-        val syncAccountManager = SyncAccountManager(tokenErrorNotification, accountManager)
+        val syncAccountManager = SyncAccountManagerImpl(tokenErrorNotification, accountManager)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
 
         val syncManager = SyncManagerImpl(
