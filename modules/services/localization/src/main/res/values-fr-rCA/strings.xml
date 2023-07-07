@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-22 13:54:03+0000
+Translation-Revision-Date: 2023-07-05 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="bookmarks">Favoris</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Thèmes et icônes d’applications supplémentaires</string>
+    <string name="onboarding_plus_feature_watch_playback">Lecture sur la montre</string>
+    <string name="onboarding_patron_feature_early_access_title">Accès en avant-première aux fonctionnalités</string>
+    <string name="settings_continuous_playback_summary">Si votre file d’attente À écouter ensuite est vide, nous diffuserons les épisodes du même podcast ou de la même liste que ceux que vous écoutez actuellement.</string>
+    <string name="renew_your_subscription">Renouveler votre abonnement</string>
+    <string name="log_in_watch_from_phone_instructions_3">En cas de problème, assurez-vous que votre téléphone utilise la même version de Pocket Casts que votre montre (%s)</string>
+    <string name="log_in_free_acccount">%s utilise un compte gratuit</string>
+    <string name="player_play_failed_check_internet">Impossible de charger le podcast. Veuillez vérifier votre connexion internet, puis réessayez.</string>
+    <string name="empty_play_state">Choisissez un épisode pour commencer</string>
+    <string name="settings_beta_features">Fonctionnalités bêta</string>
     <string name="settings_watch_logs">Journaux de la montre</string>
     <string name="settings_help_phone_unavailable_message">Veuillez réessayer lorsque votre téléphone sera connecté à votre montre.</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">Si votre téléphone est actuellement jumelé avec votre montre, une fenêtre contextuelle avec vos journaux s’affichera.</string>
@@ -26,6 +37,8 @@ Language: fr
     <string name="error_invalid_email_address">Veuillez saisir une adresse e-mail valide.</string>
     <string name="settings_privacy_crash_link_short">Associer votre compte</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Veuillez vous connecter avec un compte Plus</string>
+    <string name="log_in_watch_requires_plus">Connectez-vous avec un compte Plus pour utiliser cette application ou souscrivez une option payante en vous rendant sur le site</string>
     <string name="enter_password">Saisissez un mot de passe</string>
     <string name="enter_email">Entrer l’adresse e-mail</string>
     <string name="player_effects_trim_level_down">Diminuer la sensibilité de coupe</string>
@@ -95,6 +108,7 @@ Language: fr
     <string name="podcasts_all">Tous les podcasts</string>
     <string name="search_results_all_podcasts">Tous les podcasts</string>
     <string name="search_results_all_episodes">Tous les épisodes</string>
+    <string name="search_history_row_type_episode_subtitle">Épisode \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Montrer tous</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>

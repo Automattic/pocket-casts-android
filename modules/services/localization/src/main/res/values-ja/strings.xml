@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-22 10:54:04+0000
+Translation-Revision-Date: 2023-07-05 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="bookmarks">ブックマーク</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">追加のテーマとアプリアイコン</string>
+    <string name="onboarding_plus_feature_watch_playback">Watch 再生</string>
+    <string name="onboarding_patron_feature_early_access_title">機能への早期アクセス</string>
+    <string name="settings_continuous_playback_summary">「\"次のエピソード」が空の場合、現在視聴中のポッドキャストと同じものまたはリストからエピソードを再生します。</string>
+    <string name="renew_your_subscription">サブスクリプションを更新</string>
+    <string name="log_in_watch_from_phone_instructions_3">問題が発生した場合は、スマートフォンでウォッチと同じバージョンの Pocket Casts が実行されていることを確認します (%s)</string>
+    <string name="log_in_free_acccount">%s では無料アカウントを使用しています</string>
+    <string name="player_play_failed_check_internet">ポッドキャストを読み込めませんでした。 ネットワーク接続を確認して、もう一度お試しください。</string>
+    <string name="empty_play_state">開始するエピソードを選ぶ</string>
+    <string name="settings_beta_features">ベータ版の機能</string>
     <string name="settings_watch_logs">Watch ログ</string>
     <string name="settings_help_phone_unavailable_message">スマートフォンがウォッチに接続されているときにもう一度お試しください。</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">スマートフォンが現在ペアリングされている場合は、ログのポップアップが表示されます</string>
@@ -26,6 +37,8 @@ Language: ja_JP
     <string name="error_invalid_email_address">有効なメールアドレスを入力してください。</string>
     <string name="settings_privacy_crash_link_short">アカウントをリンクする</string>
     <string name="settings_app_icon_pride_2023">プライド2023</string>
+    <string name="log_in_with_plus">Plus アカウントでログインしてください</string>
+    <string name="log_in_watch_requires_plus">Plus アカウントでログインしてこのアプリを使用するかアクセスをアップグレードする</string>
     <string name="enter_password">パスワードを入力</string>
     <string name="enter_email">メールアドレスを入力</string>
     <string name="player_effects_trim_level_down">カットレベルを下げる</string>
@@ -95,6 +108,7 @@ Language: ja_JP
     <string name="podcasts_all">すべてのポッドキャスト</string>
     <string name="search_results_all_podcasts">すべてのポッドキャスト</string>
     <string name="search_results_all_episodes">すべてのエピソード</string>
+    <string name="search_history_row_type_episode_subtitle">エピソード \u2022%1$s \u2022%2$s</string>
     <string name="search_show_all">すべて表示</string>
     <string name="podcast">ポッドキャスト</string>
     <string name="search_history_row_type_podcast_subtitle">ポッドキャスト \u2022 %s</string>

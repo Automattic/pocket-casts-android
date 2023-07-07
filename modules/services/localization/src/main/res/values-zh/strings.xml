@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-20 18:54:03+0000
+Translation-Revision-Date: 2023-07-05 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="bookmarks">书签</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">其他主题和应用图标</string>
+    <string name="onboarding_plus_feature_watch_playback">观看播放</string>
+    <string name="onboarding_patron_feature_early_access_title">抢先体验功能</string>
+    <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
+    <string name="renew_your_subscription">续订您的订阅</string>
+    <string name="log_in_watch_from_phone_instructions_3">如果您遇到问题，请确保您的手机运行的 Pocket Casts 版本与与手表相同 (%s)</string>
+    <string name="log_in_free_acccount">%s 正在使用免费账户</string>
+    <string name="player_play_failed_check_internet">无法加载播客。 请检查您的网络连接，然后重试。</string>
+    <string name="empty_play_state">选择一集以开始</string>
+    <string name="settings_beta_features">测试版功能</string>
     <string name="settings_watch_logs">Watch 日志</string>
     <string name="settings_help_phone_unavailable_message">请在手机连接手表后重试。</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">如果您的手机当前已配对，它将显示一个包含日志的弹出窗口</string>
@@ -26,6 +37,8 @@ Language: zh_CN
     <string name="error_invalid_email_address">请输入有效的电子邮箱地址。</string>
     <string name="settings_privacy_crash_link_short">关联您的账户</string>
     <string name="settings_app_icon_pride_2023">2023 年骄傲月</string>
+    <string name="log_in_with_plus">请使用 Plus 账户登录</string>
+    <string name="log_in_watch_requires_plus">使用 Plus 账户登录以使用此应用或升级访问</string>
     <string name="enter_password">输入密码</string>
     <string name="enter_email">输入电子邮件地址</string>
     <string name="player_effects_trim_level_down">降低功能级别</string>
@@ -95,6 +108,7 @@ Language: zh_CN
     <string name="podcasts_all">所有播客</string>
     <string name="search_results_all_podcasts">所有播客</string>
     <string name="search_results_all_episodes">所有剧集</string>
+    <string name="search_history_row_type_episode_subtitle">剧集 \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">显示所有</string>
     <string name="podcast">播客</string>
     <string name="search_history_row_type_podcast_subtitle">播客 \u2022 %s</string>

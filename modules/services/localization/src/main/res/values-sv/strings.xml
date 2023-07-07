@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-23 09:56:55+0000
+Translation-Revision-Date: 2023-07-04 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="bookmarks">Bokmärken</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Extra teman och appikoner</string>
+    <string name="onboarding_plus_feature_watch_playback">Watch-uppspelning</string>
+    <string name="onboarding_patron_feature_early_access_title">Tidig åtkomst till funktioner</string>
+    <string name="settings_continuous_playback_summary">Om din Nästa-kö är tom kommer vi att spela upp avsnitt från den podcast eller lista som du för närvarande lyssnar på.</string>
+    <string name="renew_your_subscription">Förnya din prenumeration</string>
+    <string name="log_in_watch_from_phone_instructions_3">Om du har problem, se till att din telefon kör samma version av Pocket Casts som din klocka (%s)</string>
+    <string name="log_in_free_acccount">%s använder ett gratiskonto</string>
+    <string name="player_play_failed_check_internet">Det gick inte att ladda podcasten. Kontrollera din internetanslutning och försök igen.</string>
+    <string name="empty_play_state">Välj ett avsnitt för att börja</string>
+    <string name="settings_beta_features">Betafunktioner</string>
     <string name="settings_watch_logs">Watch-loggar</string>
     <string name="settings_help_phone_unavailable_message">Försök igen när din telefon är ansluten till din klocka.</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">Om din telefon är parkopplad kommer ett popup-meddelande med dina loggar att visas</string>
@@ -27,6 +38,7 @@ Language: sv_SE
     <string name="settings_privacy_crash_link_short">Länka ditt konto</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
     <string name="log_in_with_plus">Logga in med ett Plus-konto</string>
+    <string name="log_in_watch_requires_plus">Logga in med ett Plus-konto för att använda den här appen eller uppgradera genom att besöka</string>
     <string name="enter_password">Ditt lösenord</string>
     <string name="enter_email">Ange e-post</string>
     <string name="player_effects_trim_level_down">Trimningsnivå upp</string>
@@ -96,6 +108,7 @@ Language: sv_SE
     <string name="podcasts_all">Alla podcasts</string>
     <string name="search_results_all_podcasts">Alla podcasts</string>
     <string name="search_results_all_episodes">Alla avsnitt</string>
+    <string name="search_history_row_type_episode_subtitle">Avsnitt \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Visa alla</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>

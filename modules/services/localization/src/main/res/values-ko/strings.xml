@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-21 09:54:03+0000
+Translation-Revision-Date: 2023-07-05 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="bookmarks">북마크</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">추가 테마 및 앱 아이콘</string>
+    <string name="onboarding_plus_feature_watch_playback">시계 재생</string>
+    <string name="onboarding_patron_feature_early_access_title">기능 조기 접근</string>
+    <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
+    <string name="renew_your_subscription">구독 갱신</string>
+    <string name="log_in_watch_from_phone_instructions_3">문제가 있는 경우 휴대폰에서 시계(%s)와 동일한 버전의 Pocket Casts를 실행하고 있는지 확인하세요.</string>
+    <string name="log_in_free_acccount">%s은(는) 무료 계정을 사용하고 있습니다.</string>
+    <string name="player_play_failed_check_internet">팟캐스트를 로드할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
+    <string name="empty_play_state">시작할 에피소드 선택</string>
+    <string name="settings_beta_features">베타 기능</string>
     <string name="settings_watch_logs">시계 로그</string>
     <string name="settings_help_phone_unavailable_message">스마트폰이 시계에 연결되면 다시 시도하세요.</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">스마트폰이 현재 페어링되어 있으면 로그가 있는 팝업이 표시됩니다.</string>
@@ -26,6 +37,8 @@ Language: ko_KR
     <string name="error_invalid_email_address">유효한 이메일 주소를 입력하세요.</string>
     <string name="settings_privacy_crash_link_short">계정 연결</string>
     <string name="settings_app_icon_pride_2023">프라이드 2023</string>
+    <string name="log_in_with_plus">Plus 계정으로 로그인하세요.</string>
+    <string name="log_in_watch_requires_plus">이 앱을 사용하거나 방문을 업그레이드하려면 Plus 계정으로 로그인하세요.</string>
     <string name="enter_password">비밀번호 입력</string>
     <string name="enter_email">이메일 입력</string>
     <string name="player_effects_trim_level_down">트리밍 레벨 낮추기</string>
@@ -95,6 +108,7 @@ Language: ko_KR
     <string name="podcasts_all">모든 팟캐스트</string>
     <string name="search_results_all_podcasts">모든 팟캐스트</string>
     <string name="search_results_all_episodes">모든 에피소드</string>
+    <string name="search_history_row_type_episode_subtitle">에피소드 \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">모두 보기</string>
     <string name="podcast">팟캐스트</string>
     <string name="search_history_row_type_podcast_subtitle">팟캐스트 \u2022 %s</string>
