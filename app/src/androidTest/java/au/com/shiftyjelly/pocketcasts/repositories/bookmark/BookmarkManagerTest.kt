@@ -70,7 +70,7 @@ class BookmarkManagerTest {
         runTest {
             val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
             bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
-            val bookmarks = bookmarkManager.findEpisodeBookmarks(episode)
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode).take(1).first()
             assertEquals(1, bookmarks.size)
             assertEquals(bookmarkOne.uuid, bookmarks[0].uuid)
         }

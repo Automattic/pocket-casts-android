@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface BookmarkManager {
     suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String): Bookmark
     suspend fun findBookmark(bookmarkUuid: String): Bookmark?
-    suspend fun findEpisodeBookmarks(episode: BaseEpisode): List<Bookmark>
     suspend fun findEpisodeBookmarksFlow(episode: BaseEpisode): Flow<List<Bookmark>>
     suspend fun deleteToSync(bookmarkUuid: String)
     suspend fun deleteSynced(bookmarkUuid: String)

@@ -55,13 +55,6 @@ class BookmarkManagerImpl @Inject constructor(
     }
 
     /**
-     * Find all bookmarks for the given episode.
-     */
-    override suspend fun findEpisodeBookmarks(episode: BaseEpisode): List<Bookmark> {
-        return bookmarkDao.findByEpisode(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid)
-    }
-
-    /**
      * Find all bookmarks for the given episode. The flow will be updated when the bookmarks change.
      */
     override suspend fun findEpisodeBookmarksFlow(episode: BaseEpisode): Flow<List<Bookmark>> {

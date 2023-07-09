@@ -222,8 +222,8 @@ class PodcastSyncProcessTest {
             // check new bookmarks are added
             val newBookmark = bookmarkManager.findBookmark(bookmarkUuidToAdd)
             assertNotNull("Bookmark should have been added", newBookmark)
-            assertEquals("New bookmark podcast UUID doesn't match", "e979cf2f-58f2-4f47-8ad7-b9b58d511346", newBookmark?.podcastUuid)
-            assertEquals("New bookmark episode UUID doesn't match", "b70fcdf2-dc04-44b1-8829-1028374fc656", newBookmark?.episodeUuid)
+            assertEquals("New bookmark podcast UUID should match", "e979cf2f-58f2-4f47-8ad7-b9b58d511346", newBookmark?.podcastUuid)
+            assertEquals("New bookmark episode UUID should match", "b70fcdf2-dc04-44b1-8829-1028374fc656", newBookmark?.episodeUuid)
             assertEquals("2023-06-16T02:04:35Z", newBookmark?.createdAt?.toIsoString())
             assertEquals("Bookmark Added", newBookmark?.title)
             assertEquals(875, newBookmark?.timeSecs)
