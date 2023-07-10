@@ -3,6 +3,14 @@
     android:persistent="true">
 
     <Preference
+        android:key="showkase"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:icon="@drawable/ic_heart_outline"
+        android:title="Showkase"
+        android:summary="Compose components"/>
+
+    <Preference
         android:key="forceRefresh"
         android:defaultValue="false"
         android:persistent="false"

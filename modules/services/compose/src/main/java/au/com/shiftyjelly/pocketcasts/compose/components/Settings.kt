@@ -29,12 +29,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.horizontalPadding
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.indentedStartPadding
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.verticalPadding
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 object SettingsSection {
@@ -229,6 +231,88 @@ private fun SettingSectionPreview(
                 ),
                 primaryTextEndDrawable = IR.drawable.ic_effects_plus,
             )
+        }
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
+@Composable
+fun SettingRowLightPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingRow(
+            primaryText = "Primary text",
+            secondaryText = "Secondary text",
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Dark")
+@Preview(name = "Dark")
+@Composable
+fun SettingRowDarkPreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        SettingRow(
+            primaryText = "Primary text",
+            secondaryText = "Secondary text",
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon")
+@Preview(name = "Icon")
+@Composable
+fun SettingRowIconPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingRow(
+            primaryText = "Row with icon",
+            icon = GradientIconData(IR.drawable.ic_profile_settings)
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Switch")
+@Preview(name = "Switch")
+@Composable
+fun SettingRowSwitchPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingRow(
+            primaryText = "Row with switch",
+            toggle = SettingRowToggle.Switch(checked = true)
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Checkbox")
+@Preview(name = "Checkbox")
+@Composable
+fun SettingRowCheckboxPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingRow(
+            primaryText = "Row with checkbox",
+            toggle = SettingRowToggle.Checkbox(checked = true)
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingSection", group = "Setting", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
+@Composable
+fun SettingSectionLightPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingSection(heading = "Section heading") {
+            SettingRow(primaryText = "Setting row")
+        }
+    }
+}
+
+@ShowkaseComposable(name = "SettingSection", group = "Setting", styleName = "Dark")
+@Preview(name = "Dark")
+@Composable
+fun SettingSectionDarkPreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        SettingSection(heading = "Section heading") {
+            SettingRow(primaryText = "Setting row")
         }
     }
 }

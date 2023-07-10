@@ -354,7 +354,7 @@ fun TextC70(
 
 @Preview(showBackground = true)
 @Composable
-fun TextStylesLightPreview() {
+private fun TextStylesLightPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         TextStylesPreview()
     }
@@ -362,7 +362,7 @@ fun TextStylesLightPreview() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun TextStylesDarkPreview() {
+private fun TextStylesDarkPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         TextStylesPreview()
     }
