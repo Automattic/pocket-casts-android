@@ -101,18 +101,37 @@ class ServersModule {
 
             return builder.build()
         }
+
+        fun provideCache(folder: String, context: Context): Cache {
+            val cacheSize = 10 * 1024 * 1024 // 10 MB
+            val cacheDirectory = File(context.cacheDir.absolutePath, folder)
+            return Cache(cacheDirectory, cacheSize.toLong())
+        }
+
+        fun provideRetrofit(baseUrl: String, okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+            return Retrofit.Builder()
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl(baseUrl)
+                .client(okHttpClient)
+                .build()
+        }
+
+        fun provideMoshiBuilder(): Moshi.Builder {
+            return Moshi.Builder()
+                .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
+                .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
+                .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
+                .add(AccessToken::class.java, AccessToken.Adapter)
+                .add(RefreshToken::class.java, RefreshToken.Adapter)
+        }
     }
 
     @Provides
     @Singleton
-    internal fun provideMoshiBuilder(): Moshi.Builder {
-        return Moshi.Builder()
-            .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-            .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
-            .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
-            .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
-            .add(AccessToken::class.java, AccessToken.Adapter)
-            .add(RefreshToken::class.java, RefreshToken.Adapter)
+    internal fun provideMoshiBuilderInternal(): Moshi.Builder {
+        return provideMoshiBuilder()
     }
 
     @Provides
@@ -125,9 +144,7 @@ class ServersModule {
     @SyncServerCache
     @Singleton
     internal fun provideSyncServerCache(@ApplicationContext context: Context): Cache {
-        val cacheSize = 10 * 1024 * 1024 // 10 MB
-        val cacheDirectory = File(context.cacheDir.absolutePath, "HttpCache")
-        return Cache(cacheDirectory, cacheSize.toLong())
+        return provideCache(folder = "HttpCache", context = context)
     }
 
     @Provides
@@ -245,12 +262,7 @@ class ServersModule {
     @SyncServerRetrofit
     @Singleton
     internal fun provideApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_API_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_API_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
@@ -272,73 +284,45 @@ class ServersModule {
     @RefreshServerRetrofit
     @Singleton
     internal fun provideRefreshRetrofit(@NoCacheTokenedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_MAIN_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_MAIN_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
     @PodcastCacheServerRetrofit
     @Singleton
     internal fun providePodcastRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_CACHE_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_CACHE_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
     @StaticServerRetrofit
     @Singleton
     internal fun provideStaticRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_STATIC_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
     @ListDownloadServerRetrofit
     @Singleton
     internal fun provideListDownloadRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl(Settings.SERVER_LIST_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_LIST_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
     @ListUploadServerRetrofit
     @Singleton
     internal fun provideListUploadRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl(Settings.SERVER_SHARING_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_SHARING_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
     @DiscoverServerRetrofit
     @Singleton
-    internal fun provideRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshiBuilder: Moshi.Builder): Retrofit {
+    internal fun provideDiscoverRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshiBuilder: Moshi.Builder): Retrofit {
         moshiBuilder.add(ListTypeMoshiAdapter())
         moshiBuilder.add(DisplayStyleMoshiAdapter())
         moshiBuilder.add(ExpandedStyleMoshiAdapter())
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshiBuilder.build()))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_STATIC_URL)
-            .client(okHttpClient)
-            .build()
+        return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshiBuilder.build())
     }
 
     @Provides

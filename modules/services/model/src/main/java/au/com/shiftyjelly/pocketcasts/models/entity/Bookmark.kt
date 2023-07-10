@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import java.io.Serializable
 import java.util.Date
 
@@ -18,14 +19,10 @@ data class Bookmark(
     @ColumnInfo(name = "podcast_uuid") var podcastUuid: String,
     @ColumnInfo(name = "episode_uuid") var episodeUuid: String,
     @ColumnInfo(name = "time") var timeSecs: Int,
-    @ColumnInfo(name = "title") var title: String,
     @ColumnInfo(name = "created_at") var createdAt: Date,
+    @ColumnInfo(name = "title") var title: String,
+    @ColumnInfo(name = "title_modified") var titleModified: Long? = null,
     @ColumnInfo(name = "deleted") var deleted: Boolean = false,
-    @ColumnInfo(name = "sync_status") var syncStatus: Int
-) : Serializable {
-
-    companion object {
-        const val SYNC_STATUS_NOT_SYNCED = 0
-        const val SYNC_STATUS_SYNCED = 1
-    }
-}
+    @ColumnInfo(name = "deleted_modified") var deletedModified: Long? = null,
+    @ColumnInfo(name = "sync_status") var syncStatus: SyncStatus
+) : Serializable

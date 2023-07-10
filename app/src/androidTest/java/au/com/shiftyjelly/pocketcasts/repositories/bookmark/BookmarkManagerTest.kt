@@ -4,8 +4,8 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
-import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
@@ -44,15 +44,35 @@ class BookmarkManagerTest {
         episodeDao.insert(episode)
 
         runTest {
-            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61)
+            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "Bookmark Title")
             val foundBookmark = bookmarkManager.findBookmark(bookmarkUuid = bookmark.uuid)
             assertNotNull(foundBookmark)
             assertEquals(episodeUuid, foundBookmark?.episodeUuid)
             assertEquals(podcastUuid, foundBookmark?.podcastUuid)
             assertEquals(61, foundBookmark?.timeSecs)
-            assertEquals(Bookmark.SYNC_STATUS_NOT_SYNCED, foundBookmark?.syncStatus)
+            assertEquals(SyncStatus.NOT_SYNCED, foundBookmark?.syncStatus)
+            assertEquals("Bookmark Title", foundBookmark?.title)
             assertNotNull(foundBookmark?.createdAt)
             assert(foundBookmark?.deleted == false)
+        }
+    }
+
+    /**
+     * Test more than one bookmark can't be added for the same episode.
+     */
+    @Test
+    fun addDuplicate() {
+        val episodeUuid = UUID.randomUUID().toString()
+        val podcastUuid = UUID.randomUUID().toString()
+        val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
+        episodeDao.insert(episode)
+
+        runTest {
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
+            bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode).take(1).first()
+            assertEquals(1, bookmarks.size)
+            assertEquals(bookmarkOne.uuid, bookmarks[0].uuid)
         }
     }
 
@@ -66,9 +86,9 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 61)
-            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 122)
-            val bookmarks = bookmarkManager.findEpisodeBookmarks(episode).take(1).first()
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 61, title = "")
+            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 122, title = "")
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode).take(1).first()
             assertEquals(2, bookmarks.size)
             val sortedBookmarks = bookmarks.sortedBy { it.timeSecs }
             assertEquals(bookmarkOne.uuid, sortedBookmarks[0].uuid)
@@ -86,12 +106,12 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61)
+            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "")
             bookmarkManager.deleteToSync(bookmark.uuid)
             val savedBookmark = bookmarkManager.findBookmark(bookmark.uuid)
             assertNotNull(savedBookmark)
             assertEquals(true, savedBookmark?.deleted)
-            assertEquals(Bookmark.SYNC_STATUS_NOT_SYNCED, savedBookmark?.syncStatus)
+            assertEquals(SyncStatus.NOT_SYNCED, savedBookmark?.syncStatus)
         }
     }
 
@@ -105,7 +125,7 @@ class BookmarkManagerTest {
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61)
+            val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "")
             bookmarkManager.deleteSynced(bookmark.uuid)
             val savedBookmark = bookmarkManager.findBookmark(bookmark.uuid)
             assertNull(savedBookmark)

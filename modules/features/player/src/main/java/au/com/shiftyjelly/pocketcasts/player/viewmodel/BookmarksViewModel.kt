@@ -37,7 +37,7 @@ class BookmarksViewModel
                     _uiState.value = UiState.PlusUpsell
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        bookmarkManager.findEpisodeBookmarks(episode)
+                        bookmarkManager.findEpisodeBookmarksFlow(episode)
                             .stateIn(viewModelScope)
                             .collect { bookmarks ->
                                 _uiState.value = if (bookmarks.isEmpty()) {

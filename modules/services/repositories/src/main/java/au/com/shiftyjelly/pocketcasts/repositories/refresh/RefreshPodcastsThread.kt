@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
@@ -66,6 +67,7 @@ class RefreshPodcastsThread(
         fun serverManager(): ServerManager
         fun podcastManager(): PodcastManager
         fun playlistManager(): PlaylistManager
+        fun bookmarkManager(): BookmarkManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
         fun podcastCacheServerManager(): PodcastCacheServerManagerImpl
@@ -240,6 +242,7 @@ class RefreshPodcastsThread(
             episodeManager = entryPoint.episodeManager(),
             podcastManager = entryPoint.podcastManager(),
             playlistManager = entryPoint.playlistManager(),
+            bookmarkManager = entryPoint.bookmarkManager(),
             statsManager = entryPoint.statsManager(),
             fileStorage = entryPoint.fileStorage(),
             playbackManager = playbackManager,

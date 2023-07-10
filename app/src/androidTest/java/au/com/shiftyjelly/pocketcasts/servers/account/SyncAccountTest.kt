@@ -5,14 +5,13 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
-import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -24,8 +23,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import java.io.File
 import java.net.HttpURLConnection
 
 internal class SyncAccountTest {
@@ -42,22 +39,14 @@ internal class SyncAccountTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val moshi = Moshi.Builder()
-            .add(AccessToken::class.java, AccessToken.Adapter)
-            .add(RefreshToken::class.java, RefreshToken.Adapter)
-            .build()
-
-        retrofit = Retrofit.Builder()
-            .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(OkHttpClient.Builder().build())
-            .build()
-
-        okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
+        val moshi = ServersModule.provideMoshiBuilder().build()
+        val okHttpClient = OkHttpClient.Builder().build()
+        retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
+        okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context)
 
         val accountManager = AccountManager.get(context)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
-        val syncAccountManager = SyncAccountManager(mock(), accountManager)
+        val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
             analyticsTracker = mock(),

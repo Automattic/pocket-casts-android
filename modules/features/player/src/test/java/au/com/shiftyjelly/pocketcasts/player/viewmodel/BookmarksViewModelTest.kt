@@ -64,7 +64,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given no bookmarks, when bookmarks loaded, then Empty state shown`() = runTest {
-        whenever(bookmarkManager.findEpisodeBookmarks(episode)).thenReturn(flowOf(emptyList()))
+        whenever(bookmarkManager.findEpisodeBookmarksFlow(episode)).thenReturn(flowOf(emptyList()))
 
         bookmarksViewModel.loadBookmarks(episodeUuid)
 
@@ -73,7 +73,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given bookmarks present, when bookmarks loaded, then Loaded state shown`() = runTest {
-        whenever(bookmarkManager.findEpisodeBookmarks(episode)).thenReturn(flowOf(listOf(mock())))
+        whenever(bookmarkManager.findEpisodeBookmarksFlow(episode)).thenReturn(flowOf(listOf(mock())))
 
         bookmarksViewModel.loadBookmarks(episodeUuid)
 

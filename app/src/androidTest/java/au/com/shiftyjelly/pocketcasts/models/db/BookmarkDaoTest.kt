@@ -6,6 +6,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest
@@ -47,7 +48,7 @@ class BookmarkDaoTest {
                     timeSecs = 61,
                     createdAt = Date(),
                     deleted = false,
-                    syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+                    syncStatus = SyncStatus.NOT_SYNCED,
                     title = ""
                 )
             )
@@ -66,23 +67,23 @@ class BookmarkDaoTest {
                 timeSecs = 61,
                 createdAt = Date(),
                 deleted = false,
-                syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+                syncStatus = SyncStatus.NOT_SYNCED,
                 title = ""
             )
             bookmarkDao.insert(bookmark)
 
             val createdBookmark = bookmarkDao.findByUuid(uuid)
             assert(createdBookmark?.deleted == false)
-            assert(createdBookmark?.syncStatus == Bookmark.SYNC_STATUS_NOT_SYNCED)
+            assert(createdBookmark?.syncStatus == SyncStatus.NOT_SYNCED)
 
             bookmark.deleted = true
-            bookmark.syncStatus = Bookmark.SYNC_STATUS_SYNCED
+            bookmark.syncStatus = SyncStatus.SYNCED
 
             bookmarkDao.update(bookmark)
 
             val updatedBookmark = bookmarkDao.findByUuid(uuid)
             assert(updatedBookmark?.deleted == true)
-            assert(updatedBookmark?.syncStatus == Bookmark.SYNC_STATUS_SYNCED)
+            assert(updatedBookmark?.syncStatus == SyncStatus.SYNCED)
         }
     }
 
@@ -97,7 +98,7 @@ class BookmarkDaoTest {
                 timeSecs = 61,
                 createdAt = Date(),
                 deleted = false,
-                syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+                syncStatus = SyncStatus.NOT_SYNCED,
                 title = ""
             )
             bookmarkDao.insert(bookmark)

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 77,
-    "identityHash": "d7557d1d32178062067db50a59193633",
+    "identityHash": "96779d849c7c41837aab040cf6d329f9",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -40,7 +40,7 @@
       },
       {
         "tableName": "bookmarks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `time` INTEGER NOT NULL, `title` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, `sync_status` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `time` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `title` TEXT NOT NULL, `title_modified` INTEGER, `deleted` INTEGER NOT NULL, `deleted_modified` INTEGER, `sync_status` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -67,22 +67,34 @@
             "notNull": true
           },
           {
-            "fieldPath": "title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "createdAt",
             "columnName": "created_at",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titleModified",
+            "columnName": "title_modified",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
             "fieldPath": "deleted",
             "columnName": "deleted",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "deletedModified",
+            "columnName": "deleted_modified",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "syncStatus",
@@ -1504,7 +1516,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd7557d1d32178062067db50a59193633')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96779d849c7c41837aab040cf6d329f9')"
     ]
   }
 }

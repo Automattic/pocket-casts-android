@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -421,7 +422,7 @@ private fun BookmarksPreview(
                         podcastUuid = UUID.randomUUID().toString(),
                         timeSecs = 10,
                         createdAt = Date(),
-                        syncStatus = 1,
+                        syncStatus = SyncStatus.SYNCED,
                         title = "Funny bit",
                     )
                 )
