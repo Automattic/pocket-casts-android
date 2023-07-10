@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -64,6 +65,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -72,6 +75,16 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    companion object {
+        private const val ARG_SCROLL_TO_AUTOPLAY = "scroll_to_autoplay"
+
+        fun newInstance(scrollToAutoPlay: Boolean = false): PlaybackSettingsFragment = PlaybackSettingsFragment().apply {
+            arguments = bundleOf(
+                ARG_SCROLL_TO_AUTOPLAY to scrollToAutoPlay
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,6 +95,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             AppThemeWithBackground(theme.activeTheme) {
                 PlaybackSettings(
                     settings = settings,
+                    scrollToAutoPlay = arguments?.getBoolean(ARG_SCROLL_TO_AUTOPLAY) ?: false,
                     onBackClick = {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
@@ -94,11 +108,24 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun PlaybackSettings(
         settings: Settings,
+        scrollToAutoPlay: Boolean,
         onBackClick: () -> Unit,
     ) {
 
         LaunchedEffect(Unit) {
             analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_SHOWN)
+        }
+
+        val scrollState = rememberScrollState()
+        val scrollToAutoPlayDelay = 300.milliseconds
+
+        LaunchedEffect(scrollToAutoPlay) {
+            if (scrollToAutoPlay) {
+                // Add a slight delay so the user sees the scroll
+                delay(scrollToAutoPlayDelay)
+                // Scroll to the end of the list
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
         }
 
         Column {
@@ -110,7 +137,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.theme.colors.primaryUi02)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
             ) {
                 SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {
 
@@ -275,8 +302,17 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     if (FeatureFlag.isEnabled(Feature.AUTO_PLAY_UP_NEXT_SETTING)) {
+                        // The [scrollToAutoPlay] fragment argument handling depends on this item being last
+                        // in the list. If it's position is changed, make sure you update the handling when
+                        // we scroll to this item as well.
                         AutoPlayNextOnEmpty(
                             saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
+                            showFlashWithDelay = if (scrollToAutoPlay) {
+                                // Have flash occur after scroll to autoplay
+                                scrollToAutoPlayDelay * 2
+                            } else {
+                                null
+                            },
                             onSave = {
                                 analyticsTracker.track(
                                     AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
@@ -521,11 +557,16 @@ class PlaybackSettingsFragment : BaseFragment() {
         )
 
     @Composable
-    private fun AutoPlayNextOnEmpty(saved: Boolean, onSave: (Boolean) -> Unit) =
+    private fun AutoPlayNextOnEmpty(
+        saved: Boolean,
+        showFlashWithDelay: Duration?,
+        onSave: (Boolean) -> Unit,
+    ) =
         SettingRow(
             primaryText = stringResource(LR.string.settings_autoplay),
             secondaryText = stringResource(LR.string.settings_continuous_playback_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
+            showFlashWithDelay = showFlashWithDelay,
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
 
