@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -25,9 +27,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.HeadphoneAction
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -47,7 +51,17 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                val previousAction = settings.headphonePreviousActionFlow.collectAsState().value
+                val nextAction = settings.headphoneNextActionFlow.collectAsState().value
+                val confirmationSound = settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value
+
                 HeadphoneControlsSettingsPage(
+                    previousAction = previousAction,
+                    nextAction = nextAction,
+                    onPreviousActionSave = { settings.setHeadphoneControlsPreviousAction(it) },
+                    onNextActionSave = { settings.setHeadphoneControlsNextAction(it) },
+                    confirmationSound = confirmationSound,
+                    onConfirmationSoundSave = { settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it) },
                     onBackPressed = {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
@@ -59,6 +73,12 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
 
     @Composable
     private fun HeadphoneControlsSettingsPage(
+        previousAction: HeadphoneAction,
+        nextAction: HeadphoneAction,
+        onPreviousActionSave: (HeadphoneAction) -> Unit,
+        onNextActionSave: (HeadphoneAction) -> Unit,
+        confirmationSound: Boolean,
+        onConfirmationSoundSave: (Boolean) -> Unit,
         onBackPressed: () -> Unit,
     ) {
         Column {
@@ -77,23 +97,17 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                     modifier = Modifier.padding(16.dp)
                 )
                 PreviousActionRow(
-                    saved = settings.headphonePreviousActionFlow.collectAsState().value,
-                    onSave = {
-                        settings.setHeadphoneControlsPreviousAction(it)
-                    }
+                    saved = previousAction,
+                    onSave = onPreviousActionSave
                 )
                 NextActionRow(
-                    saved = settings.headphoneNextActionFlow.collectAsState().value,
-                    onSave = {
-                        settings.setHeadphoneControlsNextAction(it)
-                    }
+                    saved = nextAction,
+                    onSave = onNextActionSave
                 )
-                if (shouldShowConfirmationSoundRow()) {
+                if (previousAction == HeadphoneAction.ADD_BOOKMARK || nextAction == HeadphoneAction.ADD_BOOKMARK) {
                     ConfirmationSoundRow(
-                        saved = settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value,
-                        onSave = {
-                            settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it)
-                        }
+                        saved = confirmationSound,
+                        onSave = onConfirmationSoundSave
                     )
                 }
             }
@@ -162,8 +176,21 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         HeadphoneAction.PREVIOUS_CHAPTER -> LR.string.settings_headphone_controls_choice_previous_chapter
     }
 
+    @Preview
     @Composable
-    private fun shouldShowConfirmationSoundRow() =
-        (settings.headphoneNextActionFlow.collectAsState().value == HeadphoneAction.ADD_BOOKMARK) ||
-            (settings.headphonePreviousActionFlow.collectAsState().value == HeadphoneAction.ADD_BOOKMARK)
+    private fun OnboardingCreateAccountPagePreview(
+        @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+    ) {
+        AppThemeWithBackground(themeType) {
+            HeadphoneControlsSettingsPage(
+                previousAction = HeadphoneAction.SKIP_BACK,
+                nextAction = HeadphoneAction.ADD_BOOKMARK,
+                onPreviousActionSave = {},
+                onNextActionSave = {},
+                confirmationSound = true,
+                onConfirmationSoundSave = {},
+                onBackPressed = {}
+            )
+        }
+    }
 }
