@@ -100,6 +100,9 @@ class SettingsImpl @Inject constructor(
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
     override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
     override val autoPlayNextEpisodeOnEmptyFlow = MutableStateFlow(getAutoPlayNextEpisodeOnEmpty())
+    override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
+    override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
+    override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1068,6 +1071,33 @@ class SettingsImpl @Inject constructor(
     override fun setTapOnUpNextShouldPlay(value: Boolean) {
         setBoolean("tap_on_up_next_should_play", value)
         tapOnUpNextShouldPlayFlow.update { value }
+    }
+
+    override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
+        return Settings.HeadphoneAction.values()[getInt("headphone_controls_next_action", Settings.HeadphoneAction.SKIP_FORWARD.ordinal)]
+    }
+
+    override fun setHeadphoneControlsNextAction(action: Settings.HeadphoneAction) {
+        setInt("headphone_controls_next_action", action.ordinal)
+        headphoneNextActionFlow.update { action }
+    }
+
+    override fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
+        return Settings.HeadphoneAction.values()[getInt("headphone_controls_previous_action", Settings.HeadphoneAction.SKIP_BACK.ordinal)]
+    }
+
+    override fun setHeadphoneControlsPreviousAction(action: Settings.HeadphoneAction) {
+        setInt("headphone_controls_previous_action", action.ordinal)
+        headphonePreviousActionFlow.update { action }
+    }
+
+    override fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean {
+        return getBoolean("headphone_controls_play_bookmark_confirmation_sound", true)
+    }
+
+    override fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean) {
+        setBoolean("headphone_controls_play_bookmark_confirmation_sound", value)
+        headphonePlayBookmarkConfirmationSoundFlow.update { value }
     }
 
     override fun defaultShowArchived(): Boolean {
