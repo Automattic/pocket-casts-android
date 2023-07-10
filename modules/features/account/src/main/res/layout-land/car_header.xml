@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -13,8 +12,8 @@
         android:background="?attr/actionBarItemBackground"
         android:contentDescription="@string/cancel"
         android:scaleType="fitCenter"
-        android:tint="?attr/primary_icon_01"
         android:padding="20dp"
+        app:tint="?attr/primary_icon_01"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_cancel" />
