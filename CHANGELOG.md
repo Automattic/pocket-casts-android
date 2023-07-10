@@ -8,6 +8,8 @@
 *   Bug Fixes:
     *   Fixed crash that could occur when rearranging shelf items on the full screen player
         ([#1155](https://github.com/Automattic/pocket-casts-android/pull/1155)).
+    *   Fixed the acknowledgements being hidden in the Automotive about page.
+        ([#1166](https://github.com/Automattic/pocket-casts-android/pull/1166)).
 
 7.42
 -----
