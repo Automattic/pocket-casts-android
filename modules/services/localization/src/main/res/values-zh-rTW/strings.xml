@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-20 09:54:03+0000
+Translation-Revision-Date: 2023-07-04 14:10:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="bookmarks">書籤</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">其他主題和應用程式圖示</string>
+    <string name="onboarding_plus_feature_watch_playback">手錶播放</string>
+    <string name="onboarding_patron_feature_early_access_title">搶先使用新功能</string>
+    <string name="settings_continuous_playback_summary">如果「接下來播放」佇列是空的，我們會播放你正在聆聽的同一個 Podcast 或清單內的單集。</string>
+    <string name="renew_your_subscription">續訂</string>
+    <string name="log_in_watch_from_phone_instructions_3">如果遇到問題，請確認手機執行的 Pocket Casts 版本與手錶 (%s) 相同</string>
+    <string name="log_in_free_acccount">%s 正在使用免費帳號</string>
+    <string name="player_play_failed_check_internet">無法載入 Podcast。 請檢查你的網際網路連線並再試一次。</string>
+    <string name="empty_play_state">挑選單集以開始</string>
+    <string name="settings_beta_features">Beta 功能</string>
     <string name="settings_watch_logs">手錶記錄</string>
     <string name="settings_help_phone_unavailable_message">請將手機連結至手錶後再試一次。</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">如果你的手機目前已完成配對，手機畫面就會顯示包含記錄的快顯視窗</string>
@@ -26,11 +37,13 @@ Language: zh_TW
     <string name="error_invalid_email_address">請輸入有效的電子郵件地址。</string>
     <string name="settings_privacy_crash_link_short">連結你的帳號</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">請使用 Plus 帳號登入</string>
+    <string name="log_in_watch_requires_plus">使用 Plus 帳號登入即可使用此應用程式，或升級以造訪</string>
     <string name="enter_password">輸入密碼</string>
     <string name="enter_email">輸入電子郵件地址</string>
-    <string name="player_effects_trim_level_down">剪輯程度降低</string>
-    <string name="player_effects_trim_level_up">剪輯程度提高</string>
-    <string name="effects">效果</string>
+    <string name="player_effects_trim_level_down">剪去程度降低</string>
+    <string name="player_effects_trim_level_up">剪去程度提高</string>
+    <string name="effects">特效</string>
     <string name="profile_hi">%s，你好</string>
     <string name="settings_take_me_there">帶我前往</string>
     <string name="settings_forums_description">請前往 Pocket Casts 的論壇 (%1$s)，我們的支援團隊可為你提供協助。</string>
@@ -56,10 +69,10 @@ Language: zh_TW
     <string name="trial_then_per_month">試用只要 %1$s，接著每月 %2$s</string>
     <string name="trial_start">開始我的免費試用</string>
     <string name="subscribe_to">訂閱 %s</string>
-    <string name="settings_description_advanced">這些設定為實驗性功能。 我們建議大部分的使用者不要變更這些設定的預設值。</string>
+    <string name="settings_description_advanced">這些設定為實驗性功能。建議大部分使用者無需變更這些設定的預設值。</string>
     <string name="player_up_next_empty_desc_watch">你可以在單集詳細資料畫面中，將單集加入接下來要播放的佇列。</string>
-    <string name="settings_advanced_sync_on_metered_summary">允許在計量付費網路自動背景同步處理。 此功能預設為啟用，如果關閉背景重新整理則無效。</string>
-    <string name="settings_advanced_sync_on_metered">在計量付費網路同步處理</string>
+    <string name="settings_advanced_sync_on_metered_summary">允許在使用計費網路時自動進行背景同步處理。此功能預設為啟用；如果關閉背景重新整理則無效。</string>
+    <string name="settings_advanced_sync_on_metered">使用計費網路來同步處理</string>
     <string name="settings_title_advanced">進階</string>
     <string name="profile_logging_in">正在登入…</string>
     <string name="episode_downloading">正在下載</string>
@@ -82,7 +95,7 @@ Language: zh_TW
     <string name="wear_show_password">顯示密碼</string>
     <string name="wear_hide_password">隱藏密碼</string>
     <string name="settings_metered_data_warning">計量付費數據警告</string>
-    <string name="stream_warning_summary_short">將使用行動數據串流。 要繼續嗎？</string>
+    <string name="stream_warning_summary_short">將使用行動數據串流。要繼續嗎？</string>
     <string name="removed">已移除</string>
     <string name="mark_unplayed">標記為未播放</string>
     <string name="log_out">登出</string>
@@ -95,6 +108,7 @@ Language: zh_TW
     <string name="podcasts_all">所有 Podcast</string>
     <string name="search_results_all_podcasts">所有 Podcast</string>
     <string name="search_results_all_episodes">所有單集</string>
+    <string name="search_history_row_type_episode_subtitle">單集 \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">顯示全部</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
@@ -155,7 +169,7 @@ Language: zh_TW
     <string name="onboarding_plus_can_be_canceled_at_any_time">可隨時取消。</string>
     <string name="profile_cancel_confirm_cancel_button_title">是，請取消我的訂閱」</string>
     <string name="profile_cancel_confirm_stay_button_title">實際上，我想繼續訂閱」</string>
-    <string name="profile_cancel_confirm_item_web_player">你將無法再使用網頁瀏覽器或桌上型電腦存取 Pocket Casts。</string>
+    <string name="profile_cancel_confirm_item_web_player">你將無法再次透過瀏覽器或桌上型電腦來使用 Pocket Casts。</string>
     <string name="profile_cancel_confirm_item_uploads">系統會刪除上傳至你 Pocket Casts 帳號的所有檔案 (但會保留下載到行動裝置的檔案)。</string>
     <string name="profile_cancel_confirm_item_folders">你的資料夾將會移除，而資料夾內容會移回 Podcast 畫面中。</string>
     <string name="profile_cancel_confirm_item_plus">在此日期之後，Pocket Casts Plus 功能使用權限將會鎖定。</string>
@@ -176,10 +190,10 @@ Language: zh_TW
     <string name="onboarding_import_from_castbox_step_1">開啟 Castbox。</string>
     <string name="onboarding_import_from_other_apps">從其他應用程式匯入</string>
     <string name="onboarding_import_from_castbox">從 Castbox 匯入</string>
-    <string name="onboarding_coming_from_another_app">是其他應用程式的內容？ 匯入並收聽你的 Podcast 節目。 你可以稍後在設定中執行此操作。</string>
+    <string name="onboarding_coming_from_another_app">是其他應用程式的內容？匯入並收聽你的 Podcast 節目。稍後你就可以在設定中執行此操作。</string>
     <string name="onboarding_bring_your_podcasts">將 Podcast 節目隨身帶著聽。</string>
     <string name="onboarding_import_podcasts_button">匯入 Podcast 節目</string>
-    <string name="onboarding_import_podcasts_text">是其他應用程式的內容？ 將 Podcast 節目隨身帶著聽。</string>
+    <string name="onboarding_import_podcasts_text">是其他應用程式的內容？將 Podcast 節目隨身帶著聽。</string>
     <string name="onboarding_import_podcasts_title">匯入你的 Podcast 節目</string>
     <string name="onboarding_continue_with_google_error">無法啟動 Google 登入。</string>
     <string name="onboarding_find_podcasts">尋找 Podcast</string>
@@ -188,26 +202,26 @@ Language: zh_TW
     <string name="onboarding_welcome_recommendations_title">探索新事物</string>
     <string name="onboarding_welcome_get_you_listening_plus">謝謝，立刻讓你聽聽看！</string>
     <string name="onboarding_welcome_get_you_listening">歡迎，立刻讓你聽聽看！</string>
-    <string name="onboarding_plus_recurring_after_free_trial">週期性付款將在你 %s 之後開始</string>
+    <string name="onboarding_plus_recurring_after_free_trial">定期付款將在你 %s 之後開始</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">開始免費試用和訂閱</string>
-    <string name="onboarding_plus_terms_and_conditions">條款與條件</string>
+    <string name="onboarding_plus_terms_and_conditions">條款與細則</string>
     <string name="onboarding_plus_privacy_policy">隱私權政策</string>
     <string name="onboarding_plus_continuing_agrees_to">繼續即表示你同意我們的%1$s和%2$s。</string>
-    <string name="onboarding_plus_become_a_plus_member">成為 Plus 會員並解鎖所有 Pocket Casts 功能</string>
+    <string name="onboarding_plus_become_a_plus_member">成為 Plus 會員並開始使用所有 Pocket Casts 功能</string>
     <string name="onboarding_sign_up">註冊</string>
-    <string name="onboarding_create_account">建立帳號</string>
+    <string name="onboarding_create_account">註冊帳號</string>
     <string name="onboarding_log_in">登入</string>
     <string name="plus_trial_duration_free_trial">%s 免費試用</string>
-    <string name="end_of_year_stories_failed">無法載入你的年終故事，請檢查網際網路連線</string>
+    <string name="end_of_year_stories_failed">無法載入你的年度回顧，請檢查網際網路連線</string>
     <string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
     <string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB 雲端儲存空間</string>
-    <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並在所有裝置間同步。</string>
+    <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並同步到所有裝置。</string>
     <string name="onboarding_plus_feature_folders_title">資料夾</string>
-    <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，在更多地方收聽。</string>
+    <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，享受更多元的收聽方式。</string>
     <string name="onboarding_plus_feature_desktop_apps_title">桌面應用程式</string>
-    <string name="onboarding_upgrade_unlock_all_features">解鎖所有功能</string>
+    <string name="onboarding_upgrade_unlock_all_features">使用所有功能</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">使用獨家功能和自訂選項</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">包含所有你喜愛的 Pocket Casts 功能，以及更多好康</string>
     <string name="onboarding_recommendations_import">匯入</string>
@@ -238,7 +252,7 @@ Language: zh_TW
     <string name="end_of_year_story_top_podcast_share_text">2022 年我最愛的 Podcast！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
     <string name="end_of_year_story_top_podcast">你最愛的 Podcast 是 %2$s 的「%1$s」</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2022 年收聽了 %1$d 個不同 Podcast 節目和 %2$d 集內容</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2022 年收聽了 %1$d 個不同 Podcast 節目、%2$d 集內容</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
     <string name="end_of_year_story_listened_to_numbers">你收聽了 %1$d 個不同 Podcast 節目和 %2$d 集內容</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2022 年收聽了 %1$d 個不同分類</string>
@@ -253,9 +267,9 @@ Language: zh_TW
     <string name="volume_boost_enabled_not_valid">「已啟用音量增強」的值必須為「true」或「false」，先前為  %1$s</string>
     <string name="volume_boost_enabled">已啟用音量增強</string>
     <string name="set_volume_boost">設定音量增強</string>
-    <string name="trim_silence_mode_not_valid">修剪無聲模式 %1$s 無效</string>
-    <string name="trim_silence_mode">修剪無聲模式</string>
-    <string name="set_trim_silence_mode">設定修剪無聲模式</string>
+    <string name="trim_silence_mode_not_valid">無聲修去模式 %1$s 無效</string>
+    <string name="trim_silence_mode">無聲修去模式</string>
+    <string name="set_trim_silence_mode">設定無聲修去模式</string>
     <string name="playback_speed_between_values">播放速度 (介於 0.5 到 3 倍之間)</string>
     <string name="set_playback_speed">設定播放速度</string>
     <string name="playback_speed_not_valid">播放速度 %1$s 無效</string>
@@ -287,7 +301,7 @@ Language: zh_TW
     <string name="must_provide_filter_name">必須提供篩選條件名稱</string>
     <string name="end_of_year_launch_modal_secondary_button_title">現在不要</string>
     <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2022 年</string>
-    <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。 與朋友分享，並向你最喜愛的創作者表達敬意！</string>
+    <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
     <string name="end_of_year_launch_modal_title">你的 Podcast 年度回顧</string>
     <string name="settings_app_icon_halloween">萬聖節</string>
     <string name="settings_show_played_summary">你已播放完畢的節目仍會顯示</string>
@@ -307,7 +321,7 @@ Language: zh_TW
     <string name="settings_storage_section_heading_mobile_data">行動數據</string>
     <string name="settings_storage_section_heading_usage">使用方式</string>
     <string name="settings_storage_downloaded_files">已下載的檔案</string>
-    <string name="settings_storage_downloaded_bytes">%d 位元</string>
+    <string name="settings_storage_downloaded_bytes">%d 位元組</string>
     <string name="plus_per_month">每月 %s</string>
     <string name="plus_day">天</string>
     <string name="plus_month_year_price">每月 %1$s/每年 %2$s</string>
@@ -344,7 +358,7 @@ Language: zh_TW
     <string name="settings_battery_update_message">請點選上方的「%s」切換以更新你的電池設定。</string>
     <string name="settings_battery_unrestricted_accessibility_label">更新你的電池設定</string>
     <string name="settings_battery_unrestricted">不受限制</string>
-    <string name="settings_battery_learn_more">瞭解更多</string>
+    <string name="settings_battery_learn_more">深入了解</string>
     <string name="settings_battery_settings">電池設定</string>
     <string name="settings_battery">電池</string>
     <string name="stream_warning_summary">本集將使用行動數據串流。</string>
@@ -353,10 +367,10 @@ Language: zh_TW
     <string name="go_to_folder">前往資料夾</string>
     <string name="change_folder">變更資料夾</string>
     <string name="remove_from_folder">從資料夾移除</string>
-    <string name="whats_new_blog_link">在我們的網誌深入瞭解此更新</string>
+    <string name="whats_new_blog_link">閱讀我們的網誌，深入了解此更新</string>
     <string name="whats_new_grid_7_20">我們已將你的主畫面（包括排序選項）同步至所有裝置！ 現在你還可以拖放網頁播放器。\n\n這表示你對排版 Podcast 頁面所付出的努力工作，都會同步至你的帳戶，因此你可以高枕無憂。</string>
     <string name="whats_new_grid_title_7_20">主畫面網格同步</string>
-    <string name="whats_new_folders_7_20">如果你喜歡 Podcast 的程度有我們的一半，那你可能收聽很多 Podcast 節目。 如果你是 Pocket Casts Plus 訂閱者，現在你可以將 Podcast 節目排序至資料夾，再將其排序至整潔的群組。\n\n多虧了你的支援，你的主畫面現已更加美觀！</string>
+    <string name="whats_new_folders_7_20">如果你喜歡 Podcast 的程度有我們的一半，那你可能收聽很多 Podcast 節目。如果你是 Pocket Casts Plus 訂閱者，現在你可以將 Podcast 節目排序至資料夾，再將其排序至整潔的群組。\n\n多虧了你的支援，你的主畫面現已更加美觀！</string>
     <string name="podcasts_empty_folder_summary">新增 Podcast 節目至您的資料夾後即會顯示在此處</string>
     <string name="podcasts_empty_folder">資料夾是空的</string>
     <string name="add_podcasts">新增 Podcast 節目</string>

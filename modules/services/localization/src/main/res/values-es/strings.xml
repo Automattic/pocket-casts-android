@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-22 16:54:03+0000
+Translation-Revision-Date: 2023-07-04 14:10:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="bookmarks">Marcadores</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Temas e iconos de la aplicación adicionales</string>
+    <string name="onboarding_plus_feature_watch_playback">Reproducción en el reloj</string>
+    <string name="onboarding_patron_feature_early_access_title">Acceso anticipado a las funciones</string>
+    <string name="settings_continuous_playback_summary">Si no tienes ningún episodio en cola, reproduciremos los del pódcast o lista que estés escuchando en ese momento.</string>
+    <string name="renew_your_subscription">Renovar la suscripción</string>
+    <string name="log_in_watch_from_phone_instructions_3">Si estás experimentando problemas, asegúrate de que tengas instalada la misma versión de Pocket Casts en el móvil y en el reloj (%s)</string>
+    <string name="log_in_free_acccount">%s está usando una cuenta gratuita</string>
+    <string name="player_play_failed_check_internet">No se ha podido cargar el pódcast. Revisa tu conexión a Internet e inténtalo de nuevo.</string>
+    <string name="empty_play_state">Elige un episodio para empezar</string>
+    <string name="settings_beta_features">Funciones beta</string>
     <string name="settings_watch_logs">Registros del reloj</string>
     <string name="settings_help_phone_unavailable_message">Vuelve a intentarlo cuando el teléfono esté conectado con el reloj.</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">Si actualmente el teléfono está emparejado, se mostrará una ventana emergente con los registros</string>
@@ -26,6 +37,8 @@ Language: es
     <string name="error_invalid_email_address">Introduce una dirección de correo electrónico válida.</string>
     <string name="settings_privacy_crash_link_short">Vincular tu cuenta</string>
     <string name="settings_app_icon_pride_2023">Orgullo 2023</string>
+    <string name="log_in_with_plus">Accede con una cuenta Plus</string>
+    <string name="log_in_watch_requires_plus">Para utilizar esta aplicación o mejorar la experiencia de visita, accede con una cuenta Plus.</string>
     <string name="enter_password">Escribe contraseña</string>
     <string name="enter_email">Introduce el correo electrónico</string>
     <string name="player_effects_trim_level_down">Bajar nivel de recorte</string>
@@ -95,6 +108,7 @@ Language: es
     <string name="podcasts_all">Todos los podcasts</string>
     <string name="search_results_all_podcasts">Todos los podcasts</string>
     <string name="search_results_all_episodes">Todos los episodios</string>
+    <string name="search_history_row_type_episode_subtitle">Episodio \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Mostrar todas</string>
     <string name="podcast">Pódcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>

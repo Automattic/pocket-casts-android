@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-21 14:54:03+0000
+Translation-Revision-Date: 2023-07-04 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="bookmarks">Lesezeichen</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Zusätzliche Themes und App-Icons</string>
+    <string name="onboarding_plus_feature_watch_playback">Watch-Wiedergabe</string>
+    <string name="onboarding_patron_feature_early_access_title">Frühzeitiger Zugriff auf Funktionen</string>
+    <string name="settings_continuous_playback_summary">Wenn deine Warteschlange leer ist, spielen wir Folgen aus dem Podcast oder der Liste, die du dir gerade anhörst.</string>
+    <string name="renew_your_subscription">Abonnement verlängern</string>
+    <string name="log_in_watch_from_phone_instructions_3">Hast du Probleme? Stelle sicher, dass auf deinem Smartphone dieselbe Pocket Casts-Version installiert ist, wie auf deiner Uhr (%s)</string>
+    <string name="log_in_free_acccount">%s nutzt ein kostenloses Konto</string>
+    <string name="player_play_failed_check_internet">Podcast konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
+    <string name="empty_play_state">Wähle eine Folge aus, um loszulegen</string>
+    <string name="settings_beta_features">Betafunktionen</string>
     <string name="settings_watch_logs">Watch-Protokolle</string>
     <string name="settings_help_phone_unavailable_message">Bitte versuche es erneut, wenn dein Mobiltelefon mit deiner Uhr verbunden ist.</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">Wenn dein Mobiltelefon gerade gekoppelt ist, wird dir ein Pop-up-Fenster mit deinen Protokollen angezeigt</string>
@@ -26,6 +37,8 @@ Language: de
     <string name="error_invalid_email_address">Bitte gib eine gültige E-Mail-Adresse ein.</string>
     <string name="settings_privacy_crash_link_short">Dein Konto verbinden</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Bitte melde dich mit einem Plus-Konto an</string>
+    <string name="log_in_watch_requires_plus">Melde dich mit einem Plus-Konto an, um diese App zu verwenden, oder führe ein Upgrade durch unter</string>
     <string name="enter_password">Passwort eingeben</string>
     <string name="enter_email">E-Mail-Adresse eingeben</string>
     <string name="player_effects_trim_level_down">Kürzungsgrad runter</string>
@@ -95,6 +108,7 @@ Language: de
     <string name="podcasts_all">Alle Podcasts</string>
     <string name="search_results_all_podcasts">Alle Podcasts</string>
     <string name="search_results_all_episodes">Alle Folgen</string>
+    <string name="search_history_row_type_episode_subtitle">Folge \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Alle zeigen</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
