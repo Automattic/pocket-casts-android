@@ -4,7 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -94,6 +101,7 @@ class WhatsNewFragment : BaseFragment() {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun WhatsNewComposable(
     onGoToSettings: () -> Unit,
@@ -134,22 +142,51 @@ private fun WhatsNewComposable(
                     .background(gradientBrush)
                     .fillMaxWidth(),
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(vertical = 43.dp)
-                        .clip(shape = CircleShape)
-                        .background(Color.White)
-                        .size(95.dp),
 
+                var iconIsVisible by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    iconIsVisible = true
+                }
+
+                // Using the same spring animation for the scaleIn and rotation ensures that they
+                // finish at the same time.
+                val springAnimation = spring<Float>(
+                    stiffness = Spring.StiffnessVeryLow,
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                )
+
+                this@Column.AnimatedVisibility(
+                    visible = iconIsVisible,
+                    enter = scaleIn(animationSpec = springAnimation)
                 ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(IR.drawable.whatsnew_autoplay),
-                        contentDescription = null,
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .height(24.dp)
-                            .brush(gradientBrush),
-                    )
+                            .padding(all = 43.dp)
+                            .clip(shape = CircleShape)
+                            .background(Color.White)
+                            .size(95.dp),
+
+                    ) {
+
+                        var rotating by remember { mutableStateOf(false) }
+                        val rotation by animateFloatAsState(
+                            targetValue = if (rotating) 2 * 360f else 0f,
+                            animationSpec = springAnimation
+                        )
+                        LaunchedEffect(Unit) {
+                            rotating = true
+                        }
+
+                        Icon(
+                            imageVector = ImageVector.vectorResource(IR.drawable.whatsnew_autoplay),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .height(24.dp)
+                                .rotate(rotation)
+                                .brush(gradientBrush),
+                        )
+                    }
                 }
             }
 
