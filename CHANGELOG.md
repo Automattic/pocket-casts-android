@@ -6,7 +6,9 @@
 -----
 *   New Feature:
     *   Enabled the ratings feature
-        ([#1159])(https://github.com/Automattic/pocket-casts-android/pull/1159)
+        ([#1159](https://github.com/Automattic/pocket-casts-android/pull/1159)).
+    *   Add setting to autoplay episodes when up next queue is not being used
+        ([#1170](https://github.com/Automattic/pocket-casts-android/pull/1170)).
     *   Add capability to add +1 minute on the sleep timer
         ([#1139](https://github.com/Automattic/pocket-casts-android/pull/1139)).
     * Adds +- 1 increments to the sleep timer if the custom timer is less than 5 Min
