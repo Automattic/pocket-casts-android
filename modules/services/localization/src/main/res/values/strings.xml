@@ -608,6 +608,7 @@
     <string name="filters_download_limit_100">100 episodes</string>
     <string name="filters_download_limit_20">20 episodes</string>
     <string name="filters_download_limit_40">40 episodes</string>
+    <string name="filters_download_limit_3">3 episodes</string>
     <string name="filters_download_limit_5">5 episodes</string>
     <string name="filters_download_title">Auto download first</string>
     <string name="filters_duration_error_body">Filtering for episodes longer than %1$dm but shorter than %2$dm would cause a rift in our space time continuum. Sorry.</string>
