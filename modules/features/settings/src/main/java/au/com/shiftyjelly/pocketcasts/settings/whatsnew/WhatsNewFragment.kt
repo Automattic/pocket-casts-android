@@ -48,11 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -135,7 +136,8 @@ private fun WhatsNewComposable(
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = performClose,
             )
-            .padding(all = 16.dp)
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp)
             .fillMaxSize()
     ) {
         Column(Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
@@ -231,16 +233,14 @@ private fun WhatsNewComposable(
                         .fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                TextH40(
-                    text = stringResource(LR.string.whats_new_autoplay_maybe_later_button),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryInteractive01,
-                    modifier = Modifier.clickable { performClose() },
-                )
-
                 Spacer(modifier = Modifier.height(8.dp))
+
+                RowTextButton(
+                    text = stringResource(LR.string.whats_new_autoplay_maybe_later_button),
+                    fontSize = 15.sp,
+                    onClick = performClose,
+                    includePadding = false,
+                )
             }
         }
     }
