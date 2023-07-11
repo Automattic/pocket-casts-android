@@ -48,8 +48,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -301,27 +299,25 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
                     )
 
-                    if (FeatureFlag.isEnabled(Feature.AUTO_PLAY_UP_NEXT_SETTING)) {
-                        // The [scrollToAutoPlay] fragment argument handling depends on this item being last
-                        // in the list. If it's position is changed, make sure you update the handling when
-                        // we scroll to this item as well.
-                        AutoPlayNextOnEmpty(
-                            saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
-                            showFlashWithDelay = if (scrollToAutoPlay) {
-                                // Have flash occur after scroll to autoplay
-                                scrollToAutoPlayDelay * 2
-                            } else {
-                                null
-                            },
-                            onSave = {
-                                analyticsTracker.track(
-                                    AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
-                                    mapOf("enabled" to it)
-                                )
-                                settings.setAutoPlayNextEpisodeOnEmpty(it)
-                            }
-                        )
-                    }
+                    // The [scrollToAutoPlay] fragment argument handling depends on this item being last
+                    // in the list. If it's position is changed, make sure you update the handling when
+                    // we scroll to this item as well.
+                    AutoPlayNextOnEmpty(
+                        saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
+                        showFlashWithDelay = if (scrollToAutoPlay) {
+                            // Have flash occur after scroll to autoplay
+                            scrollToAutoPlayDelay * 2
+                        } else {
+                            null
+                        },
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
+                                mapOf("enabled" to it)
+                            )
+                            settings.setAutoPlayNextEpisodeOnEmpty(it)
+                        }
+                    )
                 }
             }
         }

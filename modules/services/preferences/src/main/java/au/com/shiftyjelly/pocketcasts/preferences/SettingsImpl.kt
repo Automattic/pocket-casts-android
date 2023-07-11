@@ -11,8 +11,6 @@ import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
 import androidx.work.NetworkType
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -1001,9 +999,6 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoPlayNextEpisodeOnEmpty(): Boolean {
-        if (!FeatureFlag.isEnabled(Feature.AUTO_PLAY_UP_NEXT_SETTING)) {
-            return false
-        }
         val defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
             AppPlatform.Phone -> false

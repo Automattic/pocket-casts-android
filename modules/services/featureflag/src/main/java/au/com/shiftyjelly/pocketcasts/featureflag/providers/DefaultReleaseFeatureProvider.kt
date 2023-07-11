@@ -22,7 +22,6 @@ class DefaultReleaseFeatureProvider @Inject constructor() : FeatureProvider {
             Feature.END_OF_YEAR_ENABLED -> Feature.END_OF_YEAR_ENABLED.defaultValue
             Feature.SHOW_RATINGS_ENABLED -> Feature.SHOW_RATINGS_ENABLED.defaultValue
             Feature.ADD_PATRON_ENABLED -> Feature.ADD_PATRON_ENABLED.defaultValue
-            Feature.AUTO_PLAY_UP_NEXT_SETTING -> Feature.AUTO_PLAY_UP_NEXT_SETTING.defaultValue
             Feature.BOOKMARKS_ENABLED -> Feature.BOOKMARKS_ENABLED.defaultValue
         }
 }
