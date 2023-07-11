@@ -2,6 +2,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'com.google.devtools.ksp'
 
 def SERVER_MAIN_URL_PROD = "\"https://refresh.pocketcasts.com\""
 def SERVER_API_URL_PROD = "\"https://api.pocketcasts.com\""
@@ -243,8 +244,9 @@ dependencies {
     implementation libs.media3Extractor
     implementation libs.media3Ui
 
-    kapt libs.moshiKotlinCompile
-    kapt libs.glideCompile
+    ksp libs.moshiKotlinCompile
+    ksp libs.glideCompile
+    // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
     kapt libs.hiltCompiler
     kapt libs.hiltDaggerCompiler
 
