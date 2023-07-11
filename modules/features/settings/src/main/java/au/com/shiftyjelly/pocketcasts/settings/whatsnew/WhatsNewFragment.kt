@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -141,56 +143,60 @@ private fun WhatsNewComposable(
                 0f to MaterialTheme.theme.colors.primaryInteractive01,
                 1f to MaterialTheme.theme.colors.primaryInteractive01Hover,
             )
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .background(gradientBrush)
-                    .fillMaxWidth(),
-            ) {
 
-                var iconIsVisible by remember { mutableStateOf(false) }
-                LaunchedEffect(Unit) {
-                    iconIsVisible = true
-                }
-
-                // Using the same spring animation for the scaleIn and rotation ensures that they
-                // finish at the same time.
-                val springAnimation = spring<Float>(
-                    stiffness = Spring.StiffnessVeryLow,
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                )
-
-                this@Column.AnimatedVisibility(
-                    visible = iconIsVisible,
-                    enter = scaleIn(animationSpec = springAnimation)
+            // Hide the top graphic if the phone is in landscape mode so there is room for the text
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .background(gradientBrush)
+                        .fillMaxWidth(),
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .padding(all = 43.dp)
-                            .clip(shape = CircleShape)
-                            .background(Color.White)
-                            .size(95.dp),
 
+                    var iconIsVisible by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        iconIsVisible = true
+                    }
+
+                    // Using the same spring animation for the scaleIn and rotation ensures that they
+                    // finish at the same time.
+                    val springAnimation = spring<Float>(
+                        stiffness = Spring.StiffnessVeryLow,
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                    )
+
+                    this@Column.AnimatedVisibility(
+                        visible = iconIsVisible,
+                        enter = scaleIn(animationSpec = springAnimation)
                     ) {
-
-                        var rotating by remember { mutableStateOf(false) }
-                        val rotation by animateFloatAsState(
-                            targetValue = if (rotating) 2 * 360f else 0f,
-                            animationSpec = springAnimation
-                        )
-                        LaunchedEffect(Unit) {
-                            rotating = true
-                        }
-
-                        Icon(
-                            imageVector = ImageVector.vectorResource(IR.drawable.whatsnew_autoplay),
-                            contentDescription = null,
+                        Box(
+                            contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .height(24.dp)
-                                .rotate(rotation)
-                                .brush(gradientBrush),
-                        )
+                                .padding(all = 43.dp)
+                                .clip(shape = CircleShape)
+                                .background(Color.White)
+                                .size(95.dp),
+
+                        ) {
+
+                            var rotating by remember { mutableStateOf(false) }
+                            val rotation by animateFloatAsState(
+                                targetValue = if (rotating) 2 * 360f else 0f,
+                                animationSpec = springAnimation
+                            )
+                            LaunchedEffect(Unit) {
+                                rotating = true
+                            }
+
+                            Icon(
+                                imageVector = ImageVector.vectorResource(IR.drawable.whatsnew_autoplay),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .rotate(rotation)
+                                    .brush(gradientBrush),
+                            )
+                        }
                     }
                 }
             }
