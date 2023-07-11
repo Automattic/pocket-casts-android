@@ -3,7 +3,7 @@ buildscript {
     ext {
         kotlin_version = '1.7.10'
         // KSP releases need to match the Kotlin version - https://github.com/google/ksp/releases
-        ksp_version = '1.7.10-1.0.6'
+        ksp_version = "$kotlin_version-1.0.6"
         hilt_version = '2.43.2'
     }
     repositories {
