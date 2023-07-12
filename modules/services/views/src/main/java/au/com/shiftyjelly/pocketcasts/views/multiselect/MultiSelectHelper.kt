@@ -61,6 +61,9 @@ class MultiSelectHelper @Inject constructor(
         fun multiSelectSelectNone()
         fun multiSelectSelectAllUp(episode: BaseEpisode)
         fun multiSelectSelectAllDown(episode: BaseEpisode)
+        fun multiDeselectAll()
+        fun multiDeselectAllBelow(episode: BaseEpisode)
+        fun multiDeselectAllAbove(episode: BaseEpisode)
     }
 
     override val coroutineContext: CoroutineContext
@@ -104,9 +107,28 @@ class MultiSelectHelper @Inject constructor(
 
             FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
+            val selectAllAbove = if (isSelected(episode)) {
+                LR.string.deselect_all_above
+            } else {
+                LR.string.select_all_above
+            }
+
+            val selectAll = if (selectedList.contains(episode)) {
+                LR.string.deselect_all
+            } else {
+                LR.string.select_all
+            }
+
+            val selectAllBelow = if (isSelected(episode)) {
+                LR.string.deselect_all_below
+            } else {
+                LR.string.select_all_below
+            }
+
             OptionsDialog()
-                .addTextOption(titleId = LR.string.select_all_above, click = { selectAllAbove(episode) }, imageId = IR.drawable.ic_selectall_up)
-                .addTextOption(titleId = LR.string.select_all_below, click = { selectAllBelow(episode) }, imageId = IR.drawable.ic_selectall_down)
+                .addTextOption(titleId = selectAllAbove, click = { toggleSelectAllAbove(episode) }, imageId = IR.drawable.ic_selectall_up)
+                .addTextOption(titleId = selectAll, click = { toggleSelectAll(episode) }, imageId = IR.drawable.ic_selectall_up)
+                .addTextOption(titleId = selectAllBelow, click = { toggleSelectAllBelow(episode) }, imageId = IR.drawable.ic_selectall_down)
                 .show(fragmentManager, "multi_select_select_dialog")
         }
     }
@@ -214,6 +236,11 @@ class MultiSelectHelper @Inject constructor(
         selectedListLive.value = selectedList
     }
 
+    fun deselectAllInList(episodes: List<BaseEpisode>) {
+        selectedList.removeAll(episodes)
+        selectedListLive.value = selectedList
+    }
+
     fun deselect(episode: BaseEpisode) {
         val foundEpisode = selectedList.find { it.uuid == episode.uuid }
         foundEpisode?.let {
@@ -227,6 +254,28 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
+    private fun toggleSelectAll(episode: BaseEpisode) {
+        if (selectedList.contains(episode)) {
+            deselectAll()
+        } else {
+            selectAll()
+        }
+    }
+    private fun toggleSelectAllAbove(episode: BaseEpisode) {
+        if (isSelected(episode)) {
+            deselectAllAbove(episode)
+        } else {
+            selectAllAbove(episode)
+        }
+    }
+    private fun toggleSelectAllBelow(episode: BaseEpisode) {
+        if (isSelected(episode)) {
+            deselectAllBelow(episode)
+        } else {
+            selectAllBelow(episode)
+        }
+    }
+
     fun toggle(episode: BaseEpisode): Boolean {
         if (isSelected(episode)) {
             deselect(episode)
@@ -235,6 +284,17 @@ class MultiSelectHelper @Inject constructor(
             select(episode)
             return true
         }
+    }
+    fun deselectAll() {
+        listener.multiDeselectAll()
+    }
+
+    fun deselectAllAbove(episode: BaseEpisode) {
+        listener.multiDeselectAllAbove(episode)
+    }
+
+    fun deselectAllBelow(episode: BaseEpisode) {
+        listener.multiDeselectAllBelow(episode)
     }
 
     fun markAsPlayed(shownWarning: Boolean = false, resources: Resources, fragmentManager: FragmentManager) {
