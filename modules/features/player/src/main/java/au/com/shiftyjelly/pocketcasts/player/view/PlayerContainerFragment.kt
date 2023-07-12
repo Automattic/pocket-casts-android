@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
 import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -41,6 +42,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -48,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
     @Inject lateinit var settings: Settings
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -184,6 +187,17 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 tourView.startTour(tour, PLAYER_TOUR_NAME)
             }
         }
+
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            binding.multiSelectToolbar.isVisible = isMultiSelecting
+            binding.multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
+        }
+        binding.multiSelectToolbar.setup(
+            lifecycleOwner = viewLifecycleOwner,
+            multiSelectHelper = multiSelectHelper,
+            menuRes = null,
+            fragmentManager = parentFragmentManager,
+        )
     }
 
     fun openUpNext() {

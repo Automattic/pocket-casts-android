@@ -34,20 +34,14 @@ class MultiSelectToolbar @JvmOverloads constructor(
     }
 
     private var overflowItems: List<MultiSelectAction> = emptyList()
-    private var fragmentManager: FragmentManager? = null
-    private var multiSelectHelper: MultiSelectEpisodesHelper? = null
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
-    fun setup(
+    fun <T> setup(
         lifecycleOwner: LifecycleOwner,
-        multiSelectHelper: MultiSelectEpisodesHelper,
+        multiSelectHelper: MultiSelectHelper<T>,
         @MenuRes menuRes: Int?,
         fragmentManager: FragmentManager
     ) {
-
-        this.fragmentManager = fragmentManager
-        this.multiSelectHelper = multiSelectHelper
-
         setBackgroundColor(context.getThemeColor(UR.attr.support_01))
         if (menuRes != null) {
             inflateMenu(menuRes)
@@ -81,8 +75,13 @@ class MultiSelectToolbar @JvmOverloads constructor(
 
         setOnMenuItemClickListener {
             if (it.itemId == R.id.menu_overflow) {
-                analyticsTracker.track(AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN, AnalyticsProp.sourceMap(multiSelectHelper.source))
-                showOverflowBottomSheet()
+                if (multiSelectHelper is MultiSelectEpisodesHelper) {
+                    analyticsTracker.track(
+                        AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN,
+                        AnalyticsProp.sourceMap(multiSelectHelper.source)
+                    )
+                    showOverflowBottomSheet(fragmentManager, multiSelectHelper)
+                }
                 true
             } else {
                 multiSelectHelper.onMenuItemSelected(itemId = it.itemId, resources = resources, fragmentManager = fragmentManager)
@@ -99,8 +98,11 @@ class MultiSelectToolbar @JvmOverloads constructor(
         navigationContentDescription = context.getString(LR.string.back)
     }
 
-    fun showOverflowBottomSheet() {
-        val fragmentManager = fragmentManager ?: return
+    private fun showOverflowBottomSheet(
+        fragmentManager: FragmentManager?,
+        multiSelectHelper: MultiSelectEpisodesHelper
+    ) {
+        if (fragmentManager == null) return
         val overflowSheet = MultiSelectBottomSheet.newInstance(overflowItems.map { it.actionId })
         overflowSheet.multiSelectHelper = multiSelectHelper
         overflowSheet.show(fragmentManager, "multiselectbottomsheet")
