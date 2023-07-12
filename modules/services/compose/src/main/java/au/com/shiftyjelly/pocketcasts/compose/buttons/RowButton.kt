@@ -90,3 +90,21 @@ fun RowButtonsDarkPreview() {
         RowButton(text = "Accept", onClick = {})
     }
 }
+
+@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Disabled")
+@Preview(name = "Disabled")
+@Composable
+fun RowButtonsDisabledPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        RowButton(text = "Accept", enabled = false, onClick = {})
+    }
+}
+
+@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "No padding")
+@Preview(name = "No padding")
+@Composable
+fun RowButtonsNoPaddingPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        RowButton(text = "Accept", includePadding = false, onClick = {})
+    }
+}

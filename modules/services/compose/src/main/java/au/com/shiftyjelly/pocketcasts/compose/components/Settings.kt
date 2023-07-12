@@ -11,11 +11,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -85,7 +92,8 @@ fun <T> SettingRadioDialogRow(
     primaryText: String,
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
-    icon: GradientIconData? = null,
+    icon: Painter? = null,
+    iconGradientColors: List<Color>? = null,
     options: List<T>,
     savedOption: T,
     optionToLocalisedString: (T) -> String,
@@ -97,6 +105,7 @@ fun <T> SettingRadioDialogRow(
         primaryText = primaryText,
         secondaryText = secondaryText,
         icon = icon,
+        iconGradientColors = iconGradientColors,
         modifier = modifier.clickable { showDialog = true }
     ) {
         if (showDialog) {
@@ -120,7 +129,8 @@ fun SettingRow(
     primaryText: String,
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
-    icon: GradientIconData? = null,
+    icon: Painter? = null,
+    iconGradientColors: List<Color>? = null,
     @DrawableRes primaryTextEndDrawable: Int? = null,
     toggle: SettingRowToggle = SettingRowToggle.None,
     indent: Boolean = true,
@@ -140,7 +150,21 @@ fun SettingRow(
             contentAlignment = Alignment.Center,
             modifier = Modifier.width(if (indent || icon != null) indentedStartPadding else horizontalPadding)
         ) {
-            GradientIcon(icon)
+            if (icon != null) {
+                if (iconGradientColors != null) {
+                    GradientIcon(
+                        painter = icon,
+                        colors = iconGradientColors
+                    )
+                } else {
+                    Icon(
+                        painter = icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.theme.colors.primaryInteractive01,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
         }
         Column(
             modifier = Modifier
@@ -227,10 +251,8 @@ private fun SettingSectionPreview(
                 primaryText = "Such very very very very very very very long text",
                 secondaryText = "I know you want to flip this toggle, so just do it. DO IT!",
                 toggle = SettingRowToggle.Switch(checked = false),
-                icon = GradientIconData(
-                    res = IR.drawable.ic_podcasts,
-                    colors = listOf(Color.Red, Color.Yellow)
-                ),
+                icon = painterResource(IR.drawable.ic_podcasts),
+                iconGradientColors = listOf(Color.Red, Color.Yellow),
                 primaryTextEndDrawable = IR.drawable.ic_effects_plus,
             )
         }
@@ -261,14 +283,39 @@ fun SettingRowDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon")
-@Preview(name = "Icon")
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Project)")
+@Preview(name = "Icon (Project)")
 @Composable
-fun SettingRowIconPreview() {
+fun SettingRowIconProjectPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with icon",
-            icon = GradientIconData(IR.drawable.ic_profile_settings)
+            icon = painterResource(IR.drawable.ic_profile_settings)
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Material)")
+@Preview(name = "Icon (Material)")
+@Composable
+fun SettingRowIconMaterialPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingRow(
+            primaryText = "Row with icon",
+            icon = rememberVectorPainter(Icons.Default.Share)
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Gradient)")
+@Preview(name = "Icon (Gradient)")
+@Composable
+fun SettingRowIconGradientPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingRow(
+            primaryText = "Row with icon",
+            icon = painterResource(IR.drawable.ic_podcasts),
+            iconGradientColors = listOf(Color.Red, Color.Yellow)
         )
     }
 }
