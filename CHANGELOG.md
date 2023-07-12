@@ -1,6 +1,8 @@
 7.44
 -----
-
+*   New Feature:
+    *   Added 3 episodes on the Filter AutoDownload
+        ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169) 
 
 7.43
 -----
