@@ -30,6 +30,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
 ) : Toolbar(context, attrs, defStyleAttr) {
 
     companion object {
+        private const val MAX_ICONS_BOOKMARKS = 2
         const val MAX_ICONS = 4
     }
 
@@ -49,17 +50,34 @@ class MultiSelectToolbar @JvmOverloads constructor(
             multiSelectHelper.toolbarActions.observe(lifecycleOwner) {
                 menu.clear()
 
-                it.subList(0, MAX_ICONS).forEachIndexed { _, action ->
+                val maxIcons = when (multiSelectHelper) {
+                    is MultiSelectBookmarksHelper -> MAX_ICONS_BOOKMARKS
+                    is MultiSelectEpisodesHelper -> MAX_ICONS
+                    else -> 0
+                }
+                it.subList(0, maxIcons).forEachIndexed { _, action ->
                     val item = menu.add(Menu.NONE, action.actionId, 0, action.title)
                     item.setIcon(action.iconRes)
                     item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    item.isVisible = action.isVisible
                 }
 
-                overflowItems = it.subList(MAX_ICONS, it.size)
+                overflowItems = it.subList(maxIcons, it.size)
 
-                val overflow = menu.add(Menu.NONE, R.id.menu_overflow, 0, context.getString(LR.string.more_options))
-                overflow.setIcon(IR.drawable.ic_more_vert_black_24dp)
-                overflow.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                when (multiSelectHelper) {
+                    is MultiSelectBookmarksHelper -> {
+                        overflowItems.forEachIndexed { _, action ->
+                            val item = menu.add(Menu.NONE, action.actionId, 0, action.title)
+                            item.setIcon(action.iconRes)
+                            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+                        }
+                    }
+                    is MultiSelectEpisodesHelper -> {
+                        val overflow = menu.add(Menu.NONE, R.id.menu_overflow, 0, context.getString(LR.string.more_options))
+                        overflow.setIcon(IR.drawable.ic_more_vert_black_24dp)
+                        overflow.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    }
+                }
 
                 menu.tintIcons(context.getThemeColor(UR.attr.primary_interactive_02))
             }
