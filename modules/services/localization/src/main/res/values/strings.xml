@@ -1364,7 +1364,7 @@
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
     <string name="whats_new_autoplay_title">Autoplay is here!</string>
-    <string name="whats_new_autoplay_body">Enable it and Pocket Casts will autoplay episodes from your current list, if your Up Next queue is empty.</string>
+    <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
     <string name="whats_new_autoplay_enable_button">Enable it now</string>
     <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
 
