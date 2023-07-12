@@ -76,7 +76,7 @@ fun RowButton(
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun RowButtonsLightPreview() {
+fun RowButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", onClick = {})
     }
@@ -85,7 +85,7 @@ fun RowButtonsLightPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun RowButtonsDarkPreview() {
+fun RowButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         RowButton(text = "Accept", onClick = {})
     }
@@ -94,7 +94,7 @@ fun RowButtonsDarkPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Disabled")
 @Preview(name = "Disabled")
 @Composable
-fun RowButtonsDisabledPreview() {
+fun RowButtonDisabledPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", enabled = false, onClick = {})
     }
@@ -103,7 +103,7 @@ fun RowButtonsDisabledPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "No padding")
 @Preview(name = "No padding")
 @Composable
-fun RowButtonsNoPaddingPreview() {
+fun RowButtonNoPaddingPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", includePadding = false, onClick = {})
     }
