@@ -80,6 +80,10 @@ android {
         }
     }
 
+    ksp {
+        arg("skipPrivatePreviews", "true")
+    }
+
     if (canSignRelease) {
         signingConfigs {
             release {
@@ -243,9 +247,11 @@ dependencies {
     implementation libs.media3ExoplayerHls
     implementation libs.media3Extractor
     implementation libs.media3Ui
+    implementation libs.showkase
 
     ksp libs.moshiKotlinCompile
     ksp libs.glideCompile
+    ksp libs.showkaseProcessor
     // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
     kapt libs.hiltCompiler
     kapt libs.hiltDaggerCompiler
