@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -45,7 +46,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics
 ) : MultiSelectHelper<BaseEpisode>() {
 
-    override val toolbarActions = settings.multiSelectItemsObservable
+    override val toolbarActions: LiveData<List<MultiSelectAction>> = settings.multiSelectItemsObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { MultiSelectAction.listFromIds(it) }
         .toLiveData()

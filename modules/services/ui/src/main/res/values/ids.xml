@@ -8,4 +8,5 @@
     <item name="menu_unstar" type="id" />
     <item name="menu_undownload" type="id" />
     <item name="menu_unarchive" type="id" />
+    <item name="menu_edit" type="id" />
 </resources>
