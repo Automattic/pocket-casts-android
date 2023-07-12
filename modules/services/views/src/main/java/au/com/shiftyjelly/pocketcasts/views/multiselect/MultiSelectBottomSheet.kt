@@ -36,7 +36,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
-    var multiSelectHelper: MultiSelectHelper? = null
+    var multiSelectHelper: MultiSelectEpisodesHelper? = null
 
     private val adapter = MultiSelectAdapter(editable = false, listener = this::onClick, dragListener = null)
     private var binding: FragmentMultiselectBottomSheetBinding? = null

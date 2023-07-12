@@ -50,7 +50,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -86,7 +86,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var imageLoader: PodcastImageLoader
@@ -417,7 +417,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
         )
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectEpisodesHelper.Listener {
             override fun multiSelectSelectAll() {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
                 val episodes = viewModel.episodesList.value

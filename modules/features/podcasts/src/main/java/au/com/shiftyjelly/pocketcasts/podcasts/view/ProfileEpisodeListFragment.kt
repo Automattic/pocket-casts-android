@@ -43,7 +43,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -84,7 +84,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
     @Inject lateinit var settings: Settings
     @Inject lateinit var upNextQueue: UpNextQueue
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
@@ -202,7 +202,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
             adapter.notifyDataSetChanged()
         }
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectEpisodesHelper.Listener {
             override fun multiSelectSelectAll() {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {

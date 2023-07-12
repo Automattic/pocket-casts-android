@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val WARNING_LIMIT = 3
 @Singleton
-class MultiSelectHelper @Inject constructor(
+class MultiSelectEpisodesHelper @Inject constructor(
     val episodeManager: EpisodeManager,
     val userEpisodeManager: UserEpisodeManager,
     val podcastManager: PodcastManager,

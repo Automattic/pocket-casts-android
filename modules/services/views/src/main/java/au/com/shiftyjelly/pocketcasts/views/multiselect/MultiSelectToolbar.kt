@@ -35,12 +35,12 @@ class MultiSelectToolbar @JvmOverloads constructor(
 
     private var overflowItems: List<MultiSelectAction> = emptyList()
     private var fragmentManager: FragmentManager? = null
-    private var multiSelectHelper: MultiSelectHelper? = null
+    private var multiSelectHelper: MultiSelectEpisodesHelper? = null
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     fun setup(
         lifecycleOwner: LifecycleOwner,
-        multiSelectHelper: MultiSelectHelper,
+        multiSelectHelper: MultiSelectEpisodesHelper,
         @MenuRes menuRes: Int?,
         fragmentManager: FragmentManager
     ) {

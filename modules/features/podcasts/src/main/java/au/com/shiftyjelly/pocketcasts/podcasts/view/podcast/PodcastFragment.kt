@@ -63,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -112,7 +112,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var coilManager: CoilManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
@@ -586,7 +586,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             adapter?.notifyDataSetChanged()
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectEpisodesHelper.Listener {
             override fun multiSelectSelectNone() {
                 val episodeState = viewModel.episodes.value
                 if (episodeState is PodcastViewModel.EpisodeState.Loaded) {

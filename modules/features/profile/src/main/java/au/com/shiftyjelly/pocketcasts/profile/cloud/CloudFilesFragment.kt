@@ -43,7 +43,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -57,7 +57,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
     @Inject lateinit var settings: Settings
     @Inject lateinit var upNextQueue: UpNextQueue
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
@@ -204,7 +204,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
             adapter.notifyDataSetChanged()
         }
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectEpisodesHelper.Listener {
             override fun multiSelectSelectAll() {
                 val episodes = viewModel.cloudFilesList.value
                 if (episodes != null) {
