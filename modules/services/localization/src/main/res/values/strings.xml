@@ -69,6 +69,9 @@
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
     <string name="select_all_above">Select all above</string>
+    <string name="deselect_all_above">Deselect all above</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="deselect_all_below">Deselect all below</string>
     <string name="select_all_below">Select all below</string>
     <string name="share_podcast">Share podcast</string>
     <string name="show_archived">Show archived</string>
