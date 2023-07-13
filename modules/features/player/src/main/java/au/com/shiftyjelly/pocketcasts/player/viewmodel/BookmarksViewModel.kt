@@ -43,7 +43,13 @@ class BookmarksViewModel
                                 _uiState.value = if (bookmarks.isEmpty()) {
                                     UiState.Empty
                                 } else {
-                                    UiState.Loaded(bookmarks)
+                                    UiState.Loaded(
+                                        bookmarks = bookmarks,
+                                        isMultiSelecting = false,
+                                        isSelected = { false },
+                                        onRowLongPress = ::onRowLongPress,
+                                        onRowClick = ::onRowClick,
+                                    )
                                 }
                             }
                     } ?: run { // This shouldn't happen in the ideal world
@@ -55,12 +61,25 @@ class BookmarksViewModel
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
+    private fun onRowLongPress(bookmark: Bookmark) {
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun onRowClick(bookmark: Bookmark) {
+    }
+
     sealed class UiState {
         object Empty : UiState()
         object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
+            val isMultiSelecting: Boolean,
+            val isSelected: (Bookmark) -> Boolean,
+            val onRowLongPress: (Bookmark) -> Unit,
+            val onRowClick: (Bookmark) -> Unit,
         ) : UiState()
+
         object PlusUpsell : UiState()
     }
 }

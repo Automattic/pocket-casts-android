@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -40,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
@@ -133,9 +136,10 @@ private fun Content(
         when (state) {
             is UiState.Loading -> LoadingView()
             is UiState.Loaded -> BookmarksView(
-                bookmarks = state.bookmarks,
+                state = state,
                 backgroundColor = backgroundColor,
             )
+
             is UiState.Empty -> NoBookmarksView()
             is UiState.PlusUpsell -> PlusUpsellView()
         }
@@ -144,7 +148,7 @@ private fun Content(
 
 @Composable
 private fun BookmarksView(
-    bookmarks: List<Bookmark>,
+    state: UiState.Loaded,
     backgroundColor: Color,
 ) {
     LazyColumn(
@@ -153,19 +157,28 @@ private fun BookmarksView(
     ) {
         item {
             val title = stringResource(
-                id = if (bookmarks.size > 1) {
+                id = if (state.bookmarks.size > 1) {
                     LR.string.bookmarks_plural
                 } else {
                     LR.string.bookmarks_singular
                 },
-                bookmarks.size
+                state.bookmarks.size
             )
             HeaderItem(title)
         }
-        items(bookmarks) { bookmark ->
+        items(state.bookmarks, key = { it }) { bookmark ->
             BookmarkItem(
                 bookmark = bookmark,
-                textColor = backgroundColor
+                textColor = backgroundColor,
+                isMultiSelecting = state.isMultiSelecting,
+                isSelected = state.isSelected,
+                modifier = Modifier
+                    .pointerInput(state.isSelected(bookmark)) {
+                        detectTapGestures(
+                            onLongPress = { state.onRowLongPress(bookmark) },
+                            onTap = { state.onRowClick(bookmark) }
+                        )
+                    }
             )
         }
     }
@@ -200,10 +213,12 @@ private fun HeaderItem(title: String) {
 private fun BookmarkItem(
     bookmark: Bookmark,
     textColor: Color,
+    isMultiSelecting: Boolean,
+    isSelected: (Bookmark) -> Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
-            .clickable { /* TODO */ }
+        modifier = modifier
     ) {
         Spacer(
             modifier = Modifier
@@ -216,13 +231,29 @@ private fun BookmarkItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .background(
+                    color = if (isMultiSelecting && isSelected(bookmark)) {
+                        MaterialTheme.theme.colors.primaryUi02Selected
+                    } else {
+                        Color.Transparent
+                    }
+                )
+
         ) {
             val createdAtText by remember {
                 mutableStateOf(
                     bookmark.createdAt.toLocalizedFormatPattern(
                         bookmark.createdAtDatePattern()
                     )
+                )
+            }
+
+            if (isMultiSelecting) {
+                Checkbox(
+                    checked = isSelected(bookmark),
+                    onCheckedChange = null,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
                 )
             }
             Column(
@@ -232,19 +263,22 @@ private fun BookmarkItem(
                     text = bookmark.title,
                     color = MaterialTheme.theme.colors.playerContrast01,
                     maxLines = 2,
+                    modifier = Modifier.padding(top = 16.dp, start = 16.dp),
                 )
 
                 TextH60(
                     text = createdAtText,
                     color = MaterialTheme.theme.colors.playerContrast02,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 16.dp),
                     maxLines = 1,
                 )
             }
-            PlayButton(
-                bookmark = bookmark,
-                textColor = textColor,
-            )
+            Box(modifier = Modifier.padding(end = 16.dp)) {
+                PlayButton(
+                    bookmark = bookmark,
+                    textColor = textColor,
+                )
+            }
         }
     }
 }
@@ -425,7 +459,11 @@ private fun BookmarksPreview(
                         syncStatus = SyncStatus.SYNCED,
                         title = "Funny bit",
                     )
-                )
+                ),
+                isMultiSelecting = false,
+                isSelected = { false },
+                onRowLongPress = {},
+                onRowClick = {},
             ),
             backgroundColor = Color.Black,
         )
