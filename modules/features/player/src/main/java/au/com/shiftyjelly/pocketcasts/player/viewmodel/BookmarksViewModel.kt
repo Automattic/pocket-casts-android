@@ -57,7 +57,6 @@ class BookmarksViewModel
                                     bookmarks = bookmarks,
                                     isMultiSelecting = isMultiSelecting,
                                     isSelected = { selectedList.contains(it) },
-                                    onRowLongPress = ::onRowLongPress,
                                     onRowClick = ::onRowClick,
                                 )
                             }
@@ -83,16 +82,24 @@ class BookmarksViewModel
                 }
             }
 
-            override fun multiSelectSelectAllUp(multiSelectable: Bookmark) { // Do Nothing
+            override fun multiSelectSelectAllUp(multiSelectable: Bookmark) {
+                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                    val startIndex = bookmarks.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        multiSelectHelper.selectAllInList(bookmarks.subList(0, startIndex + 1))
+                    }
+                }
             }
 
-            override fun multiSelectSelectAllDown(multiSelectable: Bookmark) { // Do Nothing
+            override fun multiSelectSelectAllDown(multiSelectable: Bookmark) {
+                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                    val startIndex = bookmarks.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        multiSelectHelper.selectAllInList(bookmarks.subList(startIndex, bookmarks.size))
+                    }
+                }
             }
         }
-    }
-
-    private fun onRowLongPress(bookmark: Bookmark) {
-        multiSelectHelper.defaultLongPress(bookmark)
     }
 
     private fun onRowClick(bookmark: Bookmark) {
@@ -112,7 +119,6 @@ class BookmarksViewModel
             val bookmarks: List<Bookmark> = emptyList(),
             val isMultiSelecting: Boolean,
             val isSelected: (Bookmark) -> Boolean,
-            val onRowLongPress: (Bookmark) -> Unit,
             val onRowClick: (Bookmark) -> Unit,
         ) : UiState()
 

@@ -58,27 +58,25 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fragmentManager: FragmentManager,
     ): Boolean
 
-    fun defaultLongPress(multiSelectable: T, fragmentManager: FragmentManager? = null) {
+    fun defaultLongPress(multiSelectable: T, fragmentManager: FragmentManager) {
         if (!isMultiSelecting) {
             isMultiSelecting = !isMultiSelecting
             select(multiSelectable)
 
             FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
-            if (fragmentManager != null) {
-                OptionsDialog()
-                    .addTextOption(
-                        titleId = R.string.select_all_above,
-                        click = { selectAllAbove(multiSelectable) },
-                        imageId = IR.drawable.ic_selectall_up
-                    )
-                    .addTextOption(
-                        titleId = R.string.select_all_below,
-                        click = { selectAllBelow(multiSelectable) },
-                        imageId = IR.drawable.ic_selectall_down
-                    )
-                    .show(fragmentManager, "multi_select_select_dialog")
-            }
+            OptionsDialog()
+                .addTextOption(
+                    titleId = R.string.select_all_above,
+                    click = { selectAllAbove(multiSelectable) },
+                    imageId = IR.drawable.ic_selectall_up
+                )
+                .addTextOption(
+                    titleId = R.string.select_all_below,
+                    click = { selectAllBelow(multiSelectable) },
+                    imageId = IR.drawable.ic_selectall_down
+                )
+                .show(fragmentManager, "multi_select_select_dialog")
         }
     }
 

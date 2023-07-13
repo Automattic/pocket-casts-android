@@ -73,16 +73,19 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class BookmarksFragment : BaseFragment() {
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    @Inject lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,7 +99,10 @@ class BookmarksFragment : BaseFragment() {
                 // https://stackoverflow.com/a/70195667/193545
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     BookmarksPage(
-                        playerViewModel = playerViewModel
+                        playerViewModel = playerViewModel,
+                        onRowLongPressed = { bookmark ->
+                            multiSelectHelper.defaultLongPress(bookmark, childFragmentManager)
+                        },
                     )
                 }
             }
@@ -108,6 +114,7 @@ class BookmarksFragment : BaseFragment() {
 private fun BookmarksPage(
     playerViewModel: PlayerViewModel,
     bookmarksViewModel: BookmarksViewModel = hiltViewModel(),
+    onRowLongPressed: (Bookmark) -> Unit,
 ) {
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
     val listData = playerViewModel.listDataLive.asFlow().collectAsState(initial = null)
@@ -115,6 +122,7 @@ private fun BookmarksPage(
         Content(
             state = state,
             backgroundColor = Color(it.podcastHeader.backgroundColor),
+            onRowLongPressed = onRowLongPressed,
         )
         LaunchedEffect(Unit) {
             bookmarksViewModel.loadBookmarks(
@@ -128,6 +136,7 @@ private fun BookmarksPage(
 private fun Content(
     state: UiState,
     backgroundColor: Color,
+    onRowLongPressed: (Bookmark) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -138,6 +147,7 @@ private fun Content(
             is UiState.Loaded -> BookmarksView(
                 state = state,
                 backgroundColor = backgroundColor,
+                onRowLongPressed = onRowLongPressed,
             )
 
             is UiState.Empty -> NoBookmarksView()
@@ -150,6 +160,7 @@ private fun Content(
 private fun BookmarksView(
     state: UiState.Loaded,
     backgroundColor: Color,
+    onRowLongPressed: (Bookmark) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -175,7 +186,7 @@ private fun BookmarksView(
                 modifier = Modifier
                     .pointerInput(state.isSelected(bookmark)) {
                         detectTapGestures(
-                            onLongPress = { state.onRowLongPress(bookmark) },
+                            onLongPress = { onRowLongPressed(bookmark) },
                             onTap = { state.onRowClick(bookmark) }
                         )
                     }
@@ -462,10 +473,10 @@ private fun BookmarksPreview(
                 ),
                 isMultiSelecting = false,
                 isSelected = { false },
-                onRowLongPress = {},
                 onRowClick = {},
             ),
             backgroundColor = Color.Black,
+            onRowLongPressed = {},
         )
     }
 }
@@ -479,6 +490,7 @@ private fun NoBookmarksPreview(
         Content(
             state = UiState.Empty,
             backgroundColor = Color.Black,
+            onRowLongPressed = {},
         )
     }
 }
@@ -492,6 +504,7 @@ private fun PlusUpsellPreview(
         Content(
             state = UiState.PlusUpsell,
             backgroundColor = Color.Black,
+            onRowLongPressed = {},
         )
     }
 }
