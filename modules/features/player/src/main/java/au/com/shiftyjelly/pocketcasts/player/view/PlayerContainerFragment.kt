@@ -121,6 +121,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 if (state == SCROLL_STATE_IDLE) {
                     (activity as? FragmentHostListener)?.updatePlayerView()
                 }
+                viewPager.isUserInputEnabled = !multiSelectHelper.isMultiSelecting
             }
 
             override fun onPageSelected(position: Int) {
@@ -230,15 +231,23 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     override fun getBackstackCount(): Int {
-        return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) 1 else 0
+        return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+            multiSelectHelper.isMultiSelecting
+        ) 1 else 0
     }
 
     override fun onBackPressed(): Boolean {
-        return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            true
-        } else {
-            false
+        return when {
+            upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
+                upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                true
+            }
+            multiSelectHelper.isMultiSelecting -> {
+                multiSelectHelper.closeMultiSelect()
+                binding?.viewPager?.isUserInputEnabled = true
+                true
+            }
+            else -> false
         }
     }
 
