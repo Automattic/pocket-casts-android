@@ -35,8 +35,9 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
 
     protected val selectedList: MutableList<T> = mutableListOf()
-    protected val selectedListLive = MutableLiveData<List<T>>().apply { value = listOf() }
-    val selectedCount: LiveData<Int> = selectedListLive.map { it.size }
+    protected val _selectedListLive = MutableLiveData<List<T>>().apply { value = listOf() }
+    val selectedListLive: LiveData<List<T>> = _selectedListLive
+    val selectedCount: LiveData<Int> = _selectedListLive.map { it.size }
 
     var isMultiSelecting: Boolean = false
         set(value) {
@@ -57,25 +58,27 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fragmentManager: FragmentManager,
     ): Boolean
 
-    fun defaultLongPress(multiSelectable: T, fragmentManager: FragmentManager) {
+    fun defaultLongPress(multiSelectable: T, fragmentManager: FragmentManager? = null) {
         if (!isMultiSelecting) {
             isMultiSelecting = !isMultiSelecting
             select(multiSelectable)
 
             FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
-            OptionsDialog()
-                .addTextOption(
-                    titleId = R.string.select_all_above,
-                    click = { selectAllAbove(multiSelectable) },
-                    imageId = IR.drawable.ic_selectall_up
-                )
-                .addTextOption(
-                    titleId = R.string.select_all_below,
-                    click = { selectAllBelow(multiSelectable) },
-                    imageId = IR.drawable.ic_selectall_down
-                )
-                .show(fragmentManager, "multi_select_select_dialog")
+            if (fragmentManager != null) {
+                OptionsDialog()
+                    .addTextOption(
+                        titleId = R.string.select_all_above,
+                        click = { selectAllAbove(multiSelectable) },
+                        imageId = IR.drawable.ic_selectall_up
+                    )
+                    .addTextOption(
+                        titleId = R.string.select_all_below,
+                        click = { selectAllBelow(multiSelectable) },
+                        imageId = IR.drawable.ic_selectall_down
+                    )
+                    .show(fragmentManager, "multi_select_select_dialog")
+            }
         }
     }
 
@@ -83,7 +86,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         if (!isSelected(multiSelectable)) {
             selectedList.add(multiSelectable)
         }
-        selectedListLive.value = selectedList
+        _selectedListLive.value = selectedList
     }
 
     fun deselect(multiSelectable: T) {
@@ -91,7 +94,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             selectedList.remove(multiSelectable)
         }
 
-        selectedListLive.value = selectedList
+        _selectedListLive.value = selectedList
 
         if (selectedList.isEmpty()) {
             closeMultiSelect()
@@ -117,7 +120,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     fun selectAllInList(multiSelectables: List<T>) {
         val trimmed = multiSelectables.filter { !selectedList.contains(it) }
         selectedList.addAll(trimmed)
-        selectedListLive.value = selectedList
+        _selectedListLive.value = selectedList
     }
 
     fun toggle(episode: T): Boolean {
@@ -132,7 +135,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
 
     fun closeMultiSelect() {
         selectedList.clear()
-        selectedListLive.value = selectedList
+        _selectedListLive.value = selectedList
         isMultiSelecting = false
     }
 

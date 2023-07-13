@@ -1,17 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -24,6 +28,7 @@ class BookmarksViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
+    private val multiSelectHelper: MultiSelectBookmarksHelper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -37,21 +42,26 @@ class BookmarksViewModel
                     _uiState.value = UiState.PlusUpsell
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        bookmarkManager.findEpisodeBookmarksFlow(episode)
-                            .stateIn(viewModelScope)
-                            .collect { bookmarks ->
-                                _uiState.value = if (bookmarks.isEmpty()) {
-                                    UiState.Empty
-                                } else {
-                                    UiState.Loaded(
-                                        bookmarks = bookmarks,
-                                        isMultiSelecting = false,
-                                        isSelected = { false },
-                                        onRowLongPress = ::onRowLongPress,
-                                        onRowClick = ::onRowClick,
-                                    )
-                                }
+                        val bookmarksFlow = bookmarkManager.findEpisodeBookmarksFlow(episode)
+                        val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
+                        val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
+                        combine(
+                            bookmarksFlow,
+                            isMultiSelectingFlow,
+                            selectedListFlow
+                        ) { bookmarks, isMultiSelecting, selectedList ->
+                            _uiState.value = if (bookmarks.isEmpty()) {
+                                UiState.Empty
+                            } else {
+                                UiState.Loaded(
+                                    bookmarks = bookmarks,
+                                    isMultiSelecting = isMultiSelecting,
+                                    isSelected = { selectedList.contains(it) },
+                                    onRowLongPress = ::onRowLongPress,
+                                    onRowClick = ::onRowClick,
+                                )
                             }
+                        }.stateIn(viewModelScope)
                     } ?: run { // This shouldn't happen in the ideal world
                         Timber.e("Episode not found.")
                         _uiState.value = UiState.Empty
@@ -59,14 +69,40 @@ class BookmarksViewModel
                 }
             }
         }
+
+        multiSelectHelper.listener = object : MultiSelectHelper.Listener<Bookmark> {
+            override fun multiSelectSelectAll() {
+                (_uiState.value as? UiState.Loaded)?.bookmarks?.let {
+                    multiSelectHelper.selectAllInList(it)
+                }
+            }
+
+            override fun multiSelectSelectNone() {
+                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                    bookmarks.forEach { multiSelectHelper.deselect(it) }
+                }
+            }
+
+            override fun multiSelectSelectAllUp(multiSelectable: Bookmark) { // Do Nothing
+            }
+
+            override fun multiSelectSelectAllDown(multiSelectable: Bookmark) { // Do Nothing
+            }
+        }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     private fun onRowLongPress(bookmark: Bookmark) {
+        multiSelectHelper.defaultLongPress(bookmark)
     }
 
-    @Suppress("UNUSED_PARAMETER")
     private fun onRowClick(bookmark: Bookmark) {
+        if ((_uiState.value as? UiState.Loaded)?.isMultiSelecting == false) return
+
+        if (multiSelectHelper.isSelected(bookmark)) {
+            multiSelectHelper.deselect(bookmark)
+        } else {
+            multiSelectHelper.select(bookmark)
+        }
     }
 
     sealed class UiState {

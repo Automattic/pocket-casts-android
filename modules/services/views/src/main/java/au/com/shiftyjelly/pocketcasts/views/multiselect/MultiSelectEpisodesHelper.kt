@@ -50,7 +50,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         .toFlowable(BackpressureStrategy.LATEST)
         .map { MultiSelectAction.listFromIds(it) }
         .toLiveData()
-        .combineLatest(selectedListLive)
+        .combineLatest(_selectedListLive)
         .map { (actions, selectedEpisodes) ->
             actions.mapNotNull {
                 MultiSelectAction.actionForGroup(it.groupId, selectedEpisodes)
