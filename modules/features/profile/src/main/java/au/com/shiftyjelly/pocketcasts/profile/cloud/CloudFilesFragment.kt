@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -204,7 +205,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
             adapter.notifyDataSetChanged()
         }
-        multiSelectHelper.listener = object : MultiSelectEpisodesHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
                 val episodes = viewModel.cloudFilesList.value
                 if (episodes != null) {
@@ -223,10 +224,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
+            override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.cloudFilesList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(0, startIndex + 1))
                     }
@@ -236,10 +237,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
+            override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.cloudFilesList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(startIndex, episodes.size))
                     }

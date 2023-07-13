@@ -1,18 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
-import android.content.Context
 import android.content.res.Resources
-import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -26,19 +19,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
-import com.google.android.material.snackbar.Snackbar
 import io.reactivex.BackpressureStrategy
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -54,33 +43,9 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val downloadManager: DownloadManager,
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics
-) :
-    CoroutineScope {
-    interface Listener {
-        fun multiSelectSelectAll()
-        fun multiSelectSelectNone()
-        fun multiSelectSelectAllUp(episode: BaseEpisode)
-        fun multiSelectSelectAllDown(episode: BaseEpisode)
-    }
+) : MultiSelectHelper<BaseEpisode>() {
 
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
-
-    private val _isMultiSelectingLive = MutableLiveData<Boolean>().apply { value = false }
-    val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
-
-    var isMultiSelecting: Boolean = false
-        set(value) {
-            field = value
-            _isMultiSelectingLive.value = value
-            selectedList.clear()
-        }
-
-    private val selectedList: MutableList<BaseEpisode> = mutableListOf()
-    private val selectedListLive = MutableLiveData<List<BaseEpisode>>().apply { value = listOf() }
-    val selectedCount: LiveData<Int> = selectedListLive.map { it.size }
-
-    val toolbarActions = settings.multiSelectItemsObservable
+    override val toolbarActions = settings.multiSelectItemsObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { MultiSelectAction.listFromIds(it) }
         .toLiveData()
@@ -91,27 +56,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
         }
 
-    var coordinatorLayout: View? = null
-    var context: Context? = null
-    var source = SourceView.UNKNOWN
+    override lateinit var listener: Listener<BaseEpisode>
 
-    lateinit var listener: Listener
+    override fun isSelected(multiSelectable: BaseEpisode) =
+        selectedList.count { it.uuid == multiSelectable.uuid } > 0
 
-    fun defaultLongPress(episode: BaseEpisode, fragmentManager: FragmentManager) {
-        if (!isMultiSelecting) {
-            isMultiSelecting = !isMultiSelecting
-            select(episode)
-
-            FirebaseAnalyticsTracker.enteredMultiSelect()
-        } else {
-            OptionsDialog()
-                .addTextOption(titleId = LR.string.select_all_above, click = { selectAllAbove(episode) }, imageId = IR.drawable.ic_selectall_up)
-                .addTextOption(titleId = LR.string.select_all_below, click = { selectAllBelow(episode) }, imageId = IR.drawable.ic_selectall_down)
-                .show(fragmentManager, "multi_select_select_dialog")
-        }
-    }
-
-    fun onMenuItemSelected(itemId: Int, resources: Resources, fragmentManager: FragmentManager): Boolean {
+    override fun onMenuItemSelected(itemId: Int, resources: Resources, fragmentManager: FragmentManager): Boolean {
         return when (itemId) {
             R.id.menu_archive -> {
                 archive(resources = resources, fragmentManager = fragmentManager)
@@ -178,62 +128,6 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 true
             }
             else -> false
-        }
-    }
-
-    fun isSelected(episode: BaseEpisode): Boolean {
-        return selectedList.count { it.uuid == episode.uuid } > 0
-    }
-
-    fun selectAll() {
-        listener.multiSelectSelectAll()
-    }
-
-    fun unselectAll() {
-        listener.multiSelectSelectNone()
-    }
-
-    fun selectAllAbove(episode: BaseEpisode) {
-        listener.multiSelectSelectAllUp(episode)
-    }
-
-    fun selectAllBelow(episode: BaseEpisode) {
-        listener.multiSelectSelectAllDown(episode)
-    }
-
-    fun select(episode: BaseEpisode) {
-        if (!isSelected(episode)) {
-            selectedList.add(episode)
-        }
-        selectedListLive.value = selectedList
-    }
-
-    fun selectAllInList(episodes: List<BaseEpisode>) {
-        val trimmed = episodes.filter { !selectedList.contains(it) }
-        selectedList.addAll(trimmed)
-        selectedListLive.value = selectedList
-    }
-
-    fun deselect(episode: BaseEpisode) {
-        val foundEpisode = selectedList.find { it.uuid == episode.uuid }
-        foundEpisode?.let {
-            selectedList.remove(it)
-        }
-
-        selectedListLive.value = selectedList
-
-        if (selectedList.isEmpty()) {
-            closeMultiSelect()
-        }
-    }
-
-    fun toggle(episode: BaseEpisode): Boolean {
-        if (isSelected(episode)) {
-            deselect(episode)
-            return false
-        } else {
-            select(episode)
-            return true
         }
     }
 
@@ -427,17 +321,6 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
-    private fun showSnackBar(snackText: String) {
-        coordinatorLayout?.let {
-            val snackbar = Snackbar.make(it, snackText, Snackbar.LENGTH_LONG)
-            snackbar.show()
-        } ?: run { // If we don't have a coordinator layout, fallback to a toast
-            context?.let { context ->
-                Toast.makeText(context, snackText, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     fun playNext(resources: Resources) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
@@ -522,11 +405,5 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val list = selectedList.toList()
         playbackManager.playEpisodesLast(episodes = list, source = source)
         closeMultiSelect()
-    }
-
-    fun closeMultiSelect() {
-        selectedList.clear()
-        selectedListLive.value = selectedList
-        isMultiSelecting = false
     }
 }

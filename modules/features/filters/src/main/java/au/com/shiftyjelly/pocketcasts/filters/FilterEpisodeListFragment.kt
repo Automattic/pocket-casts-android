@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -417,7 +418,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
         )
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.listener = object : MultiSelectEpisodesHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
                 val episodes = viewModel.episodesList.value
@@ -435,11 +436,11 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
+            override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_ABOVE)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(0, startIndex + 1))
                     }
@@ -448,11 +449,11 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
+            override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(startIndex, episodes.size))
                     }

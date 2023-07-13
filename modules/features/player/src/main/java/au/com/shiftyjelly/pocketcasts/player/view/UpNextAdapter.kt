@@ -104,7 +104,7 @@ class UpNextAdapter(
         }
         holder.binding.itemContainer.setOnLongClickListener {
             if (multiSelectHelper.isMultiSelecting) {
-                multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = fragmentManager)
+                multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
             } else {
                 val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
                 val playOnLongPress = !settings.getTapOnUpNextShouldPlay()

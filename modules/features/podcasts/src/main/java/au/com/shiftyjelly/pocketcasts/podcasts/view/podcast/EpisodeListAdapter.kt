@@ -90,7 +90,7 @@ class EpisodeListAdapter(
             }
         }
         holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = fragmentManager)
+            multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
             notifyDataSetChanged()
             true
         }
@@ -108,7 +108,7 @@ class EpisodeListAdapter(
             }
         }
         holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(episode = userEpisode, fragmentManager = fragmentManager)
+            multiSelectHelper.defaultLongPress(multiSelectable = userEpisode, fragmentManager = fragmentManager)
             notifyDataSetChanged()
             true
         }
