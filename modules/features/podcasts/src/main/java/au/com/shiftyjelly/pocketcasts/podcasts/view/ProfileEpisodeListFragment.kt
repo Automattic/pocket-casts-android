@@ -246,6 +246,36 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     adapter.notifyDataSetChanged()
                 }
             }
+
+            override fun multiDeselectAll() {
+                val episodes = viewModel.episodeList.value
+                if (episodes != null) {
+                    episodes.forEach { multiSelectHelper.deselect(it) }
+                    adapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun multiDeselectAllBelow(episode: BaseEpisode) {
+                val episodes = viewModel.episodeList.value
+                if (episodes != null) {
+                    val startIndex = episodes.indexOf(episode)
+                    if (startIndex > -1) {
+                        episodes.subList(startIndex, episodes.size).forEach { multiSelectHelper.deselect(it) }
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun multiDeselectAllAbove(episode: BaseEpisode) {
+                val episodes = viewModel.episodeList.value
+                if (episodes != null) {
+                    val startIndex = episodes.indexOf(episode)
+                    if (startIndex > -1) {
+                        episodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
