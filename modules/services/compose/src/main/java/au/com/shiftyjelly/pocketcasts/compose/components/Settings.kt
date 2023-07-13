@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,7 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 object SettingsSection {
@@ -134,12 +139,32 @@ fun SettingRow(
     @DrawableRes primaryTextEndDrawable: Int? = null,
     toggle: SettingRowToggle = SettingRowToggle.None,
     indent: Boolean = true,
+    showFlashWithDelay: Duration? = null, // if null, no flash is shown
     additionalContent: @Composable () -> Unit = {},
 ) {
+
+    var flashAlphaTarget by remember { mutableStateOf(0f) }
+    LaunchedEffect(showFlashWithDelay) {
+        if (showFlashWithDelay != null) {
+            delay(showFlashWithDelay)
+            flashAlphaTarget = 1.0f
+        }
+    }
+    val flashAlpha by animateFloatAsState(
+        targetValue = flashAlphaTarget,
+        finishedListener = {
+            flashAlphaTarget = 0f
+        },
+    )
+
+    val backgroundColor = MaterialTheme.theme.colors.primaryInteractive01Active.copy(
+        alpha = flashAlpha
+    )
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .background(backgroundColor)
             .padding(
                 end = horizontalPadding,
                 top = verticalPadding,
