@@ -18,7 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/secondary_ui_01"
-            android:minHeight="?android:attr/actionBarSize" />
+            android:minHeight="?android:attr/actionBarSize"
+            android:paddingLeft="0dp"
+            android:paddingRight="20dp"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
