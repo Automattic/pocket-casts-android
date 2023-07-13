@@ -34,7 +34,7 @@ fun PodcastSelectedText(
 
 @Preview(name = "PodcastSelectText in English", showBackground = true)
 @Composable
-fun PodcastSelectedTextEnglishPreview() {
+private fun PodcastSelectedTextEnglishPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         Column(modifier = Modifier.padding(8.dp)) {
             PodcastSelectedText(count = 0, modifier = Modifier.padding(bottom = 8.dp))
@@ -46,7 +46,7 @@ fun PodcastSelectedTextEnglishPreview() {
 
 @Preview(name = "PodcastSelectText in French", showBackground = true, locale = "fr")
 @Composable
-fun PodcastSelectedTextFrenchPreview() {
+private fun PodcastSelectedTextFrenchPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         Column(modifier = Modifier.padding(8.dp)) {
             PodcastSelectedText(count = 0, modifier = Modifier.padding(bottom = 8.dp))

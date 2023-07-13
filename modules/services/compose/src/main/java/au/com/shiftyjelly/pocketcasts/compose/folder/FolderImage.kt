@@ -34,11 +34,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val gradientTop = Color(0x00000000)
 private val gradientBottom = Color(0x33000000)
@@ -218,19 +219,32 @@ private fun FolderPodcastImage(
     }
 }
 
-@Preview(showBackground = true)
+@ShowkaseComposable(name = "FolderImage", group = "Folder", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
 @Composable
-fun FolderImagePreview() {
-    AppTheme(Theme.ThemeType.LIGHT) {
-        Column {
-            FolderImage(
-                name = "Favourites",
-                color = Color.Blue,
-                podcastUuids = emptyList(),
-                badgeCount = 1,
-                badgeType = Settings.BadgeType.ALL_UNFINISHED,
-                modifier = Modifier.size(50.dp)
-            )
-        }
+fun FolderImageLightPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        FolderImagePreview()
     }
+}
+
+@ShowkaseComposable(name = "FolderImage", group = "Folder", styleName = "Dark")
+@Preview(name = "Dark")
+@Composable
+fun FolderImageDarkPreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        FolderImagePreview()
+    }
+}
+
+@Composable
+private fun FolderImagePreview() {
+    FolderImage(
+        name = "Favourites",
+        color = Color.Blue,
+        podcastUuids = emptyList(),
+        badgeCount = 1,
+        badgeType = Settings.BadgeType.ALL_UNFINISHED,
+        modifier = Modifier.size(100.dp)
+    )
 }

@@ -242,7 +242,7 @@ fun TrimSilenceSlider(
     showBackground = true
 )
 @Composable
-fun EffectsScreenDarkPreview() {
+private fun EffectsScreenDarkPreview() {
     AppTheme(themeType = Theme.ThemeType.DARK) {
         Content(
             columnState = belowTimeTextPreview(),

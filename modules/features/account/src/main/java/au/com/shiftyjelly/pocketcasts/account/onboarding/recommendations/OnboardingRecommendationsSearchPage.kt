@@ -132,7 +132,7 @@ fun OnboardingRecommendationsSearchPage(
 
 @Preview
 @Composable
-fun OnboardingRecommendationSearchPage_Preview(
+private fun OnboardingRecommendationSearchPage_Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {

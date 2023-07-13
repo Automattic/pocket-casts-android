@@ -298,7 +298,7 @@ private fun MessageView(
 
 @Preview
 @Composable
-fun SearchResultsViewPreview(
+private fun SearchResultsViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -352,7 +352,7 @@ fun SearchResultsViewPreview(
 
 @Preview
 @Composable
-fun NoResultsViewPreview(
+private fun NoResultsViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -362,7 +362,7 @@ fun NoResultsViewPreview(
 
 @Preview
 @Composable
-fun SearchFailedViewPreview(
+private fun SearchFailedViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {

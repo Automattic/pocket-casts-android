@@ -22,13 +22,12 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.removeNewLines
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -84,16 +83,31 @@ fun FormField(
     )
 }
 
-@Preview
+@ShowkaseComposable(name = "FormField", group = "Form", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
 @Composable
-private fun FormFieldPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
-        Box(Modifier.background(MaterialTheme.theme.colors.primaryUi03).padding(8.dp)) {
-            FormField(
-                value = "",
-                placeholder = "Email",
-                onValueChange = {}
-            )
-        }
+fun FormFieldLightPreview() {
+    AppTheme(Theme.ThemeType.LIGHT) {
+        FormFieldPreview()
+    }
+}
+
+@ShowkaseComposable(name = "FormField", group = "Form", styleName = "Dark")
+@Preview(name = "Dark")
+@Composable
+fun FormFieldDarkPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        FormFieldPreview()
+    }
+}
+
+@Composable
+private fun FormFieldPreview() {
+    Box(Modifier.background(MaterialTheme.theme.colors.primaryUi03).padding(8.dp)) {
+        FormField(
+            value = "",
+            placeholder = "Email",
+            onValueChange = {}
+        )
     }
 }

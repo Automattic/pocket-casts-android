@@ -608,6 +608,7 @@
     <string name="filters_download_limit_100">100 episodes</string>
     <string name="filters_download_limit_20">20 episodes</string>
     <string name="filters_download_limit_40">40 episodes</string>
+    <string name="filters_download_limit_3">3 episodes</string>
     <string name="filters_download_limit_5">5 episodes</string>
     <string name="filters_download_title">Auto download first</string>
     <string name="filters_duration_error_body">Filtering for episodes longer than %1$dm but shorter than %2$dm would cause a rift in our space time continuum. Sorry.</string>
@@ -1063,6 +1064,16 @@
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
     <string name="settings_get_plus_and_more">Get Pocket Casts Plus to unlock this feature and more!</string>
+    <string name="settings_headphone_controls_action_next">Next action</string>
+    <string name="settings_headphone_controls_action_previous">Previous action</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Add bookmark</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Next chapter</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Previous chapter</string>
+    <string name="settings_headphone_controls_choice_skip_back">Skip back</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Skip forward</string>
+    <string name="settings_headphone_controls_confirmation_sound">Bookmark confirmation sound</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Play a confirmation sound after creating a bookmark with your headphones.</string>
+    <string name="settings_headphone_controls_summary">Customise the actions done by the most common headphone controls.</string>
     <string name="settings_help_cant_load">Could not load Help &amp; Feedback.\nPlease check your internet connection and try again.</string>
     <string name="settings_help_contact_support">Contact Support</string>
     <string name="settings_help_contact_support_email_sent_to_phone">If your phone is currently paired, it will show a pop-up to email support with your logs attached</string>
@@ -1197,6 +1208,7 @@
     <string name="settings_title_auto_archive" translatable="false">@string/auto_archive</string>
     <string name="settings_title_auto_download" translatable="false">@string/auto_download</string>
     <string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
+    <string name="settings_title_headphone_controls">Headphone controls</string>
     <string name="settings_title_help">Help &amp; feedback</string>
     <string name="settings_title_import_export">Import &amp; export OPML</string>
     <string name="settings_title_privacy">Privacy</string>

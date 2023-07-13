@@ -366,7 +366,7 @@ fun SearchHistoryTermView(
 
 @Preview
 @Composable
-fun SearchHistoryViewPreview(
+private fun SearchHistoryViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {

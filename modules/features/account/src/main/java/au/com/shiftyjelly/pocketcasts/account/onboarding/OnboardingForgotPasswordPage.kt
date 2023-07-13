@@ -144,7 +144,7 @@ fun OnboardingForgotPasswordPage(
 
 @Preview
 @Composable
-fun OnboardingForgotPasswordPreview(
+private fun OnboardingForgotPasswordPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {

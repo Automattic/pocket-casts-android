@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -20,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import com.airbnb.android.showkase.ui.ShowkaseBrowserActivity
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.CoroutineScope
@@ -47,6 +49,14 @@ class DeveloperFragment : PreferenceFragmentCompat(), CoroutineScope {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_developer, rootKey)
+
+        preferenceManager.findPreference<Preference>("showkase")?.setOnPreferenceClickListener {
+            val intent = Intent(context, ShowkaseBrowserActivity::class.java).apply {
+                putExtra("SHOWKASE_ROOT_MODULE", "au.com.shiftyjelly.pocketcasts.showkase.AppShowkaseRootModule")
+            }
+            startActivity(intent)
+            true
+        }
 
         preferenceManager.findPreference<Preference>("causeNotification")?.setOnPreferenceClickListener {
             triggerNotification()

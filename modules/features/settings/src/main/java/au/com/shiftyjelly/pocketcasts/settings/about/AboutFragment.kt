@@ -386,6 +386,6 @@ private fun AppLogoImage(width: Dp, image: Painter, text: String, color: Color, 
 
 @Preview
 @Composable
-fun AboutPagePreview() {
+private fun AboutPagePreview() {
     AboutPage(onBackPressed = {})
 }
