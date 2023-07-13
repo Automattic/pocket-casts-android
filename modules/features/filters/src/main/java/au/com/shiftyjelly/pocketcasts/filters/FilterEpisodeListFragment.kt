@@ -448,6 +448,41 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
 
+            override fun multiDeselectAll() {
+                analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_BUTTON_TAPPED)
+                val episodes = viewModel.episodesList.value
+                if (episodes != null) {
+                    multiSelectHelper.deselectAllInList(episodes)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun multiDeselectAllBelow(episode: BaseEpisode) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_BELOW)
+                val episodes = viewModel.episodesList.value
+                if (episodes != null) {
+                    val startIndex = episodes.indexOf(episode)
+                    if (startIndex > -1) {
+                        val episodesBelow = episodes.subList(startIndex, episodes.size)
+                        episodesBelow.forEach { multiSelectHelper.deselect(it) }
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun multiDeselectAllAbove(episode: BaseEpisode) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_ABOVE)
+                val episodes = viewModel.episodesList.value
+                if (episodes != null) {
+                    val startIndex = episodes.indexOf(episode)
+                    if (startIndex > -1) {
+                        val episodesAbove = episodes.subList(0, startIndex + 1)
+                        episodesAbove.forEach { multiSelectHelper.deselect(it) }
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
             override fun multiSelectSelectAllDown(episode: BaseEpisode) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value
