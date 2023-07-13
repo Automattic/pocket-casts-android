@@ -66,6 +66,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        multiSelectHelper.context = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -193,6 +194,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             binding.multiSelectToolbar.isVisible = isMultiSelecting
             binding.multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
         }
+        multiSelectHelper.context = context
         binding.multiSelectToolbar.setup(
             lifecycleOwner = viewLifecycleOwner,
             multiSelectHelper = multiSelectHelper,

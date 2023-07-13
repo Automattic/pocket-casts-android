@@ -87,13 +87,16 @@ class BookmarksFragment : BaseFragment() {
     private val playerViewModel: PlayerViewModel by activityViewModels()
     @Inject lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
+    private val overrideTheme: Theme.ThemeType
+        get() = if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
-            AppTheme(theme.activeTheme) {
+            AppTheme(overrideTheme) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 // Hack to allow nested scrolling inside bottom sheet viewpager
                 // https://stackoverflow.com/a/70195667/193545
@@ -101,7 +104,11 @@ class BookmarksFragment : BaseFragment() {
                     BookmarksPage(
                         playerViewModel = playerViewModel,
                         onRowLongPressed = { bookmark ->
-                            multiSelectHelper.defaultLongPress(bookmark, childFragmentManager)
+                            multiSelectHelper.defaultLongPress(
+                                multiSelectable = bookmark,
+                                fragmentManager = childFragmentManager,
+                                forceDarkTheme = true,
+                            )
                         },
                     )
                 }

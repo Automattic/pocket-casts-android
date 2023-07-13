@@ -58,7 +58,11 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fragmentManager: FragmentManager,
     ): Boolean
 
-    fun defaultLongPress(multiSelectable: T, fragmentManager: FragmentManager) {
+    fun defaultLongPress(
+        multiSelectable: T,
+        fragmentManager: FragmentManager,
+        forceDarkTheme: Boolean = false,
+    ) {
         if (!isMultiSelecting) {
             isMultiSelecting = !isMultiSelecting
             select(multiSelectable)
@@ -66,6 +70,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
             OptionsDialog()
+                .setForceDarkTheme(forceDarkTheme)
                 .addTextOption(
                     titleId = R.string.select_all_above,
                     click = { selectAllAbove(multiSelectable) },
