@@ -84,7 +84,7 @@ class WhatsNewFragment : BaseFragment() {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
                     }
-                    WhatsNewComposable(
+                    WhatsNewPage(
                         onGoToSettings = {
                             onClose()
                             goToPlaybackSettings()
@@ -111,7 +111,7 @@ class WhatsNewFragment : BaseFragment() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun WhatsNewComposable(
+private fun WhatsNewPage(
     onGoToSettings: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -248,11 +248,11 @@ private fun WhatsNewComposable(
 
 @Composable
 @Preview
-private fun WhatsNewComposablePreview(
+private fun WhatsNewPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        WhatsNewComposable(
+        WhatsNewPage(
             onGoToSettings = {},
             onClose = {}
         )
