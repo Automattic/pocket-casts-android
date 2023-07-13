@@ -119,7 +119,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.WhatsNew
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -739,11 +738,13 @@ class MainActivity :
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()
         val migratedVersion = settings.getMigratedVersionCode()
         if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-            val whatsNewShouldBeShown = WhatsNew.isWhatsNewNewerThan(lastSeenVersionCode)
+            val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
             if (whatsNewShouldBeShown) {
                 settings.setWhatsNewVersionCode(Settings.WHATS_NEW_VERSION_CODE)
-                val fragment = WhatsNewFragment()
-                showBottomSheet(fragment, swipeEnabled = false)
+                showBottomSheet(
+                    fragment = WhatsNewFragment(),
+                    swipeEnabled = false,
+                )
             }
         }
 
