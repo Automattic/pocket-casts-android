@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,8 @@ class MainActivityViewModel
     playbackManager: PlaybackManager,
     userManager: UserManager,
     val settings: Settings,
-    private val endOfYearManager: EndOfYearManager
+    private val endOfYearManager: EndOfYearManager,
+    private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
 ) : ViewModel() {
 
     var isPlayerOpen: Boolean = false
@@ -67,5 +69,9 @@ class MainActivityViewModel
         viewModelScope.launch {
             shouldShowStoriesModal.value = show && isEndOfYearStoriesEligible()
         }
+    }
+
+    fun closeMultiSelect() {
+        multiSelectBookmarksHelper.closeMultiSelect()
     }
 }

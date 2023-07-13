@@ -847,6 +847,7 @@ class MainActivity :
         updateNavAndStatusColors(false, null)
 
         viewModel.isPlayerOpen = false
+        viewModel.closeMultiSelect()
     }
 
     override fun openTab(tabId: Int) {
