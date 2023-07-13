@@ -251,6 +251,27 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
                 adapter.notifyDataSetChanged()
             }
+
+            override fun multiDeselectAll() {
+                upNextEpisodes.forEach { multiSelectHelper.deselect(it) }
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun multiDeselectAllBelow(episode: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(episode)
+                if (startIndex > -1) {
+                    upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.deselect(it) }
+                }
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun multiDeselectAllAbove(episode: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(episode)
+                if (startIndex > -1) {
+                    upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                }
+                adapter.notifyDataSetChanged()
+            }
         }
 
         multiSelectHelper.context = view.context
