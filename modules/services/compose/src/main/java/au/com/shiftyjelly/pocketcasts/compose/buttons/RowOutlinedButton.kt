@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,14 +24,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val outlinedBorder: BorderStroke
@@ -104,22 +102,42 @@ private fun RowOutlinedImage(image: Painter?, colors: ButtonColors, tintIcon: Bo
     )
 }
 
-@Preview(showBackground = true)
+@ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
 @Composable
-private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppThemeWithBackground(themeType) {
-        Column {
-            RowOutlinedButton(
-                text = "Share",
-                textIcon = rememberVectorPainter(Icons.Default.Share),
-                onClick = {}
-            )
-            RowOutlinedButton(
-                text = stringResource(LR.string.onboarding_continue_with_google),
-                leadingIcon = painterResource(R.drawable.google_g),
-                tintIcon = false,
-                onClick = {}
-            )
-        }
+fun RowOutlinedButtonLightPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        RowOutlinedButton(
+            text = "Share",
+            textIcon = rememberVectorPainter(Icons.Default.Share),
+            onClick = {}
+        )
+    }
+}
+
+@ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Dark")
+@Preview(name = "Dark")
+@Composable
+fun RowOutlinedButtonDarkPreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        RowOutlinedButton(
+            text = "Share",
+            textIcon = rememberVectorPainter(Icons.Default.Share),
+            onClick = {}
+        )
+    }
+}
+
+@ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Leading icon")
+@Preview(name = "Leading icon")
+@Composable
+fun RowOutlinedButtonLeadingIconPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        RowOutlinedButton(
+            text = stringResource(LR.string.onboarding_continue_with_google),
+            leadingIcon = painterResource(R.drawable.google_g),
+            tintIcon = false,
+            onClick = {}
+        )
     }
 }

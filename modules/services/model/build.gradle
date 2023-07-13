@@ -5,10 +5,8 @@ apply plugin: 'kotlin-parcelize'
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.model'
     defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 }
@@ -22,5 +20,5 @@ dependencies {
     implementation androidLibs.roomRx
     implementation androidLibs.roomKtx
 
-    kapt androidLibs.roomCompile
+    ksp androidLibs.roomCompile
 }

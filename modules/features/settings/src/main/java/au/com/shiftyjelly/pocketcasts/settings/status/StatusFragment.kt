@@ -216,9 +216,9 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
     }
 }
 
-@Composable
 @Preview
-fun PreviewServiceStatusRow() {
+@Composable
+private fun PreviewServiceStatusRow() {
     MaterialTheme {
         ServiceStatusRow(
             title = stringResource(LR.string.settings_status_service_internet),

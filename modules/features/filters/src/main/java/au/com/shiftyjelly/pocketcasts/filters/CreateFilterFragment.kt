@@ -227,6 +227,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
 
         layoutDownloadLimit.setOnClickListener {
             val dialog = OptionsDialog()
+                .addTextOption(LR.string.filters_download_limit_3, click = { setDownloadLimit(3) })
                 .addTextOption(LR.string.filters_download_limit_5, click = { setDownloadLimit(5) })
                 .addTextOption(LR.string.filters_download_limit_10, click = { setDownloadLimit(10) })
                 .addTextOption(LR.string.filters_download_limit_20, click = { setDownloadLimit(20) })

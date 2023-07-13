@@ -294,6 +294,8 @@ project.ext {
             // AboutLibraries - https://github.com/mikepenz/AboutLibraries
             aboutLibrariesCore: 'com.mikepenz:aboutlibraries-core:10.5.0',
             aboutLibrariesCompose: 'com.mikepenz:aboutlibraries-compose:10.5.0',
-
+            // Showkase
+            showkase: 'com.airbnb.android:showkase:1.0.0-beta18',
+            showkaseProcessor: 'com.airbnb.android:showkase-processor:1.0.0-beta18',
     ]
 }
