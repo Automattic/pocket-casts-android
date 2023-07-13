@@ -107,19 +107,19 @@ class MultiSelectHelper @Inject constructor(
 
             FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
-            val selectAllAbove = if (isSelected(episode)) {
+            val selectAllAbove = if (isSelected(episode) && selectedList.size > 1) {
                 LR.string.deselect_all_above
             } else {
                 LR.string.select_all_above
             }
 
-            val selectAll = if (selectedList.contains(episode)) {
+            val selectAll = if (selectedList.contains(episode) && selectedList.size > 1) {
                 LR.string.deselect_all
             } else {
                 LR.string.select_all
             }
 
-            val selectAllBelow = if (isSelected(episode)) {
+            val selectAllBelow = if (isSelected(episode) && selectedList.size > 1) {
                 LR.string.deselect_all_below
             } else {
                 LR.string.select_all_below
@@ -255,21 +255,21 @@ class MultiSelectHelper @Inject constructor(
     }
 
     private fun toggleSelectAll(episode: BaseEpisode) {
-        if (selectedList.contains(episode)) {
+        if (selectedList.contains(episode) && selectedList.size > 1) {
             deselectAll()
         } else {
             selectAll()
         }
     }
     private fun toggleSelectAllAbove(episode: BaseEpisode) {
-        if (isSelected(episode)) {
+        if (isSelected(episode) && selectedList.size > 1) {
             deselectAllAbove(episode)
         } else {
             selectAllAbove(episode)
         }
     }
     private fun toggleSelectAllBelow(episode: BaseEpisode) {
-        if (isSelected(episode)) {
+        if (isSelected(episode) && selectedList.size > 1) {
             deselectAllBelow(episode)
         } else {
             selectAllBelow(episode)
