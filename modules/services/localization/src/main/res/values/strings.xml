@@ -580,6 +580,8 @@
 
     <string name="filters">Filters</string>
     <string name="episode_filters">Episode Filters</string>
+    <string name="no_results_for_filters">No results found for filter %s</string>
+    <string name="no_result_found">No results found</string>
     <string name="filters_all_your_podcasts">All your podcasts</string>
     <string name="filters_auto_download_limit" translatable="false">@string/episodes_plural</string>
     <string name="filters_chip_episode_status">Episode Status</string>
