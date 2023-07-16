@@ -1135,7 +1135,7 @@
     <string name="settings_notification_choose_podcasts">Choose podcasts</string>
     <string name="settings_notification_hide_on_pause">Hide playback notification on pause</string>
     <string name="settings_notification_notify_me">Notify me</string>
-    <string name="settings_notification_play_over">Play over external notifications</string>
+    <string name="settings_notification_play_over">Play over notifications</string>
     <string name="settings_notification_play_over_never">Never</string>
     <string name="settings_notification_play_over_duck">Duck volume</string>
     <string name="settings_notification_play_over_always">Always</string>

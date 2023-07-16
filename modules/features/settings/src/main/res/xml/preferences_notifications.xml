@@ -43,7 +43,7 @@
 
     <PreferenceCategory android:title="@string/settings" >
         <ListPreference
-            android:key="notificationAudio"
+            android:key="overrideNotificationAudio"
             android:title="@string/settings_notification_play_over"
             android:persistent="true"/>
 

@@ -97,7 +97,7 @@ class NotificationsSettingsFragment :
         vibratePreference = manager.findPreference("notificationVibrate")
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
-        playOverNotificationPreference = manager.findPreference("notificationAudio")
+        playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
@@ -410,7 +410,7 @@ class NotificationsSettingsFragment :
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (Settings.PREFERENCE_NOTIFICATION_VIBRATE == key) {
             changeVibrateSummary()
-        } else if (Settings.PREFERENCE_NOTIFICATION_AUDIO == key) {
+        } else if (Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO == key) {
             changePlayOverNotificationSummary()
         }
     }

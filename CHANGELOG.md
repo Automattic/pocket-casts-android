@@ -8,6 +8,9 @@
     *   Added share option to episode swipe and multiselect menus
         ([#1190](https://github.com/Automattic/pocket-casts-android/pull/1190)),
         ([#1191](https://github.com/Automattic/pocket-casts-android/pull/1191))
+*   Bug Fixes:
+    *   Added audio ducking as an option when playing over notifications
+        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009)).
 
 7.43
 -----
@@ -64,8 +67,6 @@
         ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
     *   Improved the Automotive user profile view
         ([#975](https://github.com/Automattic/pocket-casts-android/pull/975)).
-    *   Added audio ducking as an option when playing over external notifications
-        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009)).
 
 7.39
 -----
