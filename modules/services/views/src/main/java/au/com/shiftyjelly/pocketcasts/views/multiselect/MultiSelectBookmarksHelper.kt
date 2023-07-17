@@ -50,11 +50,6 @@ class MultiSelectBookmarksHelper @Inject constructor() : MultiSelectHelper<Bookm
                 true
             }
 
-            R.id.menu_unselect_all -> {
-                unselectAll()
-                true
-            }
-
             else -> false
         }
     }
