@@ -34,6 +34,7 @@ class FolderDaoTest {
         testDatabase.clearAllTables()
         testDatabase.close()
     }
+
     @Test
     fun testInsertFolderShouldStoreItCorrectly() = runTest {
         folderDao.insert(fakeFolder)
@@ -42,6 +43,7 @@ class FolderDaoTest {
         assertEquals(fakeFolder.uuid, foundFolder?.uuid)
         assertEquals(fakeFolder.name, foundFolder?.name)
     }
+
     @Test
     fun updateFolderShouldModifyTheExistingFolder() = runTest {
         folderDao.insert(fakeFolder)
@@ -53,6 +55,7 @@ class FolderDaoTest {
         assertNotNull(foundFolder)
         assertEquals(updatedFolder.name, foundFolder?.name)
     }
+
     @Test
     fun deleteFolderShouldRemoveItFromTheDatabase() = runTest {
         folderDao.insert(fakeFolder)
@@ -60,6 +63,7 @@ class FolderDaoTest {
         val foundFolder = folderDao.findByUuid(fakeFolder.uuid)
         assertNull(foundFolder)
     }
+
     @Test
     fun deleteAllShouldRemoveAllFolders() = runTest {
         folderDao.insert(fakeFolder)
@@ -67,6 +71,7 @@ class FolderDaoTest {
         val foundFolders = folderDao.findFolders()
         assertTrue(foundFolders.isEmpty())
     }
+
     @Test
     fun findByUuidShouldReturnFolderWithMatchingUUID() = runTest {
         folderDao.insert(fakeFolder)
@@ -75,11 +80,13 @@ class FolderDaoTest {
         assertEquals(fakeFolder.uuid, foundFolder?.uuid)
         assertEquals(fakeFolder.name, foundFolder?.name)
     }
+
     @Test
     fun findByUuidShouldReturnNullWhenUUIDDoesNotExist() = runTest {
         val foundFolder = folderDao.findByUuid("non_existing_uuid")
         assertNull(foundFolder)
     }
+
     @Test
     fun updateSortPositionShouldUpdateTheSortPositionOfTheFolder() = runTest {
         folderDao.insert(fakeFolder)
@@ -93,6 +100,7 @@ class FolderDaoTest {
         assertEquals(newSortPosition, updatedFolder?.sortPosition)
         assertEquals(syncModified, updatedFolder?.syncModified)
     }
+
     @Test
     fun updateFolderSortTypeShouldUpdateTheSortTypeOfTheFolder() = runTest {
         folderDao.insert(fakeFolder)
@@ -106,6 +114,7 @@ class FolderDaoTest {
         assertEquals(newSortType, updatedFolder?.podcastsSortType)
         assertEquals(syncModified, updatedFolder?.syncModified)
     }
+
     @Test
     fun updateAllSyncedShouldUpdateTheSynModifiedFieldOfAllFolders() = runTest {
         folderDao.insert(fakeFolder)
@@ -113,6 +122,7 @@ class FolderDaoTest {
         val updatedFolder = folderDao.findFolders()
         assertTrue(updatedFolder.all { it.syncModified == 0L })
     }
+
     @Test
     fun updateFolderColorShouldUpdateTheColorOfTheFolder() = runTest {
         folderDao.insert(fakeFolder)
@@ -126,6 +136,7 @@ class FolderDaoTest {
         assertEquals(newColor, updatedFolder?.color)
         assertEquals(syncModified, updatedFolder?.syncModified)
     }
+
     @Test
     fun updateFolderNameShouldUpdateTheNameOfTheFolder() = runTest {
         folderDao.insert(fakeFolder)
