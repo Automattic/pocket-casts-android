@@ -27,6 +27,7 @@
     <string name="done">Done</string>
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
+    <string name="edit">Edit</string>
     <string name="effects">Effects</string>
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
@@ -778,7 +779,7 @@
     <string name="profile_files_add_to_upnext" translatable="false">@string/add_to_up_next</string>
     <string name="profile_files_addfile_save">Save</string>
     <string name="profile_files_delete" translatable="false">@string/delete</string>
-    <string name="profile_files_edit">Edit</string>
+    <string name="profile_files_edit" translatable="false">@string/edit</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they&#x2019;ll appear here.</string>
     <string name="profile_files_empty_title">No Files</string>
     <string name="profile_files_mark_as_played" translatable="false">@string/mark_as_played</string>

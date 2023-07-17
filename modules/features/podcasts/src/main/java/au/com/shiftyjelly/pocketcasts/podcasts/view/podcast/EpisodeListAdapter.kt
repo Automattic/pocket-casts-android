@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.disposables.CompositeDisposable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -44,7 +44,7 @@ class EpisodeListAdapter(
     val onRowClick: (BaseEpisode) -> Unit,
     val playButtonListener: PlayButton.OnClickListener,
     val imageLoader: PodcastImageLoader,
-    val multiSelectHelper: MultiSelectHelper,
+    val multiSelectHelper: MultiSelectEpisodesHelper,
     val fragmentManager: FragmentManager,
     val fromListUuid: String? = null,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
@@ -90,7 +90,7 @@ class EpisodeListAdapter(
             }
         }
         holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = fragmentManager)
+            multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
             notifyDataSetChanged()
             true
         }
@@ -108,7 +108,7 @@ class EpisodeListAdapter(
             }
         }
         holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(episode = userEpisode, fragmentManager = fragmentManager)
+            multiSelectHelper.defaultLongPress(multiSelectable = userEpisode, fragmentManager = fragmentManager)
             notifyDataSetChanged()
             true
         }
