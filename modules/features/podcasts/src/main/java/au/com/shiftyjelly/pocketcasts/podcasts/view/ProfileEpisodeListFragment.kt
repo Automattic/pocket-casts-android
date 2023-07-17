@@ -256,10 +256,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiDeselectAllBelow(episode: BaseEpisode) {
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         episodes.subList(startIndex, episodes.size).forEach { multiSelectHelper.deselect(it) }
                         adapter.notifyDataSetChanged()
@@ -267,10 +267,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiDeselectAllAbove(episode: BaseEpisode) {
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         episodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
                         adapter.notifyDataSetChanged()

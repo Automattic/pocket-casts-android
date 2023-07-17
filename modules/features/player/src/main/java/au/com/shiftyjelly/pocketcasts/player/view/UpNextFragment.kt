@@ -258,16 +258,16 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiDeselectAllBelow(episode: BaseEpisode) {
-                val startIndex = upNextEpisodes.indexOf(episode)
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.deselect(it) }
                 }
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiDeselectAllAbove(episode: BaseEpisode) {
-                val startIndex = upNextEpisodes.indexOf(episode)
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
                 }

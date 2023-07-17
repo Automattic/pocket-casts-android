@@ -258,10 +258,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
 
-            override fun multiDeselectAllBelow(episode: BaseEpisode) {
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val cloudFiles = viewModel.cloudFilesList.value
                 if (cloudFiles != null) {
-                    val startIndex = cloudFiles.indexOf(episode)
+                    val startIndex = cloudFiles.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         val episodesBelow = cloudFiles.subList(startIndex, cloudFiles.size)
                         multiSelectHelper.deselectAllInList(episodesBelow)
@@ -270,10 +270,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
 
-            override fun multiDeselectAllAbove(episode: BaseEpisode) {
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
                 val cloudFiles = viewModel.cloudFilesList.value
                 if (cloudFiles != null) {
-                    val startIndex = cloudFiles.indexOf(episode)
+                    val startIndex = cloudFiles.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         val episodesAbove = cloudFiles.subList(0, startIndex + 1)
                         multiSelectHelper.deselectAllInList(episodesAbove)

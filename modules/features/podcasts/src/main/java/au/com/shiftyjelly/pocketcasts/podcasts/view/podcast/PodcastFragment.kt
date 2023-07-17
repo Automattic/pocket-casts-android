@@ -638,11 +638,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiDeselectAllBelow(episode: BaseEpisode) {
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
-                    val group = grouped.find { it.contains(episode) } ?: return
-                    val startIndex = group.indexOf(episode)
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         group.subList(startIndex, group.size).forEach { multiSelectHelper.deselect(it) }
                         adapter?.notifyDataSetChanged()
@@ -650,11 +650,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiDeselectAllAbove(episode: BaseEpisode) {
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
-                    val group = grouped.find { it.contains(episode) } ?: return
-                    val startIndex = group.indexOf(episode)
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         group.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
                         adapter?.notifyDataSetChanged()

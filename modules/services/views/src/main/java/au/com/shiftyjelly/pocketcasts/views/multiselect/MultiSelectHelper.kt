@@ -11,7 +11,6 @@ import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -93,6 +92,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             }
 
             OptionsDialog()
+                .setForceDarkTheme(forceDarkTheme)
                 .addTextOption(
                     titleId = selectAllAbove,
                     click = { toggleSelectAllAbove(multiSelectable) },
@@ -191,15 +191,15 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         }
     }
 
-    fun deselectAll() {
+    private fun deselectAll() {
         listener.multiDeselectAll()
     }
 
-    fun deselectAllAbove(deselectAllBelow: T) {
+    private fun deselectAllAbove(deselectAllBelow: T) {
         listener.multiDeselectAllAbove(deselectAllBelow)
     }
 
-    fun deselectAllBelow(deselectAllBelow: T) {
+    private fun deselectAllBelow(deselectAllBelow: T) {
         listener.multiDeselectAllBelow(deselectAllBelow)
     }
 
