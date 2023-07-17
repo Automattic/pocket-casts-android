@@ -126,9 +126,22 @@ class MultiSelectHelper @Inject constructor(
             }
 
             OptionsDialog()
-                .addTextOption(titleId = selectAllAbove, click = { toggleSelectAllAbove(episode) }, imageId = IR.drawable.ic_selectall_up)
-                .addTextOption(titleId = selectAll, click = { toggleSelectAll(episode) }, imageId = IR.drawable.ic_selectall_up)
-                .addTextOption(titleId = selectAllBelow, click = { toggleSelectAllBelow(episode) }, imageId = IR.drawable.ic_selectall_down)
+                .addTextOption(
+                    titleId = selectAllAbove,
+                    click = { toggleSelectAllAbove(episode) },
+                    imageId = if (isSelected(episode) && selectedList.size > 1) IR.drawable.ic_deselectall_up else IR.drawable.ic_selectall_up
+
+                )
+                .addTextOption(
+                    titleId = selectAll,
+                    click = { toggleSelectAll(episode) },
+                    imageId = if (selectedList.contains(episode) && selectedList.size > 1) IR.drawable.ic_deselectall else IR.drawable.ic_selectall
+                )
+                .addTextOption(
+                    titleId = selectAllBelow,
+                    click = { toggleSelectAllBelow(episode) },
+                    imageId = if (isSelected(episode) && selectedList.size > 1) IR.drawable.ic_deselectall_down else IR.drawable.ic_selectall_down
+                )
                 .show(fragmentManager, "multi_select_select_dialog")
         }
     }
