@@ -119,8 +119,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.WhatsNew
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -171,7 +170,7 @@ class MainActivity :
         const val PROMOCODE_REQUEST_CODE = 2
     }
 
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var playlistManager: PlaylistManager
@@ -739,11 +738,13 @@ class MainActivity :
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()
         val migratedVersion = settings.getMigratedVersionCode()
         if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-            val whatsNewShouldBeShown = WhatsNew.isWhatsNewNewerThan(lastSeenVersionCode)
+            val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
             if (whatsNewShouldBeShown) {
                 settings.setWhatsNewVersionCode(Settings.WHATS_NEW_VERSION_CODE)
-                val fragment = WhatsNewFragment()
-                showBottomSheet(fragment, swipeEnabled = false)
+                showBottomSheet(
+                    fragment = WhatsNewFragment(),
+                    swipeEnabled = false,
+                )
             }
         }
 
@@ -846,6 +847,7 @@ class MainActivity :
         updateNavAndStatusColors(false, null)
 
         viewModel.isPlayerOpen = false
+        viewModel.closeMultiSelect()
     }
 
     override fun openTab(tabId: Int) {

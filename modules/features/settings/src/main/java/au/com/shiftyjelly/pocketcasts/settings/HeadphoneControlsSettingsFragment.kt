@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +23,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.components.GradientIconData
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -122,7 +122,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_previous),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
-            icon = GradientIconData(IR.drawable.ic_skip_back),
+            icon = painterResource(IR.drawable.ic_skip_back),
             options = listOf(
                 HeadphoneAction.SKIP_BACK,
                 HeadphoneAction.PREVIOUS_CHAPTER,
@@ -142,7 +142,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_next),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
-            icon = GradientIconData(IR.drawable.ic_skip_forward),
+            icon = painterResource(IR.drawable.ic_skip_forward),
             options = listOf(
                 HeadphoneAction.SKIP_FORWARD,
                 HeadphoneAction.NEXT_CHAPTER,

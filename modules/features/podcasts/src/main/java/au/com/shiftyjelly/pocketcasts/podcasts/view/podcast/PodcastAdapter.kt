@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -108,7 +108,7 @@ class PodcastAdapter(
     private val onSearchQueryChanged: (String) -> Unit,
     private val onSearchFocus: () -> Unit,
     private val onShowArchivedClicked: () -> Unit,
-    private val multiSelectHelper: MultiSelectHelper,
+    private val multiSelectHelper: MultiSelectEpisodesHelper,
     private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
     private val ratingsViewModel: PodcastRatingsViewModel,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {

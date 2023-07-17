@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -40,7 +40,7 @@ class UpNextAdapter(
     imageLoader: PodcastImageLoader,
     val episodeManager: EpisodeManager,
     val listener: UpNextListener,
-    val multiSelectHelper: MultiSelectHelper,
+    val multiSelectHelper: MultiSelectEpisodesHelper,
     val fragmentManager: FragmentManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val upNextSource: UpNextSource,
@@ -104,7 +104,7 @@ class UpNextAdapter(
         }
         holder.binding.itemContainer.setOnLongClickListener {
             if (multiSelectHelper.isMultiSelecting) {
-                multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = fragmentManager)
+                multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
             } else {
                 val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
                 val playOnLongPress = !settings.getTapOnUpNextShouldPlay()

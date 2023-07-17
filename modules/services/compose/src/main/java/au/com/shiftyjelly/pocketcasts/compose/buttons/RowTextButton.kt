@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -17,6 +18,7 @@ fun RowTextButton(
     includePadding: Boolean = true,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     textIcon: Painter? = null,
+    fontSize: TextUnit? = null,
     tintIcon: Boolean = true,
     onClick: () -> Unit,
 ) {
@@ -27,6 +29,7 @@ fun RowTextButton(
         border = null,
         colors = colors,
         textIcon = textIcon,
+        fontSize = fontSize,
         tintIcon = tintIcon,
         onClick = onClick
     )
