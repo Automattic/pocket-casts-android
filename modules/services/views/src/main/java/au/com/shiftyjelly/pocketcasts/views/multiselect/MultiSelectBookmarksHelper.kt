@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Singleton
 class MultiSelectBookmarksHelper @Inject constructor() : MultiSelectHelper<Bookmark>() {
+    override val maxToolbarIcons = 2
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {

@@ -50,6 +50,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     var context: Context? = null
     var source = SourceView.UNKNOWN
 
+    abstract val maxToolbarIcons: Int
     abstract val toolbarActions: LiveData<List<MultiSelectAction>>
     abstract fun isSelected(multiSelectable: T): Boolean
     abstract fun onMenuItemSelected(

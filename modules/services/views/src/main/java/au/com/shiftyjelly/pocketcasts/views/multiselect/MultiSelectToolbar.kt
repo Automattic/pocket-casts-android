@@ -29,11 +29,6 @@ class MultiSelectToolbar @JvmOverloads constructor(
     defStyleAttr: Int = androidx.appcompat.R.attr.toolbarStyle
 ) : Toolbar(context, attrs, defStyleAttr) {
 
-    companion object {
-        private const val MAX_ICONS_BOOKMARKS = 2
-        const val MAX_ICONS = 4
-    }
-
     private var overflowItems: List<MultiSelectAction> = emptyList()
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
@@ -50,11 +45,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
             multiSelectHelper.toolbarActions.observe(lifecycleOwner) {
                 menu.clear()
 
-                val maxIcons = when (multiSelectHelper) {
-                    is MultiSelectBookmarksHelper -> MAX_ICONS_BOOKMARKS
-                    is MultiSelectEpisodesHelper -> MAX_ICONS
-                    else -> 0
-                }
+                val maxIcons = multiSelectHelper.maxToolbarIcons
                 it.subList(0, maxIcons).forEachIndexed { _, action ->
                     val item = menu.add(Menu.NONE, action.actionId, 0, action.title)
                     item.setIcon(action.iconRes)

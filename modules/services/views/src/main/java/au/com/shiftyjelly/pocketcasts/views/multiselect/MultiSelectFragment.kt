@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHelperAdapter {
     @Inject lateinit var settings: Settings
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
     private val source: String
         get() = arguments?.getString(ARG_SOURCE) ?: SourceView.UNKNOWN.analyticsValue
 
@@ -80,7 +81,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
                 val multiSelectActions: MutableList<Any> = MultiSelectAction.listFromIds(it).toMutableList()
 
                 multiSelectActions.add(0, shortcutTitle)
-                multiSelectActions.add(MultiSelectToolbar.MAX_ICONS + 1, overflowTitle)
+                multiSelectActions.add(multiSelectEpisodesHelper.maxToolbarIcons + 1, overflowTitle)
 
                 items = multiSelectActions.toList()
                 adapter.submitList(multiSelectActions.toList())
@@ -111,7 +112,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
         // Make sure the titles are in the right spot
         listData.remove(shortcutTitle)
         listData.remove(overflowTitle)
-        listData.add(MultiSelectToolbar.MAX_ICONS + 1, overflowTitle)
+        listData.add(multiSelectEpisodesHelper.maxToolbarIcons + 1, overflowTitle)
         listData.add(0, shortcutTitle)
 
         adapter.submitList(listData)
@@ -131,7 +132,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     }
 
     private fun sectionTitleAt(position: Int) =
-        if (position <= MultiSelectToolbar.MAX_ICONS) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+        if (position <= multiSelectEpisodesHelper.maxToolbarIcons) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
 
     private fun trackRearrangeFinishedEvent() {
         analyticsTracker.track(
@@ -149,7 +150,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
             val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
                 position - 1
             } else {
-                position - (items.indexOf(MultiSelectToolbar.MAX_ICONS) + 1)
+                position - (items.indexOf(multiSelectEpisodesHelper.maxToolbarIcons) + 1)
             }
             analyticsTracker.track(
                 AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
