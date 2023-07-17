@@ -49,12 +49,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = settings.multiSelectItemsObservable
         .toFlowable(BackpressureStrategy.LATEST)
-        .map { MultiSelectAction.listFromIds(it) }
+        .map { MultiSelectEpisodeAction.listFromIds(it) }
         .toLiveData()
         .combineLatest(_selectedListLive)
         .map { (actions, selectedEpisodes) ->
             actions.mapNotNull {
-                MultiSelectAction.actionForGroup(it.groupId, selectedEpisodes)
+                MultiSelectEpisodeAction.actionForGroup(it.groupId, selectedEpisodes)
             }
         }
 

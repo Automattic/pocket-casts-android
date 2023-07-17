@@ -78,7 +78,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
 
         settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
             .observe(viewLifecycleOwner) {
-                val multiSelectActions: MutableList<Any> = MultiSelectAction.listFromIds(it).toMutableList()
+                val multiSelectActions: MutableList<Any> = MultiSelectEpisodeAction.listFromIds(it).toMutableList()
 
                 multiSelectActions.add(0, shortcutTitle)
                 multiSelectActions.add(multiSelectEpisodesHelper.maxToolbarIcons + 1, overflowTitle)

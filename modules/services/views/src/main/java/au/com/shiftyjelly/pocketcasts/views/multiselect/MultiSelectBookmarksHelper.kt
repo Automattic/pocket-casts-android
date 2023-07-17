@@ -17,8 +17,8 @@ class MultiSelectBookmarksHelper @Inject constructor() : MultiSelectHelper<Bookm
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
             listOf(
-                MultiSelectAction.BookmarkAction.EditBookmark(isVisible = it.count() == 1),
-                MultiSelectAction.BookmarkAction.DeleteBookmark,
+                MultiSelectBookmarkAction.EditBookmark(isVisible = it.count() == 1),
+                MultiSelectBookmarkAction.DeleteBookmark,
                 MultiSelectAction.SelectAll,
             )
         }

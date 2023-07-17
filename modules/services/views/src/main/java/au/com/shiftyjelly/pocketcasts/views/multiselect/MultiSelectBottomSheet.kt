@@ -66,7 +66,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
         recyclerView.layoutManager = LinearLayoutManager(recyclerView.context, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, LinearLayoutManager.VERTICAL))
 
-        val items = arguments?.getIntArray(ARG_ACTION_IDS)?.map { MultiSelectAction.ALL_BY_ID[it] } ?: emptyList()
+        val items = arguments?.getIntArray(ARG_ACTION_IDS)?.map { MultiSelectEpisodeAction.ALL_BY_ID[it] } ?: emptyList()
         adapter.submitList(items + listOf(MultiSelectAction.SelectAll))
 
         multiSelectHelper?.selectedCount?.observe(viewLifecycleOwner) {
