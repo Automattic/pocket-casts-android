@@ -517,7 +517,7 @@ class PodcastSyncProcess(
     private fun uploadBookmarkChanges(bookmark: Bookmark, records: JSONArray) {
         try {
             val fields = JSONObject().apply {
-                put("uuid", bookmark.uuid)
+                put("bookmark_uuid", bookmark.uuid)
                 put("podcast_uuid", bookmark.podcastUuid)
                 put("episode_uuid", bookmark.episodeUuid)
                 put("time", bookmark.timeSecs)
