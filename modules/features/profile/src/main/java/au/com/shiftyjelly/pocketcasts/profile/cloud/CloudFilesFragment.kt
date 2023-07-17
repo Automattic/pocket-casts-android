@@ -250,14 +250,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
 
-            override fun multiDeselectAll() {
-                val cloudFiles = viewModel.cloudFilesList.value
-                if (cloudFiles != null) {
-                    cloudFiles.forEach { multiSelectHelper.deselect(it) }
-                    adapter.notifyDataSetChanged()
-                }
-            }
-
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val cloudFiles = viewModel.cloudFilesList.value
                 if (cloudFiles != null) {

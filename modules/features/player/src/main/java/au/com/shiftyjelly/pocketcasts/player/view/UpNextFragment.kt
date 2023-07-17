@@ -253,11 +253,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiDeselectAll() {
-                upNextEpisodes.forEach { multiSelectHelper.deselect(it) }
-                adapter.notifyDataSetChanged()
-            }
-
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {

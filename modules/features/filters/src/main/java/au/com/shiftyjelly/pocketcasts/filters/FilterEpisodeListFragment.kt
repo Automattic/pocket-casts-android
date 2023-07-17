@@ -449,15 +449,6 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
 
-            override fun multiDeselectAll() {
-                analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_BUTTON_TAPPED)
-                val episodes = viewModel.episodesList.value
-                if (episodes != null) {
-                    multiSelectHelper.deselectAllInList(episodes)
-                    adapter.notifyDataSetChanged()
-                }
-            }
-
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value

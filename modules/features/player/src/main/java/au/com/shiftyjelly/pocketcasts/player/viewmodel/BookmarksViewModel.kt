@@ -82,12 +82,6 @@ class BookmarksViewModel
                 }
             }
 
-            override fun multiDeselectAll() {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    multiSelectHelper.deselectAllInList(bookmarks)
-                }
-            }
-
             override fun multiDeselectAllAbove(multiSelectable: Bookmark) {
                 (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
                     val startIndex = bookmarks.indexOf(multiSelectable)

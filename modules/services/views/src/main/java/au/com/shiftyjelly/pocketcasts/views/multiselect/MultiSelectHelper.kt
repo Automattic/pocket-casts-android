@@ -27,7 +27,6 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fun multiSelectSelectNone()
         fun multiSelectSelectAllUp(multiSelectable: T)
         fun multiSelectSelectAllDown(multiSelectable: T)
-        fun multiDeselectAll()
         fun multiDeselectAllBelow(multiSelectable: T)
         fun multiDeselectAllAbove(multiSelectable: T)
     }
@@ -192,7 +191,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     }
 
     private fun deselectAll() {
-        listener.multiDeselectAll()
+        listener.multiSelectSelectNone()
     }
 
     private fun deselectAllAbove(deselectAllBelow: T) {

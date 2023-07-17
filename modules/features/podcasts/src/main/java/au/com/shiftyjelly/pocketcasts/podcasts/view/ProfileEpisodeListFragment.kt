@@ -248,14 +248,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiDeselectAll() {
-                val episodes = viewModel.episodeList.value
-                if (episodes != null) {
-                    episodes.forEach { multiSelectHelper.deselect(it) }
-                    adapter.notifyDataSetChanged()
-                }
-            }
-
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
