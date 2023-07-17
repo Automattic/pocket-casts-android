@@ -16,6 +16,8 @@
 *   Bug Fixes:
     *   Fixed crash that could occur when rearranging shelf items on the full screen player
         ([#1155](https://github.com/Automattic/pocket-casts-android/pull/1155)).
+    *   Wear OS: Fixed blank screen when showing episode details of cloud files
+        ([#1181](https://github.com/Automattic/pocket-casts-android/pull/1181)).
 
 7.42
 -----
