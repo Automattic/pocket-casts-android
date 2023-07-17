@@ -8,6 +8,11 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import java.util.Locale
 
+private val replaceTheRegex = "^the ".toRegex(RegexOption.IGNORE_CASE)
+private fun cleanStringForSortInternal(value: String): String {
+    return value.lowercase(Locale.getDefault()).replaceFirst(replaceTheRegex, "")
+}
+
 enum class PodcastsSortType(
     val clientId: Int,
     val serverId: Int,
@@ -28,8 +33,8 @@ enum class PodcastsSortType(
         clientId = 2,
         serverId = 1,
         labelId = R.string.name,
-        podcastComparator = compareBy { cleanStringForSort(it.title) },
-        folderComparator = compareBy { cleanStringForSort(it.title) },
+        podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
+        folderComparator = compareBy { cleanStringForSortInternal(it.title) },
         analyticsValue = "name"
     ),
     EPISODE_DATE_NEWEST_TO_OLDEST(
@@ -56,10 +61,8 @@ enum class PodcastsSortType(
             return values().firstOrNull { it.serverId == id } ?: DATE_ADDED_OLDEST_TO_NEWEST
         }
 
-        private val replaceTheRegex = "^the ".toRegex(RegexOption.IGNORE_CASE)
-
         fun cleanStringForSort(value: String): String {
-            return value.lowercase(Locale.getDefault()).replaceFirst(replaceTheRegex, "")
+            return cleanStringForSortInternal(value)
         }
     }
 

@@ -608,6 +608,7 @@
     <string name="filters_download_limit_100">100 episodes</string>
     <string name="filters_download_limit_20">20 episodes</string>
     <string name="filters_download_limit_40">40 episodes</string>
+    <string name="filters_download_limit_3">3 episodes</string>
     <string name="filters_download_limit_5">5 episodes</string>
     <string name="filters_download_title">Auto download first</string>
     <string name="filters_duration_error_body">Filtering for episodes longer than %1$dm but shorter than %2$dm would cause a rift in our space time continuum. Sorry.</string>
@@ -1374,11 +1375,10 @@
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
-    <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
-    <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>
-    <string name="whats_new_grid_title_7_20">Home Grid Syncing</string>
-    <string name="whats_new_grid_7_20">We now sync your Home Screen (including your sort options) across devices! And you can drag and drop in the Web Player now as well.\n\nThis means you can rest easier, knowing the hard work you put in to arranging your podcasts page is being synced to your account.</string>
-    <string name="whats_new_blog_link">Read more about this update on our blog</string>
+    <string name="whats_new_autoplay_title">Autoplay is here!</string>
+    <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
+    <string name="whats_new_autoplay_enable_button">Enable it now</string>
+    <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
 
     <!-- Errors -->
 

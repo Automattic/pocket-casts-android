@@ -38,12 +38,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -61,6 +60,7 @@ fun EmailAndPasswordFields(
     showPasswordErrorMessage: Boolean = showPasswordError,
     enabled: Boolean,
     isCreatingAccount: Boolean,
+    focusEnabled: Boolean = true,
     onDone: () -> Unit,
     onUpdateEmail: (String) -> Unit,
     onUpdatePassword: (String) -> Unit,
@@ -71,7 +71,9 @@ fun EmailAndPasswordFields(
     val passwordFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
-        emailFocusRequester.requestFocus()
+        if (focusEnabled) {
+            emailFocusRequester.requestFocus()
+        }
     }
 
     Column(modifier) {
@@ -249,23 +251,38 @@ private fun Modifier.autofill(
     }
 }
 
+@ShowkaseComposable(name = "EmailAndPasswordFields", group = "Form", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
+@Composable
+fun UserPasswordFieldsLightPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        UserPasswordFieldsPreview()
+    }
+}
+
+@ShowkaseComposable(name = "EmailAndPasswordFields", group = "Form", styleName = "Dark")
+@Preview(name = "Dark")
+@Composable
+fun UserPasswordFieldsDarkPreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        UserPasswordFieldsPreview()
+    }
+}
+
 @Preview
 @Composable
-private fun UserPasswordFieldsPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    AppThemeWithBackground(themeType) {
-        EmailAndPasswordFields(
-            email = "",
-            password = "",
-            showEmailError = false,
-            showPasswordError = false,
-            enabled = true,
-            onDone = {},
-            onUpdateEmail = {},
-            onUpdatePassword = {},
-            showPasswordErrorMessage = false,
-            isCreatingAccount = false,
-        )
-    }
+private fun UserPasswordFieldsPreview() {
+    EmailAndPasswordFields(
+        email = "",
+        password = "",
+        showEmailError = false,
+        showPasswordError = false,
+        enabled = true,
+        focusEnabled = false,
+        onDone = {},
+        onUpdateEmail = {},
+        onUpdatePassword = {},
+        showPasswordErrorMessage = false,
+        isCreatingAccount = false,
+    )
 }
