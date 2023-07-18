@@ -1676,6 +1676,12 @@
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%s bookmarks</string>
     <string name="bookmarks_singular">%s bookmark</string>
+    <string name="bookmarks_delete_plural">Delete bookmarks</string>
+    <string name="bookmarks_delete_singular">Delete bookmark</string>
+    <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
+    <string name="bookmarks_deleted_singular">1 bookmark deleted</string>
+    <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
+    <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
 
     <!--    Tasker Plugin-->
 
