@@ -249,6 +249,30 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SELECT_ALL_BELOW_TAPPED)
                 }
             }
+
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
+                val cloudFiles = viewModel.cloudFilesList.value
+                if (cloudFiles != null) {
+                    val startIndex = cloudFiles.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        val episodesBelow = cloudFiles.subList(startIndex, cloudFiles.size)
+                        multiSelectHelper.deselectAllInList(episodesBelow)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
+                val cloudFiles = viewModel.cloudFilesList.value
+                if (cloudFiles != null) {
+                    val startIndex = cloudFiles.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        val episodesAbove = cloudFiles.subList(0, startIndex + 1)
+                        multiSelectHelper.deselectAllInList(episodesAbove)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.source = SourceView.FILES

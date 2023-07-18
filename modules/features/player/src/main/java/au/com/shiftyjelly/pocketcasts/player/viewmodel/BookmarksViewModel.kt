@@ -82,6 +82,26 @@ class BookmarksViewModel
                 }
             }
 
+            override fun multiDeselectAllAbove(multiSelectable: Bookmark) {
+                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                    val startIndex = bookmarks.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        val episodesAbove = bookmarks.subList(0, startIndex + 1)
+                        multiSelectHelper.deselectAllInList(episodesAbove)
+                    }
+                }
+            }
+
+            override fun multiDeselectAllBelow(multiSelectable: Bookmark) {
+                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                    val startIndex = bookmarks.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        bookmarks.subList(startIndex, bookmarks.size)
+                            .forEach { multiSelectHelper.deselect(it) }
+                    }
+                }
+            }
+
             override fun multiSelectSelectAllUp(multiSelectable: Bookmark) {
                 (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
                     val startIndex = bookmarks.indexOf(multiSelectable)

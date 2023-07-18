@@ -2,7 +2,9 @@
 -----
 *   New Feature:
     *   Added 3 episodes on the Filter AutoDownload
-        ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169) 
+        ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169)
+    *   Added capability to deselect all/below and above on the multiselect feature
+        ([#1172](https://github.com/Automattic/pocket-casts-android/pull/1172))
 
 7.43
 -----
