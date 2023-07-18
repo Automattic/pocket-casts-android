@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -16,10 +17,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.util.Locale
 
 private val Float.nonScaledSp
@@ -352,18 +355,20 @@ fun TextC70(
     )
 }
 
-@Preview(showBackground = true)
+@ShowkaseComposable(name = "Text", group = "Text", styleName = "Light", defaultStyle = true)
+@Preview(name = "Light")
 @Composable
 fun TextStylesLightPreview() {
-    AppTheme(Theme.ThemeType.LIGHT) {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         TextStylesPreview()
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@ShowkaseComposable(name = "Text", group = "Text", styleName = "Dark")
+@Preview(name = "Dark")
 @Composable
 fun TextStylesDarkPreview() {
-    AppTheme(Theme.ThemeType.DARK) {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
         TextStylesPreview()
     }
 }
@@ -371,17 +376,18 @@ fun TextStylesDarkPreview() {
 @Composable
 private fun TextStylesPreview() {
     Column {
-        TextH10("H10")
-        TextH20("H20")
-        TextH30("H30")
-        TextP30("P30")
-        TextH40("H40")
-        TextP40("P40")
-        TextH50("H50")
-        TextP50("P50")
-        TextP60("P60")
-        TextH70("H70")
-        TextC50("C50")
-        TextC70("C70")
+        val modifier = Modifier.padding(vertical = 2.dp)
+        TextH10("TextH10 - 31 / 700", modifier = modifier)
+        TextH20("TextH20 - 22 / 700", modifier = modifier)
+        TextH30("TextH30 - 18 / 600", modifier = modifier)
+        TextP30("TextP30 - 18 / 500", modifier = modifier)
+        TextH40("TextH40 - 15 / 500", modifier = modifier)
+        TextP40("TextP40 - 16 / 400", modifier = modifier)
+        TextH50("TextH50 - 14 / 500", modifier = modifier)
+        TextP50("TextP50 - 14 / 400", modifier = modifier)
+        TextP60("TextP60 - 13 / 400", modifier = modifier)
+        TextH70("TextH70 - 12 / 500", modifier = modifier)
+        TextC50("TextC50 - 13 / 700", modifier = modifier)
+        TextC70("TextC70 - 12 / 500", modifier = modifier)
     }
 }

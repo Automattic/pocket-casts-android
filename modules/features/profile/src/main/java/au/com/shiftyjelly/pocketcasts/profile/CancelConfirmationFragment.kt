@@ -262,7 +262,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
 
     @Preview(showBackground = true)
     @Composable
-    fun CancelConfirmationView_Preview(
+    private fun CancelConfirmationViewPreview(
         @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
     ) {
         AppThemeWithBackground(themeType) {

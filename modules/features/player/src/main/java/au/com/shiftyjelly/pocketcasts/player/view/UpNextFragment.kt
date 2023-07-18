@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
@@ -77,7 +78,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     @Inject lateinit var settings: Settings
     @Inject lateinit var episodeManager: EpisodeManager
     @Inject lateinit var playbackManager: PlaybackManager
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var adapter: UpNextAdapter
@@ -221,7 +222,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
             adapter.notifyDataSetChanged()
         }
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
                 upNextEpisodes.forEach { multiSelectHelper.select(it) }
@@ -234,8 +235,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
-                val startIndex = upNextEpisodes.indexOf(episode)
+            override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.select(it) }
                 }
@@ -243,12 +244,28 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
-                val startIndex = upNextEpisodes.indexOf(episode)
+            override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.select(it) }
                 }
 
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.deselect(it) }
+                }
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
+                val startIndex = upNextEpisodes.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                }
                 adapter.notifyDataSetChanged()
             }
         }

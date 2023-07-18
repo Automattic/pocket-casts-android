@@ -148,7 +148,7 @@ internal fun OnboardingLoginPage(
 
 @Preview(showBackground = true)
 @Composable
-fun OnboardingLoginPage_Preview(
+private fun OnboardingLoginPage_Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {

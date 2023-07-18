@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -84,7 +85,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
     @Inject lateinit var settings: Settings
     @Inject lateinit var upNextQueue: UpNextQueue
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
@@ -202,7 +203,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
             adapter.notifyDataSetChanged()
         }
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
@@ -221,10 +222,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
+            override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(0, startIndex + 1))
                         trackSelectAllAbove()
@@ -234,16 +235,38 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
+            override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
-                    val startIndex = episodes.indexOf(episode)
+                    val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(startIndex, episodes.size))
                         trackSelectAllBelow()
                     }
 
                     adapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
+                val episodes = viewModel.episodeList.value
+                if (episodes != null) {
+                    val startIndex = episodes.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        episodes.subList(startIndex, episodes.size).forEach { multiSelectHelper.deselect(it) }
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
+                val episodes = viewModel.episodeList.value
+                if (episodes != null) {
+                    val startIndex = episodes.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        episodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                        adapter.notifyDataSetChanged()
+                    }
                 }
             }
         }

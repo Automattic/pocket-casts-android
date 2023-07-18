@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -112,7 +113,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
-    @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var coilManager: CoilManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
@@ -194,7 +195,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onRowLongPress: (episode: PodcastEpisode) -> Unit = { episode ->
-        multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = childFragmentManager)
+        multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = childFragmentManager)
         adapter?.notifyDataSetChanged()
     }
 
@@ -586,7 +587,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             adapter?.notifyDataSetChanged()
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener {
+        multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectNone() {
                 val episodeState = viewModel.episodes.value
                 if (episodeState is PodcastViewModel.EpisodeState.Loaded) {
@@ -595,11 +596,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
+            override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
-                    val group = grouped.find { it.contains(episode) } ?: return
-                    val startIndex = group.indexOf(episode)
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(group.subList(0, startIndex + 1))
                     }
@@ -608,11 +609,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
+            override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
-                    val group = grouped.find { it.contains(episode) } ?: return
-                    val startIndex = group.indexOf(episode)
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(group.subList(startIndex, group.size))
                     }
@@ -626,6 +627,30 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 if (episodeState is PodcastViewModel.EpisodeState.Loaded) {
                     multiSelectHelper.selectAllInList(episodeState.episodes)
                     adapter?.notifyDataSetChanged()
+                }
+            }
+
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
+                val grouped = viewModel.groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        group.subList(startIndex, group.size).forEach { multiSelectHelper.deselect(it) }
+                        adapter?.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
+                val grouped = viewModel.groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        group.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                        adapter?.notifyDataSetChanged()
+                    }
                 }
             }
         }
