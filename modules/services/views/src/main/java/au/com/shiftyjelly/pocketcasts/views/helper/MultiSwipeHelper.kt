@@ -483,7 +483,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                         if (abs(currentTranslateX) > mRecyclerView!!.width * mCallback.getMultiItemCutoffThreshold()) {
                             targetTranslateX = Math.signum(mDx) * mRecyclerView!!.width
                         } else {
-                            targetTranslateX = -mCallback.getMultiItemStopSize(mSelected!!)
+                            targetTranslateX = -mCallback.getMultiItemStopSize(mSelected!!, SwipeDirection.Left)
                         }
                     }
                     RIGHT, END -> {
@@ -491,7 +491,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                         if (currentTranslateX > mRecyclerView!!.width * mCallback.getMultiItemCutoffThreshold()) {
                             targetTranslateX = Math.signum(mDx) * mRecyclerView!!.width
                         } else {
-                            targetTranslateX = mCallback.getMultiItemStopSize(mSelected!!)
+                            targetTranslateX = mCallback.getMultiItemStopSize(mSelected!!, SwipeDirection.Right)
                         }
                     }
                     UP, DOWN -> {
@@ -1485,7 +1485,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             return .4f
         }
 
-        abstract fun getMultiItemStopSize(viewHolder: ViewHolder): Float
+        abstract fun getMultiItemStopSize(viewHolder: ViewHolder, swipeDirection: SwipeDirection): Float
 
         open fun augmentUpdateDxDy(dx: Float, dy: Float): Pair<Float, Float> {
             return Pair(dx, dy)

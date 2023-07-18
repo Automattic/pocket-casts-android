@@ -29,7 +29,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="23dp"
-                    android:layout_gravity="center_vertical|right"
+                    android:layout_gravity="center_vertical|left"
                     app:tint="@android:color/white"/>
             </FrameLayout>
             <FrameLayout
@@ -43,7 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="23dp"
-                    android:layout_gravity="center_vertical|right"
+                    android:layout_gravity="center_vertical|left"
                     android:src="@drawable/ic_archive"
                     app:tint="@android:color/white"/>
             </FrameLayout>

@@ -108,7 +108,12 @@ class UserEpisodeViewHolder(
             }
         }
     override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground> =
-        listOf(EpisodeItemTouchHelper.IconWithBackground(VR.drawable.ic_delete, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
+        listOf(
+            EpisodeItemTouchHelper.IconWithBackground(
+                iconRes = VR.drawable.ic_delete,
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_05)
+            )
+        )
 
     fun setup(episode: UserEpisode, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false) {
         this.upNextAction = upNextAction

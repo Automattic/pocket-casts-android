@@ -42,78 +42,80 @@ class EpisodeItemTouchHelper(
     onLeftItem1: (episode: BaseEpisode, index: Int) -> Unit,
     onLeftItem2: (episode: BaseEpisode, index: Int) -> Unit,
     onRightItem1: (episode: BaseEpisode, index: Int) -> Unit,
-    onRightItem2: (episode: BaseEpisode, index: Int) -> Unit = { _, _ -> },
-) : MultiSwipeHelper(object : SwipeToArchiveCallback() {
-    override fun onSwiped(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, direction: Int): Boolean {
-        val episodeViewHolder = viewHolder as? RowSwipeable
-            ?: return false
+    onRightItem2: ((episode: BaseEpisode, index: Int) -> Unit)? = null,
+) : MultiSwipeHelper(object : SwipeToArchiveCallback(
+    swipeButtonLayout = if (onRightItem2 == null) SwipeButtonLayout.TwoLeftOneRight else SwipeButtonLayout.TwoLeftTwoRight
+) {
+        override fun onSwiped(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, direction: Int): Boolean {
+            val episodeViewHolder = viewHolder as? RowSwipeable
+                ?: return false
 
-        val rowTranslation = episodeViewHolder.episodeRow.translationX
-        val episode = episodeViewHolder.episode ?: return false
-        val multiItemCutoff = episodeViewHolder.episodeRow.width * getMultiItemCutoffThreshold()
-        if (direction == ItemTouchHelper.LEFT && rowTranslation < 0) {
-            if (abs(rowTranslation) > multiItemCutoff) {
-                onRightItem1(episode, episodeViewHolder.positionAdapter)
+            val rowTranslation = episodeViewHolder.episodeRow.translationX
+            val episode = episodeViewHolder.episode ?: return false
+            val multiItemCutoff = episodeViewHolder.episodeRow.width * getMultiItemCutoffThreshold()
+            if (direction == ItemTouchHelper.LEFT && rowTranslation < 0) {
+                if (abs(rowTranslation) > multiItemCutoff) {
+                    onRightItem1(episode, episodeViewHolder.positionAdapter)
+                    clearView(recyclerView, viewHolder)
+                    return true
+                } else {
+                    episodeViewHolder.rightLeftIcon1.apply {
+                        setOnClickListener {
+                            onRightItem1(episode, episodeViewHolder.positionAdapter)
+                            clearView(recyclerView, viewHolder)
+                        }
+                        setRippleBackground(true)
+                    }
+                    episodeViewHolder.rightLeftIcon2.apply {
+                        setOnClickListener {
+                            onRightItem2?.invoke(episode, episodeViewHolder.positionAdapter)
+                            clearView(recyclerView, viewHolder)
+                        }
+                        setRippleBackground(true)
+                    }
+                    return false
+                }
+            } else if (direction == ItemTouchHelper.RIGHT && rowTranslation > 0) {
+                if (rowTranslation > multiItemCutoff) {
+                    onLeftItem1(episode, episodeViewHolder.positionAdapter)
+                    clearView(recyclerView, viewHolder)
+                    return true
+                } else {
+                    episodeViewHolder.leftRightIcon1.apply {
+                        setOnClickListener {
+                            onLeftItem1(episode, episodeViewHolder.positionAdapter)
+                            clearView(recyclerView, viewHolder)
+                        }
+                        setRippleBackground(true)
+                    }
+                    episodeViewHolder.leftRightIcon2.apply {
+                        setOnClickListener {
+                            onLeftItem2(episode, episodeViewHolder.positionAdapter)
+                            clearView(recyclerView, viewHolder)
+                        }
+                        setRippleBackground(true)
+                    }
+                    return false
+                }
+            } else {
                 clearView(recyclerView, viewHolder)
                 return true
-            } else {
-                episodeViewHolder.rightLeftIcon1.apply {
-                    setOnClickListener {
-                        onRightItem1(episode, episodeViewHolder.positionAdapter)
-                        clearView(recyclerView, viewHolder)
-                    }
-                    setRippleBackground(true)
-                }
-                episodeViewHolder.rightLeftIcon2.apply {
-                    setOnClickListener {
-                        onRightItem2(episode, episodeViewHolder.positionAdapter)
-                        clearView(recyclerView, viewHolder)
-                    }
-                    setRippleBackground(true)
-                }
-                return false
             }
-        } else if (direction == ItemTouchHelper.RIGHT && rowTranslation > 0) {
-            if (rowTranslation > multiItemCutoff) {
-                onLeftItem1(episode, episodeViewHolder.positionAdapter)
-                clearView(recyclerView, viewHolder)
-                return true
-            } else {
-                episodeViewHolder.leftRightIcon1.apply {
-                    setOnClickListener {
-                        onLeftItem1(episode, episodeViewHolder.positionAdapter)
-                        clearView(recyclerView, viewHolder)
-                    }
-                    setRippleBackground(true)
-                }
-                episodeViewHolder.leftRightIcon2.apply {
-                    setOnClickListener {
-                        onLeftItem2(episode, episodeViewHolder.positionAdapter)
-                        clearView(recyclerView, viewHolder)
-                    }
-                    setRippleBackground(true)
-                }
-                return false
-            }
-        } else {
-            clearView(recyclerView, viewHolder)
-            return true
         }
-    }
 
-    override fun getClickableViews(viewHolder: RecyclerView.ViewHolder): List<View> {
-        return if (viewHolder is RowSwipeable) {
-            listOf(
-                viewHolder.leftRightIcon1,
-                viewHolder.leftRightIcon2,
-                viewHolder.rightLeftIcon1,
-                viewHolder.rightLeftIcon2,
-            )
-        } else {
-            emptyList()
+        override fun getClickableViews(viewHolder: RecyclerView.ViewHolder): List<View> {
+            return if (viewHolder is RowSwipeable) {
+                listOf(
+                    viewHolder.leftRightIcon1,
+                    viewHolder.leftRightIcon2,
+                    viewHolder.rightLeftIcon1,
+                    viewHolder.rightLeftIcon2,
+                )
+            } else {
+                emptyList()
+            }
         }
-    }
-}) {
+    }) {
     data class IconWithBackground(
         @DrawableRes val iconRes: Int,
         @ColorInt val backgroundColor: Int
@@ -149,8 +151,19 @@ class EpisodeItemTouchHelper(
     }
 }
 
-private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)) {
+enum class SwipeButtonLayout {
+    TwoLeftOneRight,
+    TwoLeftTwoRight
+}
+
+private abstract class SwipeToArchiveCallback(
+    private val swipeButtonLayout: SwipeButtonLayout,
+) : MultiSwipeHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)) {
     var swipeDirection: Int? = 0
+
+    companion object {
+        private const val maxButtonWidth = 140
+    }
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         if (viewHolder !is RowSwipeable) {
@@ -174,15 +187,21 @@ private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallbac
         ItemTouchHelper.Callback.getDefaultUIUtil().onSelected(leftToRightLayout)
     }
 
-    override fun getMultiItemStopSize(viewHolder: RecyclerView.ViewHolder): Float =
-        140.dpToPx(viewHolder.itemView.context).toFloat()
+    override fun getMultiItemStopSize(viewHolder: RecyclerView.ViewHolder, swipeDirection: SwipeDirection): Float =
+        when (swipeButtonLayout) {
+            SwipeButtonLayout.TwoLeftOneRight -> when (swipeDirection) {
+                SwipeDirection.Left -> maxButtonWidth / 2 // only one button on the right
+                SwipeDirection.Right -> maxButtonWidth
+            }
+            SwipeButtonLayout.TwoLeftTwoRight -> maxButtonWidth
+        }.dpToPx(viewHolder.itemView.context).toFloat()
 
     override fun getMultiItemCutoffThreshold(): Float {
         return 0.5f
     }
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        return getMultiItemStopSize(viewHolder) - 1f
+        return maxButtonWidth - 1f
     }
 
     override fun augmentUpdateDxDy(dx: Float, dy: Float): Pair<Float, Float> {
