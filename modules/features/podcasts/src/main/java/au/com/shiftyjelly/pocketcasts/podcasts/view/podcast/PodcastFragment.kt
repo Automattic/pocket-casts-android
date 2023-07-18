@@ -630,14 +630,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiDeselectAll() {
-                val episodeState = viewModel.episodes.value
-                if (episodeState is PodcastViewModel.EpisodeState.Loaded) {
-                    episodeState.episodes.forEach { multiSelectHelper.deselect(it) }
-                    adapter?.notifyDataSetChanged()
-                }
-            }
-
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
