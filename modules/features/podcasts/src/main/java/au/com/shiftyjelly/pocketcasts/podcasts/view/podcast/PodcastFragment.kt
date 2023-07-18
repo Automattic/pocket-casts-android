@@ -509,7 +509,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
-        itemTouchHelper = EpisodeItemTouchHelper(this::episodeSwipedRightItem1, this::episodeSwipedRightItem2, this::episodeSwipeArchive)
+        itemTouchHelper = EpisodeItemTouchHelper(
+            onLeftItem1 = this::episodeSwipedRightItem1,
+            onLeftItem2 = this::episodeSwipedRightItem2,
+            onRightItem1 = this::episodeSwipeArchive
+        )
 
         loadData()
 

@@ -56,12 +56,14 @@ class UserEpisodeViewHolder(
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
-    override val swipeLeftIcon: ImageView
-        get() = binding.archiveIcon
     override val leftRightIcon1: ImageView
         get() = binding.leftRightIcon1
     override val leftRightIcon2: ImageView
         get() = binding.leftRightIcon2
+    override val rightLeftIcon1: ImageView
+        get() = binding.rightLeftIcon1
+    override val rightLeftIcon2: ImageView
+        get() = binding.rightLeftIcon2
     override val episode: BaseEpisode?
         get() = binding.episode
     override val positionAdapter: Int
@@ -105,13 +107,8 @@ class UserEpisodeViewHolder(
                 )
             }
         }
-    override val rightIconDrawableRes: List<EpisodeItemTouchHelper.IconWithBackground>
-        get() {
-            return if (episode?.isArchived == true)
-                listOf(EpisodeItemTouchHelper.IconWithBackground(VR.drawable.ic_delete, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
-            else
-                listOf(EpisodeItemTouchHelper.IconWithBackground(VR.drawable.ic_delete, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
-        }
+    override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground> =
+        listOf(EpisodeItemTouchHelper.IconWithBackground(VR.drawable.ic_delete, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
 
     fun setup(episode: UserEpisode, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false) {
         this.upNextAction = upNextAction

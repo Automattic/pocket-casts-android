@@ -138,14 +138,16 @@ class UpNextEpisodeViewHolder(
         get() = binding.itemContainer
     override val episode: BaseEpisode?
         get() = binding.episode
-    override val swipeLeftIcon: ImageView
-        get() = binding.archiveIcon
     override val positionAdapter: Int
         get() = bindingAdapterPosition
     override val leftRightIcon1: ImageView
         get() = binding.leftRightIcon1
     override val leftRightIcon2: ImageView
         get() = binding.leftRightIcon2
+    override val rightLeftIcon1: ImageView
+        get() = binding.rightLeftIcon1
+    override val rightLeftIcon2: ImageView
+        get() = binding.rightLeftIcon2
     override val isMultiSelecting: Boolean
         get() = binding.checkbox.isVisible
     override val rightToLeftSwipeLayout: ViewGroup
@@ -159,6 +161,6 @@ class UpNextEpisodeViewHolder(
             EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_movetotop, binding.itemContainer.context.getThemeColor(UR.attr.support_04)),
             EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_movetobottom, binding.itemContainer.context.getThemeColor(UR.attr.support_03))
         )
-    override val rightIconDrawableRes: List<EpisodeItemTouchHelper.IconWithBackground>
+    override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() = listOf(EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_remove, binding.itemContainer.context.getThemeColor(UR.attr.support_05)))
 }

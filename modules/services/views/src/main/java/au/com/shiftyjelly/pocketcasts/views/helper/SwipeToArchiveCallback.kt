@@ -25,19 +25,25 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 interface RowSwipeable {
     val episodeRow: ViewGroup
     val episode: BaseEpisode?
-    val swipeLeftIcon: ImageView
     val positionAdapter: Int
     val leftRightIcon1: ImageView
     val leftRightIcon2: ImageView
+    val rightLeftIcon1: ImageView
+    val rightLeftIcon2: ImageView
     val isMultiSelecting: Boolean
     val rightToLeftSwipeLayout: ViewGroup
     val leftToRightSwipeLayout: ViewGroup
     val upNextAction: Settings.UpNextAction
     val leftIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
-    val rightIconDrawableRes: List<EpisodeItemTouchHelper.IconWithBackground>
+    val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
 }
 
-class EpisodeItemTouchHelper(onLeftItem1: (episode: BaseEpisode, index: Int) -> Unit, onLeftItem2: (episode: BaseEpisode, index: Int) -> Unit, onSwipeLeftAction: (episode: BaseEpisode, index: Int) -> Unit) : MultiSwipeHelper(object : SwipeToArchiveCallback() {
+class EpisodeItemTouchHelper(
+    onLeftItem1: (episode: BaseEpisode, index: Int) -> Unit,
+    onLeftItem2: (episode: BaseEpisode, index: Int) -> Unit,
+    onRightItem1: (episode: BaseEpisode, index: Int) -> Unit,
+    onRightItem2: (episode: BaseEpisode, index: Int) -> Unit = { _, _ -> },
+) : MultiSwipeHelper(object : SwipeToArchiveCallback() {
     override fun onSwiped(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, direction: Int): Boolean {
         val episodeViewHolder = viewHolder as? RowSwipeable
             ?: return false
@@ -47,15 +53,24 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: BaseEpisode, index: Int) -> 
         val multiItemCutoff = episodeViewHolder.episodeRow.width * getMultiItemCutoffThreshold()
         if (direction == ItemTouchHelper.LEFT && rowTranslation < 0) {
             if (abs(rowTranslation) > multiItemCutoff) {
-                onSwipeLeftAction(episode, episodeViewHolder.positionAdapter)
+                onRightItem1(episode, episodeViewHolder.positionAdapter)
                 clearView(recyclerView, viewHolder)
                 return true
             } else {
-                episodeViewHolder.swipeLeftIcon.setOnClickListener {
-                    onSwipeLeftAction(episode, episodeViewHolder.positionAdapter)
-                    clearView(recyclerView, viewHolder)
+                episodeViewHolder.rightLeftIcon1.apply {
+                    setOnClickListener {
+                        onRightItem1(episode, episodeViewHolder.positionAdapter)
+                        clearView(recyclerView, viewHolder)
+                    }
+                    setRippleBackground(true)
                 }
-                episodeViewHolder.swipeLeftIcon.setRippleBackground(true)
+                episodeViewHolder.rightLeftIcon2.apply {
+                    setOnClickListener {
+                        onRightItem2(episode, episodeViewHolder.positionAdapter)
+                        clearView(recyclerView, viewHolder)
+                    }
+                    setRippleBackground(true)
+                }
                 return false
             }
         } else if (direction == ItemTouchHelper.RIGHT && rowTranslation > 0) {
@@ -64,16 +79,20 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: BaseEpisode, index: Int) -> 
                 clearView(recyclerView, viewHolder)
                 return true
             } else {
-                episodeViewHolder.leftRightIcon1.setOnClickListener {
-                    onLeftItem1(episode, episodeViewHolder.positionAdapter)
-                    clearView(recyclerView, viewHolder)
+                episodeViewHolder.leftRightIcon1.apply {
+                    setOnClickListener {
+                        onLeftItem1(episode, episodeViewHolder.positionAdapter)
+                        clearView(recyclerView, viewHolder)
+                    }
+                    setRippleBackground(true)
                 }
-                episodeViewHolder.leftRightIcon1.setRippleBackground(true)
-                episodeViewHolder.leftRightIcon2.setOnClickListener {
-                    onLeftItem2(episode, episodeViewHolder.positionAdapter)
-                    clearView(recyclerView, viewHolder)
+                episodeViewHolder.leftRightIcon2.apply {
+                    setOnClickListener {
+                        onLeftItem2(episode, episodeViewHolder.positionAdapter)
+                        clearView(recyclerView, viewHolder)
+                    }
+                    setRippleBackground(true)
                 }
-                episodeViewHolder.leftRightIcon2.setRippleBackground(true)
                 return false
             }
         } else {
@@ -84,7 +103,12 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: BaseEpisode, index: Int) -> 
 
     override fun getClickableViews(viewHolder: RecyclerView.ViewHolder): List<View> {
         return if (viewHolder is RowSwipeable) {
-            listOf(viewHolder.leftRightIcon1, viewHolder.leftRightIcon2, viewHolder.swipeLeftIcon)
+            listOf(
+                viewHolder.leftRightIcon1,
+                viewHolder.leftRightIcon2,
+                viewHolder.rightLeftIcon1,
+                viewHolder.rightLeftIcon2,
+            )
         } else {
             emptyList()
         }
@@ -150,9 +174,8 @@ private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallbac
         ItemTouchHelper.Callback.getDefaultUIUtil().onSelected(leftToRightLayout)
     }
 
-    override fun getMultiItemStopSize(viewHolder: RecyclerView.ViewHolder): Float {
-        return if (swipeDirection ?: 0 > 0) 140.dpToPx(viewHolder.itemView.context).toFloat() else 70.dpToPx(viewHolder.itemView.context).toFloat()
-    }
+    override fun getMultiItemStopSize(viewHolder: RecyclerView.ViewHolder): Float =
+        140.dpToPx(viewHolder.itemView.context).toFloat()
 
     override fun getMultiItemCutoffThreshold(): Float {
         return 0.5f
@@ -163,9 +186,9 @@ private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallbac
     }
 
     override fun augmentUpdateDxDy(dx: Float, dy: Float): Pair<Float, Float> {
-        val transformedDx = if (swipeDirection ?: 0 < 0) {
+        val transformedDx = if ((swipeDirection ?: 0) < 0) {
             min(dx, 0f)
-        } else if (swipeDirection ?: 0 > 0) {
+        } else if ((swipeDirection ?: 0) > 0) {
             max(dx, 0f)
         } else {
             dx
@@ -179,17 +202,19 @@ private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallbac
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+
         val episodeViewHolder = viewHolder as? RowSwipeable
             ?: return
-        if (actionState == MultiSwipeHelper.ACTION_STATE_IDLE || swipeDirection ?: 0 > 0 && dX <= 0 || swipeDirection ?: 0 < 0 && dX >= 0 || episodeViewHolder.isMultiSelecting) {
-            return
-        }
+
+        if (actionState == MultiSwipeHelper.ACTION_STATE_IDLE ||
+            (swipeDirection ?: 0) > 0 && dX <= 0 ||
+            (swipeDirection ?: 0) < 0 && dX >= 0 ||
+            episodeViewHolder.isMultiSelecting
+        ) return
 
         val foregroundView = episodeViewHolder.episodeRow
         val rightToLeftLayout = episodeViewHolder.rightToLeftSwipeLayout
         val leftToRightLayout = episodeViewHolder.leftToRightSwipeLayout
-        val item1Icon = episodeViewHolder.leftIconDrawablesRes[0]
-        val item2Icon = episodeViewHolder.leftIconDrawablesRes.getOrNull(1)
 
         defaultDrawWithoutTranslation(recyclerView, foregroundView, isCurrentlyActive)
         foregroundView.translationX = dX
@@ -200,62 +225,115 @@ private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallbac
         leftToRightLayout.isVisible = true
 
         if (foregroundView.translationX < 0) {
-            // Is swiping from the right
-            leftToRightLayout.translationX = foregroundView.translationX
-
-            val iconView = episodeViewHolder.swipeLeftIcon
-            val rightIcon = episodeViewHolder.rightIconDrawableRes.first()
-            iconView.setImageResource(rightIcon.iconRes)
-            rightToLeftLayout.setBackgroundColor(rightIcon.backgroundColor)
-
-            if (abs(foregroundView.translationX) / foregroundView.width < getMultiItemCutoffThreshold()) {
-                iconView.x = max(rightToLeftLayout.width + foregroundView.translationX, rightToLeftLayout.width - iconView.width.toFloat())
-            } else {
-                iconView.x = rightToLeftLayout.width + foregroundView.translationX
-            }
+            handleSwipeFromRight(
+                rightToLeftLayout = rightToLeftLayout,
+                foregroundView = foregroundView,
+                leftToRightLayout = leftToRightLayout,
+                item1Icon = episodeViewHolder.rightIconDrawablesRes[0],
+                item2Icon = episodeViewHolder.rightIconDrawablesRes.getOrNull(1),
+                episodeViewHolder = episodeViewHolder
+            )
         } else {
-            // Is swiping from the left
-            rightToLeftLayout.translationX = foregroundView.translationX
+            handleSwipeFromLeft(
+                rightToLeftLayout = rightToLeftLayout,
+                foregroundView = foregroundView,
+                leftToRightLayout = leftToRightLayout,
+                item1Icon = episodeViewHolder.leftIconDrawablesRes[0],
+                item2Icon = episodeViewHolder.leftIconDrawablesRes.getOrNull(1),
+                episodeViewHolder = episodeViewHolder
+            )
+        }
+    }
 
-            val item1 = leftToRightLayout.findViewById<ViewGroup>(UR.id.leftRightItem1)
-            val item2 = leftToRightLayout.findViewById<ViewGroup>(UR.id.leftRightItem2)
+    private fun handleSwipeFromRight(
+        rightToLeftLayout: ViewGroup,
+        foregroundView: ViewGroup,
+        leftToRightLayout: ViewGroup,
+        item1Icon: EpisodeItemTouchHelper.IconWithBackground,
+        item2Icon: EpisodeItemTouchHelper.IconWithBackground?,
+        episodeViewHolder: RowSwipeable,
+    ) {
+        leftToRightLayout.translationX = foregroundView.translationX
 
-            item1.setBackgroundColor(item1Icon.backgroundColor)
-            if (item2Icon != null) {
-                item2.setBackgroundColor(item2Icon.backgroundColor)
-            }
+        val item1 = rightToLeftLayout.findViewById<ViewGroup>(UR.id.rightLeftItem1)
+        val item2 = rightToLeftLayout.findViewById<ViewGroup>(UR.id.rightLeftItem2)
 
+        item1.setBackgroundColor(item1Icon.backgroundColor)
+        if (item2Icon != null) {
+            item2.setBackgroundColor(item2Icon.backgroundColor)
+        }
+
+        episodeViewHolder.rightLeftIcon1.setImageResource(item1Icon.iconRes)
+        if (item2Icon != null) {
+            episodeViewHolder.rightLeftIcon2.setImageResource(item2Icon.iconRes)
+        } else {
+            episodeViewHolder.rightLeftIcon2.setImageDrawable(null)
+        }
+
+        if (abs(foregroundView.translationX) / foregroundView.width <= getMultiItemCutoffThreshold() && item2Icon != null) {
             episodeViewHolder.leftRightIcon1.setImageResource(item1Icon.iconRes)
-            if (item2Icon != null) {
-                episodeViewHolder.leftRightIcon2.setImageResource(item2Icon.iconRes)
-            } else {
-                episodeViewHolder.leftRightIcon2.setImageDrawable(null)
+
+            if (item1.x >= 10f && item1.x == item2.x) {
+                // Transition between modes
+                item1.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            }
+            item1.x = foregroundView.width - abs(foregroundView.translationX) / 2
+            item2.x = foregroundView.width - abs(foregroundView.translationX)
+        } else {
+            if (item1.x >= 10f && item1.x < item2.x) {
+                // Transition between modes
+                item1.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            }
+            item1.x = foregroundView.width - abs(foregroundView.translationX) // - item1.width
+            item2.x = foregroundView.width - abs(foregroundView.translationX) // - item2.width
+        }
+    }
+
+    private fun handleSwipeFromLeft(
+        rightToLeftLayout: ViewGroup,
+        foregroundView: ViewGroup,
+        leftToRightLayout: ViewGroup,
+        item1Icon: EpisodeItemTouchHelper.IconWithBackground,
+        item2Icon: EpisodeItemTouchHelper.IconWithBackground?,
+        episodeViewHolder: RowSwipeable,
+    ) {
+        rightToLeftLayout.translationX = foregroundView.translationX
+
+        val item1 = leftToRightLayout.findViewById<ViewGroup>(UR.id.leftRightItem1)
+        val item2 = leftToRightLayout.findViewById<ViewGroup>(UR.id.leftRightItem2)
+
+        item1.setBackgroundColor(item1Icon.backgroundColor)
+        if (item2Icon != null) {
+            item2.setBackgroundColor(item2Icon.backgroundColor)
+        }
+
+        episodeViewHolder.leftRightIcon1.setImageResource(item1Icon.iconRes)
+        if (item2Icon != null) {
+            episodeViewHolder.leftRightIcon2.setImageResource(item2Icon.iconRes)
+        } else {
+            episodeViewHolder.leftRightIcon2.setImageDrawable(null)
+        }
+
+        if (foregroundView.translationX / foregroundView.width <= getMultiItemCutoffThreshold() && item2Icon != null) {
+            item1.setBackgroundColor(item1Icon.backgroundColor)
+            episodeViewHolder.leftRightIcon1.setImageResource(item1Icon.iconRes)
+
+            if (item1.x >= 10f && item1.x == item2.x) {
+                // Transition between modes
+                item1.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             }
 
-            if (foregroundView.translationX / foregroundView.width <= getMultiItemCutoffThreshold() && item2Icon != null) {
-                item1.setBackgroundColor(item1Icon.backgroundColor)
-                episodeViewHolder.leftRightIcon1.setImageResource(item1Icon.iconRes)
+            item1.x = foregroundView.translationX / 2 - item1.width
+            item2.x = foregroundView.translationX - item2.width
+        } else {
+            item1.setBackgroundColor(item1Icon.backgroundColor)
 
-                if (item1.x >= 10f && item1.x == item2.x) {
-                    // Transition between modes
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        item1.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    }
-                }
-                item1.x = foregroundView.translationX / 2 - item1.width
-                item2.x = foregroundView.translationX - item2.width
-            } else {
-                item1.setBackgroundColor(item1Icon.backgroundColor)
-
-                if (item1.x >= 10f && item1.x < item2.x) {
-                    // Transition between modes
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        item1.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    }
-                }
-                item1.x = foregroundView.translationX - item1.width
-                item2.x = foregroundView.translationX - item2.width
+            if (item1.x >= 10f && item1.x < item2.x) {
+                // Transition between modes
+                item1.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             }
+            item1.x = foregroundView.translationX - item1.width
+            item2.x = foregroundView.translationX - item2.width
         }
     }
 
