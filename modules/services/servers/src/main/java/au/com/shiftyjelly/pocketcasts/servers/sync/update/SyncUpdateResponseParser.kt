@@ -236,7 +236,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
         reader.beginObject()
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "uuid" -> uuid = reader.nextString()
+                "bookmark_uuid" -> uuid = reader.nextString()
                 "podcast_uuid" -> podcastUuid = reader.nextString()
                 "episode_uuid" -> episodeUuid = reader.nextString()
                 "time" -> time = reader.nextIntOrNull()
