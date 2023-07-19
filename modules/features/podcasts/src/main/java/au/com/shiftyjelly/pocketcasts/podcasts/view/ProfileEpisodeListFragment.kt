@@ -164,7 +164,18 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
             it.adapter = adapter
             (it.itemAnimator as SimpleItemAnimator).changeDuration = 0
-            val itemTouchHelper = EpisodeItemTouchHelper(this::episodeSwipedRightItem1, this::episodeSwipedRightItem2, viewModel::episodeSwiped)
+            val itemTouchHelper = EpisodeItemTouchHelper(
+                onLeftItem1 = this::episodeSwipeLeftItem1,
+                onLeftItem2 = this::episodeSwipeLeftItem2,
+                onRightItem1 = { episode, _ -> viewModel.episodeSwipeRightItem1(episode) },
+                onRightItem2 = { episode, _ ->
+                    viewModel.episodeSwipeRightItem2(
+                        baseEpisode = episode,
+                        context = context ?: return@EpisodeItemTouchHelper,
+                        fragmentManager = parentFragmentManager,
+                    )
+                }
+            )
             itemTouchHelper.attachToRecyclerView(it)
         }
 
@@ -345,7 +356,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         (activity as? FragmentHostListener)?.addFragment(fragment)
     }
 
-    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
+    private fun episodeSwipeLeftItem1(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
@@ -353,7 +364,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         adapter.notifyItemChanged(index)
     }
 
-    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
+    private fun episodeSwipeLeftItem2(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)

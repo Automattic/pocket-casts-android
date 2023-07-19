@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setupChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -489,7 +490,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding?.episodesRecyclerView?.layoutManager?.onRestoreInstanceState(listState)
     }
 
-    fun episodeSwipeArchive(episode: BaseEpisode, index: Int) {
+    fun episodeSwipeRightItem1(episode: BaseEpisode, index: Int) {
         val binding = binding ?: return
 
         binding.episodesRecyclerView.findViewHolderForAdapterPosition(index)?.let {
@@ -497,6 +498,19 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
 
         viewModel.episodeSwipeArchive(episode, index)
+    }
+
+    fun episodeSwipeRightItem2(baseEpisode: BaseEpisode) {
+        val episode = baseEpisode as? PodcastEpisode ?: return
+        val podcast = binding?.podcast ?: return
+        ShareDialog(
+            podcast = podcast,
+            episode = episode,
+            fragmentManager = parentFragmentManager,
+            context = context,
+            shouldShowPodcast = false,
+            analyticsTracker = analyticsTracker,
+        ).show()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -510,9 +524,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         updateStatusBar()
 
         itemTouchHelper = EpisodeItemTouchHelper(
-            onLeftItem1 = this::episodeSwipedRightItem1,
-            onLeftItem2 = this::episodeSwipedRightItem2,
-            onRightItem1 = this::episodeSwipeArchive
+            onLeftItem1 = this::episodeSwipeLeftItem1,
+            onLeftItem2 = this::episodeSwipeLeftItem2,
+            onRightItem1 = this::episodeSwipeRightItem1,
+            onRightItem2 = { episode, _ -> episodeSwipeRightItem2(episode) },
         )
 
         loadData()
@@ -769,7 +784,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding = null
     }
 
-    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
+    private fun episodeSwipeLeftItem1(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
@@ -784,7 +799,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         adapter?.notifyItemChanged(index)
     }
 
-    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
+    private fun episodeSwipeLeftItem2(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)

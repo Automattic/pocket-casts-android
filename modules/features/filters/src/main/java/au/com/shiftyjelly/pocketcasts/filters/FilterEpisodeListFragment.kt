@@ -383,7 +383,18 @@ class FilterEpisodeListFragment : BaseFragment() {
         binding.btnChevron.setOnClickListener(clickListener)
         toolbar.setOnClickListener(clickListener)
 
-        val itemTouchHelper = EpisodeItemTouchHelper(this::episodeSwipedRightItem1, this::episodeSwipedRightItem2, viewModel::episodeSwiped)
+        val itemTouchHelper = EpisodeItemTouchHelper(
+            onLeftItem1 = this::episodeSwipeLeftItem1,
+            onLeftItem2 = this::episodeSwipeLeftItem2,
+            onRightItem1 = viewModel::episodeSwipeRightItem1,
+            onRightItem2 = { baseEpisode, _ ->
+                viewModel.episodeSwipeRightItem2(
+                    baseEpisode = baseEpisode,
+                    context = context ?: return@EpisodeItemTouchHelper,
+                    fragmentManager = parentFragmentManager,
+                )
+            },
+        )
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
@@ -563,7 +574,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             .show(childFragmentManager, "confirm")
     }
 
-    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
+    private fun episodeSwipeLeftItem1(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
@@ -571,7 +582,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         adapter.notifyItemChanged(index)
     }
 
-    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
+    private fun episodeSwipeLeftItem2(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)

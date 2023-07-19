@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
+import android.content.Context
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -19,7 +22,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +49,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     val downloadManager: DownloadManager,
+    val podcastManager: PodcastManager,
     val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -103,7 +109,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun episodeSwiped(episode: BaseEpisode, index: Int) {
+    fun episodeSwipeRightItem1(episode: BaseEpisode, index: Int) {
         if (episode !is PodcastEpisode) return
 
         launch {
@@ -116,6 +122,25 @@ class FilterEpisodeListViewModel @Inject constructor(
                 trackSwipeAction(SwipeAction.UNARCHIVE)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, SourceView.FILTERS, episode.uuid)
             }
+        }
+    }
+
+    fun episodeSwipeRightItem2(
+        baseEpisode: BaseEpisode,
+        context: Context,
+        fragmentManager: FragmentManager,
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val episode = baseEpisode as? PodcastEpisode ?: return@launch
+            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
+            ShareDialog(
+                podcast = podcast,
+                episode = episode,
+                fragmentManager = fragmentManager,
+                context = context,
+                shouldShowPodcast = false,
+                analyticsTracker = analyticsTracker,
+            ).show()
         }
     }
 
