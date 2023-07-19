@@ -31,8 +31,8 @@ abstract class BookmarkDao {
     @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND time = :timeSecs LIMIT 1")
     abstract suspend fun findByEpisodeTime(podcastUuid: String, episodeUuid: String, timeSecs: Int): Bookmark?
 
-    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND deleted = 0")
-    abstract fun findByEpisodeFlow(podcastUuid: String, episodeUuid: String): Flow<List<Bookmark>>
+    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND deleted = :deleted")
+    abstract fun findByEpisodeFlow(podcastUuid: String, episodeUuid: String, deleted: Boolean = false): Flow<List<Bookmark>>
 
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)
