@@ -158,7 +158,7 @@ class PodcastSyncProcessTest {
                           {
                             "type": "UserBookmark",
                             "fields": {
-                              "uuid": "${bookmarkToUpdate.uuid}",
+                              "bookmark_uuid": "${bookmarkToUpdate.uuid}",
                               "podcast_uuid": "${bookmarkToUpdate.podcastUuid}",
                               "episode_uuid": "${bookmarkToUpdate.episodeUuid}",
                               "created_at": "2023-07-06T23:01:55Z",
@@ -172,7 +172,7 @@ class PodcastSyncProcessTest {
                           {
                             "type": "UserBookmark",
                             "fields": {
-                              "uuid": "$bookmarkUuidToAdd",
+                              "bookmark_uuid": "$bookmarkUuidToAdd",
                               "podcast_uuid": "e979cf2f-58f2-4f47-8ad7-b9b58d511346",
                               "episode_uuid": "b70fcdf2-dc04-44b1-8829-1028374fc656",
                               "created_at": "2023-06-16T02:04:35Z",
@@ -186,7 +186,7 @@ class PodcastSyncProcessTest {
                           {
                             "type": "UserBookmark",
                             "fields": {
-                              "uuid": "${bookmarkToDelete.uuid}",
+                              "bookmark_uuid": "${bookmarkToDelete.uuid}",
                               "podcast_uuid": "${bookmarkToDelete.podcastUuid}",
                               "episode_uuid": "${bookmarkToDelete.episodeUuid}",
                               "created_at": "2023-06-12T01:01:56Z",
