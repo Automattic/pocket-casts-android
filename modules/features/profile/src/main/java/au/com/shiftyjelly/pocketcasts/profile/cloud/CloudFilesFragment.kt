@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,7 +69,26 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val viewModel: CloudFilesViewModel by viewModels()
     private var binding: FragmentCloudFilesBinding? = null
 
-    val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager) }
+    val adapter by lazy {
+        EpisodeListAdapter(
+            downloadManager = downloadManager,
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            settings = settings,
+            onRowClick = onRowClick,
+            playButtonListener = playButtonListener,
+            imageLoader = imageLoader,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                onQueueUpNextTopClick = ::episodeSwipedRightItem1,
+                onQueueUpNextBottomClick = ::episodeSwipedRightItem2,
+                onDeleteOrArchiveClick = ::episodeDeleteSwiped,
+                playbackManager = playbackManager,
+                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+            )
+        )
+    }
 
     private val onRowClick = { episode: BaseEpisode ->
         analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_SHOWN)
@@ -129,7 +149,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
             it.adapter = adapter
             (it.itemAnimator as SimpleItemAnimator).changeDuration = 0
-            itemTouchHelper = EpisodeItemTouchHelper(this::episodeSwipedRightItem1, this::episodeSwipedRightItem2, this::episodeDeleteSwiped)
+            itemTouchHelper = EpisodeItemTouchHelper()
             itemTouchHelper.attachToRecyclerView(it)
         }
 

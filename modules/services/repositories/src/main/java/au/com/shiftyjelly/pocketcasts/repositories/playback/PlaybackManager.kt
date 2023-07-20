@@ -435,6 +435,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.PLAYER,
             SourceView.PLAYER_BROADCAST_ACTION,
             SourceView.PLAYER_PLAYBACK_EFFECTS,
+            SourceView.SWIPE_ACTION,
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,

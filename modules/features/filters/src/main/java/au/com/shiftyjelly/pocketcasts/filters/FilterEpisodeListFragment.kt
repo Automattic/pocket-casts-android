@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -114,7 +115,33 @@ class FilterEpisodeListFragment : BaseFragment() {
         }.smallPlaceholder()
 
         playButtonListener.source = SourceView.FILTERS
-        adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager)
+        adapter = EpisodeListAdapter(
+            downloadManager = downloadManager,
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            settings = settings,
+            onRowClick = this::onRowClick,
+            playButtonListener = playButtonListener,
+            imageLoader = imageLoader,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                onQueueUpNextTopClick = this::episodeSwipeLeftItem1,
+                onQueueUpNextBottomClick = this::episodeSwipeLeftItem2,
+                onDeleteOrArchiveClick = { baseEpisode, _ ->
+                    viewModel.updateArchive(baseEpisode)
+                },
+                onShareClick = { baseEpisode, _ ->
+                    viewModel.share(
+                        baseEpisode = baseEpisode,
+                        context = context,
+                        fragmentManager = parentFragmentManager,
+                    )
+                },
+                playbackManager = playbackManager,
+                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+            )
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -383,18 +410,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         binding.btnChevron.setOnClickListener(clickListener)
         toolbar.setOnClickListener(clickListener)
 
-        val itemTouchHelper = EpisodeItemTouchHelper(
-            onLeftItem1 = this::episodeSwipeLeftItem1,
-            onLeftItem2 = this::episodeSwipeLeftItem2,
-            onRightItem1 = viewModel::episodeSwipeRightItem1,
-            onRightItem2 = { baseEpisode, _ ->
-                viewModel.episodeSwipeRightItem2(
-                    baseEpisode = baseEpisode,
-                    context = context ?: return@EpisodeItemTouchHelper,
-                    fragmentManager = parentFragmentManager,
-                )
-            },
-        )
+        val itemTouchHelper = EpisodeItemTouchHelper()
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar

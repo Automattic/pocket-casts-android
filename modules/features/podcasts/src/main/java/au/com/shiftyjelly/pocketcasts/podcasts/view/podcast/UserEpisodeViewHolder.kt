@@ -33,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -52,7 +54,8 @@ class UserEpisodeViewHolder(
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageLoader: PodcastImageLoader? = null
+    val imageLoader: PodcastImageLoader? = null,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
@@ -77,6 +80,8 @@ class UserEpisodeViewHolder(
         object NoArtwork : ViewMode()
         object Artwork : ViewMode()
     }
+
+    override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     val dateFormatter = RelativeDateFormatter(context)
     val context: Context
@@ -118,6 +123,8 @@ class UserEpisodeViewHolder(
     fun setup(episode: UserEpisode, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
+
+        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
         binding.playButtonType = playButtonType

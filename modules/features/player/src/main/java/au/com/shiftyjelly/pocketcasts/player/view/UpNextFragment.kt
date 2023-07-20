@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
@@ -28,16 +29,19 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
@@ -77,6 +81,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
@@ -138,7 +143,15 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             fragmentManager = childFragmentManager,
             analyticsTracker = analyticsTracker,
             upNextSource = upNextSource,
-            settings = settings
+            settings = settings,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                onQueueUpNextTopClick = this::moveToTop,
+                onQueueUpNextBottomClick = this::moveToBottom,
+                onDeleteOrArchiveClick = { _, index -> removeFromUpNext(index) },
+                onShareClick = { episode, _ -> share(episode) },
+                playbackManager = playbackManager,
+                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+            ),
         )
         adapter.theme = overrideTheme
 
@@ -196,7 +209,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             attachToRecyclerView(recyclerView)
         }
 
-        episodeItemTouchHelper = EpisodeItemTouchHelper(this::moveToTop, this::moveToBottom, this::removeFromUpNext).apply {
+        episodeItemTouchHelper = EpisodeItemTouchHelper().apply {
             attachToRecyclerView(recyclerView)
         }
 
@@ -303,10 +316,25 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         trackSwipeAction(SwipeAction.UP_NEXT_MOVE_BOTTOM)
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun removeFromUpNext(episode: BaseEpisode, position: Int) {
+    fun removeFromUpNext(position: Int) {
         onUpNextEpisodeRemove(position)
         trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
+    }
+
+    fun share(baseEpisode: BaseEpisode) {
+
+        trackSwipeAction(SwipeAction.SHARE)
+
+        val episode = baseEpisode as? PodcastEpisode ?: return
+        val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return
+        ShareDialog(
+            podcast = podcast,
+            episode = episode,
+            fragmentManager = parentFragmentManager,
+            context = context,
+            shouldShowPodcast = false,
+            analyticsTracker = analyticsTracker,
+        ).show(sourceView = SourceView.SWIPE_ACTION)
     }
 
     fun startTour() {

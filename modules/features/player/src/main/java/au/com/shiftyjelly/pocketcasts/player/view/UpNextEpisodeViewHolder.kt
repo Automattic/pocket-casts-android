@@ -32,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -45,12 +47,15 @@ class UpNextEpisodeViewHolder(
     val listener: UpNextListener?,
     val dateFormatter: RelativeDateFormatter,
     val imageLoader: PodcastImageLoader,
-    val episodeManager: EpisodeManager
+    val episodeManager: EpisodeManager,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root),
     UpNextTouchCallback.ItemTouchHelperViewHolder,
     RowSwipeable {
     private val elevatedBackground = ContextCompat.getColor(binding.root.context, R.color.elevatedBackground)
     private val selectedBackground = ContextCompat.getColor(binding.root.context, R.color.selectedBackground)
+
+    override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     var disposable: Disposable? = null
         set(value) {
@@ -95,6 +100,13 @@ class UpNextEpisodeViewHolder(
                 binding.executePendingBindings()
             }
             .subscribeBy(onError = { Timber.e(it) })
+
+        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(
+            episode = episode,
+            isShowingUpNextQueue = true,
+            ignoreUserSwipePreference = true,
+        )
+
         binding.episode = episode
         binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
         binding.executePendingBindings()

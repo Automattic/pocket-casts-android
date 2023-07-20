@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -112,7 +113,35 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         }
     }
 
-    val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager) }
+    val adapter by lazy {
+        EpisodeListAdapter(
+            downloadManager = downloadManager,
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            settings = settings,
+            onRowClick = onRowClick,
+            playButtonListener = playButtonListener,
+            imageLoader = imageLoader,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                onQueueUpNextTopClick = this::episodeSwipeLeftItem1,
+                onQueueUpNextBottomClick = this::episodeSwipeLeftItem2,
+                onDeleteOrArchiveClick = { baseEpisode, _ ->
+                    viewModel.swipeToUpdateArchive(baseEpisode)
+                },
+                onShareClick = { episode, _ ->
+                    viewModel.swipeToShare(
+                        baseEpisode = episode,
+                        context = context ?: return@SwipeButtonLayoutFactory,
+                        fragmentManager = parentFragmentManager,
+                    )
+                },
+                playbackManager = playbackManager,
+                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+            )
+        )
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentProfileEpisodeListBinding.inflate(inflater, container, false)
@@ -164,18 +193,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
             it.adapter = adapter
             (it.itemAnimator as SimpleItemAnimator).changeDuration = 0
-            val itemTouchHelper = EpisodeItemTouchHelper(
-                onLeftItem1 = this::episodeSwipeLeftItem1,
-                onLeftItem2 = this::episodeSwipeLeftItem2,
-                onRightItem1 = { episode, _ -> viewModel.episodeSwipeRightItem1(episode) },
-                onRightItem2 = { episode, _ ->
-                    viewModel.episodeSwipeRightItem2(
-                        baseEpisode = episode,
-                        context = context ?: return@EpisodeItemTouchHelper,
-                        fragmentManager = parentFragmentManager,
-                    )
-                }
-            )
+            val itemTouchHelper = EpisodeItemTouchHelper()
             itemTouchHelper.attachToRecyclerView(it)
         }
 

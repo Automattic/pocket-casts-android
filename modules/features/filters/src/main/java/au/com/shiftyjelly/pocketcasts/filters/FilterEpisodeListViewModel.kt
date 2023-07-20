@@ -108,8 +108,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun episodeSwipeRightItem1(episode: BaseEpisode, index: Int) {
+    fun updateArchive(episode: BaseEpisode) {
         if (episode !is PodcastEpisode) return
 
         launch {
@@ -125,22 +124,26 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun episodeSwipeRightItem2(
+    fun share(
         baseEpisode: BaseEpisode,
         context: Context,
         fragmentManager: FragmentManager,
     ) {
         viewModelScope.launch(Dispatchers.Default) {
+
+            trackSwipeAction(SwipeAction.SHARE)
+
             val episode = baseEpisode as? PodcastEpisode ?: return@launch
             val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
+
             ShareDialog(
-                podcast = podcast,
                 episode = episode,
+                podcast = podcast,
                 fragmentManager = fragmentManager,
                 context = context,
                 shouldShowPodcast = false,
                 analyticsTracker = analyticsTracker,
-            ).show()
+            ).show(sourceView = SourceView.SWIPE_ACTION)
         }
     }
 

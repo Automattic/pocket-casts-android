@@ -35,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -49,13 +51,14 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class EpisodeViewHolder(
+class EpisodeViewHolder constructor(
     val binding: AdapterEpisodeBinding,
     val viewMode: ViewMode,
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageLoader: PodcastImageLoader? = null
+    val imageLoader: PodcastImageLoader? = null,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
@@ -80,6 +83,8 @@ class EpisodeViewHolder(
         object NoArtwork : ViewMode()
         object Artwork : ViewMode()
     }
+
+    override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     val dateFormatter = RelativeDateFormatter(context)
     val context: Context
@@ -140,6 +145,8 @@ class EpisodeViewHolder(
             updateTimeLeft(textView = binding.lblStatus, episode = episode)
         }
         binding.episode = episode
+        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
+
         binding.playButton.listener = playButtonListener
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)

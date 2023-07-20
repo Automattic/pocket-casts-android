@@ -50,7 +50,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
         episodeList = episodeListFlowable.toLiveData()
     }
 
-    fun episodeSwipeRightItem1(episode: BaseEpisode) {
+    fun swipeToUpdateArchive(episode: BaseEpisode) {
         if (episode !is PodcastEpisode) return
 
         launch {
@@ -67,12 +67,15 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun episodeSwipeRightItem2(
+    fun swipeToShare(
         baseEpisode: BaseEpisode,
         context: Context,
         fragmentManager: FragmentManager,
     ) {
         viewModelScope.launch(Dispatchers.Default) {
+
+            trackSwipeAction(SwipeAction.SHARE)
+
             val episode = baseEpisode as? PodcastEpisode ?: return@launch
             val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
             ShareDialog(
@@ -82,7 +85,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
                 context = context,
                 shouldShowPodcast = false,
                 analyticsTracker = analyticsTracker,
-            ).show()
+            ).show(sourceView = SourceView.SWIPE_ACTION)
         }
     }
 

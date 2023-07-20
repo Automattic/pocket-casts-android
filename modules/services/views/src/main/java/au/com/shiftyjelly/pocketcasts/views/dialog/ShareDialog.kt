@@ -20,8 +20,7 @@ class ShareDialog(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) {
 
-    private val source = SourceView.EPISODE_DETAILS
-    fun show() {
+    fun show(sourceView: SourceView) {
         if (fragmentManager == null || context == null) {
             return
         }
@@ -37,7 +36,7 @@ class ShareDialog(
                         null,
                         context,
                         ShareType.PODCAST,
-                        source,
+                        sourceView,
                         analyticsTracker
                     ).showShareDialogDirect()
                 }
@@ -53,7 +52,7 @@ class ShareDialog(
                         null,
                         context,
                         ShareType.EPISODE,
-                        source,
+                        sourceView,
                         analyticsTracker
                     ).showShareDialogDirect()
                 }
@@ -67,7 +66,7 @@ class ShareDialog(
                         episode.playedUpTo,
                         context,
                         ShareType.CURRENT_TIME,
-                        source,
+                        sourceView,
                         analyticsTracker
                     ).showShareDialogDirect()
                 }
@@ -82,7 +81,7 @@ class ShareDialog(
                             episode.playedUpTo,
                             context,
                             ShareType.EPISODE_FILE,
-                            source,
+                            sourceView,
                             analyticsTracker
                         ).sendFile()
                     }

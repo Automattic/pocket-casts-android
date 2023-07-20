@@ -57,12 +57,12 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setupChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -497,20 +497,16 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             itemTouchHelper.clearView(binding.episodesRecyclerView, it)
         }
 
-        viewModel.episodeSwipeArchive(episode, index)
+        viewModel.episodeSwipeArchive(episode)
     }
 
     fun episodeSwipeRightItem2(baseEpisode: BaseEpisode) {
-        val episode = baseEpisode as? PodcastEpisode ?: return
-        val podcast = binding?.podcast ?: return
-        ShareDialog(
-            podcast = podcast,
-            episode = episode,
-            fragmentManager = parentFragmentManager,
-            context = context,
-            shouldShowPodcast = false,
-            analyticsTracker = analyticsTracker,
-        ).show()
+        viewModel.episodeSwipeShare(
+            episode = baseEpisode as? PodcastEpisode ?: return,
+            podcast = binding?.podcast ?: return,
+            context = context ?: return,
+            fragmentManager = parentFragmentManager
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -523,12 +519,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
-        itemTouchHelper = EpisodeItemTouchHelper(
-            onLeftItem1 = this::episodeSwipeLeftItem1,
-            onLeftItem2 = this::episodeSwipeLeftItem2,
-            onRightItem1 = this::episodeSwipeRightItem1,
-            onRightItem2 = { episode, _ -> episodeSwipeRightItem2(episode) },
-        )
+        itemTouchHelper = EpisodeItemTouchHelper()
 
         loadData()
 
@@ -577,6 +568,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 multiSelectHelper = multiSelectHelper,
                 onArtworkLongClicked = onArtworkLongClicked,
                 ratingsViewModel = ratingsViewModel,
+                swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                    onQueueUpNextTopClick = ::episodeSwipeLeftItem1,
+                    onQueueUpNextBottomClick = ::episodeSwipeLeftItem2,
+                    onDeleteOrArchiveClick = ::episodeSwipeRightItem1,
+                    onShareClick = { episode, _ -> episodeSwipeRightItem2(episode) },
+                    playbackManager = playbackManager,
+                    defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                )
             )
         }
 
