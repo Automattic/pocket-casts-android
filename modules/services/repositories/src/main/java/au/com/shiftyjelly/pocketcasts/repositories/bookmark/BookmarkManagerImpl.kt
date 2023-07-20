@@ -3,17 +3,17 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class BookmarkManagerImpl @Inject constructor(
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
 ) : BookmarkManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -57,8 +57,30 @@ class BookmarkManagerImpl @Inject constructor(
     /**
      * Find all bookmarks for the given episode. The flow will be updated when the bookmarks change.
      */
-    override suspend fun findEpisodeBookmarksFlow(episode: BaseEpisode): Flow<List<Bookmark>> {
-        return bookmarkDao.findByEpisodeFlow(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid)
+    override suspend fun findEpisodeBookmarksFlow(
+        episode: BaseEpisode,
+        sortType: BookmarksSortType,
+        isAsc: Boolean,
+    ) = when (sortType) {
+        BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST ->
+            bookmarkDao.findByEpisodeOrderCreatedAtFlow(
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                episodeUuid = episode.uuid,
+                isAsc = false,
+            )
+
+        BookmarksSortType.DATE_ADDED_OLDEST_TO_NEWEST ->
+            bookmarkDao.findByEpisodeOrderCreatedAtFlow(
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                episodeUuid = episode.uuid,
+                isAsc = true,
+            )
+
+        BookmarksSortType.TIMESTAMP ->
+            bookmarkDao.findByEpisodeOrderTimeFlow(
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                episodeUuid = episode.uuid,
+            )
     }
 
     /**
