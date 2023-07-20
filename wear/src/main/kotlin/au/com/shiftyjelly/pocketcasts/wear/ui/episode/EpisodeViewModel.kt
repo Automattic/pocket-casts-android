@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -157,8 +158,17 @@ class EpisodeViewModel @Inject constructor(
         }
 
         val showNotesFlow = episodeFlow
-            .filterIsInstance<PodcastEpisode>() // user episodes don't have show notes
-            .flatMapLatest { showNotesManager.loadShowNotesFlow(podcastUuid = it.podcastUuid, episodeUuid = it.uuid) }
+            .flatMapLatest {
+                when (it) {
+                    is PodcastEpisode -> showNotesManager.loadShowNotesFlow(
+                        podcastUuid = it.podcastUuid,
+                        episodeUuid = it.uuid,
+                    )
+
+                    // user episodes don't have show notes
+                    is UserEpisode -> flowOf(ShowNotesState.NotFound)
+                }
+            }
 
         stateFlow = combine6(
             episodeFlow,
