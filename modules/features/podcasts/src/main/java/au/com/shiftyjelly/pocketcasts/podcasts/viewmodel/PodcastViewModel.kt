@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import android.content.Context
 import android.content.res.Resources
 import android.widget.Toast
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -326,25 +324,6 @@ class PodcastViewModel
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
-    }
-
-    fun episodeSwipeShare(
-        episode: PodcastEpisode,
-        podcast: Podcast,
-        context: Context,
-        fragmentManager: FragmentManager,
-    ) {
-
-        trackSwipeAction(SwipeAction.SHARE)
-
-        ShareDialog(
-            podcast = podcast,
-            episode = episode,
-            fragmentManager = fragmentManager,
-            context = context,
-            shouldShowPodcast = false,
-            analyticsTracker = analyticsTracker,
-        ).show(sourceView = SourceView.SWIPE_ACTION)
     }
 
     fun shouldShowArchiveAll(): Boolean {

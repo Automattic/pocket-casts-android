@@ -1,11 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view
 
-import android.content.Context
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -14,8 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +24,6 @@ import kotlin.math.max
 class ProfileEpisodeListViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
-    val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
@@ -64,28 +58,6 @@ class ProfileEpisodeListViewModel @Inject constructor(
                 trackSwipeAction(SwipeAction.UNARCHIVE)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
             }
-        }
-    }
-
-    fun swipeToShare(
-        baseEpisode: BaseEpisode,
-        context: Context,
-        fragmentManager: FragmentManager,
-    ) {
-        viewModelScope.launch(Dispatchers.Default) {
-
-            trackSwipeAction(SwipeAction.SHARE)
-
-            val episode = baseEpisode as? PodcastEpisode ?: return@launch
-            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
-            ShareDialog(
-                podcast = podcast,
-                episode = episode,
-                fragmentManager = fragmentManager,
-                context = context,
-                shouldShowPodcast = false,
-                analyticsTracker = analyticsTracker,
-            ).show(sourceView = SourceView.SWIPE_ACTION)
         }
     }
 

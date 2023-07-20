@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,6 +91,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private lateinit var imageLoader: PodcastImageLoader
     private var binding: FragmentProfileEpisodeListBinding? = null
 
@@ -125,20 +127,21 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onQueueUpNextTopClick = this::episodeSwipeLeftItem1,
                 onQueueUpNextBottomClick = this::episodeSwipeLeftItem2,
                 onDeleteOrArchiveClick = { baseEpisode, _ ->
                     viewModel.swipeToUpdateArchive(baseEpisode)
                 },
-                onShareClick = { episode, _ ->
-                    viewModel.swipeToShare(
-                        baseEpisode = episode,
-                        context = context ?: return@SwipeButtonLayoutFactory,
-                        fragmentManager = parentFragmentManager,
-                    )
-                },
                 playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                context = requireContext(),
+                fragmentManager = parentFragmentManager,
+                swipeSource = when (mode) {
+                    Mode.Downloaded -> EpisodeItemTouchHelper.SwipeSource.DOWNLOADS
+                    Mode.History -> EpisodeItemTouchHelper.SwipeSource.LISTENING_HISTORY
+                    Mode.Starred -> EpisodeItemTouchHelper.SwipeSource.STARRED
+                },
             )
         )
     }

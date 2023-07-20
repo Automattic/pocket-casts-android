@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,6 +68,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     lateinit var itemTouchHelper: EpisodeItemTouchHelper
 
     private val viewModel: CloudFilesViewModel by viewModels()
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var binding: FragmentCloudFilesBinding? = null
 
     val adapter by lazy {
@@ -81,11 +83,15 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onQueueUpNextTopClick = ::episodeSwipedRightItem1,
                 onQueueUpNextBottomClick = ::episodeSwipedRightItem2,
                 onDeleteOrArchiveClick = ::episodeDeleteSwiped,
                 playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                context = requireContext(),
+                fragmentManager = parentFragmentManager,
+                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
             )
         )
     }

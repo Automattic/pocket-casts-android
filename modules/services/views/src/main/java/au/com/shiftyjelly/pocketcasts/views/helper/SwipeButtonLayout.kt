@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
+import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -105,13 +106,18 @@ sealed interface SwipeButton {
             { it.getThemeColor(UR.attr.support_06) }
     }
 
-    class ShareButton(onClick: (PodcastEpisode, RowIndex) -> Unit) : SwipeButton {
+    class ShareButton(
+        swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        fragmentManager: FragmentManager,
+        context: Context,
+        viewModel: SwipeButtonLayoutViewModel,
+    ) : SwipeButton {
         override val iconRes = IR.drawable.ic_share
         override val backgroundColor: (Context) -> Int =
             { it.getThemeColor(UR.attr.support_01) }
-        override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, rowIndex ->
+        override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, _ ->
             (baseEpisode as? PodcastEpisode)?.let { episode ->
-                onClick(episode, rowIndex)
+                viewModel.share(episode, fragmentManager, context, swipeSource)
             }
         }
     }
@@ -119,15 +125,18 @@ sealed interface SwipeButton {
 
 /**
  * - [onDeleteOrArchiveClick] will delete [UserEpisode]s and archive [PodcastEpisode]s
- * - Share button will not be shown if [onShareClick] is null
  */
 class SwipeButtonLayoutFactory(
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel,
     private val onQueueUpNextTopClick: (BaseEpisode, RowIndex) -> Unit,
     private val onQueueUpNextBottomClick: (BaseEpisode, RowIndex) -> Unit,
     private val onDeleteOrArchiveClick: (BaseEpisode, RowIndex) -> Unit,
-    private val onShareClick: ((BaseEpisode, RowIndex) -> Unit)? = null,
+    private val showShareButton: Boolean = true,
     private val playbackManager: PlaybackManager,
     private val defaultUpNextSwipeAction: () -> Settings.UpNextAction,
+    private val context: Context,
+    private val fragmentManager: FragmentManager,
+    private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
 ) {
     fun forEpisode(
         episode: BaseEpisode,
@@ -196,7 +205,14 @@ class SwipeButtonLayoutFactory(
                     null
                 } else {
                     when (episode) {
-                        is PodcastEpisode -> onShareClick?.let { SwipeButton.ShareButton(onClick = it) }
+                        is PodcastEpisode -> if (showShareButton) {
+                            SwipeButton.ShareButton(
+                                swipeSource = swipeSource,
+                                fragmentManager = fragmentManager,
+                                context = context,
+                                viewModel = swipeButtonLayoutViewModel,
+                            )
+                        } else null
                         is UserEpisode -> null
                     }
                 }

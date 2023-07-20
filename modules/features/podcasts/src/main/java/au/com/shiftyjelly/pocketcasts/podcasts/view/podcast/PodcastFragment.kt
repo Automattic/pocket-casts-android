@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -120,6 +121,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var adapter: PodcastAdapter? = null
     private var binding: FragmentPodcastBinding? = null
 
@@ -500,15 +502,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         viewModel.episodeSwipeArchive(episode)
     }
 
-    fun episodeSwipeRightItem2(baseEpisode: BaseEpisode) {
-        viewModel.episodeSwipeShare(
-            episode = baseEpisode as? PodcastEpisode ?: return,
-            podcast = binding?.podcast ?: return,
-            context = context ?: return,
-            fragmentManager = parentFragmentManager
-        )
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPodcastBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -569,12 +562,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 onArtworkLongClicked = onArtworkLongClicked,
                 ratingsViewModel = ratingsViewModel,
                 swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                    swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                     onQueueUpNextTopClick = ::episodeSwipeLeftItem1,
                     onQueueUpNextBottomClick = ::episodeSwipeLeftItem2,
                     onDeleteOrArchiveClick = ::episodeSwipeRightItem1,
-                    onShareClick = { episode, _ -> episodeSwipeRightItem2(episode) },
                     playbackManager = playbackManager,
                     defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                    context = context,
+                    fragmentManager = parentFragmentManager,
+                    swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
                 )
             )
         }

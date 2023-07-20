@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -81,6 +82,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     private val viewModel by viewModels<FilterEpisodeListViewModel>()
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
 
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var playbackManager: PlaybackManager
@@ -126,20 +128,17 @@ class FilterEpisodeListFragment : BaseFragment() {
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onQueueUpNextTopClick = this::episodeSwipeLeftItem1,
                 onQueueUpNextBottomClick = this::episodeSwipeLeftItem2,
                 onDeleteOrArchiveClick = { baseEpisode, _ ->
                     viewModel.updateArchive(baseEpisode)
                 },
-                onShareClick = { baseEpisode, _ ->
-                    viewModel.share(
-                        baseEpisode = baseEpisode,
-                        context = context,
-                        fragmentManager = parentFragmentManager,
-                    )
-                },
                 playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                context = context,
+                fragmentManager = parentFragmentManager,
+                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             )
         )
     }
