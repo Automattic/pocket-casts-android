@@ -127,6 +127,13 @@ class BookmarksFragment : BaseFragment() {
             OptionsDialog()
                 .setForceDarkTheme(true)
                 .addTextOption(
+                    titleId = LR.string.bookmarks_select_option,
+                    imageId = IR.drawable.ic_selectall,
+                    click = {
+                        multiSelectHelper.isMultiSelecting = true
+                    }
+                )
+                .addTextOption(
                     titleId = LR.string.bookmarks_sort_option,
                     imageId = IR.drawable.ic_sort,
                     valueId = selectedValue,
