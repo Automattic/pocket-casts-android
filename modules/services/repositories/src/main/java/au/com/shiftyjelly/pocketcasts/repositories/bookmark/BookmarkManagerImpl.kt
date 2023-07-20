@@ -60,7 +60,6 @@ class BookmarkManagerImpl @Inject constructor(
     override suspend fun findEpisodeBookmarksFlow(
         episode: BaseEpisode,
         sortType: BookmarksSortType,
-        isAsc: Boolean,
     ) = when (sortType) {
         BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST ->
             bookmarkDao.findByEpisodeOrderCreatedAtFlow(

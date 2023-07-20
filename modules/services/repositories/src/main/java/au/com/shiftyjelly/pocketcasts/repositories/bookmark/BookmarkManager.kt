@@ -11,7 +11,6 @@ interface BookmarkManager {
     suspend fun findEpisodeBookmarksFlow(
         episode: BaseEpisode,
         sortType: BookmarksSortType,
-        isAsc: Boolean = false,
     ): Flow<List<Bookmark>>
 
     suspend fun deleteToSync(bookmarkUuid: String)
