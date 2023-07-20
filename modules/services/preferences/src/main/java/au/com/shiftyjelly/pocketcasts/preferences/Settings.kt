@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -107,6 +108,8 @@ interface Settings {
         const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
+
+        const val PREFERENCE_BOOKMARKS_SORT = "bookmarksSort"
 
         val SUPPORTED_LANGUAGE_CODES = arrayOf("us", "se", "jp", "gb", "fr", "es", "de", "ca", "au", "it", "ru", "br", "no", "be", "cn", "dk", "sw", "ch", "ie", "pl", "kr", "nl")
 
@@ -318,6 +321,7 @@ interface Settings {
     val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
     val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
+    val bookmarkSortTypeFlow: StateFlow<BookmarksSortType>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -642,4 +646,7 @@ interface Settings {
 
     fun getlastLoadedFromPodcastOrFilterUuid(): String?
     fun setlastLoadedFromPodcastOrFilterUuid(uuid: String?)
+
+    fun setBookmarksSortType(sortType: BookmarksSortType)
+    fun getBookmarksSortType(): BookmarksSortType
 }
