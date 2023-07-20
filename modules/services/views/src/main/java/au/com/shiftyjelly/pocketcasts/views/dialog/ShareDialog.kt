@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.dialog
 
+import android.app.Application
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -19,6 +20,14 @@ class ShareDialog(
     private val forceDarkTheme: Boolean = false,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) {
+
+    init {
+        if (context is Application) {
+            // Cannot use application context here because it will cause a crash when
+            // the show method tries to start a new activity.
+            throw IllegalArgumentException("ShareDialog cannot use the application context")
+        }
+    }
 
     fun show(sourceView: SourceView) {
         if (fragmentManager == null || context == null) {
