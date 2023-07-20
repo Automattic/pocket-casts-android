@@ -127,7 +127,7 @@ class ShareFragment : BaseDialogFragment() {
                             ).showShareDialogDirect()
                         }
                     },
-                    onShareOpenFileIn ={
+                    onShareOpenFileIn = {
                         if (podcast != null && episode is PodcastEpisode) {
                             SharePodcastHelper(
                                 podcast,
@@ -148,7 +148,6 @@ class ShareFragment : BaseDialogFragment() {
         }
         (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
-
 }
 
 @Composable
@@ -156,10 +155,10 @@ private fun ShareScreen(
     podcast: Podcast?,
     episode: BaseEpisode?,
     backgroundColor: Color,
-    onSharePodcast:()->Unit,
-    onShareEpisode:()->Unit,
-    onShareCurrentPosition:()->Unit,
-    onShareOpenFileIn:()->Unit,
+    onSharePodcast: () -> Unit,
+    onShareEpisode: () -> Unit,
+    onShareCurrentPosition: () -> Unit,
+    onShareOpenFileIn: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -169,16 +168,15 @@ private fun ShareScreen(
         Column(
             modifier = Modifier
                 .padding(bottom = 24.dp)
-        ){
+        ) {
             Pill(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
-            if (podcast !=null){
+            if (podcast != null) {
                 ShareButton(
                     modifier = Modifier
-                        .padding(top = 20.dp)
-                    ,
+                        .padding(top = 20.dp),
                     label = IR.string.share_podcast,
                     onClick = onSharePodcast
                 )
@@ -188,7 +186,7 @@ private fun ShareScreen(
                 thickness = 1.dp,
             )
             Divider(thickness = 1.dp)
-            if (podcast !=null && episode is BaseEpisode){
+            if (podcast != null && episode is BaseEpisode) {
                 ShareButton(
                     label = IR.string.podcast_share_episode,
                     onClick = onShareEpisode
@@ -202,7 +200,7 @@ private fun ShareScreen(
                     onClick = onShareCurrentPosition
                 )
             }
-            if (podcast !=null && episode is BaseEpisode && episode.isDownloaded){
+            if (podcast != null && episode is BaseEpisode && episode.isDownloaded) {
                 ShareButton(label = IR.string.podcast_share_open_file_in, onClick = onShareOpenFileIn)
             }
         }
@@ -215,16 +213,17 @@ private fun ShareButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = rememberRipple(color = Color.LightGray)
-        ) { onClick() }
-        .height(64.dp)
-        .padding(start = 32.dp)
-        .wrapContentSize(Alignment.CenterStart)
-    ){
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(color = Color.LightGray)
+            ) { onClick() }
+            .height(64.dp)
+            .padding(start = 32.dp)
+            .wrapContentSize(Alignment.CenterStart)
+    ) {
         Text(
             text = stringResource(id = label),
             color = MaterialTheme.theme.colors.playerContrast01,
@@ -256,7 +255,7 @@ private fun ShareScreenPrev(
 ) {
     AppTheme(themeType = theme) {
         ShareScreen(
-            podcast =Podcast() ,
+            podcast = Podcast(),
             episode = null,
             backgroundColor = Color.DarkGray,
             onSharePodcast = {},
