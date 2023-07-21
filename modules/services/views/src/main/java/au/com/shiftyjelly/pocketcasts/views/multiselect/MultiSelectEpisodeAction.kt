@@ -60,6 +60,13 @@ sealed class MultiSelectEpisodeAction(
         R.drawable.ic_delete,
         "delete"
     )
+    object Share : MultiSelectEpisodeAction(
+        groupId = R.id.menu_share,
+        actionId = R.id.menu_share,
+        title = LR.string.share,
+        iconRes = IR.drawable.ic_share,
+        analyticsValue = "share",
+    )
     object MarkAsUnplayed : MultiSelectEpisodeAction(
         R.id.menu_mark_played,
         UR.id.menu_markasunplayed,
@@ -104,7 +111,7 @@ sealed class MultiSelectEpisodeAction(
     )
 
     companion object {
-        val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star)
+        val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star, Share)
         val ALL = STANDARD + listOf(DeleteDownload, DeleteUserEpisode, MarkAsUnplayed, Unstar, Unarchive)
         val STANDARD_BY_ID = STANDARD.associateBy { it.actionId }
         val ALL_BY_ID = ALL.associateBy { it.actionId }
@@ -156,6 +163,7 @@ sealed class MultiSelectEpisodeAction(
                 }
                 R.id.menu_playnext -> return PlayNext
                 R.id.menu_playlast -> return PlayLast
+                R.id.menu_share -> if (selected.size == 1) return Share
             }
 
             return null

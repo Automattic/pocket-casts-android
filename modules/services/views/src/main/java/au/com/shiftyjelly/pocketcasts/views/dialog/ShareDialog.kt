@@ -29,6 +29,8 @@ class ShareDialog(
         }
     }
 
+    // If the share dialog is not appearing, make sure you're setting an appropriate fragmentManager
+    // when constructing this class, i.e., you might need a parentFragmentManager instead of a childFragmentManager
     fun show(sourceView: SourceView) {
         if (fragmentManager == null || context == null) {
             return

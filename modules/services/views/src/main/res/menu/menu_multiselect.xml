@@ -13,6 +13,10 @@
         android:icon="@drawable/ic_delete"
         android:title="@string/delete"
         app:showAsAction="always" />
+    <item android:id="@+id/menu_share"
+        android:icon="@drawable/ic_share"
+        android:title="@string/share"
+        app:showAsAction="always" />
     <item android:id="@+id/menu_mark_played"
         android:icon="@drawable/ic_markasplayed"
         android:title="@string/mark_as_played"
