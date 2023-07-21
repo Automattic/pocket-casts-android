@@ -46,7 +46,6 @@
                     android:layout_height="wrap_content"
                     android:padding="23dp"
                     android:layout_gravity="center_vertical|left"
-                    android:src="@drawable/ic_delete"
                     app:tint="@android:color/white"/>
             </FrameLayout>
         </FrameLayout>
