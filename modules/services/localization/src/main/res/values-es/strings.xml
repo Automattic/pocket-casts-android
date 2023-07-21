@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 14:10:06+0000
+Translation-Revision-Date: 2023-07-18 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="deselect_all">Anular todas las selecciones</string>
+    <string name="edit">Editar</string>
+    <string name="whats_new_autoplay_maybe_later_button">Quizá más tarde</string>
+    <string name="whats_new_autoplay_enable_button">Activar esta opción ahora</string>
+    <string name="whats_new_autoplay_body">Si empiezas a escuchar un episodio sin que haya más en cola, la reproducción automática continuará reproduciendo episodios de ese pódcast o lista.</string>
+    <string name="whats_new_autoplay_title">¡Ya puedes disfrutar de la reproducción automática!</string>
+    <string name="filters_download_limit_3">Tres episodios</string>
+    <string name="settings_title_headphone_controls">Controles de los auriculares</string>
+    <string name="settings_headphone_controls_summary">Personaliza las acciones que llevan a cabo los controles más habituales de los auriculares.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Reproduce un sonido de confirmación al crear un marcador con los auriculares.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Sonido de confirmación para marcadores</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Saltar adelante</string>
+    <string name="settings_headphone_controls_choice_skip_back">Saltar atrás</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Capítulo anterior</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Capítulo siguiente</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Añadir marcador</string>
+    <string name="settings_headphone_controls_action_previous">Acción anterior</string>
+    <string name="settings_headphone_controls_action_next">Acción siguiente</string>
+    <string name="bookmarks_headphone_settings">Ajustes de los auriculares</string>
+    <string name="bookmarks_not_found">Todavía no hay marcadores</string>
+    <string name="bookmarks_create_instructions">Para guardar las marcas de tiempo de los episodios, ve al menú de acciones del reproductor o configura una acción con los auriculares.</string>
+    <string name="bookmark_play">Reproducir en la posición del marcador %s</string>
+    <string name="bookmarks_plural">%s marcadores</string>
+    <string name="bookmarks_singular">%s marcador</string>
     <string name="bookmarks">Marcadores</string>
+    <string name="settings_autoplay">Reproducción automática</string>
+    <string name="player_sleep_add_1_minute">Más de un minuto</string>
+    <string name="player_sleep_1_minute">Un minuto</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Temas e iconos de la aplicación adicionales</string>
     <string name="onboarding_plus_feature_watch_playback">Reproducción en el reloj</string>
     <string name="onboarding_patron_feature_early_access_title">Acceso anticipado a las funciones</string>
@@ -367,10 +394,6 @@ Language: es
     <string name="go_to_folder">Ir a la carpeta</string>
     <string name="change_folder">Cambiar carpeta</string>
     <string name="remove_from_folder">Eliminar de la carpeta</string>
-    <string name="whats_new_blog_link">Para obtener más información sobre esta actualización, consulta nuestro blog.</string>
-    <string name="whats_new_grid_7_20">Ahora, sincronizamos tu pantalla de inicio (y las opciones de ordenación) en todos los dispositivos. Además, también puedes arrastrar y soltar en el reproductor web.\n\nCon esta función, el trabajo que has hecho para organizar tu página de podcasts se sincroniza con tu cuenta, así que puedes relajarte.</string>
-    <string name="whats_new_grid_title_7_20">Sincronización de la red doméstica</string>
-    <string name="whats_new_folders_7_20">Si te gustan los podcasts la mitad de lo que nos gustan a nosotros, probablemente sigas muchos de ellos. Ahora, con la suscripción a Pocket Casts Plus, puedes clasificarlos en carpetas y archivarlos en grupos ordenados.\n\nGracias a tu apoyo, ¡tu pantalla de inicio tiene un aspecto fantástico!</string>
     <string name="podcasts_empty_folder_summary">Añade podcast a tu carpeta y aparecerán aquí.</string>
     <string name="podcasts_empty_folder">Tu carpeta está vacía</string>
     <string name="add_podcasts">Añadir podcast</string>
@@ -986,7 +1009,6 @@ Language: es
     <string name="profile_files_remove_image">Reemplazar imagen</string>
     <string name="profile_files_empty_title">Sin archivos</string>
     <string name="profile_files_empty_summary">¿Quieres escuchar tus propios archivos?\nToca el botón con el signo + para abrirlos en Pocket Casts y aparecerán ahí.</string>
-    <string name="profile_files_edit">Editar</string>
     <string name="profile_files_addfile_save">Guardar</string>
     <string name="profile_files_add_filename">Nombre</string>
     <string name="profile_files_add_custom_image">Añadir imagen personalizada</string>

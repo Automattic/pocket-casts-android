@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 16:54:03+0000
+Translation-Revision-Date: 2023-07-18 08:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="deselect_all">Avmarkera alla </string>
+    <string name="edit">Redigera</string>
+    <string name="whats_new_autoplay_maybe_later_button">Kanske senare</string>
+    <string name="whats_new_autoplay_enable_button">Aktivera det nu</string>
+    <string name="whats_new_autoplay_body">Om du startar ett avsnitt medan Nästa-kön är tom kommer Spela upp automatiskt att fortsätta spela upp avsnitt från den aktuella podcasten eller listan.</string>
+    <string name="whats_new_autoplay_title">Spela upp automatiskt är här.</string>
+    <string name="filters_download_limit_3">3 avsnitt</string>
+    <string name="settings_title_headphone_controls">Hörlurskontroller</string>
+    <string name="settings_headphone_controls_summary">Anpassa åtgärder som utförs med de vanligaste hörlurskontrollerna.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Spela upp ett bekräftelseljud när ett bokmärke har skapats med dina hörlurar.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Bekräftelseljud för bokmärke</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Hoppa framåt</string>
+    <string name="settings_headphone_controls_choice_skip_back">Hoppa bakåt</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Föregående kapitel</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Nästa kapitel</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Lägg till bokmärke</string>
+    <string name="settings_headphone_controls_action_previous">Föregående åtgärd</string>
+    <string name="settings_headphone_controls_action_next">Nästa åtgärd</string>
+    <string name="bookmarks_headphone_settings">Hörlursinställningar</string>
+    <string name="bookmarks_not_found">Inga bokmärken än</string>
+    <string name="bookmarks_create_instructions">Du kan spara tidsstämplar för avsnitt från åtgärdsmenyn i spelaren eller genom att konfigurera en åtgärd med dina hörlurar.</string>
+    <string name="bookmark_play">Spela upp från bokmärkesposition %s</string>
+    <string name="bookmarks_plural">%s bokmärken</string>
+    <string name="bookmarks_singular">%s bokmärke</string>
     <string name="bookmarks">Bokmärken</string>
+    <string name="settings_autoplay">Spela upp automatiskt</string>
+    <string name="player_sleep_add_1_minute">+ 1 minut</string>
+    <string name="player_sleep_1_minute">1 minut</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra teman och appikoner</string>
     <string name="onboarding_plus_feature_watch_playback">Watch-uppspelning</string>
     <string name="onboarding_patron_feature_early_access_title">Tidig åtkomst till funktioner</string>
@@ -367,10 +394,6 @@ Language: sv_SE
     <string name="go_to_folder">Gå till mapp</string>
     <string name="change_folder">Ändra mapp</string>
     <string name="remove_from_folder">Ta bort från mapp</string>
-    <string name="whats_new_blog_link">Läs mer om denna uppdatering på vår blogg</string>
-    <string name="whats_new_grid_7_20">Vi synkroniserar nu din startskärm (inklusive dina sorteringsalternativ) på alla enheter. Du kan även dra och släppa objekt i webbspelaren.\n\nDetta innebär att du kan koppla av med vetskapen om att allt det hårda arbete du har lagt ner på att arrangera din podcastsida synkroniseras till ditt konto.</string>
-    <string name="whats_new_grid_title_7_20">Synkronisering av startsidesrutnät</string>
-    <string name="whats_new_folders_7_20">Om du älskar podcasts hälften så mycket som vi gör har du antagligen en hel del. Om du Pocket Casts Plus-prenumerant kan du nu sortera dem i mappar och dela in dem i grupper.\n\nTack för ditt stöd. Din startskärm har aldrig sett bättre ut.</string>
     <string name="podcasts_empty_folder_summary">Lägg till podcasts i din mapp så visas de här.</string>
     <string name="podcasts_empty_folder">Din mapp är tom</string>
     <string name="add_podcasts">Lägg till podcasts</string>
@@ -986,7 +1009,6 @@ Language: sv_SE
     <string name="profile_files_remove_image">Byt bild</string>
     <string name="profile_files_empty_title">Inga filer</string>
     <string name="profile_files_empty_summary">Vill du lyssna på dina egna filer?\nTryck på knappen + för att öppna dem i Pocket Casts så visas de här.</string>
-    <string name="profile_files_edit">Redigera</string>
     <string name="profile_files_addfile_save">Spara</string>
     <string name="profile_files_add_filename">Namn</string>
     <string name="profile_files_add_custom_image">Lägg till anpassad bild</string>

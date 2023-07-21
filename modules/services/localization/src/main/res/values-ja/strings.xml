@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-05 09:54:04+0000
+Translation-Revision-Date: 2023-07-19 11:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="deselect_all">すべて選択解除</string>
+    <string name="edit">編集する</string>
+    <string name="whats_new_autoplay_maybe_later_button">後で確認する</string>
+    <string name="whats_new_autoplay_enable_button">すぐに有効化</string>
+    <string name="whats_new_autoplay_body">「次のエピソード待機リスト」が空の間にエピソードを開始すると、自動再生によってそのポッドキャストまたはリストからエピソードが再生され続けます。</string>
+    <string name="whats_new_autoplay_title">自動再生機能が登場</string>
+    <string name="filters_download_limit_3">3エピソード</string>
+    <string name="settings_title_headphone_controls">ヘッドフォン操作</string>
+    <string name="settings_headphone_controls_summary">よく使用されるヘッドフォン操作で実行されるアクションをカスタマイズします。</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">ヘッドフォンでブックマークを作成したら、確認音声を再生します。</string>
+    <string name="settings_headphone_controls_confirmation_sound">確認音声をブックマーク</string>
+    <string name="settings_headphone_controls_choice_skip_forward">スキップ</string>
+    <string name="settings_headphone_controls_choice_skip_back">巻き戻し</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">前のチャプター</string>
+    <string name="settings_headphone_controls_choice_next_chapter">次のチャプター</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">ブックマークを追加</string>
+    <string name="settings_headphone_controls_action_previous">前のアクション</string>
+    <string name="settings_headphone_controls_action_next">次のアクション</string>
+    <string name="bookmarks_headphone_settings">ヘッドフォン設定</string>
+    <string name="bookmarks_not_found">まだブックマークはありません</string>
+    <string name="bookmarks_create_instructions">プレーヤーのアクションメニューから、またはヘッドフォンでアクションを設定して、エピソードのタイムスタンプを保存できます。</string>
+    <string name="bookmark_play">ブックマーク位置で再生%s</string>
+    <string name="bookmarks_plural">%s件のブックマーク</string>
+    <string name="bookmarks_singular">%s件のブックマーク</string>
     <string name="bookmarks">ブックマーク</string>
+    <string name="settings_autoplay">自動再生</string>
+    <string name="player_sleep_add_1_minute">1分以上</string>
+    <string name="player_sleep_1_minute">1分</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">追加のテーマとアプリアイコン</string>
     <string name="onboarding_plus_feature_watch_playback">Watch 再生</string>
     <string name="onboarding_patron_feature_early_access_title">機能への早期アクセス</string>
@@ -367,10 +394,6 @@ Language: ja_JP
     <string name="go_to_folder">フォルダーに移動</string>
     <string name="change_folder">フォルダーを変更</string>
     <string name="remove_from_folder">フォルダーから消去</string>
-    <string name="whats_new_blog_link">今回の更新の詳細については、ブログをご覧ください</string>
-    <string name="whats_new_grid_7_20">ホーム画面 (並べ替えオプションを含む) をデバイス間で同期できるようになりました。 また、ウェブプレーヤーのドラッグ &amp; ドロップもできるようになりました。\n\nこれにより、ポッドキャストページを配置し、アカウントに同期するために費やす手間がなくなるので安心です。</string>
-    <string name="whats_new_grid_title_7_20">ホームグリッドの同期</string>
-    <string name="whats_new_folders_7_20">私たちの半分ほどでも、ポッドキャストを愛好している方なら、おそらくたくさんポットキャスト保存していることでしょう。 Pocket Casts Plus に登録すれば、これらをフォルダーに分類し、わかりやす整理できるようになりました。\n\nサポートのおかげで、ホーム画面は見違えるほどよくなりました。</string>
     <string name="podcasts_empty_folder_summary">フォルダーにポッドキャストを追加するとここに表示されます。</string>
     <string name="podcasts_empty_folder">フォルダーは空です</string>
     <string name="add_podcasts">ポッドキャストを追加する</string>
@@ -986,7 +1009,6 @@ Language: ja_JP
     <string name="profile_files_remove_image">画像を置換</string>
     <string name="profile_files_empty_title">ファイルなし</string>
     <string name="profile_files_empty_summary">自身のファイルを聴きたい場合は、\n+ ボタンをタップして Pocket Casts で開くとここに表示されます。</string>
-    <string name="profile_files_edit">編集</string>
     <string name="profile_files_addfile_save">保存</string>
     <string name="profile_files_add_filename">名前</string>
     <string name="profile_files_add_custom_image">カスタム画像を追加</string>

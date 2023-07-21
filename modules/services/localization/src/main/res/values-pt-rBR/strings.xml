@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 14:10:07+0000
+Translation-Revision-Date: 2023-07-18 08:10:07+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="deselect_all">Desmarcar todos</string>
+    <string name="edit">Editar</string>
+    <string name="whats_new_autoplay_maybe_later_button">Talvez depois</string>
+    <string name="whats_new_autoplay_enable_button">Ativar agora</string>
+    <string name="whats_new_autoplay_body">Se você começar um episódio e a fila de Próximos estiver vazia, os episódios desse podcast ou lista vão ser reproduzidos automaticamente.</string>
+    <string name="whats_new_autoplay_title">Chegou a reprodução automática</string>
+    <string name="filters_download_limit_3">3 episódios</string>
+    <string name="settings_title_headphone_controls">Controles do fone</string>
+    <string name="settings_headphone_controls_summary">Personaliza as ações dos controles de fone mais comuns.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Reproduz um som de confirmação após a criação de um favorito com seus fones de ouvido.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Som de confirmação de favorito</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Avançar</string>
+    <string name="settings_headphone_controls_choice_skip_back">Voltar</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Capítulo anterior</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Próximo capítulo</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Adicionar favorito</string>
+    <string name="settings_headphone_controls_action_previous">Ação anterior</string>
+    <string name="settings_headphone_controls_action_next">Próxima ação</string>
+    <string name="bookmarks_headphone_settings">Configurações do headset</string>
+    <string name="bookmarks_not_found">Ainda sem favoritos</string>
+    <string name="bookmarks_create_instructions">Você pode salvar a data/hora dos episódios pelo menu de ações do reprodutor ou configurando uma ação com seu headset.</string>
+    <string name="bookmark_play">Reproduzir na posição %s do favorito</string>
+    <string name="bookmarks_plural">%s favoritos</string>
+    <string name="bookmarks_singular">%s favorito</string>
     <string name="bookmarks">Favoritos</string>
+    <string name="settings_autoplay">Reprodução automática</string>
+    <string name="player_sleep_add_1_minute">+ 1 minuto</string>
+    <string name="player_sleep_1_minute">1 minuto</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Ícones de aplicativo e temas extras</string>
     <string name="onboarding_plus_feature_watch_playback">Reprodução no smartwatch</string>
     <string name="onboarding_patron_feature_early_access_title">Acesso antecipado a funcionalidades</string>
@@ -367,10 +394,6 @@ Language: pt_BR
     <string name="go_to_folder">Ir para pasta</string>
     <string name="change_folder">Mudar pasta</string>
     <string name="remove_from_folder">Remover da pasta</string>
-    <string name="whats_new_blog_link">Leia mais sobre esta atualização no nosso blog</string>
-    <string name="whats_new_grid_7_20">Agora sincronizamos sua tela inicial (incluindo suas opções de ordenação) entre dispositivos! E você também pode arrastar e soltar no reprodutor da web.\n\nEntão, pode ficar tranquilo porque enquanto você organiza sua página de podcasts, seu trabalho está sendo sincronizado com a sua conta.</string>
-    <string name="whats_new_grid_title_7_20">Sincronização de grade da página inicial</string>
-    <string name="whats_new_folders_7_20">Se você ama podcasts como a gente, provavelmente terá muitos. Assinantes do Pocket Casts Plus agora podem ordená-los e arquivá-los em grupos organizados.\n\nAgradecemos seu suporte. Sua tela inicial nunca esteve melhor!</string>
     <string name="podcasts_empty_folder_summary">Adicione podcasts à sua pasta e eles aparecerão aqui.</string>
     <string name="podcasts_empty_folder">Sua pasta está vazia</string>
     <string name="add_podcasts">Adicionar podcasts</string>
@@ -986,7 +1009,6 @@ Language: pt_BR
     <string name="profile_files_remove_image">Trocar imagem</string>
     <string name="profile_files_empty_title">Nenhum arquivo</string>
     <string name="profile_files_empty_summary">Quer ouvir seus próprios arquivos?\nClique no botão + para abri-los no Pocket Casts e eles aparecerão aqui.</string>
-    <string name="profile_files_edit">Editar</string>
     <string name="profile_files_addfile_save">Salvar</string>
     <string name="profile_files_add_filename">Nome</string>
     <string name="profile_files_add_custom_image">Adicionar imagem personalizada</string>

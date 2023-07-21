@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-20 02:10:08+0000
+Translation-Revision-Date: 2023-07-18 08:10:07+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="deselect_all">إلغاء تحديد الكل</string>
+    <string name="edit">تعديل</string>
     <string name="enter_password">أدخل كلمة المرور</string>
     <string name="log_out">تسجيل الخروج</string>
     <string name="removed">تم الحذف</string>
@@ -29,10 +31,6 @@ Language: ar
     <string name="go_to_folder">الانتقال إلى المجلد</string>
     <string name="change_folder">تغيير المجلد</string>
     <string name="remove_from_folder">إزالة من مجلد</string>
-    <string name="whats_new_blog_link">قراءة المزيد حول هذا التحديث على مدونتنا</string>
-    <string name="whats_new_grid_7_20">نقوم الآن بمزامنة شاشتك الرئيسية (بما في ذلك، خيارات الفرز) عبر الأجهزة! ويمكنك الآن السحب والإفلات في مُشغِّل الويب كذلك.\n\nوهذا يعني أنه يمكنك الشعور بالراحة بشكل أيسر، علمًا بأنه تتم مزامنة العمل الجاد الذي بذلته لترتيب صفحة بثك الصوتي الآن مع حسابك.</string>
-    <string name="whats_new_grid_title_7_20">مزامنة الشبكة الرئيسية</string>
-    <string name="whats_new_folders_7_20">إذا كنت تحب البث الصوتي نصف ما نحب، فمن المحتمل أن لديك الكثير منه. إذا كنت مشتركًا في Pocket Casts Plus، فيمكنك الآن فرز هذه إلى مجلدات ووضعها في مجموعات مرتبة.\n\nبفضل دعمك، لم تكن شاشتك الرئيسية على نحو أفضل من هذا من قبل!</string>
     <string name="podcasts_empty_folder_summary">أضف بثًا صوتيًا إلى مجلدك، وسيظهر هنا.</string>
     <string name="podcasts_empty_folder">مجلدك فارغ.</string>
     <string name="add_podcasts">إضافة بث صوتي</string>
@@ -645,7 +643,6 @@ Language: ar
     <string name="profile_files_remove_image">استبدال صورة</string>
     <string name="profile_files_empty_title">لا توجد ملفات</string>
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
-    <string name="profile_files_edit">تحرير</string>
     <string name="profile_files_addfile_save">حفظ</string>
     <string name="profile_files_add_filename">الاسم</string>
     <string name="profile_files_add_custom_image">إضافة صورة مخصصة</string>
