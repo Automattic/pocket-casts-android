@@ -79,13 +79,13 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         swipeSource: EpisodeItemTouchHelper.SwipeSource,
     ) {
         viewModelScope.launch(Dispatchers.Default) {
-            playbackManager.playNext(
-                episode = episode,
-                source = swipeSourceToSourceView(swipeSource)
-            )
             trackSwipeAction(
                 swipeSource = swipeSource,
                 swipeAction = EpisodeItemTouchHelper.SwipeAction.UP_NEXT_ADD_TOP
+            )
+            playbackManager.playNext(
+                episode = episode,
+                source = swipeSourceToSourceView(swipeSource)
             )
         }
     }
@@ -95,13 +95,13 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         swipeSource: EpisodeItemTouchHelper.SwipeSource,
     ) {
         viewModelScope.launch(Dispatchers.Default) {
-            playbackManager.playLast(
-                episode = episode,
-                source = swipeSourceToSourceView(swipeSource)
-            )
             trackSwipeAction(
                 swipeSource = swipeSource,
                 swipeAction = EpisodeItemTouchHelper.SwipeAction.UP_NEXT_ADD_BOTTOM
+            )
+            playbackManager.playLast(
+                episode = episode,
+                source = swipeSourceToSourceView(swipeSource)
             )
         }
     }
@@ -111,13 +111,13 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         swipeSource: EpisodeItemTouchHelper.SwipeSource,
     ) {
         viewModelScope.launch(Dispatchers.Default) {
-            playbackManager.removeEpisode(
-                episodeToRemove = episode,
-                source = swipeSourceToSourceView(swipeSource)
-            )
             trackSwipeAction(
                 swipeSource = swipeSource,
                 swipeAction = EpisodeItemTouchHelper.SwipeAction.UP_NEXT_REMOVE
+            )
+            playbackManager.removeEpisode(
+                episodeToRemove = episode,
+                source = swipeSourceToSourceView(swipeSource)
             )
         }
     }
@@ -125,16 +125,16 @@ class SwipeButtonLayoutViewModel @Inject constructor(
     fun updateArchive(episode: PodcastEpisode, swipeSource: EpisodeItemTouchHelper.SwipeSource) {
         viewModelScope.launch(Dispatchers.Default) {
             if (!episode.isArchived) {
-                episodeManager.archive(episode, playbackManager)
                 trackSwipeAction(swipeSource, EpisodeItemTouchHelper.SwipeAction.ARCHIVE)
+                episodeManager.archive(episode, playbackManager)
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_ARCHIVED,
                     source = swipeSourceToSourceView(swipeSource),
                     uuid = episode.uuid
                 )
             } else {
-                episodeManager.unarchive(episode)
                 trackSwipeAction(swipeSource, EpisodeItemTouchHelper.SwipeAction.UNARCHIVE)
+                episodeManager.unarchive(episode)
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_UNARCHIVED,
                     source = swipeSourceToSourceView(swipeSource),
