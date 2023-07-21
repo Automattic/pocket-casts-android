@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -12,10 +14,14 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -29,12 +35,17 @@ class BookmarksViewModel
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
     private val multiSelectHelper: MultiSelectBookmarksHelper,
+    private val settings: Settings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
 
+    private val _showOptionsDialog = MutableSharedFlow<Int>()
+    val showOptionsDialog = _showOptionsDialog.asSharedFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(episodeUuid: String) {
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
@@ -42,13 +53,18 @@ class BookmarksViewModel
                     _uiState.value = UiState.PlusUpsell
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        val bookmarksFlow = bookmarkManager.findEpisodeBookmarksFlow(episode)
+                        val bookmarksFlow = settings.bookmarkSortTypeFlow.flatMapLatest { sortType ->
+                            bookmarkManager.findEpisodeBookmarksFlow(
+                                episode = episode,
+                                sortType = sortType,
+                            )
+                        }
                         val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
                         val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
                         combine(
                             bookmarksFlow,
                             isMultiSelectingFlow,
-                            selectedListFlow
+                            selectedListFlow,
                         ) { bookmarks, isMultiSelecting, selectedList ->
                             _uiState.value = if (bookmarks.isEmpty()) {
                                 UiState.Empty
@@ -115,7 +131,12 @@ class BookmarksViewModel
                 (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
                     val startIndex = bookmarks.indexOf(multiSelectable)
                     if (startIndex > -1) {
-                        multiSelectHelper.selectAllInList(bookmarks.subList(startIndex, bookmarks.size))
+                        multiSelectHelper.selectAllInList(
+                            bookmarks.subList(
+                                startIndex,
+                                bookmarks.size
+                            )
+                        )
                     }
                 }
             }
@@ -130,6 +151,16 @@ class BookmarksViewModel
         } else {
             multiSelectHelper.select(bookmark)
         }
+    }
+
+    fun onOptionsMenuClicked() {
+        viewModelScope.launch {
+            _showOptionsDialog.emit(settings.getBookmarksSortType().mapToLocalizedString())
+        }
+    }
+
+    fun changeSortOrder(order: BookmarksSortType) {
+        settings.setBookmarksSortType(order)
     }
 
     sealed class UiState {

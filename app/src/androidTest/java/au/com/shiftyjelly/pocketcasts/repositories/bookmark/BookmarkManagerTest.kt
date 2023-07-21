@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
@@ -19,9 +20,9 @@ import java.util.Date
 import java.util.UUID
 
 class BookmarkManagerTest {
-    lateinit var appDatabase: AppDatabase
-    lateinit var episodeDao: EpisodeDao
-    lateinit var bookmarkManager: BookmarkManager
+    private lateinit var appDatabase: AppDatabase
+    private lateinit var episodeDao: EpisodeDao
+    private lateinit var bookmarkManager: BookmarkManager
 
     @Before
     fun setup() {
@@ -70,29 +71,78 @@ class BookmarkManagerTest {
         runTest {
             val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
             bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
-            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode).take(1).first()
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST).take(1).first()
             assertEquals(1, bookmarks.size)
             assertEquals(bookmarkOne.uuid, bookmarks[0].uuid)
         }
     }
 
     /**
-     * Test findEpisodeBookmarks returns the bookmarks for an episode.
+     * Test findEpisodeBookmarksFlow timestamp order returns the bookmarks sorted by timestamp
      */
     @Test
-    fun findEpisodeBookmarks() {
+    fun findEpisodeBookmarksOrderTimestamp() {
         val episodeUuid = UUID.randomUUID().toString()
         val podcastUuid = UUID.randomUUID().toString()
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
 
         runTest {
-            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 61, title = "")
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 610, title = "")
             val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 122, title = "")
-            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode).take(1).first()
-            assertEquals(2, bookmarks.size)
-            val sortedBookmarks = bookmarks.sortedBy { it.timeSecs }
-            assertEquals(bookmarkOne.uuid, sortedBookmarks[0].uuid)
-            assertEquals(bookmarkTwo.uuid, sortedBookmarks[1].uuid)
+
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
+                episode = episode,
+                sortType = BookmarksSortType.TIMESTAMP,
+            ).take(1).first()
+
+            assertEquals(bookmarkTwo.uuid, bookmarks[0].uuid)
+            assertEquals(bookmarkOne.uuid, bookmarks[1].uuid)
+        }
+    }
+
+    /**
+     * Test findEpisodeBookmarksFlow newest to older order returns newest bookmark first
+     */
+    @Test
+    fun findEpisodeBookmarksOrderNewestToOldest() {
+        val episodeUuid = UUID.randomUUID().toString()
+        val podcastUuid = UUID.randomUUID().toString()
+        val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
+
+        runTest {
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "")
+            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
+
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
+                episode = episode,
+                sortType = BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST,
+            ).take(1).first()
+
+            assertEquals(bookmarkTwo.uuid, bookmarks[0].uuid)
+            assertEquals(bookmarkOne.uuid, bookmarks[1].uuid)
+        }
+    }
+
+    /**
+     * Test findEpisodeBookmarksFlow oldest to newest order returns oldest bookmark first
+     */
+    @Test
+    fun findEpisodeBookmarksOrderOldestToNewest() {
+        val episodeUuid = UUID.randomUUID().toString()
+        val podcastUuid = UUID.randomUUID().toString()
+        val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
+
+        runTest {
+            val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "")
+            val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
+
+            val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
+                episode = episode,
+                sortType = BookmarksSortType.DATE_ADDED_OLDEST_TO_NEWEST,
+            ).take(1).first()
+
+            assertEquals(bookmarkOne.uuid, bookmarks[0].uuid)
+            assertEquals(bookmarkTwo.uuid, bookmarks[1].uuid)
         }
     }
 

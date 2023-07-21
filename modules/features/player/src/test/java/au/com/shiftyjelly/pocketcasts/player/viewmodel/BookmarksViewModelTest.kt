@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.player.util.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -47,6 +48,9 @@ class BookmarksViewModelTest {
     @Mock
     private lateinit var signInState: SignInState
 
+    @Mock
+    private lateinit var settings: Settings
+
     private lateinit var bookmarksViewModel: BookmarksViewModel
     private val episodeUuid = UUID.randomUUID().toString()
 
@@ -62,6 +66,7 @@ class BookmarksViewModelTest {
             episodeManager = episodeManager,
             userManager = userManager,
             multiSelectHelper = multiSelectHelper,
+            settings = settings,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }

@@ -65,6 +65,11 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
     fun delete(resources: Resources, fragmentManager: FragmentManager) {
         val bookmarks = selectedList.toList()
+        if (bookmarks.isEmpty()) {
+            closeMultiSelect()
+            return
+        }
+
         val count = bookmarks.size
         ConfirmationDialog()
             .setForceDarkTheme(true)

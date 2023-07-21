@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -101,6 +102,7 @@ class SettingsImpl @Inject constructor(
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
     override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
+    override val bookmarkSortTypeFlow = MutableStateFlow(getBookmarksSortType())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1442,4 +1444,17 @@ class SettingsImpl @Inject constructor(
 
     override fun getlastLoadedFromPodcastOrFilterUuid(): String? =
         getString(LAST_SELECTED_PODCAST_OR_FILTER_UUID)
+
+    override fun setBookmarksSortType(sortType: BookmarksSortType) {
+        setInt(Settings.PREFERENCE_BOOKMARKS_SORT, sortType.ordinal)
+        bookmarkSortTypeFlow.update { sortType }
+    }
+
+    override fun getBookmarksSortType() =
+        BookmarksSortType.values()[
+            getInt(
+                Settings.PREFERENCE_BOOKMARKS_SORT,
+                BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
+            )
+        ]
 }
