@@ -101,11 +101,7 @@ class UpNextEpisodeViewHolder(
             }
             .subscribeBy(onError = { Timber.e(it) })
 
-        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(
-            episode = episode,
-            isShowingUpNextQueue = true,
-            ignoreUserSwipePreference = true,
-        )
+        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         binding.episode = episode
         binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)

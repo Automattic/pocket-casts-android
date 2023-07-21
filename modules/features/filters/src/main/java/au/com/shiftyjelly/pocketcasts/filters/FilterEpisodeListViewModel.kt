@@ -158,30 +158,6 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun episodeSwipeUpNext(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playNext(episode = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
-            }
-        }
-    }
-
-    fun episodeSwipeUpLast(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playLast(episode = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
-            }
-        }
-    }
-
     fun downloadAll() {
         val episodes = (episodesList.value ?: emptyList())
         val trimmedList = episodes.subList(0, min(MAX_DOWNLOAD_ALL, episodes.count()))

@@ -144,10 +144,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             settings = settings,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onQueueUpNextTopClick = this::moveToTop,
-                onQueueUpNextBottomClick = this::moveToBottom,
+                onItemUpdated = this::clearViewAtPosition,
                 onDeleteOrArchiveClick = { _, index -> removeFromUpNext(index) },
-                playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = context,
                 fragmentManager = parentFragmentManager,
@@ -159,6 +157,16 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         if (!isEmbedded) {
             updateStatusAndNavColors()
             FirebaseAnalyticsTracker.openedUpNext()
+        }
+    }
+
+    private fun clearViewAtPosition(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        position: Int,
+    ) {
+        val recyclerView = realBinding?.recyclerView ?: return
+        recyclerView.findViewHolderForAdapterPosition(position)?.let {
+            episodeItemTouchHelper?.clearView(recyclerView, it)
         }
     }
 
@@ -297,24 +305,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         if (multiSelectHelper.isMultiSelecting) {
             multiSelectHelper.isMultiSelecting = false
         }
-    }
-
-    fun moveToTop(episode: BaseEpisode, position: Int) {
-        val recyclerView = realBinding?.recyclerView ?: return
-        recyclerView.findViewHolderForAdapterPosition(position)?.let {
-            episodeItemTouchHelper?.clearView(recyclerView, it)
-        }
-        playbackManager.playEpisodesNext(episodes = listOf(episode), source = SourceView.UP_NEXT)
-        trackSwipeAction(SwipeAction.UP_NEXT_MOVE_TOP)
-    }
-
-    fun moveToBottom(episode: BaseEpisode, position: Int) {
-        val recyclerView = realBinding?.recyclerView ?: return
-        recyclerView.findViewHolderForAdapterPosition(position)?.let {
-            episodeItemTouchHelper?.clearView(recyclerView, it)
-        }
-        playbackManager.playEpisodesLast(episodes = listOf(episode), source = SourceView.UP_NEXT)
-        trackSwipeAction(SwipeAction.UP_NEXT_MOVE_BOTTOM)
     }
 
     fun removeFromUpNext(position: Int) {

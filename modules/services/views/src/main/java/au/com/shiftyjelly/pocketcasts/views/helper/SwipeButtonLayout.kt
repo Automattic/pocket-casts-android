@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -33,60 +32,58 @@ sealed interface SwipeButton {
 
     // Shows the remove from up next button if the episode is already queued
     class AddToUpNextTopOrRemove(
-        private val episode: BaseEpisode,
-        private val playbackManager: PlaybackManager,
-        private val alwaysShowAddQueueOptions: Boolean,
-        override val onClick: (BaseEpisode, RowIndex) -> Unit,
+        private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
+        private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
-
-        override val iconRes
-            get() =
-                if (playbackManager.upNextQueue.contains(episode.uuid) && !alwaysShowAddQueueOptions) {
-                    removeUpNextIconRes
-                } else {
-                    IR.drawable.ic_upnext_movetotop
-                }
-
-        override val backgroundColor: (Context) -> Int
-            get() = {
-                if (playbackManager.upNextQueue.contains(episode.uuid) && !alwaysShowAddQueueOptions) {
-                    it.getThemeColor(removeUpNextBackgroundColorAttr)
-                } else {
-                    it.getThemeColor(UR.attr.support_04)
-                }
+        override val iconRes = IR.drawable.ic_upnext_movetotop
+        override val backgroundColor: (Context) -> Int = { it.getThemeColor(UR.attr.support_04) }
+        override val onClick: (BaseEpisode, RowIndex) -> Unit
+            get() = { baseEpisode, rowIndex ->
+                viewModel.episodeSwipeUpNextTop(
+                    episode = baseEpisode,
+                    swipeSource = swipeSource,
+                )
+                onItemUpdated(baseEpisode, rowIndex)
             }
     }
 
     // Shows the remove from up next button if the episode is already queued
     class AddToUpNextBottom(
-        private val episode: BaseEpisode,
-        private val playbackManager: PlaybackManager,
-        private val alwaysShowAddQueueOptions: Boolean,
-        override val onClick: (BaseEpisode, RowIndex) -> Unit
+        private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
+        private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
-
-        override val iconRes
-            get() = if (playbackManager.upNextQueue.contains(episode.uuid) && !alwaysShowAddQueueOptions) {
-                removeUpNextIconRes
-            } else {
-                IR.drawable.ic_upnext_movetobottom
-            }
-
-        override val backgroundColor: (Context) -> Int
-            get() = {
-                it.getThemeColor(
-                    if (playbackManager.upNextQueue.contains(episode.uuid) && !alwaysShowAddQueueOptions) {
-                        removeUpNextBackgroundColorAttr
-                    } else {
-                        UR.attr.support_03
-                    }
-                )
-            }
+        override val iconRes = IR.drawable.ic_upnext_movetobottom
+        override val backgroundColor: (Context) -> Int = {
+            it.getThemeColor(UR.attr.support_03)
+        }
+        override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, rowIndex ->
+            viewModel.episodeSwipeUpNextBottom(
+                episode = baseEpisode,
+                swipeSource = swipeSource,
+            )
+            onItemUpdated(baseEpisode, rowIndex)
+        }
     }
 
-    class DeleteFileButton(
-        override val onClick: (BaseEpisode, RowIndex) -> Unit
+    class RemoveFromUpNext(
+        private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
+        private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
+        override val iconRes = removeUpNextIconRes
+        override val backgroundColor: (Context) -> Int = { it.getThemeColor(removeUpNextBackgroundColorAttr) }
+        override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, rowIndex ->
+            viewModel.episodeSwipeRemoveUpNext(
+                episode = baseEpisode,
+                swipeSource = swipeSource,
+            )
+            onItemUpdated(baseEpisode, rowIndex)
+        }
+    }
+
+    class DeleteFileButton(override val onClick: (BaseEpisode, RowIndex) -> Unit) : SwipeButton {
         override val iconRes = VR.drawable.ic_delete
         override val backgroundColor: (Context) -> Int =
             { it.getThemeColor(UR.attr.support_05) }
@@ -94,7 +91,7 @@ sealed interface SwipeButton {
 
     class ArchiveButton(
         private val episode: BaseEpisode,
-        override val onClick: (BaseEpisode, RowIndex) -> Unit
+        override val onClick: (BaseEpisode, RowIndex) -> Unit,
     ) : SwipeButton {
         override val iconRes
             get() = if (episode.isArchived) {
@@ -128,95 +125,94 @@ sealed interface SwipeButton {
  */
 class SwipeButtonLayoutFactory(
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel,
-    private val onQueueUpNextTopClick: (BaseEpisode, RowIndex) -> Unit,
-    private val onQueueUpNextBottomClick: (BaseEpisode, RowIndex) -> Unit,
+    private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
     private val onDeleteOrArchiveClick: (BaseEpisode, RowIndex) -> Unit,
     private val showShareButton: Boolean = true,
-    private val playbackManager: PlaybackManager,
     private val defaultUpNextSwipeAction: () -> Settings.UpNextAction,
     private val context: Context,
     private val fragmentManager: FragmentManager,
     private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
 ) {
-    fun forEpisode(
-        episode: BaseEpisode,
-        isShowingUpNextQueue: Boolean = false,
-        ignoreUserSwipePreference: Boolean = false,
-    ): SwipeButtonLayout {
-        val isQueued = { playbackManager.upNextQueue.contains(episode.uuid) }
-        val addToUpNextTop = SwipeButton.AddToUpNextTopOrRemove(
-            episode = episode,
-            playbackManager = playbackManager,
-            alwaysShowAddQueueOptions = isShowingUpNextQueue,
-            onClick = onQueueUpNextTopClick,
-        )
-        val addToUpNextBottom = SwipeButton.AddToUpNextBottom(
-            episode = episode,
-            playbackManager = playbackManager,
-            alwaysShowAddQueueOptions = isShowingUpNextQueue,
-            onClick = onQueueUpNextBottomClick,
-        )
+    fun forEpisode(episode: BaseEpisode): SwipeButtonLayout {
 
-        return SwipeButtonLayout(
-            leftPrimary = {
-                if (ignoreUserSwipePreference) {
-                    addToUpNextTop
-                } else {
-                    // The left primary button is the action that is taken when the user swipes to the right
-                    when (defaultUpNextSwipeAction()) {
-                        Settings.UpNextAction.PLAY_NEXT -> addToUpNextTop
-                        Settings.UpNextAction.PLAY_LAST -> addToUpNextBottom
-                    }
-                }
-            },
-            leftSecondary = {
-                if (isQueued() && !isShowingUpNextQueue) {
-                    null
-                } else {
-                    if (ignoreUserSwipePreference) {
-                        addToUpNextBottom
+        val buttons = object {
+            val addToUpNextTop = SwipeButton.AddToUpNextTopOrRemove(
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            )
+            val addToUpNextBottom = SwipeButton.AddToUpNextBottom(
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            )
+            val removeFromUpNext = SwipeButton.RemoveFromUpNext(
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            )
+            val archive = SwipeButton.ArchiveButton(episode, onDeleteOrArchiveClick)
+            val deleteFile = SwipeButton.DeleteFileButton(onDeleteOrArchiveClick)
+            val share = SwipeButton.ShareButton(
+                swipeSource = swipeSource,
+                fragmentManager = fragmentManager,
+                context = context,
+                viewModel = swipeButtonLayoutViewModel,
+            )
+        }
+
+        val onUpNextQueueScreen = swipeSource == EpisodeItemTouchHelper.SwipeSource.UP_NEXT
+        return if (onUpNextQueueScreen) {
+            SwipeButtonLayout(
+                // We ignore the user's swipe preference setting when on the up next screen
+                leftPrimary = { buttons.addToUpNextTop },
+                leftSecondary = { buttons.addToUpNextBottom },
+                rightPrimary = { buttons.removeFromUpNext },
+                rightSecondary = { null },
+            )
+        } else {
+            SwipeButtonLayout(
+                leftPrimary = {
+                    if (swipeButtonLayoutViewModel.isEpisodeQueued(episode)) {
+                        buttons.removeFromUpNext
                     } else {
+                        // The left primary button is the action that is taken when the user swipes to the right
                         when (defaultUpNextSwipeAction()) {
-                            Settings.UpNextAction.PLAY_NEXT -> addToUpNextBottom
-                            Settings.UpNextAction.PLAY_LAST -> addToUpNextTop
+                            Settings.UpNextAction.PLAY_NEXT -> buttons.addToUpNextTop
+                            Settings.UpNextAction.PLAY_LAST -> buttons.addToUpNextBottom
                         }
                     }
-                }
-            },
-            rightPrimary = {
-                if (isShowingUpNextQueue) {
-                    // When an episode is queued, the button shows the remove from queue option
-                    SwipeButton.AddToUpNextTopOrRemove(
-                        episode = episode,
-                        playbackManager = playbackManager,
-                        alwaysShowAddQueueOptions = false, // ensures this button shows the remove option
-                        onClick = onQueueUpNextTopClick,
-                    )
-                } else {
-                    when (episode) {
-                        is PodcastEpisode -> SwipeButton.ArchiveButton(episode, onDeleteOrArchiveClick)
-
-                        is UserEpisode -> SwipeButton.DeleteFileButton(onDeleteOrArchiveClick)
+                },
+                leftSecondary = {
+                    if (swipeButtonLayoutViewModel.isEpisodeQueued(episode)) {
+                        // Do not show a secondary button on the left when episode queued
+                        null
+                    } else {
+                        when (defaultUpNextSwipeAction()) {
+                            Settings.UpNextAction.PLAY_NEXT -> buttons.addToUpNextBottom
+                            Settings.UpNextAction.PLAY_LAST -> buttons.addToUpNextTop
+                        }
                     }
-                }
-            },
-            rightSecondary = {
-                if (isShowingUpNextQueue) {
-                    null
-                } else {
+                },
+                rightPrimary = {
                     when (episode) {
-                        is PodcastEpisode -> if (showShareButton) {
-                            SwipeButton.ShareButton(
-                                swipeSource = swipeSource,
-                                fragmentManager = fragmentManager,
-                                context = context,
-                                viewModel = swipeButtonLayoutViewModel,
-                            )
-                        } else null
+                        is UserEpisode -> buttons.deleteFile
+                        is PodcastEpisode -> buttons.archive
+                    }
+                },
+                rightSecondary = {
+                    when (episode) {
                         is UserEpisode -> null
+                        is PodcastEpisode ->
+                            if (showShareButton) {
+                                buttons.share
+                            } else null
                     }
-                }
-            },
-        )
+                },
+            )
+        }
     }
 }
+
+private fun getOnUpNextQueueScreen(swipeSource: EpisodeItemTouchHelper.SwipeSource) =
+    swipeSource == EpisodeItemTouchHelper.SwipeSource.UP_NEXT

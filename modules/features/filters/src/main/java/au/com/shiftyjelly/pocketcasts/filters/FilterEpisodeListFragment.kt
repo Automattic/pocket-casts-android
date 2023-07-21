@@ -129,18 +129,25 @@ class FilterEpisodeListFragment : BaseFragment() {
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onQueueUpNextTopClick = this::episodeSwipeLeftItem1,
-                onQueueUpNextBottomClick = this::episodeSwipeLeftItem2,
+                onItemUpdated = this::lazyNotifyAdapterChanged,
                 onDeleteOrArchiveClick = { baseEpisode, _ ->
                     viewModel.updateArchive(baseEpisode)
                 },
-                playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = context,
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             )
         )
+    }
+
+    // Cannot call notify.notifyItemChanged directly because the compiler gets confused
+    // when the adapter's constructor includes references to the adapter
+    private fun lazyNotifyAdapterChanged(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        index: Int,
+    ) {
+        adapter.notifyItemChanged(index)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -587,22 +594,6 @@ class FilterEpisodeListFragment : BaseFragment() {
                 activity?.onBackPressed()
             }
             .show(childFragmentManager, "confirm")
-    }
-
-    private fun episodeSwipeLeftItem1(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
-        }
-        adapter.notifyItemChanged(index)
-    }
-
-    private fun episodeSwipeLeftItem2(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)
-        }
-        adapter.notifyItemChanged(index)
     }
 
     private fun downloadAll() {

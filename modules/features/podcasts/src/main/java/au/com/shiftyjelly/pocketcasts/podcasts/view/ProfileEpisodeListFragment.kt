@@ -128,12 +128,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onQueueUpNextTopClick = this::episodeSwipeLeftItem1,
-                onQueueUpNextBottomClick = this::episodeSwipeLeftItem2,
+                onItemUpdated = ::lazyNotifyItemChanged,
                 onDeleteOrArchiveClick = { baseEpisode, _ ->
                     viewModel.swipeToUpdateArchive(baseEpisode)
                 },
-                playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
@@ -144,6 +142,15 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 },
             )
         )
+    }
+
+    // Cannot inline this because the compiler gets confused
+    // when the adapter's constructor includes references to the adapter
+    private fun lazyNotifyItemChanged(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        index: Int,
+    ) {
+        adapter.notifyItemChanged(index)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -375,22 +382,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     private fun showFragment(fragment: Fragment) {
         (activity as? FragmentHostListener)?.addFragment(fragment)
-    }
-
-    private fun episodeSwipeLeftItem1(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
-        }
-        adapter.notifyItemChanged(index)
-    }
-
-    private fun episodeSwipeLeftItem2(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)
-        }
-        adapter.notifyItemChanged(index)
     }
 
     override fun onBackPressed(): Boolean {

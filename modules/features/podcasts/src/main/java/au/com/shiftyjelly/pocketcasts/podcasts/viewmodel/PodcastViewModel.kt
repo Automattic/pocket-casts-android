@@ -302,30 +302,6 @@ class PodcastViewModel
         }
     }
 
-    fun episodeSwipeUpNext(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playNext(episode = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
-            }
-        }
-    }
-
-    fun episodeSwipeUpLast(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playLast(episode = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
-            }
-        }
-    }
-
     fun shouldShowArchiveAll(): Boolean {
         val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return false
         return episodes.find { !it.isArchived } != null

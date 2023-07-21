@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
 
 @HiltViewModel
 class ProfileEpisodeListViewModel @Inject constructor(
@@ -59,36 +58,6 @@ class ProfileEpisodeListViewModel @Inject constructor(
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
             }
         }
-    }
-
-    fun episodeSwipeUpNext(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = getAnalyticsSource())
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playNext(episode = episode, source = getAnalyticsSource())
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
-            }
-        }
-    }
-
-    fun episodeSwipeUpLast(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = getAnalyticsSource())
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playLast(episode = episode, source = getAnalyticsSource())
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
-            }
-        }
-    }
-
-    fun onArchiveFromHereCount(episode: PodcastEpisode): Int {
-        val episodes = episodeList.value ?: return 0
-        val index = max(episodes.indexOf(episode), 0) // -1 on not found
-        return episodes.count() - index
     }
 
     fun clearAllEpisodeHistory() {

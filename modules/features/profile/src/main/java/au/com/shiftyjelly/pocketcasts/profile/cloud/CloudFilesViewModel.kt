@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
@@ -19,10 +18,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,32 +50,6 @@ class CloudFilesViewModel @Inject constructor(
             )
         }
         userEpisodeManager.syncFilesInBackground(playbackManager)
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun episodeSwipeUpNext(episode: BaseEpisode) {
-        GlobalScope.launch(Dispatchers.Default) {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playNext(episode = episode, source = SourceView.FILES)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
-            }
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun episodeSwipeUpLast(episode: BaseEpisode) {
-        GlobalScope.launch(Dispatchers.Default) {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playLast(episode = episode, source = SourceView.FILES)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
-            }
-        }
     }
 
     fun getDeleteStateOnSwipeDelete(episode: UserEpisode): DeleteState {

@@ -563,10 +563,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 ratingsViewModel = ratingsViewModel,
                 swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                    onQueueUpNextTopClick = ::episodeSwipeLeftItem1,
-                    onQueueUpNextBottomClick = ::episodeSwipeLeftItem2,
+                    onItemUpdated = ::notifyItemChanged,
                     onDeleteOrArchiveClick = ::episodeSwipeRightItem1,
-                    playbackManager = playbackManager,
                     defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                     context = context,
                     fragmentManager = parentFragmentManager,
@@ -674,6 +672,19 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         return binding.root
     }
 
+    private fun notifyItemChanged(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        index: Int,
+    ) {
+        binding?.episodesRecyclerView?.let { recyclerView ->
+            recyclerView.findViewHolderForAdapterPosition(index)?.let {
+                itemTouchHelper.clearView(recyclerView, it)
+            }
+        }
+
+        adapter?.notifyItemChanged(index)
+    }
+
     private fun loadData() {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loading podcast page for $podcastUuid")
         viewModel.loadPodcast(podcastUuid, resources)
@@ -777,35 +788,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding?.episodesRecyclerView?.removeOnScrollListener(onScrollListener)
         binding?.episodesRecyclerView?.adapter = null
         binding = null
-    }
-
-    private fun episodeSwipeLeftItem1(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
-        }
-
-        binding?.episodesRecyclerView?.let { recyclerView ->
-            recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper.clearView(recyclerView, it)
-            }
-        }
-
-        adapter?.notifyItemChanged(index)
-    }
-
-    private fun episodeSwipeLeftItem2(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)
-        }
-
-        binding?.episodesRecyclerView?.let { recyclerView ->
-            recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper.clearView(recyclerView, it)
-            }
-        }
-        adapter?.notifyItemChanged(index)
     }
 
     private fun archiveAllPlayed() {

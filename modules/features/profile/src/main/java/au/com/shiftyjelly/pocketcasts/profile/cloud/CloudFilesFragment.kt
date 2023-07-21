@@ -84,16 +84,23 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onQueueUpNextTopClick = ::episodeSwipedRightItem1,
-                onQueueUpNextBottomClick = ::episodeSwipedRightItem2,
+                onItemUpdated = ::lazyNotifyItemChanged,
                 onDeleteOrArchiveClick = ::episodeDeleteSwiped,
-                playbackManager = playbackManager,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
             )
         )
+    }
+
+    // Cannot call notify.notifyItemChanged directly because the compiler gets confused
+    // when the adapter's constructor includes references to the adapter
+    private fun lazyNotifyItemChanged(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        index: Int
+    ) {
+        adapter.notifyItemChanged(index)
     }
 
     private val onRowClick = { episode: BaseEpisode ->
@@ -391,22 +398,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
         confirmationDialog.show(parentFragmentManager, "delete_confirm")
-    }
-
-    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
-        }
-        adapter.notifyItemChanged(index)
-    }
-
-    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)
-        }
-        adapter.notifyItemChanged(index)
     }
 
     override fun onBackPressed(): Boolean {
