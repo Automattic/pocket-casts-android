@@ -129,9 +129,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = ::lazyNotifyItemChanged,
-                onDeleteOrArchiveClick = { baseEpisode, _ ->
-                    viewModel.swipeToUpdateArchive(baseEpisode)
-                },
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,

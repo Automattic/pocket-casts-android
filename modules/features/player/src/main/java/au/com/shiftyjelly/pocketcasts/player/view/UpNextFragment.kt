@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
@@ -60,7 +59,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     companion object {
         private const val ARG_EMBEDDED = "embedded"
         private const val ARG_SOURCE = "source"
-        private const val ACTION_KEY = "action"
         private const val SOURCE_KEY = "source"
         private const val SELECT_ALL_KEY = "select_all"
         private const val DIRECTION_KEY = "direction"
@@ -145,7 +143,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = this::clearViewAtPosition,
-                onDeleteOrArchiveClick = { _, index -> removeFromUpNext(index) },
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = context,
                 fragmentManager = parentFragmentManager,
@@ -307,11 +304,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
     }
 
-    fun removeFromUpNext(position: Int) {
-        onUpNextEpisodeRemove(position)
-        trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-    }
-
     fun startTour() {
         val upNextTourView = realBinding?.upNextTourView ?: return
         if (settings.getSeenUpNextTour()) {
@@ -401,12 +393,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         userRearrangingFrom = toPosition
     }
 
-    override fun onUpNextEpisodeRemove(position: Int) {
-        (upNextItems.getOrNull(position) as? BaseEpisode)?.let {
-            playerViewModel.removeFromUpNext(it)
-        }
-    }
-
     override fun onUpNextItemTouchHelperFinished(position: Int) {
         if (playingEpisodeAtStartOfDrag == playbackManager.upNextQueue.currentEpisode?.uuid) {
             playerViewModel.changeUpNextEpisodes(upNextItems.subList(1, upNextItems.size).filterIsInstance<BaseEpisode>())
@@ -438,16 +424,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onNowPlayingClick() {
         (activity as? FragmentHostListener)?.openPlayer()
         close()
-    }
-
-    private fun trackSwipeAction(swipeAction: SwipeAction) {
-        analyticsTracker.track(
-            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
-            mapOf(
-                ACTION_KEY to swipeAction.analyticsValue,
-                SOURCE_KEY to SwipeSource.UP_NEXT.analyticsValue
-            )
-        )
     }
 
     private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {

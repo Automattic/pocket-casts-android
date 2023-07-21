@@ -13,7 +13,6 @@ class UpNextTouchCallback(
 
     interface ItemTouchHelperAdapter {
         fun onUpNextEpisodeMove(fromPosition: Int, toPosition: Int)
-        fun onUpNextEpisodeRemove(position: Int)
         fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder)
         fun onUpNextItemTouchHelperFinished(position: Int)
     }

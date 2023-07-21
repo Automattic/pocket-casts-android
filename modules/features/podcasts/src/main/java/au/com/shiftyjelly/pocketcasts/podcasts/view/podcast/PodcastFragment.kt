@@ -492,16 +492,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding?.episodesRecyclerView?.layoutManager?.onRestoreInstanceState(listState)
     }
 
-    fun episodeSwipeRightItem1(episode: BaseEpisode, index: Int) {
-        val binding = binding ?: return
-
-        binding.episodesRecyclerView.findViewHolderForAdapterPosition(index)?.let {
-            itemTouchHelper.clearView(binding.episodesRecyclerView, it)
-        }
-
-        viewModel.episodeSwipeArchive(episode)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPodcastBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -564,7 +554,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                     onItemUpdated = ::notifyItemChanged,
-                    onDeleteOrArchiveClick = ::episodeSwipeRightItem1,
                     defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                     context = context,
                     fragmentManager = parentFragmentManager,

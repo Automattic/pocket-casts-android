@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
@@ -40,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
-import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -85,7 +83,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = ::lazyNotifyItemChanged,
-                onDeleteOrArchiveClick = ::episodeDeleteSwiped,
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
@@ -100,6 +97,11 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
         index: Int
     ) {
+        val recyclerView = binding?.recyclerView
+        recyclerView?.findViewHolderForAdapterPosition(index)?.let {
+            itemTouchHelper.clearView(recyclerView, it)
+        }
+
         adapter.notifyItemChanged(index)
     }
 
@@ -384,20 +386,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z)
             )
         dialog.show(parentFragmentManager, "sort_options")
-    }
-
-    private fun episodeDeleteSwiped(episode: BaseEpisode, index: Int) {
-        val userEpisode = episode as? UserEpisode ?: return
-        val deleteState = viewModel.getDeleteStateOnSwipeDelete(userEpisode)
-        val confirmationDialog = CloudDeleteHelper.getDeleteDialog(userEpisode, deleteState, viewModel::deleteEpisode, resources)
-        confirmationDialog
-            .setOnDismiss {
-                val recyclerView = binding?.recyclerView
-                recyclerView?.findViewHolderForAdapterPosition(index)?.let {
-                    itemTouchHelper.clearView(recyclerView, it)
-                }
-            }
-        confirmationDialog.show(parentFragmentManager, "delete_confirm")
     }
 
     override fun onBackPressed(): Boolean {

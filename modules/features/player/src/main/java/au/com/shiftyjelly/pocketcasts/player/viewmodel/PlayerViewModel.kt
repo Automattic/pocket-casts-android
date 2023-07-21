@@ -472,10 +472,6 @@ class PlayerViewModel @Inject constructor(
         disposables.clear()
     }
 
-    fun removeFromUpNext(episode: BaseEpisode) {
-        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
-    }
-
     private fun calcCustomTimeText(): String {
         return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
     }

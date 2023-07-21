@@ -36,8 +36,11 @@ sealed interface SwipeButton {
         private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
         private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
+
         override val iconRes = IR.drawable.ic_upnext_movetotop
+
         override val backgroundColor: (Context) -> Int = { it.getThemeColor(UR.attr.support_04) }
+
         override val onClick: (BaseEpisode, RowIndex) -> Unit
             get() = { baseEpisode, rowIndex ->
                 viewModel.episodeSwipeUpNextTop(
@@ -54,10 +57,13 @@ sealed interface SwipeButton {
         private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
         private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
+
         override val iconRes = IR.drawable.ic_upnext_movetobottom
+
         override val backgroundColor: (Context) -> Int = {
             it.getThemeColor(UR.attr.support_03)
         }
+
         override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, rowIndex ->
             viewModel.episodeSwipeUpNextBottom(
                 episode = baseEpisode,
@@ -72,8 +78,11 @@ sealed interface SwipeButton {
         private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
         private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
+
         override val iconRes = removeUpNextIconRes
+
         override val backgroundColor: (Context) -> Int = { it.getThemeColor(removeUpNextBackgroundColorAttr) }
+
         override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, rowIndex ->
             viewModel.episodeSwipeRemoveUpNext(
                 episode = baseEpisode,
@@ -83,24 +92,55 @@ sealed interface SwipeButton {
         }
     }
 
-    class DeleteFileButton(override val onClick: (BaseEpisode, RowIndex) -> Unit) : SwipeButton {
+    class DeleteFileButton(
+        private val onItemModified: (UserEpisode, RowIndex) -> Unit,
+        private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        private val fragmentManager: FragmentManager,
+        private val viewModel: SwipeButtonLayoutViewModel,
+    ) : SwipeButton {
+
         override val iconRes = VR.drawable.ic_delete
+
         override val backgroundColor: (Context) -> Int =
             { it.getThemeColor(UR.attr.support_05) }
+
+        override val onClick: (BaseEpisode, RowIndex) -> Unit = { episode, rowIndex ->
+            if (episode !is UserEpisode) {
+                throw IllegalStateException("Can only delete user episodes, but tried to delete: $episode")
+            }
+            viewModel.deleteEpisode(
+                episode = episode,
+                swipeSource = swipeSource,
+                fragmentManager = fragmentManager,
+                onDismiss = { onItemModified(episode, rowIndex) }
+            )
+        }
     }
 
     class ArchiveButton(
         private val episode: BaseEpisode,
-        override val onClick: (BaseEpisode, RowIndex) -> Unit,
+        private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
+        private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
+
         override val iconRes
             get() = if (episode.isArchived) {
                 IR.drawable.ic_unarchive
             } else {
                 IR.drawable.ic_archive
             }
+
         override val backgroundColor: (Context) -> Int =
             { it.getThemeColor(UR.attr.support_06) }
+
+        override val onClick: (BaseEpisode, RowIndex) -> Unit = { episode, rowIndex ->
+            if (episode !is PodcastEpisode) {
+                throw IllegalStateException("Can only share podcast episodes, but tried to archive: $episode")
+            }
+            viewModel.updateArchive(episode, swipeSource)
+            onItemUpdated(episode, rowIndex)
+        }
     }
 
     class ShareButton(
@@ -109,13 +149,17 @@ sealed interface SwipeButton {
         context: Context,
         viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
+
         override val iconRes = IR.drawable.ic_share
+
         override val backgroundColor: (Context) -> Int =
             { it.getThemeColor(UR.attr.support_01) }
-        override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, _ ->
-            (baseEpisode as? PodcastEpisode)?.let { episode ->
-                viewModel.share(episode, fragmentManager, context, swipeSource)
+
+        override val onClick: (BaseEpisode, RowIndex) -> Unit = { episode, _ ->
+            if (episode !is PodcastEpisode) {
+                throw IllegalStateException("Can only share podcast episodes: $episode")
             }
+            viewModel.share(episode, fragmentManager, context, swipeSource)
         }
     }
 }
@@ -126,7 +170,6 @@ sealed interface SwipeButton {
 class SwipeButtonLayoutFactory(
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel,
     private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
-    private val onDeleteOrArchiveClick: (BaseEpisode, RowIndex) -> Unit,
     private val showShareButton: Boolean = true,
     private val defaultUpNextSwipeAction: () -> Settings.UpNextAction,
     private val context: Context,
@@ -151,8 +194,18 @@ class SwipeButtonLayoutFactory(
                 swipeSource = swipeSource,
                 viewModel = swipeButtonLayoutViewModel,
             )
-            val archive = SwipeButton.ArchiveButton(episode, onDeleteOrArchiveClick)
-            val deleteFile = SwipeButton.DeleteFileButton(onDeleteOrArchiveClick)
+            val archive = SwipeButton.ArchiveButton(
+                episode = episode,
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            )
+            val deleteFile = SwipeButton.DeleteFileButton(
+                onItemModified = onItemUpdated,
+                swipeSource = swipeSource,
+                fragmentManager = fragmentManager,
+                viewModel = swipeButtonLayoutViewModel,
+            )
             val share = SwipeButton.ShareButton(
                 swipeSource = swipeSource,
                 fragmentManager = fragmentManager,

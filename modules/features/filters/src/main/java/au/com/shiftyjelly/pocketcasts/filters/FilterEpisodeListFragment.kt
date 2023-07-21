@@ -130,9 +130,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = this::lazyNotifyAdapterChanged,
-                onDeleteOrArchiveClick = { baseEpisode, _ ->
-                    viewModel.updateArchive(baseEpisode)
-                },
                 defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
                 context = context,
                 fragmentManager = parentFragmentManager,
