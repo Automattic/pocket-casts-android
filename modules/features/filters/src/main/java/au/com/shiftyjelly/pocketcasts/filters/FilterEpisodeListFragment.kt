@@ -95,7 +95,28 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private lateinit var imageLoader: PodcastImageLoader
 
-    private lateinit var adapter: EpisodeListAdapter
+    private val adapter: EpisodeListAdapter by lazy {
+        EpisodeListAdapter(
+            downloadManager = downloadManager,
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            settings = settings,
+            onRowClick = this::onRowClick,
+            playButtonListener = playButtonListener,
+            imageLoader = imageLoader,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
+                onItemUpdated = this::lazyNotifyAdapterChanged,
+                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                context = requireContext(),
+                fragmentManager = parentFragmentManager,
+                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
+            )
+        )
+    }
+
     private var showingFilterOptionsBeforeMultiSelect: Boolean = false
     private var multiSelectLoaded: Boolean = false
     private var listSavedState: Parcelable? = null
@@ -117,25 +138,6 @@ class FilterEpisodeListFragment : BaseFragment() {
         }.smallPlaceholder()
 
         playButtonListener.source = SourceView.FILTERS
-        adapter = EpisodeListAdapter(
-            downloadManager = downloadManager,
-            playbackManager = playbackManager,
-            upNextQueue = upNextQueue,
-            settings = settings,
-            onRowClick = this::onRowClick,
-            playButtonListener = playButtonListener,
-            imageLoader = imageLoader,
-            multiSelectHelper = multiSelectHelper,
-            fragmentManager = childFragmentManager,
-            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onItemUpdated = this::lazyNotifyAdapterChanged,
-                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
-                context = context,
-                fragmentManager = parentFragmentManager,
-                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
-            )
-        )
     }
 
     // Cannot call notify.notifyItemChanged directly because the compiler gets confused
