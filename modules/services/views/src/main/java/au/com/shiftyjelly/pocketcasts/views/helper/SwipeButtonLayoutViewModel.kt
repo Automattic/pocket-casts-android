@@ -57,7 +57,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
                 context = context,
                 shouldShowPodcast = false,
                 analyticsTracker = analyticsTracker,
-            ).show(sourceView = SourceView.SWIPE_ACTION)
+            ).show(sourceView = SourceView.EPISODE_SWIPE_ACTION)
         }
     }
 

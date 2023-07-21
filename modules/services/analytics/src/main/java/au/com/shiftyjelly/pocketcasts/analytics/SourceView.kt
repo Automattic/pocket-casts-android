@@ -30,7 +30,7 @@ enum class SourceView(val analyticsValue: String) {
     ONBOARDING_RECOMMENDATIONS_SEARCH("onboarding_recommendations_search"),
     UNKNOWN("unknown"),
     TASKER("tasker"),
-    SWIPE_ACTION("swipe_action");
+    EPISODE_SWIPE_ACTION("episode_swipe_action");
 
     fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
 
