@@ -7,10 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -105,7 +103,6 @@ class BookmarkManagerTest {
     /**
      * Test findEpisodeBookmarksFlow newest to older order returns newest bookmark first
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun findEpisodeBookmarksOrderNewestToOldest() {
         val episodeUuid = UUID.randomUUID().toString()
@@ -114,7 +111,6 @@ class BookmarkManagerTest {
 
         runTest {
             val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "")
-            advanceTimeBy(1000)
             val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
 
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
@@ -130,7 +126,6 @@ class BookmarkManagerTest {
     /**
      * Test findEpisodeBookmarksFlow oldest to newest order returns oldest bookmark first
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun findEpisodeBookmarksOrderOldestToNewest() {
         val episodeUuid = UUID.randomUUID().toString()
@@ -139,7 +134,6 @@ class BookmarkManagerTest {
 
         runTest {
             val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 10, title = "")
-            advanceTimeBy(1000)
             val bookmarkTwo = bookmarkManager.add(episode = episode, timeSecs = 20, title = "")
 
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(
