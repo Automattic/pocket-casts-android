@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -174,7 +175,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         }
     }
 
-    fun isEpisodeQueued(episode: BaseEpisode) = playbackManager.upNextQueue.contains(episode.uuid)
+    private fun isEpisodeQueued(episode: BaseEpisode) = playbackManager.upNextQueue.contains(episode.uuid)
 
     private fun swipeSourceToSourceView(swipeSource: EpisodeItemTouchHelper.SwipeSource) = when (swipeSource) {
         EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS -> SourceView.PODCAST_SCREEN
@@ -185,4 +186,74 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         EpisodeItemTouchHelper.SwipeSource.FILES -> SourceView.FILES
         EpisodeItemTouchHelper.SwipeSource.UP_NEXT -> SourceView.UP_NEXT
     }
+
+    fun getSwipeButtonLayout(
+        episode: BaseEpisode,
+        swipeSource: EpisodeItemTouchHelper.SwipeSource,
+        showShareButton: Boolean,
+        defaultUpNextSwipeAction: () -> Settings.UpNextAction,
+        buttons: SwipeButtons,
+    ): SwipeButtonLayout {
+
+        val onUpNextQueueScreen = swipeSource == EpisodeItemTouchHelper.SwipeSource.UP_NEXT
+
+        return if (onUpNextQueueScreen) {
+            SwipeButtonLayout(
+                // We ignore the user's swipe preference setting when on the up next screen
+                leftPrimary = { buttons.addToUpNextTop },
+                leftSecondary = { buttons.addToUpNextBottom },
+                rightPrimary = { buttons.removeFromUpNext },
+                rightSecondary = { null },
+            )
+        } else {
+            SwipeButtonLayout(
+                leftPrimary = {
+                    if (isEpisodeQueued(episode)) {
+                        buttons.removeFromUpNext
+                    } else {
+                        // The left primary button is the action that is taken when the user swipes to the right
+                        when (defaultUpNextSwipeAction()) {
+                            Settings.UpNextAction.PLAY_NEXT -> buttons.addToUpNextTop
+                            Settings.UpNextAction.PLAY_LAST -> buttons.addToUpNextBottom
+                        }
+                    }
+                },
+                leftSecondary = {
+                    if (isEpisodeQueued(episode)) {
+                        // Do not show a secondary button on the left when episode queued
+                        null
+                    } else {
+                        when (defaultUpNextSwipeAction()) {
+                            Settings.UpNextAction.PLAY_NEXT -> buttons.addToUpNextBottom
+                            Settings.UpNextAction.PLAY_LAST -> buttons.addToUpNextTop
+                        }
+                    }
+                },
+                rightPrimary = {
+                    when (episode) {
+                        is UserEpisode -> buttons.deleteFile
+                        is PodcastEpisode -> buttons.archive
+                    }
+                },
+                rightSecondary = {
+                    when (episode) {
+                        is UserEpisode -> null
+                        is PodcastEpisode ->
+                            if (showShareButton) {
+                                buttons.share
+                            } else null
+                    }
+                },
+            )
+        }
+    }
+
+    data class SwipeButtons(
+        val addToUpNextTop: SwipeButton.AddToUpNextTop,
+        val addToUpNextBottom: SwipeButton.AddToUpNextBottom,
+        val removeFromUpNext: SwipeButton.RemoveFromUpNext,
+        val archive: SwipeButton.ArchiveButton,
+        val deleteFile: SwipeButton.DeleteFileButton,
+        val share: SwipeButton.ShareButton,
+    )
 }

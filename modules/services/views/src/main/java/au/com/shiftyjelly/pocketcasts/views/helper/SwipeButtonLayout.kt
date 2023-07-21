@@ -31,7 +31,7 @@ sealed interface SwipeButton {
     }
 
     // Shows the remove from up next button if the episode is already queued
-    class AddToUpNextTopOrRemove(
+    class AddToUpNextTop(
         private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
         private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
         private val viewModel: SwipeButtonLayoutViewModel,
@@ -176,96 +176,46 @@ class SwipeButtonLayoutFactory(
     private val fragmentManager: FragmentManager,
     private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
 ) {
-    fun forEpisode(episode: BaseEpisode): SwipeButtonLayout {
-
-        val buttons = object {
-            val addToUpNextTop = SwipeButton.AddToUpNextTopOrRemove(
-                onItemUpdated = onItemUpdated,
-                swipeSource = swipeSource,
-                viewModel = swipeButtonLayoutViewModel,
-            )
-            val addToUpNextBottom = SwipeButton.AddToUpNextBottom(
-                onItemUpdated = onItemUpdated,
-                swipeSource = swipeSource,
-                viewModel = swipeButtonLayoutViewModel,
-            )
-            val removeFromUpNext = SwipeButton.RemoveFromUpNext(
-                onItemUpdated = onItemUpdated,
-                swipeSource = swipeSource,
-                viewModel = swipeButtonLayoutViewModel,
-            )
-            val archive = SwipeButton.ArchiveButton(
-                episode = episode,
-                onItemUpdated = onItemUpdated,
-                swipeSource = swipeSource,
-                viewModel = swipeButtonLayoutViewModel,
-            )
-            val deleteFile = SwipeButton.DeleteFileButton(
-                onItemModified = onItemUpdated,
-                swipeSource = swipeSource,
-                fragmentManager = fragmentManager,
-                viewModel = swipeButtonLayoutViewModel,
-            )
-            val share = SwipeButton.ShareButton(
-                swipeSource = swipeSource,
-                fragmentManager = fragmentManager,
-                context = context,
-                viewModel = swipeButtonLayoutViewModel,
-            )
-        }
-
-        val onUpNextQueueScreen = swipeSource == EpisodeItemTouchHelper.SwipeSource.UP_NEXT
-        return if (onUpNextQueueScreen) {
-            SwipeButtonLayout(
-                // We ignore the user's swipe preference setting when on the up next screen
-                leftPrimary = { buttons.addToUpNextTop },
-                leftSecondary = { buttons.addToUpNextBottom },
-                rightPrimary = { buttons.removeFromUpNext },
-                rightSecondary = { null },
-            )
-        } else {
-            SwipeButtonLayout(
-                leftPrimary = {
-                    if (swipeButtonLayoutViewModel.isEpisodeQueued(episode)) {
-                        buttons.removeFromUpNext
-                    } else {
-                        // The left primary button is the action that is taken when the user swipes to the right
-                        when (defaultUpNextSwipeAction()) {
-                            Settings.UpNextAction.PLAY_NEXT -> buttons.addToUpNextTop
-                            Settings.UpNextAction.PLAY_LAST -> buttons.addToUpNextBottom
-                        }
-                    }
-                },
-                leftSecondary = {
-                    if (swipeButtonLayoutViewModel.isEpisodeQueued(episode)) {
-                        // Do not show a secondary button on the left when episode queued
-                        null
-                    } else {
-                        when (defaultUpNextSwipeAction()) {
-                            Settings.UpNextAction.PLAY_NEXT -> buttons.addToUpNextBottom
-                            Settings.UpNextAction.PLAY_LAST -> buttons.addToUpNextTop
-                        }
-                    }
-                },
-                rightPrimary = {
-                    when (episode) {
-                        is UserEpisode -> buttons.deleteFile
-                        is PodcastEpisode -> buttons.archive
-                    }
-                },
-                rightSecondary = {
-                    when (episode) {
-                        is UserEpisode -> null
-                        is PodcastEpisode ->
-                            if (showShareButton) {
-                                buttons.share
-                            } else null
-                    }
-                },
-            )
-        }
-    }
+    fun forEpisode(episode: BaseEpisode): SwipeButtonLayout =
+        swipeButtonLayoutViewModel.getSwipeButtonLayout(
+            episode = episode,
+            swipeSource = swipeSource,
+            defaultUpNextSwipeAction = defaultUpNextSwipeAction,
+            showShareButton = showShareButton,
+            buttons = SwipeButtonLayoutViewModel.SwipeButtons(
+                addToUpNextTop = SwipeButton.AddToUpNextTop(
+                    onItemUpdated = onItemUpdated,
+                    swipeSource = swipeSource,
+                    viewModel = swipeButtonLayoutViewModel,
+                ),
+                addToUpNextBottom = SwipeButton.AddToUpNextBottom(
+                    onItemUpdated = onItemUpdated,
+                    swipeSource = swipeSource,
+                    viewModel = swipeButtonLayoutViewModel,
+                ),
+                removeFromUpNext = SwipeButton.RemoveFromUpNext(
+                    onItemUpdated = onItemUpdated,
+                    swipeSource = swipeSource,
+                    viewModel = swipeButtonLayoutViewModel,
+                ),
+                archive = SwipeButton.ArchiveButton(
+                    episode = episode,
+                    onItemUpdated = onItemUpdated,
+                    swipeSource = swipeSource,
+                    viewModel = swipeButtonLayoutViewModel,
+                ),
+                deleteFile = SwipeButton.DeleteFileButton(
+                    onItemModified = onItemUpdated,
+                    swipeSource = swipeSource,
+                    fragmentManager = fragmentManager,
+                    viewModel = swipeButtonLayoutViewModel,
+                ),
+                share = SwipeButton.ShareButton(
+                    swipeSource = swipeSource,
+                    fragmentManager = fragmentManager,
+                    context = context,
+                    viewModel = swipeButtonLayoutViewModel,
+                ),
+            ),
+        )
 }
-
-private fun getOnUpNextQueueScreen(swipeSource: EpisodeItemTouchHelper.SwipeSource) =
-    swipeSource == EpisodeItemTouchHelper.SwipeSource.UP_NEXT
