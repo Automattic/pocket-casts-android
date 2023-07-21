@@ -38,8 +38,16 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.uuidMap(uuid))
     }
 
-    fun trackEvent(event: AnalyticsEvent, source: SourceView, toTop: Boolean) {
-        analyticsTracker.track(event, AnalyticsProp.sourceAndToTopMap(source, toTop))
+    fun trackEvent(
+        event: AnalyticsEvent,
+        source: SourceView,
+        toTop: Boolean,
+        episode: BaseEpisode,
+    ) {
+        analyticsTracker.track(
+            event,
+            AnalyticsProp.sourceAndToTopMap(source, toTop, episode)
+        )
     }
 
     fun trackBulkEvent(event: AnalyticsEvent, source: SourceView, count: Int) {
@@ -72,8 +80,12 @@ class EpisodeAnalytics @Inject constructor(
             mapOf(source to eventSource.analyticsValue, episode_uuid to uuid)
 
         fun uuidMap(uuid: String) = mapOf(episode_uuid to uuid)
-        fun sourceAndToTopMap(eventSource: SourceView, toTop: Boolean) =
-            mapOf(source to eventSource.analyticsValue, to_top to toTop)
+        fun sourceAndToTopMap(eventSource: SourceView, toTop: Boolean, episode: BaseEpisode) =
+            mapOf(
+                source to eventSource.analyticsValue,
+                to_top to toTop,
+                episode_uuid to episode.uuid,
+            )
 
         fun bulkMap(eventSource: SourceView, count: Int) =
             mapOf(source to eventSource.analyticsValue, this.count to count)

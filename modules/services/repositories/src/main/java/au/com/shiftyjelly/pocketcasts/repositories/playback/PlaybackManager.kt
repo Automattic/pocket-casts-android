@@ -479,7 +479,7 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNext(episode, downloadManager, null)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
@@ -494,7 +494,7 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, downloadManager, null)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
