@@ -5,6 +5,8 @@
         ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169)
     *   Added capability to deselect all/below and above on the multiselect feature
         ([#1172](https://github.com/Automattic/pocket-casts-android/pull/1172))
+    *   Added share option to episode swipe menu
+        ([#1190](https://github.com/Automattic/pocket-casts-android/pull/1190))
 
 7.43
 -----
