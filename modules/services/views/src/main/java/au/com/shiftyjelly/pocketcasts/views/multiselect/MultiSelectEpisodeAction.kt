@@ -163,7 +163,11 @@ sealed class MultiSelectEpisodeAction(
                 }
                 R.id.menu_playnext -> return PlayNext
                 R.id.menu_playlast -> return PlayLast
-                R.id.menu_share -> if (selected.size == 1) return Share
+                R.id.menu_share -> {
+                    if (selected.size == 1 &&
+                        selected.firstOrNull() is PodcastEpisode
+                    ) return Share
+                }
             }
 
             return null

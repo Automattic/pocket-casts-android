@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
@@ -403,6 +404,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
         if (episode !is PodcastEpisode) {
             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share a ${PodcastEpisode::class.java.simpleName}")
+            Toast.makeText(context, LR.string.podcasts_share_failed, Toast.LENGTH_SHORT).show()
             return
         }
 
