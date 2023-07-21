@@ -67,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -128,7 +129,7 @@ class BookmarksFragment : BaseFragment() {
                 .setForceDarkTheme(true)
                 .addTextOption(
                     titleId = LR.string.bookmarks_select_option,
-                    imageId = IR.drawable.ic_multiselect,
+                    imageId = R.drawable.ic_multiselect,
                     click = {
                         multiSelectHelper.isMultiSelecting = true
                     }
