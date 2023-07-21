@@ -25,11 +25,6 @@ sealed interface SwipeButton {
     val backgroundColor: (Context) -> Int
     val onClick: (BaseEpisode, RowIndex) -> Unit
 
-    companion object {
-        private val removeUpNextIconRes = IR.drawable.ic_upnext_remove
-        private val removeUpNextBackgroundColorAttr = UR.attr.support_05
-    }
-
     // Shows the remove from up next button if the episode is already queued
     class AddToUpNextTop(
         private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
@@ -79,9 +74,9 @@ sealed interface SwipeButton {
         private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
 
-        override val iconRes = removeUpNextIconRes
+        override val iconRes = IR.drawable.ic_upnext_remove
 
-        override val backgroundColor: (Context) -> Int = { it.getThemeColor(removeUpNextBackgroundColorAttr) }
+        override val backgroundColor: (Context) -> Int = { it.getThemeColor(UR.attr.support_05) }
 
         override val onClick: (BaseEpisode, RowIndex) -> Unit = { baseEpisode, rowIndex ->
             viewModel.episodeSwipeRemoveUpNext(
