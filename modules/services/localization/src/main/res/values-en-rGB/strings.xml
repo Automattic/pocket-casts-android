@@ -23,10 +23,6 @@ Language: en_GB
     <string name="go_to_folder">Go to folder</string>
     <string name="change_folder">Change folder</string>
     <string name="remove_from_folder">Remove from folder</string>
-    <string name="whats_new_blog_link">Read more about this update on our blog</string>
-    <string name="whats_new_grid_7_20">We now sync your Home Screen (including your sort options) across devices! And you can drag and drop in the Web Player now as well.\n\nThis means you can rest easier, knowing the hard work you put in to arranging your podcasts page is being synced to your account.</string>
-    <string name="whats_new_grid_title_7_20">Home Grid Syncing</string>
-    <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>
     <string name="podcasts_empty_folder_summary">Add podcasts to your folder and they’ll appear here.</string>
     <string name="podcasts_empty_folder">Your folder is empty</string>
     <string name="add_podcasts">Add podcasts</string>
@@ -628,6 +624,7 @@ Language: en_GB
     <string name="profile_navigation_listening_history">Listening History</string>
     <string name="profile_navigation_files">Files</string>
     <string name="profile_monthly">Monthly</string>
+    <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account and don’t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you’re welcome to view prior to submission.</string>
     <string name="profile_last_refresh">Last refresh: %s ago</string>
     <string name="profile_joined">Joined:</string>
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
@@ -638,10 +635,8 @@ Language: en_GB
     <string name="profile_files_remove_image">Replace Image</string>
     <string name="profile_files_empty_title">No Files</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they’ll appear here.</string>
-    <string name="profile_files_edit">Edit</string>
     <string name="profile_files_addfile_save">Save</string>
     <string name="profile_files_add_filename">Name</string>
-    <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account and don’t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you’re welcome to view prior to submission.</string>
     <string name="profile_files_add_custom_image">Add Custom Image</string>
     <string name="profile_file_locked">locked</string>
     <string name="profile_file">File</string>

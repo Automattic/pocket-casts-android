@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-05 17:54:03+0000
+Translation-Revision-Date: 2023-07-18 11:54:22+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="deselect_all">Tout déselectionner</string>
+    <string name="edit">Editer</string>
+    <string name="whats_new_autoplay_maybe_later_button">Peut-être plus tard</string>
+    <string name="whats_new_autoplay_enable_button">Activez-la maintenant</string>
+    <string name="whats_new_autoplay_body">Si vous démarrez un épisode alors que la liste À écouter ensuite est vide, l’option Lecture automatique continuera à lire les épisodes de ce podcast ou de cette liste.</string>
+    <string name="whats_new_autoplay_title">La lecture automatique est disponible !</string>
+    <string name="filters_download_limit_3">3 épisodes</string>
+    <string name="settings_title_headphone_controls">Commandes du casque</string>
+    <string name="settings_headphone_controls_summary">Personnalisez les actions effectuées par les principales commandes du casque.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Émettez un son de confirmation dans votre casque après la création d’un signet.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Son de confirmation lors de l’ajout d’un signet</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Avance rapide</string>
+    <string name="settings_headphone_controls_choice_skip_back">Retour rapide</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Chapitre précédent</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Chapitre suivant</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Ajouter un signet</string>
+    <string name="settings_headphone_controls_action_previous">Action précédente</string>
+    <string name="settings_headphone_controls_action_next">Action suivante</string>
+    <string name="bookmarks_headphone_settings">Réglages des écouteurs</string>
+    <string name="bookmarks_not_found">Aucun signet pour l’instant</string>
+    <string name="bookmarks_create_instructions">Vous pouvez enregistrer les horodatages des épisodes à partir du menu Actions du lecteur ou en configurant une action avec vos écouteurs.</string>
+    <string name="bookmark_play">Lire à la position du signet %s</string>
+    <string name="bookmarks_plural">%s favoris</string>
+    <string name="bookmarks_singular">%s favori</string>
     <string name="bookmarks">Favoris</string>
+    <string name="settings_autoplay">Lecture automatique</string>
+    <string name="player_sleep_add_1_minute">+ 1 minute</string>
+    <string name="player_sleep_1_minute">1 minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Thèmes et icônes d’applications supplémentaires</string>
     <string name="onboarding_plus_feature_watch_playback">Lecture sur la montre</string>
     <string name="onboarding_patron_feature_early_access_title">Accès en avant-première aux fonctionnalités</string>
@@ -367,10 +394,6 @@ Language: fr
     <string name="go_to_folder">Accéder au dossier</string>
     <string name="change_folder">Modifier le dossier</string>
     <string name="remove_from_folder">Supprimer du dossier</string>
-    <string name="whats_new_blog_link">Lire la suite à propos de cette mise à jour sur notre blog</string>
-    <string name="whats_new_grid_7_20">Votre écran d’accueil (options de tri comprises) est désormais synchronisé sur vos appareils ! Et la fonction glisser-déposer est désormais aussi disponible dans le lecteur Web.\n\nVous pouvez donc avoir l’esprit tranquille, sachant que le dur labeur consacré à l’agencement de votre page de podcasts est synchronisé sur votre compte.</string>
-    <string name="whats_new_grid_title_7_20">Synchronisation de la grille d’accueil</string>
-    <string name="whats_new_folders_7_20">Si comme nous, vous êtes passionné·e de podcasts, vous en avez probablement une belle collection. Les abonnés Pocket Casts Plus peuvent désormais organiser leurs podcasts dans des dossiers et les classer en groupes bien ordonnés.\n\nMerci de votre soutien, votre écran d’accueil n’a jamais été aussi impeccable !</string>
     <string name="podcasts_empty_folder_summary">Ajoutez des podcasts à votre dossier et ils apparaîtront ici.</string>
     <string name="podcasts_empty_folder">Votre dossier est vide</string>
     <string name="add_podcasts">Ajouter des podcasts</string>
@@ -986,7 +1009,6 @@ Language: fr
     <string name="profile_files_remove_image">Remplacer l’image</string>
     <string name="profile_files_empty_title">Aucun fichier</string>
     <string name="profile_files_empty_summary">Vous souhaitez écouter vos propres fichiers ?\nAppuyez sur le bouton + pour les ouvrir dans Pocket Casts, et ils apparaîtront ici.</string>
-    <string name="profile_files_edit">Éditer</string>
     <string name="profile_files_addfile_save">Enregistrer</string>
     <string name="profile_files_add_filename">Nom</string>
     <string name="profile_files_add_custom_image">Ajouter une image personnalisée</string>

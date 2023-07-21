@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 16:54:03+0000
+Translation-Revision-Date: 2023-07-18 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="deselect_all">Alles deselecteren</string>
+    <string name="edit">Bewerk</string>
+    <string name="whats_new_autoplay_maybe_later_button">Misschien later</string>
+    <string name="whats_new_autoplay_enable_button">Nu inschakelen</string>
+    <string name="whats_new_autoplay_body">Als je een aflevering afspeelt wanneer de Wachtrij Hierna leeg is, blijft Automatisch afspelen afleveringen van die podcast of lijst afspelen.</string>
+    <string name="whats_new_autoplay_title">Automatisch afspelen is nu beschikbaar!</string>
+    <string name="filters_download_limit_3">3 afleveringen</string>
+    <string name="settings_title_headphone_controls">Koptelefoonbediening</string>
+    <string name="settings_headphone_controls_summary">Pas de andere acties aan die via de vaakst voorkomende knoppen op koptelefoon.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Speel een bevestigingsgeluid op je koptelefoon af nadat een bladwijzer is aangemaakt.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Bevestigingsgeluid bladwijzer</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Doorspoelen</string>
+    <string name="settings_headphone_controls_choice_skip_back">Terugspoelen</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Eerder hoofdstuk</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Volgend hoofdstuk</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Bladwijzer toevoegen</string>
+    <string name="settings_headphone_controls_action_previous">Vorige actie</string>
+    <string name="settings_headphone_controls_action_next">Nieuwe actie</string>
+    <string name="bookmarks_headphone_settings">Instellingen koptelefoon</string>
+    <string name="bookmarks_not_found">Nog geen bladwijzers</string>
+    <string name="bookmarks_create_instructions">Je kan tijdstempels van afleveringen opslaan in het actiemenu van de speler of door een actie te configureren met je koptelefoon.</string>
+    <string name="bookmark_play">Afspelen bij positie bladwijzer %s</string>
+    <string name="bookmarks_plural">%s bladwijzers</string>
+    <string name="bookmarks_singular">%s bladwijzer</string>
     <string name="bookmarks">Bladwijzers</string>
+    <string name="settings_autoplay">Automatisch afspelen</string>
+    <string name="player_sleep_add_1_minute">+ 1 minuut</string>
+    <string name="player_sleep_1_minute">1 minuut</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra thema\'s en app-pictogrammen</string>
     <string name="onboarding_plus_feature_watch_playback">Afspelen op horloge</string>
     <string name="onboarding_patron_feature_early_access_title">Vroegtijdige toegang tot functies</string>
@@ -367,10 +394,6 @@ Language: nl
     <string name="go_to_folder">Ga naar map</string>
     <string name="change_folder">Map wijzigen</string>
     <string name="remove_from_folder">Verwijderen uit map</string>
-    <string name="whats_new_blog_link">Lees meer over deze update op onze blog</string>
-    <string name="whats_new_grid_7_20">Je startscherm (waaronder je sorteeropties) wordt nu op al je apparaten gesynchroniseerd! En je kan nu ook slepen en neerzetten in de webspeler.\n\nJe kan nu dus met een gerust hart de lay-out van de pagina podcasts gaan aanpassen, want alle aangebrachte veranderingen worden met je account gesynchroniseerd.</string>
-    <string name="whats_new_grid_title_7_20">Startraster synchroniseren</string>
-    <string name="whats_new_folders_7_20">Als je podcasts net zo leuk vindt als wij, dan luister je waarschijnlijk naar een heleboel. Als je een Pocket Casts Plus-abonnee bent, kan je nu je podcasts aan mappen toevoegen en in groepen sorteren.\n\nDankzij jouw ondersteuning ziet je Startscherm er beter uit dan ooit!</string>
     <string name="podcasts_empty_folder_summary">Als je podcasts aan je map toevoegt, zullen ze hier verschijnen</string>
     <string name="podcasts_empty_folder">Je map is leeg</string>
     <string name="add_podcasts">Podcasts toevoegen</string>
@@ -986,7 +1009,6 @@ Language: nl
     <string name="profile_files_remove_image">Afbeelding vervangen</string>
     <string name="profile_files_empty_title">Geen bestanden</string>
     <string name="profile_files_empty_summary">Wil je naar je eigen bestanden luisteren?\nTik op de knop + om ze te openen in Pocket Casts en ze verschijnen hier.</string>
-    <string name="profile_files_edit">Bewerk</string>
     <string name="profile_files_addfile_save">Opslaan</string>
     <string name="profile_files_add_filename">Naam</string>
     <string name="profile_files_add_custom_image">Aangepaste afbeelding toevoegen</string>

@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 14:10:07+0000
+Translation-Revision-Date: 2023-07-18 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="deselect_all">Alle abwählen</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="whats_new_autoplay_maybe_later_button">Vielleicht später</string>
+    <string name="whats_new_autoplay_enable_button">Jetzt aktivieren</string>
+    <string name="whats_new_autoplay_body">Wenn du eine Folge startest, während deine „Als Nächstes“-Liste leer ist, spielt Autoplay weiter Folgen aus diesem Podcast oder aus dieser Liste ab.</string>
+    <string name="whats_new_autoplay_title">Autoplay ist da!</string>
+    <string name="filters_download_limit_3">3 Folgen</string>
+    <string name="settings_title_headphone_controls">Kopfhörersteuerungen</string>
+    <string name="settings_headphone_controls_summary">Passe die Aktionen der gängigsten Kopfhörersteuerungen an.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Spiele einen Bestätigungston, nachdem du ein Lesezeichen mit deinen Kopfhörern erstellt hast.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Bestätigungston für Lesezeichen</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Vor</string>
+    <string name="settings_headphone_controls_choice_skip_back">Zurück</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Vorheriges Kapitel</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Nächstes Kapitel</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Lesezeichen hinzufügen</string>
+    <string name="settings_headphone_controls_action_previous">Vorherige Aktion</string>
+    <string name="settings_headphone_controls_action_next">Nächste Aktion</string>
+    <string name="bookmarks_headphone_settings">Kopfhörereinstellungen</string>
+    <string name="bookmarks_not_found">Noch keine Lesezeichen</string>
+    <string name="bookmarks_create_instructions">Du kannst Zeitstempel von Folgen über das Aktionsmenü im Player speichern oder, indem du eine Aktion mit deinen Kopfhörern konfigurierst.</string>
+    <string name="bookmark_play">Wiedergabe bei Lesezeichenposition %s</string>
+    <string name="bookmarks_plural">%s Lesezeichen</string>
+    <string name="bookmarks_singular">%s Lesezeichen</string>
     <string name="bookmarks">Lesezeichen</string>
+    <string name="settings_autoplay">Automatische Wiedergabe</string>
+    <string name="player_sleep_add_1_minute">+ 1 Minute</string>
+    <string name="player_sleep_1_minute">1 Minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Zusätzliche Themes und App-Icons</string>
     <string name="onboarding_plus_feature_watch_playback">Watch-Wiedergabe</string>
     <string name="onboarding_patron_feature_early_access_title">Frühzeitiger Zugriff auf Funktionen</string>
@@ -367,10 +394,6 @@ Language: de
     <string name="go_to_folder">Ordner aufrufen</string>
     <string name="change_folder">Ordner ändern</string>
     <string name="remove_from_folder">Aus Ordner entfernen</string>
-    <string name="whats_new_blog_link">Weitere Informationen zu diesem Update findest du in unserem Blog</string>
-    <string name="whats_new_grid_7_20">Dein Startbildschirm (einschließlich deiner Sortierungsoptionen) wird jetzt auf allen Geräten synchronisiert! Und du kannst die Drag-and-drop-Funktion nun auch im Webplayer verwenden.\n\nD. h., deine Podcasts-Seite mit allen Anordnungen, die du vorgenommen hast, wird mit deinem Konto synchronisiert. Du kannst dich also ganz entspannt zurücklehnen.</string>
-    <string name="whats_new_grid_title_7_20">Synchronisierung des Startbildschirms</string>
-    <string name="whats_new_folders_7_20">Wenn du Podcasts nur halb so gerne magst wie wir, hast du bestimmt eine Menge davon. Als Abonnent von Pocket Casts Plus kannst du deine Podcasts ab sofort in Ordern sortieren und diese ordentlich in Gruppen anordnen.\n\nDein Startbildschirm sieht perfekt aus. Vielen Dank für die Unterstützung!</string>
     <string name="podcasts_empty_folder_summary">Füge Podcasts zu deinem Ordner hinzu und sie werden hier angezeigt.</string>
     <string name="podcasts_empty_folder">Dein Ordner ist leer</string>
     <string name="add_podcasts">Podcasts hinzufügen</string>
@@ -986,7 +1009,6 @@ Language: de
     <string name="profile_files_remove_image">Bild ersetzen</string>
     <string name="profile_files_empty_title">Keine Dateien</string>
     <string name="profile_files_empty_summary">Möchtest du deine eigenen Dateien anhören?\nTippe auf den (+)-Button, um sie in Pocket Casts zu öffnen. Sie werden dann hier angezeigt.</string>
-    <string name="profile_files_edit">Bearbeiten</string>
     <string name="profile_files_addfile_save">Speichern</string>
     <string name="profile_files_add_filename">Name</string>
     <string name="profile_files_add_custom_image">Eigenes Bild hinzufügen</string>

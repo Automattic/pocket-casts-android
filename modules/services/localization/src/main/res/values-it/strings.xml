@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-05 09:54:04+0000
+Translation-Revision-Date: 2023-07-18 08:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="deselect_all">Deseleziona tutto</string>
+    <string name="edit">Modifica</string>
+    <string name="bookmarks_headphone_settings">Impostazioni delle cuffie</string>
+    <string name="bookmarks_not_found">Ancora nessun segnalibro</string>
+    <string name="bookmarks_create_instructions">Puoi salvare data e ora degli episodi dal menu delle azioni nel lettore o configurando un\'azione con le cuffie.</string>
+    <string name="bookmark_play">Riproduci alla posizione del segnalibro %s</string>
+    <string name="bookmarks_plural">%s segnalibri</string>
+    <string name="bookmarks_singular">%s segnalibro</string>
     <string name="bookmarks">Segnalibri</string>
+    <string name="settings_autoplay">Riproduzione automatica</string>
+    <string name="player_sleep_add_1_minute">+ 1 minuto</string>
+    <string name="player_sleep_1_minute">1 minuto</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Temi aggiuntivi e icone delle app</string>
     <string name="onboarding_plus_feature_watch_playback">Riproduzione su smartwatch</string>
     <string name="onboarding_patron_feature_early_access_title">Accesso anticipato alle funzionalità</string>
@@ -367,10 +378,6 @@ Language: it
     <string name="go_to_folder">Vai alla cartella</string>
     <string name="change_folder">Modifica la cartella</string>
     <string name="remove_from_folder">Rimuovi dalla cartella</string>
-    <string name="whats_new_blog_link">Leggi di più su questo aggiornamento sul nostro blog</string>
-    <string name="whats_new_grid_7_20">Ora sincronizziamo la schermata Home (includendo le opzioni di ordinamento) tra i dispositivi. Inoltre, ora puoi anche trascinare e rilasciare nel lettore web.\n\nCiò significa che puoi stare più tranquillo sapendo che il duro lavoro che hai dedicato alla sistemazione della pagina dei tuoi podcast viene sincronizzato con il tuo account.</string>
-    <string name="whats_new_grid_title_7_20">Sincronizzazione della griglia della home</string>
-    <string name="whats_new_folders_7_20">Se ami i podcast la metà di quanto li amiamo noi, probabilmente ne avrai molti. Se sei un abbonato a Pocket Casts Plus, ora puoi ordinarli in cartelle e archiviarli in gruppi ordinati.\n\nGrazie per il supporto, la tua schermata Home non è mai apparsa più bella.</string>
     <string name="podcasts_empty_folder_summary">Aggiungi i podcast alla tua cartella e verranno visualizzati qui.</string>
     <string name="podcasts_empty_folder">La tua cartella è vuota</string>
     <string name="add_podcasts">Aggiungi podcast</string>
@@ -986,7 +993,6 @@ Language: it
     <string name="profile_files_remove_image">Sostituisci Immagine</string>
     <string name="profile_files_empty_title">Nessun file</string>
     <string name="profile_files_empty_summary">Vuoi ascoltare i tuoi file?\nTocca + per aprirli su Pocket Casts. Appariranno qui.</string>
-    <string name="profile_files_edit">Modifica</string>
     <string name="profile_files_addfile_save">Salva</string>
     <string name="profile_files_add_filename">Nome</string>
     <string name="profile_files_add_custom_image">Aggiungi immagine personalizzata</string>
