@@ -14,7 +14,7 @@ Fixes # <!-- issue number, if applicable -->
 
 ## Checklist
 - [ ] If this is a user-facing change, I have added an entry in CHANGELOG.md
-- [ ] Ensure the linter passes (`./codeAnalysis` to automatically apply formatting/linting)
+- [ ] Ensure the linter passes (`./gradlew :spotlessApply` to automatically apply formatting/linting)
 - [ ] I have considered whether it makes sense to add tests for my changes
 - [ ] All strings that need to be localized are in `modules/services/localization/src/main/res/values/strings.xml`
 - [ ] Any jetpack compose components I added or changed are covered by compose previews
