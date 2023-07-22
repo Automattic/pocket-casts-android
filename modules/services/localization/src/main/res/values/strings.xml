@@ -66,10 +66,15 @@
     <string name="removed">Removed</string>
     <string name="search">Search</string>
     <string name="selected">Selected</string>
+    <string name="sort_newest_to_oldest">Newest to oldest</string>
+    <string name="sort_oldest_to_newest">Oldest to newest</string>
     <string name="not_selected">Not selected</string>
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
     <string name="select_all_above">Select all above</string>
+    <string name="deselect_all_above">Deselect all above</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="deselect_all_below">Deselect all below</string>
     <string name="select_all_below">Select all below</string>
     <string name="share_podcast">Share podcast</string>
     <string name="show_archived">Show archived</string>
@@ -533,8 +538,8 @@
     <string name="episode_row_waiting_for_power">Waiting for power</string>
     <string name="episode_row_waiting_for_wifi">Waiting for WiFi</string>
     <string name="episode_sort_long_to_short">Longest to shortest</string>
-    <string name="episode_sort_newest_to_oldest">Newest to oldest</string>
-    <string name="episode_sort_oldest_to_newest">Oldest to newest</string>
+    <string name="episode_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
+    <string name="episode_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
     <string name="episode_sort_short_to_long">Shortest to longest</string>
     <string name="episode_bonus">Bonus</string>
     <string name="episode_trailer">Trailer</string>
@@ -1673,6 +1678,17 @@
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%s bookmarks</string>
     <string name="bookmarks_singular">%s bookmark</string>
+    <string name="bookmarks_delete_plural">Delete bookmarks</string>
+    <string name="bookmarks_delete_singular">Delete bookmark</string>
+    <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
+    <string name="bookmarks_deleted_singular">1 bookmark deleted</string>
+    <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
+    <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
+    <string name="bookmarks_select_option">Select bookmarks</string>
+    <string name="bookmarks_sort_option" translatable="false">@string/sort_by</string>
+    <string name="bookmarks_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
+    <string name="bookmarks_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
+    <string name="bookmarks_sort_timestamp">Timestamp</string>
 
     <!--    Tasker Plugin-->
 

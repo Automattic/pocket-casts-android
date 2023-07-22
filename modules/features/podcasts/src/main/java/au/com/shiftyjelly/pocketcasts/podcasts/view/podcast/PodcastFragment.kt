@@ -629,6 +629,30 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                     adapter?.notifyDataSetChanged()
                 }
             }
+
+            override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
+                val grouped = viewModel.groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        group.subList(startIndex, group.size).forEach { multiSelectHelper.deselect(it) }
+                        adapter?.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
+                val grouped = viewModel.groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        group.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                        adapter?.notifyDataSetChanged()
+                    }
+                }
+            }
         }
         multiSelectHelper.source = SourceView.PODCAST_SCREEN
         binding.multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)

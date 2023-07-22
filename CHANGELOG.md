@@ -2,7 +2,9 @@
 -----
 *   New Feature:
     *   Added 3 episodes on the Filter AutoDownload
-        ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169) 
+        ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169)
+    *   Added capability to deselect all/below and above on the multiselect feature
+        ([#1172](https://github.com/Automattic/pocket-casts-android/pull/1172))
 
 7.43
 -----
@@ -20,6 +22,8 @@
         ([#1155](https://github.com/Automattic/pocket-casts-android/pull/1155)).
     *   Fixed the acknowledgements being hidden in the Automotive about page.
         ([#1166](https://github.com/Automattic/pocket-casts-android/pull/1166)).
+    *   Wear OS: Fixed blank screen when showing episode details of cloud files
+        ([#1181](https://github.com/Automattic/pocket-casts-android/pull/1181)).
 
 7.42
 -----

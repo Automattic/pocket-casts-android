@@ -55,7 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -67,11 +67,14 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -85,7 +88,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class BookmarksFragment : BaseFragment() {
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    private val bookmarksViewModel: BookmarksViewModel by viewModels()
     @Inject lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    @Inject lateinit var settings: Settings
 
     private val overrideTheme: Theme.ThemeType
         get() = if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
@@ -103,6 +108,7 @@ class BookmarksFragment : BaseFragment() {
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     BookmarksPage(
                         playerViewModel = playerViewModel,
+                        bookmarksViewModel = bookmarksViewModel,
                         onRowLongPressed = { bookmark ->
                             multiSelectHelper.defaultLongPress(
                                 multiSelectable = bookmark,
@@ -110,9 +116,36 @@ class BookmarksFragment : BaseFragment() {
                                 forceDarkTheme = true,
                             )
                         },
+                        showOptionsDialog = { showOptionsDialog(it) }
                     )
                 }
             }
+        }
+    }
+
+    private val showOptionsDialog: (Int) -> Unit = { selectedValue ->
+        activity?.supportFragmentManager?.let {
+            OptionsDialog()
+                .setForceDarkTheme(true)
+                .addTextOption(
+                    titleId = LR.string.bookmarks_select_option,
+                    imageId = R.drawable.ic_multiselect,
+                    click = {
+                        multiSelectHelper.isMultiSelecting = true
+                    }
+                )
+                .addTextOption(
+                    titleId = LR.string.bookmarks_sort_option,
+                    imageId = IR.drawable.ic_sort,
+                    valueId = selectedValue,
+                    click = {
+                        BookmarksSortByDialog(settings, bookmarksViewModel::changeSortOrder)
+                            .show(
+                                context = requireContext(),
+                                fragmentManager = it
+                            )
+                    }
+                ).show(it, "bookmarks_options_dialog")
         }
     }
 }
@@ -120,8 +153,9 @@ class BookmarksFragment : BaseFragment() {
 @Composable
 private fun BookmarksPage(
     playerViewModel: PlayerViewModel,
-    bookmarksViewModel: BookmarksViewModel = hiltViewModel(),
+    bookmarksViewModel: BookmarksViewModel,
     onRowLongPressed: (Bookmark) -> Unit,
+    showOptionsDialog: (Int) -> Unit,
 ) {
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
     val listData = playerViewModel.listDataLive.asFlow().collectAsState(initial = null)
@@ -130,11 +164,16 @@ private fun BookmarksPage(
             state = state,
             backgroundColor = Color(it.podcastHeader.backgroundColor),
             onRowLongPressed = onRowLongPressed,
+            onBookmarksOptionsMenuClicked = { bookmarksViewModel.onOptionsMenuClicked() },
         )
         LaunchedEffect(Unit) {
             bookmarksViewModel.loadBookmarks(
                 episodeUuid = it.podcastHeader.episodeUuid
             )
+            bookmarksViewModel.showOptionsDialog
+                .collect { selectedValue ->
+                    showOptionsDialog(selectedValue)
+                }
         }
     }
 }
@@ -144,6 +183,7 @@ private fun Content(
     state: UiState,
     backgroundColor: Color,
     onRowLongPressed: (Bookmark) -> Unit,
+    onBookmarksOptionsMenuClicked: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -155,6 +195,7 @@ private fun Content(
                 state = state,
                 backgroundColor = backgroundColor,
                 onRowLongPressed = onRowLongPressed,
+                onOptionsMenuClicked = onBookmarksOptionsMenuClicked,
             )
 
             is UiState.Empty -> NoBookmarksView()
@@ -168,6 +209,7 @@ private fun BookmarksView(
     state: UiState.Loaded,
     backgroundColor: Color,
     onRowLongPressed: (Bookmark) -> Unit,
+    onOptionsMenuClicked: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -182,7 +224,10 @@ private fun BookmarksView(
                 },
                 state.bookmarks.size
             )
-            HeaderItem(title)
+            HeaderItem(
+                title = title,
+                onOptionsMenuClicked = onOptionsMenuClicked,
+            )
         }
         items(state.bookmarks, key = { it }) { bookmark ->
             BookmarkItem(
@@ -203,7 +248,10 @@ private fun BookmarksView(
 }
 
 @Composable
-private fun HeaderItem(title: String) {
+private fun HeaderItem(
+    title: String,
+    onOptionsMenuClicked: () -> Unit,
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -216,7 +264,7 @@ private fun HeaderItem(title: String) {
             color = MaterialTheme.theme.colors.playerContrast02,
         )
         IconButton(
-            onClick = { /* TODO */ },
+            onClick = { onOptionsMenuClicked() },
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_more_vert_black_24dp),
@@ -484,6 +532,7 @@ private fun BookmarksPreview(
             ),
             backgroundColor = Color.Black,
             onRowLongPressed = {},
+            onBookmarksOptionsMenuClicked = {},
         )
     }
 }
@@ -498,6 +547,7 @@ private fun NoBookmarksPreview(
             state = UiState.Empty,
             backgroundColor = Color.Black,
             onRowLongPressed = {},
+            onBookmarksOptionsMenuClicked = {},
         )
     }
 }
@@ -512,6 +562,7 @@ private fun PlusUpsellPreview(
             state = UiState.PlusUpsell,
             backgroundColor = Color.Black,
             onRowLongPressed = {},
+            onBookmarksOptionsMenuClicked = {},
         )
     }
 }

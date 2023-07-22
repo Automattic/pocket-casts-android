@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 14:10:07+0000
+Translation-Revision-Date: 2023-07-18 15:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="deselect_all">Снять выделение</string>
+    <string name="edit">Править</string>
+    <string name="whats_new_autoplay_maybe_later_button">Возможно, позже</string>
+    <string name="whats_new_autoplay_enable_button">Включить</string>
+    <string name="whats_new_autoplay_body">Если в очереди «Следующие» ничего нет, то после выпуска, который вы слушаете, автоматически запустится другой из этого подкаста или списка.</string>
+    <string name="whats_new_autoplay_title">А вот и автовоспроизведение!</string>
+    <string name="filters_download_limit_3">3 выпуска</string>
+    <string name="settings_title_headphone_controls">Элементы управления наушников</string>
+    <string name="settings_headphone_controls_summary">Настройте действия для основных элементов управления наушников.</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Звук подтверждения при создании закладки с помощью наушников.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Звук добавления в закладки</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Перейти дальше</string>
+    <string name="settings_headphone_controls_choice_skip_back">Перейти назад</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Предыдущая глава</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Следующая глава</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Добавить закладку</string>
+    <string name="settings_headphone_controls_action_previous">Предыдущее действие</string>
+    <string name="settings_headphone_controls_action_next">Следующее действие</string>
+    <string name="bookmarks_headphone_settings">Настройки наушников</string>
+    <string name="bookmarks_not_found">Пока нет закладок.</string>
+    <string name="bookmarks_create_instructions">Вы можете сохранять отметки времени выпусков, используя меню действий проигрывателя или настроив действие с наушниками.</string>
+    <string name="bookmark_play">Воспроизвести с закладки %s</string>
+    <string name="bookmarks_plural">Закладки: %s</string>
+    <string name="bookmarks_singular">%s закладка</string>
     <string name="bookmarks">Закладки</string>
+    <string name="settings_autoplay">Автовоспроизведение</string>
+    <string name="player_sleep_add_1_minute">+ 1 минута</string>
+    <string name="player_sleep_1_minute">1 минута</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Дополнительные темы и значки приложения</string>
     <string name="onboarding_plus_feature_watch_playback">Воспроизведение на Watch</string>
     <string name="onboarding_patron_feature_early_access_title">Ранний доступ к новым возможностям</string>
@@ -367,10 +394,6 @@ Language: ru
     <string name="go_to_folder">Перейти в папку</string>
     <string name="change_folder">Изменить папку</string>
     <string name="remove_from_folder">Удалить из папки</string>
-    <string name="whats_new_blog_link">Узнайте больше об этом обновлении в нашем блоге</string>
-    <string name="whats_new_grid_7_20">Теперь ваш главный экран (включая опции сортировки) синхронизирован на всех устройствах! Кроме того, теперь вы можете перетаскивать компоненты в веб-плеер.\n\nЭто означает, что все ваши усилия по упорядочению страницы с подкастами не прошли зря и соответствующие данные синхронизированы с учётной записью.</string>
-    <string name="whats_new_grid_title_7_20">Синхронизация структуры домашней страницы</string>
-    <string name="whats_new_folders_7_20">Если вы любите подкасты так же, как мы, то у вас их должно быть много. Теперь подписчики Pocket Casts Plus могут сортировать их по папкам и делить на удобные группы.\n\nБлагодаря вашей поддержке ваш главный экран выглядит существенно лучше!</string>
     <string name="podcasts_empty_folder_summary">Добавляйте подкасты в папку, и они будут отображаться здесь.</string>
     <string name="podcasts_empty_folder">В папке нет файлов</string>
     <string name="add_podcasts">Добавить подкасты</string>
@@ -986,7 +1009,6 @@ Language: ru
     <string name="profile_files_remove_image">Заменить</string>
     <string name="profile_files_empty_title">Нет файлов</string>
     <string name="profile_files_empty_summary">Хотите слушать собственные файлы?\nКоснитесь кнопки +, чтобы открыть их в Pocket Casts, и они появятся здесь.</string>
-    <string name="profile_files_edit">Изменить</string>
     <string name="profile_files_addfile_save">Сохранить</string>
     <string name="profile_files_add_filename">Имя</string>
     <string name="profile_files_add_custom_image">Добавьте настраиваемое изображение</string>

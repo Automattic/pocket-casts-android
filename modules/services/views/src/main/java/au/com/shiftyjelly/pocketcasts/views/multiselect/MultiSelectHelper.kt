@@ -27,6 +27,8 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fun multiSelectSelectNone()
         fun multiSelectSelectAllUp(multiSelectable: T)
         fun multiSelectSelectAllDown(multiSelectable: T)
+        fun multiDeselectAllBelow(multiSelectable: T)
+        fun multiDeselectAllAbove(multiSelectable: T)
     }
 
     open lateinit var listener: Listener<T>
@@ -70,17 +72,41 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
 
             FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
+            val selectAllAbove = if (isSelected(multiSelectable) && selectedList.size > 1) {
+                R.string.deselect_all_above
+            } else {
+                R.string.select_all_above
+            }
+
+            val selectAll = if (selectedList.contains(multiSelectable) && selectedList.size > 1) {
+                R.string.deselect_all
+            } else {
+                R.string.select_all
+            }
+
+            val selectAllBelow = if (isSelected(multiSelectable) && selectedList.size > 1) {
+                R.string.deselect_all_below
+            } else {
+                R.string.select_all_below
+            }
+
             OptionsDialog()
                 .setForceDarkTheme(forceDarkTheme)
                 .addTextOption(
-                    titleId = R.string.select_all_above,
-                    click = { selectAllAbove(multiSelectable) },
-                    imageId = IR.drawable.ic_selectall_up
+                    titleId = selectAllAbove,
+                    click = { toggleSelectAllAbove(multiSelectable) },
+                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_up else IR.drawable.ic_selectall_up
+
                 )
                 .addTextOption(
-                    titleId = R.string.select_all_below,
-                    click = { selectAllBelow(multiSelectable) },
-                    imageId = IR.drawable.ic_selectall_down
+                    titleId = selectAll,
+                    click = { toggleSelectAll(multiSelectable) },
+                    imageId = if (selectedList.contains(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall else IR.drawable.ic_selectall
+                )
+                .addTextOption(
+                    titleId = selectAllBelow,
+                    click = { toggleSelectAllBelow(multiSelectable) },
+                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_down else IR.drawable.ic_selectall_down
                 )
                 .show(fragmentManager, "multi_select_select_dialog")
         }
@@ -127,14 +153,53 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         _selectedListLive.value = selectedList
     }
 
-    fun toggle(episode: T): Boolean {
-        return if (isSelected(episode)) {
-            deselect(episode)
+    fun deselectAllInList(multiSelectables: List<T>) {
+        selectedList.removeAll(multiSelectables)
+        _selectedListLive.value = selectedList
+    }
+
+    private fun toggleSelectAll(multiSelectable: T) {
+        if (selectedList.contains(multiSelectable) && selectedList.size > 1) {
+            deselectAll()
+        } else {
+            selectAll()
+        }
+    }
+    private fun toggleSelectAllAbove(multiSelectable: T) {
+        if (isSelected(multiSelectable) && selectedList.size > 1) {
+            deselectAllAbove(multiSelectable)
+        } else {
+            selectAllAbove(multiSelectable)
+        }
+    }
+    private fun toggleSelectAllBelow(multiSelectable: T) {
+        if (isSelected(multiSelectable) && selectedList.size > 1) {
+            deselectAllBelow(multiSelectable)
+        } else {
+            selectAllBelow(multiSelectable)
+        }
+    }
+
+    fun toggle(multiSelectable: T): Boolean {
+        return if (isSelected(multiSelectable)) {
+            deselect(multiSelectable)
             false
         } else {
-            select(episode)
+            select(multiSelectable)
             true
         }
+    }
+
+    private fun deselectAll() {
+        listener.multiSelectSelectNone()
+    }
+
+    private fun deselectAllAbove(deselectAllBelow: T) {
+        listener.multiDeselectAllAbove(deselectAllBelow)
+    }
+
+    private fun deselectAllBelow(deselectAllBelow: T) {
+        listener.multiDeselectAllBelow(deselectAllBelow)
     }
 
     fun closeMultiSelect() {

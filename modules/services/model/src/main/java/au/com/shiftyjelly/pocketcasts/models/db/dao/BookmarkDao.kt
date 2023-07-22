@@ -31,8 +31,25 @@ abstract class BookmarkDao {
     @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND time = :timeSecs LIMIT 1")
     abstract suspend fun findByEpisodeTime(podcastUuid: String, episodeUuid: String, timeSecs: Int): Bookmark?
 
-    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid")
-    abstract fun findByEpisodeFlow(podcastUuid: String, episodeUuid: String): Flow<List<Bookmark>>
+    @Query(
+        "SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND deleted = :deleted " +
+            "ORDER BY " +
+            "CASE WHEN :isAsc = 1 THEN created_at END ASC, " +
+            "CASE WHEN :isAsc = 0 THEN created_at END DESC"
+    )
+    abstract fun findByEpisodeOrderCreatedAtFlow(
+        podcastUuid: String,
+        episodeUuid: String,
+        deleted: Boolean = false,
+        isAsc: Boolean,
+    ): Flow<List<Bookmark>>
+
+    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND deleted = :deleted ORDER BY time ASC")
+    abstract fun findByEpisodeOrderTimeFlow(
+        podcastUuid: String,
+        episodeUuid: String,
+        deleted: Boolean = false,
+    ): Flow<List<Bookmark>>
 
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)

@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-04 14:10:07+0000
+Translation-Revision-Date: 2023-07-18 09:54:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="deselect_all">取消全選</string>
+    <string name="edit">編輯</string>
+    <string name="whats_new_autoplay_maybe_later_button">稍後再說</string>
+    <string name="whats_new_autoplay_enable_button">立即啟用</string>
+    <string name="whats_new_autoplay_body">如果你開始播放單集時「接下來播放」沒有任何內容，自動播放功能會繼續播放來自同一個 Podcast 或清單的單集。</string>
+    <string name="whats_new_autoplay_title">我們推出自動播放功能了！</string>
+    <string name="filters_download_limit_3">3 集</string>
+    <string name="settings_title_headphone_controls">耳機控制項</string>
+    <string name="settings_headphone_controls_summary">自訂由最常見耳機控制項完成的動作。</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">在透過耳機建立書籤後播放確認音效。</string>
+    <string name="settings_headphone_controls_confirmation_sound">書籤確認音效</string>
+    <string name="settings_headphone_controls_choice_skip_forward">快轉跳過</string>
+    <string name="settings_headphone_controls_choice_skip_back">倒轉跳過</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">上一節</string>
+    <string name="settings_headphone_controls_choice_next_chapter">下一節</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">新增書籤</string>
+    <string name="settings_headphone_controls_action_previous">上一個動作</string>
+    <string name="settings_headphone_controls_action_next">下一個動作</string>
+    <string name="bookmarks_headphone_settings">耳機設定</string>
+    <string name="bookmarks_not_found">尚未有書籤</string>
+    <string name="bookmarks_create_instructions">你可以從播放器的動作選單儲存單集的時間戳記，或設定耳機動作來儲存。</string>
+    <string name="bookmark_play">播放書籤位置 %s</string>
+    <string name="bookmarks_plural">%s 個書籤</string>
+    <string name="bookmarks_singular">%s 個書籤</string>
     <string name="bookmarks">書籤</string>
+    <string name="settings_autoplay">自動播放</string>
+    <string name="player_sleep_add_1_minute">1 分鐘</string>
+    <string name="player_sleep_1_minute">1 分鐘</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">其他主題和應用程式圖示</string>
     <string name="onboarding_plus_feature_watch_playback">手錶播放</string>
     <string name="onboarding_patron_feature_early_access_title">搶先使用新功能</string>
@@ -198,7 +225,7 @@ Language: zh_TW
     <string name="onboarding_continue_with_google_error">無法啟動 Google 登入。</string>
     <string name="onboarding_find_podcasts">尋找 Podcast</string>
     <string name="onboarding_welcome_recommendations_button">尋找我的下一個 Podcast</string>
-    <string name="onboarding_welcome_recommendations_text">在我們精心策劃的「探索」頁面中尋找低調時髦的 Podcast。</string>
+    <string name="onboarding_welcome_recommendations_text">在我們精心策劃的「探索」頁面中尋找還不出名與正在快速竄升的 Podcast。</string>
     <string name="onboarding_welcome_recommendations_title">探索新事物</string>
     <string name="onboarding_welcome_get_you_listening_plus">謝謝，立刻讓你聽聽看！</string>
     <string name="onboarding_welcome_get_you_listening">歡迎，立刻讓你聽聽看！</string>
@@ -213,7 +240,7 @@ Language: zh_TW
     <string name="onboarding_log_in">登入</string>
     <string name="plus_trial_duration_free_trial">%s 免費試用</string>
     <string name="end_of_year_stories_failed">無法載入你的年度回顧，請檢查網際網路連線</string>
-    <string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
+    <string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的專屬圖示和主題。</string>
     <string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB 雲端儲存空間</string>
@@ -228,12 +255,12 @@ Language: zh_TW
     <string name="onboarding_recommendations_make_pocket_casts_yours">選取你最愛的 Podcast，或從其他 Podcast 播放器匯入，打造你專屬的 Pocket Casts。 你可以稍後進行。</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">尋找你最愛的 Podcast</string>
     <string name="not_now">現在不要</string>
-    <string name="settings_open_player_automatically_summary">如果開啟，全螢幕播放器會在開始播放一集 Podcast 時開啟。</string>
+    <string name="settings_open_player_automatically_summary">如果開啟，全螢幕播放器會在開始播放 Podcast 時開啟。</string>
     <string name="settings_open_player_automatically">自動開啟播放器</string>
     <string name="onboarding_email_invalid_message">請輸入有效的電子郵件</string>
     <string name="onboarding_forgot_password">忘記密碼？</string>
     <string name="onboarding_get_the_newsletter">取得電子報</string>
-    <string name="onboarding_create_an_account_to">建立帳號即可在所有裝置上同步你的收聽體驗。</string>
+    <string name="onboarding_create_an_account_to">註冊帳號，即可在所有裝置上同步你的收聽進度。</string>
     <string name="onboarding_discover_your_next_favorite_podcast">探索下一個最愛的 Podcast 節目</string>
     <string name="onboarding_continue_with_google">繼續使用 Google</string>
     <string name="onboarding_welcome_back">歡迎回來</string>
@@ -296,10 +323,10 @@ Language: zh_TW
     <string name="playback_command">播放指令</string>
     <string name="command_x_not_valid">指令「%1$s」無效</string>
     <string name="must_provide_command_name">必須提供指令名稱</string>
-    <string name="no_episodes_in_filter_x">篩選條件「%1$s」中無集數</string>
+    <string name="no_episodes_in_filter_x">找不到符合篩選條件「%1$s」的單集</string>
     <string name="filter_x_not_found">找不到篩選條件「%1$s」</string>
     <string name="must_provide_filter_name">必須提供篩選條件名稱</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">現在不要</string>
+    <string name="end_of_year_launch_modal_secondary_button_title">先不要</string>
     <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2022 年</string>
     <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
     <string name="end_of_year_launch_modal_title">你的 Podcast 年度回顧</string>
@@ -307,7 +334,7 @@ Language: zh_TW
     <string name="settings_show_played_summary">你已播放完畢的節目仍會顯示</string>
     <string name="settings_show_played">顯示已播放的節目</string>
     <string name="settings_privacy_crash_link_summary">允許我們將你的 Pocket Casts 帳號連結至當機報告。</string>
-    <string name="settings_privacy_crash_link">連結帳號與當機</string>
+    <string name="settings_privacy_crash_link">將帳號與當機報告連結起來</string>
     <string name="settings_privacy_crash_summary">允許我們收集當機報告。</string>
     <string name="settings_privacy_crash">當機報告</string>
     <string name="settings_privacy_analytics_summary">允許我們收集分析。</string>
@@ -353,7 +380,7 @@ Language: zh_TW
     <string name="profile_create_failed_title">無法建立帳號</string>
     <string name="please_try_again">請再試一次</string>
     <string name="player_battery_warning_snackbar_action">更新</string>
-    <string name="player_battery_warning_snackbar">你的電池限制可能會導致播放中斷。</string>
+    <string name="player_battery_warning_snackbar">你的電池續航限制可能會導致播放中斷。</string>
     <string name="settings_battery_usage_message">電池用量必須不受限制，才能確保螢幕關閉時播放不受中斷。</string>
     <string name="settings_battery_update_message">請點選上方的「%s」切換以更新你的電池設定。</string>
     <string name="settings_battery_unrestricted_accessibility_label">更新你的電池設定</string>
@@ -367,10 +394,6 @@ Language: zh_TW
     <string name="go_to_folder">前往資料夾</string>
     <string name="change_folder">變更資料夾</string>
     <string name="remove_from_folder">從資料夾移除</string>
-    <string name="whats_new_blog_link">閱讀我們的網誌，深入了解此更新</string>
-    <string name="whats_new_grid_7_20">我們已將你的主畫面（包括排序選項）同步至所有裝置！ 現在你還可以拖放網頁播放器。\n\n這表示你對排版 Podcast 頁面所付出的努力工作，都會同步至你的帳戶，因此你可以高枕無憂。</string>
-    <string name="whats_new_grid_title_7_20">主畫面網格同步</string>
-    <string name="whats_new_folders_7_20">如果你喜歡 Podcast 的程度有我們的一半，那你可能收聽很多 Podcast 節目。如果你是 Pocket Casts Plus 訂閱者，現在你可以將 Podcast 節目排序至資料夾，再將其排序至整潔的群組。\n\n多虧了你的支援，你的主畫面現已更加美觀！</string>
     <string name="podcasts_empty_folder_summary">新增 Podcast 節目至您的資料夾後即會顯示在此處</string>
     <string name="podcasts_empty_folder">資料夾是空的</string>
     <string name="add_podcasts">新增 Podcast 節目</string>
@@ -420,17 +443,17 @@ Language: zh_TW
     <string name="settings_about_automattic_family">Automattic 品牌系列</string>
     <string name="settings_about_work_from_anywhere">遠端工作，不限地點</string>
     <string name="settings_about_legal">法律與其他</string>
-    <string name="settings_about_work_with_us">加入我們</string>
+    <string name="settings_about_work_with_us">工作機會</string>
     <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">幫我們評分</string>
-    <string name="settings_about_share_with_friends_message">嗨！ 在此提供下載 Pocket Casts 應用程式的連結。我很喜歡這個應用程式，相信你也會喜歡它。 \nhttps://www.pocketcasts.com</string>
+    <string name="settings_about_share_with_friends_message">嗨！分享 Pocket Casts 的下載連結。我很喜歡這個 App，相信你也會喜歡它。 \nhttps://www.pocketcasts.com</string>
     <string name="settings_about_share_with_friends">與朋友分享</string>
     <string name="collapsed">已收合</string>
     <string name="expanded">已展開</string>
     <string name="discover_popular_in">在%s十分熱門</string>
     <string name="discover_popular">熱門</string>
-    <string name="discover_top">頂部</string>
+    <string name="discover_top">最熱門</string>
     <string name="filters_filter_name">篩選條件名稱</string>
     <string name="episode_short_episode">第 %d 集</string>
     <string name="episode_short_season">日%d</string>
@@ -472,7 +495,7 @@ Language: zh_TW
     <string name="profile_cloud_add_file">新增檔案</string>
     <string name="profile_cloud_settings_title">檔案設定</string>
     <string name="server_files_title_required">標題為必填。</string>
-    <string name="server_files_storage_limit_exceeded">你已超出帳號的儲存空間限制。</string>
+    <string name="server_files_storage_limit_exceeded">你已超出本帳號的儲存空間限制。</string>
     <string name="server_files_file_too_large">這個檔案太大，無法上傳。</string>
     <string name="server_files_invalid_user">使用者未登入。</string>
     <string name="server_files_invalid_content_type">我們無法判斷此檔案的內容類型，因此無法上傳。</string>
@@ -525,7 +548,7 @@ Language: zh_TW
     <string name="discover_region_denmark">丹麥</string>
     <string name="discover_region_germany">德國</string>
     <string name="discover_region_switzerland">瑞士</string>
-    <string name="discover_region_china">中国</string>
+    <string name="discover_region_china">中國</string>
     <string name="discover_region_canada">加拿大</string>
     <string name="discover_region_brazil">巴西</string>
     <string name="discover_region_belgium">比利時</string>
@@ -541,7 +564,7 @@ Language: zh_TW
     <string name="discover_category_sports">運動</string>
     <string name="discover_category_society">社會與文化</string>
     <string name="discover_category_science">科學</string>
-    <string name="discover_category_religion">宗教與靈性</string>
+    <string name="discover_category_religion">宗教與心靈</string>
     <string name="discover_category_news">新聞</string>
     <string name="discover_category_music">音樂</string>
     <string name="discover_category_leisure">休閒</string>
@@ -563,21 +586,21 @@ Language: zh_TW
     <string name="discover_error_try_again">無法載入內容。 請檢查你的網際網路連線並再試一次。</string>
     <string name="discover_error">載入內容時發生錯誤。</string>
     <string name="discover">探索</string>
-    <string name="error_login_failed">抱歉，無法登入你的同步帳號。 請稍後再試一次。</string>
+    <string name="error_login_failed">抱歉，無法登入你的同步帳號。稍後請再試一次。</string>
     <string name="error_field_required">此欄位為必填</string>
     <string name="error_incorrect_password">此密碼不正確</string>
     <string name="error_invalid_password">此密碼太短</string>
     <string name="error_invalid_email">此電子郵件地址無效</string>
     <string name="error_file_not_found">找不到單集檔案，請重新嘗試下載。</string>
-    <string name="error_storage_permission">已拒絕！ Pocket Casts 無法播放此檔案，請檢查你的儲存空間權限。</string>
+    <string name="error_storage_permission">已拒絕！Pocket Casts 無法播放此檔案，請檢查你的儲存空間權限。</string>
     <string name="error_playing_format_external">本集格式似乎無法播放，不妨試試其他應用程式？</string>
-    <string name="error_playing_format">無法播放檔案。 請嘗試轉換為其他格式。</string>
+    <string name="error_playing_format">無法播放檔案。請嘗試轉換為其他格式。</string>
     <string name="error_unable_to_play">無法播放檔案</string>
-    <string name="error_unable_to_cast">無法轉換本集。 Podcast 作者可能未提供本集。</string>
-    <string name="error_unable_to_cast_local">無法投射本機檔案</string>
+    <string name="error_unable_to_cast">無法轉換本集。Podcast 作者可能未提供本集。</string>
+    <string name="error_unable_to_cast_local">無法播放本機檔案</string>
     <string name="error_streaming_try_downloading">串流失敗，請重新下載 Podcast。</string>
     <string name="error_streaming_internet">串流失敗，請檢查你的網路連線。</string>
-    <string name="error_chartable_streaming">串流失敗。 製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
+    <string name="error_chartable_streaming">串流失敗。製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等 篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
     <string name="error_chartable">製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
     <string name="error_loading_show_notes">無法載入節目備註。</string>
     <string name="error_webview_not_installed">未安裝系統 WebView，無法載入節目備註。</string>
@@ -586,8 +609,8 @@ Language: zh_TW
     <string name="settings_status_service_hosts_help">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要為此網域解除封鎖，才能下載 Podcast。 請注意，Pocket Casts 不負責管理 Podcast 或選擇託管服務商，一切由節目作者決定。</string>
     <string name="settings_status_service_hosts_summary">Podcast 作者會將單集檔案交由各式託管服務商管理，而這些服務商不受 Pocket Casts 管理。</string>
     <string name="settings_status_service_hosts">Podcast 常見託管服務商</string>
-    <string name="settings_status_service_ad_blocker_help_plural">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除封鎖網域 %s</string>
-    <string name="settings_status_service_ad_blocker_help_singular">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除封鎖網域 %s</string>
+    <string name="settings_status_service_ad_blocker_help_plural">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除本網域 %s 的封鎖</string>
+    <string name="settings_status_service_ad_blocker_help_singular">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除本網域 %s 的封鎖</string>
     <string name="settings_status_service_discover_summary">應用程式的探索區段，包括 Podcast 搜尋。</string>
     <string name="settings_status_service_discover">探索和搜尋</string>
     <string name="settings_status_service_account_summary">該服務用於儲存單集進度、訂閱、篩選條件等。</string>
@@ -624,13 +647,13 @@ Language: zh_TW
     <string name="settings_theme_radioactivity">放射線</string>
     <string name="settings_theme_classic">經典</string>
     <string name="settings_theme_electricity">電氣</string>
-    <string name="settings_theme_light_contrast">輕度對比</string>
-    <string name="settings_theme_dark_contrast">深度對比</string>
+    <string name="settings_theme_light_contrast">淺色對比</string>
+    <string name="settings_theme_dark_contrast">深色對比</string>
     <string name="settings_theme_extra_dark">極深</string>
     <string name="settings_theme_indigo">靛藍色</string>
     <string name="settings_theme_rose">玫瑰</string>
-    <string name="settings_theme_dark">深色系</string>
-    <string name="settings_theme_light">淡色系</string>
+    <string name="settings_theme_dark">深色</string>
+    <string name="settings_theme_light">淺色</string>
     <string name="settings_auto_archive_inactive_dialog">未啟用的單集</string>
     <string name="settings_archive_played_dialog">已播放的單集</string>
     <string name="settings_archive_played">封存已播放的單集</string>
@@ -646,21 +669,21 @@ Language: zh_TW
     <string name="settings_select_podcasts">選取 Podcast 節目</string>
     <string name="settings_auto_archive_no_starred_summary">加上星號的單集不會自動封存</string>
     <string name="settings_stats_share_app_failed">未安裝可接受圖片的應用程式。</string>
-    <string name="settings_stats_funny_searches">這段時間裡，世界執行了 %1$,.0f 次 Google 搜尋。 騙到你了吧。</string>
+    <string name="settings_stats_funny_searches">這段時間裡，全世界執行了 %1$,.0f 次 Google 搜尋。真的假的？</string>
     <string name="settings_stats_funny_air_balloon">這段時間裡，你可以乘坐氣球環遊世界 %1$,.0f 次。</string>
-    <string name="settings_stats_funny_laces">這段時間裡，你可以繫上 %1$,.0f 條鞋帶。 大概吧。</string>
-    <string name="settings_stats_funny_air_biscuits">這段時間裡，你放了 %1$,.0f 盎司的屁。 好噁喔！</string>
-    <string name="settings_stats_funny_tweets">這段時間裡，%1$,.0f 則推文引起迴響。 嘰嘰喳喳！ 嘰嘰喳喳！</string>
-    <string name="settings_stats_funny_emails">這段時間裡，世界傳送了 %1$,.0f 封電子郵件。</string>
-    <string name="settings_stats_funny_sneezed">這段時間裡，某個太空人打了 %1$,.0f 次噴嚏。 哈啾！</string>
-    <string name="settings_stats_funny_skin">這段時間裡，你脫落了 %1$,.0f 個皮膚細胞。 啥？</string>
+    <string name="settings_stats_funny_laces">這段時間裡，你可以繫上 %1$,.0f 條鞋帶。大概吧。</string>
+    <string name="settings_stats_funny_air_biscuits">這段時間裡，你放了 %1$,.0f 盎司的屁。好臭喔！</string>
+    <string name="settings_stats_funny_tweets">這段時間裡，%1$,.0f 則推文引起迴響。嘰嘰喳喳！嘰嘰喳喳！</string>
+    <string name="settings_stats_funny_emails">這段時間裡，全世界寄出 %1$,.0f 封電子郵件。</string>
+    <string name="settings_stats_funny_sneezed">這段時間裡，某個太空人打了 %1$,.0f 次噴嚏。哈啾！</string>
+    <string name="settings_stats_funny_skin">這段時間裡，你有 %1$,.0f 個皮膚細胞脫落下來。啥？</string>
     <string name="settings_stats_funny_lightning">這段時間裡，發生了 %1$,.0f 次閃電。 砰！</string>
     <string name="settings_stats_funny_blinked">這段時間裡，你眨了 %1$,.0f 次眼睛。 看過來！</string>
     <string name="settings_stats_funny_babies">這段時間裡，%1$,.0f 個嬰兒誕生了。 哇！</string>
     <string name="settings_stats_funny_empty">你大概沒怎麼聽進去，對吧？</string>
     <string name="settings_auto_up_next_limit_reached_stop_summary">「接下來播放」到達 %d 集時，將停止新增新單集。</string>
     <string name="settings_auto_up_next_limit_reached_stop">停止新增</string>
-    <string name="settings_auto_up_next_limit_reached_top_summary">「接下來播放」到達 %d 集時，新單集將自動新增至頂端，並移除佇列中的最後一集。 新單集不會新增至底端。</string>
+    <string name="settings_auto_up_next_limit_reached_top_summary">「接下來播放」到達 %d 集時，新單集將自動新增至頂端，並移除佇列中的最後一集。新單集不會新增至底端。</string>
     <string name="settings_auto_up_next_limit_reached_top">僅新增至頂端</string>
     <string name="settings_auto_up_next_limit_reached">若達上限</string>
     <string name="settings_auto_up_next_to_bottom">到底端</string>
@@ -704,7 +727,7 @@ Language: zh_TW
     <string name="settings_storage_folder_change_failed">無法變更為自訂資料夾。</string>
     <string name="settings_storage_folder_blank">資料夾不可為空白。</string>
     <string name="settings_storage_data_warning_summary">在允許計量付費網路下載或串流單集前發出警告。</string>
-    <string name="settings_storage_data_warning_car">請注意，此設定不適用於透過 Android Auto 播放的單集。 未下載的單集將透過計量付費網路串流，並且不會顯示警告。</string>
+    <string name="settings_storage_data_warning_car">請注意，此設定不適用於透過 Android Auto 播放的單集。未下載的單集將透過計量付費網路串流，並且不會顯示警告。</string>
     <string name="settings_storage_data_warning">使用數據前發出警告</string>
     <string name="settings_storage_custom_folder_location">自訂資料夾位置</string>
     <string name="settings_storage_custom_folder">自訂資料夾</string>
@@ -741,7 +764,7 @@ Language: zh_TW
     <string name="settings_podcast_episode_grouping">Podcast 單集分組</string>
     <string name="settings_podcast_custom">自訂此 Podcast</string>
     <string name="settings_podcast_artwork">Podcast 封面作品</string>
-    <string name="settings_playback_resumption_summary">開啟此功能時，Pocket Casts 會在你繼續播放單集時稍微回放，讓你能更輕鬆跟上進度。</string>
+    <string name="settings_playback_resumption_summary">開啟此功能時，Pocket Casts 會在你繼續播放單集時稍微退回一點，讓你能更輕鬆跟上進度。</string>
     <string name="settings_playback_resumption">智慧型繼續播放</string>
     <string name="settings_notification_vibrate_never">永不</string>
     <string name="settings_notification_vibrate_in_silent">只在靜音模式時</string>
@@ -765,7 +788,7 @@ Language: zh_TW
     <string name="settings_logs">記錄</string>
     <string name="settings_lock_image">鎖定圖片</string>
     <string name="settings_licenses">授權</string>
-    <string name="settings_learn_more">瞭解詳情</string>
+    <string name="settings_learn_more">進一步了解</string>
     <string name="settings_keep_screen_awake_summary">若啟用，播放時螢幕不會鎖定。</string>
     <string name="settings_keep_screen_awake">保持螢幕喚醒</string>
     <string name="settings_instagram">Instagram 連結</string>
@@ -794,7 +817,7 @@ Language: zh_TW
     <string name="settings_auto_play_summary">全部播完時，自動為我挑選單集</string>
     <string name="settings_auto_play">自動播放</string>
     <string name="settings_auto_download_up_next">已加入「接下來播放」的單集</string>
-    <string name="settings_auto_download_unmetered_summary">關閉此功能，將允許從行動數據和其他計量付費網路下載。 請檢查網路設定，以瞭解更多資訊。</string>
+    <string name="settings_auto_download_unmetered_summary">關閉此功能，將允許從行動數據和其他計量付費網路下載。請檢查網路設定，以進一步了解詳細資訊。</string>
     <string name="settings_auto_download_unmetered">只使用非計量付費 WiFi</string>
     <string name="settings_auto_download_podcasts">自動下載 Podcast</string>
     <string name="settings_auto_download_new_episodes">新單集</string>
@@ -833,7 +856,7 @@ Language: zh_TW
     <string name="settings_apply_group_by">要將所有現有 Podcast 改成依 %s 分組嗎？</string>
     <string name="settings_apply_archived_show">要將所有現有 Podcast 改成顯示已封存項目嗎？</string>
     <string name="settings_apply_archived_hide">要將所有現有 Podcast 改成隱藏已封存項目嗎？</string>
-    <string name="settings_app_icon_updated_message">這個新圖示可能需要幾分鐘才會出現，所有應用程式畫面將顯示兩個圖示。 這是正常的。 將新圖示拖曳到主畫面，這樣就大功告成了！</string>
+    <string name="settings_app_icon_updated_message">這個新圖示可能需要幾分鐘才會出現，所有應用程式畫面將顯示兩個圖示；這是正常的。將新圖示拖曳到主畫面，這樣就大功告成了！</string>
     <string name="settings_app_icon_updated">已更新圖示</string>
     <string name="settings_app_icon_title">標題</string>
     <string name="settings_app_icon_image">圖示圖片</string>
@@ -858,15 +881,15 @@ Language: zh_TW
     <string name="plus_thanks_for_your_support_bang">感謝你的支持！</string>
     <string name="plus_slash_month">%s /月</string>
     <string name="plus_lifetime_member">終身會員</string>
-    <string name="plus_learn_more_button">瞭解詳情</string>
-    <string name="plus_learn_more_about_plus">深入瞭解 Pocket Casts Plus</string>
+    <string name="plus_learn_more_button">進一步了解</string>
+    <string name="plus_learn_more_about_plus">深入了解 Pocket Casts Plus</string>
     <string name="plus_desktop_apps_body">透過我們的 Windows、macOS 和網頁應用程式，隨時隨地都能聆聽 Podcast 節目 。</string>
     <string name="plus_desktop_apps">桌上型電腦應用程式</string>
     <string name="plus_description_title">進階聽眾的進階功能</string>
-    <string name="plus_description_body">個人化設計和發佈內容，全部一次實現。 上傳個人音訊檔案到雲端伺服器、透過網頁播放器存取帳號，還可將應用程式打造成你的專屬天地。</string>
+    <string name="plus_description_body">個人化設定和內容發表，全部一次搞定。上傳個人音訊檔案到雲端伺服器、透過網頁播放器使用帳號，還可將 App 打造成你的專屬天地。</string>
     <string name="plus_create_marketing_features"> 所有內容</string>
     <string name="plus_cloud_storage_limit">%d GB 雲端儲存空間</string>
-    <string name="plus_cloud_storage_body">加速課程進度。 探索其他內容。 成為你自己的 Podcast DJ。</string>
+    <string name="plus_cloud_storage_body">加速課程進度。 探索其他內容。成為你自己的 Podcast DJ。</string>
     <string name="plus_cloud_storage">雲端儲存空間</string>
     <string name="profile_expiry_date_unknown">未知</string>
     <string name="profile_yearly">每年</string>
@@ -986,7 +1009,6 @@ Language: zh_TW
     <string name="profile_files_remove_image">取代圖片</string>
     <string name="profile_files_empty_title">沒有檔案</string>
     <string name="profile_files_empty_summary">想收聽自己的檔案嗎？\n點選 + 按鈕即可在 Pocket Casts 中開啟這些檔案，檔案會顯示於此處。</string>
-    <string name="profile_files_edit">編輯</string>
     <string name="profile_files_addfile_save">儲存</string>
     <string name="profile_files_add_filename">名稱</string>
     <string name="profile_files_add_custom_image">新增自訂圖片</string>
