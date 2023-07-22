@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
 import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -11,8 +13,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 object ShelfItems {
-    val itemsList = listOf(ShelfItem.Effects, ShelfItem.Sleep, ShelfItem.Star, ShelfItem.Share, ShelfItem.Podcast, ShelfItem.Cast, ShelfItem.Played, ShelfItem.Archive)
-    val items = itemsList.associateBy { it.id }
+    val itemsList = buildList {
+        add(ShelfItem.Effects)
+        add(ShelfItem.Sleep)
+        add(ShelfItem.Star)
+        add(ShelfItem.Share)
+        add(ShelfItem.Podcast)
+        add(ShelfItem.Cast)
+        add(ShelfItem.Played)
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            add(ShelfItem.Bookmark)
+        }
+        add(ShelfItem.Archive)
+    }
+    private val items = itemsList.associateBy { it.id }
 
     fun itemForId(id: String): ShelfItem? {
         return items[id]
@@ -24,6 +38,7 @@ sealed class ShelfItem(
     var title: (BaseEpisode?) -> Int,
     var iconRes: (BaseEpisode?) -> Int,
     val shownWhen: Shown,
+    val isPlus: Boolean,
     val analyticsValue: String,
     @StringRes val subtitle: Int? = null
 ) {
@@ -38,7 +53,8 @@ sealed class ShelfItem(
         title = { LR.string.podcast_playback_effects },
         iconRes = { IR.drawable.ic_effects_off },
         shownWhen = Shown.Always,
-        analyticsValue = "playback_effects"
+        analyticsValue = "playback_effects",
+        isPlus = false
     )
 
     object Sleep : ShelfItem(
@@ -46,6 +62,7 @@ sealed class ShelfItem(
         title = { LR.string.player_sleep_timer },
         iconRes = { R.drawable.ic_sleep },
         shownWhen = Shown.Always,
+        isPlus = false,
         analyticsValue = "sleep_timer"
     )
 
@@ -55,7 +72,8 @@ sealed class ShelfItem(
         subtitle = LR.string.player_actions_hidden_for_custom,
         iconRes = { if (it is PodcastEpisode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
         shownWhen = Shown.EpisodeOnly,
-        analyticsValue = "star_episode"
+        isPlus = false,
+        analyticsValue = "star_episode",
     )
 
     object Share : ShelfItem(
@@ -64,6 +82,7 @@ sealed class ShelfItem(
         subtitle = LR.string.player_actions_hidden_for_custom,
         iconRes = { IR.drawable.ic_share },
         shownWhen = Shown.EpisodeOnly,
+        isPlus = false,
         analyticsValue = "share_episode"
     )
 
@@ -72,6 +91,7 @@ sealed class ShelfItem(
         title = { if (it is UserEpisode) LR.string.go_to_files else LR.string.go_to_podcast },
         iconRes = { R.drawable.ic_arrow_goto },
         shownWhen = Shown.Always,
+        isPlus = false,
         analyticsValue = "go_to_podcast"
     )
 
@@ -80,6 +100,7 @@ sealed class ShelfItem(
         title = { LR.string.chromecast },
         iconRes = { com.google.android.gms.cast.framework.R.drawable.quantum_ic_cast_connected_white_24 },
         shownWhen = Shown.Always,
+        isPlus = false,
         analyticsValue = "chromecast"
     )
 
@@ -88,7 +109,17 @@ sealed class ShelfItem(
         title = { LR.string.mark_as_played },
         iconRes = { R.drawable.ic_markasplayed },
         shownWhen = Shown.Always,
+        isPlus = false,
         analyticsValue = "mark_as_played"
+    )
+
+    object Bookmark : ShelfItem(
+        id = "bookmark",
+        title = { LR.string.add_bookmark },
+        iconRes = { IR.drawable.ic_bookmark },
+        shownWhen = Shown.Always,
+        isPlus = true,
+        analyticsValue = "add_bookmark"
     )
 
     object Archive : ShelfItem(
@@ -97,6 +128,7 @@ sealed class ShelfItem(
         subtitle = LR.string.player_actions_show_as_delete_for_custom,
         iconRes = { if (it is UserEpisode) VR.drawable.ic_delete else IR.drawable.ic_archive },
         shownWhen = Shown.Always,
+        isPlus = false,
         analyticsValue = "archive"
     )
 
@@ -121,6 +153,7 @@ sealed class ShelfItem(
             }
         },
         shownWhen = Shown.Always,
+        isPlus = false,
         analyticsValue = "download"
     )
 }

@@ -81,7 +81,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val userEpisodeDao = appDatabase.userEpisodeDao()
 
     override suspend fun findEpisodeByUuid(uuid: String): BaseEpisode? {
-        val episode = findByUuid(uuid)
+        val episode = findByUuidSuspend(uuid)
         if (episode != null) {
             return episode
         }
@@ -91,6 +91,10 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun findByUuid(uuid: String): PodcastEpisode? {
         return episodeDao.findByUuid(uuid)
+    }
+
+    override suspend fun findByUuidSuspend(uuid: String): PodcastEpisode? {
+        return episodeDao.findByUuidSuspend(uuid)
     }
 
     override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> {

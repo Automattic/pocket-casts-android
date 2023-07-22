@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.Analyt
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
@@ -27,6 +28,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
+    @Inject lateinit var playbackManager: PlaybackManager
 
     override val statusBarColor: StatusBarColor? = null
 
@@ -106,6 +108,9 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
             is ShelfItem.Archive -> {
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
+            }
+            is ShelfItem.Bookmark -> {
+                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick()
             }
             ShelfItem.Download -> {
                 Timber.e("Unexpected click on ShelfItem.Download")

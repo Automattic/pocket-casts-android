@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
-import android.view.KeyEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,23 +12,18 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.onEnter
+import au.com.shiftyjelly.pocketcasts.compose.extensions.onTabMoveFocus
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.removeNewLines
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FormField(
     value: String,
@@ -45,7 +39,6 @@ fun FormField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
-    val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(if (singleLine) it.removeNewLines() else it) },
@@ -67,18 +60,9 @@ fun FormField(
         trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
-            .onPreviewKeyEvent {
-                if (singleLine && it.key == Key.Enter && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
-                    // the enter key for a single line field should call the next event, but for multiline fields it should be a new line.
-                    onImeAction()
-                    true
-                } else if (it.key == Key.Tab && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
-                    // tab should focus on the next field
-                    focusManager.moveFocus(FocusDirection.Down)
-                    true
-                } else {
-                    false
-                }
+            .onTabMoveFocus()
+            .let {
+                if (singleLine) it.onEnter(onImeAction) else it
             }
     )
 }
