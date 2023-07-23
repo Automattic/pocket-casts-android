@@ -48,6 +48,7 @@ fun FilterScreen(
             modifier = modifier,
             listState = columnState,
         )
+
         is UiState.Loading -> LoadingScreen()
         is UiState.Empty -> {
             Column(
@@ -58,7 +59,7 @@ fun FilterScreen(
                 state.filter?.let {
                     ScreenHeaderChip(it.title)
                     Text(
-                        text = stringResource(LR.string.no_results_for_filters, state.filter.title),
+                        text = stringResource(LR.string.filters_no_episodes),
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colors.onPrimary,
@@ -66,7 +67,7 @@ fun FilterScreen(
                     )
                 } ?: run {
                     Text(
-                        text = stringResource(LR.string.no_result_found),
+                        text = stringResource(LR.string.filters_not_found),
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colors.onPrimary,
