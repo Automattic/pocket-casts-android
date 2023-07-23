@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.di.IoDispatcher
@@ -36,6 +37,7 @@ class BookmarksViewModel
     private val userManager: UserManager,
     private val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
+    private val playbackManager: PlaybackManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -161,6 +163,11 @@ class BookmarksViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         settings.setBookmarksSortType(order)
+    }
+
+    fun play(bookmark: Bookmark) {
+        val time = bookmark.timeSecs
+        playbackManager.seekToTimeMs(positionMs = time * 1000)
     }
 
     sealed class UiState {
