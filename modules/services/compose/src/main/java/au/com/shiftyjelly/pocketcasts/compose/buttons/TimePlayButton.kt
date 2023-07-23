@@ -82,7 +82,7 @@ fun TimePlayButton(
     }
 }
 
-@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Light", defaultStyle = true)
+@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Outline - Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 fun TimePlayButtonLightPreview() {
@@ -95,7 +95,7 @@ fun TimePlayButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Dark")
+@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Outline - Dark")
 @Preview(name = "Dark")
 @Composable
 fun TimePlayButtonDarkPreview() {
@@ -108,7 +108,7 @@ fun TimePlayButtonDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Dark")
+@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Outline - Rose")
 @Preview(name = "Rose")
 @Composable
 fun TimePlayButtonRosePreview() {
@@ -121,8 +121,8 @@ fun TimePlayButtonRosePreview() {
     }
 }
 
-@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Player")
-@Preview(name = "Player")
+@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Solid - Player")
+@Preview(name = "Solid style - Player")
 @Composable
 fun TimePlayButtonFilledPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
