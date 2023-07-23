@@ -86,33 +86,26 @@ fun TimePlayButton(
 @Preview(name = "Light")
 @Composable
 fun TimePlayButtonLightPreview() {
-    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        TimePlayButton(
-            timeSecs = 121,
-            contentDescriptionId = R.string.bookmark_play,
-            onClick = {}
-        )
-    }
+    TimePlayButtonPreview(Theme.ThemeType.LIGHT)
 }
 
 @ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Outline - Dark")
 @Preview(name = "Dark")
 @Composable
 fun TimePlayButtonDarkPreview() {
-    AppThemeWithBackground(Theme.ThemeType.DARK) {
-        TimePlayButton(
-            timeSecs = 121,
-            contentDescriptionId = R.string.bookmark_play,
-            onClick = {}
-        )
-    }
+    TimePlayButtonPreview(Theme.ThemeType.DARK)
 }
 
 @ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Outline - Rose")
 @Preview(name = "Rose")
 @Composable
 fun TimePlayButtonRosePreview() {
-    AppThemeWithBackground(Theme.ThemeType.ROSE) {
+    TimePlayButtonPreview(Theme.ThemeType.ROSE)
+}
+
+@Composable
+private fun TimePlayButtonPreview(themeType: Theme.ThemeType) {
+    AppThemeWithBackground(themeType) {
         TimePlayButton(
             timeSecs = 121,
             contentDescriptionId = R.string.bookmark_play,
