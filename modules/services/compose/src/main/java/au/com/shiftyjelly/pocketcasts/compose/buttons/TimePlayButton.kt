@@ -32,7 +32,7 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 sealed class TimePlayButtonStyle {
     object Solid : TimePlayButtonStyle()
-    object Outline : TimePlayButtonStyle()
+    object Outlined : TimePlayButtonStyle()
 }
 
 @Composable
@@ -44,14 +44,14 @@ fun TimePlayButton(
     textColor: Color = MaterialTheme.theme.colors.primaryText01,
     backgroundColor: Color = MaterialTheme.colors.surface,
     borderColor: Color = MaterialTheme.theme.colors.primaryText01,
-    buttonStyle: TimePlayButtonStyle = TimePlayButtonStyle.Outline
+    buttonStyle: TimePlayButtonStyle = TimePlayButtonStyle.Outlined
 ) {
     val timeText by remember {
         mutableStateOf(TimeHelper.formattedSeconds(timeSecs.toDouble()))
     }
     val description = stringResource(contentDescriptionId, timeText)
     val border = when (buttonStyle) {
-        TimePlayButtonStyle.Outline -> BorderStroke(2.dp, borderColor)
+        TimePlayButtonStyle.Outlined -> BorderStroke(2.dp, borderColor)
         TimePlayButtonStyle.Solid -> null
     }
     OutlinedButton(
