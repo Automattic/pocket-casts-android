@@ -428,6 +428,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.DISCOVER_RANKED_LIST,
             SourceView.FULL_SCREEN_VIDEO,
             SourceView.MINIPLAYER,
+            SourceView.MULTI_SELECT,
             SourceView.ONBOARDING_RECOMMENDATIONS,
             SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH,
             SourceView.PODCAST_LIST,
