@@ -41,14 +41,14 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         swipeSource: EpisodeItemTouchHelper.SwipeSource
     ) {
 
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch {
 
             trackSwipeAction(
                 swipeSource = swipeSource,
                 swipeAction = EpisodeItemTouchHelper.SwipeAction.SHARE,
             )
 
-            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
+            val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: return@launch
 
             ShareDialog(
                 episode = episode,
