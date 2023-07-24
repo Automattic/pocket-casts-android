@@ -26,7 +26,7 @@ class BookmarkManagerImpl @Inject constructor(
      */
     override suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String): Bookmark {
         // Prevent adding more than one bookmark at the same place
-        val existingBookmark = bookmarkDao.findByEpisodeTime(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid, timeSecs = timeSecs)
+        val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
             return existingBookmark
         }
@@ -47,11 +47,27 @@ class BookmarkManagerImpl @Inject constructor(
         return bookmark
     }
 
+    override suspend fun updateTitle(bookmarkUuid: String, title: String) {
+        bookmarkDao.updateTitle(
+            bookmarkUuid = bookmarkUuid,
+            title = title,
+            titleModified = System.currentTimeMillis(),
+            syncStatus = SyncStatus.NOT_SYNCED
+        )
+    }
+
     /**
      * Find the bookmark by its UUID.
      */
     override suspend fun findBookmark(bookmarkUuid: String): Bookmark? {
         return bookmarkDao.findByUuid(bookmarkUuid)
+    }
+
+    /**
+     * Find the bookmark by episode and time
+     */
+    override suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark? {
+        return bookmarkDao.findByEpisodeTime(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid, timeSecs = timeSecs)
     }
 
     /**

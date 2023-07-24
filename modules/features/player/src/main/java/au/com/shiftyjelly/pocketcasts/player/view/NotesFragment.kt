@@ -149,7 +149,7 @@ class NotesFragment : BaseFragment() {
     private fun jumpToTime(timeStr: String) {
         val timeInSeconds = timeStr.toSecondsFromColonFormattedString() ?: return
 
-        Toast.makeText(context, "Skipping to $timeStr", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(LR.string.skipping_to, timeStr), Toast.LENGTH_SHORT).show()
         playbackManager.seekToTimeMs((timeInSeconds * 1000))
     }
 

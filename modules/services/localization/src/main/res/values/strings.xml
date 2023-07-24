@@ -9,6 +9,14 @@
     <string name="empty" translatable="false" />
 
     <string name="account">Account</string>
+    <string name="add_bookmark">Add bookmark</string>
+    <string name="add_bookmark_title">Add Bookmark</string>
+    <string name="bookmark_added">Bookmark \"%s\" added</string>
+    <string name="change_title">Change title</string>
+    <string name="add_bookmark_title_hint">Add an optional title to identify this bookmark</string>
+    <string name="save_bookmark">Save bookmark</string>
+    <string name="playing_bookmark">Playing \"%s\"</string>
+    <string name="skipping_to">Skipping to %s</string>
     <string name="add_to_up_next">Add to Up Next</string>
     <string name="add_to_up_next_question">Add to up next?</string>
     <string name="archive">Archive</string>

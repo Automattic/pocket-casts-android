@@ -381,6 +381,13 @@
                 style="@style/shelf_item" />
 
             <ImageButton
+                android:id="@+id/bookmark"
+                android:contentDescription="@string/add_bookmark"
+                app:srcCompat="@drawable/ic_bookmark"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
                 android:id="@+id/archive"
                 android:contentDescription="@string/archive_episode"
                 app:srcCompat="@drawable/ic_archive"
