@@ -1,12 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.filter
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingScreen
@@ -14,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.filter.FilterViewModel.UiState
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FilterScreen {
     const val argumentFilterUuid = "filterUuid"
@@ -37,8 +48,34 @@ fun FilterScreen(
             modifier = modifier,
             listState = columnState,
         )
+
         is UiState.Loading -> LoadingScreen()
-        is UiState.Empty -> Unit
+        is UiState.Empty -> {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                state.filter?.let {
+                    ScreenHeaderChip(it.title)
+                    Text(
+                        text = stringResource(LR.string.filters_no_episodes),
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colors.onPrimary,
+                        style = MaterialTheme.typography.body1,
+                    )
+                } ?: run {
+                    Text(
+                        text = stringResource(LR.string.filters_not_found),
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colors.onPrimary,
+                        style = MaterialTheme.typography.body1,
+                    )
+                }
+            }
+        }
     }
 }
 
