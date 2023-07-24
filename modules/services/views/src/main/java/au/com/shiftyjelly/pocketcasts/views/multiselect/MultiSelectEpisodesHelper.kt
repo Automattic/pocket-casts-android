@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -18,8 +21,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import io.reactivex.BackpressureStrategy
@@ -42,6 +47,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
     val downloadManager: DownloadManager,
+    val analyticsTracker: AnalyticsTrackerWrapper,
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics
 ) : MultiSelectHelper<BaseEpisode>() {
@@ -75,6 +81,10 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
             R.id.menu_delete -> {
                 delete(resources, fragmentManager)
+                true
+            }
+            R.id.menu_share -> {
+                share(fragmentManager)
                 true
             }
             R.id.menu_download -> {
@@ -379,6 +389,42 @@ class MultiSelectEpisodesHelper @Inject constructor(
             closeMultiSelect()
         }
         CloudDeleteHelper.getDeleteDialog(episodes, deleteState, deleteFunction, resources).show(fragmentManager, "delete_warning")
+    }
+
+    fun share(fragmentManager: FragmentManager) {
+
+        val episode = selectedList.let { list ->
+            if (list.size != 1) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share one episode, but trying to share ${selectedList.size} episodes when multi selecting")
+                return
+            } else {
+                list.first()
+            }
+        }
+
+        if (episode !is PodcastEpisode) {
+            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share a ${PodcastEpisode::class.java.simpleName}")
+            Toast.makeText(context, LR.string.podcasts_share_failed, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        launch {
+            val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: run {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Share failed because unable to find podcast from uuid")
+                return@launch
+            }
+
+            ShareDialog(
+                episode = episode,
+                podcast = podcast,
+                fragmentManager = fragmentManager,
+                context = context,
+                shouldShowPodcast = false,
+                analyticsTracker = analyticsTracker,
+            ).show(sourceView = SourceView.MULTI_SELECT)
+        }
+
+        closeMultiSelect()
     }
 
     fun removeFromUpNext(resources: Resources) {

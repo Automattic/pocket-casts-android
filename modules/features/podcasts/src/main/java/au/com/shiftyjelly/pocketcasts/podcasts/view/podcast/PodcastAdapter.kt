@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
@@ -111,6 +112,7 @@ class PodcastAdapter(
     private val multiSelectHelper: MultiSelectEpisodesHelper,
     private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
     private val ratingsViewModel: PodcastRatingsViewModel,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -150,7 +152,14 @@ class PodcastAdapter(
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
             VIEW_TYPE_NO_EPISODE -> NoEpisodesViewHolder(inflater.inflate(R.layout.adapter_no_episodes, parent, false))
             VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
-            else -> EpisodeViewHolder(AdapterEpisodeBinding.inflate(inflater, parent, false), EpisodeViewHolder.ViewMode.NoArtwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable)
+            else -> EpisodeViewHolder(
+                binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
+                viewMode = EpisodeViewHolder.ViewMode.NoArtwork,
+                downloadProgressUpdates = downloadManager.progressUpdateRelay,
+                playbackStateUpdates = playbackManager.playbackStateRelay,
+                upNextChangesObservable = upNextQueue.changesObservable,
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+            )
         }
     }
 

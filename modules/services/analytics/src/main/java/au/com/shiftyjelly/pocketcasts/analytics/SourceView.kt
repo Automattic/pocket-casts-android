@@ -29,7 +29,9 @@ enum class SourceView(val analyticsValue: String) {
     ONBOARDING_RECOMMENDATIONS("onboarding_recommendations"),
     ONBOARDING_RECOMMENDATIONS_SEARCH("onboarding_recommendations_search"),
     UNKNOWN("unknown"),
-    TASKER("tasker");
+    TASKER("tasker"),
+    EPISODE_SWIPE_ACTION("episode_swipe_action"),
+    MULTI_SELECT("multi_select");
 
     fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
 

@@ -6,10 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -20,8 +18,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -40,18 +36,15 @@ import kotlin.math.min
 
 @HiltViewModel
 class FilterEpisodeListViewModel @Inject constructor(
-    val playlistManager: PlaylistManager,
-    val episodeManager: EpisodeManager,
-    val playbackManager: PlaybackManager,
-    val downloadManager: DownloadManager,
-    val settings: Settings,
+    private val playlistManager: PlaylistManager,
+    private val episodeManager: EpisodeManager,
+    private val playbackManager: PlaybackManager,
+    private val downloadManager: DownloadManager,
+    private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
-        private const val ACTION_KEY = "action"
-        private const val SOURCE_KEY = "source"
         const val MAX_DOWNLOAD_ALL = Settings.MAX_DOWNLOAD
     }
 
@@ -102,23 +95,6 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun episodeSwiped(episode: BaseEpisode, index: Int) {
-        if (episode !is PodcastEpisode) return
-
-        launch {
-            if (!episode.isArchived) {
-                episodeManager.archive(episode, playbackManager)
-                trackSwipeAction(SwipeAction.ARCHIVE)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, SourceView.FILTERS, episode.uuid)
-            } else {
-                episodeManager.unarchive(episode)
-                trackSwipeAction(SwipeAction.UNARCHIVE)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, SourceView.FILTERS, episode.uuid)
-            }
-        }
-    }
-
     fun onPlayAllFromHere(episode: PodcastEpisode) {
         launch {
             val episodes = episodesList.value ?: emptyList()
@@ -159,30 +135,6 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun episodeSwipeUpNext(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playNext(episode = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
-            }
-        }
-    }
-
-    fun episodeSwipeUpLast(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playLast(episode = episode, source = SourceView.FILTERS)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
-            }
-        }
-    }
-
     fun downloadAll() {
         val episodes = (episodesList.value ?: emptyList())
         val trimmedList = episodes.subList(0, min(MAX_DOWNLOAD_ALL, episodes.count()))
@@ -197,16 +149,6 @@ class FilterEpisodeListViewModel @Inject constructor(
         val episodes = episodesList.value ?: return 0
         val index = max(episodes.indexOf(episode), 0) // -1 on not found
         return min(episodes.count() - index, settings.getMaxUpNextEpisodes())
-    }
-
-    private fun trackSwipeAction(swipeAction: SwipeAction) {
-        analyticsTracker.track(
-            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
-            mapOf(
-                ACTION_KEY to swipeAction.analyticsValue,
-                SOURCE_KEY to SwipeSource.FILTERS.analyticsValue
-            )
-        )
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {

@@ -428,6 +428,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.DISCOVER_RANKED_LIST,
             SourceView.FULL_SCREEN_VIDEO,
             SourceView.MINIPLAYER,
+            SourceView.MULTI_SELECT,
             SourceView.ONBOARDING_RECOMMENDATIONS,
             SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH,
             SourceView.PODCAST_LIST,
@@ -435,6 +436,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.PLAYER,
             SourceView.PLAYER_BROADCAST_ACTION,
             SourceView.PLAYER_PLAYBACK_EFFECTS,
+            SourceView.EPISODE_SWIPE_ACTION,
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
@@ -478,7 +480,7 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNext(episode, downloadManager, null)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
@@ -493,7 +495,7 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, downloadManager, null)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)

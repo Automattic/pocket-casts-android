@@ -49,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -80,6 +82,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     private val viewModel by viewModels<FilterEpisodeListViewModel>()
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
 
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var playbackManager: PlaybackManager
@@ -92,7 +95,28 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private lateinit var imageLoader: PodcastImageLoader
 
-    private lateinit var adapter: EpisodeListAdapter
+    private val adapter: EpisodeListAdapter by lazy {
+        EpisodeListAdapter(
+            downloadManager = downloadManager,
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            settings = settings,
+            onRowClick = this::onRowClick,
+            playButtonListener = playButtonListener,
+            imageLoader = imageLoader,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
+                onItemUpdated = this::lazyNotifyAdapterChanged,
+                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                context = requireContext(),
+                fragmentManager = parentFragmentManager,
+                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
+            )
+        )
+    }
+
     private var showingFilterOptionsBeforeMultiSelect: Boolean = false
     private var multiSelectLoaded: Boolean = false
     private var listSavedState: Parcelable? = null
@@ -114,7 +138,15 @@ class FilterEpisodeListFragment : BaseFragment() {
         }.smallPlaceholder()
 
         playButtonListener.source = SourceView.FILTERS
-        adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager)
+    }
+
+    // Cannot call notify.notifyItemChanged directly because the compiler gets confused
+    // when the adapter's constructor includes references to the adapter
+    private fun lazyNotifyAdapterChanged(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        index: Int,
+    ) {
+        adapter.notifyItemChanged(index)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -383,7 +415,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         binding.btnChevron.setOnClickListener(clickListener)
         toolbar.setOnClickListener(clickListener)
 
-        val itemTouchHelper = EpisodeItemTouchHelper(this::episodeSwipedRightItem1, this::episodeSwipedRightItem2, viewModel::episodeSwiped)
+        val itemTouchHelper = EpisodeItemTouchHelper()
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
@@ -561,22 +593,6 @@ class FilterEpisodeListFragment : BaseFragment() {
                 activity?.onBackPressed()
             }
             .show(childFragmentManager, "confirm")
-    }
-
-    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
-        }
-        adapter.notifyItemChanged(index)
-    }
-
-    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)
-        }
-        adapter.notifyItemChanged(index)
     }
 
     private fun downloadAll() {

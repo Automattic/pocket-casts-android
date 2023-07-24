@@ -20,14 +20,34 @@
             android:layout_height="match_parent"
             android:background="?attr/support_05"
             android:importantForAccessibility="noHideDescendants">
-            <ImageView
-                android:id="@+id/archiveIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="23dp"
-                android:src="@drawable/ic_delete"
-                app:tint="@android:color/white"/>
+
+            <FrameLayout
+                android:id="@id/rightLeftItem2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/support_03">
+                <ImageView
+                    android:id="@+id/rightLeftIcon2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="23dp"
+                    android:layout_gravity="center_vertical|left"
+                    app:tint="@android:color/white"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@id/rightLeftItem1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/support_04"
+                android:importantForAccessibility="noHideDescendants">
+                <ImageView
+                    android:id="@+id/rightLeftIcon1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="23dp"
+                    android:layout_gravity="center_vertical|left"
+                    app:tint="@android:color/white"/>
+            </FrameLayout>
         </FrameLayout>
 
         <FrameLayout

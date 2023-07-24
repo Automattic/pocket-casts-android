@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -28,8 +27,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -71,7 +68,6 @@ class PodcastViewModel
     private val disposables = CompositeDisposable()
     val podcast = MutableLiveData<Podcast>()
     var searchTerm = ""
-    var searchOpen = false
     lateinit var podcastUuid: String
     lateinit var episodes: LiveData<EpisodeState>
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
@@ -286,47 +282,6 @@ class PodcastViewModel
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun episodeSwipeArchive(episode: BaseEpisode, index: Int) {
-        if (episode !is PodcastEpisode) return
-
-        launch {
-            if (!episode.isArchived) {
-                episodeManager.archive(episode, playbackManager)
-                trackSwipeAction(SwipeAction.ARCHIVE)
-                trackEpisodeEvent(AnalyticsEvent.EPISODE_ARCHIVED, episode)
-            } else {
-                episodeManager.unarchive(episode)
-                trackSwipeAction(SwipeAction.UNARCHIVE)
-                trackEpisodeEvent(AnalyticsEvent.EPISODE_UNARCHIVED, episode)
-            }
-        }
-    }
-
-    fun episodeSwipeUpNext(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playNext(episode = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
-            }
-        }
-    }
-
-    fun episodeSwipeUpLast(episode: BaseEpisode) {
-        launch {
-            if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
-            } else {
-                playbackManager.playLast(episode = episode, source = SourceView.PODCAST_SCREEN)
-                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
-            }
-        }
-    }
-
     fun shouldShowArchiveAll(): Boolean {
         val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return false
         return episodes.find { !it.isArchived } != null
@@ -392,24 +347,6 @@ class PodcastViewModel
         }
     }
 
-    private fun trackSwipeAction(swipeAction: SwipeAction) {
-        analyticsTracker.track(
-            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
-            AnalyticsProp.swipePerformed(
-                action = swipeAction,
-                source = SwipeSource.PODCAST_DETAILS
-            )
-
-        )
-    }
-    private fun trackEpisodeEvent(event: AnalyticsEvent, episode: PodcastEpisode) {
-        episodeAnalytics.trackEvent(
-            event,
-            source = SourceView.PODCAST_SCREEN,
-            uuid = episode.uuid
-        )
-    }
-
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
         episodeAnalytics.trackBulkEvent(
             event,
@@ -444,7 +381,6 @@ class PodcastViewModel
     }
 
     private object AnalyticsProp {
-        private const val ACTION_KEY = "action"
         private const val ENABLED_KEY = "enabled"
         private const val SHOW_ARCHIVED = "show_archived"
         private const val SOURCE_KEY = "source"
@@ -455,8 +391,6 @@ class PodcastViewModel
             mapOf(ENABLED_KEY to show)
         fun podcastSubscribeToggled(source: SourceView, uuid: String) =
             mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
-        fun swipePerformed(source: SwipeSource, action: SwipeAction) =
-            mapOf(SOURCE_KEY to source, ACTION_KEY to action.analyticsValue)
     }
 }
 

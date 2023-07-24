@@ -62,6 +62,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -119,6 +121,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
+    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var adapter: PodcastAdapter? = null
     private var binding: FragmentPodcastBinding? = null
 
@@ -489,16 +492,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding?.episodesRecyclerView?.layoutManager?.onRestoreInstanceState(listState)
     }
 
-    fun episodeSwipeArchive(episode: BaseEpisode, index: Int) {
-        val binding = binding ?: return
-
-        binding.episodesRecyclerView.findViewHolderForAdapterPosition(index)?.let {
-            itemTouchHelper.clearView(binding.episodesRecyclerView, it)
-        }
-
-        viewModel.episodeSwipeArchive(episode, index)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPodcastBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -509,7 +502,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
-        itemTouchHelper = EpisodeItemTouchHelper(this::episodeSwipedRightItem1, this::episodeSwipedRightItem2, this::episodeSwipeArchive)
+        itemTouchHelper = EpisodeItemTouchHelper()
 
         loadData()
 
@@ -558,6 +551,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 multiSelectHelper = multiSelectHelper,
                 onArtworkLongClicked = onArtworkLongClicked,
                 ratingsViewModel = ratingsViewModel,
+                swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                    swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
+                    onItemUpdated = ::notifyItemChanged,
+                    defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                    context = context,
+                    fragmentManager = parentFragmentManager,
+                    swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
+                )
             )
         }
 
@@ -658,6 +659,19 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding.multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
 
         return binding.root
+    }
+
+    private fun notifyItemChanged(
+        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
+        index: Int,
+    ) {
+        binding?.episodesRecyclerView?.let { recyclerView ->
+            recyclerView.findViewHolderForAdapterPosition(index)?.let {
+                itemTouchHelper.clearView(recyclerView, it)
+            }
+        }
+
+        adapter?.notifyItemChanged(index)
     }
 
     private fun loadData() {
@@ -763,35 +777,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding?.episodesRecyclerView?.removeOnScrollListener(onScrollListener)
         binding?.episodesRecyclerView?.adapter = null
         binding = null
-    }
-
-    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
-        }
-
-        binding?.episodesRecyclerView?.let { recyclerView ->
-            recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper.clearView(recyclerView, it)
-            }
-        }
-
-        adapter?.notifyItemChanged(index)
-    }
-
-    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
-        when (settings.getUpNextSwipeAction()) {
-            Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
-            Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)
-        }
-
-        binding?.episodesRecyclerView?.let { recyclerView ->
-            recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper.clearView(recyclerView, it)
-            }
-        }
-        adapter?.notifyItemChanged(index)
     }
 
     private fun archiveAllPlayed() {
