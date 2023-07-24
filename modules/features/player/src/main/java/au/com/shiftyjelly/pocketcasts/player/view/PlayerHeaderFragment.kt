@@ -13,6 +13,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -34,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -51,6 +54,7 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,6 +84,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private var skippedFirstTouch: Boolean = false
     private var hasReceivedOnTouchDown = false
     private val sourceView = SourceView.PLAYER
+
+    private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
+        showViewBookmarksSnackbar(result)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -139,7 +147,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Cast.id to binding.cast,
             ShelfItem.Played.id to binding.played,
             ShelfItem.Archive.id to binding.archive,
-            ShelfItem.Download.id to binding.download
+            ShelfItem.Download.id to binding.download,
+            ShelfItem.Bookmark.id to binding.bookmark,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
             val visibleItems = it.first.subList(0, 4).map { it.id }
@@ -171,6 +180,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Download.analyticsValue)
             viewModel.downloadCurrentlyPlaying()
         }
+        binding.bookmark.setOnClickListener { onAddBookmarkClick() }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
@@ -459,6 +469,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.starToggle()
     }
 
+    fun onAddBookmarkClick() {
+        trackShelfAction(ShelfItem.Bookmark.analyticsValue)
+        viewModel.buildBookmarkArguments { arguments ->
+            activityLauncher.launch(arguments.getIntent(requireContext()))
+        }
+    }
+
     override fun onShareClick() {
         trackShelfAction(ShelfItem.Share.analyticsValue)
         ShareFragment().show(parentFragmentManager, "share_sheet")
@@ -552,5 +569,22 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
             mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
         )
+    }
+
+    private fun showViewBookmarksSnackbar(result: BookmarkActivityContract.BookmarkResult?) {
+        val view = view
+        if (result == null || view == null) {
+            return
+        }
+
+        val viewBookmarksAction = View.OnClickListener {
+            (parentFragment as? PlayerContainerFragment)?.openBookmarks()
+        }
+        Snackbar.make(view, getString(LR.string.bookmark_added, result.title), Snackbar.LENGTH_LONG)
+            .setAction(LR.string.settings_view, viewBookmarksAction)
+            .setActionTextColor(result.tintColor)
+            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
+            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
+            .show()
     }
 }

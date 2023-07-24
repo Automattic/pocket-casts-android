@@ -42,6 +42,9 @@ abstract class EpisodeDao {
     abstract fun findByUuid(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
+    abstract suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
+
+    @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
