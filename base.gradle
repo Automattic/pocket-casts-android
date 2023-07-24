@@ -206,6 +206,7 @@ dependencies {
     implementation androidLibs.composeUiUtil
     implementation androidLibs.wearPlayServices
 
+    implementation libs.turbine
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid
     implementation libs.kotlinCoroutinesPlayServices
