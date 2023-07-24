@@ -159,9 +159,6 @@ sealed interface SwipeButton {
     }
 }
 
-/**
- * - [onDeleteOrArchiveClick] will delete [UserEpisode]s and archive [PodcastEpisode]s
- */
 class SwipeButtonLayoutFactory(
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel,
     private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
