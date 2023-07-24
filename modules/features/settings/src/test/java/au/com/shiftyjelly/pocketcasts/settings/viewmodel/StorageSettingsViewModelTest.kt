@@ -7,8 +7,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.settings.viewmodel.utils.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import au.com.shiftyjelly.pocketcasts.utils.MainCoroutineRule
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertEquals

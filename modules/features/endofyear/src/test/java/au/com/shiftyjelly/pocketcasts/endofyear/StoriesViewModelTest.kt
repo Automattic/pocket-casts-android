@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import au.com.shiftyjelly.pocketcasts.utils.MainCoroutineRule
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
