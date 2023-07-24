@@ -1,3 +1,10 @@
+7.45
+-----
+*   Bug Fixes:
+    *   Added audio ducking as an option when playing over notifications
+        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
+
+
 7.44
 -----
 *   New Feature:
@@ -8,9 +15,6 @@
     *   Added share option to episode swipe and multiselect menus
         ([#1190](https://github.com/Automattic/pocket-casts-android/pull/1190)),
         ([#1191](https://github.com/Automattic/pocket-casts-android/pull/1191))
-*   Bug Fixes:
-    *   Added audio ducking as an option when playing over notifications
-        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009)).
 
 7.43
 -----
