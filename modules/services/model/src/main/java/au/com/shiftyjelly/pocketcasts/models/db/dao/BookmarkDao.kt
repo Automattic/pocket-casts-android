@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -51,11 +52,16 @@ abstract class BookmarkDao {
         deleted: Boolean = false,
     ): Flow<List<Bookmark>>
 
-    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND deleted = :deleted")
+    @Query(
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted"""
+    )
     abstract fun findByPodcastFlow(
         podcastUuid: String,
         deleted: Boolean = false,
-    ): Flow<List<Bookmark>>
+    ): Flow<List<PodcastBookmark>>
 
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)
