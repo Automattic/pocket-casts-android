@@ -635,6 +635,7 @@
     <string name="filters_no_episodes">No Episodes Found</string>
     <string name="filters_no_matching_episodes">The criteria you selected doesn&#x2019;t match any current episodes in your subscriptions.\n\nChoose different criteria, or save this filter if you think it will match episodes in the future.</string>
     <string name="filters_no_matching_episodes_title">No Matching Episodes</string>
+    <string name="filters_not_found">No filters found</string>
     <string name="filters_options_delete">Delete filter</string>
     <string name="filters_options_download_all">Download all</string>
     <string name="filters_options_play_all" translatable="false">@string/play_all</string>
