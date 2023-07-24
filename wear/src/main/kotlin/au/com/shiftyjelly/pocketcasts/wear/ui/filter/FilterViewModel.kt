@@ -29,7 +29,9 @@ class FilterViewModel @Inject constructor(
 
     sealed class UiState {
         object Loading : UiState()
-        object Empty : UiState()
+        data class Empty(
+            val filter: Playlist? = null,
+        ) : UiState()
         data class Loaded(
             val filter: Playlist,
             val episodes: List<PodcastEpisode>,
@@ -41,9 +43,11 @@ class FilterViewModel @Inject constructor(
             val filter = filters.firstOrNull()
             if (filter != null) {
                 playlistManager.observeEpisodes(filter, episodeManager, playbackManager)
-                    .map { UiState.Loaded(filter = filter, episodes = it) }
+                    .map {
+                        if (it.isEmpty()) UiState.Empty(filter) else UiState.Loaded(filter = filter, episodes = it)
+                    }
             } else {
-                Flowable.just(UiState.Empty)
+                Flowable.just(UiState.Empty(null))
             }
         }
         .distinctUntilChanged()
