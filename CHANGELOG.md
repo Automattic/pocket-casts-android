@@ -1,3 +1,10 @@
+7.45
+-----
+*   Bug Fixes:
+    *   Added audio ducking as an option when playing over notifications
+        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
+
+
 7.44
 -----
 *   New Feature:

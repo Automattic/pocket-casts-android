@@ -7,6 +7,7 @@ import android.media.AudioManager
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
+import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import timber.log.Timber
@@ -150,17 +151,14 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
         }
     }
 
-    fun canDuck(): Boolean {
-        return audioFocus == AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT && hasUserAllowedDucking()
-    }
-
-    protected open fun hasUserAllowedDucking(): Boolean {
-        return settings.canDuckAudioWithNotifications()
+    private fun canDuck(): PlayOverNotificationSetting {
+        if (audioFocus != AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT) return PlayOverNotificationSetting.NEVER
+        return settings.getPlayOverNotification()
     }
 
     interface FocusChangeListener {
         fun onFocusGain(shouldResume: Boolean)
-        fun onFocusLoss(mayDuck: Boolean, transientLoss: Boolean)
+        fun onFocusLoss(playOverNotification: PlayOverNotificationSetting, transientLoss: Boolean)
         fun onFocusRequestFailed()
     }
 
