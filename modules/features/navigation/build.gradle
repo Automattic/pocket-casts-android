@@ -2,6 +2,9 @@ apply from: "../../modules.gradle"
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.navigation'
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
