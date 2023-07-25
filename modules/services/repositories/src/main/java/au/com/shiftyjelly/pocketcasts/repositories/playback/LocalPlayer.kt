@@ -14,7 +14,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
 
     companion object {
         // The volume we set the media player to seekToTimeMswhen we lose audio focus, but are allowed to reduce the volume instead of stopping playback.
-        const val VOLUME_DUCK = 1.0f // We don't actually duck the volume
+        const val VOLUME_DUCK = 0.5f
         // The volume we set the media player when we have audio focus.
         const val VOLUME_NORMAL = 1.0f
     }

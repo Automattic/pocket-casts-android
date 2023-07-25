@@ -406,7 +406,7 @@ class Support @Inject constructor(
                 output.append(eol)
 
                 output.append("Notifications").append(eol)
-                output.append("Play over notifications? ").append(if (settings.canDuckAudioWithNotifications()) "yes" else "no").append(eol)
+                output.append("Play over notifications? ").append(settings.getPlayOverNotification().analyticsString).append(eol)
                 output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause()) "yes" else "no").append(eol)
                 output.append(eol)
 
