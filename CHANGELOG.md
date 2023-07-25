@@ -3,6 +3,8 @@
 *   Bug Fixes:
     *   Added audio ducking as an option when playing over notifications
         ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
+    *   Fixed upgrade flow when signing in with Google account
+        ([#1204](https://github.com/Automattic/pocket-casts-android/pull/1204))
 
 
 7.44
