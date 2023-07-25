@@ -119,7 +119,7 @@ project.ext {
             auth: "com.google.android.gms:play-services-auth:20.4.0",
             mediarouter: "androidx.mediarouter:mediarouter:1.3.1",
             palette: "androidx.palette:palette:1.0.0",
-            recyclerview: "androidx.recyclerview:recyclerview:1.2.1",
+            recyclerview: "androidx.recyclerview:recyclerview:1.3.0",
             swipeToRefresh: "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
             design: "com.google.android.material:material:1.5.0",
             cardview: "androidx.cardview:cardview:1.0.0",
