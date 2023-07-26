@@ -432,6 +432,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
     }
 
+    private val onTabClicked: (tab: PodcastViewModel.PodcastTab) -> Unit = { tab ->
+        viewModel.onTabClicked(tab)
+    }
+
     val podcastUuid
         get() = arguments?.getString(ARG_PODCAST_UUID)!!
 
@@ -550,6 +554,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 onShowArchivedClicked = onShowArchivedClicked,
                 multiSelectHelper = multiSelectHelper,
                 onArtworkLongClicked = onArtworkLongClicked,
+                onTabClicked = onTabClicked,
                 ratingsViewModel = ratingsViewModel,
                 swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
@@ -716,6 +721,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                         addPaddingForEpisodeSearch(state.episodes)
                         val contextRequired = context ?: return@Observer
                         adapter?.setEpisodes(
+                            showTab = state.showTab,
                             episodes = state.episodes,
                             showingArchived = state.showingArchived,
                             episodeCount = state.episodeCount,

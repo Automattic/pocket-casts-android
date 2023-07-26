@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import android.content.Context
 import android.content.res.Resources
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -138,7 +140,7 @@ class PodcastViewModel
             }
             .switchMap {
                 Observables.combineLatest(Observable.just(it), searchResults) { podcast, searchQuery ->
-                    CombinedEpisodeData(podcast, podcast.showArchived, searchQuery.first, searchQuery.second)
+                    CombinedEpisodeData(podcast, podcast.showArchived, searchQuery.first, searchQuery.second, getCurrentTab())
                 }.toFlowable(BackpressureStrategy.LATEST)
             }
             .loadEpisodes(episodeManager)
@@ -157,6 +159,9 @@ class PodcastViewModel
             .observeOn(AndroidSchedulers.mainThread())
 
         episodes = episodeStateFlowable.toLiveData()
+    }
+
+    fun onTabClicked(tab: PodcastTab) {
     }
 
     override fun onCleared() {
@@ -355,8 +360,17 @@ class PodcastViewModel
         )
     }
 
+    private fun getCurrentTab() =
+        (episodes.value as? EpisodeState.Loaded)?.showTab ?: PodcastTab.EPISODES
+
+    enum class PodcastTab(@StringRes val labelResId: Int) {
+        EPISODES(LR.string.episodes),
+        BOOKMARKS(LR.string.bookmarks),
+    }
+
     sealed class EpisodeState {
         data class Loaded(
+            val showTab: PodcastTab,
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val showingArchived: Boolean,
@@ -400,10 +414,16 @@ private fun Maybe<Podcast>.filterKeepSubscribed(): Maybe<Podcast> {
 
 private class EpisodeLimitPlaceholder
 
-private data class CombinedEpisodeData(val podcast: Podcast, val showingArchived: Boolean, val searchTerm: String, val searchUuids: List<String>?)
+private data class CombinedEpisodeData(
+    val podcast: Podcast,
+    val showingArchived: Boolean,
+    val searchTerm: String,
+    val searchUuids: List<String>?,
+    val showTab: PodcastTab
+)
 
 private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeManager): Flowable<PodcastViewModel.EpisodeState> {
-    return this.switchMap { (podcast, showArchived, searchTerm, searchUuids) ->
+    return this.switchMap { (podcast, showArchived, searchTerm, searchUuids, showTab) ->
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast ${podcast.uuid} episode changes")
         episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
             .map {
@@ -449,6 +469,7 @@ private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeMa
                 }
 
                 PodcastViewModel.EpisodeState.Loaded(
+                    showTab = showTab,
                     podcast = podcast,
                     episodes = filteredList,
                     showingArchived = showArchivedWithSearch,
