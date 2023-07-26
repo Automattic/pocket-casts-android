@@ -51,6 +51,12 @@ abstract class BookmarkDao {
         deleted: Boolean = false,
     ): Flow<List<Bookmark>>
 
+    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND deleted = :deleted")
+    abstract fun findByPodcastFlow(
+        podcastUuid: String,
+        deleted: Boolean = false,
+    ): Flow<List<Bookmark>>
+
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)
 

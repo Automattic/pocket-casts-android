@@ -99,6 +99,13 @@ class BookmarkManagerImpl @Inject constructor(
     }
 
     /**
+     * Find all bookmarks for the given podcast.
+     */
+    override fun findPodcastBookmarksFlow(
+        podcastUuid: String,
+    ) = bookmarkDao.findByPodcastFlow(podcastUuid)
+
+    /**
      * Mark the bookmark as deleted so it can be synced to other devices.
      */
     override suspend fun deleteToSync(bookmarkUuid: String) {
