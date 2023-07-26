@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -436,6 +437,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         viewModel.onTabClicked(tab)
     }
 
+    private val onBookmarkPlayClicked: (bookmark: Bookmark) -> Unit = {
+        // TODO: Add play action
+    }
+
     val podcastUuid
         get() = arguments?.getString(ARG_PODCAST_UUID)!!
 
@@ -555,6 +560,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 multiSelectHelper = multiSelectHelper,
                 onArtworkLongClicked = onArtworkLongClicked,
                 onTabClicked = onTabClicked,
+                onBookmarkPlayClicked = onBookmarkPlayClicked,
                 ratingsViewModel = ratingsViewModel,
                 swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
@@ -595,8 +601,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectNone() {
-                val episodeState = viewModel.episodes.value
-                if (episodeState is PodcastViewModel.EpisodeState.Loaded) {
+                val episodeState = viewModel.uiState.value
+                if (episodeState is PodcastViewModel.UiState.Loaded) {
                     episodeState.episodes.forEach { multiSelectHelper.deselect(it) }
                     adapter?.notifyDataSetChanged()
                 }
@@ -629,8 +635,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             }
 
             override fun multiSelectSelectAll() {
-                val episodeState = viewModel.episodes.value
-                if (episodeState is PodcastViewModel.EpisodeState.Loaded) {
+                val episodeState = viewModel.uiState.value
+                if (episodeState is PodcastViewModel.UiState.Loaded) {
                     multiSelectHelper.selectAllInList(episodeState.episodes)
                     adapter?.notifyDataSetChanged()
                 }
@@ -713,41 +719,39 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             adapter?.setTint(tintColor)
         }
 
-        viewModel.episodes.observe(
-            viewLifecycleOwner,
-            Observer { state ->
-                when (state) {
-                    is PodcastViewModel.EpisodeState.Loaded -> {
-                        addPaddingForEpisodeSearch(state.episodes)
-                        val contextRequired = context ?: return@Observer
-                        adapter?.setEpisodes(
-                            showTab = state.showTab,
-                            episodes = state.episodes,
-                            showingArchived = state.showingArchived,
-                            episodeCount = state.episodeCount,
-                            archivedCount = state.archivedCount,
-                            searchTerm = state.searchTerm,
-                            episodeLimit = state.episodeLimit,
-                            episodeLimitIndex = state.episodeLimitIndex,
-                            podcast = state.podcast,
-                            context = contextRequired
-                        )
-                        if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
-                            binding?.episodesRecyclerView?.smoothScrollToTop(1)
-                        }
-                        lastSearchTerm = state.searchTerm
+        viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is PodcastViewModel.UiState.Loading -> Unit
+                is PodcastViewModel.UiState.Loaded -> {
+                    addPaddingForEpisodeSearch(state.episodes)
+                    adapter?.setEpisodes(
+                        showTab = state.showTab,
+                        episodes = state.episodes,
+                        bookmarks = state.bookmarks,
+                        showingArchived = state.showingArchived,
+                        episodeCount = state.episodeCount,
+                        archivedCount = state.archivedCount,
+                        searchTerm = state.searchTerm,
+                        episodeLimit = state.episodeLimit,
+                        episodeLimitIndex = state.episodeLimitIndex,
+                        podcast = state.podcast,
+                        context = requireContext()
+                    )
+                    if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
+                        binding?.episodesRecyclerView?.smoothScrollToTop(1)
                     }
-                    is PodcastViewModel.EpisodeState.Error -> {
-                        adapter?.setError()
-                        binding?.error = getString(LR.string.podcast_load_error)
+                    lastSearchTerm = state.searchTerm
+                }
+                is PodcastViewModel.UiState.Error -> {
+                    adapter?.setError()
+                    binding?.error = getString(LR.string.podcast_load_error)
 
-                        if (BuildConfig.DEBUG) {
-                            UiUtil.displayAlertError(requireContext(), state.errorMessage, null)
-                        }
+                    if (BuildConfig.DEBUG) {
+                        UiUtil.displayAlertError(requireContext(), state.errorMessage, null)
                     }
                 }
             }
-        )
+        }
 
         viewModel.castConnected.observe(viewLifecycleOwner) { castConnected ->
             adapter?.castConnected = castConnected

@@ -8,17 +8,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -43,6 +45,8 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -65,13 +69,18 @@ class PodcastViewModel
     private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
+    private val bookmarkManager: BookmarkManager,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
     val podcast = MutableLiveData<Podcast>()
     var searchTerm = ""
     lateinit var podcastUuid: String
-    lateinit var episodes: LiveData<EpisodeState>
+
+    private val _uiState: MutableLiveData<UiState> = MutableLiveData(UiState.Loading)
+    val uiState: LiveData<UiState>
+        get() = _uiState
+
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
 
@@ -88,80 +97,88 @@ class PodcastViewModel
         get() = Dispatchers.Default
 
     fun loadPodcast(uuid: String, resources: Resources) {
-        this.podcastUuid = uuid
-        val noSearchResult = Pair<String, List<String>?>("", null)
-        val searchResults = searchQueryRelay.debounce { // Only debounce when search has a value otherwise it slows down loading the pages
-            if (it.isEmpty()) {
-                Observable.empty()
-            } else {
-                Observable.timer(settings.getEpisodeSearchDebounceMs(), TimeUnit.MILLISECONDS)
-            }
-        }.switchMapSingle { searchTerm ->
-            if (searchTerm.length > 2) {
-                cacheServerManager.searchEpisodes(uuid, searchTerm).map { Pair<String, List<String>?>(searchTerm, it) }.onErrorReturnItem(noSearchResult)
-            } else {
-                Single.just(noSearchResult)
-            }
-        }.distinctUntilChanged()
-
-        val episodeStateFlowable = podcastManager.findPodcastByUuidRx(uuid)
-            .subscribeOn(Schedulers.io())
-            .flatMap {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
-                if (it.isSubscribed) {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid is subscribed")
-                    updatePodcast(it)
-                    return@flatMap Maybe.just(it)
+        viewModelScope.launch {
+            this@PodcastViewModel.podcastUuid = uuid
+            val noSearchResult = Pair<String, List<String>?>("", null)
+            val searchResults = searchQueryRelay.debounce { // Only debounce when search has a value otherwise it slows down loading the pages
+                if (it.isEmpty()) {
+                    Observable.empty()
                 } else {
-                    val wasDeleted = podcastManager.deletePodcastIfUnused(it, playbackManager)
-                    if (wasDeleted) {
-                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid was old and deleted")
-                        return@flatMap Maybe.empty<Podcast>()
-                    } else {
+                    Observable.timer(settings.getEpisodeSearchDebounceMs(), TimeUnit.MILLISECONDS)
+                }
+            }.switchMapSingle { searchTerm ->
+                if (searchTerm.length > 2) {
+                    cacheServerManager.searchEpisodes(uuid, searchTerm).map { Pair<String, List<String>?>(searchTerm, it) }.onErrorReturnItem(noSearchResult)
+                } else {
+                    Single.just(noSearchResult)
+                }
+            }.distinctUntilChanged()
+
+            val podcastStateFlowable = podcastManager.findPodcastByUuidRx(uuid)
+                .subscribeOn(Schedulers.io())
+                .flatMap {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
+                    if (it.isSubscribed) {
+                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid is subscribed")
                         updatePodcast(it)
                         return@flatMap Maybe.just(it)
+                    } else {
+                        val wasDeleted = podcastManager.deletePodcastIfUnused(it, playbackManager)
+                        if (wasDeleted) {
+                            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid was old and deleted")
+                            return@flatMap Maybe.empty<Podcast>()
+                        } else {
+                            updatePodcast(it)
+                            return@flatMap Maybe.just(it)
+                        }
                     }
                 }
-            }
-            .filterKeepSubscribed()
-            .downloadMissingPodcast(uuid, podcastManager)
-            .toFlowable()
-            .switchMap {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Creating observer for podcast $uuid changes")
-                // We have already loaded the podcast so fire that first and then observe changes from then on
-                Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { newPodcast ->
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
-                tintColor.value = theme.getPodcastTintColor(newPodcast)
-                observableHeaderExpanded.value = !newPodcast.isSubscribed
-                podcast.postValue(newPodcast)
-            }
-            .switchMap {
-                Observables.combineLatest(Observable.just(it), searchResults) { podcast, searchQuery ->
-                    CombinedEpisodeData(podcast, podcast.showArchived, searchQuery.first, searchQuery.second, getCurrentTab())
-                }.toFlowable(BackpressureStrategy.LATEST)
-            }
-            .loadEpisodes(episodeManager)
-            .doOnNext {
-                if (it is EpisodeState.Loaded) {
-                    val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
-                    groupedEpisodes.postValue(groups)
-                } else {
-                    groupedEpisodes.postValue(emptyList())
+                .filterKeepSubscribed()
+                .downloadMissingPodcast(uuid, podcastManager)
+                .toFlowable()
+                .switchMap {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Creating observer for podcast $uuid changes")
+                    // We have already loaded the podcast so fire that first and then observe changes from then on
+                    Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext { newPodcast ->
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
+                    tintColor.value = theme.getPodcastTintColor(newPodcast)
+                    observableHeaderExpanded.value = !newPodcast.isSubscribed
+                    podcast.postValue(newPodcast)
+                }
+                .switchMap {
+                    Observables.combineLatest(Observable.just(it), searchResults) { podcast, searchQuery ->
+                        CombinedEpisodeData(podcast, podcast.showArchived, searchQuery.first, searchQuery.second)
+                    }.toFlowable(BackpressureStrategy.LATEST)
+                }
+                .loadEpisodesAndBookmarks(episodeManager, bookmarkManager)
+                .doOnNext {
+                    if (it is UiState.Loaded) {
+                        val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
+                        groupedEpisodes.postValue(groups)
+                    } else {
+                        groupedEpisodes.postValue(emptyList())
+                    }
+                }
+                .onErrorReturn {
+                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not load podcast page")
+                    UiState.Error(it.message ?: "Unknown error", searchTerm)
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+
+            podcastStateFlowable.asFlow().collect {
+                _uiState.value = when (it) {
+                    is UiState.Loaded -> it.copy(showTab = getCurrentTab())
+                    else -> it
                 }
             }
-            .onErrorReturn {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not load podcast page")
-                EpisodeState.Error(it.message ?: "Unknown error", searchTerm)
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-
-        episodes = episodeStateFlowable.toLiveData()
+        }
     }
 
     fun onTabClicked(tab: PodcastTab) {
+        _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }
 
     override fun onCleared() {
@@ -216,8 +233,8 @@ class PodcastViewModel
 
     fun onArchiveAllClicked() {
         launch {
-            val episodeState = episodes.value
-            if (episodeState is EpisodeState.Loaded) {
+            val episodeState = uiState.value
+            if (episodeState is UiState.Loaded) {
                 episodeManager.archiveAllInList(episodeState.episodes, playbackManager)
                 trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodeState.episodes.size)
             }
@@ -225,7 +242,7 @@ class PodcastViewModel
     }
 
     fun episodeCount(): Int {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return 0
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return 0
         return episodes.size
     }
 
@@ -288,18 +305,18 @@ class PodcastViewModel
     }
 
     fun shouldShowArchiveAll(): Boolean {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return false
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return false
         return episodes.find { !it.isArchived } != null
     }
 
     fun shouldShowUnarchive(): Boolean {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return false
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return false
         if (podcast.value?.overrideGlobalArchive == true && podcast.value?.autoArchiveEpisodeLimit != null) return false
         return episodes.find { !it.isArchived } == null
     }
 
     fun shouldShowArchivePlayed(): Boolean {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return false
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return false
         return episodes.find { !it.isArchived && it.isFinished } != null
     }
 
@@ -313,12 +330,12 @@ class PodcastViewModel
     }
 
     fun archiveAllCount(): Int {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return 0
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return 0
         return episodes.filter { !it.isArchived }.count()
     }
 
     fun archivePlayedCount(): Int {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return 0
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return 0
         return episodes.filter { it.isFinished }.count()
     }
 
@@ -331,7 +348,7 @@ class PodcastViewModel
     }
 
     fun downloadAll() {
-        val episodes = (episodes.value as? EpisodeState.Loaded)?.episodes ?: return
+        val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
         launch {
             trimmedList.forEach {
@@ -361,29 +378,31 @@ class PodcastViewModel
     }
 
     private fun getCurrentTab() =
-        (episodes.value as? EpisodeState.Loaded)?.showTab ?: PodcastTab.EPISODES
+        (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
     enum class PodcastTab(@StringRes val labelResId: Int) {
         EPISODES(LR.string.episodes),
         BOOKMARKS(LR.string.bookmarks),
     }
 
-    sealed class EpisodeState {
+    sealed class UiState {
         data class Loaded(
-            val showTab: PodcastTab,
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
+            val bookmarks: List<Bookmark>,
             val showingArchived: Boolean,
             val episodeCount: Int,
             val archivedCount: Int,
             val searchTerm: String,
             val episodeLimit: Int?,
             val episodeLimitIndex: Int?,
-        ) : EpisodeState()
+            val showTab: PodcastTab = PodcastTab.EPISODES,
+        ) : UiState()
         data class Error(
             val errorMessage: String,
             val searchTerm: String
-        ) : EpisodeState()
+        ) : UiState()
+        object Loading : UiState()
     }
 
     private fun trackSearchIfNeeded(oldValue: String, newValue: String) {
@@ -419,69 +438,81 @@ private data class CombinedEpisodeData(
     val showingArchived: Boolean,
     val searchTerm: String,
     val searchUuids: List<String>?,
-    val showTab: PodcastTab
 )
 
-private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeManager): Flowable<PodcastViewModel.EpisodeState> {
-    return this.switchMap { (podcast, showArchived, searchTerm, searchUuids, showTab) ->
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast ${podcast.uuid} episode changes")
-        episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
-            .map {
-                val sortFunction = podcast.podcastGrouping.sortFunction
-                if (sortFunction != null) {
-                    it.sortedByDescending(sortFunction)
-                } else {
-                    it
-                }
-            }
-            .flatMap { episodeList ->
-                if (searchUuids == null) {
-                    Flowable.just(Pair(episodeList, episodeList))
-                } else {
-                    val searchEpisodes = episodeList.filter { searchUuids.contains(it.uuid) }
-                    Flowable.just(Pair(searchEpisodes, episodeList))
-                }
-            }
-            .map<PodcastViewModel.EpisodeState> { (searchList, episodeList) ->
-                val episodeCount = episodeList.size
-                val archivedCount = episodeList.count { it.isArchived }
-                val showArchivedWithSearch = searchUuids != null || showArchived
-                val filteredList = if (showArchivedWithSearch) searchList else searchList.filter { !it.isArchived }
-                val episodeLimit = podcast.autoArchiveEpisodeLimit
-                val episodeLimitIndex: Int?
-                // if the episode limit is on, the following texting is shown the episode list 'Limited to x most recent episodes'
-                if (episodeLimit != null && filteredList.isNotEmpty() && podcast.overrideGlobalArchive) {
-                    val mutableEpisodeList: MutableList<Any> = episodeList.toMutableList()
-                    if (podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC) {
-                        if (episodeLimit <= episodeList.size) {
-                            mutableEpisodeList.add(episodeLimit, EpisodeLimitPlaceholder())
-                        }
+private fun Flowable<CombinedEpisodeData>.loadEpisodesAndBookmarks(
+    episodeManager: EpisodeManager,
+    bookmarkManager: BookmarkManager,
+): Flowable<PodcastViewModel.UiState> {
+    return this.switchMap { (podcast, showArchived, searchTerm, searchUuids) ->
+        LogBuffer.i(
+            LogBuffer.TAG_BACKGROUND_TASKS,
+            "Observing podcast ${podcast.uuid} episode changes"
+        )
+        Flowable.combineLatest(
+            episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
+                .map {
+                    val sortFunction = podcast.podcastGrouping.sortFunction
+                    if (sortFunction != null) {
+                        it.sortedByDescending(sortFunction)
                     } else {
-                        if (episodeList.size - episodeLimit >= 0) {
-                            mutableEpisodeList.add(episodeList.size - episodeLimit, EpisodeLimitPlaceholder())
-                        }
+                        it
                     }
-
-                    val indexOf = mutableEpisodeList.filter { showArchived || (it is PodcastEpisode && !it.isArchived) || it is EpisodeLimitPlaceholder }.indexOfFirst { it is EpisodeLimitPlaceholder }
-                    episodeLimitIndex = if (indexOf == -1) null else indexOf // Why doesn't indexOfFirst return an optional?!
+                }
+                .flatMap { episodeList ->
+                    if (searchUuids == null) {
+                        Flowable.just(Pair(episodeList, episodeList))
+                    } else {
+                        val searchEpisodes = episodeList.filter { searchUuids.contains(it.uuid) }
+                        Flowable.just(Pair(searchEpisodes, episodeList))
+                    }
+                },
+            bookmarkManager.findPodcastBookmarksFlow(podcast.uuid).asFlowable()
+        ) { (searchList, episodeList), bookmarks ->
+            val episodeCount = episodeList.size
+            val archivedCount = episodeList.count { it.isArchived }
+            val showArchivedWithSearch = searchUuids != null || showArchived
+            val filteredList =
+                if (showArchivedWithSearch) searchList else searchList.filter { !it.isArchived }
+            val episodeLimit = podcast.autoArchiveEpisodeLimit
+            val episodeLimitIndex: Int?
+            // if the episode limit is on, the following texting is shown the episode list 'Limited to x most recent episodes'
+            if (episodeLimit != null && filteredList.isNotEmpty() && podcast.overrideGlobalArchive) {
+                val mutableEpisodeList: MutableList<Any> = episodeList.toMutableList()
+                if (podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC) {
+                    if (episodeLimit <= episodeList.size) {
+                        mutableEpisodeList.add(episodeLimit, EpisodeLimitPlaceholder())
+                    }
                 } else {
-                    episodeLimitIndex = null
+                    if (episodeList.size - episodeLimit >= 0) {
+                        mutableEpisodeList.add(
+                            episodeList.size - episodeLimit,
+                            EpisodeLimitPlaceholder()
+                        )
+                    }
                 }
 
-                PodcastViewModel.EpisodeState.Loaded(
-                    showTab = showTab,
-                    podcast = podcast,
-                    episodes = filteredList,
-                    showingArchived = showArchivedWithSearch,
-                    episodeCount = episodeCount,
-                    archivedCount = archivedCount,
-                    searchTerm = searchTerm,
-                    episodeLimit = podcast.autoArchiveEpisodeLimit,
-                    episodeLimitIndex = episodeLimitIndex,
-                )
+                val indexOf = mutableEpisodeList.filter { showArchived || (it is PodcastEpisode && !it.isArchived) || it is EpisodeLimitPlaceholder }.indexOfFirst { it is EpisodeLimitPlaceholder }
+                episodeLimitIndex = if (indexOf == -1) null else indexOf // Why doesn't indexOfFirst return an optional?!
+            } else {
+                episodeLimitIndex = null
             }
+
+            val state: PodcastViewModel.UiState = PodcastViewModel.UiState.Loaded(
+                podcast = podcast,
+                episodes = filteredList,
+                bookmarks = bookmarks,
+                showingArchived = showArchivedWithSearch,
+                episodeCount = episodeCount,
+                archivedCount = archivedCount,
+                searchTerm = searchTerm,
+                episodeLimit = podcast.autoArchiveEpisodeLimit,
+                episodeLimitIndex = episodeLimitIndex,
+            )
+            state
+        }
             .doOnError { Timber.e("Error loading episodes: ${it.message}") }
-            .onErrorReturnItem(PodcastViewModel.EpisodeState.Error("There was an error loading the episodes", searchTerm))
+            .onErrorReturnItem(PodcastViewModel.UiState.Error("There was an error loading the episodes", searchTerm))
             .subscribeOn(Schedulers.io())
     }
 }

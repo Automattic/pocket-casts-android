@@ -7,7 +7,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import java.io.Serializable
+import java.util.Calendar
 import java.util.Date
+import java.util.UUID
 
 @Entity(
     tableName = "bookmarks",
@@ -29,4 +31,20 @@ data class Bookmark(
     @Ignore val episodeTitle: String = "",
 ) : Serializable {
     constructor() : this(uuid = "")
+
+    val adapterId: Long
+        get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
+
+    fun createdAtDatePattern(): String {
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        calendar.time = createdAt
+        val createdAtYear = calendar.get(Calendar.YEAR)
+
+        return if (createdAtYear == currentYear) {
+            "MMM d 'at' h:mm a"
+        } else {
+            "MMM d, YYYY 'at' h:mm a"
+        }
+    }
 }

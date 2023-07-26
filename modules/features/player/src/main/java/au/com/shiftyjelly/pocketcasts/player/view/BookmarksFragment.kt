@@ -50,7 +50,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,7 +78,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -466,19 +464,6 @@ private fun LoadingView() {
                 .size(24.dp),
             strokeWidth = 2.dp,
         )
-    }
-}
-
-private fun Bookmark.createdAtDatePattern(): String {
-    val calendar = Calendar.getInstance()
-    val currentYear = calendar.get(Calendar.YEAR)
-    calendar.time = createdAt
-    val createdAtYear = calendar.get(Calendar.YEAR)
-
-    return if (createdAtYear == currentYear) {
-        "MMM d 'at' h:mm a"
-    } else {
-        "MMM d, YYYY 'at' h:mm a"
     }
 }
 
