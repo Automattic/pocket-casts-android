@@ -3,6 +3,8 @@
 *   Bug Fixes:
     *   Added audio ducking as an option when playing over notifications
         ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
+    *   Fixed swiping to open Up Next queue in landscape and on foldables
+        ([#1209](https://github.com/Automattic/pocket-casts-android/pull/1209))
 
 7.44
 -----
