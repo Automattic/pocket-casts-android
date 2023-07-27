@@ -295,7 +295,6 @@ interface Settings {
     val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
     val upNextSwipeActionObservable: Observable<UpNextAction>
-    val rowActionObservable: Observable<Boolean>
     val marketingOptObservable: Observable<Boolean>
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
@@ -408,8 +407,7 @@ interface Settings {
 
     fun hideNotificationOnPause(): Boolean
 
-    fun streamingMode(): Boolean
-    fun setStreamingMode(newValue: Boolean)
+    val streamingMode: UserSetting<Boolean>
 
     fun keepScreenAwake(): Boolean
     fun setKeepScreenAwake(newValue: Boolean)

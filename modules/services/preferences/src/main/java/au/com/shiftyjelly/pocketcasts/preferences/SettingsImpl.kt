@@ -80,7 +80,6 @@ class SettingsImpl @Inject constructor(
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
     override val upNextSwipeActionObservable = BehaviorRelay.create<Settings.UpNextAction>().apply { accept(getUpNextSwipeAction()) }
-    override val rowActionObservable = BehaviorRelay.create<Boolean>().apply { accept(streamingMode()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
     override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
@@ -612,14 +611,12 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getBoolean(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE, false)
     }
 
-    override fun streamingMode(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_GLOBAL_STREAMING_MODE, true)
-    }
-
-    override fun setStreamingMode(newValue: Boolean) {
-        setBoolean(Settings.PREFERENCE_GLOBAL_STREAMING_MODE, newValue)
-        rowActionObservable.accept(newValue)
-    }
+    override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
+        defaultValue = true,
+        syncable = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun keepScreenAwake(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, false)

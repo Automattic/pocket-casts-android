@@ -140,9 +140,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                 SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {
 
                     RowAction(
-                        saved = settings.rowActionObservable
-                            .subscribeAsState(settings.streamingMode())
-                            .value,
+                        saved = settings.streamingMode.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_ROW_ACTION_CHANGED,
@@ -153,7 +151,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setStreamingMode(it)
+                            settings.streamingMode.set(it)
                         }
                     )
 

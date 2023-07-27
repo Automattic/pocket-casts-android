@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
-import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -37,23 +36,33 @@ sealed class UserSetting<T>(
         _flow.value = value
     }
 
-    abstract fun set(value: T, now: Boolean = false)
+    abstract fun set(value: T)
 
-//    sealed class Boolean(sharedPrefKey: String): UserSetting<Boolean> {
-//
-//    }
+    class BoolPref(
+        sharedPrefKey: String,
+        private val defaultValue: Boolean,
+        syncable: Boolean,
+        sharedPrefs: SharedPreferences,
+    ) : UserSetting<Boolean>(
+        sharedPrefKey = sharedPrefKey,
+        sharedPrefs = sharedPrefs,
+        syncable = syncable,
+    ) {
 
-//    sealed class String(sharedPrefKey: String): UserSetting<String> {
-//
-//    }
+        override fun set(value: Boolean) {
+            sharedPrefs.edit().run {
+                putBoolean(sharedPrefKey, value)
+                apply()
+            }
+            updateFlow(value)
+        }
 
-//    sealed class Int(sharedPrefKey: String): UserSetting<Int> {
-//
-//    }
+        override fun get(): Boolean = sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
+    }
 
     // This stores an Int preference as a String and only exists for legacy
     // reasons. No new preferences should use this class.
-    open class IntFromStringPref(
+    class IntFromStringPref(
         sharedPrefKey: String,
         private val defaultValue: Int,
         private val allowNegative: Boolean = true,
@@ -77,18 +86,12 @@ sealed class UserSetting<T>(
             }
         }
 
-        @SuppressLint("ApplySharedPref")
-        override fun set(value: Int, now: Boolean) {
+        override fun set(value: Int) {
             val adjustedValue = if (value <= 0 && !allowNegative) defaultValue else value
-
-            val editor = sharedPrefs.edit()
-            editor.putString(sharedPrefKey, adjustedValue.toString())
-            if (now) {
-                editor.commit()
-            } else {
-                editor.apply()
+            sharedPrefs.edit().run {
+                putString(sharedPrefKey, adjustedValue.toString())
+                apply()
             }
-
             updateFlow(value)
         }
     }

@@ -27,6 +27,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,7 +64,11 @@ class FilterEpisodeListViewModel @Inject constructor(
     fun setup(playlistUUID: String) {
         this.playlistUUID = playlistUUID
 
-        val episodes = Observables.combineLatest(settings.upNextSwipeActionObservable, settings.rowActionObservable).toFlowable(BackpressureStrategy.LATEST)
+        val episodes = Observables.combineLatest(
+            settings.upNextSwipeActionObservable,
+            settings.streamingMode.flow.asObservable(coroutineContext)
+        )
+            .toFlowable(BackpressureStrategy.LATEST)
             .switchMap { playlistManager.observeByUuidAsList(playlistUUID) }
             .switchMap { playlists ->
                 Timber.d("Loading playlist $playlist")
