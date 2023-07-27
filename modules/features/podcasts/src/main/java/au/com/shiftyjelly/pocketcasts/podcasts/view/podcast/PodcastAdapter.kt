@@ -325,8 +325,6 @@ class PodcastAdapter(
     }
 
     fun setEpisodes(
-        showTab: PodcastTab,
-        bookmarks: List<Bookmark>,
         episodes: List<PodcastEpisode>,
         showingArchived: Boolean,
         episodeCount: Int,
@@ -337,69 +335,67 @@ class PodcastAdapter(
         podcast: Podcast,
         context: Context,
     ) {
-        val content = when (showTab) {
-            PodcastTab.EPISODES -> {
-                val grouping = podcast.podcastGrouping
-                val groupingFunction = grouping.sortFunction
-                val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
-                if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
-                    if (searchTerm.isEmpty() && (podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC || podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC)) {
-                        episodesPlusLimit.add(episodeLimitIndex, EpisodeLimitRow(episodeLimit))
-                    }
-                }
-                if (groupingFunction != null) {
-                    val grouped = grouping.formGroups(episodes, podcast, context.resources)
-                    episodesPlusLimit.clear()
-
-                    grouped.forEachIndexed { index, list ->
-                        if (list.isNotEmpty()) {
-                            episodesPlusLimit.add(DividerRow(grouping, index))
-                            episodesPlusLimit.addAll(list)
-                        }
-                    }
-                }
-                val content = mutableListOf<Any>().apply {
-                    add(Podcast())
-                    if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                        add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
-                    }
-                    add(
-                        EpisodeHeader(
-                            showingArchived = showingArchived,
-                            episodeCount = episodeCount,
-                            archivedCount = archivedCount,
-                            searchTerm = searchTerm,
-                            episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null
-                        )
-                    )
-                    addAll(episodesPlusLimit)
-                }
-
-                if (episodes.isEmpty()) {
-                    if (searchTerm.isEmpty()) {
-                        if (archivedCount == 0) {
-                            content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes), false))
-                        } else {
-                            content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount), true))
-                        }
-                    } else {
-                        content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_matching), false))
-                    }
-                }
-                content
+        val grouping = podcast.podcastGrouping
+        val groupingFunction = grouping.sortFunction
+        val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
+        if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
+            if (searchTerm.isEmpty() && (podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC || podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC)) {
+                episodesPlusLimit.add(episodeLimitIndex, EpisodeLimitRow(episodeLimit))
             }
-            PodcastTab.BOOKMARKS -> {
-                val content = mutableListOf<Any>().apply {
-                    add(Podcast())
-                    if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                        add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
-                    }
-                    addAll(bookmarks)
+        }
+        if (groupingFunction != null) {
+            val grouped = grouping.formGroups(episodes, podcast, context.resources)
+            episodesPlusLimit.clear()
+
+            grouped.forEachIndexed { index, list ->
+                if (list.isNotEmpty()) {
+                    episodesPlusLimit.add(DividerRow(grouping, index))
+                    episodesPlusLimit.addAll(list)
                 }
-                content
+            }
+        }
+        val content = mutableListOf<Any>().apply {
+            add(Podcast())
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
+            }
+            add(
+                EpisodeHeader(
+                    showingArchived = showingArchived,
+                    episodeCount = episodeCount,
+                    archivedCount = archivedCount,
+                    searchTerm = searchTerm,
+                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null
+                )
+            )
+            addAll(episodesPlusLimit)
+        }
+
+        if (episodes.isEmpty()) {
+            if (searchTerm.isEmpty()) {
+                if (archivedCount == 0) {
+                    content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes), false))
+                } else {
+                    content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount), true))
+                }
+            } else {
+                content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_matching), false))
             }
         }
 
+        submitList(content)
+    }
+
+    fun setBookmarks(
+        bookmarks: List<Bookmark>,
+    ) {
+        val content = mutableListOf<Any>().apply {
+            add(Podcast())
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
+            }
+            addAll(bookmarks)
+        }
         submitList(content)
     }
 

@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderChooserFragmen
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -724,19 +725,22 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 is PodcastViewModel.UiState.Loading -> Unit
                 is PodcastViewModel.UiState.Loaded -> {
                     addPaddingForEpisodeSearch(state.episodes)
-                    adapter?.setEpisodes(
-                        showTab = state.showTab,
-                        episodes = state.episodes,
-                        bookmarks = state.bookmarks,
-                        showingArchived = state.showingArchived,
-                        episodeCount = state.episodeCount,
-                        archivedCount = state.archivedCount,
-                        searchTerm = state.searchTerm,
-                        episodeLimit = state.episodeLimit,
-                        episodeLimitIndex = state.episodeLimitIndex,
-                        podcast = state.podcast,
-                        context = requireContext()
-                    )
+                    when (state.showTab) {
+                        PodcastTab.EPISODES -> adapter?.setEpisodes(
+                            episodes = state.episodes,
+                            showingArchived = state.showingArchived,
+                            episodeCount = state.episodeCount,
+                            archivedCount = state.archivedCount,
+                            searchTerm = state.searchTerm,
+                            episodeLimit = state.episodeLimit,
+                            episodeLimitIndex = state.episodeLimitIndex,
+                            podcast = state.podcast,
+                            context = requireContext()
+                        )
+                        PodcastTab.BOOKMARKS -> adapter?.setBookmarks(
+                            bookmarks = state.bookmarks,
+                        )
+                    }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
                         binding?.episodesRecyclerView?.smoothScrollToTop(1)
                     }
