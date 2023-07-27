@@ -739,6 +739,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                         )
                         PodcastTab.BOOKMARKS -> adapter?.setBookmarks(
                             bookmarks = state.bookmarks,
+                            searchTerm = state.searchTerm,
                         )
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
