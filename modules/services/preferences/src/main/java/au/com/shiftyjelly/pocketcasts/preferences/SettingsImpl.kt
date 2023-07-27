@@ -87,7 +87,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultMediaNotificationControlsFlow = MutableStateFlow(getMediaNotificationControlItems())
-    override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
@@ -1057,14 +1056,11 @@ class SettingsImpl @Inject constructor(
         headphonePlayBookmarkConfirmationSoundFlow.update { value }
     }
 
-    override fun defaultShowArchived(): Boolean {
-        return getBoolean("default_show_archived", false)
-    }
-
-    override fun setDefaultShowArchived(value: Boolean) {
-        setBoolean("default_show_archived", value)
-        defaultShowArchivedFlow.update { value }
-    }
+    override val showArchivedDefault = UserSetting.BoolPref(
+        sharedPrefKey = "default_show_archived",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getMediaNotificationControlItems(): List<MediaNotificationControls> {
         var items = getStringList("media_notification_controls_action")

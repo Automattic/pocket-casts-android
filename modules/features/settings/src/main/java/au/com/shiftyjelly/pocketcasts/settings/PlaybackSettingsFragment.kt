@@ -191,7 +191,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     ShowArchived(
-                        saved = settings.defaultShowArchivedFlow.collectAsState().value,
+                        saved = settings.showArchivedDefault.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_CHANGED,
@@ -202,7 +202,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setDefaultShowArchived(it)
+                            settings.showArchivedDefault.set(it)
                             showSetAllArchiveDialog(it)
                         }
                     )

@@ -302,7 +302,6 @@ interface Settings {
     val autoAddUpNextLimit: Observable<Int>
 
     val defaultMediaNotificationControlsFlow: StateFlow<List<MediaNotificationControls>>
-    val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val keepScreenAwakeFlow: StateFlow<Boolean>
     val openPlayerAutomaticallyFlow: StateFlow<Boolean>
@@ -558,8 +557,7 @@ interface Settings {
     fun getAutoShowPlayed(): Boolean
     fun getAutoPlayNextEpisodeOnEmpty(): Boolean
     fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean)
-    fun defaultShowArchived(): Boolean
-    fun setDefaultShowArchived(value: Boolean)
+    val showArchivedDefault: UserSetting<Boolean>
     fun getMediaNotificationControlItems(): List<MediaNotificationControls>
     fun setMediaNotificationControlItems(items: List<String>)
     fun setMultiSelectItems(items: List<Int>)

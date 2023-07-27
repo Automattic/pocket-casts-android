@@ -130,7 +130,7 @@ class SubscribeManager @Inject constructor(
         val updateObservable = podcastDao.updateSubscribedRx(subscribed = true, uuid = podcastUuid)
             .andThen(podcastDao.updateSyncStatusRx(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
             .andThen(Completable.fromAction { podcastDao.updateGrouping(PodcastGrouping.All.indexOf(settings.podcastGroupingDefault.flow.value), podcastUuid) })
-            .andThen(rxCompletable { podcastDao.updateShowArchived(podcastUuid, settings.defaultShowArchived()) })
+            .andThen(rxCompletable { podcastDao.updateShowArchived(podcastUuid, settings.showArchivedDefault.flow.value) })
         // return the final podcast
         val findObservable = podcastDao.findByUuidRx(podcastUuid)
         return updateObservable.andThen(findObservable.toSingle())
@@ -144,7 +144,7 @@ class SubscribeManager @Inject constructor(
                 podcast.syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED
                 podcast.isSubscribed = subscribed
                 podcast.grouping = PodcastGrouping.All.indexOf(settings.podcastGroupingDefault.flow.value)
-                podcast.showArchived = settings.defaultShowArchived()
+                podcast.showArchived = settings.showArchivedDefault.flow.value
             }
         // add the podcast
         val insertPodcastObservable = podcastObservable.flatMap { podcast ->
