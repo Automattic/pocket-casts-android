@@ -192,7 +192,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.flow.value * 1000L)
-            .setSeekBackIncrementMs(settings.getSkipBackwardInMs())
+            .setSeekBackIncrementMs(settings.skipBackInSecs.flow.value * 1000L)
             .build()
 
         renderer.onAudioSessionId(player.audioSessionId)

@@ -737,7 +737,7 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, sourceView)
     }
 
-    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipBackwardInSecs()) {
+    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.flow.value) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 

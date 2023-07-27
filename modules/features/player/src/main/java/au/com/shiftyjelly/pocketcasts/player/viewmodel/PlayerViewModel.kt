@@ -180,7 +180,7 @@ class PlayerViewModel @Inject constructor(
     val listDataRx = Observables.combineLatest(
         upNextStateObservable,
         playbackStateObservable,
-        settings.skipBackwardInSecsObservable,
+        settings.skipBackInSecs.flow.asObservable(coroutineContext),
         settings.skipForwardInSecs.flow.asObservable(coroutineContext),
         upNextExpandedObservable,
         chaptersExpandedObservable,

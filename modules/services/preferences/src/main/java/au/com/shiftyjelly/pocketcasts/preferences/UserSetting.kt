@@ -33,8 +33,6 @@ sealed class UserSetting<T>(
     // better, use the flow itself to observe changes.
     protected abstract fun get(): T
 
-    abstract val defaultValue: T
-
     protected fun updateFlow(value: T) {
         _flow.value = value
     }
@@ -57,10 +55,10 @@ sealed class UserSetting<T>(
     // reasons. No new preferences should use this class.
     open class IntFromString(
         sharedPrefKey: String,
-        override val defaultValue: Int,
+        private val defaultValue: Int,
         private val allowNegative: Boolean = true,
-        sharedPrefs: SharedPreferences,
         syncable: Boolean,
+        sharedPrefs: SharedPreferences,
     ) : UserSetting<Int>(
         sharedPrefKey = sharedPrefKey,
         sharedPrefs = sharedPrefs,

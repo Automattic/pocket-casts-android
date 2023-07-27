@@ -75,7 +75,6 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
-    override val skipBackwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipBackwardInSecs()) }
     override val podcastBadgeTypeObservable = BehaviorRelay.create<Settings.BadgeType>().apply { accept(getPodcastBadgeType()) }
     override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
@@ -155,43 +154,20 @@ class SettingsImpl @Inject constructor(
     }
 
     override val skipForwardInSecs = UserSetting.IntFromString(
-        sharedPrefs = sharedPreferences,
         sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
         defaultValue = 30,
         allowNegative = false,
         syncable = true,
+        sharedPrefs = sharedPreferences,
     )
 
-    private fun getSkipAmountInSecs(key: String, defaultValue: String): Int {
-        val value = sharedPreferences.getString(key, defaultValue) ?: defaultValue
-        return try {
-            val valueInt = Integer.parseInt(value)
-            if (valueInt <= 0) defaultValue.toInt() else valueInt
-        } catch (nfe: NumberFormatException) {
-            defaultValue.toInt()
-        }
-    }
-
-    override fun getSkipBackwardInSecs(): Int {
-        return getSkipAmountInSecs(key = Settings.PREFERENCE_SKIP_BACKWARD, defaultValue = Settings.SKIP_BACKWARD_DEFAULT)
-    }
-
-    override fun getSkipBackwardInMs(): Long {
-        return getSkipBackwardInSecs() * 1000L
-    }
-
-    override fun setSkipBackwardInSec(value: Int) {
-        setString(Settings.PREFERENCE_SKIP_BACKWARD, if (value <= 0) Settings.SKIP_BACKWARD_DEFAULT else value.toString())
-        skipBackwardInSecsObservable.accept(value)
-    }
-
-    override fun getSkipBackNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_SKIP_BACK_NEEDS_SYNC, false)
-    }
-
-    override fun setSkipBackNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_SKIP_BACK_NEEDS_SYNC, value)
-    }
+    override val skipBackInSecs: UserSetting<Int> = UserSetting.IntFromString(
+        sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
+        defaultValue = 10,
+        allowNegative = false,
+        syncable = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getMarketingOptIn(): Boolean {
         return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, false)

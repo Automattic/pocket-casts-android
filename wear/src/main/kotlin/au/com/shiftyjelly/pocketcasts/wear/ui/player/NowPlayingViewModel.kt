@@ -52,7 +52,7 @@ class NowPlayingViewModel @Inject constructor(
     val state: StateFlow<State> =
         combine(
             playbackManager.playbackStateRelay.asFlow(),
-            settings.skipBackwardInSecsObservable.asFlow(),
+            settings.skipBackInSecs.flow,
             settings.skipForwardInSecs.flow,
         ) { playbackState, skipBackwardSecs, skipForwardSecs ->
 

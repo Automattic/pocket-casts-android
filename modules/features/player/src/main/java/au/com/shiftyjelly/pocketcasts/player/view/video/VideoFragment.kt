@@ -69,7 +69,7 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
         binding.seekBar.changeListener = this
         binding.toolbar.setNavigationOnClickListener { activity?.finish() }
 
-        binding.skipBackwardInSecs = "${settings.getSkipBackwardInSecs()}"
+        binding.skipBackwardInSecs = "${settings.skipBackInSecs.flow.value}"
         binding.skipForwardInSecs = "${settings.skipForwardInSecs.flow.value}"
 
         binding.playButton.setCircleTintColor(ContextCompat.getColor(context, UR.color.transparent))

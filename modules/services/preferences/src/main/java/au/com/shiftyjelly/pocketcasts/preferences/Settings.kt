@@ -62,7 +62,6 @@ interface Settings {
         const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
-        const val PREFERENCE_SKIP_BACK_NEEDS_SYNC = "skipBackNeedsSync"
 
         const val PREFERENCE_MARKETING_OPT_IN = "marketingOptIn"
         const val PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC = "marketingOptInNeedsSync"
@@ -116,9 +115,6 @@ interface Settings {
         // legacy settings
         const val LEGACY_STORAGE_ON_PHONE = "phone"
         const val LEGACY_STORAGE_ON_SD_CARD = "external"
-
-        const val SKIP_FORWARD_DEFAULT = "30"
-        const val SKIP_BACKWARD_DEFAULT = "10"
 
         const val LAST_MAIN_NAV_SCREEN_OPENED = "last_main_screen"
 
@@ -296,7 +292,6 @@ interface Settings {
     val podcastBadgeTypeObservable: Observable<BadgeType>
     val podcastSortTypeObservable: Observable<PodcastsSortType>
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val skipBackwardInSecsObservable: Observable<Int>
     val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
     val upNextSwipeActionObservable: Observable<UpNextAction>
@@ -332,8 +327,7 @@ interface Settings {
     fun isScreenReaderOn(): Boolean
 
     val skipForwardInSecs: UserSetting<Int>
-    fun getSkipBackwardInSecs(): Int
-    fun getSkipBackwardInMs(): Long
+    val skipBackInSecs: UserSetting<Int>
 
     fun getLastScreenOpened(): String?
     fun setLastScreenOpened(screenId: String)
@@ -515,9 +509,6 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     fun defaultPodcastGrouping(): PodcastGrouping
     fun setDefaultPodcastGrouping(podcastGrouping: PodcastGrouping)
-    fun setSkipBackwardInSec(value: Int)
-    fun setSkipBackNeedsSync(value: Boolean)
-    fun getSkipBackNeedsSync(): Boolean
 
     fun getMarketingOptIn(): Boolean
     fun setMarketingOptIn(value: Boolean)

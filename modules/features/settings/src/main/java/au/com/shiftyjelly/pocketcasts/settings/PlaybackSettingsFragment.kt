@@ -244,16 +244,16 @@ class PlaybackSettingsFragment : BaseFragment() {
                     // Skip back time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_back_time),
-                        saved = settings.skipBackwardInSecsObservable
-                            .subscribeAsState(settings.getSkipBackwardInSecs())
-                            .value,
+                        saved = settings.skipBackInSecs.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_BACK_CHANGED,
                                 mapOf("value" to it)
                             )
-                            settings.setSkipBackNeedsSync(true)
-                            settings.setSkipBackwardInSec(it)
+                            settings.skipBackInSecs.run {
+                                set(it)
+                                needsSync = true
+                            }
                         }
                     )
 
