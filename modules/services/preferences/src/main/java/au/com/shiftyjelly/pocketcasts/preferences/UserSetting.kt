@@ -5,20 +5,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 sealed class UserSetting<T>(
     protected val sharedPrefKey: String,
-    private val syncable: Boolean,
     protected val sharedPrefs: SharedPreferences,
 ) {
 
     var needsSync: Boolean
         get() = sharedPrefs.getBoolean("${sharedPrefKey}NeedsSync", false)
         set(value) {
-            if (syncable) {
-                sharedPrefs.edit().run {
-                    putBoolean("${sharedPrefKey}NeedsSync", value)
-                    apply()
-                }
-            } else {
-                throw IllegalStateException("Cannot set needsSync on a UserSetting ($sharedPrefKey) that is not syncable")
+            sharedPrefs.edit().run {
+                putBoolean("${sharedPrefKey}NeedsSync", value)
+                apply()
             }
         }
 
@@ -41,12 +36,10 @@ sealed class UserSetting<T>(
     class BoolPref(
         sharedPrefKey: String,
         private val defaultValue: Boolean,
-        syncable: Boolean,
         sharedPrefs: SharedPreferences,
     ) : UserSetting<Boolean>(
         sharedPrefKey = sharedPrefKey,
         sharedPrefs = sharedPrefs,
-        syncable = syncable,
     ) {
 
         override fun set(value: Boolean) {
@@ -66,12 +59,10 @@ sealed class UserSetting<T>(
         sharedPrefKey: String,
         private val defaultValue: Int,
         private val allowNegative: Boolean = true,
-        syncable: Boolean,
         sharedPrefs: SharedPreferences,
     ) : UserSetting<Int>(
         sharedPrefKey = sharedPrefKey,
         sharedPrefs = sharedPrefs,
-        syncable = syncable
     ) {
 
         override fun get(): Int {

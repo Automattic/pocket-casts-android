@@ -156,7 +156,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
         defaultValue = 30,
         allowNegative = false,
-        syncable = true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -164,7 +163,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
         defaultValue = 10,
         allowNegative = false,
-        syncable = true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -614,7 +612,6 @@ class SettingsImpl @Inject constructor(
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
-        syncable = false,
         sharedPrefs = sharedPreferences,
     )
 
