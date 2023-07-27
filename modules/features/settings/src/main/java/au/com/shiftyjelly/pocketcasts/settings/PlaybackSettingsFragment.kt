@@ -171,7 +171,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     PodcastEpisodeGrouping(
-                        saved = settings.defaultPodcastGroupingFlow.collectAsState().value,
+                        saved = settings.podcastGroupingDefault.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_CHANGED,
@@ -185,7 +185,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setDefaultPodcastGrouping(it)
+                            settings.podcastGroupingDefault.set(it)
                             showSetAllGroupingDialog(it)
                         }
                     )

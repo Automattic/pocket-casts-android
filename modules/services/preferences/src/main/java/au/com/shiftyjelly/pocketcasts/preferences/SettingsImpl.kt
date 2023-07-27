@@ -86,7 +86,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
     override val defaultMediaNotificationControlsFlow = MutableStateFlow(getMediaNotificationControlItems())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
@@ -1080,14 +1079,15 @@ class SettingsImpl @Inject constructor(
         defaultMediaNotificationControlsFlow.update { items.mapNotNull { MediaNotificationControls.itemForId(it) } }
     }
 
-    override fun defaultPodcastGrouping(): PodcastGrouping {
-        val index = getInt("default_podcast_grouping", 0)
-        return PodcastGrouping.All.getOrNull(index) ?: PodcastGrouping.None
-    }
-
-    override fun setDefaultPodcastGrouping(podcastGrouping: PodcastGrouping) {
-        setInt("default_podcast_grouping", PodcastGrouping.All.indexOf(podcastGrouping))
-        defaultPodcastGroupingFlow.update { podcastGrouping }
+    override val podcastGroupingDefault = run {
+        val default = PodcastGrouping.None
+        UserSetting.PrefFromInt<PodcastGrouping>(
+            sharedPrefKey = "default_podcast_grouping",
+            defaultValue = default,
+            sharedPrefs = sharedPreferences,
+            fromInt = { PodcastGrouping.All.getOrNull(it) ?: default },
+            toInt = { PodcastGrouping.All.indexOf(it) }
+        )
     }
 
     override fun setCloudSortOrder(sortOrder: Settings.CloudSortOrder) {

@@ -301,7 +301,6 @@ interface Settings {
     val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
     val autoAddUpNextLimit: Observable<Int>
 
-    val defaultPodcastGroupingFlow: StateFlow<PodcastGrouping>
     val defaultMediaNotificationControlsFlow: StateFlow<List<MediaNotificationControls>>
     val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
@@ -503,8 +502,7 @@ interface Settings {
     fun getPeriodicSaveTimeMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
-    fun defaultPodcastGrouping(): PodcastGrouping
-    fun setDefaultPodcastGrouping(podcastGrouping: PodcastGrouping)
+    val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     fun getMarketingOptIn(): Boolean
     fun setMarketingOptIn(value: Boolean)
