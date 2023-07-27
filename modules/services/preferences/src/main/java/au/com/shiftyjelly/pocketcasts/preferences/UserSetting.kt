@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 sealed class UserSetting<T>(
     protected val sharedPrefKey: String,
-    protected val sharedPrefs: SharedPreferences,
     private val syncable: Boolean,
+    protected val sharedPrefs: SharedPreferences,
 ) {
 
     var needsSync: Boolean
@@ -53,7 +53,7 @@ sealed class UserSetting<T>(
 
     // This stores an Int preference as a String and only exists for legacy
     // reasons. No new preferences should use this class.
-    open class IntFromString(
+    open class IntFromStringPref(
         sharedPrefKey: String,
         private val defaultValue: Int,
         private val allowNegative: Boolean = true,

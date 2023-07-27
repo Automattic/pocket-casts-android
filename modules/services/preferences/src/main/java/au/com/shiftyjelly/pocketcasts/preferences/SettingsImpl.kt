@@ -153,7 +153,7 @@ class SettingsImpl @Inject constructor(
         return context.isScreenReaderOn()
     }
 
-    override val skipForwardInSecs = UserSetting.IntFromString(
+    override val skipForwardInSecs = UserSetting.IntFromStringPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
         defaultValue = 30,
         allowNegative = false,
@@ -161,7 +161,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val skipBackInSecs: UserSetting<Int> = UserSetting.IntFromString(
+    override val skipBackInSecs: UserSetting<Int> = UserSetting.IntFromStringPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
         defaultValue = 10,
         allowNegative = false,
