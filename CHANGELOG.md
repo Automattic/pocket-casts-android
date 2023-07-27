@@ -5,6 +5,9 @@
         ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
     *   Fixed swiping to open Up Next queue in landscape and on foldables
         ([#1209](https://github.com/Automattic/pocket-casts-android/pull/1209))
+    *   Fixed upgrade flow when signing in with Google account
+        ([#1204](https://github.com/Automattic/pocket-casts-android/pull/1204))
+
 
 7.44
 -----

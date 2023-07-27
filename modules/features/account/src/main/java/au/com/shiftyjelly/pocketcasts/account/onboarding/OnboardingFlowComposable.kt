@@ -125,7 +125,21 @@ private fun Content(
                     if (state.isNewAccount) {
                         onAccountCreated()
                     } else {
-                        exitOnboarding()
+                        when (flow) {
+                            OnboardingFlow.InitialOnboarding,
+                            OnboardingFlow.LoggedOut,
+                            is OnboardingFlow.PlusAccountUpgrade,
+                            is OnboardingFlow.PlusUpsell -> exitOnboarding()
+
+                            is OnboardingFlow.PatronAccountUpgrade,
+                            OnboardingFlow.PlusAccountUpgradeNeedsLogin ->
+                                navController.navigate(
+                                    OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
+                                ) {
+                                    // clear backstack after successful login
+                                    popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+                                }
+                        }
                     }
                 },
             )
