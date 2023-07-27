@@ -42,9 +42,9 @@ data class Bookmark(
         val createdAtYear = calendar.get(Calendar.YEAR)
 
         return if (createdAtYear == currentYear) {
-            "MMM d 'at' h:mm a"
+            "MMM d, h:mm a"
         } else {
-            "MMM d, YYYY 'at' h:mm a"
+            "MMM d, YYYY h:mm a"
         }
     }
 }
