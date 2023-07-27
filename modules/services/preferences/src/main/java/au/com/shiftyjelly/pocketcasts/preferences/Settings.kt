@@ -294,7 +294,6 @@ interface Settings {
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
-    val upNextSwipeActionObservable: Observable<UpNextAction>
     val marketingOptObservable: Observable<Boolean>
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
@@ -489,8 +488,7 @@ interface Settings {
     fun contains(key: String): Boolean
     fun getLastRefreshError(): String?
 
-    fun getUpNextSwipeAction(): UpNextAction
-    fun setUpNextSwipeAction(action: UpNextAction)
+    val upNextSwipe: UserSetting<UpNextAction>
     fun getTapOnUpNextShouldPlay(): Boolean
     fun setTapOnUpNextShouldPlay(value: Boolean)
 

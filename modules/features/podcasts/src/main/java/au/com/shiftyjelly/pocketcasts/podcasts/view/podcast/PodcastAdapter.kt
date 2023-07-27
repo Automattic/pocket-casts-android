@@ -269,7 +269,7 @@ class PodcastAdapter(
             tintColor = ThemeColor.podcastIcon02(theme.activeTheme, tintColor),
             playButtonListener = playButtonListener,
             streamByDefault = settings.streamingMode.flow.value || castConnected,
-            upNextAction = settings.getUpNextSwipeAction(),
+            upNextAction = settings.upNextSwipe.flow.value,
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
             disposables = disposables

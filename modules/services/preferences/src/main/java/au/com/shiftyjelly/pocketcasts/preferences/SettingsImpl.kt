@@ -79,7 +79,6 @@ class SettingsImpl @Inject constructor(
     override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
-    override val upNextSwipeActionObservable = BehaviorRelay.create<Settings.UpNextAction>().apply { accept(getUpNextSwipeAction()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
     override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
@@ -1015,13 +1014,16 @@ class SettingsImpl @Inject constructor(
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value
     }
 
-    override fun getUpNextSwipeAction(): Settings.UpNextAction {
-        return Settings.UpNextAction.values()[getInt("up_next_action", Settings.UpNextAction.PLAY_NEXT.ordinal)]
-    }
+    override val upNextSwipe = object : UserSetting.PrefFromInt<Settings.UpNextAction>(
+        sharedPrefKey = "up_next_action",
+        defaultValue = Settings.UpNextAction.PLAY_NEXT,
+        sharedPrefs = sharedPreferences
+    ) {
+        override fun fromInt(value: Int): Settings.UpNextAction =
+            Settings.UpNextAction.values()[value]
 
-    override fun setUpNextSwipeAction(action: Settings.UpNextAction) {
-        setInt("up_next_action", action.ordinal)
-        upNextSwipeActionObservable.accept(action)
+        override fun toInt(value: Settings.UpNextAction): Int =
+            value.ordinal
     }
 
     override fun getTapOnUpNextShouldPlay(): Boolean {

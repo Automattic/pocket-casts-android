@@ -53,31 +53,31 @@ abstract class UserSetting<T>(
         override fun get(): Boolean = sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
     }
 
-//    abstract class PrefFromInt<T>(
-//        sharedPrefKey: String,
-//        private val defaultValue: T,
-//        sharedPrefs: SharedPreferences,
-//    ) : UserSetting<T>(
-//        sharedPrefKey = sharedPrefKey,
-//        sharedPrefs = sharedPrefs,
-//    ) {
-//        protected abstract fun fromInt(value: Int): T
-//        protected abstract fun toInt(value: T): Int
-//
-//        override fun get(): T {
-//            val persistedInt = sharedPrefs.getInt(sharedPrefKey, toInt(defaultValue))
-//            return fromInt(persistedInt)
-//        }
-//
-//        override fun set(value: T) {
-//            val intValue = toInt(value)
-//            sharedPrefs.edit().run {
-//                putInt(sharedPrefKey, intValue)
-//                apply()
-//            }
-//            updateFlow(value)
-//        }
-//    }
+    abstract class PrefFromInt<T>(
+        sharedPrefKey: String,
+        private val defaultValue: T,
+        sharedPrefs: SharedPreferences,
+    ) : UserSetting<T>(
+        sharedPrefKey = sharedPrefKey,
+        sharedPrefs = sharedPrefs,
+    ) {
+        protected abstract fun fromInt(value: Int): T
+        protected abstract fun toInt(value: T): Int
+
+        override fun get(): T {
+            val persistedInt = sharedPrefs.getInt(sharedPrefKey, toInt(defaultValue))
+            return fromInt(persistedInt)
+        }
+
+        override fun set(value: T) {
+            val intValue = toInt(value)
+            sharedPrefs.edit().run {
+                putInt(sharedPrefKey, intValue)
+                apply()
+            }
+            updateFlow(value)
+        }
+    }
 
     abstract class PrefFromString<T>(
         sharedPrefKey: String,

@@ -65,8 +65,8 @@ class FilterEpisodeListViewModel @Inject constructor(
         this.playlistUUID = playlistUUID
 
         val episodes = Observables.combineLatest(
-            settings.upNextSwipeActionObservable,
-            settings.streamingMode.flow.asObservable(coroutineContext)
+            settings.upNextSwipe.flow.asObservable(coroutineContext),
+            settings.streamingMode.flow.asObservable(coroutineContext),
         )
             .toFlowable(BackpressureStrategy.LATEST)
             .switchMap { playlistManager.observeByUuidAsList(playlistUUID) }

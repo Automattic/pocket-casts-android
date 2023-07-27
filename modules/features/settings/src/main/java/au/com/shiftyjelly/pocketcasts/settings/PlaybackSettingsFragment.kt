@@ -24,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -156,9 +155,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     UpNextSwipe(
-                        saved = settings.upNextSwipeActionObservable
-                            .subscribeAsState(settings.getUpNextSwipeAction())
-                            .value,
+                        saved = settings.upNextSwipe.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED,
@@ -169,7 +166,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setUpNextSwipeAction(it)
+                            settings.upNextSwipe.set(it)
                         }
                     )
 
