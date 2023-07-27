@@ -226,16 +226,18 @@ class PlaybackSettingsFragment : BaseFragment() {
                     // Skip forward time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_forward_time),
-                        saved = settings.skipForwardInSecsObservable
-                            .subscribeAsState(settings.getSkipForwardInSecs())
+                        saved = settings.skipForwardInSecs.flow
+                            .collectAsState()
                             .value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
                                 mapOf("value" to it)
                             )
-                            settings.setSkipForwardNeedsSync(true)
-                            settings.setSkipForwardInSec(it)
+                            settings.skipForwardInSecs.run {
+                                set(it)
+                                needsSync = true
+                            }
                         }
                     )
 

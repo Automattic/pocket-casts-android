@@ -131,7 +131,7 @@ class WidgetManagerImpl @Inject constructor(
     }
 
     private fun updateSkipAmounts(views: RemoteViews, settings: Settings) {
-        val jumpFwdAmount = settings.getSkipForwardInSecs()
+        val jumpFwdAmount = settings.skipForwardInSecs.flow.value
         val jumpBackAmount = settings.getSkipBackwardInSecs()
 
         views.setTextViewText(R.id.widget_skip_back_text, "$jumpBackAmount")

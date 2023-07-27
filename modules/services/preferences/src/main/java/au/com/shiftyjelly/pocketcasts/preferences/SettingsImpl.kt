@@ -75,7 +75,6 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
-    override val skipForwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipForwardInSecs()) }
     override val skipBackwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipBackwardInSecs()) }
     override val podcastBadgeTypeObservable = BehaviorRelay.create<Settings.BadgeType>().apply { accept(getPodcastBadgeType()) }
     override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
@@ -155,9 +154,13 @@ class SettingsImpl @Inject constructor(
         return context.isScreenReaderOn()
     }
 
-    override fun getSkipForwardInSecs(): Int {
-        return getSkipAmountInSecs(key = Settings.PREFERENCE_SKIP_FORWARD, defaultValue = Settings.SKIP_FORWARD_DEFAULT)
-    }
+    override val skipForwardInSecs = UserSetting.IntFromString(
+        sharedPrefs = sharedPreferences,
+        sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
+        defaultValue = 30,
+        allowNegative = false,
+        syncable = true,
+    )
 
     private fun getSkipAmountInSecs(key: String, defaultValue: String): Int {
         val value = sharedPreferences.getString(key, defaultValue) ?: defaultValue
@@ -167,15 +170,6 @@ class SettingsImpl @Inject constructor(
         } catch (nfe: NumberFormatException) {
             defaultValue.toInt()
         }
-    }
-
-    override fun getSkipForwardInMs(): Long {
-        return getSkipForwardInSecs() * 1000L
-    }
-
-    override fun setSkipForwardInSec(value: Int) {
-        setString(Settings.PREFERENCE_SKIP_FORWARD, if (value <= 0) Settings.SKIP_FORWARD_DEFAULT else value.toString())
-        skipForwardInSecsObservable.accept(value)
     }
 
     override fun getSkipBackwardInSecs(): Int {
@@ -189,14 +183,6 @@ class SettingsImpl @Inject constructor(
     override fun setSkipBackwardInSec(value: Int) {
         setString(Settings.PREFERENCE_SKIP_BACKWARD, if (value <= 0) Settings.SKIP_BACKWARD_DEFAULT else value.toString())
         skipBackwardInSecsObservable.accept(value)
-    }
-
-    override fun getSkipForwardNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_SKIP_FORWARD_NEEDS_SYNC, false)
-    }
-
-    override fun setSkipForwardNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_SKIP_FORWARD_NEEDS_SYNC, value)
     }
 
     override fun getSkipBackNeedsSync(): Boolean {

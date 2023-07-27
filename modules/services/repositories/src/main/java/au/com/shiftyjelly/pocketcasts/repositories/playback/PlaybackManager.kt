@@ -710,7 +710,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipForward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipForwardInSecs()) {
+    fun skipForward(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        jumpAmountSeconds: Int = settings.skipForwardInSecs.flow.value,
+    ) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 

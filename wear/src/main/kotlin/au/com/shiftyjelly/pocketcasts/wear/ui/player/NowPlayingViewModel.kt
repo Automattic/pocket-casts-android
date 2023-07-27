@@ -53,7 +53,7 @@ class NowPlayingViewModel @Inject constructor(
         combine(
             playbackManager.playbackStateRelay.asFlow(),
             settings.skipBackwardInSecsObservable.asFlow(),
-            settings.skipForwardInSecsObservable.asFlow(),
+            settings.skipForwardInSecs.flow,
         ) { playbackState, skipBackwardSecs, skipForwardSecs ->
 
             if (playbackState.isEmpty) {
