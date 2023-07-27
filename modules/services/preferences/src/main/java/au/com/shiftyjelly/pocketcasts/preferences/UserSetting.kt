@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 
-sealed class UserSetting<T>(
+abstract class UserSetting<T>(
     protected val sharedPrefKey: String,
     protected val sharedPrefs: SharedPreferences,
 ) {
@@ -53,37 +53,82 @@ sealed class UserSetting<T>(
         override fun get(): Boolean = sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
     }
 
-    // This stores an Int preference as a String and only exists for legacy
-    // reasons. No new preferences should use this class.
-    class IntFromStringPref(
+//    abstract class PrefFromInt<T>(
+//        sharedPrefKey: String,
+//        private val defaultValue: T,
+//        sharedPrefs: SharedPreferences,
+//    ) : UserSetting<T>(
+//        sharedPrefKey = sharedPrefKey,
+//        sharedPrefs = sharedPrefs,
+//    ) {
+//        protected abstract fun fromInt(value: Int): T
+//        protected abstract fun toInt(value: T): Int
+//
+//        override fun get(): T {
+//            val persistedInt = sharedPrefs.getInt(sharedPrefKey, toInt(defaultValue))
+//            return fromInt(persistedInt)
+//        }
+//
+//        override fun set(value: T) {
+//            val intValue = toInt(value)
+//            sharedPrefs.edit().run {
+//                putInt(sharedPrefKey, intValue)
+//                apply()
+//            }
+//            updateFlow(value)
+//        }
+//    }
+
+    abstract class PrefFromString<T>(
         sharedPrefKey: String,
-        private val defaultValue: Int,
-        private val allowNegative: Boolean = true,
+        protected val defaultValue: T,
         sharedPrefs: SharedPreferences,
-    ) : UserSetting<Int>(
+    ) : UserSetting<T>(
         sharedPrefKey = sharedPrefKey,
         sharedPrefs = sharedPrefs,
     ) {
+        private val defaultString = this.toString(defaultValue)
 
-        override fun get(): Int {
-            val defaultAsString = defaultValue.toString()
-            val value = sharedPrefs.getString(sharedPrefKey, defaultAsString)
-                ?: defaultAsString
-            return try {
-                val valueInt = Integer.parseInt(value)
-                if (valueInt <= 0) defaultValue else valueInt
-            } catch (nfe: NumberFormatException) {
-                defaultValue
-            }
+        protected abstract fun fromString(value: String): T
+        protected abstract fun toString(value: T): String
+
+        override fun get(): T {
+
+            val persistedString = sharedPrefs.getString(sharedPrefKey, defaultString) ?: defaultString
+            return fromString(persistedString)
         }
 
-        override fun set(value: Int) {
-            val adjustedValue = if (value <= 0 && !allowNegative) defaultValue else value
+        override fun set(value: T) {
+            val stringValue = toString(value)
             sharedPrefs.edit().run {
-                putString(sharedPrefKey, adjustedValue.toString())
+                putString(sharedPrefKey, stringValue)
                 apply()
             }
             updateFlow(value)
+        }
+
+        // This stores an the skip value Int as a String in shared preferences.
+        class SkipAmount(
+            sharedPrefKey: String,
+            defaultValue: Int,
+            sharedPrefs: SharedPreferences,
+        ) : PrefFromString<Int>(
+            sharedPrefKey = sharedPrefKey,
+            defaultValue = defaultValue,
+            sharedPrefs = sharedPrefs,
+        ) {
+            override fun fromString(value: String): Int =
+                try {
+                    val valueInt = Integer.parseInt(value)
+                    if (valueInt <= 0) defaultValue else valueInt
+                } catch (nfe: NumberFormatException) {
+                    defaultValue
+                }
+
+            override fun toString(value: Int): String {
+                val intValue = if (value <= 0) defaultValue else value
+                return intValue.toString()
+            }
         }
     }
 }
