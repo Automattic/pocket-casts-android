@@ -19,4 +19,5 @@ interface BookmarkManager {
     suspend fun deleteSynced(bookmarkUuid: String)
     suspend fun upsertSynced(bookmark: Bookmark): Bookmark
     fun findBookmarksToSync(): List<Bookmark>
+    fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
 }
