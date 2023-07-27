@@ -33,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -52,16 +54,19 @@ class UserEpisodeViewHolder(
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageLoader: PodcastImageLoader? = null
+    val imageLoader: PodcastImageLoader? = null,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
-    override val swipeLeftIcon: ImageView
-        get() = binding.archiveIcon
     override val leftRightIcon1: ImageView
         get() = binding.leftRightIcon1
     override val leftRightIcon2: ImageView
         get() = binding.leftRightIcon2
+    override val rightLeftIcon1: ImageView
+        get() = binding.rightLeftIcon1
+    override val rightLeftIcon2: ImageView
+        get() = binding.rightLeftIcon2
     override val episode: BaseEpisode?
         get() = binding.episode
     override val positionAdapter: Int
@@ -75,6 +80,8 @@ class UserEpisodeViewHolder(
         object NoArtwork : ViewMode()
         object Artwork : ViewMode()
     }
+
+    override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     val dateFormatter = RelativeDateFormatter(context)
     val context: Context
@@ -105,17 +112,19 @@ class UserEpisodeViewHolder(
                 )
             }
         }
-    override val rightIconDrawableRes: List<EpisodeItemTouchHelper.IconWithBackground>
-        get() {
-            return if (episode?.isArchived == true)
-                listOf(EpisodeItemTouchHelper.IconWithBackground(VR.drawable.ic_delete, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
-            else
-                listOf(EpisodeItemTouchHelper.IconWithBackground(VR.drawable.ic_delete, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
-        }
+    override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground> =
+        listOf(
+            EpisodeItemTouchHelper.IconWithBackground(
+                iconRes = VR.drawable.ic_delete,
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_05)
+            )
+        )
 
     fun setup(episode: UserEpisode, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
+
+        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
         binding.playButtonType = playButtonType

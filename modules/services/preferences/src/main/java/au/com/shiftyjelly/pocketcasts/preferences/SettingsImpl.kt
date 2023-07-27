@@ -504,8 +504,17 @@ class SettingsImpl @Inject constructor(
         return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)
     }
 
-    override fun canDuckAudioWithNotifications(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_OVERRIDE_AUDIO, false)
+    override fun getPlayOverNotification(): PlayOverNotificationSetting {
+        val value = sharedPreferences.getString(Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO, null) ?: legacyPlayOverNotification()
+        return PlayOverNotificationSetting.fromPreferenceString(value)
+    }
+
+    private fun legacyPlayOverNotification(): String {
+        if (sharedPreferences.getBoolean(Settings.PREFERENCE_OVERRIDE_AUDIO_LEGACY, false)) {
+            return PlayOverNotificationSetting.ALWAYS.preferenceInt.toString()
+        }
+
+        return PlayOverNotificationSetting.NEVER.preferenceInt.toString()
     }
 
     override fun hasBlockAlreadyRun(label: String): Boolean {

@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -44,7 +45,8 @@ class UpNextAdapter(
     val fragmentManager: FragmentManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val upNextSource: UpNextSource,
-    private val settings: Settings
+    private val settings: Settings,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
 
@@ -63,7 +65,14 @@ class UpNextAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            R.layout.adapter_up_next -> UpNextEpisodeViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next, parent, false), listener, dateFormatter, imageLoader, episodeManager)
+            R.layout.adapter_up_next -> UpNextEpisodeViewHolder(
+                binding = DataBindingUtil.inflate(inflater, R.layout.adapter_up_next, parent, false),
+                listener = listener,
+                dateFormatter = dateFormatter,
+                imageLoader = imageLoader,
+                episodeManager = episodeManager,
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+            )
             R.layout.adapter_up_next_footer -> HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_footer, parent, false))
             R.layout.adapter_up_next_playing -> PlayingViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_playing, parent, false))
             else -> throw IllegalStateException("Unknown view type in up next")

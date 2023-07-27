@@ -4,6 +4,8 @@
     <item name="tour_background" type="id" />
     <item name="leftRightItem1" type="id" />
     <item name="leftRightItem2" type="id" />
+    <item name="rightLeftItem1" type="id" />
+    <item name="rightLeftItem2" type="id" />
     <item name="menu_markasunplayed" type="id" />
     <item name="menu_unstar" type="id" />
     <item name="menu_undownload" type="id" />

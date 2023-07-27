@@ -83,7 +83,8 @@ interface Settings {
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
         const val PREFERENCE_WARN_WHEN_NOT_ON_WIFI = "warnWhenNotOnWifi"
         const val PREFERENCE_SYNC_ON_METERED = "SyncWhenOnMetered"
-        const val PREFERENCE_OVERRIDE_AUDIO = "overrideAudioInterruption"
+        const val PREFERENCE_OVERRIDE_AUDIO_LEGACY = "overrideAudioInterruption"
+        const val PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO = "overrideNotificationAudio"
         const val PREFERENCE_USE_EMBEDDED_ARTWORK = "useEmbeddedArtwork"
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
@@ -396,7 +397,7 @@ interface Settings {
 
     fun setPopularPodcastCountryCode(code: String)
 
-    fun canDuckAudioWithNotifications(): Boolean
+    fun getPlayOverNotification(): PlayOverNotificationSetting
 
     fun hasBlockAlreadyRun(label: String): Boolean
     fun setBlockAlreadyRun(label: String, hasRun: Boolean)

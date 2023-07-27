@@ -28,6 +28,7 @@ import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -599,6 +600,6 @@ class EpisodeFragment : BaseDialogFragment() {
             context,
             shouldShowPodcast = false,
             analyticsTracker = analyticsTracker,
-        ).show()
+        ).show(sourceView = SourceView.EPISODE_DETAILS)
     }
 }

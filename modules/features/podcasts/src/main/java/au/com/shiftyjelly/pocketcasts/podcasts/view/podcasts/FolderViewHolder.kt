@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -28,12 +27,6 @@ class FolderViewHolder(
     val podcastsLayout: Int,
     val onFolderClick: (Folder) -> Unit
 ) : RecyclerView.ViewHolder(composeView) {
-
-    init {
-        composeView.setViewCompositionStrategy(
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-        )
-    }
 
     fun bind(folder: Folder, podcasts: List<Podcast>, badgeType: Settings.BadgeType, podcastUuidToBadge: Map<String, Int>) {
         val badgeCount = calculateFolderBadge(podcasts, badgeType, podcastUuidToBadge)

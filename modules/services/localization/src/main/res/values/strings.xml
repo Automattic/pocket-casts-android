@@ -1136,7 +1136,9 @@
     <string name="settings_notification_hide_on_pause">Hide playback notification on pause</string>
     <string name="settings_notification_notify_me">Notify me</string>
     <string name="settings_notification_play_over">Play over notifications</string>
-    <string name="settings_notification_play_over_summary">Keep playing even when other apps, like notifications or navigation, play sounds.</string>
+    <string name="settings_notification_play_over_never">Never</string>
+    <string name="settings_notification_play_over_duck">Duck volume</string>
+    <string name="settings_notification_play_over_always">Always</string>
     <string name="settings_notification_sound">Notification sound</string>
     <string name="settings_notification_sound_summary">Notification sound played.</string>
     <string name="settings_notification_actions_title">Select 3 actions</string>
