@@ -79,6 +79,7 @@ dependencies {
     implementation project(':modules:services:preferences')
     implementation project(':modules:services:utils')
     implementation project(':modules:services:ui')
+    implementation project(':modules:services:sharedtest')
     implementation project(':modules:services:compose')
     implementation project(':modules:services:views')
     implementation project(':modules:services:model')

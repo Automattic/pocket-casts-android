@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    implementation project(':modules:services:sharedtest')
     implementation project(':modules:services:analytics')
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
