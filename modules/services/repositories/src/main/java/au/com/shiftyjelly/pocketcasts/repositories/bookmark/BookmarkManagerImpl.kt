@@ -7,6 +7,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -96,6 +99,16 @@ class BookmarkManagerImpl @Inject constructor(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
             )
+    }
+
+    /**
+     * Find all bookmarks for the given podcast.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun findPodcastBookmarksFlow(
+        podcastUuid: String,
+    ) = bookmarkDao.findByPodcastFlow(podcastUuid = podcastUuid).flatMapLatest { helper ->
+        flowOf(helper.map { it.toBookmark() })
     }
 
     /**
