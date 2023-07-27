@@ -70,34 +70,28 @@ fun BookmarkItem(
                 }
             }
 
-            Column(Modifier.Companion.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp)
+            ) {
                 TextC70(
                     text = bookmark.episodeTitle,
                     maxLines = 1,
-                    modifier = Modifier.padding(
-                        top = 8.dp,
-                        start = 16.dp
-                    ),
+                    modifier = Modifier.padding(top = 8.dp),
                     isUpperCase = false,
                 )
 
                 TextH40(
                     text = bookmark.title,
                     maxLines = 2,
-                    modifier = Modifier.padding(
-                        top = 4.dp,
-                        start = 16.dp
-                    ),
+                    modifier = Modifier.padding(top = 4.dp),
                 )
 
                 TextC70(
                     text = createdAtText,
                     maxLines = 1,
-                    modifier = Modifier.padding(
-                        top = 4.dp,
-                        bottom = 8.dp,
-                        start = 16.dp
-                    ),
+                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                     isUpperCase = false,
                 )
             }
