@@ -1014,17 +1014,13 @@ class SettingsImpl @Inject constructor(
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value
     }
 
-    override val upNextSwipe = object : UserSetting.PrefFromInt<Settings.UpNextAction>(
+    override val upNextSwipe = UserSetting.PrefFromInt(
         sharedPrefKey = "up_next_action",
         defaultValue = Settings.UpNextAction.PLAY_NEXT,
-        sharedPrefs = sharedPreferences
-    ) {
-        override fun fromInt(value: Int): Settings.UpNextAction =
-            Settings.UpNextAction.values()[value]
-
-        override fun toInt(value: Settings.UpNextAction): Int =
-            value.ordinal
-    }
+        sharedPrefs = sharedPreferences,
+        fromInt = { Settings.UpNextAction.values()[it] },
+        toInt = { it.ordinal }
+    )
 
     override fun getTapOnUpNextShouldPlay(): Boolean {
         return getBoolean("tap_on_up_next_should_play", false)
