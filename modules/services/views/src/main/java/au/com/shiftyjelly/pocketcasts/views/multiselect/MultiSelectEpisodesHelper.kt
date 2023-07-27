@@ -51,7 +51,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics
 ) : MultiSelectHelper<BaseEpisode>() {
-    override val maxToolbarIcons = 2
+    override val maxToolbarIcons = 4
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = settings.multiSelectItemsObservable
         .toFlowable(BackpressureStrategy.LATEST)
