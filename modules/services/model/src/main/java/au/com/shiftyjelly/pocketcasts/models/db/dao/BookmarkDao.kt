@@ -63,7 +63,15 @@ abstract class BookmarkDao {
         deleted: Boolean = false,
     ): Flow<List<PodcastBookmark>>
 
-    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND UPPER(title) LIKE UPPER(:title) AND deleted = :deleted")
+    @Query(
+        """SELECT bookmarks.*
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid 
+            AND UPPER(bookmarks.title) LIKE UPPER(:title)
+            OR UPPER(podcast_episodes.title) LIKE UPPER(:title)
+            AND deleted = :deleted"""
+    )
     abstract fun searchInPodcastByTitle(
         podcastUuid: String,
         title: String,
