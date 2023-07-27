@@ -66,8 +66,8 @@ abstract class BookmarkDao {
     @Query(
         """SELECT bookmarks.*
             FROM bookmarks
-            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
-            WHERE podcast_uuid = :podcastUuid 
+            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE bookmarks.podcast_uuid = :podcastUuid 
             AND UPPER(bookmarks.title) LIKE UPPER(:title)
             OR UPPER(podcast_episodes.title) LIKE UPPER(:title)
             AND deleted = :deleted"""
