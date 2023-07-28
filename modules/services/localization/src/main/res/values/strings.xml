@@ -1188,7 +1188,9 @@
     <string name="settings_storage_android_10_custom">We can no longer support custom folders for storage on Android 10+. We have switched your storage option back to your phones default.</string>
     <string name="settings_storage_background_refresh">Background refresh</string>
     <string name="settings_storage_background_refresh_off">Pocket Casts will only refresh when you open the app.\n\nEpisode notifications and auto downloads will only happen when you open the app.</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts will only sync your account when you open the app.</string>
     <string name="settings_storage_background_refresh_on">Pocket Casts will periodically check for new episodes and auto downloads in the background.</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts will periodically sync your account in the background.</string>
     <string name="settings_storage_clear_cache">Clearing download cache</string>
     <string name="settings_storage_clear_download_cache">Clear download cache</string>
     <string name="settings_storage_custom_folder">Custom Folder</string>
