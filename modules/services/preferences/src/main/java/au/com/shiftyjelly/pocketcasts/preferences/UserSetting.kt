@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 abstract class UserSetting<T>(
     protected val sharedPrefKey: String,
@@ -22,7 +23,7 @@ abstract class UserSetting<T>(
 
     private val _flow by lazy { MutableStateFlow(get()) }
     // lazy because the class needs to initialize before calling get()
-    val flow by lazy { _flow }
+    val flow: StateFlow<T> by lazy { _flow }
 
     // external callers should use the flow.value to get the current value or, even
     // better, use the flow itself to observe changes.
