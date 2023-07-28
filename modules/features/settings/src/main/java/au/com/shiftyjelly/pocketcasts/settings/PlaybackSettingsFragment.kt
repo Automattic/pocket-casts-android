@@ -264,13 +264,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     OpenPlayerAutomatically(
-                        saved = settings.openPlayerAutomaticallyFlow.collectAsState().value,
+                        saved = settings.openPlayerAutomatically.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setOpenPlayerAutomatically(it)
+                            settings.openPlayerAutomatically.set(it)
                         }
                     )
 

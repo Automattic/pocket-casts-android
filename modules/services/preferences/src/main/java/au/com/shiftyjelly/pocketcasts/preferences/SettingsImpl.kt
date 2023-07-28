@@ -86,7 +86,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
     override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
@@ -614,14 +613,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun openPlayerAutomatically(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)
-    }
-
-    override fun setOpenPlayerAutomatically(newValue: Boolean) {
-        setBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, newValue)
-        openPlayerAutomaticallyFlow.update { newValue }
-    }
+    override val openPlayerAutomatically = UserSetting.BoolPref(
+        sharedPrefKey = "openPlayerAutomatically",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED, true)
