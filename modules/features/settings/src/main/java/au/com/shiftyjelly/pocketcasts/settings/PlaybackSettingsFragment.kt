@@ -286,13 +286,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     PlayUpNextOnTap(
-                        saved = settings.tapOnUpNextShouldPlayFlow.collectAsState().value,
+                        saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setTapOnUpNextShouldPlay(it)
+                            settings.tapOnUpNextShouldPlay.set(it)
                         }
                     )
 
@@ -300,7 +300,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                     // in the list. If it's position is changed, make sure you update the handling when
                     // we scroll to this item as well.
                     AutoPlayNextOnEmpty(
-                        saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
+                        saved = settings.autoPlayNextEpisodeOnEmpty.flow.collectAsState().value,
                         showFlashWithDelay = if (scrollToAutoPlay) {
                             // Have flash occur after scroll to autoplay
                             scrollToAutoPlayDelay * 2
@@ -312,7 +312,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setAutoPlayNextEpisodeOnEmpty(it)
+                            settings.autoPlayNextEpisodeOnEmpty.set(it)
                         }
                     )
                 }

@@ -86,9 +86,7 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
     override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
-    override val autoPlayNextEpisodeOnEmptyFlow = MutableStateFlow(getAutoPlayNextEpisodeOnEmpty())
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
     override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
@@ -950,19 +948,15 @@ class SettingsImpl @Inject constructor(
         sharedPreferences.edit().putStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, excluded.toSet()).apply()
     }
 
-    override fun getAutoPlayNextEpisodeOnEmpty(): Boolean {
-        val defaultValue = when (Util.getAppPlatform(context)) {
+    override val autoPlayNextEpisodeOnEmpty = UserSetting.BoolPref(
+        sharedPrefKey = "autoUpNextEmpty",
+        defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
-            AppPlatform.Phone -> false
+            AppPlatform.Phone,
             AppPlatform.WearOs -> false
-        }
-        return getBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, defaultValue)
-    }
-
-    override fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean) {
-        setBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, enabled)
-        autoPlayNextEpisodeOnEmptyFlow.update { enabled }
-    }
+        },
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getAutoArchiveIncludeStarred(): Boolean {
         return getBoolean(Settings.AUTO_ARCHIVE_INCLUDE_STARRED, false)
@@ -1007,14 +1001,11 @@ class SettingsImpl @Inject constructor(
         toInt = { it.ordinal }
     )
 
-    override fun getTapOnUpNextShouldPlay(): Boolean {
-        return getBoolean("tap_on_up_next_should_play", false)
-    }
-
-    override fun setTapOnUpNextShouldPlay(value: Boolean) {
-        setBoolean("tap_on_up_next_should_play", value)
-        tapOnUpNextShouldPlayFlow.update { value }
-    }
+    override val tapOnUpNextShouldPlay = UserSetting.BoolPref(
+        sharedPrefKey = "tap_on_up_next_should_play",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
         return Settings.HeadphoneAction.values()[getInt("headphone_controls_next_action", Settings.HeadphoneAction.SKIP_FORWARD.ordinal)]

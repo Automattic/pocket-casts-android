@@ -98,7 +98,6 @@ interface Settings {
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
 
-        const val PREFERENCE_AUTO_PLAY_ON_EMPTY = "autoUpNextEmpty"
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
@@ -299,9 +298,7 @@ interface Settings {
     val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
     val autoAddUpNextLimit: Observable<Int>
 
-    val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
     val customMediaActionsVisibilityFlow: StateFlow<Boolean>
-    val autoPlayNextEpisodeOnEmptyFlow: StateFlow<Boolean>
     val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
     val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
@@ -477,8 +474,7 @@ interface Settings {
     fun getLastRefreshError(): String?
 
     val upNextSwipe: UserSetting<UpNextAction>
-    fun getTapOnUpNextShouldPlay(): Boolean
-    fun setTapOnUpNextShouldPlay(value: Boolean)
+    val tapOnUpNextShouldPlay: UserSetting<Boolean>
 
     fun getHeadphoneControlsNextAction(): HeadphoneAction
     fun setHeadphoneControlsNextAction(action: HeadphoneAction)
@@ -545,8 +541,7 @@ interface Settings {
     fun getTrialFinishedSeen(): Boolean
     fun getAutoSubscribeToPlayed(): Boolean
     fun getAutoShowPlayed(): Boolean
-    fun getAutoPlayNextEpisodeOnEmpty(): Boolean
-    fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean)
+    val autoPlayNextEpisodeOnEmpty: UserSetting<Boolean>
     val showArchivedDefault: UserSetting<Boolean>
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
     fun setMultiSelectItems(items: List<Int>)

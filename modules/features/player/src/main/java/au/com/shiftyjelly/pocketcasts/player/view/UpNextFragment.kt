@@ -347,7 +347,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
-        if (settings.getTapOnUpNextShouldPlay()) {
+        if (settings.tapOnUpNextShouldPlay.flow.value) {
             playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
         } else {
             (activity as? FragmentHostListener)?.openEpisodeDialog(
@@ -360,7 +360,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onEpisodeActionsLongPress(episodeUuid: String, podcastUuid: String?) {
-        if (settings.getTapOnUpNextShouldPlay()) {
+        if (settings.tapOnUpNextShouldPlay.flow.value) {
             (activity as? FragmentHostListener)?.openEpisodeDialog(
                 episodeUuid = episodeUuid,
                 source = EpisodeViewSource.UP_NEXT,

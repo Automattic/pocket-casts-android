@@ -226,7 +226,7 @@ open class PlaybackManager @Inject constructor(
             return nextEpisode
         }
 
-        if (!settings.getAutoPlayNextEpisodeOnEmpty()) {
+        if (!settings.autoPlayNextEpisodeOnEmpty.flow.value) {
             return null
         }
 
