@@ -275,13 +275,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     IntelligentPlaybackResumption(
-                        saved = settings.intelligentPlaybackResumptionFlow.collectAsState().value,
+                        saved = settings.intelligentPlaybackResumption.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setIntelligentPlaybackResumption(it)
+                            settings.intelligentPlaybackResumption.set(it)
                         }
                     )
 

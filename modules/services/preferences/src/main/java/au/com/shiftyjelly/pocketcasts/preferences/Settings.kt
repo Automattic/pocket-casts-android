@@ -299,7 +299,6 @@ interface Settings {
     val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
     val autoAddUpNextLimit: Observable<Int>
 
-    val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
     val customMediaActionsVisibilityFlow: StateFlow<Boolean>
     val autoPlayNextEpisodeOnEmptyFlow: StateFlow<Boolean>
@@ -558,8 +557,7 @@ interface Settings {
     fun getLastPausedUUID(): String?
     fun setLastPausedAt(pausedAt: Int)
     fun getLastPausedAt(): Int?
-    fun getIntelligentPlaybackResumption(): Boolean
-    fun setIntelligentPlaybackResumption(value: Boolean)
+    val intelligentPlaybackResumption: UserSetting<Boolean>
     fun getAutoAddUpNextLimit(): Int
     fun setAutoAddUpNextLimit(limit: Int)
     fun setAutoAddUpNextLimitBehaviour(value: AutoAddUpNextLimitBehaviour)

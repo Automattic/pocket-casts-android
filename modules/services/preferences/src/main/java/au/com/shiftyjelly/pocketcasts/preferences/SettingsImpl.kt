@@ -86,7 +86,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
     override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
     override val autoPlayNextEpisodeOnEmptyFlow = MutableStateFlow(getAutoPlayNextEpisodeOnEmpty())
@@ -856,14 +855,11 @@ class SettingsImpl @Inject constructor(
         return if (lastPausedAt != 0) lastPausedAt else null
     }
 
-    override fun getIntelligentPlaybackResumption(): Boolean {
-        return getBoolean(Settings.INTELLIGENT_PLAYBACK_RESUMPTION, true)
-    }
-
-    override fun setIntelligentPlaybackResumption(value: Boolean) {
-        setBoolean(Settings.INTELLIGENT_PLAYBACK_RESUMPTION, value)
-        intelligentPlaybackResumptionFlow.update { value }
-    }
+    override val intelligentPlaybackResumption = UserSetting.BoolPref(
+        sharedPrefKey = Settings.INTELLIGENT_PLAYBACK_RESUMPTION,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     private fun setDate(preference: String, date: Date?) {
         val editor = sharedPreferences.edit()
