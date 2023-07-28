@@ -65,7 +65,6 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
-        private const val CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY = "CustomMediaActionsVisibleKey"
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
@@ -86,7 +85,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
     override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
@@ -1328,13 +1326,11 @@ class SettingsImpl @Inject constructor(
         setBoolean(DONE_INITIAL_ONBOARDING_KEY, true)
     }
 
-    override fun areCustomMediaActionsVisible() =
-        getBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, true)
-
-    override fun setCustomMediaActionsVisible(value: Boolean) {
-        setBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, value)
-        customMediaActionsVisibilityFlow.update { value }
-    }
+    override val customMediaActionsVisibility = UserSetting.BoolPref(
+        sharedPrefKey = "CustomMediaActionsVisibleKey",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun isNotificationsDisabledMessageShown() =
         getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)

@@ -298,7 +298,6 @@ interface Settings {
     val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
     val autoAddUpNextLimit: Observable<Int>
 
-    val customMediaActionsVisibilityFlow: StateFlow<Boolean>
     val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
     val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
@@ -585,8 +584,7 @@ interface Settings {
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
 
-    fun areCustomMediaActionsVisible(): Boolean
-    fun setCustomMediaActionsVisible(value: Boolean)
+    val customMediaActionsVisibility: UserSetting<Boolean>
 
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)
