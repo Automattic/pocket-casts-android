@@ -86,7 +86,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val defaultMediaNotificationControlsFlow = MutableStateFlow(getMediaNotificationControlItems())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
@@ -1062,18 +1061,13 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getMediaNotificationControlItems(): List<MediaNotificationControls> {
-        var items = getStringList("media_notification_controls_action")
-
-        if (items.isEmpty())
-            items = MediaNotificationControls.All.map { it.key }
-        return items.mapNotNull { MediaNotificationControls.itemForId(it) }
-    }
-
-    override fun setMediaNotificationControlItems(items: List<String>) {
-        setStringList("media_notification_controls_action", items)
-        defaultMediaNotificationControlsFlow.update { items.mapNotNull { MediaNotificationControls.itemForId(it) } }
-    }
+    override val mediaControlItems = UserSetting.PrefListFromString<MediaNotificationControls>(
+        sharedPrefKey = "media_notification_controls_action",
+        sharedPrefs = sharedPreferences,
+        defaultValue = MediaNotificationControls.All,
+        fromString = { MediaNotificationControls.itemForId(it) },
+        toString = { it.key }
+    )
 
     override val podcastGroupingDefault = run {
         val default = PodcastGrouping.None

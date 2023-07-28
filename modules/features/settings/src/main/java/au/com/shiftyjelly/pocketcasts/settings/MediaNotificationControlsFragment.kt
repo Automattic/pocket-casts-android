@@ -120,7 +120,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.defaultMediaNotificationControlsFlow.collect {
+                settings.mediaControlItems.flow.collect {
                     val itemsPlusTitles = mutableListOf<Any>()
                     itemsPlusTitles.addAll(it)
                     itemsPlusTitles.add(3, otherActionsTitle)
@@ -282,7 +282,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         // Reset mediaActionMove now that we've tracked it
         mediaActionMove = null
 
-        settings.setMediaNotificationControlItems(items.filterIsInstance<Settings.MediaNotificationControls>().map { it.key })
+        settings.mediaControlItems.set(items.filterIsInstance<Settings.MediaNotificationControls>())
     }
 }
 

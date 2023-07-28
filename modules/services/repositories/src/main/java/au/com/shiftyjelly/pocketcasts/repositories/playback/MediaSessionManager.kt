@@ -142,7 +142,7 @@ class MediaSessionManager(
 
     private fun observeMediaNotificationControls() {
         launch {
-            settings.defaultMediaNotificationControlsFlow.collect {
+            settings.mediaControlItems.flow.collect {
                 withContext(Dispatchers.Main) {
                     val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
                     updatePlaybackState(playbackStateCompat)
@@ -376,7 +376,7 @@ class MediaSessionManager(
         }
 
         val visibleCount = if (settings.areCustomMediaActionsVisible()) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
-        settings.getMediaNotificationControlItems().take(visibleCount).forEach { mediaControl ->
+        settings.mediaControlItems.flow.value.take(visibleCount).forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)

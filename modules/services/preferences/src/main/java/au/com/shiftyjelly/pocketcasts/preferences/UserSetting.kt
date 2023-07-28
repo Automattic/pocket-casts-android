@@ -129,4 +129,38 @@ abstract class UserSetting<T>(
             }
         )
     }
+
+    class PrefListFromString<T>(
+        sharedPrefKey: String,
+        sharedPrefs: SharedPreferences,
+        private val defaultValue: List<T>,
+        private val fromString: (String) -> T?,
+        private val toString: (T) -> String,
+    ) : UserSetting<List<T>>(
+        sharedPrefKey = sharedPrefKey,
+        sharedPrefs = sharedPrefs,
+    ) {
+
+        override fun get(): List<T> {
+            val strValue = sharedPrefs.getString(sharedPrefKey, "")
+            return if (strValue.isNullOrEmpty()) {
+                defaultValue
+            } else {
+                val commaSeparatedString = strValue.split(",")
+                commaSeparatedString.mapNotNull(fromString)
+            }
+        }
+
+        override fun set(value: List<T>) {
+            sharedPrefs.edit().run {
+                val commaSeparatedString = value.joinToString(
+                    separator = ",",
+                    transform = toString
+                )
+                putString(sharedPrefKey, commaSeparatedString)
+                apply()
+            }
+            super.set(value)
+        }
+    }
 }
