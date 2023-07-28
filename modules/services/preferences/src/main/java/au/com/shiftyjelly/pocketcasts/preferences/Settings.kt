@@ -71,8 +71,6 @@ interface Settings {
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
-        const val OLD_PREFERENCE_EPISODE_NOTIFICATIONS_ON = "episodeNotificationsOn"
-        const val PREFERENCE_EPISODE_NOTIFICATIONS_ON_DEFAULT = false
         const val PREFERENCE_NOTIFICATION_RINGTONE = "notificationRingtone"
         const val PREFERENCE_NOTIFICATION_VIBRATE = "notificationVibrate"
         const val PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT = "2"
@@ -341,7 +339,7 @@ interface Settings {
 
     fun isNotificationVibrateOn(): Boolean
 
-    fun oldNotifyRefreshPodcast(): Boolean
+    val notifyRefreshPodcast: UserSetting<Boolean>
 
     fun usingCustomFolderStorage(): Boolean
 

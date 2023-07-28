@@ -305,12 +305,11 @@ class SettingsImpl @Inject constructor(
         return vibrate == 2 || vibrate == 1 && !isSoundOn()
     }
 
-    override fun oldNotifyRefreshPodcast(): Boolean {
-        return sharedPreferences.getBoolean(
-            Settings.OLD_PREFERENCE_EPISODE_NOTIFICATIONS_ON,
-            Settings.PREFERENCE_EPISODE_NOTIFICATIONS_ON_DEFAULT
-        )
-    }
+    override val notifyRefreshPodcast = UserSetting.BoolPref(
+        sharedPrefKey = "episodeNotificationsOn",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun usingCustomFolderStorage(): Boolean {
         val storageChoice = getStorageChoice()
