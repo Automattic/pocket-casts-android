@@ -434,7 +434,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
     }
 
-    private val onTabClicked: (tab: PodcastViewModel.PodcastTab) -> Unit = { tab ->
+    private val onTabClicked: (tab: PodcastTab) -> Unit = { tab ->
         viewModel.onTabClicked(tab)
     }
 
@@ -739,6 +739,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                         )
                         PodcastTab.BOOKMARKS -> adapter?.setBookmarks(
                             bookmarks = state.bookmarks,
+                            searchTerm = state.searchBookmarkTerm,
                         )
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {

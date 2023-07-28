@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderB
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
@@ -73,6 +74,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
             oldItem is PodcastAdapter.EpisodeHeader && newItem is PodcastAdapter.EpisodeHeader -> true
             oldItem is PodcastEpisode && newItem is PodcastEpisode -> oldItem.uuid == newItem.uuid
             oldItem is Bookmark && newItem is Bookmark -> oldItem.uuid == newItem.uuid
+            oldItem is PodcastAdapter.BookmarkHeader && newItem is PodcastAdapter.BookmarkHeader -> true
             oldItem is PodcastAdapter.DividerRow && newItem is PodcastAdapter.DividerRow -> oldItem.groupIndex == newItem.groupIndex
             else -> oldItem == newItem
         }
@@ -91,6 +93,8 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
                         oldItem.showingArchived == newItem.showingArchived &&
                         oldItem.episodeLimit == newItem.episodeLimit
                     )
+        } else if (oldItem is PodcastAdapter.BookmarkHeader && newItem is PodcastAdapter.BookmarkHeader) {
+            return oldItem.bookmarksCount == newItem.bookmarksCount
         }
         return oldItem == newItem
     }
@@ -132,10 +136,17 @@ class PodcastAdapter(
         val selectedTab: PodcastTab,
         val onTabClicked: (PodcastTab) -> Unit,
     )
+    data class BookmarkHeader(
+        val bookmarksCount: Int,
+        val searchTerm: String,
+        val onSearchFocus: () -> Unit,
+        val onSearchQueryChanged: (String) -> Unit,
+    )
 
     companion object {
         private const val VIEW_TYPE_TABS = 100
         private const val VIEW_TYPE_BOOKMARKS = 101
+        private const val VIEW_TYPE_BOOKMARK_HEADER = 102
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
@@ -169,6 +180,7 @@ class PodcastAdapter(
             VIEW_TYPE_NO_EPISODE -> NoEpisodesViewHolder(inflater.inflate(R.layout.adapter_no_episodes, parent, false))
             VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
                 viewMode = EpisodeViewHolder.ViewMode.NoArtwork,
@@ -190,6 +202,7 @@ class PodcastAdapter(
             is NoEpisodesViewHolder -> bindNoEpisodesMessage(holder, position)
             is DividerViewHolder -> bindDividerRow(holder, position)
             is BookmarkViewHolder -> holder.bind(getItem(position) as Bookmark, onBookmarkPlayClicked)
+            is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
         }
     }
 
@@ -388,12 +401,14 @@ class PodcastAdapter(
 
     fun setBookmarks(
         bookmarks: List<Bookmark>,
+        searchTerm: String,
     ) {
         val content = mutableListOf<Any>().apply {
             add(Podcast())
             if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
             }
+            add(BookmarkHeader(bookmarks.size, searchTerm, onSearchFocus, onSearchQueryChanged))
             addAll(bookmarks)
         }
         submitList(content)
@@ -413,6 +428,7 @@ class PodcastAdapter(
             is DividerRow -> R.layout.adapter_divider_row
             is TabsHeader -> VIEW_TYPE_TABS
             is Bookmark -> VIEW_TYPE_BOOKMARKS
+            is BookmarkHeader -> VIEW_TYPE_BOOKMARK_HEADER
             else -> R.layout.adapter_episode
         }
     }
@@ -425,6 +441,7 @@ class PodcastAdapter(
             is EpisodeLimitRow -> Long.MAX_VALUE - 2
             is NoEpisodeMessage -> Long.MAX_VALUE - 3
             is TabsHeader -> Long.MAX_VALUE - 4
+            is BookmarkHeader -> Long.MAX_VALUE - 5
             is DividerRow -> item.groupIndex.toLong()
             is PodcastEpisode -> item.adapterId
             is Bookmark -> item.adapterId

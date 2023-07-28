@@ -1687,8 +1687,8 @@
     <string name="bookmarks_create_instructions">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
     <string name="bookmarks_not_found">No bookmarks yet</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
-    <string name="bookmarks_plural">%s bookmarks</string>
-    <string name="bookmarks_singular">%s bookmark</string>
+    <string name="bookmarks_plural">%d bookmarks</string>
+    <string name="bookmarks_singular">1 bookmark</string>
     <string name="bookmarks_delete_plural">Delete bookmarks</string>
     <string name="bookmarks_delete_singular">Delete bookmark</string>
     <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
@@ -1696,6 +1696,7 @@
     <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
     <string name="bookmarks_select_option">Select bookmarks</string>
+    <string name="bookmarks_search">Search bookmark</string>
     <string name="bookmarks_sort_option" translatable="false">@string/sort_by</string>
     <string name="bookmarks_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
     <string name="bookmarks_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
