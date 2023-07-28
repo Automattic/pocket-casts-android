@@ -111,7 +111,7 @@ class BookmarkManagerImpl @Inject constructor(
         flowOf(helper.map { it.toBookmark() })
     }
 
-    override fun searchInPodcastByTitle(podcastUuid: String, title: String) =
+    override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
         bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
 
     /**

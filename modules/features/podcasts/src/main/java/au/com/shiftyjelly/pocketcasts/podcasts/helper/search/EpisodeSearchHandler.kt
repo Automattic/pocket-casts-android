@@ -17,7 +17,7 @@ class EpisodeSearchHandler @Inject constructor(
     private val cacheServerManager: PodcastCacheServerManagerImpl,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : SearchHandler<BaseEpisode>() {
-    override val searchDebounce = settings.getEpisodeSearchDebounceMs()
+    private val searchDebounce = settings.getEpisodeSearchDebounceMs()
 
     override fun getSearchResultsObservable(podcastUuid: String): Observable<SearchResult> =
         searchQueryRelay.debounce { // Only debounce when search has a value otherwise it slows down loading the pages

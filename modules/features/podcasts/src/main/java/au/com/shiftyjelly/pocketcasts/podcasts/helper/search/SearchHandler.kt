@@ -5,7 +5,6 @@ import io.reactivex.Observable
 
 abstract class SearchHandler<T> {
     private var searchTerm = ""
-    abstract val searchDebounce: Long
     protected val searchQueryRelay = BehaviorRelay.create<String>()
         .apply { accept("") }
 

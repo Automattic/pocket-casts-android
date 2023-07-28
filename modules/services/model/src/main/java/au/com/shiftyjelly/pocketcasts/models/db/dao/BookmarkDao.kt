@@ -71,7 +71,7 @@ abstract class BookmarkDao {
             AND (UPPER(bookmarks.title) LIKE UPPER(:title) OR UPPER(podcast_episodes.title) LIKE UPPER(:title))
             AND deleted = :deleted"""
     )
-    abstract fun searchInPodcastByTitle(
+    abstract suspend fun searchInPodcastByTitle(
         podcastUuid: String,
         title: String,
         deleted: Boolean = false,
