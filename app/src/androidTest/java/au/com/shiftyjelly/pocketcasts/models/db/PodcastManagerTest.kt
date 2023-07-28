@@ -1,11 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -17,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import com.squareup.moshi.Moshi
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -42,7 +44,15 @@ class PodcastManagerTest {
 
         val episodeManager = mock<EpisodeManager>()
         val playlistManager = mock<PlaylistManager>()
-        val settings = mock<Settings>()
+
+        val settings = SettingsImpl(
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
+            privatePreferences = PreferenceManager.getDefaultSharedPreferences(context),
+            context = context,
+            firebaseRemoteConfig = mock(),
+            moshi = Moshi.Builder().build(),
+        )
+
         val syncManagerSignedOut = mock<SyncManager> {
             on { isLoggedIn() } doReturn false
         }
