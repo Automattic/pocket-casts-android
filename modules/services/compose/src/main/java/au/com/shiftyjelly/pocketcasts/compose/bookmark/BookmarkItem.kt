@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun BookmarkItem(
     bookmark: Bookmark,
+    isMultiSelecting: () -> Boolean,
+    isSelected: (Bookmark) -> Boolean,
     onPlayClick: (Bookmark) -> Unit,
     modifier: Modifier = Modifier,
     showIcon: Boolean = true,
@@ -51,13 +55,27 @@ fun BookmarkItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.theme.colors.primaryUi02)
+                .background(
+                    color = if (isMultiSelecting() && isSelected(bookmark)) {
+                        MaterialTheme.theme.colors.primaryUi02Selected
+                    } else {
+                        MaterialTheme.theme.colors.primaryUi02
+                    }
+                )
         ) {
             val createdAtText by remember {
                 mutableStateOf(
                     bookmark.createdAt.toLocalizedFormatPattern(
                         bookmark.createdAtDatePattern()
                     )
+                )
+            }
+            if (isMultiSelecting()) {
+                Checkbox(
+                    checked = isSelected(bookmark),
+                    onCheckedChange = null,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
                 )
             }
 
@@ -100,7 +118,8 @@ fun BookmarkItem(
                 TimePlayButton(
                     timeSecs = bookmark.timeSecs,
                     contentDescriptionId = LR.string.bookmark_play,
-                    onClick = { onPlayClick(bookmark) }
+                    onClick = { onPlayClick(bookmark) },
+                    backgroundColor = Color.Transparent,
                 )
             }
         }
@@ -123,6 +142,8 @@ private fun BookmarkPreview(
                 title = "Bookmark Title",
                 createdAt = Date()
             ),
+            isMultiSelecting = { false },
+            isSelected = { false },
             onPlayClick = {},
             modifier = Modifier,
             showIcon = false
