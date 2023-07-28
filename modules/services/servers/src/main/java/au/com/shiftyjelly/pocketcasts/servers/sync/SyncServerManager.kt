@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import android.os.Build
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -11,7 +12,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
+import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerProtobufRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -24,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import com.pocketcasts.service.api.bookmarkRequest
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -45,6 +49,7 @@ import javax.inject.Singleton
 @Singleton
 open class SyncServerManager @Inject constructor(
     @SyncServerRetrofit retrofit: Retrofit,
+    @SyncServerProtobufRetrofit retrofitProtobuf: Retrofit,
     val settings: Settings,
     @SyncServerCache val cache: Cache,
 ) {
@@ -54,6 +59,7 @@ open class SyncServerManager @Inject constructor(
     }
 
     private val server: SyncServer = retrofit.create(SyncServer::class.java)
+    private val serverProtobuf: SyncServerProtobuf = retrofitProtobuf.create(SyncServerProtobuf::class.java)
 
     suspend fun register(email: String, password: String): LoginTokenResponse {
         val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
@@ -157,6 +163,10 @@ open class SyncServerManager @Inject constructor(
     fun getFilters(token: AccessToken): Single<List<Playlist>> =
         server.getFilterList(addBearer(token), buildBasicRequest())
             .map { response -> response.filters?.mapNotNull { it.toFilter() } ?: emptyList() }
+
+    suspend fun getBookmarks(token: AccessToken): List<Bookmark> {
+        return serverProtobuf.getBookmarkList(addBearer(token), bookmarkRequest {}).bookmarksList.map { it.toBookmark() }
+    }
 
     fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> =
         server.historySync(addBearer(token), request)

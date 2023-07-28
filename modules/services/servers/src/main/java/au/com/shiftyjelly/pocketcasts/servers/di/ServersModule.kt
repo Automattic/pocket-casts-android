@@ -37,6 +37,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.protobuf.ProtoConverterFactory
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.Date
@@ -266,6 +267,18 @@ class ServersModule {
     }
 
     @Provides
+    @SyncServerProtobufRetrofit
+    @Singleton
+    internal fun provideSyncApiProtobufRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Settings.SERVER_API_URL)
+            .addConverterFactory(ProtoConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Provides
     @WpComServerRetrofit
     @Singleton
     internal fun provideWpComApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
@@ -399,6 +412,10 @@ annotation class ListUploadServerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SyncServerRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class SyncServerProtobufRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
