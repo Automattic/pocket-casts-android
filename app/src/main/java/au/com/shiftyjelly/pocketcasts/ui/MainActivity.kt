@@ -786,7 +786,7 @@ class MainActivity :
     private fun updatePlaybackState(state: PlaybackState) {
         binding.playerBottomSheet.setPlaybackState(state)
 
-        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake()) {
+        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake.flow.value) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

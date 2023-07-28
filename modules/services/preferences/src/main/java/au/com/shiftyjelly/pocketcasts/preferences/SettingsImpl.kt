@@ -86,7 +86,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
@@ -609,14 +608,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun keepScreenAwake(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, false)
-    }
-
-    override fun setKeepScreenAwake(newValue: Boolean) {
-        setBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, newValue)
-        keepScreenAwakeFlow.update { newValue }
-    }
+    override val keepScreenAwake = UserSetting.BoolPref(
+        sharedPrefKey = "keepScreenAwake4", // Yes, there is a 4 at the end. I don't know why.
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun openPlayerAutomatically(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)

@@ -253,13 +253,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
 
                     KeepScreenAwake(
-                        saved = settings.keepScreenAwakeFlow.collectAsState().value,
+                        saved = settings.keepScreenAwake.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setKeepScreenAwake(it)
+                            settings.keepScreenAwake.set(it)
                         }
                     )
 
