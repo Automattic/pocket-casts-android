@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.SharedPreferences
-import androidx.annotation.CallSuper
 import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class UserSetting<T>(
@@ -29,8 +28,10 @@ abstract class UserSetting<T>(
     // better, use the flow itself to observe changes.
     protected abstract fun get(): T
 
-    @CallSuper
-    open fun set(value: T) {
+    protected abstract fun persist(value: T)
+
+    fun set(value: T) {
+        persist(value)
         _flow.value = value
     }
 
@@ -43,13 +44,11 @@ abstract class UserSetting<T>(
         sharedPrefs = sharedPrefs,
     ) {
 
-        override fun set(value: Boolean) {
+        override fun persist(value: Boolean) {
             sharedPrefs.edit().run {
                 putBoolean(sharedPrefKey, value)
                 apply()
             }
-
-            super.set(value)
         }
 
         override fun get(): Boolean = sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
@@ -70,13 +69,12 @@ abstract class UserSetting<T>(
             return fromInt(persistedInt)
         }
 
-        override fun set(value: T) {
+        override fun persist(value: T) {
             val intValue = toInt(value)
             sharedPrefs.edit().run {
                 putInt(sharedPrefKey, intValue)
                 apply()
             }
-            super.set(value)
         }
     }
 
@@ -97,13 +95,12 @@ abstract class UserSetting<T>(
             return fromString(persistedString)
         }
 
-        override fun set(value: T) {
+        override fun persist(value: T) {
             val stringValue = toString(value)
             sharedPrefs.edit().run {
                 putString(sharedPrefKey, stringValue)
                 apply()
             }
-            super.set(value)
         }
 
         // This stores an the skip value Int as a String in shared preferences.
@@ -151,7 +148,7 @@ abstract class UserSetting<T>(
             }
         }
 
-        override fun set(value: List<T>) {
+        override fun persist(value: List<T>) {
             sharedPrefs.edit().run {
                 val commaSeparatedString = value.joinToString(
                     separator = ",",
@@ -160,7 +157,6 @@ abstract class UserSetting<T>(
                 putString(sharedPrefKey, commaSeparatedString)
                 apply()
             }
-            super.set(value)
         }
     }
 }
