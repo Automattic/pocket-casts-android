@@ -536,7 +536,7 @@ class RefreshPodcastsThread(
 
             // Add sound and vibrations
             if (!isGroupNotification) {
-                val sound = settings.getNotificationSound()
+                val sound = settings.notificationSound.flow.value.uri
                 if (sound != null) {
                     notification.sound = sound
                 }
@@ -625,7 +625,7 @@ class RefreshPodcastsThread(
             val summaryNotification = summaryBuilder.build()
 
             // Add sound and vibrations
-            val sound = settings.getNotificationSound()
+            val sound = settings.notificationSound.flow.value.uri
             if (sound != null) {
                 summaryNotification.sound = sound
             }

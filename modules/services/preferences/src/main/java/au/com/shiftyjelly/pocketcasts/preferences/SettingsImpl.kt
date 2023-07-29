@@ -6,10 +6,8 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.media.AudioManager
-import android.net.Uri
 import android.os.Build
 import android.util.Base64
-import androidx.core.content.edit
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -282,19 +280,13 @@ class SettingsImpl @Inject constructor(
         return Integer.parseInt(value)
     }
 
-    override fun getNotificationSound(): Uri? {
-        val value = sharedPreferences.getString(Settings.PREFERENCE_NOTIFICATION_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.path)
-        return if (value.isNullOrBlank() || !isSoundOn()) null else Uri.parse(value)
-    }
-
-    override fun getNotificationSoundPath(): String {
-        return getString(Settings.PREFERENCE_NOTIFICATION_RINGTONE, "DEFAULT_SOUND")
-            ?: "DEFAULT_SOUND"
-    }
-
-    override fun setNotificationSoundPath(path: String) {
-        setString(Settings.PREFERENCE_NOTIFICATION_RINGTONE, path)
-    }
+    override val notificationSound = UserSetting.PrefFromString(
+        sharedPrefKey = "notificationRingtone",
+        defaultValue = NotificationSound(context = context),
+        sharedPrefs = sharedPreferences,
+        fromString = { NotificationSound(it, context) },
+        toString = { it.path }
+    )
 
     override fun isSoundOn(): Boolean {
         return (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).ringerMode == AudioManager.RINGER_MODE_NORMAL

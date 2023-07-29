@@ -16,6 +16,7 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
@@ -42,6 +43,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -242,7 +244,7 @@ class NotificationsSettingsFragment :
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
 
-            val existingValue = settings.getNotificationSoundPath()
+            val existingValue = settings.notificationSound.flow.value.path
             // Select "Silent" if empty
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, if (existingValue.isEmpty()) null else Uri.parse(existingValue))
 
@@ -258,9 +260,11 @@ class NotificationsSettingsFragment :
         if (requestCode == REQUEST_CODE_ALERT_RINGTONE && data != null) {
             val ringtone = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
             val value = ringtone?.toString() ?: ""
-            settings.setNotificationSoundPath(value)
-            ringtonePreference?.summary = getRingtoneValue(value)
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
+            context?.let {
+                settings.notificationSound.set(NotificationSound(value, it))
+                ringtonePreference?.summary = getRingtoneValue(value)
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
+            } ?: Timber.e("Context was null when trying to set notification sound")
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -434,7 +438,7 @@ class NotificationsSettingsFragment :
             null -> ""
             else -> {
                 val title = ringtone.getTitle(activity)
-                if (title == "DEFAULT_SOUND") {
+                if (title == NotificationSound.defaultPath) {
                     getString(LR.string.settings_notification_default_sound)
                 } else {
                     title
@@ -449,8 +453,10 @@ class NotificationsSettingsFragment :
                 preference.summary = getRingtoneValue(newValue as String)
                 true
             }
-            it.setDefaultValue(settings.getNotificationSoundPath())
-            it.summary = getRingtoneValue(settings.getNotificationSoundPath())
+            settings.notificationSound.flow.value.path.let { notificationSoundPath ->
+                it.setDefaultValue(notificationSoundPath)
+                it.summary = getRingtoneValue(notificationSoundPath)
+            }
         }
     }
 

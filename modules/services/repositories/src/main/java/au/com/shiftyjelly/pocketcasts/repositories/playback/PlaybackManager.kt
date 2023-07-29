@@ -1702,7 +1702,7 @@ open class PlaybackManager @Inject constructor(
         val notification = builder.build()
 
         // Add sound and vibrations
-        val sound = settings.getNotificationSound()
+        val sound = settings.notificationSound.flow.value.uri
         if (sound != null) {
             notification.sound = sound
         }

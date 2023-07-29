@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.Context
-import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
@@ -71,7 +70,6 @@ interface Settings {
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
-        const val PREFERENCE_NOTIFICATION_RINGTONE = "notificationRingtone"
         const val PREFERENCE_NOTIFICATION_VIBRATE = "notificationVibrate"
         const val PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT = "2"
         const val PREFERENCE_PODCAST_LIBRARY_SORT = "podcastLibrarySort"
@@ -331,9 +329,7 @@ interface Settings {
     fun getSelectPodcastsSortType(): PodcastsSortType
 
     fun getNotificationVibrate(): Int
-    fun getNotificationSound(): Uri?
-    fun getNotificationSoundPath(): String
-    fun setNotificationSoundPath(path: String)
+    val notificationSound: UserSetting<NotificationSound>
 
     fun isSoundOn(): Boolean
 
