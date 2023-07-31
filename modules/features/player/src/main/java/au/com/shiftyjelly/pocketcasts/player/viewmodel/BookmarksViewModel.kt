@@ -5,6 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -55,7 +56,7 @@ class BookmarksViewModel
                     _uiState.value = UiState.PlusUpsell
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        val bookmarksFlow = settings.bookmarkSortTypeFlow.flatMapLatest { sortType ->
+                        val bookmarksFlow = settings.bookmarkSortTypeForPlayerFlow.flatMapLatest { sortType ->
                             bookmarkManager.findEpisodeBookmarksFlow(
                                 episode = episode,
                                 sortType = sortType,
@@ -157,11 +158,12 @@ class BookmarksViewModel
 
     fun onOptionsMenuClicked() {
         viewModelScope.launch {
-            _showOptionsDialog.emit(settings.getBookmarksSortType().mapToLocalizedString())
+            _showOptionsDialog.emit(settings.getBookmarksSortTypeForPlayer().labelId)
         }
     }
 
     fun changeSortOrder(order: BookmarksSortType) {
+        if (order !is BookmarksSortTypeForPlayer) return
         settings.setBookmarksSortType(order)
     }
 
