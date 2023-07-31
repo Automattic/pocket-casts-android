@@ -153,7 +153,7 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
 
     private fun canDuck(): PlayOverNotificationSetting {
         if (audioFocus != AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT) return PlayOverNotificationSetting.NEVER
-        return settings.getPlayOverNotification()
+        return settings.playOverNotification.flow.value
     }
 
     interface FocusChangeListener {

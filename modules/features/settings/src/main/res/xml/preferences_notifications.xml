@@ -45,7 +45,7 @@
         <ListPreference
             android:key="overrideNotificationAudio"
             android:title="@string/settings_notification_play_over"
-            android:persistent="true"/>
+            android:persistent="false"/>
 
         <SwitchPreference
             android:key="hideNotificationOnPause"

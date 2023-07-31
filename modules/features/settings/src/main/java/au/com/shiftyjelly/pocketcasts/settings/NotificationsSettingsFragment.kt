@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -53,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class NotificationsSettingsFragment :
     PreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener,
     PodcastSelectFragment.Listener,
     CoroutineScope,
     HasBackstack {
@@ -141,6 +139,9 @@ class NotificationsSettingsFragment :
             val playOverNotificationSetting = (newValue as? String)
                 ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
                 ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
+
+            settings.playOverNotification.set(playOverNotificationSetting)
+            changePlayOverNotificationSummary()
 
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED,
@@ -402,18 +403,6 @@ class NotificationsSettingsFragment :
         setupNotificationVibrate()
         setupPlayOverNotifications()
         changePodcastsSummary()
-        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO == key) {
-            changePlayOverNotificationSummary()
-        }
     }
 
     private fun changeVibrateSummary() {
@@ -478,13 +467,13 @@ class NotificationsSettingsFragment :
             )
             entries = options.map { getString(it.titleRes) }.toTypedArray()
             entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
-            value = settings.getPlayOverNotification().preferenceInt.toString()
+            value = settings.playOverNotification.flow.value.preferenceInt.toString()
         }
         changePlayOverNotificationSummary()
     }
 
     private fun changePlayOverNotificationSummary() {
-        playOverNotificationPreference?.summary = getString(settings.getPlayOverNotification().titleRes)
+        playOverNotificationPreference?.summary = getString(settings.playOverNotification.flow.value.titleRes)
     }
 
     override fun getBackstackCount(): Int {
