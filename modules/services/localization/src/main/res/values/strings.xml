@@ -960,7 +960,7 @@
     <string name="plus_description_title">Enhanced Features For Advanced Listeners</string>
     <string name="plus_desktop_apps">Desktop Apps</string>
     <string name="plus_desktop_apps_body">Take your podcasts to more places with our Windows, macOS and Web apps.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customisation options.</string>
+    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customization options.</string>
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
@@ -1088,7 +1088,7 @@
     <string name="settings_headphone_controls_choice_skip_forward">Skip forward</string>
     <string name="settings_headphone_controls_confirmation_sound">Bookmark confirmation sound</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Play a confirmation sound after creating a bookmark with your headphones.</string>
-    <string name="settings_headphone_controls_summary">Customise the actions done by the most common headphone controls.</string>
+    <string name="settings_headphone_controls_summary">Customize the actions done by the most common headphone controls.</string>
     <string name="settings_help_cant_load">Could not load Help &amp; Feedback.\nPlease check your internet connection and try again.</string>
     <string name="settings_help_contact_support">Contact Support</string>
     <string name="settings_help_contact_support_email_sent_to_phone">If your phone is currently paired, it will show a pop-up to email support with your logs attached</string>
@@ -1117,7 +1117,7 @@
     <string name="settings_manage_downloads_total">Total</string>
     <string name="settings_media_actions_prioritize_title">Prioritize your custom media actions</string>
     <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
-    <string name="settings_media_actions_customise">Customise media actions</string>
+    <string name="settings_media_actions_customise">Customize media actions</string>
     <string name="settings_media_actions_show_title">Show custom media actions</string>
     <string name="settings_media_actions_show_subtitle">Show custom media actions in Android 13 media notifications and Android Auto.</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
@@ -1442,7 +1442,6 @@
     <string name="discover_category_comedy">Comedy</string>
     <string name="discover_category_education">Education</string>
     <string name="discover_category_fiction">Fiction</string>
-    <string name="discover_category_governmentGovernment" />
     <string name="discover_category_government">Government</string>
     <string name="discover_category_health"><![CDATA[Health & Fitness]]></string>
     <string name="discover_category_history">History</string>
