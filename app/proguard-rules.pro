@@ -173,6 +173,7 @@
 -dontwarn com.google.android.material.R$dimen
 -dontwarn com.google.android.material.R$style
 -dontwarn com.google.android.material.R$styleable
+-dontwarn com.google.android.gms.cast.framework.R$drawable
 
 # The following Retrofit rules are only be required until Retrofit 2.10.0 is released as it's included https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
 
