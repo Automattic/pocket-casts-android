@@ -407,7 +407,7 @@ class Support @Inject constructor(
 
                 output.append("Notifications").append(eol)
                 output.append("Play over notifications? ").append(settings.playOverNotification.flow.value.analyticsString).append(eol)
-                output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause()) "yes" else "no").append(eol)
+                output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause.flow.value) "yes" else "no").append(eol)
                 output.append(eol)
 
                 val effects = settings.getGlobalPlaybackEffects()

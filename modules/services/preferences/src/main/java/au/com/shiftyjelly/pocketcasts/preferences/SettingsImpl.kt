@@ -589,9 +589,11 @@ class SettingsImpl @Inject constructor(
         return "us"
     }
 
-    override fun hideNotificationOnPause(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE, false)
-    }
+    override val hideNotificationOnPause = UserSetting.BoolPref(
+        sharedPrefKey = Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences
+    )
 
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,

@@ -49,7 +49,7 @@
 
         <SwitchPreference
             android:key="hideNotificationOnPause"
-            android:persistent="true"
+            android:persistent="false"
             android:title="@string/settings_notification_hide_on_pause" />
     </PreferenceCategory>
 

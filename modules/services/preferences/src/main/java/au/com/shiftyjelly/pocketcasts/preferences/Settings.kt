@@ -382,7 +382,7 @@ interface Settings {
 
     fun getLanguageCode(): String
 
-    fun hideNotificationOnPause(): Boolean
+    val hideNotificationOnPause: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>

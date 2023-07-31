@@ -268,7 +268,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_STOPPED,
                 PlaybackStateCompat.STATE_PAUSED,
                 PlaybackStateCompat.STATE_ERROR -> {
-                    val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause()
+                    val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause.flow.value
                     // We have to be careful here to only call notify when moving from PLAY to PAUSE once
                     // or else the notification will come back after being swiped away
                     if (removeNotification || isForegroundService) {

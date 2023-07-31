@@ -74,6 +74,7 @@ class NotificationsSettingsFragment :
     private var systemSettingsPreference: Preference? = null
     private var notificationActions: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
+    private var hidePlaybackNotificationsPreference: SwitchPreference? = null
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
@@ -99,6 +100,7 @@ class NotificationsSettingsFragment :
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
+        hidePlaybackNotificationsPreference = manager.findPreference<SwitchPreference>(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE)
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
@@ -114,15 +116,16 @@ class NotificationsSettingsFragment :
 
         updateNotificationsEnabled()
 
-        manager.run {
-            findPreference<SwitchPreference>(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE)?.setOnPreferenceChangeListener { _, newValue ->
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
-                    mapOf("enabled" to newValue as Boolean)
-                )
-                true
-            }
+        hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
+            val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
+            settings.hideNotificationOnPause.set(newBool)
+            analyticsTracker.track(
+                AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
+                mapOf("enabled" to newBool)
+            )
+            true
         }
+
         vibratePreference?.setOnPreferenceChangeListener { _, newValue ->
             val newSetting = (newValue as? String)?.let {
                 NotificationVibrateSetting.values().find { it.intValue.toString() == newValue }
@@ -403,6 +406,7 @@ class NotificationsSettingsFragment :
         setupNotificationVibrate()
         setupPlayOverNotifications()
         changePodcastsSummary()
+        setupHidePlaybackNotifications()
     }
 
     private fun changeVibrateSummary() {
@@ -456,6 +460,10 @@ class NotificationsSettingsFragment :
             }.toTypedArray()
             it.value = settings.notificationVibrate.flow.value.intValue.toString()
         }
+    }
+
+    private fun setupHidePlaybackNotifications() {
+        hidePlaybackNotificationsPreference?.isChecked = settings.hideNotificationOnPause.flow.value
     }
 
     private fun setupPlayOverNotifications() {
