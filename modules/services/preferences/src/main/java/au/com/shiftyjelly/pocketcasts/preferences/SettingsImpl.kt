@@ -274,12 +274,21 @@ class SettingsImpl @Inject constructor(
         return PodcastsSortType.values().find { it.clientId == sortOrderId } ?: default
     }
 
-    override fun getNotificationVibrate(): Int {
-        val value = sharedPreferences.getString(
-            Settings.PREFERENCE_NOTIFICATION_VIBRATE,
-            Settings.PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT
-        ) ?: Settings.PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT
-        return Integer.parseInt(value)
+    override val notificationVibrate = run {
+        val defaultValue = 2
+        UserSetting.PrefFromString(
+            sharedPrefKey = Settings.PREFERENCE_NOTIFICATION_VIBRATE,
+            defaultValue = defaultValue,
+            sharedPrefs = sharedPreferences,
+            fromString = {
+                try {
+                    Integer.parseInt(it)
+                } catch (e: NumberFormatException) {
+                    defaultValue
+                }
+            },
+            toString = Int::toString
+        )
     }
 
     override val notificationSound = UserSetting.PrefFromString(
@@ -295,7 +304,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun isNotificationVibrateOn(): Boolean {
-        val vibrate = getNotificationVibrate()
+        val vibrate = notificationVibrate.flow.value
         return vibrate == 2 || vibrate == 1 && !isSoundOn()
     }
 

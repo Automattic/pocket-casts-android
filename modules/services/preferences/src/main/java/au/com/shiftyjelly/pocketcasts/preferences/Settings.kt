@@ -73,7 +73,6 @@ interface Settings {
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
         const val PREFERENCE_NOTIFICATION_VIBRATE = "notificationVibrate"
-        const val PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT = "2"
         const val PREFERENCE_PODCAST_LIBRARY_SORT = "podcastLibrarySort"
         const val PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC = "podcastLibrarySortNeedsSync"
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
@@ -330,7 +329,7 @@ interface Settings {
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
 
-    fun getNotificationVibrate(): Int
+    val notificationVibrate: UserSetting<Int>
     val notificationSound: UserSetting<NotificationSound>
 
     fun isSoundOn(): Boolean

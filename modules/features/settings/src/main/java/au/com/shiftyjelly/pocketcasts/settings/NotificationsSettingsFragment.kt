@@ -420,7 +420,7 @@ class NotificationsSettingsFragment :
     }
 
     private fun changeVibrateSummary() {
-        vibratePreference?.summary = when (settings.getNotificationVibrate()) {
+        vibratePreference?.summary = when (settings.notificationVibrate.flow.value) {
             2 -> getString(LR.string.settings_notification_vibrate_new_episodes)
             1 -> getString(LR.string.settings_notification_vibrate_in_silent)
             0 -> getString(LR.string.settings_notification_vibrate_never)
@@ -468,7 +468,7 @@ class NotificationsSettingsFragment :
                 getString(LR.string.settings_notification_vibrate_never)
             )
             it.entryValues = arrayOf("2", "1", "0")
-            it.value = settings.getNotificationVibrate().toString()
+            it.value = settings.notificationVibrate.flow.value.toString()
         }
     }
 
