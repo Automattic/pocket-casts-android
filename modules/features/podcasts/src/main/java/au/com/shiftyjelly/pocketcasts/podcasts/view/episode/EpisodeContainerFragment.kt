@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import android.app.Dialog
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
@@ -15,6 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
@@ -25,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -158,6 +162,12 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
 
         binding.viewPager.adapter = adapter
 
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            TabLayoutMediator(binding.tabLayout, binding.viewPager, true) { tab, position ->
+                tab.setText(adapter.pageTitle(position))
+            }.attach()
+        }
+
         binding.btnClose.setOnClickListener { dismiss() }
     }
 
@@ -178,7 +188,7 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
         private sealed class Section(@StringRes val titleRes: Int) {
-            object Episode : Section(LR.string.episode)
+            object Episode : Section(LR.string.details)
         }
 
         private var sections = listOf(Section.Episode)
@@ -210,6 +220,11 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
                 else -> throw IllegalArgumentException("Unknown section $position")
             }
         }
+
+        @StringRes
+        fun pageTitle(position: Int): Int {
+            return sections[position].titleRes
+        }
     }
 
     override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {
@@ -217,6 +232,8 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
             val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
             episode = state.episode
             toolbarTintColor = iconColor
+            tabLayout.tabTextColors = ColorStateList.valueOf(iconColor)
+            tabLayout.setSelectedTabIndicatorColor(iconColor)
             btnShare.setOnClickListener { state.onShareClicked() }
             btnFav.contentDescription = getString(if (state.episode.isStarred) LR.string.podcast_episode_starred else LR.string.podcast_episode_unstarred)
             btnFav.setOnClickListener { state.onFavClicked() }

@@ -35,6 +35,24 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:background="@color/transparent"
+                style="@style/Widget.MaterialComponents.TabLayout"
+                app:tabIndicatorFullWidth="false"
+                app:tabTextAppearance="@style/PlayerTabTextAppearance"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                app:tabBackground="@color/transparent"
+                app:tabPaddingStart="8dp"
+                app:tabPaddingEnd="8dp"
+                app:tabMinWidth="0dp"
+                app:layout_constraintStart_toEndOf="@+id/btnClose"
+                app:layout_constraintTop_toTopOf="@+id/btnClose"
+                app:layout_constraintEnd_toEndOf="@+id/btnShare"/>
+
             <ImageButton
                 android:id="@+id/btnShare"
                 android:layout_width="28dp"
