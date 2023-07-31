@@ -41,7 +41,7 @@
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
     <string name="log_in">Log in</string>
-    <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
+    <string name="log_in_subtitle">Start listening to your favorite podcasts</string>
     <string name="log_out">Log out</string>
     <string name="log_in_watch_requires_plus">Log in with a Plus account to use this app or upgrade visiting</string>
     <string name="log_in_with_plus">Please log in with a Plus account</string>
@@ -608,7 +608,7 @@
     <string name="filters_create">Create</string>
     <string name="filters_create_add_more">Add more criteria to finish refining your filter.</string>
     <string name="filters_create_auto_download" translatable="false">@string/auto_download</string>
-    <string name="filters_create_colour_icon">COLOUR &amp; ICON</string>
+    <string name="filters_create_colour_icon">COLOR &amp; ICON</string>
     <string name="filters_create_filter">Create filter</string>
     <string name="filters_create_filter_by">FILTER BY</string>
     <string name="filters_create_filter_details">Filter details</string>
@@ -688,8 +688,8 @@
     <string name="profile_cancel_confirm_item_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
     <string name="profile_cancel_confirm_item_uploads">All files uploaded to your Pocket&#160;Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
     <string name="profile_cancel_confirm_item_web_player">You will no longer be able to access Pocket&#160;Casts using your web browser, or desktop computer.</string>
-    <string name="profile_cancel_confirm_stay_button_title">Actually, I want to stay"</string>
-    <string name="profile_cancel_confirm_cancel_button_title">Yes, cancel my subscription"</string>
+    <string name="profile_cancel_confirm_stay_button_title">Actually, I want to stay</string>
+    <string name="profile_cancel_confirm_cancel_button_title">Yes, cancel my subscription</string>
     <string name="profile_change_email_address">Change email address</string>
     <string name="profile_change_email_address_title">Change Email Address</string>
     <string name="profile_change_password">Change password</string>
@@ -978,7 +978,7 @@
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_themes_icons_body">Fly your true colors. Exclusive icons and themes for the plus club only.</string>
     <string name="plus_folder" translatable="false">@string/folders</string>
-    <string name="plus_folder_body">Create folders to organise your podcast collection.</string>
+    <string name="plus_folder_body">Create folders to organize your podcast collection.</string>
     <string name="plus_trial_finished">Pocket Casts Plus Trial Finished</string>
     <string name="plus_trial_finished_continue">Upgrade your account anytime to continue using Pocket Casts Plus</string>
     <string name="plus_trial_finished_detail">Sadly, your free trial period has reached its end. Your account has now been downgraded to free.</string>
@@ -1676,7 +1676,7 @@
     <string name="onboarding_import_from_castbox_step_2">Tap the \“Personal\” tab.</string>
     <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
     <string name="onboarding_import_from_castbox_step_4">Scroll down to \“OPML Export\” and tap it.</string>
-    <string name="onboarding_import_from_castbox_step_5">@string/onboarding_import_from_other_apps_step_2</string>
+    <string name="onboarding_import_from_castbox_step_5" translatable="false">@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_open">Open Castbox&#8230;</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts can import podcasts from OPML files, so if your current app can export an OPML file, you can follow these steps:</string>
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
