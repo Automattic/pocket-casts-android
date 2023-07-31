@@ -174,7 +174,12 @@
 -dontwarn com.google.android.material.R$style
 -dontwarn com.google.android.material.R$styleable
 
+# The following Retrofit rules are only be required until Retrofit 2.10.0 is released as it's included https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
+
+# With R8 full mode generic signatures are stripped for classes that are not kept.
+# Suspend functions are wrapped in continuations where the type argument is used.
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
 # R8 full mode strips generic signatures from return types if not kept.
-# This stop the app crashing on startup and will only be required until Retrofit 2.10.0 is released as it's included https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
 -if interface * { @retrofit2.http.* public *** *(...); }
 -keep,allowoptimization,allowshrinking,allowobfuscation class <3>
