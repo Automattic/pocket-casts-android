@@ -14,6 +14,7 @@ class BookmarksSortByDialog(
     val settings: Settings,
     val changeSortOrder: (BookmarksSortType) -> Unit,
     private val sourceView: SourceView,
+    private val forceDarkTheme: Boolean = false,
 ) {
     fun show(context: Context, fragmentManager: FragmentManager) {
         val message = "Bookmarks sort accessed in unknown source view: $sourceView"
@@ -24,7 +25,7 @@ class BookmarksSortByDialog(
         }
         val dialog = OptionsDialog()
             .setTitle(context.resources.getString(LR.string.sort_by))
-            .setForceDarkTheme(true)
+            .setForceDarkTheme(forceDarkTheme)
         val valuesToShow = when (sourceView) {
             SourceView.PLAYER -> BookmarksSortTypeForPlayer.values().toList()
             SourceView.PODCAST_SCREEN -> BookmarksSortTypeForPodcast.values().toList()
