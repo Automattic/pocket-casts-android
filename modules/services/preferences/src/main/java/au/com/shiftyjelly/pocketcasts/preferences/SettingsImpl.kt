@@ -590,7 +590,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override val hideNotificationOnPause = UserSetting.BoolPref(
-        sharedPrefKey = Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE,
+        sharedPrefKey = "hideNotificationOnPause",
         defaultValue = false,
         sharedPrefs = sharedPreferences
     )

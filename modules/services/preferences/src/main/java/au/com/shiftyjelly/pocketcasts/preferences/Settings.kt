@@ -81,7 +81,6 @@ interface Settings {
         const val PREFERENCE_USE_EMBEDDED_ARTWORK = "useEmbeddedArtwork"
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
-        const val PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE = "hideNotificationOnPause"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
         const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED = "autoDownloadOnlyDownloadOnWifi"
         const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING = "autoDownloadOnlyDownloadWhenCharging"

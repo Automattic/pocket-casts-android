@@ -100,7 +100,7 @@ class NotificationsSettingsFragment :
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
-        hidePlaybackNotificationsPreference = manager.findPreference(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE)
+        hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
