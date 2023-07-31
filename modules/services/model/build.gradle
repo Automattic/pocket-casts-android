@@ -9,6 +9,9 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {

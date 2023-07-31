@@ -5,6 +5,7 @@ apply plugin: 'kotlin-parcelize'
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.compose'
     buildFeatures {
+        buildConfig true
         compose true
     }
 }
