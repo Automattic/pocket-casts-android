@@ -28,12 +28,12 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="?attr/primary_ui_01">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
             android:clickable="true"
             android:focusable="true"
             android:paddingBottom="32dp">
@@ -86,7 +86,7 @@
                 android:id="@+id/episodeArt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="56dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginStart="@dimen/episode_card_edge_padding"
                 android:layout_marginEnd="@dimen/episode_card_edge_padding"
                 app:cardCornerRadius="10dp"

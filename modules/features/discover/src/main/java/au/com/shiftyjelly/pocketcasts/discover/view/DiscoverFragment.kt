@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBindi
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
-import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
@@ -94,7 +94,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?) {
-        val fragment = EpisodeFragment.newInstance(
+        val fragment = EpisodeContainerFragment.newInstance(
             episodeUuid = episode.uuid,
             source = EpisodeViewSource.DISCOVER,
             podcastUuid = episode.podcast_uuid,

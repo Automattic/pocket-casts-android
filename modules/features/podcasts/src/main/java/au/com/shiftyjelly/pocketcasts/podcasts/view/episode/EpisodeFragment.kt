@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -22,7 +20,6 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -30,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -40,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -56,11 +53,10 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
@@ -68,15 +64,8 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val ARG_EPISODE_UUID = "episodeUUID"
-private const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
-private const val ARG_OVERRIDE_PODCAST_LINK = "override_podcast_link"
-private const val ARG_PODCAST_UUID = "podcastUUID"
-private const val ARG_FROMLIST_UUID = "fromListUUID"
-private const val ARG_FORCE_DARK = "forceDark"
-
 @AndroidEntryPoint
-class EpisodeFragment : BaseDialogFragment() {
+class EpisodeFragment : BaseFragment() {
     companion object {
 
         private object AnalyticsProp {
@@ -84,22 +73,6 @@ class EpisodeFragment : BaseDialogFragment() {
                 const val SOURCE = "source"
                 const val EPISODE_UUID = "episode_uuid"
             }
-        }
-        fun newInstance(
-            episode: PodcastEpisode,
-            source: EpisodeViewSource,
-            overridePodcastLink: Boolean = false,
-            fromListUuid: String? = null,
-            forceDark: Boolean = false
-        ): EpisodeFragment {
-            return newInstance(
-                episodeUuid = episode.uuid,
-                source = source,
-                overridePodcastLink = overridePodcastLink,
-                podcastUuid = episode.podcastUuid,
-                fromListUuid = fromListUuid,
-                forceDark = forceDark
-            )
         }
 
         fun newInstance(
@@ -112,23 +85,18 @@ class EpisodeFragment : BaseDialogFragment() {
         ): EpisodeFragment {
             return EpisodeFragment().apply {
                 arguments = bundleOf(
-                    ARG_EPISODE_UUID to episodeUuid,
-                    ARG_EPISODE_VIEW_SOURCE to source.value,
-                    ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
-                    ARG_PODCAST_UUID to podcastUuid,
-                    ARG_FROMLIST_UUID to fromListUuid,
-                    ARG_FORCE_DARK to forceDark
+                    EpisodeContainerFragment.ARG_EPISODE_UUID to episodeUuid,
+                    EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE to source.value,
+                    EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
+                    EpisodeContainerFragment.ARG_PODCAST_UUID to podcastUuid,
+                    EpisodeContainerFragment.ARG_FROMLIST_UUID to fromListUuid,
+                    EpisodeContainerFragment.ARG_FORCE_DARK to forceDark
                 )
             }
         }
     }
 
-    override val statusBarColor: StatusBarColor
-        get() = StatusBarColor.Custom(
-            context?.getThemeColor(UR.attr.primary_ui_01)
-                ?: Color.WHITE,
-            theme.isDarkTheme
-        )
+    override lateinit var statusBarColor: StatusBarColor
 
     @Inject lateinit var serverManager: ServerManager
     @Inject lateinit var settings: Settings
@@ -143,38 +111,42 @@ class EpisodeFragment : BaseDialogFragment() {
     private var formattedNotes: String? = null
     private lateinit var showNotesFormatter: ShowNotesFormatter
 
-    val episodeUUID: String?
-        get() = arguments?.getString(ARG_EPISODE_UUID)
+    private val episodeUUID: String?
+        get() = arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_UUID)
 
     private val episodeViewSource: EpisodeViewSource
-        get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
+        get() = EpisodeViewSource.fromString(arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE))
 
-    val overridePodcastLink: Boolean
-        get() = arguments?.getBoolean(ARG_OVERRIDE_PODCAST_LINK) ?: false
+    private val overridePodcastLink: Boolean
+        get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK) ?: false
 
     val podcastUuid: String?
-        get() = arguments?.getString(ARG_PODCAST_UUID)
+        get() = arguments?.getString(EpisodeContainerFragment.ARG_PODCAST_UUID)
 
     val fromListUuid: String?
-        get() = arguments?.getString(ARG_FROMLIST_UUID)
+        get() = arguments?.getString(EpisodeContainerFragment.ARG_FROMLIST_UUID)
 
-    val forceDarkTheme: Boolean
-        get() = arguments?.getBoolean(ARG_FORCE_DARK) ?: false
+    private val forceDarkTheme: Boolean
+        get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_FORCE_DARK) ?: false
 
     var listener: FragmentHostListener? = null
 
     val activeTheme: Theme.ThemeType
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        if (!forceDarkTheme || theme.isDarkTheme) {
-            showNotesFormatter = createShowNotesFormatter(requireContext())
-            return super.onCreateDialog(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentEpisodeBinding.inflate(inflater, container, false)
+        showNotesFormatter = if (!forceDarkTheme || theme.isDarkTheme) {
+            createShowNotesFormatter(requireContext())
+        } else {
+            val context = ContextThemeWrapper(requireContext(), R.style.ThemeDark)
+            createShowNotesFormatter(context)
         }
 
-        val context = ContextThemeWrapper(requireContext(), UR.style.ThemeDark)
-        showNotesFormatter = createShowNotesFormatter(context)
-        return BottomSheetDialog(context, UR.style.BottomSheetDialogThemeDark)
+        statusBarColor = StatusBarColor.Custom(
+            context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme
+        )
+        return binding?.root
     }
 
     private fun createShowNotesFormatter(context: Context): ShowNotesFormatter {
@@ -207,11 +179,6 @@ class EpisodeFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEpisodeBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         if (!viewModel.isFragmentChangingConfigurations) {
@@ -224,22 +191,6 @@ class EpisodeFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val bottomSheetDialog = dialog as? BottomSheetDialog
-        bottomSheetDialog?.behavior?.apply {
-            isFitToContents = false
-            state = BottomSheetBehavior.STATE_EXPANDED
-            skipCollapsed = true
-        }
-
-        // Ensure the dialog ends up the full height of the screen
-        // Bottom sheet dialogs get wrapped in a sheet that is WRAP_CONTENT so setting MATCH_PARENT on our
-        // root view is ignored.
-        bottomSheetDialog?.setOnShowListener {
-            view.updateLayoutParams<ViewGroup.LayoutParams> {
-                height = Resources.getSystem().displayMetrics.heightPixels
-            }
-        }
 
         binding?.loadingGroup?.isInvisible = true
 
@@ -358,7 +309,7 @@ class EpisodeFragment : BaseDialogFragment() {
                                     AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
                                 )
                             )
-                            dismiss()
+                            (parentFragment as? BaseDialogFragment)?.dismiss()
                             if (!overridePodcastLink) {
                                 (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid)
                             }
@@ -389,7 +340,7 @@ class EpisodeFragment : BaseDialogFragment() {
                                         fromListUuid = fromListUuid
                                     )
                                     if (shouldCloseAfterWarning) {
-                                        dismiss()
+                                        (parentFragment as? BaseDialogFragment)?.dismiss()
                                     }
                                 }).show(parentFragmentManager, "stream warning")
                                 false
@@ -398,7 +349,7 @@ class EpisodeFragment : BaseDialogFragment() {
                             }
 
                             if (shouldClose) {
-                                dismiss()
+                                (parentFragment as? BaseDialogFragment)?.dismiss()
                             }
                         }
                     }
@@ -430,7 +381,7 @@ class EpisodeFragment : BaseDialogFragment() {
             button.onStateChange = {
                 viewModel.archiveClicked(button.isOn)
                 if (button.isOn) {
-                    dismiss()
+                    (parentFragment as? BaseDialogFragment)?.dismiss()
                 }
             }
         }
@@ -470,7 +421,7 @@ class EpisodeFragment : BaseDialogFragment() {
             binding?.btnPlay?.setPlaying(isPlaying = isPlaying, animate = true)
         }
 
-        binding?.btnClose?.setOnClickListener { dismiss() }
+        binding?.btnClose?.setOnClickListener { (parentFragment as? BaseDialogFragment)?.dismiss() }
         binding?.btnDownload?.setOnClickListener {
             val episode = viewModel.episode ?: return@setOnClickListener
             if (episode.isDownloaded) {
