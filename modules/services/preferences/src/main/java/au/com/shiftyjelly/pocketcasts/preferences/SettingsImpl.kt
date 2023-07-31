@@ -24,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
@@ -911,15 +913,23 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getString(preference, defaultValue) ?: defaultValue
     }
 
-    override fun getNewEpisodeNotificationActions(): String? {
-        return sharedPreferences.getString("notification_actions", null)
-    }
-
-    override fun setNewEpisodeNotificationActions(actions: String) {
-        sharedPreferences.edit {
-            putString("notification_actions", actions)
-        }
-    }
+    override val newEpisodeNotificationActions = UserSetting.PrefFromString<NewEpisodeNotificationActionSetting>(
+        sharedPrefKey = "notification_actions",
+        defaultValue = NewEpisodeNotificationActionSetting.Default,
+        sharedPrefs = sharedPreferences,
+        fromString = {
+            when (it) {
+                NewEpisodeNotificationActionSetting.Default.stringValue -> NewEpisodeNotificationActionSetting.Default
+                else -> NewEpisodeNotificationActionSetting.ValueOf(it)
+            }
+        },
+        toString = {
+            when (it) {
+                NewEpisodeNotificationActionSetting.Default -> NewEpisodeNotificationActionSetting.Default.stringValue
+                is NewEpisodeNotificationActionSetting.ValueOf -> it.value
+            }
+        },
+    )
 
     override fun getPodcastsLayout(): Int {
         return getInt("PODCAST_GRID_LAYOUT", Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)

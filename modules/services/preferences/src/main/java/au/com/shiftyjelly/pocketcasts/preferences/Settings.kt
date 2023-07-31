@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
@@ -449,8 +451,7 @@ interface Settings {
     fun setShowArtworkOnLockScreen(show: Boolean)
     fun showArtworkOnLockScreen(): Boolean
 
-    fun getNewEpisodeNotificationActions(): String?
-    fun setNewEpisodeNotificationActions(actions: String)
+    val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
     fun getAutoArchiveExcludedPodcasts(): List<String>
     fun setAutoArchiveExcludedPodcasts(excluded: List<String>)
