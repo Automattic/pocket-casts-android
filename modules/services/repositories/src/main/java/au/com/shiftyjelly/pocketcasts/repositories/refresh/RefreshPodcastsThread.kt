@@ -540,7 +540,8 @@ class RefreshPodcastsThread(
                 if (sound != null) {
                     notification.sound = sound
                 }
-                if (settings.isNotificationVibrateOn()) {
+                val isVibrateOn = settings.notificationVibrate.flow.value.isNotificationVibrateOn(context)
+                if (isVibrateOn) {
                     notification.defaults = notification.defaults or Notification.DEFAULT_VIBRATE
                 }
             }
@@ -629,7 +630,8 @@ class RefreshPodcastsThread(
             if (sound != null) {
                 summaryNotification.sound = sound
             }
-            if (settings.isNotificationVibrateOn()) {
+            val isVibrateOn = settings.notificationVibrate.flow.value.isNotificationVibrateOn(context)
+            if (isVibrateOn) {
                 summaryNotification.defaults = summaryNotification.defaults or Notification.DEFAULT_VIBRATE
             }
 

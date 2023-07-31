@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
-import android.media.AudioManager
 import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
@@ -25,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -274,20 +274,24 @@ class SettingsImpl @Inject constructor(
         return PodcastsSortType.values().find { it.clientId == sortOrderId } ?: default
     }
 
-    override val notificationVibrate = run {
-        val defaultValue = 2
+    override val notificationVibrate: UserSetting<NotificationVibrateSetting> = run {
         UserSetting.PrefFromString(
             sharedPrefKey = Settings.PREFERENCE_NOTIFICATION_VIBRATE,
-            defaultValue = defaultValue,
+            defaultValue = NotificationVibrateSetting.DEFAULT,
             sharedPrefs = sharedPreferences,
             fromString = {
                 try {
-                    Integer.parseInt(it)
+                    val intValue = Integer.parseInt(it)
+                    NotificationVibrateSetting
+                        .values()
+                        .find { setting ->
+                            setting.intValue == intValue
+                        }
                 } catch (e: NumberFormatException) {
-                    defaultValue
-                }
+                    null
+                } ?: NotificationVibrateSetting.DEFAULT
             },
-            toString = Int::toString
+            toString = { it.intValue.toString() }
         )
     }
 
@@ -298,15 +302,6 @@ class SettingsImpl @Inject constructor(
         fromString = { NotificationSound(it, context) },
         toString = { it.path }
     )
-
-    override fun isSoundOn(): Boolean {
-        return (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).ringerMode == AudioManager.RINGER_MODE_NORMAL
-    }
-
-    override fun isNotificationVibrateOn(): Boolean {
-        val vibrate = notificationVibrate.flow.value
-        return vibrate == 2 || vibrate == 1 && !isSoundOn()
-    }
 
     override val notifyRefreshPodcast = UserSetting.BoolPref(
         sharedPrefKey = "episodeNotificationsOn",

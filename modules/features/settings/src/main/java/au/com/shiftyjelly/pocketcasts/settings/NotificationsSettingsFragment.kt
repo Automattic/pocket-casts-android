@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -420,12 +421,7 @@ class NotificationsSettingsFragment :
     }
 
     private fun changeVibrateSummary() {
-        vibratePreference?.summary = when (settings.notificationVibrate.flow.value) {
-            2 -> getString(LR.string.settings_notification_vibrate_new_episodes)
-            1 -> getString(LR.string.settings_notification_vibrate_in_silent)
-            0 -> getString(LR.string.settings_notification_vibrate_never)
-            else -> ""
-        }
+        vibratePreference?.summary = getString(settings.notificationVibrate.flow.value.summary)
     }
 
     private fun getRingtoneValue(ringtonePath: String): String {
@@ -462,13 +458,18 @@ class NotificationsSettingsFragment :
 
     private fun setupNotificationVibrate() {
         vibratePreference?.let {
-            it.entries = arrayOf(
-                getString(LR.string.settings_notification_vibrate_new_episodes),
-                getString(LR.string.settings_notification_vibrate_in_silent),
-                getString(LR.string.settings_notification_vibrate_never)
+            val options = arrayOf(
+                NotificationVibrateSetting.NewEpisodes,
+                NotificationVibrateSetting.OnlyWhenSilent,
+                NotificationVibrateSetting.Never
             )
-            it.entryValues = arrayOf("2", "1", "0")
-            it.value = settings.notificationVibrate.flow.value.toString()
+            it.entries = options
+                .map { getString(it.summary) }
+                .toTypedArray()
+            it.entryValues = options.map {
+                it.intValue.toString()
+            }.toTypedArray()
+            it.value = settings.notificationVibrate.flow.value.intValue.toString()
         }
     }
 

@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
@@ -329,13 +330,8 @@ interface Settings {
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
 
-    val notificationVibrate: UserSetting<Int>
+    val notificationVibrate: UserSetting<NotificationVibrateSetting>
     val notificationSound: UserSetting<NotificationSound>
-
-    fun isSoundOn(): Boolean
-
-    fun isNotificationVibrateOn(): Boolean
-
     val notifyRefreshPodcast: UserSetting<Boolean>
 
     fun usingCustomFolderStorage(): Boolean
