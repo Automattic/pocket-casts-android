@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -324,6 +325,7 @@ interface Settings {
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
     val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
     val bookmarkSortTypeForPlayerFlow: StateFlow<BookmarksSortTypeForPlayer>
+    val bookmarkSortTypeForPodcastFlow: StateFlow<BookmarksSortTypeForPodcast>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -651,4 +653,5 @@ interface Settings {
 
     fun <T> setBookmarksSortType(sortType: T)
     fun getBookmarksSortTypeForPlayer(): BookmarksSortTypeForPlayer
+    fun getBookmarksSortTypeForPodcast(): BookmarksSortTypeForPodcast
 }

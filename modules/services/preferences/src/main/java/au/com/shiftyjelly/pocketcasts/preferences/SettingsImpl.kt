@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -103,6 +104,7 @@ class SettingsImpl @Inject constructor(
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
     override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
     override val bookmarkSortTypeForPlayerFlow = MutableStateFlow(getBookmarksSortTypeForPlayer())
+    override val bookmarkSortTypeForPodcastFlow = MutableStateFlow(getBookmarksSortTypeForPodcast())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1460,6 +1462,10 @@ class SettingsImpl @Inject constructor(
                 setInt(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER, sortType.ordinal)
                 bookmarkSortTypeForPlayerFlow.update { sortType }
             }
+            is BookmarksSortTypeForPodcast -> {
+                setInt(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST, sortType.ordinal)
+                bookmarkSortTypeForPodcastFlow.update { sortType }
+            }
         }
     }
 
@@ -1468,6 +1474,14 @@ class SettingsImpl @Inject constructor(
             getInt(
                 Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER,
                 BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
+            )
+        ]
+
+    override fun getBookmarksSortTypeForPodcast() =
+        BookmarksSortTypeForPodcast.values()[
+            getInt(
+                Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
+                BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
             )
         ]
 }

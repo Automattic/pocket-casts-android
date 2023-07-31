@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -18,6 +19,7 @@ class BookmarksSortByDialog(
         val message = "Bookmarks sort accessed in unknown source view: $sourceView"
         val sortOrder = when (sourceView) {
             SourceView.PLAYER -> settings.getBookmarksSortTypeForPlayer()
+            SourceView.PODCAST_SCREEN -> settings.getBookmarksSortTypeForPodcast()
             else -> throw IllegalAccessError(message)
         }
         val dialog = OptionsDialog()
@@ -25,6 +27,7 @@ class BookmarksSortByDialog(
             .setForceDarkTheme(true)
         val valuesToShow = when (sourceView) {
             SourceView.PLAYER -> BookmarksSortTypeForPlayer.values().toList()
+            SourceView.PODCAST_SCREEN -> BookmarksSortTypeForPodcast.values().toList()
             else -> throw IllegalAccessError(message)
         }
         for (order in valuesToShow) {

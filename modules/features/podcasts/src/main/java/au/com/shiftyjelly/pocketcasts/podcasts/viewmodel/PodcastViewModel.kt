@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
@@ -47,6 +49,8 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -73,7 +77,8 @@ class PodcastViewModel
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
     private val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
-    private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper
+    private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
+    private val settings: Settings
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -152,7 +157,7 @@ class PodcastViewModel
                         )
                     }.toFlowable(BackpressureStrategy.LATEST)
                 }
-                .loadEpisodesAndBookmarks(episodeManager, bookmarkManager)
+                .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
                 .doOnNext {
                     if (it is UiState.Loaded) {
                         val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
@@ -368,6 +373,11 @@ class PodcastViewModel
         }
     }
 
+    fun changeSortOrder(order: BookmarksSortType) {
+        if (order !is BookmarksSortTypeForPodcast) return
+        settings.setBookmarksSortType(order)
+    }
+
     fun multiSelectSelectNone() {
         val uiState = uiState.value as? UiState.Loaded ?: return
         when (uiState.showTab) {
@@ -545,9 +555,11 @@ private data class CombinedEpisodeAndBookmarkData(
     val bookmarkSearchResult: SearchHandler.SearchResult,
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
     episodeManager: EpisodeManager,
     bookmarkManager: BookmarkManager,
+    settings: Settings,
 ): Flowable<PodcastViewModel.UiState> {
     return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
         LogBuffer.i(
@@ -567,7 +579,10 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     { episodeSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = episodeSearchResults,
                 ),
-            bookmarkManager.findPodcastBookmarksFlow(podcast.uuid).asFlowable()
+
+            settings.bookmarkSortTypeForPodcastFlow.flatMapLatest { sortType ->
+                bookmarkManager.findPodcastBookmarksFlow(podcast.uuid, sortType)
+            }.asFlowable()
                 .withSearchResult(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,

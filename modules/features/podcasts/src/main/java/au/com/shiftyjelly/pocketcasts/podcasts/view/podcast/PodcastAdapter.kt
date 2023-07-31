@@ -112,6 +112,7 @@ class PodcastAdapter(
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
+    private val onBookmarksOptionsClicked: () -> Unit,
     private val onEpisodeRowLongPress: (PodcastEpisode) -> Unit,
     private val onBookmarkRowLongPress: (Bookmark) -> Unit,
     private val onFoldersClicked: () -> Unit,
@@ -144,6 +145,7 @@ class PodcastAdapter(
         val searchTerm: String,
         val onSearchFocus: () -> Unit,
         val onSearchQueryChanged: (String) -> Unit,
+        val onOptionsClicked: () -> Unit,
     )
     data class BookmarkItemData(
         val bookmark: Bookmark,
@@ -418,7 +420,15 @@ class PodcastAdapter(
             if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
                 add(Podcast())
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
-                add(BookmarkHeader(bookmarks.size, searchTerm, onSearchFocus, onSearchQueryChanged))
+                add(
+                    BookmarkHeader(
+                        bookmarksCount = bookmarks.size,
+                        searchTerm = searchTerm,
+                        onSearchFocus = onSearchFocus,
+                        onSearchQueryChanged = onSearchQueryChanged,
+                        onOptionsClicked = onBookmarksOptionsClicked,
+                    )
+                )
                 addAll(
                     bookmarks.map {
                         BookmarkItemData(
