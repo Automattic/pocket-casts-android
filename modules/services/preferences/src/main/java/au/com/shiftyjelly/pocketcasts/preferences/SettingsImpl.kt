@@ -276,7 +276,7 @@ class SettingsImpl @Inject constructor(
 
     override val notificationVibrate: UserSetting<NotificationVibrateSetting> = run {
         UserSetting.PrefFromString(
-            sharedPrefKey = Settings.PREFERENCE_NOTIFICATION_VIBRATE,
+            sharedPrefKey = "notificationVibrate",
             defaultValue = NotificationVibrateSetting.DEFAULT,
             sharedPrefs = sharedPreferences,
             fromString = {

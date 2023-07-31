@@ -126,16 +126,14 @@ class NotificationsSettingsFragment :
             }
         }
         vibratePreference?.setOnPreferenceChangeListener { _, newValue ->
+            val newSetting = (newValue as? String)?.let {
+                NotificationVibrateSetting.values().find { it.intValue.toString() == newValue }
+            }
+            settings.notificationVibrate.set(newSetting ?: NotificationVibrateSetting.DEFAULT)
+            changeVibrateSummary()
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED,
-                mapOf(
-                    "value" to when (newValue) {
-                        "0" -> "never"
-                        "1" -> "silent"
-                        "2" -> "new_episodes"
-                        else -> "unknown"
-                    }
-                )
+                mapOf("value" to (newSetting?.analyticsString ?: "unknown"))
             )
             true
         }
@@ -413,9 +411,7 @@ class NotificationsSettingsFragment :
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (Settings.PREFERENCE_NOTIFICATION_VIBRATE == key) {
-            changeVibrateSummary()
-        } else if (Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO == key) {
+        if (Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO == key) {
             changePlayOverNotificationSummary()
         }
     }

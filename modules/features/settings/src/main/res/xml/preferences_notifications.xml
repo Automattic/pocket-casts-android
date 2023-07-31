@@ -31,7 +31,7 @@
 
         <ListPreference
             android:key="notificationVibrate"
-            android:persistent="true"
+            android:persistent="false"
             android:summary=""
             android:title="@string/settings_notification_vibrate" />
 
