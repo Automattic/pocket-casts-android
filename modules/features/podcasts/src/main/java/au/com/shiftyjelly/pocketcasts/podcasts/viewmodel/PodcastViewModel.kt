@@ -33,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -70,6 +72,8 @@ class PodcastViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
+    private val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
+    private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -361,6 +365,120 @@ class PodcastViewModel
         val podcast = podcast.value ?: return
         launch {
             folderManager.removePodcast(podcast)
+        }
+    }
+
+    fun multiSelectSelectNone() {
+        val uiState = uiState.value as? UiState.Loaded ?: return
+        when (uiState.showTab) {
+            PodcastTab.EPISODES -> multiSelectEpisodesHelper.deselectAllInList(uiState.episodes)
+            PodcastTab.BOOKMARKS -> multiSelectBookmarksHelper.deselectAllInList(uiState.bookmarks)
+        }
+    }
+
+    fun <T> multiSelectAllUp(multiSelectable: T) {
+        val uiState = uiState.value as? UiState.Loaded ?: return
+        when (multiSelectable) {
+            is PodcastEpisode -> {
+                val grouped = groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        multiSelectEpisodesHelper.selectAllInList(group.subList(0, startIndex + 1))
+                    }
+                }
+            }
+            is Bookmark -> {
+                val startIndex = uiState.bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectBookmarksHelper.selectAllInList(
+                        uiState.bookmarks.subList(0, startIndex + 1)
+                    )
+                }
+            }
+        }
+    }
+
+    fun <T> multiSelectSelectAllDown(multiSelectable: T) {
+        val uiState = uiState.value as? UiState.Loaded ?: return
+        when (multiSelectable) {
+            is PodcastEpisode -> {
+                val grouped = groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        multiSelectEpisodesHelper.selectAllInList(group.subList(startIndex, group.size))
+                    }
+                }
+            }
+            is Bookmark -> {
+                val startIndex = uiState.bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectBookmarksHelper.selectAllInList(
+                        uiState.bookmarks.subList(startIndex, uiState.bookmarks.size)
+                    )
+                }
+            }
+        }
+    }
+
+    fun multiSelectSelectAll() {
+        val uiState = uiState.value as? UiState.Loaded ?: return
+        when (uiState.showTab) {
+            PodcastTab.EPISODES -> multiSelectEpisodesHelper.selectAllInList(uiState.episodes)
+            PodcastTab.BOOKMARKS -> multiSelectBookmarksHelper.selectAllInList(uiState.bookmarks)
+        }
+    }
+
+    fun <T> multiDeselectAllBelow(multiSelectable: T) {
+        val uiState = uiState.value as? UiState.Loaded ?: return
+        when (multiSelectable) {
+            is PodcastEpisode -> {
+                val grouped = groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        multiSelectEpisodesHelper.deselectAllInList(group.subList(startIndex, group.size))
+                    }
+                }
+            }
+
+            is Bookmark -> {
+                val startIndex = uiState.bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectBookmarksHelper.deselectAllInList(
+                        uiState.bookmarks.subList(startIndex, uiState.bookmarks.size)
+                    )
+                }
+            }
+        }
+    }
+
+    fun <T> multiDeselectAllAbove(multiSelectable: T) {
+        val uiState = uiState.value as? UiState.Loaded ?: return
+        when (multiSelectable) {
+            is PodcastEpisode -> {
+                val grouped = groupedEpisodes.value
+                if (grouped != null) {
+                    val group = grouped.find { it.contains(multiSelectable) } ?: return
+                    val startIndex = group.indexOf(multiSelectable)
+                    if (startIndex > -1) {
+                        multiSelectEpisodesHelper.deselectAllInList(group.subList(0, startIndex + 1))
+                    }
+                }
+            }
+
+            is Bookmark -> {
+                val startIndex = uiState.bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectBookmarksHelper.deselectAllInList(
+                        uiState.bookmarks.subList(0, startIndex + 1)
+                    )
+                }
+            }
         }
     }
 
