@@ -441,9 +441,7 @@ interface Settings {
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
 
-    fun setShowArtworkOnLockScreen(show: Boolean)
-    fun showArtworkOnLockScreen(): Boolean
-
+    val showArtworkOnLockScreen: UserSetting<Boolean>
     val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
     fun getAutoArchiveExcludedPodcasts(): List<String>

@@ -787,13 +787,11 @@ class SettingsImpl @Inject constructor(
         return getBoolean("showPlayedEpisodes", true)
     }
 
-    override fun showArtworkOnLockScreen(): Boolean {
-        return getBoolean("showArtworkOnLockScreen", true)
-    }
-
-    override fun setShowArtworkOnLockScreen(show: Boolean) {
-        setBoolean("showArtworkOnLockScreen", show)
-    }
+    override val showArtworkOnLockScreen = UserSetting.BoolPref(
+        sharedPrefKey = "showArtworkOnLockScreen",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun selectedFilter(): String? {
         return getString(Settings.PREFERENCE_SELECTED_FILTER, null)

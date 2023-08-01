@@ -160,7 +160,7 @@ class AppearanceSettingsFragment : BaseFragment() {
             viewModel.useAndroidLightDarkMode(isChecked, activity as? AppCompatActivity)
         }
 
-        binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value ?: false
+        binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value
         binding.swtShowArtwork.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateShowArtworkOnLockScreen(isChecked)
         }
