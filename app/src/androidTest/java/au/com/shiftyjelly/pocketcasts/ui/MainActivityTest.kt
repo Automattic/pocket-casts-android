@@ -33,11 +33,11 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.anyOf
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.anyOf
+import org.hamcrest.Matchers.`is`
 import org.hamcrest.TypeSafeMatcher
 import org.junit.Before
 import org.junit.Rule
