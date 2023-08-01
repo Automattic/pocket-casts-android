@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import au.com.shiftyjelly.pocketcasts.utils.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
