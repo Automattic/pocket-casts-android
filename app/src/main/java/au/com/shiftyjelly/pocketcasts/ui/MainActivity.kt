@@ -673,7 +673,13 @@ class MainActivity :
                 updateNavAndStatusColors(true, state.podcast)
             }
 
-            if (viewModel.lastPlaybackState != null && (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) && settings.openPlayerAutomatically()) {
+            if (viewModel.lastPlaybackState != null &&
+                (
+                    viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid ||
+                        (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)
+                    ) &&
+                settings.openPlayerAutomatically.flow.value
+            ) {
                 binding.playerBottomSheet.openPlayer()
             }
 
@@ -786,7 +792,7 @@ class MainActivity :
     private fun updatePlaybackState(state: PlaybackState) {
         binding.playerBottomSheet.setPlaybackState(state)
 
-        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake()) {
+        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake.flow.value) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

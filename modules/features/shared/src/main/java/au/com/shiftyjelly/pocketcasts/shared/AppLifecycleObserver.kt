@@ -94,7 +94,7 @@ class AppLifecycleObserver constructor(
                 AppPlatform.WearOs -> {}
 
                 // For new users we want to auto play when the queue is empty by default
-                AppPlatform.Phone -> settings.setAutoPlayNextEpisodeOnEmpty(true)
+                AppPlatform.Phone -> settings.autoPlayNextEpisodeOnEmpty.set(true)
             }
         } else if (previousVersionCode < versionCode) {
             appLifecycleAnalytics.onApplicationUpgrade(previousVersionCode)

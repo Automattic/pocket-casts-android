@@ -181,12 +181,12 @@ class VersionMigrationsJob : JobService() {
 
     private fun performV7Migration() {
         // We want v6 users to keep defaulting to download, new users should get the new stream default
-        val currentStreamingPreference = if (settings.contains(Settings.PREFERENCE_GLOBAL_STREAMING_MODE)) settings.streamingMode() else false
-        settings.setStreamingMode(currentStreamingPreference)
+        val currentStreamingPreference = if (settings.contains(Settings.PREFERENCE_GLOBAL_STREAMING_MODE)) settings.streamingMode.flow.value else false
+        settings.streamingMode.set(currentStreamingPreference)
     }
 
     private fun addUpNextAutoDownload() {
-        settings.setUpNextAutoDownloaded(!settings.streamingMode())
+        settings.setUpNextAutoDownloaded(!settings.streamingMode.flow.value)
     }
 
     private fun deletePodcastImages() {

@@ -99,7 +99,17 @@ class EpisodeListAdapter(
         val episode = getItem(position) as PodcastEpisode
 
         val tintColor = this.tintColor ?: holder.itemView.context.getThemeColor(UR.attr.primary_icon_01)
-        holder.setup(episode, fromListUuid, tintColor, playButtonListener, settings.streamingMode(), settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
+        holder.setup(
+            episode = episode,
+            fromListUuid = fromListUuid,
+            tintColor = tintColor,
+            playButtonListener = playButtonListener,
+            streamByDefault = settings.streamingMode.flow.value,
+            upNextAction = settings.upNextSwipe.flow.value,
+            multiSelectEnabled = multiSelectHelper.isMultiSelecting,
+            isSelected = multiSelectHelper.isSelected(episode),
+            disposables = disposables
+        )
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
@@ -117,7 +127,15 @@ class EpisodeListAdapter(
     private fun bindUserEpisodeViewHolder(position: Int, holder: UserEpisodeViewHolder) {
         val userEpisode = getItem(position) as UserEpisode
         val tintColor = this.tintColor ?: holder.itemView.context.getThemeColor(UR.attr.primary_icon_01)
-        holder.setup(userEpisode, tintColor, playButtonListener, settings.streamingMode(), settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(userEpisode))
+        holder.setup(
+            episode = userEpisode,
+            tintColor = tintColor,
+            playButtonListener = playButtonListener,
+            streamByDefault = settings.streamingMode.flow.value,
+            upNextAction = settings.upNextSwipe.flow.value,
+            multiSelectEnabled = multiSelectHelper.isMultiSelecting,
+            isSelected = multiSelectHelper.isSelected(userEpisode)
+        )
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(userEpisode)

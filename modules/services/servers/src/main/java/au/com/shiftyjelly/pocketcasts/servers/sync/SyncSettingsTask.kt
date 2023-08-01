@@ -14,8 +14,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             try {
                 val request = NamedSettingsRequest(
                     settings = NamedSettingsSettings(
-                        skipForward = if (settings.getSkipForwardNeedsSync()) settings.getSkipForwardInSecs() else null,
-                        skipBack = if (settings.getSkipBackNeedsSync()) settings.getSkipBackwardInSecs() else null,
+                        skipForward = settings.skipForwardInSecs.getSyncValue(),
+                        skipBack = settings.skipBackInSecs.getSyncValue(),
                         marketingOptIn = if (settings.getMarketingOptInNeedsSync()) settings.getMarketingOptIn() else null,
                         freeGiftAcknowledged = if (settings.getFreeGiftAcknowledgedNeedsSync()) settings.getFreeGiftAcknowledged() else null,
                         gridOrder = if (settings.getPodcastsSortTypeNeedsSync()) settings.getPodcastsSortType().serverId else null,
@@ -29,8 +29,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
                         if (value.value is Number) { // Probably will have to change this when we do other settings, but for now just Number is fine
                             when (key) {
-                                "skipForward" -> settings.setSkipForwardInSec(value.value.toInt())
-                                "skipBack" -> settings.setSkipBackwardInSec(value.value.toInt())
+                                "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt())
+                                "skipBack" -> settings.skipBackInSecs.set(value.value.toInt())
                                 "gridOrder" -> settings.setPodcastsSortType(sortType = PodcastsSortType.fromServerId(value.value.toInt()), sync = false)
                             }
                         } else if (value.value is Boolean) {
@@ -48,8 +48,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return Result.failure()
             }
 
-            settings.setSkipBackNeedsSync(false)
-            settings.setSkipForwardNeedsSync(false)
+            settings.skipBackInSecs.needsSync = false
+            settings.skipForwardInSecs.needsSync = false
             settings.setMarketingOptInNeedsSync(false)
             settings.setFreeGiftAcknowledgedNeedsSync(false)
             settings.setPodcastsSortTypeNeedsSync(false)

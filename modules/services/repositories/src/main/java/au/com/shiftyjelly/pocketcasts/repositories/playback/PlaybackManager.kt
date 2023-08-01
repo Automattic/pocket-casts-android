@@ -226,7 +226,7 @@ open class PlaybackManager @Inject constructor(
             return nextEpisode
         }
 
-        if (!settings.getAutoPlayNextEpisodeOnEmpty()) {
+        if (!settings.autoPlayNextEpisodeOnEmpty.flow.value) {
             return null
         }
 
@@ -710,7 +710,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipForward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipForwardInSecs()) {
+    fun skipForward(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        jumpAmountSeconds: Int = settings.skipForwardInSecs.flow.value,
+    ) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 
@@ -734,7 +737,7 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, sourceView)
     }
 
-    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipBackwardInSecs()) {
+    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.flow.value) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 

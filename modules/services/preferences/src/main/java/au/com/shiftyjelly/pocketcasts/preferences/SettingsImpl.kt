@@ -65,7 +65,6 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
-        private const val CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY = "CustomMediaActionsVisibleKey"
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
@@ -75,14 +74,10 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
-    override val skipForwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipForwardInSecs()) }
-    override val skipBackwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipBackwardInSecs()) }
     override val podcastBadgeTypeObservable = BehaviorRelay.create<Settings.BadgeType>().apply { accept(getPodcastBadgeType()) }
     override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
-    override val upNextSwipeActionObservable = BehaviorRelay.create<Settings.UpNextAction>().apply { accept(getUpNextSwipeAction()) }
-    override val rowActionObservable = BehaviorRelay.create<Boolean>().apply { accept(streamingMode()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
     override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
@@ -90,15 +85,6 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
-    override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
-    override val defaultMediaNotificationControlsFlow = MutableStateFlow(getMediaNotificationControlItems())
-    override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
-    override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
-    override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
-    override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
-    override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
-    override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
-    override val autoPlayNextEpisodeOnEmptyFlow = MutableStateFlow(getAutoPlayNextEpisodeOnEmpty())
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
     override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
@@ -155,57 +141,17 @@ class SettingsImpl @Inject constructor(
         return context.isScreenReaderOn()
     }
 
-    override fun getSkipForwardInSecs(): Int {
-        return getSkipAmountInSecs(key = Settings.PREFERENCE_SKIP_FORWARD, defaultValue = Settings.SKIP_FORWARD_DEFAULT)
-    }
+    override val skipBackInSecs = UserSetting.PrefFromString.SkipAmount(
+        sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
+        defaultValue = 10,
+        sharedPrefs = sharedPreferences,
+    )
 
-    private fun getSkipAmountInSecs(key: String, defaultValue: String): Int {
-        val value = sharedPreferences.getString(key, defaultValue) ?: defaultValue
-        return try {
-            val valueInt = Integer.parseInt(value)
-            if (valueInt <= 0) defaultValue.toInt() else valueInt
-        } catch (nfe: NumberFormatException) {
-            defaultValue.toInt()
-        }
-    }
-
-    override fun getSkipForwardInMs(): Long {
-        return getSkipForwardInSecs() * 1000L
-    }
-
-    override fun setSkipForwardInSec(value: Int) {
-        setString(Settings.PREFERENCE_SKIP_FORWARD, if (value <= 0) Settings.SKIP_FORWARD_DEFAULT else value.toString())
-        skipForwardInSecsObservable.accept(value)
-    }
-
-    override fun getSkipBackwardInSecs(): Int {
-        return getSkipAmountInSecs(key = Settings.PREFERENCE_SKIP_BACKWARD, defaultValue = Settings.SKIP_BACKWARD_DEFAULT)
-    }
-
-    override fun getSkipBackwardInMs(): Long {
-        return getSkipBackwardInSecs() * 1000L
-    }
-
-    override fun setSkipBackwardInSec(value: Int) {
-        setString(Settings.PREFERENCE_SKIP_BACKWARD, if (value <= 0) Settings.SKIP_BACKWARD_DEFAULT else value.toString())
-        skipBackwardInSecsObservable.accept(value)
-    }
-
-    override fun getSkipForwardNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_SKIP_FORWARD_NEEDS_SYNC, false)
-    }
-
-    override fun setSkipForwardNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_SKIP_FORWARD_NEEDS_SYNC, value)
-    }
-
-    override fun getSkipBackNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_SKIP_BACK_NEEDS_SYNC, false)
-    }
-
-    override fun setSkipBackNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_SKIP_BACK_NEEDS_SYNC, value)
-    }
+    override val skipForwardInSecs = UserSetting.PrefFromString.SkipAmount(
+        sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
+        defaultValue = 30,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getMarketingOptIn(): Boolean {
         return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, false)
@@ -650,32 +596,23 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getBoolean(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE, false)
     }
 
-    override fun streamingMode(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_GLOBAL_STREAMING_MODE, true)
-    }
+    override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setStreamingMode(newValue: Boolean) {
-        setBoolean(Settings.PREFERENCE_GLOBAL_STREAMING_MODE, newValue)
-        rowActionObservable.accept(newValue)
-    }
+    override val keepScreenAwake = UserSetting.BoolPref(
+        sharedPrefKey = "keepScreenAwake4", // Yes, there is a 4 at the end. I don't know why.
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun keepScreenAwake(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, false)
-    }
-
-    override fun setKeepScreenAwake(newValue: Boolean) {
-        setBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, newValue)
-        keepScreenAwakeFlow.update { newValue }
-    }
-
-    override fun openPlayerAutomatically(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)
-    }
-
-    override fun setOpenPlayerAutomatically(newValue: Boolean) {
-        setBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, newValue)
-        openPlayerAutomaticallyFlow.update { newValue }
-    }
+    override val openPlayerAutomatically = UserSetting.BoolPref(
+        sharedPrefKey = "openPlayerAutomatically",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED, true)
@@ -914,14 +851,11 @@ class SettingsImpl @Inject constructor(
         return if (lastPausedAt != 0) lastPausedAt else null
     }
 
-    override fun getIntelligentPlaybackResumption(): Boolean {
-        return getBoolean(Settings.INTELLIGENT_PLAYBACK_RESUMPTION, true)
-    }
-
-    override fun setIntelligentPlaybackResumption(value: Boolean) {
-        setBoolean(Settings.INTELLIGENT_PLAYBACK_RESUMPTION, value)
-        intelligentPlaybackResumptionFlow.update { value }
-    }
+    override val intelligentPlaybackResumption = UserSetting.BoolPref(
+        sharedPrefKey = Settings.INTELLIGENT_PLAYBACK_RESUMPTION,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     private fun setDate(preference: String, date: Date?) {
         val editor = sharedPreferences.edit()
@@ -1012,19 +946,15 @@ class SettingsImpl @Inject constructor(
         sharedPreferences.edit().putStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, excluded.toSet()).apply()
     }
 
-    override fun getAutoPlayNextEpisodeOnEmpty(): Boolean {
-        val defaultValue = when (Util.getAppPlatform(context)) {
+    override val autoPlayNextEpisodeOnEmpty = UserSetting.BoolPref(
+        sharedPrefKey = "autoUpNextEmpty",
+        defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
-            AppPlatform.Phone -> false
+            AppPlatform.Phone,
             AppPlatform.WearOs -> false
-        }
-        return getBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, defaultValue)
-    }
-
-    override fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean) {
-        setBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, enabled)
-        autoPlayNextEpisodeOnEmptyFlow.update { enabled }
-    }
+        },
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getAutoArchiveIncludeStarred(): Boolean {
         return getBoolean(Settings.AUTO_ARCHIVE_INCLUDE_STARRED, false)
@@ -1061,23 +991,19 @@ class SettingsImpl @Inject constructor(
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value
     }
 
-    override fun getUpNextSwipeAction(): Settings.UpNextAction {
-        return Settings.UpNextAction.values()[getInt("up_next_action", Settings.UpNextAction.PLAY_NEXT.ordinal)]
-    }
+    override val upNextSwipe = UserSetting.PrefFromInt(
+        sharedPrefKey = "up_next_action",
+        defaultValue = Settings.UpNextAction.PLAY_NEXT,
+        sharedPrefs = sharedPreferences,
+        fromInt = { Settings.UpNextAction.values()[it] },
+        toInt = { it.ordinal }
+    )
 
-    override fun setUpNextSwipeAction(action: Settings.UpNextAction) {
-        setInt("up_next_action", action.ordinal)
-        upNextSwipeActionObservable.accept(action)
-    }
-
-    override fun getTapOnUpNextShouldPlay(): Boolean {
-        return getBoolean("tap_on_up_next_should_play", false)
-    }
-
-    override fun setTapOnUpNextShouldPlay(value: Boolean) {
-        setBoolean("tap_on_up_next_should_play", value)
-        tapOnUpNextShouldPlayFlow.update { value }
-    }
+    override val tapOnUpNextShouldPlay = UserSetting.BoolPref(
+        sharedPrefKey = "tap_on_up_next_should_play",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
         return Settings.HeadphoneAction.values()[getInt("headphone_controls_next_action", Settings.HeadphoneAction.SKIP_FORWARD.ordinal)]
@@ -1106,36 +1032,29 @@ class SettingsImpl @Inject constructor(
         headphonePlayBookmarkConfirmationSoundFlow.update { value }
     }
 
-    override fun defaultShowArchived(): Boolean {
-        return getBoolean("default_show_archived", false)
-    }
+    override val showArchivedDefault = UserSetting.BoolPref(
+        sharedPrefKey = "default_show_archived",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setDefaultShowArchived(value: Boolean) {
-        setBoolean("default_show_archived", value)
-        defaultShowArchivedFlow.update { value }
-    }
+    override val mediaControlItems = UserSetting.PrefListFromString<MediaNotificationControls>(
+        sharedPrefKey = "media_notification_controls_action",
+        sharedPrefs = sharedPreferences,
+        defaultValue = MediaNotificationControls.All,
+        fromString = { MediaNotificationControls.itemForId(it) },
+        toString = { it.key }
+    )
 
-    override fun getMediaNotificationControlItems(): List<MediaNotificationControls> {
-        var items = getStringList("media_notification_controls_action")
-
-        if (items.isEmpty())
-            items = MediaNotificationControls.All.map { it.key }
-        return items.mapNotNull { MediaNotificationControls.itemForId(it) }
-    }
-
-    override fun setMediaNotificationControlItems(items: List<String>) {
-        setStringList("media_notification_controls_action", items)
-        defaultMediaNotificationControlsFlow.update { items.mapNotNull { MediaNotificationControls.itemForId(it) } }
-    }
-
-    override fun defaultPodcastGrouping(): PodcastGrouping {
-        val index = getInt("default_podcast_grouping", 0)
-        return PodcastGrouping.All.getOrNull(index) ?: PodcastGrouping.None
-    }
-
-    override fun setDefaultPodcastGrouping(podcastGrouping: PodcastGrouping) {
-        setInt("default_podcast_grouping", PodcastGrouping.All.indexOf(podcastGrouping))
-        defaultPodcastGroupingFlow.update { podcastGrouping }
+    override val podcastGroupingDefault = run {
+        val default = PodcastGrouping.None
+        UserSetting.PrefFromInt<PodcastGrouping>(
+            sharedPrefKey = "default_podcast_grouping",
+            defaultValue = default,
+            sharedPrefs = sharedPreferences,
+            fromInt = { PodcastGrouping.All.getOrNull(it) ?: default },
+            toInt = { PodcastGrouping.All.indexOf(it) }
+        )
     }
 
     override fun setCloudSortOrder(sortOrder: Settings.CloudSortOrder) {
@@ -1407,13 +1326,11 @@ class SettingsImpl @Inject constructor(
         setBoolean(DONE_INITIAL_ONBOARDING_KEY, true)
     }
 
-    override fun areCustomMediaActionsVisible() =
-        getBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, true)
-
-    override fun setCustomMediaActionsVisible(value: Boolean) {
-        setBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, value)
-        customMediaActionsVisibilityFlow.update { value }
-    }
+    override val customMediaActionsVisibility = UserSetting.BoolPref(
+        sharedPrefKey = "CustomMediaActionsVisibleKey",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun isNotificationsDisabledMessageShown() =
         getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)

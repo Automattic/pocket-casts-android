@@ -24,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -140,9 +139,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                 SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {
 
                     RowAction(
-                        saved = settings.rowActionObservable
-                            .subscribeAsState(settings.streamingMode())
-                            .value,
+                        saved = settings.streamingMode.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_ROW_ACTION_CHANGED,
@@ -153,14 +150,12 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setStreamingMode(it)
+                            settings.streamingMode.set(it)
                         }
                     )
 
                     UpNextSwipe(
-                        saved = settings.upNextSwipeActionObservable
-                            .subscribeAsState(settings.getUpNextSwipeAction())
-                            .value,
+                        saved = settings.upNextSwipe.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED,
@@ -171,12 +166,12 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setUpNextSwipeAction(it)
+                            settings.upNextSwipe.set(it)
                         }
                     )
 
                     PodcastEpisodeGrouping(
-                        saved = settings.defaultPodcastGroupingFlow.collectAsState().value,
+                        saved = settings.podcastGroupingDefault.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_CHANGED,
@@ -190,13 +185,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setDefaultPodcastGrouping(it)
+                            settings.podcastGroupingDefault.set(it)
                             showSetAllGroupingDialog(it)
                         }
                     )
 
                     ShowArchived(
-                        saved = settings.defaultShowArchivedFlow.collectAsState().value,
+                        saved = settings.showArchivedDefault.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_CHANGED,
@@ -207,7 +202,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     }
                                 )
                             )
-                            settings.setDefaultShowArchived(it)
+                            settings.showArchivedDefault.set(it)
                             showSetAllArchiveDialog(it)
                         }
                     )
@@ -226,76 +221,78 @@ class PlaybackSettingsFragment : BaseFragment() {
                     // Skip forward time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_forward_time),
-                        saved = settings.skipForwardInSecsObservable
-                            .subscribeAsState(settings.getSkipForwardInSecs())
+                        saved = settings.skipForwardInSecs.flow
+                            .collectAsState()
                             .value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
                                 mapOf("value" to it)
                             )
-                            settings.setSkipForwardNeedsSync(true)
-                            settings.setSkipForwardInSec(it)
+                            settings.skipForwardInSecs.run {
+                                set(it)
+                                needsSync = true
+                            }
                         }
                     )
 
                     // Skip back time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_back_time),
-                        saved = settings.skipBackwardInSecsObservable
-                            .subscribeAsState(settings.getSkipBackwardInSecs())
-                            .value,
+                        saved = settings.skipBackInSecs.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_BACK_CHANGED,
                                 mapOf("value" to it)
                             )
-                            settings.setSkipBackNeedsSync(true)
-                            settings.setSkipBackwardInSec(it)
+                            settings.skipBackInSecs.run {
+                                set(it)
+                                needsSync = true
+                            }
                         }
                     )
 
                     KeepScreenAwake(
-                        saved = settings.keepScreenAwakeFlow.collectAsState().value,
+                        saved = settings.keepScreenAwake.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setKeepScreenAwake(it)
+                            settings.keepScreenAwake.set(it)
                         }
                     )
 
                     OpenPlayerAutomatically(
-                        saved = settings.openPlayerAutomaticallyFlow.collectAsState().value,
+                        saved = settings.openPlayerAutomatically.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setOpenPlayerAutomatically(it)
+                            settings.openPlayerAutomatically.set(it)
                         }
                     )
 
                     IntelligentPlaybackResumption(
-                        saved = settings.intelligentPlaybackResumptionFlow.collectAsState().value,
+                        saved = settings.intelligentPlaybackResumption.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setIntelligentPlaybackResumption(it)
+                            settings.intelligentPlaybackResumption.set(it)
                         }
                     )
 
                     PlayUpNextOnTap(
-                        saved = settings.tapOnUpNextShouldPlayFlow.collectAsState().value,
+                        saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setTapOnUpNextShouldPlay(it)
+                            settings.tapOnUpNextShouldPlay.set(it)
                         }
                     )
 
@@ -303,7 +300,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                     // in the list. If it's position is changed, make sure you update the handling when
                     // we scroll to this item as well.
                     AutoPlayNextOnEmpty(
-                        saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
+                        saved = settings.autoPlayNextEpisodeOnEmpty.flow.collectAsState().value,
                         showFlashWithDelay = if (scrollToAutoPlay) {
                             // Have flash occur after scroll to autoplay
                             scrollToAutoPlayDelay * 2
@@ -315,7 +312,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
                                 mapOf("enabled" to it)
                             )
-                            settings.setAutoPlayNextEpisodeOnEmpty(it)
+                            settings.autoPlayNextEpisodeOnEmpty.set(it)
                         }
                     )
                 }

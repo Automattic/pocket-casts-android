@@ -64,6 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -179,8 +180,8 @@ class PlayerViewModel @Inject constructor(
     val listDataRx = Observables.combineLatest(
         upNextStateObservable,
         playbackStateObservable,
-        settings.skipBackwardInSecsObservable,
-        settings.skipForwardInSecsObservable,
+        settings.skipBackInSecs.flow.asObservable(coroutineContext),
+        settings.skipForwardInSecs.flow.asObservable(coroutineContext),
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.playbackEffectsObservable,

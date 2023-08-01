@@ -62,8 +62,6 @@ interface Settings {
         const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
-        const val PREFERENCE_SKIP_FORWARD_NEEDS_SYNC = "skipForwardNeedsSync"
-        const val PREFERENCE_SKIP_BACK_NEEDS_SYNC = "skipBackNeedsSync"
 
         const val PREFERENCE_MARKETING_OPT_IN = "marketingOptIn"
         const val PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC = "marketingOptInNeedsSync"
@@ -94,15 +92,12 @@ interface Settings {
         const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING = "autoDownloadOnlyDownloadWhenCharging"
         const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
         const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
-        const val PREFERENCE_KEEP_SCREEN_AWAKE = "keepScreenAwake4"
-        const val PREFERENCE_OPEN_PLAYER_AUTOMATICALLY = "openPlayerAutomatically"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
 
-        const val PREFERENCE_AUTO_PLAY_ON_EMPTY = "autoUpNextEmpty"
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
@@ -117,9 +112,6 @@ interface Settings {
         // legacy settings
         const val LEGACY_STORAGE_ON_PHONE = "phone"
         const val LEGACY_STORAGE_ON_SD_CARD = "external"
-
-        const val SKIP_FORWARD_DEFAULT = "30"
-        const val SKIP_BACKWARD_DEFAULT = "10"
 
         const val LAST_MAIN_NAV_SCREEN_OPENED = "last_main_screen"
 
@@ -297,12 +289,8 @@ interface Settings {
     val podcastBadgeTypeObservable: Observable<BadgeType>
     val podcastSortTypeObservable: Observable<PodcastsSortType>
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val skipForwardInSecsObservable: Observable<Int>
-    val skipBackwardInSecsObservable: Observable<Int>
     val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
-    val upNextSwipeActionObservable: Observable<UpNextAction>
-    val rowActionObservable: Observable<Boolean>
     val marketingOptObservable: Observable<Boolean>
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
@@ -310,15 +298,6 @@ interface Settings {
     val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
     val autoAddUpNextLimit: Observable<Int>
 
-    val defaultPodcastGroupingFlow: StateFlow<PodcastGrouping>
-    val defaultMediaNotificationControlsFlow: StateFlow<List<MediaNotificationControls>>
-    val defaultShowArchivedFlow: StateFlow<Boolean>
-    val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
-    val keepScreenAwakeFlow: StateFlow<Boolean>
-    val openPlayerAutomaticallyFlow: StateFlow<Boolean>
-    val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
-    val customMediaActionsVisibilityFlow: StateFlow<Boolean>
-    val autoPlayNextEpisodeOnEmptyFlow: StateFlow<Boolean>
     val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
     val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
@@ -333,10 +312,8 @@ interface Settings {
 
     fun isScreenReaderOn(): Boolean
 
-    fun getSkipForwardInSecs(): Int
-    fun getSkipForwardInMs(): Long
-    fun getSkipBackwardInSecs(): Int
-    fun getSkipBackwardInMs(): Long
+    val skipForwardInSecs: UserSetting<Int>
+    val skipBackInSecs: UserSetting<Int>
 
     fun getLastScreenOpened(): String?
     fun setLastScreenOpened(screenId: String)
@@ -417,14 +394,9 @@ interface Settings {
 
     fun hideNotificationOnPause(): Boolean
 
-    fun streamingMode(): Boolean
-    fun setStreamingMode(newValue: Boolean)
-
-    fun keepScreenAwake(): Boolean
-    fun setKeepScreenAwake(newValue: Boolean)
-
-    fun openPlayerAutomatically(): Boolean
-    fun setOpenPlayerAutomatically(newValue: Boolean)
+    val streamingMode: UserSetting<Boolean>
+    val keepScreenAwake: UserSetting<Boolean>
+    val openPlayerAutomatically: UserSetting<Boolean>
 
     fun isPodcastAutoDownloadUnmeteredOnly(): Boolean
     fun isPodcastAutoDownloadPowerOnly(): Boolean
@@ -500,10 +472,8 @@ interface Settings {
     fun contains(key: String): Boolean
     fun getLastRefreshError(): String?
 
-    fun getUpNextSwipeAction(): UpNextAction
-    fun setUpNextSwipeAction(action: UpNextAction)
-    fun getTapOnUpNextShouldPlay(): Boolean
-    fun setTapOnUpNextShouldPlay(value: Boolean)
+    val upNextSwipe: UserSetting<UpNextAction>
+    val tapOnUpNextShouldPlay: UserSetting<Boolean>
 
     fun getHeadphoneControlsNextAction(): HeadphoneAction
     fun setHeadphoneControlsNextAction(action: HeadphoneAction)
@@ -516,14 +486,7 @@ interface Settings {
     fun getPeriodicSaveTimeMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
-    fun defaultPodcastGrouping(): PodcastGrouping
-    fun setDefaultPodcastGrouping(podcastGrouping: PodcastGrouping)
-    fun setSkipForwardInSec(value: Int)
-    fun setSkipBackwardInSec(value: Int)
-    fun setSkipForwardNeedsSync(value: Boolean)
-    fun setSkipBackNeedsSync(value: Boolean)
-    fun getSkipForwardNeedsSync(): Boolean
-    fun getSkipBackNeedsSync(): Boolean
+    val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     fun getMarketingOptIn(): Boolean
     fun setMarketingOptIn(value: Boolean)
@@ -577,12 +540,9 @@ interface Settings {
     fun getTrialFinishedSeen(): Boolean
     fun getAutoSubscribeToPlayed(): Boolean
     fun getAutoShowPlayed(): Boolean
-    fun getAutoPlayNextEpisodeOnEmpty(): Boolean
-    fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean)
-    fun defaultShowArchived(): Boolean
-    fun setDefaultShowArchived(value: Boolean)
-    fun getMediaNotificationControlItems(): List<MediaNotificationControls>
-    fun setMediaNotificationControlItems(items: List<String>)
+    val autoPlayNextEpisodeOnEmpty: UserSetting<Boolean>
+    val showArchivedDefault: UserSetting<Boolean>
+    val mediaControlItems: UserSetting<List<MediaNotificationControls>>
     fun setMultiSelectItems(items: List<Int>)
     fun getMultiSelectItems(): List<Int>
     fun setLastPauseTime(date: Date)
@@ -591,8 +551,7 @@ interface Settings {
     fun getLastPausedUUID(): String?
     fun setLastPausedAt(pausedAt: Int)
     fun getLastPausedAt(): Int?
-    fun getIntelligentPlaybackResumption(): Boolean
-    fun setIntelligentPlaybackResumption(value: Boolean)
+    val intelligentPlaybackResumption: UserSetting<Boolean>
     fun getAutoAddUpNextLimit(): Int
     fun setAutoAddUpNextLimit(limit: Int)
     fun setAutoAddUpNextLimitBehaviour(value: AutoAddUpNextLimitBehaviour)
@@ -625,8 +584,7 @@ interface Settings {
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
 
-    fun areCustomMediaActionsVisible(): Boolean
-    fun setCustomMediaActionsVisible(value: Boolean)
+    val customMediaActionsVisibility: UserSetting<Boolean>
 
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)
