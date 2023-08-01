@@ -95,8 +95,12 @@ private fun Content(
             )
         }
 
-        val backgroundRefreshStringRes =
-            if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
+        val backgroundRefreshStringRes = if (state.refreshInBackground) {
+            LR.string.settings_storage_background_refresh_on_watch
+        } else {
+            LR.string.settings_storage_background_refresh_off_watch
+        }
+
         item {
             ToggleChip(
                 label = stringResource(LR.string.settings_storage_background_refresh),

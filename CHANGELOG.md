@@ -7,7 +7,8 @@
         ([#1209](https://github.com/Automattic/pocket-casts-android/pull/1209))
     *   Fixed upgrade flow when signing in with Google account
         ([#1204](https://github.com/Automattic/pocket-casts-android/pull/1204))
-
+    *   Fixed watch background refresh description to not reference auto downloads
+        ([#1212](https://github.com/Automattic/pocket-casts-android/pull/1212))
 
 7.44
 -----

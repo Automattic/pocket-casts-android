@@ -111,6 +111,9 @@ class BookmarkManagerImpl @Inject constructor(
         flowOf(helper.map { it.toBookmark() })
     }
 
+    override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
+        bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
+
     /**
      * Mark the bookmark as deleted so it can be synced to other devices.
      */

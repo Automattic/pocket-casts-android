@@ -41,7 +41,7 @@
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
     <string name="log_in">Log in</string>
-    <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
+    <string name="log_in_subtitle">Start listening to your favorite podcasts</string>
     <string name="log_out">Log out</string>
     <string name="log_in_watch_requires_plus">Log in with a Plus account to use this app or upgrade visiting</string>
     <string name="log_in_with_plus">Please log in with a Plus account</string>
@@ -608,7 +608,7 @@
     <string name="filters_create">Create</string>
     <string name="filters_create_add_more">Add more criteria to finish refining your filter.</string>
     <string name="filters_create_auto_download" translatable="false">@string/auto_download</string>
-    <string name="filters_create_colour_icon">COLOUR &amp; ICON</string>
+    <string name="filters_create_colour_icon">COLOR &amp; ICON</string>
     <string name="filters_create_filter">Create filter</string>
     <string name="filters_create_filter_by">FILTER BY</string>
     <string name="filters_create_filter_details">Filter details</string>
@@ -688,8 +688,8 @@
     <string name="profile_cancel_confirm_item_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
     <string name="profile_cancel_confirm_item_uploads">All files uploaded to your Pocket&#160;Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
     <string name="profile_cancel_confirm_item_web_player">You will no longer be able to access Pocket&#160;Casts using your web browser, or desktop computer.</string>
-    <string name="profile_cancel_confirm_stay_button_title">Actually, I want to stay"</string>
-    <string name="profile_cancel_confirm_cancel_button_title">Yes, cancel my subscription"</string>
+    <string name="profile_cancel_confirm_stay_button_title">Actually, I want to stay</string>
+    <string name="profile_cancel_confirm_cancel_button_title">Yes, cancel my subscription</string>
     <string name="profile_change_email_address">Change email address</string>
     <string name="profile_change_email_address_title">Change Email Address</string>
     <string name="profile_change_password">Change password</string>
@@ -960,7 +960,7 @@
     <string name="plus_description_title">Enhanced Features For Advanced Listeners</string>
     <string name="plus_desktop_apps">Desktop Apps</string>
     <string name="plus_desktop_apps_body">Take your podcasts to more places with our Windows, macOS and Web apps.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customisation options.</string>
+    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customization options.</string>
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
@@ -978,7 +978,7 @@
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_themes_icons_body">Fly your true colors. Exclusive icons and themes for the plus club only.</string>
     <string name="plus_folder" translatable="false">@string/folders</string>
-    <string name="plus_folder_body">Create folders to organise your podcast collection.</string>
+    <string name="plus_folder_body">Create folders to organize your podcast collection.</string>
     <string name="plus_trial_finished">Pocket Casts Plus Trial Finished</string>
     <string name="plus_trial_finished_continue">Upgrade your account anytime to continue using Pocket Casts Plus</string>
     <string name="plus_trial_finished_detail">Sadly, your free trial period has reached its end. Your account has now been downgraded to free.</string>
@@ -1088,7 +1088,7 @@
     <string name="settings_headphone_controls_choice_skip_forward">Skip forward</string>
     <string name="settings_headphone_controls_confirmation_sound">Bookmark confirmation sound</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Play a confirmation sound after creating a bookmark with your headphones.</string>
-    <string name="settings_headphone_controls_summary">Customise the actions done by the most common headphone controls.</string>
+    <string name="settings_headphone_controls_summary">Customize the actions done by the most common headphone controls.</string>
     <string name="settings_help_cant_load">Could not load Help &amp; Feedback.\nPlease check your internet connection and try again.</string>
     <string name="settings_help_contact_support">Contact Support</string>
     <string name="settings_help_contact_support_email_sent_to_phone">If your phone is currently paired, it will show a pop-up to email support with your logs attached</string>
@@ -1117,7 +1117,7 @@
     <string name="settings_manage_downloads_total">Total</string>
     <string name="settings_media_actions_prioritize_title">Prioritize your custom media actions</string>
     <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
-    <string name="settings_media_actions_customise">Customise media actions</string>
+    <string name="settings_media_actions_customise">Customize media actions</string>
     <string name="settings_media_actions_show_title">Show custom media actions</string>
     <string name="settings_media_actions_show_subtitle">Show custom media actions in Android 13 media notifications and Android Auto.</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
@@ -1188,7 +1188,9 @@
     <string name="settings_storage_android_10_custom">We can no longer support custom folders for storage on Android 10+. We have switched your storage option back to your phones default.</string>
     <string name="settings_storage_background_refresh">Background refresh</string>
     <string name="settings_storage_background_refresh_off">Pocket Casts will only refresh when you open the app.\n\nEpisode notifications and auto downloads will only happen when you open the app.</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts will only sync your account when you open the app.</string>
     <string name="settings_storage_background_refresh_on">Pocket Casts will periodically check for new episodes and auto downloads in the background.</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts will periodically sync your account in the background.</string>
     <string name="settings_storage_clear_cache">Clearing download cache</string>
     <string name="settings_storage_clear_download_cache">Clear download cache</string>
     <string name="settings_storage_custom_folder">Custom Folder</string>
@@ -1440,7 +1442,6 @@
     <string name="discover_category_comedy">Comedy</string>
     <string name="discover_category_education">Education</string>
     <string name="discover_category_fiction">Fiction</string>
-    <string name="discover_category_governmentGovernment" />
     <string name="discover_category_government">Government</string>
     <string name="discover_category_health"><![CDATA[Health & Fitness]]></string>
     <string name="discover_category_history">History</string>
@@ -1675,7 +1676,7 @@
     <string name="onboarding_import_from_castbox_step_2">Tap the \“Personal\” tab.</string>
     <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
     <string name="onboarding_import_from_castbox_step_4">Scroll down to \“OPML Export\” and tap it.</string>
-    <string name="onboarding_import_from_castbox_step_5">@string/onboarding_import_from_other_apps_step_2</string>
+    <string name="onboarding_import_from_castbox_step_5" translatable="false">@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_open">Open Castbox&#8230;</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts can import podcasts from OPML files, so if your current app can export an OPML file, you can follow these steps:</string>
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
@@ -1687,8 +1688,8 @@
     <string name="bookmarks_create_instructions">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
     <string name="bookmarks_not_found">No bookmarks yet</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
-    <string name="bookmarks_plural">%s bookmarks</string>
-    <string name="bookmarks_singular">%s bookmark</string>
+    <string name="bookmarks_plural">%d bookmarks</string>
+    <string name="bookmarks_singular">1 bookmark</string>
     <string name="bookmarks_delete_plural">Delete bookmarks</string>
     <string name="bookmarks_delete_singular">Delete bookmark</string>
     <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
@@ -1696,6 +1697,7 @@
     <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
     <string name="bookmarks_select_option">Select bookmarks</string>
+    <string name="bookmarks_search">Search bookmark</string>
     <string name="bookmarks_sort_option" translatable="false">@string/sort_by</string>
     <string name="bookmarks_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
     <string name="bookmarks_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>

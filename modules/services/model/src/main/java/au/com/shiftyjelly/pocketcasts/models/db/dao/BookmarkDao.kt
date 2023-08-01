@@ -63,6 +63,20 @@ abstract class BookmarkDao {
         deleted: Boolean = false,
     ): Flow<List<PodcastBookmark>>
 
+    @Query(
+        """SELECT bookmarks.*
+            FROM bookmarks
+            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE bookmarks.podcast_uuid = :podcastUuid 
+            AND (UPPER(bookmarks.title) LIKE UPPER(:title) OR UPPER(podcast_episodes.title) LIKE UPPER(:title))
+            AND deleted = :deleted"""
+    )
+    abstract suspend fun searchInPodcastByTitle(
+        podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
+
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)
 
