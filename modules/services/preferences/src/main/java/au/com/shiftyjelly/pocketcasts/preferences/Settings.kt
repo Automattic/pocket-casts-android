@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -596,10 +597,14 @@ interface Settings {
     fun setBookmarksSortType(sortType: BookmarksSortType)
     fun getBookmarksSortType(): BookmarksSortType
 
-    // It would be better to have this be a UserSetting<ThemeType>, but that is not easy due to the
-    // way our modules are structured.
+    // It would be better to have this be a UserSetting<ThemeType>, but that
+    // is not easy due to the way our modules are structured.
     val theme: UserSetting<ThemeSetting>
     val darkThemePreference: UserSetting<ThemeSetting>
     val lightThemePreference: UserSetting<ThemeSetting>
     val useSystemTheme: UserSetting<Boolean>
+
+    // It would be better to have this be a UserSetting<AppIconType>, but that
+    // is not easy due to the way our modules are structured.
+    val appIcon: UserSetting<AppIconSetting>
 }

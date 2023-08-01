@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -1414,5 +1415,16 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "useSystemTheme",
         defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q, // Only default on Android 10+
         sharedPrefs = sharedPreferences
+    )
+
+    override val appIcon = UserSetting.PrefFromString(
+        sharedPrefKey = "pocketCastsAppIcon",
+        defaultValue = AppIconSetting.DEFAULT,
+        sharedPrefs = sharedPreferences,
+        fromString = { str ->
+            AppIconSetting.values().find { it.id == str }
+                ?: AppIconSetting.DEFAULT
+        },
+        toString = { it.id }
     )
 }
