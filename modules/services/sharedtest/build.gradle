@@ -2,4 +2,7 @@ apply from: "../../modules.gradle"
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.sharedtest'
+    buildFeatures {
+        buildConfig true
+    }
 }
