@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
@@ -597,8 +598,8 @@ interface Settings {
 
     // It would be better to have this be a UserSetting<ThemeType>, but that is not easy due to the
     // way our modules are structured.
-    val theme: UserSetting<String>
-    val darkThemePreference: UserSetting<String>
-    val lightThemePreference: UserSetting<String>
+    val theme: UserSetting<ThemeSetting>
+    val darkThemePreference: UserSetting<ThemeSetting>
+    val lightThemePreference: UserSetting<ThemeSetting>
     val useSystemTheme: UserSetting<Boolean>
 }

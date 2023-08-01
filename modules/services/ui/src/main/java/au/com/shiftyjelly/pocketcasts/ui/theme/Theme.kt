@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -64,9 +65,17 @@ class Theme @Inject constructor(private val settings: Settings) {
         )
     }
 
-    enum class ThemeType(val id: String, @StringRes val labelId: Int, @StyleRes val resourceId: Int, @DrawableRes val iconResourceId: Int, val defaultLightIcons: Boolean, val darkTheme: Boolean, val isPlus: Boolean) {
+    enum class ThemeType(
+        internal val themeSetting: ThemeSetting,
+        @StringRes val labelId: Int,
+        @StyleRes val resourceId: Int,
+        @DrawableRes val iconResourceId: Int,
+        val defaultLightIcons: Boolean,
+        val darkTheme: Boolean,
+        val isPlus: Boolean,
+    ) {
         LIGHT(
-            id = "light",
+            themeSetting = ThemeSetting.LIGHT,
             labelId = LR.string.settings_theme_light,
             resourceId = R.style.ThemeLight,
             iconResourceId = IR.drawable.ic_apptheme0,
@@ -75,7 +84,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         DARK(
-            id = "dark",
+            themeSetting = ThemeSetting.DARK,
             labelId = LR.string.settings_theme_dark,
             resourceId = R.style.ThemeDark,
             iconResourceId = IR.drawable.ic_apptheme1,
@@ -84,7 +93,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         ROSE(
-            id = "rose",
+            themeSetting = ThemeSetting.ROSE,
             labelId = LR.string.settings_theme_rose,
             resourceId = R.style.Rose,
             iconResourceId = IR.drawable.ic_theme_rose,
@@ -93,7 +102,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         INDIGO(
-            id = "indigo",
+            themeSetting = ThemeSetting.INDIGO,
             labelId = LR.string.settings_theme_indigo,
             resourceId = R.style.Indigo,
             iconResourceId = IR.drawable.ic_indigo,
@@ -102,7 +111,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         EXTRA_DARK(
-            id = "extraDark",
+            themeSetting = ThemeSetting.EXTRA_DARK,
             labelId = LR.string.settings_theme_extra_dark,
             resourceId = R.style.ExtraThemeDark,
             iconResourceId = IR.drawable.ic_apptheme2,
@@ -111,7 +120,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         DARK_CONTRAST(
-            id = "darkContrast",
+            themeSetting = ThemeSetting.DARK_CONTRAST,
             labelId = LR.string.settings_theme_dark_contrast,
             resourceId = R.style.DarkContrast,
             iconResourceId = IR.drawable.ic_apptheme6,
@@ -120,7 +129,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         LIGHT_CONTRAST(
-            id = "lightContrast",
+            themeSetting = ThemeSetting.LIGHT_CONTRAST,
             labelId = LR.string.settings_theme_light_contrast,
             resourceId = R.style.LightContrast,
             iconResourceId = IR.drawable.ic_apptheme7,
@@ -129,7 +138,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = false
         ),
         ELECTRIC(
-            id = "electric",
+            themeSetting = ThemeSetting.ELECTRIC,
             labelId = LR.string.settings_theme_electricity,
             resourceId = R.style.Electric,
             iconResourceId = IR.drawable.ic_apptheme5,
@@ -138,7 +147,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = true
         ),
         CLASSIC_LIGHT(
-            id = "classicLight",
+            themeSetting = ThemeSetting.CLASSIC_LIGHT,
             labelId = LR.string.settings_theme_classic, // "Classic Light"
             resourceId = R.style.ClassicLight,
             iconResourceId = IR.drawable.ic_apptheme3,
@@ -147,7 +156,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             isPlus = true
         ),
         RADIOACTIVE(
-            id = "radioactive",
+            themeSetting = ThemeSetting.RADIOACTIVE,
             labelId = LR.string.settings_theme_radioactivity,
             resourceId = R.style.Radioactive,
             iconResourceId = IR.drawable.ic_theme_radioactive,
@@ -157,8 +166,17 @@ class Theme @Inject constructor(private val settings: Settings) {
         );
 
         companion object {
-            fun fromString(value: String, default: ThemeType = DARK): ThemeType {
-                return ThemeType.values().find { it.id == value } ?: default
+            fun fromThemeSetting(themeSetting: ThemeSetting): ThemeType = when (themeSetting) {
+                ThemeSetting.LIGHT -> Theme.ThemeType.LIGHT
+                ThemeSetting.DARK -> Theme.ThemeType.DARK
+                ThemeSetting.ROSE -> Theme.ThemeType.ROSE
+                ThemeSetting.INDIGO -> Theme.ThemeType.INDIGO
+                ThemeSetting.EXTRA_DARK -> Theme.ThemeType.EXTRA_DARK
+                ThemeSetting.DARK_CONTRAST -> Theme.ThemeType.DARK_CONTRAST
+                ThemeSetting.LIGHT_CONTRAST -> Theme.ThemeType.LIGHT_CONTRAST
+                ThemeSetting.ELECTRIC -> Theme.ThemeType.ELECTRIC
+                ThemeSetting.CLASSIC_LIGHT -> Theme.ThemeType.CLASSIC_LIGHT
+                ThemeSetting.RADIOACTIVE -> Theme.ThemeType.RADIOACTIVE
             }
         }
     }
@@ -195,7 +213,7 @@ class Theme @Inject constructor(private val settings: Settings) {
 
     fun updateTheme(activity: AppCompatActivity, theme: Theme.ThemeType, configuration: Configuration = activity.resources.configuration) {
         activity.setTheme(theme.resourceId)
-        if (theme.id == activeTheme.id) return
+        if (theme == activeTheme) return
         activeTheme = theme
 
         when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
@@ -249,30 +267,27 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     private fun getThemeFromPreferences(): ThemeType =
-        ThemeType.fromString(settings.theme.flow.value, ThemeType.DARK)
+        ThemeType.fromThemeSetting(settings.theme.flow.value)
 
     private fun setThemeToPreferences(theme: ThemeType) {
-        settings.theme.set(theme.id)
+        settings.theme.set(theme.themeSetting)
     }
 
     private fun getPreferredDarkThemeFromPreferences(): ThemeType =
-        ThemeType.fromString(settings.darkThemePreference.flow.value, ThemeType.DARK)
+        ThemeType.fromThemeSetting(settings.darkThemePreference.flow.value)
 
     private fun getPreferredLightFromPreferences(): ThemeType =
-        ThemeType.fromString(settings.lightThemePreference.flow.value, ThemeType.LIGHT)
+        ThemeType.fromThemeSetting(settings.lightThemePreference.flow.value)
 
     private fun setPreferredDarkThemeToPreferences(theme: ThemeType) {
-        settings.darkThemePreference.set(theme.id)
+        settings.darkThemePreference.set(theme.themeSetting)
     }
 
     private fun setPreferredLightThemeToPreferences(theme: ThemeType) {
-        settings.lightThemePreference.set(theme.id)
+        settings.lightThemePreference.set(theme.themeSetting)
     }
 
     fun setUseSystemTheme(value: Boolean, activity: AppCompatActivity?) {
-        // Use commit to ensure update is persisted before activity is recreated. This is needed
-        // to make sure the theme is persisted in time when a user taps on a Plus theme with a Free
-        // and then taps on a Free theme.
         settings.useSystemTheme.set(value, commit = true)
 
         if (value && activity != null) {

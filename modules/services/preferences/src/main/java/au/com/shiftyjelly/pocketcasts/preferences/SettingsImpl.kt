@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
@@ -141,13 +142,13 @@ class SettingsImpl @Inject constructor(
         return context.isScreenReaderOn()
     }
 
-    override val skipBackInSecs = UserSetting.PrefFromString.SkipAmount(
+    override val skipBackInSecs = UserSetting.SkipAmountPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
         defaultValue = 10,
         sharedPrefs = sharedPreferences,
     )
 
-    override val skipForwardInSecs = UserSetting.PrefFromString.SkipAmount(
+    override val skipForwardInSecs = UserSetting.SkipAmountPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
         defaultValue = 30,
         sharedPrefs = sharedPreferences,
@@ -1391,21 +1392,21 @@ class SettingsImpl @Inject constructor(
             )
         ]
 
-    override val theme = UserSetting.StringPref(
+    override val theme = ThemeSetting.UserSettingPref(
         sharedPrefKey = "pocketCastsTheme",
-        defaultValue = "dark", // ThemeType.DARK
+        defaultValue = ThemeSetting.DARK,
         sharedPrefs = sharedPreferences,
     )
 
-    override val darkThemePreference = UserSetting.StringPref(
+    override val darkThemePreference = ThemeSetting.UserSettingPref(
         sharedPrefKey = "PreferredDarkTheme",
-        defaultValue = "dark", // ThemeType.DARK
+        defaultValue = ThemeSetting.DARK,
         sharedPrefs = sharedPreferences,
     )
 
-    override val lightThemePreference = UserSetting.StringPref(
+    override val lightThemePreference = ThemeSetting.UserSettingPref(
         sharedPrefKey = "PreferredLightTheme",
-        defaultValue = "light", // ThemeType.LIGHT
+        defaultValue = ThemeSetting.LIGHT,
         sharedPrefs = sharedPreferences,
     )
 

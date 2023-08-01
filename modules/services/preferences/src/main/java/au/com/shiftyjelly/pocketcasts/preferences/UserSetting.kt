@@ -135,29 +135,6 @@ abstract class UserSetting<T>(
                 }
             }
         }
-
-        // This stores an the skip value Int as a String in shared preferences.
-        class SkipAmount(
-            sharedPrefKey: String,
-            defaultValue: Int,
-            sharedPrefs: SharedPreferences,
-        ) : PrefFromString<Int>(
-            sharedPrefKey = sharedPrefKey,
-            defaultValue = defaultValue,
-            sharedPrefs = sharedPrefs,
-            fromString = { value ->
-                try {
-                    val valueInt = Integer.parseInt(value)
-                    if (valueInt <= 0) defaultValue else valueInt
-                } catch (nfe: NumberFormatException) {
-                    defaultValue
-                }
-            },
-            toString = { value ->
-                val intValue = if (value <= 0) defaultValue else value
-                intValue.toString()
-            }
-        )
     }
 
     class PrefListFromString<T>(
@@ -197,4 +174,27 @@ abstract class UserSetting<T>(
             }
         }
     }
+
+    // This stores the skip value Int as a String in shared preferences.
+    class SkipAmountPref(
+        sharedPrefKey: String,
+        defaultValue: Int,
+        sharedPrefs: SharedPreferences,
+    ) : PrefFromString<Int>(
+        sharedPrefKey = sharedPrefKey,
+        defaultValue = defaultValue,
+        sharedPrefs = sharedPrefs,
+        fromString = { value ->
+            try {
+                val valueInt = Integer.parseInt(value)
+                if (valueInt <= 0) defaultValue else valueInt
+            } catch (nfe: NumberFormatException) {
+                defaultValue
+            }
+        },
+        toString = { value ->
+            val intValue = if (value <= 0) defaultValue else value
+            intValue.toString()
+        }
+    )
 }
