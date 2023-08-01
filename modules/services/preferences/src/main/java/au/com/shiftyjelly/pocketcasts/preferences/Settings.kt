@@ -594,4 +594,11 @@ interface Settings {
 
     fun setBookmarksSortType(sortType: BookmarksSortType)
     fun getBookmarksSortType(): BookmarksSortType
+
+    // It would be better to have this be a UserSetting<ThemeType>, but that is not easy due to the
+    // way our modules are structured.
+    val theme: UserSetting<String>
+    val darkThemePreference: UserSetting<String>
+    val lightThemePreference: UserSetting<String>
+    val useSystemTheme: UserSetting<Boolean>
 }

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.ui.theme
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -15,10 +14,9 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -29,15 +27,8 @@ import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-const val PREFERENCE_THEME = "pocketCastsTheme"
-const val PREFERENCE_PREFERRED_DARK_THEME = "PreferredDarkTheme"
-const val PREFERENCE_PREFERRED_LIGHT_THEME = "PreferredLightTheme"
-const val PREFERENCE_USE_SYSTEM_THEME = "useSystemTheme"
-
 @Singleton
-class Theme @Inject constructor(
-    @PublicSharedPreferences private val sharedPreferences: SharedPreferences
-) {
+class Theme @Inject constructor(private val settings: Settings) {
     companion object {
         fun isDark(context: Context?): Boolean {
             val typedValue = TypedValue()
@@ -257,52 +248,39 @@ class Theme @Inject constructor(
         }
     }
 
-    private fun getThemeFromPreferences(): ThemeType {
-        val theme: String = sharedPreferences.getString(PREFERENCE_THEME, ThemeType.DARK.id) ?: ThemeType.DARK.id
-        return ThemeType.fromString(theme, ThemeType.DARK)
-    }
+    private fun getThemeFromPreferences(): ThemeType =
+        ThemeType.fromString(settings.theme.flow.value, ThemeType.DARK)
 
     private fun setThemeToPreferences(theme: ThemeType) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_THEME, theme.id)
-        }
+        settings.theme.set(theme.id)
     }
 
-    private fun getPreferredDarkThemeFromPreferences(): ThemeType {
-        val theme: String = sharedPreferences.getString(PREFERENCE_PREFERRED_DARK_THEME, ThemeType.DARK.id) ?: ThemeType.DARK.id
-        return ThemeType.fromString(theme, ThemeType.DARK)
-    }
+    private fun getPreferredDarkThemeFromPreferences(): ThemeType =
+        ThemeType.fromString(settings.darkThemePreference.flow.value, ThemeType.DARK)
 
-    private fun getPreferredLightFromPreferences(): ThemeType {
-        val theme: String = sharedPreferences.getString(PREFERENCE_PREFERRED_LIGHT_THEME, ThemeType.LIGHT.id) ?: ThemeType.LIGHT.id
-        return ThemeType.fromString(theme, ThemeType.LIGHT)
-    }
+    private fun getPreferredLightFromPreferences(): ThemeType =
+        ThemeType.fromString(settings.lightThemePreference.flow.value, ThemeType.LIGHT)
 
     private fun setPreferredDarkThemeToPreferences(theme: ThemeType) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_PREFERRED_DARK_THEME, theme.id)
-        }
+        settings.darkThemePreference.set(theme.id)
     }
 
     private fun setPreferredLightThemeToPreferences(theme: ThemeType) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_PREFERRED_LIGHT_THEME, theme.id)
-        }
+        settings.lightThemePreference.set(theme.id)
     }
 
     fun setUseSystemTheme(value: Boolean, activity: AppCompatActivity?) {
-        sharedPreferences.edit(commit = true) {
-            putBoolean(PREFERENCE_USE_SYSTEM_THEME, value)
-        }
+        // Use commit to ensure update is persisted before activity is recreated. This is needed
+        // to make sure the theme is persisted in time when a user taps on a Plus theme with a Free
+        // and then taps on a Free theme.
+        settings.useSystemTheme.set(value, commit = true)
 
         if (value && activity != null) {
             setupThemeForConfig(activity, activity.resources.configuration)
         }
     }
 
-    fun getUseSystemTheme(): Boolean {
-        return sharedPreferences.getBoolean(PREFERENCE_USE_SYSTEM_THEME, Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) // Only default on Android 10+
-    }
+    fun getUseSystemTheme(): Boolean = settings.useSystemTheme.flow.value
 
     fun getPodcastTintColor(podcast: Podcast): Int {
         return podcast.getTintColor(isDarkTheme)

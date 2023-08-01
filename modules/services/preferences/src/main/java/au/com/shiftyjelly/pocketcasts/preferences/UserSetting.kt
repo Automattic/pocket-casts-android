@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,10 +32,10 @@ abstract class UserSetting<T>(
     // better, use the flow itself to observe changes.
     protected abstract fun get(): T
 
-    protected abstract fun persist(value: T)
+    protected abstract fun persist(value: T, commit: Boolean)
 
-    fun set(value: T) {
-        persist(value)
+    fun set(value: T, commit: Boolean = false) {
+        persist(value, commit)
         _flow.value = value
     }
 
@@ -47,15 +48,32 @@ abstract class UserSetting<T>(
         sharedPrefs = sharedPrefs,
     ) {
 
-        override fun persist(value: Boolean) {
+        @SuppressLint("ApplySharedPref")
+        override fun persist(value: Boolean, commit: Boolean) {
             sharedPrefs.edit().run {
                 putBoolean(sharedPrefKey, value)
-                apply()
+                if (commit) {
+                    commit()
+                } else {
+                    apply()
+                }
             }
         }
 
         override fun get(): Boolean = sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
     }
+
+    class StringPref(
+        sharedPrefKey: String,
+        defaultValue: String,
+        sharedPrefs: SharedPreferences,
+    ) : PrefFromString<String>(
+        sharedPrefKey = sharedPrefKey,
+        defaultValue = defaultValue,
+        sharedPrefs = sharedPrefs,
+        fromString = { it },
+        toString = { it },
+    )
 
     // This persists the parameterized object as an Int in shared preferences.
     class PrefFromInt<T>(
@@ -73,11 +91,16 @@ abstract class UserSetting<T>(
             return fromInt(persistedInt)
         }
 
-        override fun persist(value: T) {
+        @SuppressLint("ApplySharedPref")
+        override fun persist(value: T, commit: Boolean) {
             val intValue = toInt(value)
             sharedPrefs.edit().run {
                 putInt(sharedPrefKey, intValue)
-                apply()
+                if (commit) {
+                    commit()
+                } else {
+                    apply()
+                }
             }
         }
     }
@@ -100,11 +123,16 @@ abstract class UserSetting<T>(
             return fromString(persistedString)
         }
 
-        override fun persist(value: T) {
+        @SuppressLint("ApplySharedPref")
+        override fun persist(value: T, commit: Boolean) {
             val stringValue = toString(value)
             sharedPrefs.edit().run {
                 putString(sharedPrefKey, stringValue)
-                apply()
+                if (commit) {
+                    commit()
+                } else {
+                    apply()
+                }
             }
         }
 
@@ -153,14 +181,19 @@ abstract class UserSetting<T>(
             }
         }
 
-        override fun persist(value: List<T>) {
+        @SuppressLint("ApplySharedPref")
+        override fun persist(value: List<T>, commit: Boolean) {
             sharedPrefs.edit().run {
                 val commaSeparatedString = value.joinToString(
                     separator = ",",
                     transform = toString
                 )
                 putString(sharedPrefKey, commaSeparatedString)
-                apply()
+                if (commit) {
+                    commit()
+                } else {
+                    apply()
+                }
             }
         }
     }

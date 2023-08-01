@@ -1390,4 +1390,28 @@ class SettingsImpl @Inject constructor(
                 BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
             )
         ]
+
+    override val theme = UserSetting.StringPref(
+        sharedPrefKey = "pocketCastsTheme",
+        defaultValue = "dark", // ThemeType.DARK
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val darkThemePreference = UserSetting.StringPref(
+        sharedPrefKey = "PreferredDarkTheme",
+        defaultValue = "dark", // ThemeType.DARK
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val lightThemePreference = UserSetting.StringPref(
+        sharedPrefKey = "PreferredLightTheme",
+        defaultValue = "light", // ThemeType.LIGHT
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val useSystemTheme = UserSetting.BoolPref(
+        sharedPrefKey = "useSystemTheme",
+        defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q, // Only default on Android 10+
+        sharedPrefs = sharedPreferences
+    )
 }
