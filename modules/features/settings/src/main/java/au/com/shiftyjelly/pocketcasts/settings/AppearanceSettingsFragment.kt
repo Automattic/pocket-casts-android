@@ -168,7 +168,7 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtShowArtwork.isChecked = !binding.swtShowArtwork.isChecked
         }
 
-        binding.swtUseEmbeddedArtwork.isChecked = viewModel.useEmbeddedArtwork.value ?: false
+        binding.swtUseEmbeddedArtwork.isChecked = viewModel.useEmbeddedArtwork.value
         binding.swtUseEmbeddedArtwork.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateUseEmbeddedArtwork(isChecked)
         }

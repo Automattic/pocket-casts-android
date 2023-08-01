@@ -631,13 +631,11 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING, false)
     }
 
-    override fun getUseEmbeddedArtwork(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_USE_EMBEDDED_ARTWORK, false)
-    }
-
-    override fun setUseEmbeddedArtwork(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_USE_EMBEDDED_ARTWORK, value)
-    }
+    override val useEmbeddedArtwork = UserSetting.BoolPref(
+        sharedPrefKey = "useEmbeddedArtwork",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getGlobalPlaybackEffects(): PlaybackEffects {
         val effects = PlaybackEffects()
