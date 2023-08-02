@@ -3,9 +3,15 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -50,20 +56,24 @@ class BookmarksViewModel
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun loadBookmarks(episodeUuid: String) {
+    fun loadBookmarks(
+        episodeUuid: String,
+        sourceView: SourceView,
+    ) {
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
                 if (!it.isSignedInAsPlusOrPatron) {
-                    _uiState.value = UiState.PlusUpsell
+                    _uiState.value = UiState.PlusUpsell(sourceView)
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        val bookmarksFlow = settings.bookmarkSortTypeForPlayerFlow.flatMapLatest { sortType ->
-                            bookmarkManager.findEpisodeBookmarksFlow(
-                                episode = episode,
-                                sortType = sortType,
-                            )
-                        }
+                        val bookmarksFlow =
+                            settings.bookmarkSortTypeForPlayerFlow.flatMapLatest { sortType ->
+                                bookmarkManager.findEpisodeBookmarksFlow(
+                                    episode = episode,
+                                    sortType = sortType,
+                                )
+                            }
                         val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
                         val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
                         combine(
@@ -72,19 +82,20 @@ class BookmarksViewModel
                             selectedListFlow,
                         ) { bookmarks, isMultiSelecting, selectedList ->
                             _uiState.value = if (bookmarks.isEmpty()) {
-                                UiState.Empty
+                                UiState.Empty(sourceView)
                             } else {
                                 UiState.Loaded(
                                     bookmarks = bookmarks,
                                     isMultiSelecting = isMultiSelecting,
                                     isSelected = { selectedList.contains(it) },
                                     onRowClick = ::onRowClick,
+                                    sourceView = sourceView,
                                 )
                             }
                         }.stateIn(viewModelScope)
                     } ?: run { // This shouldn't happen in the ideal world
                         Timber.e("Episode not found.")
-                        _uiState.value = UiState.Empty
+                        _uiState.value = UiState.Empty(sourceView)
                     }
                 }
             }
@@ -175,15 +186,54 @@ class BookmarksViewModel
     }
 
     sealed class UiState {
-        object Empty : UiState()
+        data class Empty(val sourceView: SourceView) : UiState() {
+            val colors: NoBookmarksViewColors
+                get() = when (sourceView) {
+                    SourceView.PLAYER -> NoBookmarksViewColors.Player
+                    SourceView.EPISODE_DETAILS -> NoBookmarksViewColors.Default
+                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                }
+        }
+
         object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
             val isMultiSelecting: Boolean,
             val isSelected: (Bookmark) -> Boolean,
             val onRowClick: (Bookmark) -> Unit,
-        ) : UiState()
+            val sourceView: SourceView,
+        ) : UiState() {
+            val headerRowColors: HeaderRowColors
+                get() = when (sourceView) {
+                    SourceView.PLAYER -> HeaderRowColors.Player
+                    SourceView.EPISODE_DETAILS -> HeaderRowColors.Default
+                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                }
+            val bookmarkRowColors: BookmarkRowColors
+                get() = when (sourceView) {
+                    SourceView.PLAYER -> BookmarkRowColors.Player
+                    SourceView.EPISODE_DETAILS -> BookmarkRowColors.Default
+                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                }
+            val timePlayButtonStyle: TimePlayButtonStyle
+                get() = when (sourceView) {
+                    SourceView.PLAYER -> TimePlayButtonStyle.Solid
+                    SourceView.EPISODE_DETAILS -> TimePlayButtonStyle.Outlined
+                    else -> throw IllegalArgumentException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                }
+        }
 
-        object PlusUpsell : UiState()
+        data class PlusUpsell(val sourceView: SourceView) : UiState() {
+            val colors: MessageViewColors
+                get() = when (sourceView) {
+                    SourceView.PLAYER -> MessageViewColors.Player
+                    SourceView.EPISODE_DETAILS -> MessageViewColors.Default
+                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                }
+        }
+    }
+
+    companion object {
+        const val UNKNOWN_SOURCE_MESSAGE = "Unknown source view"
     }
 }

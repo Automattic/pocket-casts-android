@@ -20,6 +20,7 @@ import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -333,7 +334,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         return when (sections[position]) {
             is Section.Player -> PlayerHeaderFragment()
             is Section.Notes -> NotesFragment()
-            is Section.Bookmarks -> BookmarksFragment()
+            is Section.Bookmarks -> BookmarksFragment.newInstance(SourceView.PLAYER)
             is Section.Chapters -> ChaptersFragment()
         }
     }
