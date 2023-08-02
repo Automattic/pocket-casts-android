@@ -379,7 +379,7 @@ interface Settings {
 
     fun getAutoArchiveExcludedPodcasts(): List<String>
     fun setAutoArchiveExcludedPodcasts(excluded: List<String>)
-    fun getAutoArchiveIncludeStarred(): Boolean
+    val autoArchiveIncludeStarred: UserSetting<Boolean>
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
     val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
 

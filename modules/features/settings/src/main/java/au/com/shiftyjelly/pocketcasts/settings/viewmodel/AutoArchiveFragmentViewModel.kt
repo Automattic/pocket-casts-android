@@ -25,10 +25,11 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         }
     }
 
-    fun onStarredChanged() {
+    fun onStarredChanged(newValue: Boolean) {
+        settings.autoArchiveIncludeStarred.set(newValue)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
-            mapOf("enabled" to settings.getAutoArchiveIncludeStarred())
+            mapOf("enabled" to newValue)
         )
     }
 

@@ -315,9 +315,9 @@ class Support @Inject constructor(
 
             output.append(eol)
             output.append("Auto archive settings").append(eol)
-            output.append("Auto archive played episodes after: " + settings.autoArchiveAfterPlaying.flow.value.analyticsValue).append(eol)
-            output.append("Auto archive inactive episodes after: " + settings.autoArchiveInactive.flow.value.analyticsValue).append(eol)
-            output.append("Auto archive starred episodes: " + settings.getAutoArchiveIncludeStarred().toString()).append(eol)
+            output.append("Auto archive played episodes after: ${settings.autoArchiveAfterPlaying.flow.value.analyticsValue}").append(eol)
+            output.append("Auto archive inactive episodes after: ${settings.autoArchiveInactive.flow.value.analyticsValue}").append(eol)
+            output.append("Auto archive starred episodes: ${settings.autoArchiveIncludeStarred.flow.value}").append(eol)
 
             output.append(eol)
             output.append("Auto downloads").append(eol)

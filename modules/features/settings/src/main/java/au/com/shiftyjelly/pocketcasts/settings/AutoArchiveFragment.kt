@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
@@ -15,12 +14,11 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPreferences.OnSharedPreferenceChangeListener {
+class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack {
     @Inject lateinit var settings: Settings
     @Inject lateinit var theme: Theme
 
@@ -28,6 +26,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
 
     private lateinit var autoArchivePlayedEpisodes: ListPreference
     private lateinit var autoArchiveInactiveEpisodes: ListPreference
+    private lateinit var autoArchiveIncludeStarred: SwitchPreference
 
     val toolbar: Toolbar?
         get() = view?.findViewById(R.id.toolbar)
@@ -48,6 +47,15 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
                     true
                 }
             }
+
+        autoArchiveIncludeStarred = preferenceManager.findPreference<SwitchPreference>("autoArchiveIncludeStarred")!!
+            .apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    viewModel.onStarredChanged(newValue as Boolean)
+                    updateStarredSummary()
+                    true
+                }
+            }
         updateStarredSummary()
     }
 
@@ -61,29 +69,17 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
         super.onResume()
         setupAutoArchiveAfterPlaying()
         setupAutoArchiveInactive()
-        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
+        setupIncludeStarred()
     }
 
     override fun onPause() {
         super.onPause()
-        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     private fun updateStarredSummary() {
-        val starredSummary = getString(if (settings.getAutoArchiveIncludeStarred()) LR.string.settings_auto_archive_starred_summary else LR.string.settings_auto_archive_no_starred_summary)
-        val preference = preferenceManager.findPreference<SwitchPreference>(Settings.AUTO_ARCHIVE_INCLUDE_STARRED)
-        preference?.summary = starredSummary
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            Settings.AUTO_ARCHIVE_INCLUDE_STARRED -> {
-                updateStarredSummary()
-                viewModel.onStarredChanged()
-            }
-            else -> Timber.d("Unknown preference changed: $key")
-        }
+        val starredSummary = getString(if (settings.autoArchiveIncludeStarred.flow.value) LR.string.settings_auto_archive_starred_summary else LR.string.settings_auto_archive_no_starred_summary)
+        autoArchiveIncludeStarred.summary = starredSummary
     }
 
     override fun onBackPressed(): Boolean {
@@ -108,5 +104,9 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     private fun setupAutoArchiveInactive() {
         val stringArray = resources.getStringArray(LR.array.settings_auto_archive_inactive_values)
         autoArchiveInactiveEpisodes.value = stringArray[settings.autoArchiveInactive.flow.value.toIndex()]
+    }
+
+    private fun setupIncludeStarred() {
+        autoArchiveIncludeStarred.isChecked = settings.autoArchiveIncludeStarred.flow.value
     }
 }

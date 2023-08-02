@@ -665,7 +665,7 @@ class EpisodeManagerImpl @Inject constructor(
 
             if (shouldArchiveBasedOnSettings &&
                 !settings.getAutoArchiveExcludedPodcasts().contains(episode.podcastUuid) &&
-                (settings.getAutoArchiveIncludeStarred() || !episode.isStarred)
+                (settings.autoArchiveIncludeStarred.flow.value || !episode.isStarred)
             ) {
                 if (sync) {
                     episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
@@ -686,7 +686,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     @Suppress("NAME_SHADOWING")
     private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
-        val episodesWithoutStarred = if (!settings.getAutoArchiveIncludeStarred()) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
+        val episodesWithoutStarred = if (!settings.autoArchiveIncludeStarred.flow.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
         val episodesByPodcast = episodesWithoutStarred.groupBy { it.podcastUuid }.toMutableMap() // Sort in to podcasts
         val excludedPodcasts = settings.getAutoArchiveExcludedPodcasts()
         excludedPodcasts.forEach { episodesByPodcast.remove(it) } // Remove all excluded podcasts
@@ -994,7 +994,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (autoArchiveAfterPlayingTime > 0) {
             val playedEpisodes = episodeDao.findByEpisodePlayingAndArchiveStatus(podcast.uuid, EpisodePlayingStatus.COMPLETED, false)
-                .filter { (settings.getAutoArchiveIncludeStarred() && it.isStarred) || !it.isStarred }
+                .filter { (settings.autoArchiveIncludeStarred.flow.value && it.isStarred) || !it.isStarred }
                 .filter { it.lastPlaybackInteractionDate != null && now.time - it.lastPlaybackInteractionDate!!.time > autoArchiveAfterPlayingTime }
 
             archiveAllInList(playedEpisodes, playbackManager)
@@ -1010,7 +1010,7 @@ class EpisodeManagerImpl @Inject constructor(
         val inactiveTime = inactiveSetting.timeSeconds * 1000L
         if (inactiveTime > 0) {
             val inactiveEpisodes = episodeDao.findInactiveEpisodes(podcast.uuid, Date(now.time - inactiveTime))
-                .filter { settings.getAutoArchiveIncludeStarred() || !it.isStarred }
+                .filter { settings.autoArchiveIncludeStarred.flow.value || !it.isStarred }
             if (inactiveEpisodes.isNotEmpty()) {
                 archiveAllInList(inactiveEpisodes, playbackManager)
                 inactiveEpisodes.forEach {
@@ -1033,7 +1033,7 @@ class EpisodeManagerImpl @Inject constructor(
             if (allEpisodes.isNotEmpty() && episodeLimit < allEpisodes.size) {
                 val episodesToRemove = allEpisodes.subList(episodeLimit, allEpisodes.size)
                     .filter { !it.isArchived }
-                    .filter { (settings.getAutoArchiveIncludeStarred() && it.isStarred) || !it.isStarred }
+                    .filter { (settings.autoArchiveIncludeStarred.flow.value && it.isStarred) || !it.isStarred }
                     .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
                 if (episodesToRemove.isNotEmpty()) {
                     archiveAllInList(episodesToRemove, playbackManager)

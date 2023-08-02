@@ -963,9 +963,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAutoArchiveIncludeStarred(): Boolean {
-        return getBoolean(Settings.AUTO_ARCHIVE_INCLUDE_STARRED, false)
-    }
+    override val autoArchiveIncludeStarred = UserSetting.BoolPref(
+        sharedPrefKey = Settings.AUTO_ARCHIVE_INCLUDE_STARRED,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val autoArchiveAfterPlaying = UserSetting.PrefFromInt(
         sharedPrefKey = "autoArchivePlayedEpisodesIndex",
