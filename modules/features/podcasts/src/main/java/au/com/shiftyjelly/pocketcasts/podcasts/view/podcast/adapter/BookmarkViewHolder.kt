@@ -6,7 +6,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkItem
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
@@ -21,7 +21,7 @@ class BookmarkViewHolder(
     fun bind(data: PodcastAdapter.BookmarkItemData) {
         composeView.setContent {
             AppTheme(theme.activeTheme) {
-                BookmarkItem(
+                BookmarkRow(
                     bookmark = data.bookmark,
                     isMultiSelecting = data.isMultiSelecting,
                     isSelected = data.isSelected,

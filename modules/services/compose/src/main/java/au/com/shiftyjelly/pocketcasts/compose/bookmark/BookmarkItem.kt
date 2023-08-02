@@ -98,7 +98,7 @@ sealed class BookmarkRowColors {
 }
 
 @Composable
-fun BookmarkItem(
+fun BookmarkRow(
     bookmark: Bookmark,
     isMultiSelecting: () -> Boolean,
     isSelected: (Bookmark) -> Boolean,
@@ -231,7 +231,7 @@ fun BookmarkRowRosePreview() {
 @Composable
 private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
-        BookmarkItem(
+        BookmarkRow(
             bookmark = Bookmark(
                 uuid = "",
                 podcastUuid = "",
@@ -257,7 +257,7 @@ private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
 @Composable
 fun BookmarkRowPlayerPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
-        BookmarkItem(
+        BookmarkRow(
             bookmark = Bookmark(
                 uuid = "",
                 podcastUuid = "",

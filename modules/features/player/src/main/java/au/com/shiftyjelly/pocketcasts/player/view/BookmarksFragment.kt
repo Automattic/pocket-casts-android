@@ -34,7 +34,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkItem
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -294,7 +294,7 @@ private fun BookmarksView(
             )
         }
         items(state.bookmarks, key = { it }) { bookmark ->
-            BookmarkItem(
+            BookmarkRow(
                 bookmark = bookmark,
                 isMultiSelecting = { state.isMultiSelecting },
                 isSelected = state.isSelected,
