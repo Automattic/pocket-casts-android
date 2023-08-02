@@ -63,7 +63,7 @@
                 android:tint="@{toolbarTintColor}"
                 android:contentDescription="@string/podcast_share_episode"
                 app:layout_constraintBottom_toBottomOf="@+id/btnClose"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/btnClose" />
 
             <ImageButton
@@ -75,7 +75,7 @@
                 android:src="@{episode.starred ? @drawable/ic_star_filled : @drawable/ic_star}"
                 android:tint="@{toolbarTintColor}"
                 app:layout_constraintBottom_toBottomOf="@+id/btnClose"
-                app:layout_constraintRight_toLeftOf="@+id/btnShare"
+                app:layout_constraintEnd_toStartOf="@+id/btnShare"
                 app:layout_constraintTop_toTopOf="@+id/btnClose" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
