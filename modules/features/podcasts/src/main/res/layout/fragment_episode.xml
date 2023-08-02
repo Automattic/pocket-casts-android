@@ -18,10 +18,6 @@
             type="int" />
 
         <variable
-            name="toolbarTintColor"
-            type="int" />
-
-        <variable
             name="podcastColor"
             type="int" />
     </data>
@@ -43,46 +39,9 @@
                 android:id="@+id/loadingGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="lblDate,lblTimeLeft,lblAuthor,btnShare,btnFav,buttonGroupLayout"
+                app:constraint_referenced_ids="lblDate,lblTimeLeft,lblAuthor,buttonGroupLayout"
                 android:visibility="invisible"
                 tools:visibility="visible" />
-
-            <ImageButton
-                android:id="@+id/btnClose"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="@dimen/episode_card_edge_padding"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_chevron"
-                android:tint="@{toolbarTintColor}"
-                android:contentDescription="@string/close"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/btnShare"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginEnd="@dimen/episode_card_edge_padding"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_share"
-                android:tint="@{toolbarTintColor}"
-                android:contentDescription="@string/podcast_share_episode"
-                app:layout_constraintBottom_toBottomOf="@+id/btnClose"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/btnClose" />
-
-            <ImageButton
-                android:id="@+id/btnFav"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginEnd="10dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@{episode.starred ? @drawable/ic_star_filled : @drawable/ic_star}"
-                android:tint="@{toolbarTintColor}"
-                app:layout_constraintBottom_toBottomOf="@+id/btnClose"
-                app:layout_constraintRight_toLeftOf="@+id/btnShare"
-                app:layout_constraintTop_toTopOf="@+id/btnClose" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/episodeArt"

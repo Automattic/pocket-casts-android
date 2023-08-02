@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -130,6 +131,7 @@ class EpisodeFragment : BaseFragment() {
         get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_FORCE_DARK) ?: false
 
     var listener: FragmentHostListener? = null
+    private var episodeLoadedListener: EpisodeLoadedListener? = null
 
     val activeTheme: Theme.ThemeType
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
@@ -163,7 +165,7 @@ class EpisodeFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listener = context as FragmentHostListener
-
+        episodeLoadedListener = (parentFragment as? EpisodeLoadedListener)
         imageLoader = PodcastImageLoaderThemed(context)
     }
 
@@ -201,13 +203,22 @@ class EpisodeFragment : BaseFragment() {
                 val binding = binding ?: return@Observer
                 when (state) {
                     is EpisodeFragmentState.Loaded -> {
+
                         binding.loadingGroup.isVisible = true
                         val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
+
+                        episodeLoadedListener?.onEpisodeLoaded(
+                            EpisodeToolbarState(
+                                tintColor = iconColor,
+                                episode = state.episode,
+                                onFavClicked = { viewModel.starClicked() },
+                                onShareClicked = { share(state) },
+                            )
+                        )
 
                         binding.episode = state.episode
                         binding.podcast = state.podcast
                         binding.tintColor = iconColor
-                        binding.toolbarTintColor = iconColor
                         binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)
 
                         binding.btnDownload.tintColor = iconColor
@@ -290,12 +301,6 @@ class EpisodeFragment : BaseFragment() {
                             binding.lblErrorDetail.text = getString(LR.string.podcast_episode_manually_unarchived_summary, state.podcast.autoArchiveEpisodeLimit)
                             binding.imgError.setImageResource(IR.drawable.ic_archive)
                         }
-
-                        binding.btnShare.setOnClickListener {
-                            share(state)
-                        }
-
-                        binding.btnFav.contentDescription = getString(if (state.episode.isStarred) LR.string.podcast_episode_starred else LR.string.podcast_episode_unstarred)
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             // Doesn't work in data binding for some reason maybe because of the API limit
@@ -421,7 +426,6 @@ class EpisodeFragment : BaseFragment() {
             binding?.btnPlay?.setPlaying(isPlaying = isPlaying, animate = true)
         }
 
-        binding?.btnClose?.setOnClickListener { (parentFragment as? BaseDialogFragment)?.dismiss() }
         binding?.btnDownload?.setOnClickListener {
             val episode = viewModel.episode ?: return@setOnClickListener
             if (episode.isDownloaded) {
@@ -446,8 +450,6 @@ class EpisodeFragment : BaseFragment() {
                 }
             }
         }
-
-        binding?.btnFav?.setOnClickListener { viewModel.starClicked() }
 
         binding?.btnAddToUpNext?.setup(ToggleActionButton.State.On(LR.string.podcasts_up_next, IR.drawable.ic_upnext_remove), ToggleActionButton.State.Off(LR.string.podcasts_up_next, IR.drawable.ic_upnext_playnext), false)
         binding?.btnPlayed?.setup(ToggleActionButton.State.On(LR.string.podcasts_mark_unplayed, IR.drawable.ic_markasunplayed), ToggleActionButton.State.Off(LR.string.podcasts_mark_played, IR.drawable.ic_markasplayed), false)
@@ -553,4 +555,15 @@ class EpisodeFragment : BaseFragment() {
             analyticsTracker = analyticsTracker,
         ).show(sourceView = SourceView.EPISODE_DETAILS)
     }
+
+    interface EpisodeLoadedListener {
+        fun onEpisodeLoaded(state: EpisodeToolbarState)
+    }
+
+    data class EpisodeToolbarState(
+        val tintColor: Int,
+        val episode: PodcastEpisode,
+        val onShareClicked: () -> Unit,
+        val onFavClicked: () -> Unit,
+    )
 }

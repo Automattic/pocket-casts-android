@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContai
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -30,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class EpisodeContainerFragment : BaseDialogFragment() {
+class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLoadedListener {
     companion object {
         const val ARG_EPISODE_UUID = "episodeUUID"
         const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
@@ -80,7 +81,7 @@ class EpisodeContainerFragment : BaseDialogFragment() {
             theme.isDarkTheme
         )
 
-    private var binding: FragmentEpisodeContainerBinding? = null
+    var binding: FragmentEpisodeContainerBinding? = null
 
     private val episodeUUID: String?
         get() = arguments?.getString(ARG_EPISODE_UUID)
@@ -156,6 +157,13 @@ class EpisodeContainerFragment : BaseDialogFragment() {
         binding.viewPager.getChildAt(0).isNestedScrollingEnabled = false
 
         binding.viewPager.adapter = adapter
+
+        binding.btnClose.setOnClickListener { dismiss() }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 
     private class ViewPagerAdapter(
@@ -201,6 +209,17 @@ class EpisodeContainerFragment : BaseDialogFragment() {
 
                 else -> throw IllegalArgumentException("Unknown section $position")
             }
+        }
+    }
+
+    override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {
+        binding?.apply {
+            val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
+            episode = state.episode
+            toolbarTintColor = iconColor
+            btnShare.setOnClickListener { state.onShareClicked() }
+            btnFav.contentDescription = getString(if (state.episode.isStarred) LR.string.podcast_episode_starred else LR.string.podcast_episode_unstarred)
+            btnFav.setOnClickListener { state.onFavClicked() }
         }
     }
 }
