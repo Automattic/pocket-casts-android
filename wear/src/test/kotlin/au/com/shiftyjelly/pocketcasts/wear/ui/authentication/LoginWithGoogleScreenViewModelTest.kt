@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.wear.util.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import junit.framework.TestCase.assertEquals
@@ -41,6 +41,7 @@ class LoginWithGoogleScreenViewModelTest {
             syncManager = syncManager
         )
     }
+
     @Test
     fun `test signing in with Google Successfully`() = runTest {
         val googleSignInAccount = mock(GoogleSignInAccount::class.java)
@@ -49,6 +50,7 @@ class LoginWithGoogleScreenViewModelTest {
             assertEquals(awaitItem().googleSignInAccount, googleSignInAccount)
         }
     }
+
     @Test
     fun `test clearing previous sign in`() = runBlocking {
         testSubject.clearPreviousSignIn()
