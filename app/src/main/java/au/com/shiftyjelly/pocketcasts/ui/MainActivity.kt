@@ -81,6 +81,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
+import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -158,7 +159,7 @@ class MainActivity :
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
     OnboardingLauncher,
-    CoroutineScope {
+    CoroutineScope, NotificationPermissionChecker {
 
     companion object {
         private const val INITIAL_KEY = "initial"
@@ -235,12 +236,14 @@ class MainActivity :
     ) {}
 
     @SuppressLint("WrongConstant") // for custom snackbar duration constant
-    private fun checkForNotificationPermission() {
+    private fun checkForNotificationPermission(onPermissionGranted: () -> Unit = {}) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 ContextCompat.checkSelfPermission(
                     this, Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> Unit // Do nothing
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    onPermissionGranted()
+                }
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
@@ -273,6 +276,8 @@ class MainActivity :
         Timber.d("Main Activity onCreate")
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
+
+        playbackManager.setNotificationPermissionChecker(this)
 
         val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
@@ -1381,5 +1386,9 @@ class MainActivity :
             }
         }
         event?.let { analyticsTracker.track(event, mapOf(INITIAL_KEY to isInitial)) }
+    }
+
+    override fun checkNotificationPermission(onPermissionGranted: () -> Unit) {
+        checkForNotificationPermission(onPermissionGranted)
     }
 }

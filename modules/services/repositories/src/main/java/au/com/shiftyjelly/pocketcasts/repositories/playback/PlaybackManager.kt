@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
@@ -129,6 +130,8 @@ open class PlaybackManager @Inject constructor(
         const val AMOUNT_KEY = "amount"
         const val ENABLED_KEY = "enabled"
     }
+
+    private lateinit var notificationPermissionChecker: NotificationPermissionChecker
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -1704,7 +1707,13 @@ open class PlaybackManager @Inject constructor(
             notification.sound = sound
         }
 
-        manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+        notificationPermissionChecker.checkNotificationPermission {
+            manager.notify(
+                notificationTag,
+                NotificationBroadcastReceiver.NOTIFICATION_ID,
+                notification
+            )
+        }
     }
 
     private fun buildNotificationIntent(intentId: Int, intentName: String, episode: BaseEpisode, notificationTag: String, context: Context): PendingIntent {
@@ -2078,5 +2087,9 @@ open class PlaybackManager @Inject constructor(
         properties[SOURCE_KEY] = sourceView.analyticsValue
         properties.putAll(props)
         analyticsTracker.track(event, properties)
+    }
+
+    fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
+        this.notificationPermissionChecker = notificationPermissionChecker
     }
 }
