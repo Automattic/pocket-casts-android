@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +51,7 @@ class BookmarksViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(episodeUuid: String) {
+        viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
                 if (!it.isSignedInAsPlusOrPatron) {
