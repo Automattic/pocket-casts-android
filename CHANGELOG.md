@@ -1,10 +1,25 @@
+7.45
+-----
+*   Bug Fixes:
+    *   Added audio ducking as an option when playing over notifications
+        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
+    *   Fixed swiping to open Up Next queue in landscape and on foldables
+        ([#1209](https://github.com/Automattic/pocket-casts-android/pull/1209))
+    *   Fixed upgrade flow when signing in with Google account
+        ([#1204](https://github.com/Automattic/pocket-casts-android/pull/1204))
+    *   Fixed watch background refresh description to not reference auto downloads
+        ([#1212](https://github.com/Automattic/pocket-casts-android/pull/1212))
+
 7.44
 -----
 *   New Feature:
     *   Added 3 episodes on the Filter AutoDownload
-        ([#1169])(https://github.com/Automattic/pocket-casts-android/pull/1169)
+        ([#1169](https://github.com/Automattic/pocket-casts-android/pull/1169))
     *   Added capability to deselect all/below and above on the multiselect feature
         ([#1172](https://github.com/Automattic/pocket-casts-android/pull/1172))
+    *   Added share option to episode swipe and multiselect menus
+        ([#1190](https://github.com/Automattic/pocket-casts-android/pull/1190)),
+        ([#1191](https://github.com/Automattic/pocket-casts-android/pull/1191))
 
 7.43
 -----

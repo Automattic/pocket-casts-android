@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
+import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -428,6 +429,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.DISCOVER_RANKED_LIST,
             SourceView.FULL_SCREEN_VIDEO,
             SourceView.MINIPLAYER,
+            SourceView.MULTI_SELECT,
             SourceView.ONBOARDING_RECOMMENDATIONS,
             SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH,
             SourceView.PODCAST_LIST,
@@ -435,6 +437,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.PLAYER,
             SourceView.PLAYER_BROADCAST_ACTION,
             SourceView.PLAYER_PLAYBACK_EFFECTS,
+            SourceView.EPISODE_SWIPE_ACTION,
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
@@ -478,7 +481,7 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNext(episode, downloadManager, null)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
@@ -493,7 +496,7 @@ open class PlaybackManager @Inject constructor(
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, downloadManager, null)
         if (userInitiated) {
-            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
@@ -1335,14 +1338,14 @@ open class PlaybackManager @Inject constructor(
         focusWasPlaying = null
     }
 
-    override fun onFocusLoss(mayDuck: Boolean, transientLoss: Boolean) {
+    override fun onFocusLoss(playOverNotification: PlayOverNotificationSetting, transientLoss: Boolean) {
         val player = player
         if (player == null || player.isRemote) {
             return
         }
         // if we are playing but can't just reduce the volume then play when focus gained
         val playing = isPlaying()
-        if (!mayDuck && playing) {
+        if ((playOverNotification == PlayOverNotificationSetting.NEVER) && playing) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while playing")
             focusWasPlaying = Date()
 
@@ -1353,9 +1356,12 @@ open class PlaybackManager @Inject constructor(
         }
 
         // check if we need to reduce the volume
-        if (focusManager.canDuck()) {
+        if (playOverNotification == PlayOverNotificationSetting.DUCK) {
             player.setVolume(VOLUME_DUCK)
+            return
         }
+
+        player.setVolume(VOLUME_NORMAL)
     }
 
     override fun onFocusRequestFailed() {

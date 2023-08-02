@@ -25,6 +25,7 @@ interface EpisodeManager {
 
     /** Find methods  */
     fun findByUuid(uuid: String): PodcastEpisode?
+    suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
     fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode>

@@ -7,6 +7,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -26,7 +29,7 @@ class BookmarkManagerImpl @Inject constructor(
      */
     override suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String): Bookmark {
         // Prevent adding more than one bookmark at the same place
-        val existingBookmark = bookmarkDao.findByEpisodeTime(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid, timeSecs = timeSecs)
+        val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
             return existingBookmark
         }
@@ -47,11 +50,27 @@ class BookmarkManagerImpl @Inject constructor(
         return bookmark
     }
 
+    override suspend fun updateTitle(bookmarkUuid: String, title: String) {
+        bookmarkDao.updateTitle(
+            bookmarkUuid = bookmarkUuid,
+            title = title,
+            titleModified = System.currentTimeMillis(),
+            syncStatus = SyncStatus.NOT_SYNCED
+        )
+    }
+
     /**
      * Find the bookmark by its UUID.
      */
     override suspend fun findBookmark(bookmarkUuid: String): Bookmark? {
         return bookmarkDao.findByUuid(bookmarkUuid)
+    }
+
+    /**
+     * Find the bookmark by episode and time
+     */
+    override suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark? {
+        return bookmarkDao.findByEpisodeTime(podcastUuid = episode.podcastOrSubstituteUuid, episodeUuid = episode.uuid, timeSecs = timeSecs)
     }
 
     /**
@@ -81,6 +100,19 @@ class BookmarkManagerImpl @Inject constructor(
                 episodeUuid = episode.uuid,
             )
     }
+
+    /**
+     * Find all bookmarks for the given podcast.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun findPodcastBookmarksFlow(
+        podcastUuid: String,
+    ) = bookmarkDao.findByPodcastFlow(podcastUuid = podcastUuid).flatMapLatest { helper ->
+        flowOf(helper.map { it.toBookmark() })
+    }
+
+    override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
+        bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
 
     /**
      * Mark the bookmark as deleted so it can be synced to other devices.

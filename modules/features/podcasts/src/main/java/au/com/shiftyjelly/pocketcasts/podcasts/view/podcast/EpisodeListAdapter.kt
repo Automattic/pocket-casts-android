@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.disposables.CompositeDisposable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -47,6 +48,7 @@ class EpisodeListAdapter(
     val multiSelectHelper: MultiSelectEpisodesHelper,
     val fragmentManager: FragmentManager,
     val fromListUuid: String? = null,
+    val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
     val disposables = CompositeDisposable()
@@ -64,8 +66,24 @@ class EpisodeListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            R.layout.adapter_episode -> EpisodeViewHolder(AdapterEpisodeBinding.inflate(inflater, parent, false), EpisodeViewHolder.ViewMode.Artwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable, imageLoader)
-            R.layout.adapter_user_episode -> UserEpisodeViewHolder(AdapterUserEpisodeBinding.inflate(inflater, parent, false), UserEpisodeViewHolder.ViewMode.Artwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable, imageLoader)
+            R.layout.adapter_episode -> EpisodeViewHolder(
+                binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
+                viewMode = EpisodeViewHolder.ViewMode.Artwork,
+                downloadProgressUpdates = downloadManager.progressUpdateRelay,
+                playbackStateUpdates = playbackManager.playbackStateRelay,
+                upNextChangesObservable = upNextQueue.changesObservable,
+                imageLoader = imageLoader,
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory
+            )
+            R.layout.adapter_user_episode -> UserEpisodeViewHolder(
+                binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),
+                viewMode = UserEpisodeViewHolder.ViewMode.Artwork,
+                downloadProgressUpdates = downloadManager.progressUpdateRelay,
+                playbackStateUpdates = playbackManager.playbackStateRelay,
+                upNextChangesObservable = upNextQueue.changesObservable,
+                imageLoader = imageLoader,
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory
+            )
             else -> throw IllegalStateException("Unknown playable type")
         }
     }

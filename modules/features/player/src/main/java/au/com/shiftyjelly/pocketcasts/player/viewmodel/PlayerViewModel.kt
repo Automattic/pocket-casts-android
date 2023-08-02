@@ -23,8 +23,10 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfItem
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfItems
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
@@ -37,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -53,6 +56,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.combineLatest
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,8 +75,10 @@ class PlayerViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
+    private val userManager: UserManager,
     private val downloadManager: DownloadManager,
     private val podcastManager: PodcastManager,
+    private val bookmarkManager: BookmarkManager,
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
@@ -188,6 +195,8 @@ class PlayerViewModel @Inject constructor(
             .switchMap { pair -> episodeManager.observeEpisodeByUuidRx(pair.first).map { Pair(it, pair.second) } }
             .toLiveData()
 
+    private var playbackPositionMs: Int = 0
+
     private val shelfObservable = settings.shelfItemsObservable.map { list ->
         if (list.isEmpty()) {
             ShelfItems.itemsList
@@ -196,7 +205,11 @@ class PlayerViewModel @Inject constructor(
                 ShelfItems.itemForId(id)
             }
         }
-    }.toFlowable(BackpressureStrategy.LATEST)
+    }
+        .toFlowable(BackpressureStrategy.LATEST)
+        .combineLatest(userManager.getSignInState()).map { (shelfItems, signInState) ->
+            shelfItems.filter { item -> !item.isPlus || signInState.isSignedInAsPlusOrPatron }
+        }
 
     private val shelfUpNext = upNextStateObservable.distinctUntilChanged { t1, t2 ->
         val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -285,9 +298,24 @@ class PlayerViewModel @Inject constructor(
 
     init {
         updateSleepTimer()
+        monitorPlaybackPosition()
     }
 
-    fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects): ListData {
+    private fun monitorPlaybackPosition() {
+        playbackStateObservable
+            .map { it.positionMs }
+            .toFlowable(BackpressureStrategy.LATEST)
+            .subscribeBy(
+                onNext = { positionMs ->
+                    playbackPositionMs = positionMs
+                }
+            )
+            .apply {
+                disposables.add(this)
+            }
+    }
+
+    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -445,6 +473,25 @@ class PlayerViewModel @Inject constructor(
         return null
     }
 
+    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
+        val episode = episode ?: return
+        val timeSecs = playbackPositionMs / 1000
+        launch {
+            val bookmark = bookmarkManager.findByEpisodeTime(episode, timeSecs)
+            val podcast = podcast
+            val backgroundColor = if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
+            val tintColor = if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
+            val arguments = BookmarkArguments(
+                bookmarkUuid = bookmark?.uuid,
+                episodeUuid = episode.uuid,
+                timeSecs = timeSecs,
+                backgroundColor = backgroundColor,
+                tintColor = tintColor
+            )
+            onSuccess(arguments)
+        }
+    }
+
     fun downloadCurrentlyPlaying() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
@@ -470,10 +517,6 @@ class PlayerViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
-    }
-
-    fun removeFromUpNext(episode: BaseEpisode) {
-        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
     }
 
     private fun calcCustomTimeText(): String {

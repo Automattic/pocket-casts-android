@@ -6,6 +6,7 @@ apply plugin: 'kotlin-kapt'
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.profile'
     buildFeatures {
+        buildConfig true
         viewBinding true
         dataBinding = true
         compose true

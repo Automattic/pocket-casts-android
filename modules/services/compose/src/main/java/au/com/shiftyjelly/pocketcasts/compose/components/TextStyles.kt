@@ -339,10 +339,11 @@ fun TextC50(
 fun TextC70(
     text: String,
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    isUpperCase: Boolean = true,
 ) {
     Text(
-        text = text.uppercase(Locale.getDefault()),
+        text = if (isUpperCase) text.uppercase(Locale.getDefault()) else text,
         color = MaterialTheme.theme.colors.primaryText02,
         fontFamily = FontFamily.SansSerif,
         fontSize = 12.sp,

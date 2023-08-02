@@ -35,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
+import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -49,22 +51,25 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class EpisodeViewHolder(
+class EpisodeViewHolder constructor(
     val binding: AdapterEpisodeBinding,
     val viewMode: ViewMode,
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageLoader: PodcastImageLoader? = null
+    val imageLoader: PodcastImageLoader? = null,
+    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
-    override val swipeLeftIcon: ImageView
-        get() = binding.archiveIcon
     override val leftRightIcon1: ImageView
         get() = binding.leftRightIcon1
     override val leftRightIcon2: ImageView
         get() = binding.leftRightIcon2
+    override val rightLeftIcon1: ImageView
+        get() = binding.rightLeftIcon1
+    override val rightLeftIcon2: ImageView
+        get() = binding.rightLeftIcon2
     override val episode: BaseEpisode?
         get() = binding.episode
     override val positionAdapter: Int
@@ -78,6 +83,8 @@ class EpisodeViewHolder(
         object NoArtwork : ViewMode()
         object Artwork : ViewMode()
     }
+
+    override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     val dateFormatter = RelativeDateFormatter(context)
     val context: Context
@@ -105,12 +112,24 @@ class EpisodeViewHolder(
                 )
             }
         }
-    override val rightIconDrawableRes: List<EpisodeItemTouchHelper.IconWithBackground>
+    override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() {
-            return if (episode?.isArchived == true)
-                listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_unarchive, binding.episodeRow.context.getThemeColor(UR.attr.support_06)))
-            else
-                listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_archive, binding.episodeRow.context.getThemeColor(UR.attr.support_06)))
+
+            val archiveItem = EpisodeItemTouchHelper.IconWithBackground(
+                iconRes = if (episode?.isArchived == true) {
+                    IR.drawable.ic_unarchive
+                } else {
+                    IR.drawable.ic_archive
+                },
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_06)
+            )
+
+            val shareItem = EpisodeItemTouchHelper.IconWithBackground(
+                iconRes = IR.drawable.ic_share,
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_01)
+            )
+
+            return listOf(archiveItem, shareItem)
         }
 
     fun setup(episode: PodcastEpisode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable) {
@@ -126,6 +145,8 @@ class EpisodeViewHolder(
             updateTimeLeft(textView = binding.lblStatus, episode = episode)
         }
         binding.episode = episode
+        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
+
         binding.playButton.listener = playButtonListener
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)

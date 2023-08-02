@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -51,8 +52,36 @@ abstract class BookmarkDao {
         deleted: Boolean = false,
     ): Flow<List<Bookmark>>
 
+    @Query(
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted"""
+    )
+    abstract fun findByPodcastFlow(
+        podcastUuid: String,
+        deleted: Boolean = false,
+    ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT bookmarks.*
+            FROM bookmarks
+            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE bookmarks.podcast_uuid = :podcastUuid 
+            AND (UPPER(bookmarks.title) LIKE UPPER(:title) OR UPPER(podcast_episodes.title) LIKE UPPER(:title))
+            AND deleted = :deleted"""
+    )
+    abstract suspend fun searchInPodcastByTitle(
+        podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
+
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)
+
+    @Query("UPDATE bookmarks SET title = :title, title_modified = :titleModified, sync_status = :syncStatus WHERE uuid = :bookmarkUuid")
+    abstract suspend fun updateTitle(bookmarkUuid: String, title: String, titleModified: Long, syncStatus: SyncStatus)
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>

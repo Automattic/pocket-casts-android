@@ -249,6 +249,10 @@ dependencies {
     implementation libs.media3Extractor
     implementation libs.media3Ui
     implementation libs.showkase
+    implementation (libs.junit) {
+        exclude group: 'org.hamcrest'
+    }
+    implementation libs.kotlinCoroutinesTest
 
     ksp libs.moshiKotlinCompile
     ksp libs.glideCompile

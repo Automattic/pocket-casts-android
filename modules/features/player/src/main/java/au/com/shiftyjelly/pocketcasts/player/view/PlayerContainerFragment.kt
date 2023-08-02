@@ -214,6 +214,12 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         binding?.viewPager?.currentItem = index
     }
 
+    fun openBookmarks() {
+        val index = adapter.indexOfBookmarks
+        if (index == -1) return
+        binding?.viewPager?.currentItem = index
+    }
+
     fun openChaptersAt(chapter: Chapter) {
         val index = adapter.indexOfChapters
         if (index == -1) {
@@ -271,13 +277,16 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         object Chapters : Section(LR.string.player_tab_chapters)
     }
 
-    private var sections = listOf<Section>(Section.Player)
+    private var sections = listOf(Section.Player, Section.Bookmarks)
 
     val indexOfPlayer: Int
         get() = sections.indexOf(Section.Player)
 
     val indexOfChapters: Int
         get() = sections.indexOf(Section.Chapters)
+
+    val indexOfBookmarks: Int
+        get() = sections.indexOf(Section.Bookmarks)
 
     fun update(hasNotes: Boolean, hasChapters: Boolean): Boolean {
         val hadNotes = sections.contains(Section.Notes)
