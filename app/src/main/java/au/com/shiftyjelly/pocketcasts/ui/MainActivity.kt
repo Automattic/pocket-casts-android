@@ -159,7 +159,8 @@ class MainActivity :
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
     OnboardingLauncher,
-    CoroutineScope, NotificationPermissionChecker {
+    CoroutineScope,
+    NotificationPermissionChecker {
 
     companion object {
         private const val INITIAL_KEY = "initial"
