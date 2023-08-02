@@ -1459,29 +1459,29 @@ class SettingsImpl @Inject constructor(
     override fun <T> setBookmarksSortType(sortType: T) {
         when (sortType) {
             is BookmarksSortTypeForPlayer -> {
-                setInt(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER, sortType.ordinal)
+                setString(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER, sortType.key)
                 bookmarkSortTypeForPlayerFlow.update { sortType }
             }
             is BookmarksSortTypeForPodcast -> {
-                setInt(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST, sortType.ordinal)
+                setString(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST, sortType.key)
                 bookmarkSortTypeForPodcastFlow.update { sortType }
             }
         }
     }
 
     override fun getBookmarksSortTypeForPlayer() =
-        BookmarksSortTypeForPlayer.values()[
-            getInt(
+        BookmarksSortTypeForPlayer.fromString(
+            getString(
                 Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER,
-                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
+                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
             )
-        ]
+        ) ?: BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST
 
     override fun getBookmarksSortTypeForPodcast() =
-        BookmarksSortTypeForPodcast.values()[
-            getInt(
+        BookmarksSortTypeForPodcast.fromString(
+            getString(
                 Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
-                BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
+                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
             )
-        ]
+        ) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST
 }
