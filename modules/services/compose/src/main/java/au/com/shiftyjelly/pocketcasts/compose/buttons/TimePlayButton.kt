@@ -29,10 +29,46 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 sealed class TimePlayButtonStyle {
     object Solid : TimePlayButtonStyle()
     object Outlined : TimePlayButtonStyle()
+}
+
+sealed class TimePlayButtonColors {
+    @Composable
+    abstract fun backgroundColor(): Color
+
+    @Composable
+    abstract fun textColor(): Color
+
+    @Composable
+    abstract fun borderColor(): Color
+
+    data class Player(
+        val textColor: Color,
+    ) : TimePlayButtonColors() {
+        @Composable
+        override fun backgroundColor() = MaterialTheme.theme.colors.playerContrast01
+
+        @Composable
+        override fun textColor() = textColor
+
+        @Composable
+        override fun borderColor() = textColor
+    }
+
+    object Default : TimePlayButtonColors() {
+        @Composable
+        override fun backgroundColor() = Color.Transparent
+
+        @Composable
+        override fun textColor() = MaterialTheme.theme.colors.primaryText01
+
+        @Composable
+        override fun borderColor() = MaterialTheme.theme.colors.primaryText01
+    }
 }
 
 @Composable
@@ -41,24 +77,22 @@ fun TimePlayButton(
     @StringRes contentDescriptionId: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    textColor: Color = MaterialTheme.theme.colors.primaryText01,
-    backgroundColor: Color = MaterialTheme.colors.surface,
-    borderColor: Color = MaterialTheme.theme.colors.primaryText01,
-    buttonStyle: TimePlayButtonStyle = TimePlayButtonStyle.Outlined
+    colors: TimePlayButtonColors = TimePlayButtonColors.Default,
+    buttonStyle: TimePlayButtonStyle = TimePlayButtonStyle.Outlined,
 ) {
     val timeText by remember {
         mutableStateOf(TimeHelper.formattedSeconds(timeSecs.toDouble()))
     }
     val description = stringResource(contentDescriptionId, timeText)
     val border = when (buttonStyle) {
-        TimePlayButtonStyle.Outlined -> BorderStroke(2.dp, borderColor)
-        TimePlayButtonStyle.Solid -> null
+        is TimePlayButtonStyle.Outlined -> BorderStroke(2.dp, colors.borderColor())
+        is TimePlayButtonStyle.Solid -> null
     }
     OutlinedButton(
         onClick = onClick,
         border = border,
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = backgroundColor,
+            backgroundColor = colors.backgroundColor(),
         ),
         shape = RoundedCornerShape(50),
         modifier = modifier
@@ -68,21 +102,26 @@ fun TimePlayButton(
     ) {
         TextH40(
             text = timeText,
-            color = textColor,
+            color = colors.textColor(),
             maxLines = 1,
             modifier = Modifier.clearAndSetSemantics { },
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Icon(
-            painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_play),
+            painter = painterResource(IR.drawable.ic_play),
             contentDescription = null,
-            tint = textColor,
+            tint = colors.textColor(),
             modifier = Modifier.size(10.dp, 13.dp)
         )
     }
 }
 
-@ShowkaseComposable(name = "TimePlayButton", group = "Button", styleName = "Outline - Light", defaultStyle = true)
+@ShowkaseComposable(
+    name = "TimePlayButton",
+    group = "Button",
+    styleName = "Outline - Light",
+    defaultStyle = true
+)
 @Preview(name = "Light")
 @Composable
 fun TimePlayButtonLightPreview() {
@@ -122,8 +161,9 @@ fun TimePlayButtonFilledPreview() {
         TimePlayButton(
             timeSecs = 121,
             contentDescriptionId = R.string.bookmark_play,
-            backgroundColor = MaterialTheme.theme.colors.playerContrast01,
-            textColor = MaterialTheme.colors.surface,
+            colors = TimePlayButtonColors.Player(
+                textColor = Color.Black
+            ),
             buttonStyle = TimePlayButtonStyle.Solid,
             onClick = {}
         )

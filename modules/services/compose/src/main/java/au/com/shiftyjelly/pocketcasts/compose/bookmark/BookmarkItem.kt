@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,20 +20,82 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+sealed class BookmarkRowColors {
+    @Composable
+    abstract fun dividerColor(): Color
+
+    @Composable
+    abstract fun backgroundColor(
+        isMultiSelecting: () -> Boolean,
+        isSelected: Boolean,
+    ): Color
+
+    @Composable
+    abstract fun primaryTextColor(): Color
+
+    @Composable
+    abstract fun secondaryTextColor(): Color
+
+    object Player : BookmarkRowColors() {
+        @Composable
+        override fun dividerColor(): Color = MaterialTheme.theme.colors.playerContrast05
+
+        @Composable
+        override fun backgroundColor(
+            isMultiSelecting: () -> Boolean,
+            isSelected: Boolean,
+        ): Color {
+            return if (isMultiSelecting() && isSelected) {
+                MaterialTheme.theme.colors.primaryUi02Selected
+            } else {
+                Color.Transparent
+            }
+        }
+        @Composable
+        override fun primaryTextColor() = MaterialTheme.theme.colors.playerContrast01
+
+        @Composable
+        override fun secondaryTextColor() = MaterialTheme.theme.colors.playerContrast02
+    }
+
+    object Default : BookmarkRowColors() {
+        @Composable
+        override fun dividerColor(): Color = MaterialTheme.theme.colors.primaryUi05
+
+        @Composable
+        override fun backgroundColor(
+            isMultiSelecting: () -> Boolean,
+            isSelected: Boolean,
+        ): Color {
+            return if (isMultiSelecting() && isSelected) {
+                MaterialTheme.theme.colors.primaryUi02Selected
+            } else {
+                MaterialTheme.theme.colors.primaryUi01
+            }
+        }
+        @Composable
+        override fun primaryTextColor() = MaterialTheme.theme.colors.primaryText01
+
+        @Composable
+        override fun secondaryTextColor() = MaterialTheme.theme.colors.primaryText02
+    }
+}
 
 @Composable
 fun BookmarkItem(
@@ -41,13 +104,17 @@ fun BookmarkItem(
     isSelected: (Bookmark) -> Boolean,
     onPlayClick: (Bookmark) -> Unit,
     modifier: Modifier = Modifier,
-    showIcon: Boolean = true,
+    colors: BookmarkRowColors,
+    timePlayButtonStyle: TimePlayButtonStyle,
+    timePlayButtonColors: TimePlayButtonColors,
+    preTitle: String? = null,
+    showIcon: Boolean,
 ) {
     Column(
         modifier = modifier
     ) {
         Divider(
-            color = MaterialTheme.theme.colors.primaryUi05,
+            color = colors.dividerColor(),
             modifier = Modifier.fillMaxWidth()
         )
         Row(
@@ -56,11 +123,10 @@ fun BookmarkItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = if (isMultiSelecting() && isSelected(bookmark)) {
-                        MaterialTheme.theme.colors.primaryUi02Selected
-                    } else {
-                        MaterialTheme.theme.colors.primaryUi02
-                    }
+                    color = colors.backgroundColor(
+                        isMultiSelecting = isMultiSelecting,
+                        isSelected = isSelected(bookmark)
+                    )
                 )
         ) {
             val createdAtText by remember {
@@ -93,24 +159,38 @@ fun BookmarkItem(
                     .weight(1f)
                     .padding(start = 16.dp)
             ) {
-                TextC70(
-                    text = bookmark.episodeTitle,
-                    maxLines = 1,
-                    modifier = Modifier.padding(top = 8.dp),
-                    isUpperCase = false,
+                if (preTitle != null) {
+                    TextH70(
+                        text = preTitle,
+                        color = colors.secondaryTextColor(),
+                        maxLines = 1,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier.padding(
+                        top = if (preTitle != null) 4.dp else 16.dp
+                    )
                 )
 
                 TextH40(
                     text = bookmark.title,
+                    color = colors.primaryTextColor(),
                     maxLines = 2,
+                )
+
+                TextH70(
+                    text = createdAtText,
+                    color = colors.secondaryTextColor(),
+                    maxLines = 1,
                     modifier = Modifier.padding(top = 4.dp),
                 )
 
-                TextC70(
-                    text = createdAtText,
-                    maxLines = 1,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
-                    isUpperCase = false,
+                Spacer(
+                    modifier = Modifier.padding(
+                        bottom = if (preTitle != null) 8.dp else 16.dp
+                    )
                 )
             }
 
@@ -119,19 +199,37 @@ fun BookmarkItem(
                     timeSecs = bookmark.timeSecs,
                     contentDescriptionId = LR.string.bookmark_play,
                     onClick = { onPlayClick(bookmark) },
-                    backgroundColor = Color.Transparent,
+                    buttonStyle = timePlayButtonStyle,
+                    colors = timePlayButtonColors,
                 )
             }
         }
     }
 }
 
-@Preview
+@ShowkaseComposable(name = "BookmarkRow", group = "Bookmark", styleName = "Default - Light")
+@Preview(name = "Light")
 @Composable
-private fun BookmarkPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class)
-    themeType: Theme.ThemeType,
-) {
+fun BookmarkRowLightPreview() {
+    BookmarkRowNormalPreview(Theme.ThemeType.LIGHT)
+}
+
+@ShowkaseComposable(name = "BookmarkRow", group = "Bookmark", styleName = "Default - Dark")
+@Preview(name = "Dark")
+@Composable
+fun BookmarkRowDarkPreview() {
+    BookmarkRowNormalPreview(Theme.ThemeType.DARK)
+}
+
+@ShowkaseComposable(name = "BookmarkRow", group = "Bookmark", styleName = "Default - Rose")
+@Preview(name = "Rose")
+@Composable
+fun BookmarkRowRosePreview() {
+    BookmarkRowNormalPreview(Theme.ThemeType.ROSE)
+}
+
+@Composable
+private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         BookmarkItem(
             bookmark = Bookmark(
@@ -146,7 +244,36 @@ private fun BookmarkPreview(
             isSelected = { false },
             onPlayClick = {},
             modifier = Modifier,
-            showIcon = false
+            colors = BookmarkRowColors.Default,
+            timePlayButtonStyle = TimePlayButtonStyle.Outlined,
+            timePlayButtonColors = TimePlayButtonColors.Default,
+            showIcon = false,
+        )
+    }
+}
+
+@ShowkaseComposable(name = "BookmarkRow", group = "Bookmark", styleName = "Player")
+@Preview(name = "Style - Player")
+@Composable
+fun BookmarkRowPlayerPreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        BookmarkItem(
+            bookmark = Bookmark(
+                uuid = "",
+                podcastUuid = "",
+                episodeTitle = "Episode Title",
+                timeSecs = 10,
+                title = "Bookmark Title",
+                createdAt = Date()
+            ),
+            isMultiSelecting = { false },
+            isSelected = { false },
+            onPlayClick = {},
+            modifier = Modifier,
+            colors = BookmarkRowColors.Player,
+            timePlayButtonStyle = TimePlayButtonStyle.Solid,
+            timePlayButtonColors = TimePlayButtonColors.Player(textColor = Color.Black),
+            showIcon = false,
         )
     }
 }
