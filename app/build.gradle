@@ -76,28 +76,31 @@ sentry {
 }
 
 dependencies {
-    implementation project(':modules:services:localization')
-    implementation project(':modules:services:preferences')
-    implementation project(':modules:services:utils')
-    implementation project(':modules:services:ui')
-    implementation project(':modules:services:compose')
-    implementation project(':modules:services:views')
-    implementation project(':modules:services:model')
-    implementation project(':modules:services:repositories')
-    implementation project(':modules:services:servers')
-    implementation project(':modules:services:analytics')
+    // features
+    implementation project(':modules:features:account')
     implementation project(':modules:features:discover')
-    implementation project(':modules:features:profile')
-    implementation project(':modules:features:settings')
-    implementation project(':modules:features:podcasts')
-    implementation project(':modules:features:player')
-    implementation project(':modules:features:search')
+    implementation project(':modules:features:endofyear')
     implementation project(':modules:features:filters')
     implementation project(':modules:features:navigation')
-    implementation project(':modules:features:account')
+    implementation project(':modules:features:player')
+    implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:profile')
+    implementation project(':modules:features:search')
+    implementation project(':modules:features:settings')
     implementation project(':modules:features:shared')
     implementation project(':modules:features:taskerplugin')
-    implementation project(':modules:features:endofyear')
+    // services
+    implementation project(':modules:services:analytics')
+    implementation project(':modules:services:compose')
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:model')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
+    implementation project(':modules:services:sharedtest')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:ui')
+    implementation project(':modules:services:views')
 }
 
 task appStart(type: Exec, dependsOn: 'installDebug') {
