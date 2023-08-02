@@ -40,7 +40,7 @@ class PodcastAutoArchiveViewModel @Inject constructor(
             val podcast = podcast.value ?: return@launch
             podcast.overrideGlobalArchive = checked
             podcast.autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.flow.value.toIndex()
-            podcast.autoArchiveInactive = settings.getAutoArchiveInactive().toIndex()
+            podcast.autoArchiveInactive = settings.autoArchiveInactive.flow.value.toIndex()
             podcastManager.updatePodcast(podcast)
         }
     }

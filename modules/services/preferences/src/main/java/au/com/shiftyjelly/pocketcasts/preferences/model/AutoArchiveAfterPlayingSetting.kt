@@ -8,15 +8,6 @@ sealed class AutoArchiveAfterPlayingSetting(val timeSeconds: Int, val analyticsV
     companion object {
         fun defaultValue(context: Context) = if (Util.isAutomotive(context)) Never else AfterPlaying
 
-        fun fromSeconds(seconds: Int, context: Context) = when (seconds) {
-            Never.timeSeconds -> Never
-            AfterPlaying.timeSeconds -> AfterPlaying
-            Hours24.timeSeconds -> Hours24
-            Days2.timeSeconds -> Days2
-            Weeks1.timeSeconds -> Weeks1
-            else -> defaultValue(context)
-        }
-
         fun fromString(value: String?, context: Context): AutoArchiveAfterPlayingSetting =
             when (value) {
                 context.getString(R.string.settings_auto_archive_played_never) -> Never

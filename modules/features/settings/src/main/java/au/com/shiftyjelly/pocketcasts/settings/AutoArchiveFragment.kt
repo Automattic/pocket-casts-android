@@ -27,6 +27,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     private val viewModel: AutoArchiveFragmentViewModel by viewModels()
 
     private lateinit var autoArchivePlayedEpisodes: ListPreference
+    private lateinit var autoArchiveInactiveEpisodes: ListPreference
 
     val toolbar: Toolbar?
         get() = view?.findViewById(R.id.toolbar)
@@ -37,6 +38,13 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
             .apply {
                 setOnPreferenceChangeListener { _, newValue ->
                     viewModel.onPlayedEpisodesAfterChanged(newValue as String)
+                    true
+                }
+            }
+        autoArchiveInactiveEpisodes = preferenceManager.findPreference<ListPreference>("autoArchiveInactiveEpisodes")!!
+            .apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    viewModel.onInactiveChanged(newValue as String)
                     true
                 }
             }
@@ -52,6 +60,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     override fun onResume() {
         super.onResume()
         setupAutoArchiveAfterPlaying()
+        setupAutoArchiveInactive()
         preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
 
@@ -72,9 +81,6 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
             Settings.AUTO_ARCHIVE_INCLUDE_STARRED -> {
                 updateStarredSummary()
                 viewModel.onStarredChanged()
-            }
-            Settings.AUTO_ARCHIVE_INACTIVE -> {
-                viewModel.onInactiveChanged()
             }
             else -> Timber.d("Unknown preference changed: $key")
         }
@@ -97,5 +103,10 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     private fun setupAutoArchiveAfterPlaying() {
         val stringArray = resources.getStringArray(LR.array.settings_auto_archive_played_values)
         autoArchivePlayedEpisodes.value = stringArray[settings.autoArchiveAfterPlaying.flow.value.toIndex()]
+    }
+
+    private fun setupAutoArchiveInactive() {
+        val stringArray = resources.getStringArray(LR.array.settings_auto_archive_inactive_values)
+        autoArchiveInactiveEpisodes.value = stringArray[settings.autoArchiveInactive.flow.value.toIndex()]
     }
 }

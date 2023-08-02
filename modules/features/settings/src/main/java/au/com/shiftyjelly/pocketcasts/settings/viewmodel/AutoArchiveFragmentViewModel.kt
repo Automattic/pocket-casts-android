@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -40,20 +41,12 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         )
     }
 
-    fun onInactiveChanged() {
+    fun onInactiveChanged(newStringValue: String) {
+        val newValue = AutoArchiveInactiveSetting.fromString(newStringValue, context)
+        settings.autoArchiveInactive.set(newValue)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-            mapOf(
-                "value" to when (settings.getAutoArchiveInactive()) {
-                    Settings.AutoArchiveInactive.Never -> "never"
-                    Settings.AutoArchiveInactive.Hours24 -> "after_24_hours"
-                    Settings.AutoArchiveInactive.Days2 -> "after_2_days"
-                    Settings.AutoArchiveInactive.Weeks1 -> "after_1_week"
-                    Settings.AutoArchiveInactive.Weeks2 -> "after_2_weeks"
-                    Settings.AutoArchiveInactive.Days30 -> "after_30_days"
-                    Settings.AutoArchiveInactive.Days90 -> "after 3 months"
-                }
-            )
+            mapOf("value" to newValue.analyticsValue)
         )
     }
 
