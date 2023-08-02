@@ -1,16 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @HiltViewModel
 class AutoArchiveFragmentViewModel @Inject constructor(
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private var isFragmentChangingConfigurations: Boolean = false
 
@@ -27,18 +31,12 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         )
     }
 
-    fun onPlayedEpisodesAfterChanged() {
+    fun onPlayedEpisodesAfterChanged(newStringValue: String) {
+        val newValue = AutoArchiveAfterPlayingSetting.fromString(newStringValue, context)
+        settings.autoArchiveAfterPlaying.set(newValue)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-            mapOf(
-                "value" to when (settings.getAutoArchiveAfterPlaying()) {
-                    Settings.AutoArchiveAfterPlaying.Never -> "never"
-                    Settings.AutoArchiveAfterPlaying.AfterPlaying -> "after_playing"
-                    Settings.AutoArchiveAfterPlaying.Hours24 -> "after_24_hours"
-                    Settings.AutoArchiveAfterPlaying.Days2 -> "after_2_days"
-                    Settings.AutoArchiveAfterPlaying.Weeks1 -> "after_1_week"
-                }
-            )
+            mapOf("value" to newValue.analyticsValue)
         )
     }
 

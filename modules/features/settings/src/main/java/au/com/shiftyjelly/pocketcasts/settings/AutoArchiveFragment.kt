@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
+import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -25,11 +26,20 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
 
     private val viewModel: AutoArchiveFragmentViewModel by viewModels()
 
+    private lateinit var autoArchivePlayedEpisodes: ListPreference
+
     val toolbar: Toolbar?
         get() = view?.findViewById(R.id.toolbar)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_auto_archive)
+        autoArchivePlayedEpisodes = preferenceManager.findPreference<ListPreference>("autoArchivePlayedEpisodes")!!
+            .apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    viewModel.onPlayedEpisodesAfterChanged(newValue as String)
+                    true
+                }
+            }
         updateStarredSummary()
     }
 
@@ -41,6 +51,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
 
     override fun onResume() {
         super.onResume()
+        setupAutoArchiveAfterPlaying()
         preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
 
@@ -62,9 +73,6 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
                 updateStarredSummary()
                 viewModel.onStarredChanged()
             }
-            Settings.AUTO_ARCHIVE_PLAYED_EPISODES_AFTER -> {
-                viewModel.onPlayedEpisodesAfterChanged()
-            }
             Settings.AUTO_ARCHIVE_INACTIVE -> {
                 viewModel.onInactiveChanged()
             }
@@ -84,5 +92,10 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
 
     override fun getBackstackCount(): Int {
         return childFragmentManager.backStackEntryCount
+    }
+
+    private fun setupAutoArchiveAfterPlaying() {
+        val stringArray = resources.getStringArray(LR.array.settings_auto_archive_played_values)
+        autoArchivePlayedEpisodes.value = stringArray[settings.autoArchiveAfterPlaying.flow.value.toIndex()]
     }
 }

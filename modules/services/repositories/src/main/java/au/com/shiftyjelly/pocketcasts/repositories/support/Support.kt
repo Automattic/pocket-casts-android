@@ -313,11 +313,10 @@ class Support @Inject constructor(
                 Timber.e(e)
             }
 
-            val afterPlaying = context.resources.getStringArray(R.array.settings_auto_archive_played_values)
             val inactive = context.resources.getStringArray(R.array.settings_auto_archive_inactive_values)
             output.append(eol)
             output.append("Auto archive settings").append(eol)
-            output.append("Auto archive played episodes after: " + afterPlaying[settings.getAutoArchiveAfterPlaying().toIndex()]).append(eol)
+            output.append("Auto archive played episodes after: " + settings.autoArchiveAfterPlaying.flow.value.analyticsValue).append(eol)
             output.append("Auto archive inactive episodes after: " + inactive[settings.getAutoArchiveInactive().toIndex()]).append(eol)
             output.append("Auto archive starred episodes: " + settings.getAutoArchiveIncludeStarred().toString()).append(eol)
 
