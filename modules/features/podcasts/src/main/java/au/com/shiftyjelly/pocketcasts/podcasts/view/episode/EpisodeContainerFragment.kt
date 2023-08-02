@@ -239,7 +239,11 @@ class EpisodeContainerFragment :
             object Bookmarks : Section(LR.string.bookmarks)
         }
 
-        private var sections = listOf(Section.Details, Section.Bookmarks)
+        private var sections = mutableListOf<Section>(Section.Details).apply {
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                add(Section.Bookmarks)
+            }
+        }.toList()
 
         override fun getItemId(position: Int): Long {
             return sections[position].hashCode().toLong()
