@@ -137,6 +137,7 @@
     <string name="on">On</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
+    <string name="episode">Episode</string>
     <string name="episodes">Episodes</string>
     <string name="none">None</string>
     <string name="expand_details">Expand details</string>

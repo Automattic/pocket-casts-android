@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.Bookm
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
 class BookmarkHeaderViewHolder(
     private val composeView: ComposeView,
     private val theme: Theme,
@@ -69,7 +70,7 @@ class BookmarkHeaderViewHolder(
                 )
             }
             IconButton(
-                onClick = { },
+                onClick = { bookmarkHeader.onOptionsClicked() },
                 modifier = Modifier
             ) {
                 Icon(

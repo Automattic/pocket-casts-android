@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.player.view.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastBinding
@@ -307,6 +308,19 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         Unit // This is dumb kotlin
     }
 
+    private val showBookmarksOptionsDialog: () -> Unit = {
+        activity?.supportFragmentManager?.let {
+            BookmarksSortByDialog(
+                settings = settings,
+                changeSortOrder = viewModel::changeSortOrder,
+                sourceView = SourceView.PODCAST_SCREEN
+            ).show(
+                context = requireContext(),
+                fragmentManager = it
+            )
+        }
+    }
+
     private val onEpisodesOptionsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
@@ -561,6 +575,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 onSubscribeClicked = onSubscribeClicked,
                 onUnsubscribeClicked = onUnsubscribeClicked,
                 onEpisodesOptionsClicked = onEpisodesOptionsClicked,
+                onBookmarksOptionsClicked = showBookmarksOptionsDialog,
                 onEpisodeRowLongPress = onRowLongPress(),
                 onBookmarkRowLongPress = onRowLongPress(),
                 onFoldersClicked = onFoldersClicked,

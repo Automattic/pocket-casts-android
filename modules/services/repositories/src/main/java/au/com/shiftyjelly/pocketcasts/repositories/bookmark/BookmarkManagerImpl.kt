@@ -3,7 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,23 +79,23 @@ class BookmarkManagerImpl @Inject constructor(
      */
     override suspend fun findEpisodeBookmarksFlow(
         episode: BaseEpisode,
-        sortType: BookmarksSortType,
+        sortType: BookmarksSortTypeForPlayer,
     ) = when (sortType) {
-        BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST ->
+        BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST ->
             bookmarkDao.findByEpisodeOrderCreatedAtFlow(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
                 isAsc = false,
             )
 
-        BookmarksSortType.DATE_ADDED_OLDEST_TO_NEWEST ->
+        BookmarksSortTypeForPlayer.DATE_ADDED_OLDEST_TO_NEWEST ->
             bookmarkDao.findByEpisodeOrderCreatedAtFlow(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
                 isAsc = true,
             )
 
-        BookmarksSortType.TIMESTAMP ->
+        BookmarksSortTypeForPlayer.TIMESTAMP ->
             bookmarkDao.findByEpisodeOrderTimeFlow(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
@@ -107,8 +108,24 @@ class BookmarkManagerImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun findPodcastBookmarksFlow(
         podcastUuid: String,
-    ) = bookmarkDao.findByPodcastFlow(podcastUuid = podcastUuid).flatMapLatest { helper ->
-        flowOf(helper.map { it.toBookmark() })
+        sortType: BookmarksSortTypeForPodcast,
+    ) = when (sortType) {
+        BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST ->
+            bookmarkDao.findByPodcastOrderCreatedAtFlow(
+                podcastUuid = podcastUuid,
+                isAsc = false,
+            ).flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
+
+        BookmarksSortTypeForPodcast.DATE_ADDED_OLDEST_TO_NEWEST ->
+            bookmarkDao.findByPodcastOrderCreatedAtFlow(
+                podcastUuid = podcastUuid,
+                isAsc = true,
+            ).flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
+
+        BookmarksSortTypeForPodcast.EPISODE ->
+            bookmarkDao.findByPodcastOrderEpisodeAndTimeFlow(
+                podcastUuid = podcastUuid,
+            ).flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
     }
 
     override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =

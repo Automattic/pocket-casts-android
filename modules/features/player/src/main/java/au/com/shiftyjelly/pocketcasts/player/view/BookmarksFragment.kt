@@ -57,6 +57,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
@@ -67,7 +68,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
-import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -128,7 +128,7 @@ class BookmarksFragment : BaseFragment() {
                 .setForceDarkTheme(true)
                 .addTextOption(
                     titleId = LR.string.bookmarks_select_option,
-                    imageId = R.drawable.ic_multiselect,
+                    imageId = IR.drawable.ic_multiselect,
                     click = {
                         multiSelectHelper.isMultiSelecting = true
                     }
@@ -138,11 +138,15 @@ class BookmarksFragment : BaseFragment() {
                     imageId = IR.drawable.ic_sort,
                     valueId = selectedValue,
                     click = {
-                        BookmarksSortByDialog(settings, bookmarksViewModel::changeSortOrder)
-                            .show(
-                                context = requireContext(),
-                                fragmentManager = it
-                            )
+                        BookmarksSortByDialog(
+                            settings = settings,
+                            changeSortOrder = bookmarksViewModel::changeSortOrder,
+                            sourceView = SourceView.PLAYER,
+                            forceDarkTheme = true,
+                        ).show(
+                            context = requireContext(),
+                            fragmentManager = it
+                        )
                     }
                 ).show(it, "bookmarks_options_dialog")
         }
@@ -170,7 +174,7 @@ private fun BookmarksPage(
                 bookmarksViewModel.play(bookmark)
             },
         )
-        LaunchedEffect(Unit) {
+        LaunchedEffect(it.podcastHeader.episodeUuid) {
             bookmarksViewModel.loadBookmarks(
                 episodeUuid = it.podcastHeader.episodeUuid
             )

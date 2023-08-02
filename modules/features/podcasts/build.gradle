@@ -15,6 +15,7 @@ dependencies {
     implementation project(':modules:features:account')
     implementation project(':modules:features:search')
     implementation project(':modules:features:settings')
+    implementation project(':modules:features:player')
 
     // services
     implementation project(':modules:services:analytics')
