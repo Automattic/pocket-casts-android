@@ -83,6 +83,7 @@ private const val ACTION_PICK_FILE = 2
 private const val EXTRA_EXISTING_EPISODE_UUID = "fileUUID"
 private const val EXTRA_FILE_CHOOSER = "filechooser"
 private const val STATE_LAUNCHED_FILE_CHOOSER = "LAUNCHED_FILE_CHOOSER"
+private const val STATE_DATAURI = "null"
 
 @AndroidEntryPoint
 class AddFileActivity :
@@ -295,6 +296,7 @@ class AddFileActivity :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(STATE_LAUNCHED_FILE_CHOOSER, launchedFileChooser)
+        outState.putParcelable(STATE_DATAURI, dataUri)
     }
 
     private fun openOnboardingFlow() {
