@@ -4,6 +4,7 @@ import android.content.res.Resources
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -71,11 +72,17 @@ enum class NewEpisodeNotificationAction(
         }
 
         fun loadFromSettings(settings: Settings): List<NewEpisodeNotificationAction> {
-            return actionsFromString(settings.getNewEpisodeNotificationActions() ?: return DEFAULT_ACTIONS)
+            val setting = settings.newEpisodeNotificationActions.flow.value
+            return when (setting) {
+                NewEpisodeNotificationActionSetting.Default -> DEFAULT_ACTIONS
+                is NewEpisodeNotificationActionSetting.ValueOf -> actionsFromString(setting.value)
+            }
         }
 
         fun saveToSettings(actions: MutableList<NewEpisodeNotificationAction>, settings: Settings) {
-            settings.setNewEpisodeNotificationActions(actionsToString(actions))
+            val stringActions = actionsToString(actions)
+            val newSetting = NewEpisodeNotificationActionSetting.ValueOf(stringActions)
+            settings.newEpisodeNotificationActions.set(newSetting)
         }
     }
 }

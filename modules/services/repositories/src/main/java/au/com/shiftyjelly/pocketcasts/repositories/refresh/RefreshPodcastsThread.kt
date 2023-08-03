@@ -536,11 +536,12 @@ class RefreshPodcastsThread(
 
             // Add sound and vibrations
             if (!isGroupNotification) {
-                val sound = settings.getNotificationSound()
+                val sound = settings.notificationSound.flow.value.uri
                 if (sound != null) {
                     notification.sound = sound
                 }
-                if (settings.isNotificationVibrateOn()) {
+                val isVibrateOn = settings.notificationVibrate.flow.value.isNotificationVibrateOn(context)
+                if (isVibrateOn) {
                     notification.defaults = notification.defaults or Notification.DEFAULT_VIBRATE
                 }
             }
@@ -625,11 +626,12 @@ class RefreshPodcastsThread(
             val summaryNotification = summaryBuilder.build()
 
             // Add sound and vibrations
-            val sound = settings.getNotificationSound()
+            val sound = settings.notificationSound.flow.value.uri
             if (sound != null) {
                 summaryNotification.sound = sound
             }
-            if (settings.isNotificationVibrateOn()) {
+            val isVibrateOn = settings.notificationVibrate.flow.value.isNotificationVibrateOn(context)
+            if (isVibrateOn) {
                 summaryNotification.defaults = summaryNotification.defaults or Notification.DEFAULT_VIBRATE
             }
 

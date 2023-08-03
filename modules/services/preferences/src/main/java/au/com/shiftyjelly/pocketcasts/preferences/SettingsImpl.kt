@@ -5,11 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
-import android.media.AudioManager
-import android.net.Uri
 import android.os.Build
 import android.util.Base64
-import androidx.core.content.edit
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -26,6 +23,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
@@ -274,43 +274,40 @@ class SettingsImpl @Inject constructor(
         return PodcastsSortType.values().find { it.clientId == sortOrderId } ?: default
     }
 
-    override fun getNotificationVibrate(): Int {
-        val value = sharedPreferences.getString(
-            Settings.PREFERENCE_NOTIFICATION_VIBRATE,
-            Settings.PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT
-        ) ?: Settings.PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT
-        return Integer.parseInt(value)
-    }
-
-    override fun getNotificationSound(): Uri? {
-        val value = sharedPreferences.getString(Settings.PREFERENCE_NOTIFICATION_RINGTONE, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.path)
-        return if (value.isNullOrBlank() || !isSoundOn()) null else Uri.parse(value)
-    }
-
-    override fun getNotificationSoundPath(): String {
-        return getString(Settings.PREFERENCE_NOTIFICATION_RINGTONE, "DEFAULT_SOUND")
-            ?: "DEFAULT_SOUND"
-    }
-
-    override fun setNotificationSoundPath(path: String) {
-        setString(Settings.PREFERENCE_NOTIFICATION_RINGTONE, path)
-    }
-
-    override fun isSoundOn(): Boolean {
-        return (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).ringerMode == AudioManager.RINGER_MODE_NORMAL
-    }
-
-    override fun isNotificationVibrateOn(): Boolean {
-        val vibrate = getNotificationVibrate()
-        return vibrate == 2 || vibrate == 1 && !isSoundOn()
-    }
-
-    override fun oldNotifyRefreshPodcast(): Boolean {
-        return sharedPreferences.getBoolean(
-            Settings.OLD_PREFERENCE_EPISODE_NOTIFICATIONS_ON,
-            Settings.PREFERENCE_EPISODE_NOTIFICATIONS_ON_DEFAULT
+    override val notificationVibrate: UserSetting<NotificationVibrateSetting> = run {
+        UserSetting.PrefFromString(
+            sharedPrefKey = "notificationVibrate",
+            defaultValue = NotificationVibrateSetting.DEFAULT,
+            sharedPrefs = sharedPreferences,
+            fromString = {
+                try {
+                    val intValue = Integer.parseInt(it)
+                    NotificationVibrateSetting
+                        .values()
+                        .find { setting ->
+                            setting.intValue == intValue
+                        }
+                } catch (e: NumberFormatException) {
+                    null
+                } ?: NotificationVibrateSetting.DEFAULT
+            },
+            toString = { it.intValue.toString() }
         )
     }
+
+    override val notificationSound = UserSetting.PrefFromString(
+        sharedPrefKey = "notificationRingtone",
+        defaultValue = NotificationSound(context = context),
+        sharedPrefs = sharedPreferences,
+        fromString = { NotificationSound(it, context) },
+        toString = { it.path }
+    )
+
+    override val notifyRefreshPodcast = UserSetting.BoolPref(
+        sharedPrefKey = "episodeNotificationsOn",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun usingCustomFolderStorage(): Boolean {
         val storageChoice = getStorageChoice()
@@ -450,18 +447,18 @@ class SettingsImpl @Inject constructor(
         return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)
     }
 
-    override fun getPlayOverNotification(): PlayOverNotificationSetting {
-        val value = sharedPreferences.getString(Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO, null) ?: legacyPlayOverNotification()
-        return PlayOverNotificationSetting.fromPreferenceString(value)
-    }
-
-    private fun legacyPlayOverNotification(): String {
-        if (sharedPreferences.getBoolean(Settings.PREFERENCE_OVERRIDE_AUDIO_LEGACY, false)) {
-            return PlayOverNotificationSetting.ALWAYS.preferenceInt.toString()
-        }
-
-        return PlayOverNotificationSetting.NEVER.preferenceInt.toString()
-    }
+    override val playOverNotification = UserSetting.PrefFromString<PlayOverNotificationSetting>(
+        sharedPrefKey = "overrideNotificationAudio",
+        defaultValue = if (sharedPreferences.getBoolean("overrideAudioInterruption", false)) {
+            // default to ALWAYS because legacy override audio interruption was set to true
+            PlayOverNotificationSetting.ALWAYS
+        } else {
+            PlayOverNotificationSetting.NEVER
+        },
+        sharedPrefs = sharedPreferences,
+        fromString = { PlayOverNotificationSetting.fromPreferenceString(it) },
+        toString = { it.preferenceInt.toString() }
+    )
 
     override fun hasBlockAlreadyRun(label: String): Boolean {
         return sharedPreferences.getBoolean("blockAlreadyRun$label", false)
@@ -592,9 +589,11 @@ class SettingsImpl @Inject constructor(
         return "us"
     }
 
-    override fun hideNotificationOnPause(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE, false)
-    }
+    override val hideNotificationOnPause = UserSetting.BoolPref(
+        sharedPrefKey = "hideNotificationOnPause",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences
+    )
 
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
@@ -920,15 +919,23 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getString(preference, defaultValue) ?: defaultValue
     }
 
-    override fun getNewEpisodeNotificationActions(): String? {
-        return sharedPreferences.getString("notification_actions", null)
-    }
-
-    override fun setNewEpisodeNotificationActions(actions: String) {
-        sharedPreferences.edit {
-            putString("notification_actions", actions)
-        }
-    }
+    override val newEpisodeNotificationActions = UserSetting.PrefFromString<NewEpisodeNotificationActionSetting>(
+        sharedPrefKey = "notification_actions",
+        defaultValue = NewEpisodeNotificationActionSetting.Default,
+        sharedPrefs = sharedPreferences,
+        fromString = {
+            when (it) {
+                NewEpisodeNotificationActionSetting.Default.stringValue -> NewEpisodeNotificationActionSetting.Default
+                else -> NewEpisodeNotificationActionSetting.ValueOf(it)
+            }
+        },
+        toString = {
+            when (it) {
+                NewEpisodeNotificationActionSetting.Default -> NewEpisodeNotificationActionSetting.Default.stringValue
+                is NewEpisodeNotificationActionSetting.ValueOf -> it.value
+            }
+        },
+    )
 
     override fun getPodcastsLayout(): Int {
         return getInt("PODCAST_GRID_LAYOUT", Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)

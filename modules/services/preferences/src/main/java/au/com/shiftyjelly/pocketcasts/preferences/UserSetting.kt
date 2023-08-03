@@ -57,6 +57,7 @@ abstract class UserSetting<T>(
         override fun get(): Boolean = sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
     }
 
+    // This persists the parameterized object as an Int in shared preferences.
     class PrefFromInt<T>(
         sharedPrefKey: String,
         private val defaultValue: T,
@@ -81,6 +82,7 @@ abstract class UserSetting<T>(
         }
     }
 
+    // This persists the parameterized object as a String in shared preferences.
     open class PrefFromString<T>(
         sharedPrefKey: String,
         private val defaultValue: T,

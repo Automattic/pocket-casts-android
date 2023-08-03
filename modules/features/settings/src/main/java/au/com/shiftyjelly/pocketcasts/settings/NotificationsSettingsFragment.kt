@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -16,8 +15,10 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -42,6 +43,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -50,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class NotificationsSettingsFragment :
     PreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener,
     PodcastSelectFragment.Listener,
     CoroutineScope,
     HasBackstack {
@@ -73,6 +74,7 @@ class NotificationsSettingsFragment :
     private var systemSettingsPreference: Preference? = null
     private var notificationActions: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
+    private var hidePlaybackNotificationsPreference: SwitchPreference? = null
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
@@ -98,6 +100,7 @@ class NotificationsSettingsFragment :
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
+        hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
@@ -113,26 +116,25 @@ class NotificationsSettingsFragment :
 
         updateNotificationsEnabled()
 
-        manager.run {
-            findPreference<SwitchPreference>(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE)?.setOnPreferenceChangeListener { _, newValue ->
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
-                    mapOf("enabled" to newValue as Boolean)
-                )
-                true
-            }
+        hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
+            val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
+            settings.hideNotificationOnPause.set(newBool)
+            analyticsTracker.track(
+                AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
+                mapOf("enabled" to newBool)
+            )
+            true
         }
+
         vibratePreference?.setOnPreferenceChangeListener { _, newValue ->
+            val newSetting = (newValue as? String)?.let {
+                NotificationVibrateSetting.values().find { it.intValue.toString() == newValue }
+            }
+            settings.notificationVibrate.set(newSetting ?: NotificationVibrateSetting.DEFAULT)
+            changeVibrateSummary()
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED,
-                mapOf(
-                    "value" to when (newValue) {
-                        "0" -> "never"
-                        "1" -> "silent"
-                        "2" -> "new_episodes"
-                        else -> "unknown"
-                    }
-                )
+                mapOf("value" to (newSetting?.analyticsString ?: "unknown"))
             )
             true
         }
@@ -140,6 +142,9 @@ class NotificationsSettingsFragment :
             val playOverNotificationSetting = (newValue as? String)
                 ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
                 ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
+
+            settings.playOverNotification.set(playOverNotificationSetting)
+            changePlayOverNotificationSummary()
 
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED,
@@ -242,7 +247,7 @@ class NotificationsSettingsFragment :
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
 
-            val existingValue = settings.getNotificationSoundPath()
+            val existingValue = settings.notificationSound.flow.value.path
             // Select "Silent" if empty
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, if (existingValue.isEmpty()) null else Uri.parse(existingValue))
 
@@ -258,9 +263,11 @@ class NotificationsSettingsFragment :
         if (requestCode == REQUEST_CODE_ALERT_RINGTONE && data != null) {
             val ringtone = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
             val value = ringtone?.toString() ?: ""
-            settings.setNotificationSoundPath(value)
-            ringtonePreference?.summary = getRingtoneValue(value)
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
+            context?.let {
+                settings.notificationSound.set(NotificationSound(value, it))
+                ringtonePreference?.summary = getRingtoneValue(value)
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
+            } ?: Timber.e("Context was null when trying to set notification sound")
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -399,29 +406,11 @@ class NotificationsSettingsFragment :
         setupNotificationVibrate()
         setupPlayOverNotifications()
         changePodcastsSummary()
-        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (Settings.PREFERENCE_NOTIFICATION_VIBRATE == key) {
-            changeVibrateSummary()
-        } else if (Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO == key) {
-            changePlayOverNotificationSummary()
-        }
+        setupHidePlaybackNotifications()
     }
 
     private fun changeVibrateSummary() {
-        vibratePreference?.summary = when (settings.getNotificationVibrate()) {
-            2 -> getString(LR.string.settings_notification_vibrate_new_episodes)
-            1 -> getString(LR.string.settings_notification_vibrate_in_silent)
-            0 -> getString(LR.string.settings_notification_vibrate_never)
-            else -> ""
-        }
+        vibratePreference?.summary = getString(settings.notificationVibrate.flow.value.summary)
     }
 
     private fun getRingtoneValue(ringtonePath: String): String {
@@ -434,7 +423,7 @@ class NotificationsSettingsFragment :
             null -> ""
             else -> {
                 val title = ringtone.getTitle(activity)
-                if (title == "DEFAULT_SOUND") {
+                if (title == NotificationSound.defaultPath) {
                     getString(LR.string.settings_notification_default_sound)
                 } else {
                     title
@@ -449,21 +438,32 @@ class NotificationsSettingsFragment :
                 preference.summary = getRingtoneValue(newValue as String)
                 true
             }
-            it.setDefaultValue(settings.getNotificationSoundPath())
-            it.summary = getRingtoneValue(settings.getNotificationSoundPath())
+            settings.notificationSound.flow.value.path.let { notificationSoundPath ->
+                it.setDefaultValue(notificationSoundPath)
+                it.summary = getRingtoneValue(notificationSoundPath)
+            }
         }
     }
 
     private fun setupNotificationVibrate() {
         vibratePreference?.let {
-            it.entries = arrayOf(
-                getString(LR.string.settings_notification_vibrate_new_episodes),
-                getString(LR.string.settings_notification_vibrate_in_silent),
-                getString(LR.string.settings_notification_vibrate_never)
+            val options = arrayOf(
+                NotificationVibrateSetting.NewEpisodes,
+                NotificationVibrateSetting.OnlyWhenSilent,
+                NotificationVibrateSetting.Never
             )
-            it.entryValues = arrayOf("2", "1", "0")
-            it.value = settings.getNotificationVibrate().toString()
+            it.entries = options
+                .map { getString(it.summary) }
+                .toTypedArray()
+            it.entryValues = options.map {
+                it.intValue.toString()
+            }.toTypedArray()
+            it.value = settings.notificationVibrate.flow.value.intValue.toString()
         }
+    }
+
+    private fun setupHidePlaybackNotifications() {
+        hidePlaybackNotificationsPreference?.isChecked = settings.hideNotificationOnPause.flow.value
     }
 
     private fun setupPlayOverNotifications() {
@@ -475,13 +475,13 @@ class NotificationsSettingsFragment :
             )
             entries = options.map { getString(it.titleRes) }.toTypedArray()
             entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
-            value = settings.getPlayOverNotification().preferenceInt.toString()
+            value = settings.playOverNotification.flow.value.preferenceInt.toString()
         }
         changePlayOverNotificationSummary()
     }
 
     private fun changePlayOverNotificationSummary() {
-        playOverNotificationPreference?.summary = getString(settings.getPlayOverNotification().titleRes)
+        playOverNotificationPreference?.summary = getString(settings.playOverNotification.flow.value.titleRes)
     }
 
     override fun getBackstackCount(): Int {

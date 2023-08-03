@@ -30,8 +30,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
-import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
@@ -1702,7 +1702,7 @@ open class PlaybackManager @Inject constructor(
         val notification = builder.build()
 
         // Add sound and vibrations
-        val sound = settings.getNotificationSound()
+        val sound = settings.notificationSound.flow.value.uri
         if (sound != null) {
             notification.sound = sound
         }

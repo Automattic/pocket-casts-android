@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.Context
-import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
@@ -14,6 +13,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
@@ -71,22 +73,14 @@ interface Settings {
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
-        const val OLD_PREFERENCE_EPISODE_NOTIFICATIONS_ON = "episodeNotificationsOn"
-        const val PREFERENCE_EPISODE_NOTIFICATIONS_ON_DEFAULT = false
-        const val PREFERENCE_NOTIFICATION_RINGTONE = "notificationRingtone"
-        const val PREFERENCE_NOTIFICATION_VIBRATE = "notificationVibrate"
-        const val PREFERENCE_NOTIFICATION_VIBRATE_DEFAULT = "2"
         const val PREFERENCE_PODCAST_LIBRARY_SORT = "podcastLibrarySort"
         const val PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC = "podcastLibrarySortNeedsSync"
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
         const val PREFERENCE_WARN_WHEN_NOT_ON_WIFI = "warnWhenNotOnWifi"
         const val PREFERENCE_SYNC_ON_METERED = "SyncWhenOnMetered"
-        const val PREFERENCE_OVERRIDE_AUDIO_LEGACY = "overrideAudioInterruption"
-        const val PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO = "overrideNotificationAudio"
         const val PREFERENCE_USE_EMBEDDED_ARTWORK = "useEmbeddedArtwork"
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
-        const val PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE = "hideNotificationOnPause"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
         const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED = "autoDownloadOnlyDownloadOnWifi"
         const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING = "autoDownloadOnlyDownloadWhenCharging"
@@ -332,16 +326,9 @@ interface Settings {
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
 
-    fun getNotificationVibrate(): Int
-    fun getNotificationSound(): Uri?
-    fun getNotificationSoundPath(): String
-    fun setNotificationSoundPath(path: String)
-
-    fun isSoundOn(): Boolean
-
-    fun isNotificationVibrateOn(): Boolean
-
-    fun oldNotifyRefreshPodcast(): Boolean
+    val notificationVibrate: UserSetting<NotificationVibrateSetting>
+    val notificationSound: UserSetting<NotificationSound>
+    val notifyRefreshPodcast: UserSetting<Boolean>
 
     fun usingCustomFolderStorage(): Boolean
 
@@ -374,7 +361,7 @@ interface Settings {
 
     fun setPopularPodcastCountryCode(code: String)
 
-    fun getPlayOverNotification(): PlayOverNotificationSetting
+    val playOverNotification: UserSetting<PlayOverNotificationSetting>
 
     fun hasBlockAlreadyRun(label: String): Boolean
     fun setBlockAlreadyRun(label: String, hasRun: Boolean)
@@ -392,7 +379,7 @@ interface Settings {
 
     fun getLanguageCode(): String
 
-    fun hideNotificationOnPause(): Boolean
+    val hideNotificationOnPause: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
@@ -455,8 +442,7 @@ interface Settings {
     fun setShowArtworkOnLockScreen(show: Boolean)
     fun showArtworkOnLockScreen(): Boolean
 
-    fun getNewEpisodeNotificationActions(): String?
-    fun setNewEpisodeNotificationActions(actions: String)
+    val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
     fun getAutoArchiveExcludedPodcasts(): List<String>
     fun setAutoArchiveExcludedPodcasts(excluded: List<String>)
