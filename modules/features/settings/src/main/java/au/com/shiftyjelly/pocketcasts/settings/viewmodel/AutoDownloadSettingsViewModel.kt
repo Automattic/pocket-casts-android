@@ -63,11 +63,14 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun onDownloadOnlyOnUnmeteredChange(enabled: Boolean) {
+        settings.autoDownloadUnmeteredOnly.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED,
             mapOf("enabled" to enabled),
         )
     }
+
+    fun getAutoDownloadUnmeteredOnly() = settings.autoDownloadUnmeteredOnly.flow.value
 
     fun onDownloadOnlyWhenChargingChange(enabled: Boolean) {
         analyticsTracker.track(

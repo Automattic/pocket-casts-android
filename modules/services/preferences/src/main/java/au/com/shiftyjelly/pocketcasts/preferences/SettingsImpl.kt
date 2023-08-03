@@ -617,9 +617,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED, true)
-    }
+    override val autoDownloadUnmeteredOnly = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadOnlyDownloadOnWifi",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val autoDownloadUpNext = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadUpNext",
