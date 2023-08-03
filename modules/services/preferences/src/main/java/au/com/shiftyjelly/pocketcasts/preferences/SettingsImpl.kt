@@ -629,9 +629,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun isPodcastAutoDownloadPowerOnly(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING, false)
-    }
+    override val autoDownloadOnlyWhenCharging = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadOnlyDownloadWhenCharging",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val useEmbeddedArtwork = UserSetting.BoolPref(
         sharedPrefKey = "useEmbeddedArtwork",

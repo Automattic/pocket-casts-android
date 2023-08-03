@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
@@ -95,6 +94,7 @@ class AutoDownloadSettingsFragment :
     private var podcastsPreference: Preference? = null
     private var filtersPreference: Preference? = null
     private lateinit var autoDownloadOnlyDownloadOnWifi: SwitchPreference
+    private lateinit var autoDownloadOnlyWhenCharging: SwitchPreference
 
     private val showToolbar: Boolean
         get() = arguments?.getBoolean(ARG_SHOW_TOOLBAR) ?: true
@@ -181,12 +181,14 @@ class AutoDownloadSettingsFragment :
                     }
                 }
 
-        preferenceManager.findPreference<SwitchPreference>(PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING)
-            ?.setOnPreferenceChangeListener { _, newValue ->
-                (newValue as? Boolean)?.let {
-                    viewModel.onDownloadOnlyWhenChargingChange(it)
+        autoDownloadOnlyWhenCharging = preferenceManager.findPreference<SwitchPreference>("autoDownloadOnlyDownloadWhenCharging")!!
+            .apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    (newValue as? Boolean)?.let {
+                        viewModel.onDownloadOnlyWhenChargingChange(it)
+                    }
+                    true
                 }
-                true
             }
 
         updateView()
@@ -302,6 +304,7 @@ class AutoDownloadSettingsFragment :
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
+        autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {
