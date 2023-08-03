@@ -291,6 +291,12 @@ class AddFileActivity :
                 updateColorItems()
             }
         }
+
+        @Suppress("DEPRECATION")
+        if (savedInstanceState != null) {
+            dataUri = savedInstanceState.getParcelable(STATE_DATAURI)
+            setupForNewFile(dataUri)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
