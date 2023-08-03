@@ -22,6 +22,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -42,7 +43,7 @@ class PodcastSettingsViewModel @Inject constructor(
     lateinit var includedFilters: LiveData<List<Playlist>>
     lateinit var availableFilters: LiveData<List<Playlist>>
 
-    val globalSettings = settings.autoAddUpNextLimit
+    val globalSettings = settings.autoAddUpNextLimit.flow.asObservable(coroutineContext)
         .toFlowable(BackpressureStrategy.LATEST)
         .combineLatest(settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
         .toLiveData()

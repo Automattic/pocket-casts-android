@@ -87,7 +87,6 @@ class SettingsImpl @Inject constructor(
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
     override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
-    override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
@@ -1236,14 +1235,11 @@ class SettingsImpl @Inject constructor(
         setBoolean("upnext_tour_shown", value)
     }
 
-    override fun getAutoAddUpNextLimit(): Int {
-        return getInt("auto_add_up_next_limit", DEFAULT_MAX_AUTO_ADD_LIMIT)
-    }
-
-    override fun setAutoAddUpNextLimit(limit: Int) {
-        setInt("auto_add_up_next_limit", limit)
-        autoAddUpNextLimit.accept(limit)
-    }
+    override val autoAddUpNextLimit = UserSetting.IntPref(
+        sharedPrefKey = "auto_add_up_next_limit",
+        defaultValue = DEFAULT_MAX_AUTO_ADD_LIMIT,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun setAutoAddUpNextLimitBehaviour(value: Settings.AutoAddUpNextLimitBehaviour) {
         setInt("auto_add_up_next_limit_reached", value.ordinal)
@@ -1256,7 +1252,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getMaxUpNextEpisodes(): Int {
-        return max(DEFAULT_MAX_AUTO_ADD_LIMIT, getAutoAddUpNextLimit())
+        return max(DEFAULT_MAX_AUTO_ADD_LIMIT, autoAddUpNextLimit.flow.value)
     }
 
     private fun setStringList(key: String, array: List<String>) {

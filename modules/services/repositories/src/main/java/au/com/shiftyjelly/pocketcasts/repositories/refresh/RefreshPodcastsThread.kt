@@ -328,7 +328,7 @@ class RefreshPodcastsThread(
         // and run through them one by one sorted by their publish date. They are added to up next as if the action
         // was run right as they were published magically
         runBlocking {
-            val upNextLimit = settings.getAutoAddUpNextLimit()
+            val upNextLimit = settings.autoAddUpNextLimit.flow.value
             episodesToAddToUpNext.sortBy { it.second.publishedDate }
             episodesToAddToUpNext.forEach {
                 if (playbackManager.upNextQueue.queueEpisodes.size < upNextLimit) {

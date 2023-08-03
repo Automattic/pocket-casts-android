@@ -12,8 +12,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 data class AutoAddSettingsState(val autoAddPodcasts: List<Podcast>, val limit: Int, val behaviour: Settings.AutoAddUpNextLimitBehaviour)
 
@@ -38,7 +40,12 @@ class AutoAddSettingsViewModel @Inject constructor(
 
     val autoAddPodcasts =
         podcastManager.observeAutoAddToUpNextPodcasts()
-            .combineLatest(settings.autoAddUpNextLimit.toFlowable(BackpressureStrategy.LATEST), settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
+            .combineLatest(
+                settings.autoAddUpNextLimit.flow
+                    .asObservable(viewModelScope.coroutineContext)
+                    .toFlowable(BackpressureStrategy.LATEST),
+                settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST)
+            )
             .map { AutoAddSettingsState(it.first, it.second, it.third) }
             .toLiveData()
 
@@ -64,7 +71,7 @@ class AutoAddSettingsViewModel @Inject constructor(
     }
 
     fun autoAddUpNextLimitChanged(limit: Int) {
-        settings.setAutoAddUpNextLimit(limit)
+        settings.autoAddUpNextLimit.set(limit)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED,
             mapOf("value" to limit)

@@ -226,7 +226,6 @@ interface Settings {
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
     val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
-    val autoAddUpNextLimit: Observable<Int>
 
     val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
@@ -471,8 +470,7 @@ interface Settings {
     fun setLastPausedAt(pausedAt: Int)
     fun getLastPausedAt(): Int?
     val intelligentPlaybackResumption: UserSetting<Boolean>
-    fun getAutoAddUpNextLimit(): Int
-    fun setAutoAddUpNextLimit(limit: Int)
+    val autoAddUpNextLimit: UserSetting<Int>
     fun setAutoAddUpNextLimitBehaviour(value: AutoAddUpNextLimitBehaviour)
     fun getAutoAddUpNextLimitBehaviour(): AutoAddUpNextLimitBehaviour
     fun getMaxUpNextEpisodes(): Int
