@@ -323,8 +323,7 @@ interface Settings {
 
     fun isPodcastAutoDownloadUnmeteredOnly(): Boolean
     fun isPodcastAutoDownloadPowerOnly(): Boolean
-    fun isUpNextAutoDownloaded(): Boolean
-    fun setUpNextAutoDownloaded(autoDownload: Boolean)
+    val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
 

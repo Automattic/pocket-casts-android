@@ -8,7 +8,7 @@
             android:key="autoDownloadUpNext"
             android:title="@string/settings_auto_download_up_next"
             android:defaultValue="false"
-            android:persistent="true" />
+            android:persistent="false" />
 
     </PreferenceCategory>
 

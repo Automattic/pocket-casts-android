@@ -64,7 +64,6 @@ class AutoDownloadSettingsFragment :
 
     companion object {
         const val PREFERENCE_PODCASTS_CATEGORY = "podcasts_category"
-        const val PREFERENCE_UP_NEXT = "autoDownloadUpNext"
         const val PREFERENCE_NEW_EPISODES = "autoDownloadNewEpisodes"
         const val PREFERENCE_CHOOSE_PODCASTS = "autoDownloadPodcastsPreference"
         const val PREFERENCE_CHOOSE_FILTERS = "autoDownloadPlaylists"
@@ -92,7 +91,7 @@ class AutoDownloadSettingsFragment :
     private val viewModel: AutoDownloadSettingsViewModel by viewModels()
 
     private var podcastsCategory: PreferenceCategory? = null
-    private var upNextPreference: SwitchPreference? = null
+    private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
     private var podcastsPreference: Preference? = null
     private var filtersPreference: Preference? = null
@@ -124,8 +123,8 @@ class AutoDownloadSettingsFragment :
         setPreferencesFromResource(R.xml.preferences_auto_download, rootKey)
 
         podcastsCategory = preferenceManager.findPreference(PREFERENCE_PODCASTS_CATEGORY)
-        upNextPreference = preferenceManager.findPreference<SwitchPreference>(PREFERENCE_UP_NEXT)
-            ?.apply {
+        upNextPreference = preferenceManager.findPreference<SwitchPreference>("autoDownloadUpNext")!!
+            .apply {
                 setOnPreferenceChangeListener { _, newValue ->
                     viewModel.onUpNextChange(newValue as Boolean)
                     true
@@ -296,9 +295,14 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun updateView() {
+        updateAutoDownloadUpNext()
         updatePodcastsSummary()
         updateFiltersSelectedSummary()
         updateNewEpisodesSwitch()
+    }
+
+    private fun updateAutoDownloadUpNext() {
+        upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {

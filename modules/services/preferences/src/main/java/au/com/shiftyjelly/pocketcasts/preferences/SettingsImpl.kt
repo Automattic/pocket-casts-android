@@ -621,13 +621,11 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED, true)
     }
 
-    override fun isUpNextAutoDownloaded(): Boolean {
-        return getBoolean("autoDownloadUpNext", false)
-    }
-
-    override fun setUpNextAutoDownloaded(autoDownload: Boolean) {
-        setBoolean("autoDownloadUpNext", autoDownload)
-    }
+    override val autoDownloadUpNext = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadUpNext",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun isPodcastAutoDownloadPowerOnly(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING, false)

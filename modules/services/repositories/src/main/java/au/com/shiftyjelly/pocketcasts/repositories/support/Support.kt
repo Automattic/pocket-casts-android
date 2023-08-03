@@ -322,7 +322,7 @@ class Support @Inject constructor(
             output.append(eol)
             output.append("Auto downloads").append(eol)
             output.append("  Any podcast? ").append(yesNoString(autoDownloadOn[0])).append(eol)
-            output.append("  Up Next? ").append(yesNoString(settings.isUpNextAutoDownloaded())).append(eol)
+            output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.flow.value)).append(eol)
             output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.isPodcastAutoDownloadUnmeteredOnly())).append(eol)
             output.append("  Only when charging? ").append(yesNoString(settings.isPodcastAutoDownloadPowerOnly())).append(eol)
             output.append(eol)

@@ -186,7 +186,7 @@ class VersionMigrationsJob : JobService() {
     }
 
     private fun addUpNextAutoDownload() {
-        settings.setUpNextAutoDownloaded(!settings.streamingMode.flow.value)
+        settings.autoDownloadUpNext.set(!settings.streamingMode.flow.value)
     }
 
     private fun deletePodcastImages() {

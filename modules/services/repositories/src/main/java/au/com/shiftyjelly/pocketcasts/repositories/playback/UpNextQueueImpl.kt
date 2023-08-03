@@ -312,7 +312,7 @@ class UpNextQueueImpl @Inject constructor(
     }
 
     private fun downloadIfPossible(episode: BaseEpisode, downloadManager: DownloadManager) {
-        if (settings.isUpNextAutoDownloaded()) {
+        if (settings.autoDownloadUpNext.flow.value) {
             DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "up next auto download", downloadManager, episodeManager)
         }
     }
