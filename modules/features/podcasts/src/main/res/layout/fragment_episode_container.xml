@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="episode"
+            type="au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode" />
+
+        <variable
+            name="toolbarTintColor"
+            type="int" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/primary_ui_01">
+
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="28dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="@dimen/episode_card_edge_padding"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron"
+                android:tint="@{toolbarTintColor}"
+                android:contentDescription="@string/close"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:background="@color/transparent"
+                style="@style/Widget.MaterialComponents.TabLayout"
+                app:tabIndicatorFullWidth="false"
+                app:tabTextAppearance="@style/PlayerTabTextAppearance"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                app:tabBackground="@color/transparent"
+                app:tabPaddingStart="8dp"
+                app:tabPaddingEnd="8dp"
+                app:tabMinWidth="0dp"
+                app:layout_constraintStart_toEndOf="@+id/btnClose"
+                app:layout_constraintTop_toTopOf="@+id/btnClose"
+                app:layout_constraintEnd_toEndOf="@+id/btnShare"/>
+
+            <ImageButton
+                android:id="@+id/btnShare"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="@dimen/episode_card_edge_padding"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_share"
+                android:tint="@{toolbarTintColor}"
+                android:contentDescription="@string/podcast_share_episode"
+                app:layout_constraintBottom_toBottomOf="@+id/btnClose"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnClose" />
+
+            <ImageButton
+                android:id="@+id/btnFav"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@{episode.starred ? @drawable/ic_star_filled : @drawable/ic_star}"
+                android:tint="@{toolbarTintColor}"
+                app:layout_constraintBottom_toBottomOf="@+id/btnClose"
+                app:layout_constraintEnd_toStartOf="@+id/btnShare"
+                app:layout_constraintTop_toTopOf="@+id/btnClose" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+</layout>
