@@ -207,6 +207,11 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     }
                 }
 
+                val layoutBookmark = binding.layoutBookmark
+                layoutBookmark.setOnClickListener {
+                    dialog?.dismiss()
+                }
+
                 val errorLayout = binding.errorLayout
                 val lblError = binding.lblError
                 val lblErrorDetail = binding.lblErrorDetail

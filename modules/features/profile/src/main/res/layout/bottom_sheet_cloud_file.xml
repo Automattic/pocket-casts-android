@@ -204,7 +204,7 @@
             android:text="@string/profile_files_mark_as_played"/>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/layoutEdit"
+        android:id="@+id/layoutBookmark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -212,6 +212,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutPlayed"
+        android:layout_marginTop="16dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+        <ImageView
+            android:id="@+id/imgIconBookmark"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:srcCompat="@drawable/ic_bookmark"
+            app:tint="?attr/primary_icon_01"/>
+        <TextView
+            android:id="@+id/lblBookmark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_marginStart="24dp"
+            style="@style/H40"
+            android:text="@string/bookmarks"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layoutEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutBookmark"
         android:layout_marginTop="16dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
