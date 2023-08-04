@@ -13,7 +13,7 @@ API_BASE_FOLDER=$1
 if [[ -z $API_BASE_FOLDER ]];
 then
     echo "Missing argument, please specify the full path to the protobuffer files for the API project."
-    echo "Eg: update_proto.sh ~/pocketcasts-api/api/modules/protobuf/src/main/proto"
+    echo "Eg: ./update_proto.sh ~/pocket-casts-sync-api/api/modules/protobuf/src/main/proto"
     exit 1
 fi
 
@@ -27,3 +27,5 @@ set -x
 
 protoc --proto_path=$API_BASE_FOLDER/ --java_out=lite:$OUTPUT_FOLDER --kotlin_out=lite:$OUTPUT_FOLDER $API_BASE_FOLDER/api.proto
 protoc --proto_path=$API_BASE_FOLDER/ --java_out=lite:$OUTPUT_FOLDER --kotlin_out=lite:$OUTPUT_FOLDER $API_BASE_FOLDER/files.proto
+# clean up the generated files
+./gradlew spotlessApply

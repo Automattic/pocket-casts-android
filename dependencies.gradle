@@ -283,7 +283,7 @@ project.ext {
             // Protocol Buffers
             // For Android users, it's recommended to use protobuf Java Lite runtime because of its smaller code size.
             // Java Lite runtime also works better with Proguard because it doesn't rely on Java reflection and is optimized
-            // to allow as much code stripping as possible. You can following these instructions to use Java Lite runtime.
+            // to allow as much code stripping as possible.
             protobufKotlinLite: 'com.google.protobuf:protobuf-kotlin-lite:3.23.4',
             protobufJavaLite: 'com.google.protobuf:protobuf-javalite:3.23.4',
             // JSONassert - https://github.com/skyscreamer/JSONassert

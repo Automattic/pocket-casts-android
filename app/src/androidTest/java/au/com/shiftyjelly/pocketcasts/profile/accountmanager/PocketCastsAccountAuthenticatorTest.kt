@@ -69,7 +69,7 @@ class PocketCastsAccountAuthenticatorTest {
         }
         val tokenErrorNotification = mock<TokenErrorNotification>()
         val syncAccountManager = SyncAccountManagerImpl(tokenErrorNotification, accountManager)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
+        val syncServerManager = SyncServerManager(retrofit, retrofit, mock(), okhttpCache)
 
         val syncManager = SyncManagerImpl(
             analyticsTracker = mock(),

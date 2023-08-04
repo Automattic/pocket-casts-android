@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync.bookmark
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import com.pocketcasts.service.api.BookmarkResponse
 import java.util.Date
 
@@ -11,7 +11,7 @@ fun BookmarkResponse.toBookmark(): Bookmark {
         podcastUuid = podcastUuid,
         episodeUuid = episodeUuid,
         timeSecs = time,
-        createdAt = createdAt?.parseIsoDate() ?: Date(), // Date(Timestamps.toMillis(createdAt)),
+        createdAt = createdAt.toDate() ?: Date(),
         title = title
     )
 }

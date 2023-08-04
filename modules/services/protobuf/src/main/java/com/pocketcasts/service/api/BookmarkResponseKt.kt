@@ -113,9 +113,9 @@ public object BookmarkResponseKt {
         }
 
         /**
-         * `string createdAt = 7;`
+         * `.google.protobuf.Timestamp createdAt = 7;`
          */
-        public var createdAt: kotlin.String
+        public var createdAt: com.google.protobuf.Timestamp
             @JvmName("getCreatedAt")
             get() = _builder.getCreatedAt()
             @JvmName("setCreatedAt")
@@ -123,12 +123,22 @@ public object BookmarkResponseKt {
                 _builder.setCreatedAt(value)
             }
         /**
-         * `string createdAt = 7;`
+         * `.google.protobuf.Timestamp createdAt = 7;`
          */
         public fun clearCreatedAt() {
             _builder.clearCreatedAt()
+        }
+        /**
+         * `.google.protobuf.Timestamp createdAt = 7;`
+         * @return Whether the createdAt field is set.
+         */
+        public fun hasCreatedAt(): kotlin.Boolean {
+            return _builder.hasCreatedAt()
         }
     }
 }
 public inline fun com.pocketcasts.service.api.BookmarkResponse.copy(block: com.pocketcasts.service.api.BookmarkResponseKt.Dsl.() -> kotlin.Unit): com.pocketcasts.service.api.BookmarkResponse =
     com.pocketcasts.service.api.BookmarkResponseKt.Dsl._create(this.toBuilder()).apply { block() }._build()
+
+public val com.pocketcasts.service.api.BookmarkResponseOrBuilder.createdAtOrNull: com.google.protobuf.Timestamp?
+    get() = if (hasCreatedAt()) getCreatedAt() else null

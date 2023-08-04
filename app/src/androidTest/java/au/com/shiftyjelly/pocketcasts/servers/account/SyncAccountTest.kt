@@ -45,7 +45,7 @@ internal class SyncAccountTest {
         okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context)
 
         val accountManager = AccountManager.get(context)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
+        val syncServerManager = SyncServerManager(retrofit, retrofit, mock(), okhttpCache)
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(

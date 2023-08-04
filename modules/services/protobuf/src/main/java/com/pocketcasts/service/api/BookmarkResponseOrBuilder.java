@@ -62,14 +62,13 @@ public interface BookmarkResponseOrBuilder extends
       getTitleBytes();
 
   /**
-   * <code>string createdAt = 7;</code>
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
+   * @return Whether the createdAt field is set.
+   */
+  boolean hasCreatedAt();
+  /**
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
    * @return The createdAt.
    */
-  java.lang.String getCreatedAt();
-  /**
-   * <code>string createdAt = 7;</code>
-   * @return The bytes for createdAt.
-   */
-  com.google.protobuf.ByteString
-      getCreatedAtBytes();
+  com.google.protobuf.Timestamp getCreatedAt();
 }

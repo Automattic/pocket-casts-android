@@ -117,6 +117,7 @@ class PodcastSyncProcessTest {
 
             val syncServerManager = SyncServerManager(
                 retrofit = retrofit,
+                retrofitProtobuf = retrofit,
                 settings = settings,
                 cache = okhttpCache
             )

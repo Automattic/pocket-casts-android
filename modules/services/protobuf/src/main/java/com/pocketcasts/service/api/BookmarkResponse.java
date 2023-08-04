@@ -16,7 +16,6 @@ public  final class BookmarkResponse extends
     podcastUuid_ = "";
     episodeUuid_ = "";
     title_ = "";
-    createdAt_ = "";
   }
   public static final int BOOKMARK_UUID_FIELD_NUMBER = 1;
   private java.lang.String bookmarkUuid_;
@@ -233,49 +232,48 @@ public  final class BookmarkResponse extends
   }
 
   public static final int CREATEDAT_FIELD_NUMBER = 7;
-  private java.lang.String createdAt_;
+  private com.google.protobuf.Timestamp createdAt_;
   /**
-   * <code>string createdAt = 7;</code>
-   * @return The createdAt.
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
    */
   @java.lang.Override
-  public java.lang.String getCreatedAt() {
-    return createdAt_;
+  public boolean hasCreatedAt() {
+    return createdAt_ != null;
   }
   /**
-   * <code>string createdAt = 7;</code>
-   * @return The bytes for createdAt.
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getCreatedAtBytes() {
-    return com.google.protobuf.ByteString.copyFromUtf8(createdAt_);
+  public com.google.protobuf.Timestamp getCreatedAt() {
+    return createdAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdAt_;
   }
   /**
-   * <code>string createdAt = 7;</code>
-   * @param value The createdAt to set.
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
    */
-  private void setCreatedAt(
-      java.lang.String value) {
-    java.lang.Class<?> valueClass = value.getClass();
-  
-    createdAt_ = value;
-  }
-  /**
-   * <code>string createdAt = 7;</code>
-   */
-  private void clearCreatedAt() {
+  private void setCreatedAt(com.google.protobuf.Timestamp value) {
+    value.getClass();
+  createdAt_ = value;
 
-    createdAt_ = getDefaultInstance().getCreatedAt();
+    }
+  /**
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
+   */
+  @java.lang.SuppressWarnings({"ReferenceEquality"})
+  private void mergeCreatedAt(com.google.protobuf.Timestamp value) {
+    value.getClass();
+  if (createdAt_ != null &&
+        createdAt_ != com.google.protobuf.Timestamp.getDefaultInstance()) {
+      createdAt_ =
+        com.google.protobuf.Timestamp.newBuilder(createdAt_).mergeFrom(value).buildPartial();
+    } else {
+      createdAt_ = value;
+    }
+
   }
   /**
-   * <code>string createdAt = 7;</code>
-   * @param value The bytes for createdAt to set.
+   * <code>.google.protobuf.Timestamp createdAt = 7;</code>
    */
-  private void setCreatedAtBytes(
-      com.google.protobuf.ByteString value) {
-    checkByteStringIsUtf8(value);
-    createdAt_ = value.toStringUtf8();
+  private void clearCreatedAt() {  createdAt_ = null;
 
   }
 
@@ -601,51 +599,49 @@ public  final class BookmarkResponse extends
     }
 
     /**
-     * <code>string createdAt = 7;</code>
-     * @return The createdAt.
+     * <code>.google.protobuf.Timestamp createdAt = 7;</code>
      */
     @java.lang.Override
-    public java.lang.String getCreatedAt() {
+    public boolean hasCreatedAt() {
+      return instance.hasCreatedAt();
+    }
+    /**
+     * <code>.google.protobuf.Timestamp createdAt = 7;</code>
+     */
+    @java.lang.Override
+    public com.google.protobuf.Timestamp getCreatedAt() {
       return instance.getCreatedAt();
     }
     /**
-     * <code>string createdAt = 7;</code>
-     * @return The bytes for createdAt.
+     * <code>.google.protobuf.Timestamp createdAt = 7;</code>
      */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getCreatedAtBytes() {
-      return instance.getCreatedAtBytes();
-    }
-    /**
-     * <code>string createdAt = 7;</code>
-     * @param value The createdAt to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCreatedAt(
-        java.lang.String value) {
+    public Builder setCreatedAt(com.google.protobuf.Timestamp value) {
       copyOnWrite();
       instance.setCreatedAt(value);
       return this;
-    }
+      }
     /**
-     * <code>string createdAt = 7;</code>
-     * @return This builder for chaining.
+     * <code>.google.protobuf.Timestamp createdAt = 7;</code>
      */
-    public Builder clearCreatedAt() {
+    public Builder setCreatedAt(
+        com.google.protobuf.Timestamp.Builder builderForValue) {
       copyOnWrite();
-      instance.clearCreatedAt();
+      instance.setCreatedAt(builderForValue.build());
       return this;
     }
     /**
-     * <code>string createdAt = 7;</code>
-     * @param value The bytes for createdAt to set.
-     * @return This builder for chaining.
+     * <code>.google.protobuf.Timestamp createdAt = 7;</code>
      */
-    public Builder setCreatedAtBytes(
-        com.google.protobuf.ByteString value) {
+    public Builder mergeCreatedAt(com.google.protobuf.Timestamp value) {
       copyOnWrite();
-      instance.setCreatedAtBytes(value);
+      instance.mergeCreatedAt(value);
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp createdAt = 7;</code>
+     */
+    public Builder clearCreatedAt() {  copyOnWrite();
+      instance.clearCreatedAt();
       return this;
     }
 
@@ -674,7 +670,7 @@ public  final class BookmarkResponse extends
           };
           java.lang.String info =
               "\u0000\u0006\u0000\u0000\u0001\u0007\u0006\u0000\u0000\u0000\u0001\u0208\u0002\u0208" +
-              "\u0003\u0208\u0005\u0004\u0006\u0208\u0007\u0208";
+              "\u0003\u0208\u0005\u0004\u0006\u0208\u0007\t";
           return newMessageInfo(DEFAULT_INSTANCE, info, objects);
       }
       // fall through
