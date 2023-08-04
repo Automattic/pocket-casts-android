@@ -206,7 +206,6 @@ dependencies {
     implementation androidLibs.composeUiUtil
     implementation androidLibs.wearPlayServices
 
-    implementation libs.turbine
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid
     implementation libs.kotlinCoroutinesPlayServices
@@ -270,6 +269,7 @@ dependencies {
     testImplementation libs.jsonAssert
     testImplementation libs.mockWebServer
     testImplementation libs.testMokitoKotlin
+    testImplementation libs.turbine
     testImplementation libs.testMokitoKotlinInline
     testImplementation libs.kotlinCoroutinesTest
     androidTestImplementation libs.jsonAssert
