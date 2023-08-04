@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
@@ -210,6 +211,10 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val layoutBookmark = binding.layoutBookmark
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
+                    BookmarksContainerFragment.newInstance(
+                        episodeUuid = episodeUUID,
+                        sourceView = SourceView.FILES
+                    ).show(parentFragmentManager, "bookmarks_container")
                 }
 
                 val errorLayout = binding.errorLayout
