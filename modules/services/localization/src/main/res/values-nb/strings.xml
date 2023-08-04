@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-17 08:10:05+0000
+Translation-Revision-Date: 2023-08-02 08:10:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nb_NO
 -->
 <resources>
+    <string name="episode">Episode</string>
     <string name="edit">Rediger</string>
     <string name="podcast">Podcast</string>
     <string name="next">Neste</string>
@@ -29,7 +30,6 @@ Language: nb_NO
     <string name="podcasts_empty_folder_summary">Legg til podcaster i mappen din, så vises de her.</string>
     <string name="podcasts_empty_folder">Mappen er tom</string>
     <string name="add_podcasts">Legg til podcaster</string>
-    <string name="plus_folder_body">Opprett mapper for å organisere podcast-samlingen.</string>
     <string name="expand_details">Vis detaljer</string>
     <string name="profile_help_support">Bidra til å støtte Pocket Casts ved å oppgradere kontoen din</string>
     <string name="error_check_your_internet_connection">Sjekk Internett-tilkoblingen.</string>
@@ -404,7 +404,6 @@ Language: nb_NO
     <string name="settings_notification_actions_title">Velg 3 handlinger</string>
     <string name="settings_notification_sound_summary">Varslingslyd spilt av.</string>
     <string name="settings_notification_sound">Varslingslyd</string>
-    <string name="settings_notification_play_over_summary">Fortsett avspillingen selv om andre apper, for eksempel varslinger eller navigasjon, spiller av lyder.</string>
     <string name="settings_notification_play_over">Spill av over varslinger</string>
     <string name="settings_notification_notify_me">Varsle meg</string>
     <string name="settings_notification_hide_on_pause">Skjul varsling om avspilling ved pause</string>
@@ -780,7 +779,6 @@ Language: nb_NO
     <string name="filters_create_filter_details">Filterdetaljer</string>
     <string name="filters_create_filter_by">FILTRER ETTER</string>
     <string name="filters_create_filter">Opprett filter</string>
-    <string name="filters_create_colour_icon">FARGE OG IKON</string>
     <string name="filters_create_add_more">Legg til flere kriterier for å fullføre finjusteringen av filteret.</string>
     <string name="filters_create">Opprett</string>
     <string name="filters_chosen_singular">1 filter valgt</string>
@@ -821,8 +819,6 @@ Language: nb_NO
     <string name="supporter_bundle">BUNT</string>
     <string name="supporter">Støttespiller</string>
     <string name="episode_sort_short_to_long">Korteste til lengste</string>
-    <string name="episode_sort_oldest_to_newest">Eldste til nyeste</string>
-    <string name="episode_sort_newest_to_oldest">Nyeste til eldste</string>
     <string name="episode_sort_long_to_short">Lengste til korteste</string>
     <string name="episode_row_waiting_for_wifi">Venter på WiFi</string>
     <string name="episode_row_waiting_for_power">Venter på strøm</string>

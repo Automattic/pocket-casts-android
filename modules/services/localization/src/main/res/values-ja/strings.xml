@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-19 11:54:04+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="bookmark">ブックマーク</string>
+    <string name="details">詳細</string>
+    <string name="episode">エピソード</string>
+    <string name="bookmarks_search">ブックマークを検索</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts はバックグラウンドでアカウントを定期的に同期します。</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts はアプリを開いたときだけアプリを同期します。</string>
+    <string name="settings_notification_play_over_always">常に</string>
+    <string name="settings_notification_play_over_duck">ダッキング</string>
+    <string name="settings_notification_play_over_never">なし</string>
+    <string name="skipping_to"> %s にスキップしています</string>
+    <string name="playing_bookmark">「%s」を再生中 </string>
+    <string name="save_bookmark">ブックマークを保存</string>
+    <string name="add_bookmark_title_hint">任意のタイトルを追加してこのブックマークを特定</string>
+    <string name="change_title">タイトルを変更</string>
+    <string name="bookmark_added">ブックマーク「%s」を追加しました</string>
+    <string name="add_bookmark_title">ブックマークを追加</string>
+    <string name="add_bookmark">ブックマークを追加</string>
+    <string name="filters_not_found">フィルターが見つかりません</string>
+    <string name="bookmarks_sort_timestamp">タイムスタンプ</string>
+    <string name="bookmarks_select_option">ブックマークを選択する</string>
+    <string name="bookmarks_delete_summary_singular">このブックマークは削除されます。 この操作は元に戻すことができません。</string>
+    <string name="bookmarks_delete_summary_plural">%d件ブックマークが削除されます。 この操作は元に戻すことができません。</string>
+    <string name="bookmarks_deleted_singular">1件のブックマークが削除されました</string>
+    <string name="bookmarks_deleted_plural">%1$d件のブックマークが削除されました</string>
+    <string name="bookmarks_delete_singular">ブックマークを削除</string>
+    <string name="bookmarks_delete_plural">ブックマークを削除</string>
+    <string name="deselect_all_below">以下すべての選択を解除</string>
     <string name="deselect_all">すべて選択解除</string>
+    <string name="deselect_all_above">以上すべての選択を解除</string>
     <string name="edit">編集する</string>
     <string name="whats_new_autoplay_maybe_later_button">後で確認する</string>
     <string name="whats_new_autoplay_enable_button">すぐに有効化</string>
@@ -14,7 +42,6 @@ Language: ja_JP
     <string name="whats_new_autoplay_title">自動再生機能が登場</string>
     <string name="filters_download_limit_3">3エピソード</string>
     <string name="settings_title_headphone_controls">ヘッドフォン操作</string>
-    <string name="settings_headphone_controls_summary">よく使用されるヘッドフォン操作で実行されるアクションをカスタマイズします。</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">ヘッドフォンでブックマークを作成したら、確認音声を再生します。</string>
     <string name="settings_headphone_controls_confirmation_sound">確認音声をブックマーク</string>
     <string name="settings_headphone_controls_choice_skip_forward">スキップ</string>
@@ -28,8 +55,8 @@ Language: ja_JP
     <string name="bookmarks_not_found">まだブックマークはありません</string>
     <string name="bookmarks_create_instructions">プレーヤーのアクションメニューから、またはヘッドフォンでアクションを設定して、エピソードのタイムスタンプを保存できます。</string>
     <string name="bookmark_play">ブックマーク位置で再生%s</string>
-    <string name="bookmarks_plural">%s件のブックマーク</string>
-    <string name="bookmarks_singular">%s件のブックマーク</string>
+    <string name="bookmarks_plural">%d件のブックマーク</string>
+    <string name="bookmarks_singular">1件のブックマーク</string>
     <string name="bookmarks">ブックマーク</string>
     <string name="settings_autoplay">自動再生</string>
     <string name="player_sleep_add_1_minute">1分以上</string>
@@ -90,7 +117,6 @@ Language: ja_JP
     <string name="log_in_with_email">メールアドレスでログイン</string>
     <string name="log_in_on_phone">スマートフォンでログイン</string>
     <string name="log_in_with_google">Google でログイン</string>
-    <string name="log_in_subtitle">お気に入りのポッドキャストの視聴を開始</string>
     <string name="onboarding_upgrade_no_subscriptions_found">サブスクリプションが見つかりません。</string>
     <string name="trial_then_per_year">%1$sをお試し、その後は年間%2$s</string>
     <string name="trial_then_per_month">%1$sをお試し、その後は月間%2$s</string>
@@ -148,10 +174,8 @@ Language: ja_JP
     <string name="notifications_blocked_warning">通知がブロックされました。 「設定」で権限を更新できます。</string>
     <string name="settings_media_actions_show_subtitle">Android 13のメディア通知と Android Auto でカスタムメディアアクションを表示します。</string>
     <string name="settings_media_actions_show_title">カスタムメディアアクションを表示</string>
-    <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
     <string name="settings_media_actions_prioritize_subtitle">上位のアクションを利用できます。</string>
     <string name="settings_media_actions_prioritize_title">カスタムメディアアクションに優先順位を設定</string>
-    <string name="plus_take_your_podcasting_to_next_level">専用の機能やカスタマイズオプションを使用して、あなたのポッドキャスト体験をさらなるレベルに引き上げることができます。</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>
@@ -210,7 +234,6 @@ Language: ja_JP
     <string name="onboarding_import_from_other_apps_step_1">他のアプリのエクスポートオプションを探し、OPML ファイルをエクスポートします。</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts では OPML ファイルのポッドキャストをインポートできます。現在のアプリで OPML ファイルをエクスポートできる場合は、次の手順に従います。</string>
     <string name="onboarding_import_from_castbox_open">Castbox を開きます…</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">「OPML をエクスポート」までスクロールしてタップします。</string>
     <string name="onboarding_import_from_castbox_step_3">「設定」をタップします。</string>
     <string name="onboarding_import_from_castbox_step_2">「パーソナル」タブをタップします。</string>
@@ -397,7 +420,6 @@ Language: ja_JP
     <string name="podcasts_empty_folder_summary">フォルダーにポッドキャストを追加するとここに表示されます。</string>
     <string name="podcasts_empty_folder">フォルダーは空です</string>
     <string name="add_podcasts">ポッドキャストを追加する</string>
-    <string name="plus_folder_body">フォルダーを作成してポッドキャストのコレクションを整理できます。</string>
     <string name="expand_details">詳細を展開</string>
     <string name="profile_help_support">アカウントをアップグレードして Pocket Casts のサポートにご協力ください</string>
     <string name="error_check_your_internet_connection">インターネット接続を確認してください。</string>
@@ -773,7 +795,6 @@ Language: ja_JP
     <string name="settings_notification_actions_title">3つのアクションの選択</string>
     <string name="settings_notification_sound_summary">通知音が再生されました。</string>
     <string name="settings_notification_sound">通知音</string>
-    <string name="settings_notification_play_over_summary">通知やナビゲーションなどの他のアプリが音声を再生しても再生を続けます。</string>
     <string name="settings_notification_play_over">通知が出ても再生</string>
     <string name="settings_notification_notify_me">通知する</string>
     <string name="settings_notification_hide_on_pause">一時停止時に再生通知を非表示</string>
@@ -1153,7 +1174,6 @@ Language: ja_JP
     <string name="filters_create_filter_details">フィルターの詳細</string>
     <string name="filters_create_filter_by">絞り込み条件</string>
     <string name="filters_create_filter">フィルターを作成</string>
-    <string name="filters_create_colour_icon">色とアイコン</string>
     <string name="filters_create_add_more">条件をさらに追加してフィルターの絞り込みを完了します。</string>
     <string name="filters_create">作成</string>
     <string name="filters_chosen_singular">1件のフィルターを選択済み</string>
@@ -1193,8 +1213,8 @@ Language: ja_JP
     <string name="supporter_bundle">パッケージ</string>
     <string name="supporter">サポーター</string>
     <string name="episode_sort_short_to_long">短い順</string>
-    <string name="episode_sort_oldest_to_newest">古い順</string>
-    <string name="episode_sort_newest_to_oldest">新しい順</string>
+    <string name="sort_oldest_to_newest">古い順</string>
+    <string name="sort_newest_to_oldest">新しい順</string>
     <string name="episode_sort_long_to_short">長い順</string>
     <string name="episode_row_waiting_for_wifi">Wi-Fi に再接続しています</string>
     <string name="episode_row_waiting_for_power">充電待ち</string>

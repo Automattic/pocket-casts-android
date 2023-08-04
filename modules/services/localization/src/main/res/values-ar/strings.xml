@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 08:10:07+0000
+Translation-Revision-Date: 2023-08-03 08:10:06+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="details">تفاصيل</string>
     <string name="deselect_all">إلغاء تحديد الكل</string>
     <string name="edit">تعديل</string>
     <string name="enter_password">أدخل كلمة المرور</string>
@@ -34,7 +35,6 @@ Language: ar
     <string name="podcasts_empty_folder_summary">أضف بثًا صوتيًا إلى مجلدك، وسيظهر هنا.</string>
     <string name="podcasts_empty_folder">مجلدك فارغ.</string>
     <string name="add_podcasts">إضافة بث صوتي</string>
-    <string name="plus_folder_body">قم بإنشاء مجلدات لتنظيم تشكيلة بثك الصوتي.</string>
     <string name="expand_details">توسيع التفاصيل</string>
     <string name="profile_help_support">المساعدة على دعم Pocket Casts عن طريق ترقية حسابك</string>
     <string name="error_check_your_internet_connection">تحقَّق من اتصالك بالإنترنت.</string>
@@ -409,7 +409,6 @@ Language: ar
     <string name="settings_notification_actions_title">تحديد 3 إجراءات</string>
     <string name="settings_notification_sound_summary">تم تشغيل صوت التنبيه.</string>
     <string name="settings_notification_sound">صوت التنبيه</string>
-    <string name="settings_notification_play_over_summary">واصل التشغيل حتى عندما تقوم التطبيقات الأخرى، مثل التنبيهات أو التنقل بتشغيل أصوات.</string>
     <string name="settings_notification_play_over">تنبيهات تكرار التشغيل</string>
     <string name="settings_notification_notify_me">تنبيهي</string>
     <string name="settings_notification_hide_on_pause">إخفاء تنبيه التشغيل عند الإيقاف المؤقت</string>
@@ -786,7 +785,6 @@ Language: ar
     <string name="filters_create_filter_details">تفاصيل التصفية</string>
     <string name="filters_create_filter_by">التصفية حسب</string>
     <string name="filters_create_filter">إنشاء عامل تصفية</string>
-    <string name="filters_create_colour_icon">اللون والأيقونة</string>
     <string name="filters_create_add_more">أضف مزيدًًا من المعايير لإنهاء تحسين عامل التصفية الخاص بك.</string>
     <string name="filters_create">إنشاء</string>
     <string name="filters_chosen_singular">تم اختيار عامل تصفية واحد</string>
@@ -826,8 +824,6 @@ Language: ar
     <string name="supporter_bundle">مجموعة</string>
     <string name="supporter">مؤيد</string>
     <string name="episode_sort_short_to_long">الأقصر إلى الأطول</string>
-    <string name="episode_sort_oldest_to_newest">الأقدم الى الأحدث</string>
-    <string name="episode_sort_newest_to_oldest">الأحدث الى الأقدم</string>
     <string name="episode_sort_long_to_short">الأطول إلى الأقصر</string>
     <string name="episode_row_waiting_for_wifi">انتظار شبكة واي فاي</string>
     <string name="episode_row_waiting_for_power">انتظار الطاقة</string>

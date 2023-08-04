@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 08:10:07+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="bookmark">Bokmärk</string>
+    <string name="details">Detaljer</string>
+    <string name="episode">Avsnitt</string>
+    <string name="bookmarks_search">Sök bokmärke</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts kommer periodvis att synkronisera ditt konto i bakgrunden.</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts kommer endast att synkronisera ditt konto när du öppnar appen.</string>
+    <string name="settings_notification_play_over_always">Alltid</string>
+    <string name="settings_notification_play_over_duck">Duckningsvolym</string>
+    <string name="settings_notification_play_over_never">Aldrig</string>
+    <string name="skipping_to">Hoppar till %s</string>
+    <string name="playing_bookmark">Spelar ”%s”</string>
+    <string name="save_bookmark">Spara bokmärke</string>
+    <string name="add_bookmark_title_hint">Lägg till en valfri rubrik för att identifiera detta bokmärke</string>
+    <string name="change_title">Ändra rubrik</string>
+    <string name="bookmark_added">Bokmärke ”%s” tillagt</string>
+    <string name="add_bookmark_title">Lägg till bokmärke</string>
+    <string name="add_bookmark">Lägg till bokmärke</string>
+    <string name="filters_not_found">Inga filter hittades</string>
+    <string name="bookmarks_sort_timestamp">Tidsstämpel</string>
+    <string name="bookmarks_select_option">Välj bokmärken</string>
+    <string name="bookmarks_delete_summary_singular">Detta bokmärke kommer att tas bort. Det här går inte att ångra.</string>
+    <string name="bookmarks_delete_summary_plural">%d bokmärken kommer att tas bort. Det här går inte att ångra.</string>
+    <string name="bookmarks_deleted_singular">1 bokmärke har tagits bort</string>
+    <string name="bookmarks_deleted_plural">%1$d bokmärken har tagits bort</string>
+    <string name="bookmarks_delete_singular">Ta bort bokmärke</string>
+    <string name="bookmarks_delete_plural">Ta bort bokmärken</string>
+    <string name="deselect_all_below">Avmarkera alla nedan</string>
     <string name="deselect_all">Avmarkera alla </string>
+    <string name="deselect_all_above">Avmarkera alla ovan</string>
     <string name="edit">Redigera</string>
     <string name="whats_new_autoplay_maybe_later_button">Kanske senare</string>
     <string name="whats_new_autoplay_enable_button">Aktivera det nu</string>
@@ -14,7 +42,6 @@ Language: sv_SE
     <string name="whats_new_autoplay_title">Spela upp automatiskt är här.</string>
     <string name="filters_download_limit_3">3 avsnitt</string>
     <string name="settings_title_headphone_controls">Hörlurskontroller</string>
-    <string name="settings_headphone_controls_summary">Anpassa åtgärder som utförs med de vanligaste hörlurskontrollerna.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Spela upp ett bekräftelseljud när ett bokmärke har skapats med dina hörlurar.</string>
     <string name="settings_headphone_controls_confirmation_sound">Bekräftelseljud för bokmärke</string>
     <string name="settings_headphone_controls_choice_skip_forward">Hoppa framåt</string>
@@ -28,8 +55,8 @@ Language: sv_SE
     <string name="bookmarks_not_found">Inga bokmärken än</string>
     <string name="bookmarks_create_instructions">Du kan spara tidsstämplar för avsnitt från åtgärdsmenyn i spelaren eller genom att konfigurera en åtgärd med dina hörlurar.</string>
     <string name="bookmark_play">Spela upp från bokmärkesposition %s</string>
-    <string name="bookmarks_plural">%s bokmärken</string>
-    <string name="bookmarks_singular">%s bokmärke</string>
+    <string name="bookmarks_plural">%d bokmärken</string>
+    <string name="bookmarks_singular">1 bokmärke</string>
     <string name="bookmarks">Bokmärken</string>
     <string name="settings_autoplay">Spela upp automatiskt</string>
     <string name="player_sleep_add_1_minute">+ 1 minut</string>
@@ -210,7 +237,6 @@ Language: sv_SE
     <string name="onboarding_import_from_other_apps_step_1">Hitta den andra appens exportalternativ och exportera en OPML-fil.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts kan importera podcasts från OPML-filer, så om din nuvarande app kan exportera en OPML-fil kan du följa dessa steg:</string>
     <string name="onboarding_import_from_castbox_open">Öppna Castbox …</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">Bläddra ner till alternativet \"OPML-export\" och tryck på det.</string>
     <string name="onboarding_import_from_castbox_step_3">Tryck på \"Inställningar\".</string>
     <string name="onboarding_import_from_castbox_step_2">Tryck på fliken \"Personligt\".</string>
@@ -773,7 +799,6 @@ Language: sv_SE
     <string name="settings_notification_actions_title">Välj 3 åtgärder</string>
     <string name="settings_notification_sound_summary">Aviseringsljud spelas upp.</string>
     <string name="settings_notification_sound">Aviseringsljud</string>
-    <string name="settings_notification_play_over_summary">Fortsätt uppspelning även när andra appar, som aviseringar eller navigering, spelar upp ljud.</string>
     <string name="settings_notification_play_over">Spela upp över aviseringar</string>
     <string name="settings_notification_notify_me">Avisera mig</string>
     <string name="settings_notification_hide_on_pause">Dölj uppspelningsavisering vid pausning</string>
@@ -1193,8 +1218,8 @@ Language: sv_SE
     <string name="supporter_bundle">PAKET</string>
     <string name="supporter">Supporter</string>
     <string name="episode_sort_short_to_long">Kortaste till längsta</string>
-    <string name="episode_sort_oldest_to_newest">Äldsta till nyaste</string>
-    <string name="episode_sort_newest_to_oldest">Nyaste till äldsta</string>
+    <string name="sort_oldest_to_newest">Äldst till nyast</string>
+    <string name="sort_newest_to_oldest">Nyast till äldst</string>
     <string name="episode_sort_long_to_short">Längsta till kortaste</string>
     <string name="episode_row_waiting_for_wifi">Väntar på WiFi</string>
     <string name="episode_row_waiting_for_power">Väntar på ström</string>
