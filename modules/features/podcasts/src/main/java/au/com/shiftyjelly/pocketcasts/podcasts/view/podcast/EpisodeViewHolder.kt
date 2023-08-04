@@ -186,6 +186,7 @@ class EpisodeViewHolder constructor(
                 val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
                 binding.inUpNext = isInUpNext
+                binding.hasBookmarks = episode.hasBookmark
 
                 imgIcon.isVisible = false
                 progressCircle.isVisible = false

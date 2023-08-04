@@ -757,6 +757,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                                 bookmarks = state.bookmarks,
                                 searchTerm = state.searchBookmarkTerm,
                             )
+
+                            adapter?.notifyDataSetChanged()
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {

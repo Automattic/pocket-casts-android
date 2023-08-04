@@ -25,6 +25,7 @@
     <string name="archived">Archived</string>
     <string name="auto_archive">Auto archive</string>
     <string name="auto_download">Auto download</string>
+    <string name="bookmark">Bookmark</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="cancel">Cancel</string>
     <string name="cancel_download">Cancel download</string>
