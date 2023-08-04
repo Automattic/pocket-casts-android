@@ -11,31 +11,40 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLoadedListener {
+class EpisodeContainerFragment :
+    BaseDialogFragment(),
+    EpisodeFragment.EpisodeLoadedListener {
     companion object {
         const val ARG_EPISODE_UUID = "episodeUUID"
         const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
@@ -109,6 +118,8 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
 
     private lateinit var adapter: ViewPagerAdapter
+    @Inject
+    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (!forceDarkTheme || theme.isDarkTheme) {
@@ -144,6 +155,20 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
                 height = Resources.getSystem().displayMetrics.heightPixels
             }
         }
+
+        val binding = binding ?: return
+
+        binding.setupViewPager()
+
+        binding.setupMultiSelectHelper()
+
+        binding.btnClose.setOnClickListener { dismiss() }
+    }
+
+    private fun FragmentEpisodeContainerBinding.setupViewPager() {
+        // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
+        viewPager.getChildAt(0).isNestedScrollingEnabled = false
+
         adapter = ViewPagerAdapter(
             fragmentManager = childFragmentManager,
             lifecycle = viewLifecycleOwner.lifecycle,
@@ -155,25 +180,47 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
             forceDarkTheme = forceDarkTheme
         )
 
-        val binding = binding ?: return
-
-        // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
-        binding.viewPager.getChildAt(0).isNestedScrollingEnabled = false
-
-        binding.viewPager.adapter = adapter
+        viewPager.adapter = adapter
 
         if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            TabLayoutMediator(binding.tabLayout, binding.viewPager, true) { tab, position ->
+            TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
                 tab.setText(adapter.pageTitle(position))
             }.attach()
         }
 
-        binding.btnClose.setOnClickListener { dismiss() }
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+                viewPager.isUserInputEnabled = !multiSelectHelper.isMultiSelecting
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                btnFav.isVisible = adapter.isDetailsTab(position)
+                btnShare.isVisible = adapter.isDetailsTab(position)
+            }
+        })
+    }
+
+    private fun FragmentEpisodeContainerBinding.setupMultiSelectHelper() {
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            multiSelectToolbar.isVisible = isMultiSelecting
+            multiSelectToolbar.setNavigationIcon(R.drawable.ic_arrow_back)
+        }
+        multiSelectHelper.context = context
+        multiSelectToolbar.setup(
+            lifecycleOwner = viewLifecycleOwner,
+            multiSelectHelper = multiSelectHelper,
+            menuRes = null,
+            fragmentManager = parentFragmentManager,
+        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        multiSelectHelper.isMultiSelecting = false
+        multiSelectHelper.context = null
     }
 
     private class ViewPagerAdapter(
@@ -188,10 +235,15 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
         private sealed class Section(@StringRes val titleRes: Int) {
-            object Episode : Section(LR.string.details)
+            object Details : Section(LR.string.details)
+            object Bookmarks : Section(LR.string.bookmarks)
         }
 
-        private var sections = listOf(Section.Episode)
+        private var sections = mutableListOf<Section>(Section.Details).apply {
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                add(Section.Bookmarks)
+            }
+        }.toList()
 
         override fun getItemId(position: Int): Long {
             return sections[position].hashCode().toLong()
@@ -208,7 +260,7 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
         override fun createFragment(position: Int): Fragment {
             Timber.d("Creating fragment for position $position ${sections[position]}")
             return when (sections[position]) {
-                Section.Episode -> EpisodeFragment.newInstance(
+                Section.Details -> EpisodeFragment.newInstance(
                     episodeUuid = requireNotNull(episodeUUID),
                     source = episodeViewSource,
                     overridePodcastLink = overridePodcastLink,
@@ -217,7 +269,10 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
                     forceDark = forceDarkTheme
                 )
 
-                else -> throw IllegalArgumentException("Unknown section $position")
+                Section.Bookmarks -> BookmarksFragment.newInstance(
+                    sourceView = SourceView.EPISODE_DETAILS,
+                    episodeUuid = requireNotNull(episodeUUID)
+                )
             }
         }
 
@@ -225,6 +280,8 @@ class EpisodeContainerFragment : BaseDialogFragment(), EpisodeFragment.EpisodeLo
         fun pageTitle(position: Int): Int {
             return sections[position].titleRes
         }
+
+        fun isDetailsTab(position: Int) = sections[position] is Section.Details
     }
 
     override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {

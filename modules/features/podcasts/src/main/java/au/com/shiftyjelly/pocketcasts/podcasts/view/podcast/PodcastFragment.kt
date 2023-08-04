@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.player.view.BookmarksSortByDialog
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastBinding
@@ -97,6 +97,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
+        private const val EPISODE_CARD = "episode_card"
 
         fun newInstance(podcastUuid: String, fromListUuid: String? = null, featuredPodcast: Boolean = false): PodcastFragment {
             return PodcastFragment().apply {
@@ -241,7 +242,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             overridePodcastLink = true,
             fromListUuid = fromListUuid
         )
-        episodeCard.show(parentFragmentManager, "episode_card")
+        episodeCard.show(parentFragmentManager, EPISODE_CARD)
     }
 
     private val onSearchQueryChanged: (String) -> Unit = { searchQuery ->
@@ -630,6 +631,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     fun <T> MultiSelectHelper<T>.setUp() {
         isMultiSelectingLive.observe(viewLifecycleOwner) {
+            val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
+            if (episodeContainerFragment != null) return@observe
             binding?.multiSelectToolbar?.isVisible = it
             binding?.toolbar?.isVisible = !it
             adapter?.notifyDataSetChanged()

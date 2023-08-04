@@ -77,6 +77,17 @@
                 app:layout_constraintBottom_toBottomOf="@+id/btnClose"
                 app:layout_constraintEnd_toStartOf="@+id/btnShare"
                 app:layout_constraintTop_toTopOf="@+id/btnClose" />
+
+            <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+                android:id="@+id/multiSelectToolbar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:attr/actionBarSize"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.viewpager2.widget.ViewPager2
