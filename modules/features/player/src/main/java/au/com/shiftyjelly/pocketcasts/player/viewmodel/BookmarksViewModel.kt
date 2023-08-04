@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +35,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -94,7 +94,7 @@ class BookmarksViewModel
                             }
                         }.stateIn(viewModelScope)
                     } ?: run { // This shouldn't happen in the ideal world
-                        Timber.e("Episode not found.")
+                        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
                         _uiState.value = UiState.Empty(sourceView)
                     }
                 }
