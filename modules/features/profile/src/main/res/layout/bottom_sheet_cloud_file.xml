@@ -216,7 +216,8 @@
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        android:visibility="gone">
         <ImageView
             android:id="@+id/imgIconBookmark"
             android:layout_width="24dp"
