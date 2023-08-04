@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -189,8 +189,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
         viewModel.globalSettings.observe(viewLifecycleOwner) {
             val summary = when (it.second) {
-                Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP, null -> getString(LR.string.settings_auto_up_next_limit_reached_top_summary, it.first)
-                Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING -> getString(LR.string.settings_auto_up_next_limit_reached_stop_summary, it.first)
+                AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> getString(LR.string.settings_auto_up_next_limit_reached_top_summary, it.first)
+                AutoAddUpNextLimitBehaviour.STOP_ADDING -> getString(LR.string.settings_auto_up_next_limit_reached_stop_summary, it.first)
             }
 
             preferenceAddToUpNextGlobal?.summary = getString(LR.string.podcast_settings_up_next_episode_limit, it.first) + "\n\n" + summary

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterAutoAddPodcastBinding
@@ -110,17 +111,17 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
 
             val podcasts = state.autoAddPodcasts
             val optionSubtitle = when (state.behaviour) {
-                Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> getString(LR.string.settings_auto_up_next_limit_reached_top)
-                Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING -> getString(LR.string.settings_auto_up_next_limit_reached_stop)
+                AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> getString(LR.string.settings_auto_up_next_limit_reached_top)
+                AutoAddUpNextLimitBehaviour.STOP_ADDING -> getString(LR.string.settings_auto_up_next_limit_reached_stop)
             }
             val optionRow = AutoAddTopSections.Option(null, getString(LR.string.settings_auto_up_next_limit_reached), optionSubtitle) {
                 OptionsDialog()
                     .setTitle(getString(LR.string.settings_auto_up_next_add_to))
-                    .addCheckedOption(titleId = LR.string.settings_auto_up_next_limit_reached_stop, checked = state.behaviour == Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING) {
-                        viewModel.autoAddUpNextLimitBehaviorChanged(Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING)
+                    .addCheckedOption(titleId = LR.string.settings_auto_up_next_limit_reached_stop, checked = state.behaviour == AutoAddUpNextLimitBehaviour.STOP_ADDING) {
+                        viewModel.autoAddUpNextLimitBehaviorChanged(AutoAddUpNextLimitBehaviour.STOP_ADDING)
                     }
-                    .addCheckedOption(titleId = LR.string.settings_auto_up_next_limit_reached_top, checked = state.behaviour == Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP) {
-                        viewModel.autoAddUpNextLimitBehaviorChanged(Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP)
+                    .addCheckedOption(titleId = LR.string.settings_auto_up_next_limit_reached_top, checked = state.behaviour == AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP) {
+                        viewModel.autoAddUpNextLimitBehaviorChanged(AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP)
                     }
                     .show(childFragmentManager, "autoadd_options")
             }
@@ -128,10 +129,10 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
             val podcastsChosenRow = AutoAddTopSections.Option(null, getString(LR.string.settings_choose_podcasts), chosenText) { openPodcastsList() }
 
             val topFooter = when (state.behaviour) {
-                Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> {
+                AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> {
                     AutoAddTopSections.Footer(getString(LR.string.settings_auto_up_next_limit_reached_top_summary, state.limit))
                 }
-                Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING -> {
+                AutoAddUpNextLimitBehaviour.STOP_ADDING -> {
                     AutoAddTopSections.Footer(getString(LR.string.settings_auto_up_next_limit_reached_stop_summary, state.limit))
                 }
             }
