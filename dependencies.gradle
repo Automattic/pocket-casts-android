@@ -271,6 +271,8 @@ project.ext {
             lottieCompose: "com.airbnb.android:lottie-compose:5.2.0",
             // JUnit
             junit: "junit:junit:4.13.2",
+            //turbine
+            turbine: "app.cash.turbine:turbine:0.12.1",
             // Mockito
             testMockitoAndroid: "org.mockito:mockito-android:4.6.1",
             testMokitoKotlin: "org.mockito.kotlin:mockito-kotlin:4.0.0",
