@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,47 @@ abstract class BookmarkDao {
         episodeUuid: String,
         deleted: Boolean = false,
     ): Flow<List<Bookmark>>
+
+    @Query(
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
+            ORDER BY 
+            CASE WHEN :isAsc = 1 THEN created_at END ASC, 
+            CASE WHEN :isAsc = 0 THEN created_at END DESC"""
+    )
+    abstract fun findByPodcastOrderCreatedAtFlow(
+        podcastUuid: String,
+        isAsc: Boolean,
+        deleted: Boolean = false,
+    ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
+            ORDER BY publishedDate, time ASC"""
+    )
+    abstract fun findByPodcastOrderEpisodeAndTimeFlow(
+        podcastUuid: String,
+        deleted: Boolean = false,
+    ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT bookmarks.*
+            FROM bookmarks
+            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE bookmarks.podcast_uuid = :podcastUuid 
+            AND (UPPER(bookmarks.title) LIKE UPPER(:title) OR UPPER(podcast_episodes.title) LIKE UPPER(:title))
+            AND deleted = :deleted"""
+    )
+    abstract suspend fun searchInPodcastByTitle(
+        podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
 
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)

@@ -16,6 +16,7 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -71,6 +72,7 @@ class NotificationsSettingsFragment :
     private var enabledPreference: SwitchPreference? = null
     private var systemSettingsPreference: Preference? = null
     private var notificationActions: PreferenceScreen? = null
+    private var playOverNotificationPreference: ListPreference? = null
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
@@ -95,6 +97,7 @@ class NotificationsSettingsFragment :
         vibratePreference = manager.findPreference("notificationVibrate")
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
+        playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
@@ -111,13 +114,6 @@ class NotificationsSettingsFragment :
         updateNotificationsEnabled()
 
         manager.run {
-            findPreference<SwitchPreference>(Settings.PREFERENCE_OVERRIDE_AUDIO)?.setOnPreferenceChangeListener { _, newValue ->
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED,
-                    mapOf("enabled" to newValue as Boolean)
-                )
-                true
-            }
             findPreference<SwitchPreference>(Settings.PREFERENCE_HIDE_NOTIFICATION_ON_PAUSE)?.setOnPreferenceChangeListener { _, newValue ->
                 analyticsTracker.track(
                     AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
@@ -138,6 +134,21 @@ class NotificationsSettingsFragment :
                     }
                 )
             )
+            true
+        }
+        playOverNotificationPreference?.setOnPreferenceChangeListener { _, newValue ->
+            val playOverNotificationSetting = (newValue as? String)
+                ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
+                ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
+
+            analyticsTracker.track(
+                AnalyticsEvent.SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED,
+                mapOf(
+                    "enabled" to (playOverNotificationSetting != PlayOverNotificationSetting.NEVER),
+                    "value" to playOverNotificationSetting.analyticsString,
+                ),
+            )
+
             true
         }
     }
@@ -386,6 +397,7 @@ class NotificationsSettingsFragment :
     override fun onResume() {
         super.onResume()
         setupNotificationVibrate()
+        setupPlayOverNotifications()
         changePodcastsSummary()
         preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
@@ -398,6 +410,8 @@ class NotificationsSettingsFragment :
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (Settings.PREFERENCE_NOTIFICATION_VIBRATE == key) {
             changeVibrateSummary()
+        } else if (Settings.PREFERENCE_OVERRIDE_NOTIFICATION_AUDIO == key) {
+            changePlayOverNotificationSummary()
         }
     }
 
@@ -450,6 +464,24 @@ class NotificationsSettingsFragment :
             it.entryValues = arrayOf("2", "1", "0")
             it.value = settings.getNotificationVibrate().toString()
         }
+    }
+
+    private fun setupPlayOverNotifications() {
+        playOverNotificationPreference?.apply {
+            val options = listOf(
+                PlayOverNotificationSetting.NEVER,
+                PlayOverNotificationSetting.DUCK,
+                PlayOverNotificationSetting.ALWAYS,
+            )
+            entries = options.map { getString(it.titleRes) }.toTypedArray()
+            entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
+            value = settings.getPlayOverNotification().preferenceInt.toString()
+        }
+        changePlayOverNotificationSummary()
+    }
+
+    private fun changePlayOverNotificationSummary() {
+        playOverNotificationPreference?.summary = getString(settings.getPlayOverNotification().titleRes)
     }
 
     override fun getBackstackCount(): Int {

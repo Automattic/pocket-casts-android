@@ -137,6 +137,8 @@ data class PodcastEpisode(
     // temporary variables
     @Ignore
     override var playing: Boolean = false
+    @Ignore
+    var hasBookmark: Boolean = false
 
     val playedPercentage: Int
         get() {

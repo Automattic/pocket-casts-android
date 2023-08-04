@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentProfileEpisodeListBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -110,7 +110,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 Mode.History -> EpisodeViewSource.LISTENING_HISTORY
                 Mode.Starred -> EpisodeViewSource.STARRED
             }
-            val fragment = EpisodeFragment.newInstance(episode = episode, source = episodeViewSource)
+            val fragment = EpisodeContainerFragment.newInstance(episode = episode, source = episodeViewSource)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }

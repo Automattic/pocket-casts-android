@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.settings.viewmodel.utils.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import dagger.hilt.android.qualifiers.ApplicationContext
 import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi

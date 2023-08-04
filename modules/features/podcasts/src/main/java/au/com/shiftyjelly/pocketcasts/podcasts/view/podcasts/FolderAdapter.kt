@@ -95,9 +95,6 @@ class FolderAdapter(
                     holder.podcastThumbnail.setImageDrawable(null)
                 }
             }
-            is FolderViewHolder -> {
-                holder.composeView.disposeComposition()
-            }
         }
     }
 

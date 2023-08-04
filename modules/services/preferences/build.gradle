@@ -4,6 +4,9 @@ apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.preferences'
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
