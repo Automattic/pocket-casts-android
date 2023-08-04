@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.PlusUpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.Companion.UNKNOWN_SOURCE_MESSAGE
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
@@ -149,8 +148,7 @@ private fun BookmarksView(
                 timePlayButtonStyle = state.timePlayButtonStyle,
                 timePlayButtonColors = when (state.sourceView) {
                     SourceView.PLAYER -> TimePlayButtonColors.Player(textColor = textColor)
-                    SourceView.EPISODE_DETAILS -> TimePlayButtonColors.Default
-                    else -> throw IllegalArgumentException("$UNKNOWN_SOURCE_MESSAGE: ${state.sourceView}")
+                    else -> TimePlayButtonColors.Default
                 },
                 showIcon = false
             )

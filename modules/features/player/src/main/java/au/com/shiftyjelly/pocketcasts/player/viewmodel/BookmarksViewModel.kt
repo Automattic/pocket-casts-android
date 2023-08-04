@@ -190,8 +190,7 @@ class BookmarksViewModel
             val colors: NoBookmarksViewColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> NoBookmarksViewColors.Player
-                    SourceView.EPISODE_DETAILS -> NoBookmarksViewColors.Default
-                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                    else -> NoBookmarksViewColors.Default
                 }
         }
 
@@ -206,20 +205,17 @@ class BookmarksViewModel
             val headerRowColors: HeaderRowColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> HeaderRowColors.Player
-                    SourceView.EPISODE_DETAILS -> HeaderRowColors.Default
-                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                    else -> HeaderRowColors.Default
                 }
             val bookmarkRowColors: BookmarkRowColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> BookmarkRowColors.Player
-                    SourceView.EPISODE_DETAILS -> BookmarkRowColors.Default
-                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                    else -> BookmarkRowColors.Default
                 }
             val timePlayButtonStyle: TimePlayButtonStyle
                 get() = when (sourceView) {
                     SourceView.PLAYER -> TimePlayButtonStyle.Solid
-                    SourceView.EPISODE_DETAILS -> TimePlayButtonStyle.Outlined
-                    else -> throw IllegalArgumentException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                    else -> TimePlayButtonStyle.Outlined
                 }
         }
 
@@ -227,13 +223,8 @@ class BookmarksViewModel
             val colors: MessageViewColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> MessageViewColors.Player
-                    SourceView.EPISODE_DETAILS -> MessageViewColors.Default
-                    else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+                    else -> MessageViewColors.Default
                 }
         }
-    }
-
-    companion object {
-        const val UNKNOWN_SOURCE_MESSAGE = "Unknown source view"
     }
 }
