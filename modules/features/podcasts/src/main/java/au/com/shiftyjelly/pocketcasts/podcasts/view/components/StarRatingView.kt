@@ -55,6 +55,9 @@ private fun Content(
     state: RatingState.Loaded,
     onClick: () -> Unit
 ) {
+    if (state.noRatings) {
+        return
+    }
     Row(
         modifier = Modifier
             .padding(horizontal = 14.dp, vertical = 4.dp)

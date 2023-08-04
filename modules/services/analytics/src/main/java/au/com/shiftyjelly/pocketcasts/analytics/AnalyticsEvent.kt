@@ -566,4 +566,9 @@ enum class AnalyticsEvent(val key: String) {
     WEAR_SIGNIN_GOOGLE_TAPPED("wear_signin_google_tapped"),
     WEAR_SIGNIN_PHONE_TAPPED("wear_signin_phone_tapped"),
     WEAR_SIGNIN_EMAIL_TAPPED("wear_signin_email_tapped"),
+
+    /* Whats New Popup */
+    WHATSNEW_SHOWN("whatsnew_shown"),
+    WHATSNEW_DISMISSED("whatsnew_dismissed"),
+    WHATSNEW_CONFIRM_BUTTON_TAPPED("whatsnew_confirm_button_tapped"),
 }

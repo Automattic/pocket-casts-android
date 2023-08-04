@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -98,7 +99,7 @@ class BookmarksViewModelTest {
     fun `given free account, when bookmarks loaded, then PlusUpsell state shown`() = runTest {
         whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(false)
 
-        bookmarksViewModel.loadBookmarks(episodeUuid)
+        bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
         assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
     }
@@ -107,7 +108,7 @@ class BookmarksViewModelTest {
     fun `given plus or patron account, when bookmarks loaded, then PlusUpsell state not shown`() = runTest {
         whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(true)
 
-        bookmarksViewModel.loadBookmarks(episodeUuid)
+        bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
         assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
     }

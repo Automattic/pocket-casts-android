@@ -56,9 +56,25 @@ abstract class BookmarkDao {
         """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
             FROM bookmarks
             JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
-            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted"""
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
+            ORDER BY 
+            CASE WHEN :isAsc = 1 THEN created_at END ASC, 
+            CASE WHEN :isAsc = 0 THEN created_at END DESC"""
     )
-    abstract fun findByPodcastFlow(
+    abstract fun findByPodcastOrderCreatedAtFlow(
+        podcastUuid: String,
+        isAsc: Boolean,
+        deleted: Boolean = false,
+    ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
+            ORDER BY publishedDate, time ASC"""
+    )
+    abstract fun findByPodcastOrderEpisodeAndTimeFlow(
         podcastUuid: String,
         deleted: Boolean = false,
     ): Flow<List<PodcastBookmark>>

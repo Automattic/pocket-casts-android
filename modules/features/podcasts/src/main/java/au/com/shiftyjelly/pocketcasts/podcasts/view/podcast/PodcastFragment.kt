@@ -30,11 +30,12 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderChooserFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
@@ -96,6 +97,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
+        private const val EPISODE_CARD = "episode_card"
 
         fun newInstance(podcastUuid: String, fromListUuid: String? = null, featuredPodcast: Boolean = false): PodcastFragment {
             return PodcastFragment().apply {
@@ -234,13 +236,13 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid)
             )
         }
-        val episodeCard = EpisodeFragment.newInstance(
+        val episodeCard = EpisodeContainerFragment.newInstance(
             episode = episode,
             source = EpisodeViewSource.PODCAST_SCREEN,
             overridePodcastLink = true,
             fromListUuid = fromListUuid
         )
-        episodeCard.show(parentFragmentManager, "episode_card")
+        episodeCard.show(parentFragmentManager, EPISODE_CARD)
     }
 
     private val onSearchQueryChanged: (String) -> Unit = { searchQuery ->
@@ -305,6 +307,19 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             dialog.show(it, "grouping_options")
         }
         Unit // This is dumb kotlin
+    }
+
+    private val showBookmarksOptionsDialog: () -> Unit = {
+        activity?.supportFragmentManager?.let {
+            BookmarksSortByDialog(
+                settings = settings,
+                changeSortOrder = viewModel::changeSortOrder,
+                sourceView = SourceView.PODCAST_SCREEN
+            ).show(
+                context = requireContext(),
+                fragmentManager = it
+            )
+        }
     }
 
     private val onEpisodesOptionsClicked: () -> Unit = {
@@ -561,6 +576,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 onSubscribeClicked = onSubscribeClicked,
                 onUnsubscribeClicked = onUnsubscribeClicked,
                 onEpisodesOptionsClicked = onEpisodesOptionsClicked,
+                onBookmarksOptionsClicked = showBookmarksOptionsDialog,
                 onEpisodeRowLongPress = onRowLongPress(),
                 onBookmarkRowLongPress = onRowLongPress(),
                 onFoldersClicked = onFoldersClicked,
@@ -615,6 +631,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     fun <T> MultiSelectHelper<T>.setUp() {
         isMultiSelectingLive.observe(viewLifecycleOwner) {
+            val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
+            if (episodeContainerFragment != null) return@observe
             binding?.multiSelectToolbar?.isVisible = it
             binding?.toolbar?.isVisible = !it
             adapter?.notifyDataSetChanged()
@@ -739,6 +757,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                                 bookmarks = state.bookmarks,
                                 searchTerm = state.searchBookmarkTerm,
                             )
+
+                            adapter?.notifyDataSetChanged()
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {

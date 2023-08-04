@@ -25,6 +25,7 @@
     <string name="archived">Archived</string>
     <string name="auto_archive">Auto archive</string>
     <string name="auto_download">Auto download</string>
+    <string name="bookmark">Bookmark</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="cancel">Cancel</string>
     <string name="cancel_download">Cancel download</string>
@@ -137,6 +138,8 @@
     <string name="on">On</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
+    <string name="details">Details</string>
+    <string name="episode">Episode</string>
     <string name="episodes">Episodes</string>
     <string name="none">None</string>
     <string name="expand_details">Expand details</string>

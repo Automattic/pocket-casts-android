@@ -210,6 +210,82 @@ class BookmarkDaoTest {
             }
         }
 
+    @Test
+    fun testFindByPodcastSortCreatedAtAsc() =
+        runTest {
+            val bookmark1 = FakeBookmarksGenerator.create(createdAt = Date(2000))
+            val bookmark2 = FakeBookmarksGenerator.create(createdAt = Date(3000))
+            val bookmark3 = FakeBookmarksGenerator.create(createdAt = Date(1000))
+            bookmarkDao.insert(bookmark1)
+            bookmarkDao.insert(bookmark2)
+            bookmarkDao.insert(bookmark3)
+
+            val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = defaultPodcastUuid, title = "", publishedDate = Date())
+            episodeDao.insert(episode)
+
+            val result = bookmarkDao.findByPodcastOrderCreatedAtFlow(
+                podcastUuid = defaultPodcastUuid,
+                isAsc = true,
+            ).first()
+
+            with(result) {
+                assert(get(0).bookmark.createdAt == bookmark3.createdAt)
+                assert(get(1).bookmark.createdAt == bookmark1.createdAt)
+                assert(get(2).bookmark.createdAt == bookmark2.createdAt)
+            }
+        }
+
+    @Test
+    fun testFindByPodcastSortCreatedAtDesc() =
+        runTest {
+            val bookmark1 = FakeBookmarksGenerator.create(createdAt = Date(2000))
+            val bookmark2 = FakeBookmarksGenerator.create(createdAt = Date(3000))
+            val bookmark3 = FakeBookmarksGenerator.create(createdAt = Date(1000))
+            bookmarkDao.insert(bookmark1)
+            bookmarkDao.insert(bookmark2)
+            bookmarkDao.insert(bookmark3)
+
+            val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = defaultPodcastUuid, title = "", publishedDate = Date())
+            episodeDao.insert(episode)
+
+            val result = bookmarkDao.findByPodcastOrderCreatedAtFlow(
+                podcastUuid = defaultPodcastUuid,
+                isAsc = false,
+            ).first()
+
+            with(result) {
+                assert(get(0).bookmark.createdAt == bookmark2.createdAt)
+                assert(get(1).bookmark.createdAt == bookmark1.createdAt)
+                assert(get(2).bookmark.createdAt == bookmark3.createdAt)
+            }
+        }
+
+    @Test
+    fun testFindByPodcastSortEpisodePublishDateAndBookmarkTime() =
+        runTest {
+            val episodeUuid1 = UUID.randomUUID().toString()
+            val episodeUuid2 = UUID.randomUUID().toString()
+            val bookmark1 = FakeBookmarksGenerator.create(episodeUuid = episodeUuid2, time = 50)
+            val bookmark2 = FakeBookmarksGenerator.create(episodeUuid = episodeUuid1, time = 100)
+            val bookmark3 = FakeBookmarksGenerator.create(episodeUuid = episodeUuid2, time = 200)
+            bookmarkDao.insert(bookmark1)
+            bookmarkDao.insert(bookmark2)
+            bookmarkDao.insert(bookmark3)
+
+            val episode1 = PodcastEpisode(uuid = episodeUuid1, podcastUuid = defaultPodcastUuid, publishedDate = Date(2000))
+            val episode2 = PodcastEpisode(uuid = episodeUuid2, podcastUuid = defaultPodcastUuid, publishedDate = Date(1000))
+            episodeDao.insert(episode1)
+            episodeDao.insert(episode2)
+            val result = bookmarkDao.findByPodcastOrderEpisodeAndTimeFlow(
+                podcastUuid = defaultPodcastUuid,
+            ).first()
+            with(result) {
+                assert(get(0).bookmark.uuid == bookmark1.uuid)
+                assert(get(1).bookmark.uuid == bookmark3.uuid)
+                assert(get(2).bookmark.uuid == bookmark2.uuid)
+            }
+        }
+
     companion object {
         private val defaultEpisodeUuid = UUID.randomUUID().toString()
         private val defaultPodcastUuid = UUID.randomUUID().toString()

@@ -69,7 +69,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
@@ -1207,14 +1207,14 @@ class MainActivity :
             val fragment = if (episode == null) {
                 val podcastUuidFound = podcastUuid ?: return@launch
                 // Assume it's an episode we don't know about
-                EpisodeFragment.newInstance(
+                EpisodeContainerFragment.newInstance(
                     episodeUuid = episodeUuid,
                     source = source,
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark
                 )
             } else if (episode is PodcastEpisode) {
-                EpisodeFragment.newInstance(
+                EpisodeContainerFragment.newInstance(
                     episodeUuid = episodeUuid,
                     source = source,
                     podcastUuid = podcastUuid,

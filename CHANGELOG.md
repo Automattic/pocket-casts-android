@@ -3,6 +3,8 @@
 *   Bug Fixes:
     *   Added audio ducking as an option when playing over notifications
         ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009))
+    *   Fixed the podcast ratings stars showing if there isn't a rating
+        ([#1237](https://github.com/Automattic/pocket-casts-android/pull/1237))
     *   Fixed swiping to open Up Next queue in landscape and on foldables
         ([#1209](https://github.com/Automattic/pocket-casts-android/pull/1209))
     *   Fixed upgrade flow when signing in with Google account
