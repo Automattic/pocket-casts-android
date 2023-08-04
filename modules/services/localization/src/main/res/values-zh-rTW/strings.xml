@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 09:54:07+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="bookmark">書籤</string>
+    <string name="details">詳細資料</string>
+    <string name="episode">單集</string>
+    <string name="bookmarks_search">搜尋書籤</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts 會定期在背景同步帳號。</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts 只會在你開啟應用程式時同步帳號。</string>
+    <string name="settings_notification_play_over_always">總是</string>
+    <string name="settings_notification_play_over_duck">減弱音量</string>
+    <string name="settings_notification_play_over_never">永不</string>
+    <string name="skipping_to">跳到 %s</string>
+    <string name="playing_bookmark">正在播放「%s」</string>
+    <string name="save_bookmark">儲存書籤</string>
+    <string name="add_bookmark_title_hint">新增選用式標題以識別此書籤</string>
+    <string name="change_title">變更標題</string>
+    <string name="bookmark_added">已新增「%s」書籤</string>
+    <string name="add_bookmark_title">新增書籤</string>
+    <string name="add_bookmark">新增書籤</string>
+    <string name="filters_not_found">找不到篩選條件</string>
+    <string name="bookmarks_sort_timestamp">時間戳記</string>
+    <string name="bookmarks_select_option">選取書籤</string>
+    <string name="bookmarks_delete_summary_singular">此書籤將刪除。 此動作無法復原。</string>
+    <string name="bookmarks_delete_summary_plural">%d 個書籤將刪除。 此動作無法復原。</string>
+    <string name="bookmarks_deleted_singular">1 個書籤已刪除</string>
+    <string name="bookmarks_deleted_plural">%1$d 個書籤已刪除</string>
+    <string name="bookmarks_delete_singular">刪除書籤</string>
+    <string name="bookmarks_delete_plural">刪除書籤</string>
+    <string name="deselect_all_below">取消選取下方所有項目</string>
     <string name="deselect_all">取消全選</string>
+    <string name="deselect_all_above">取消選取上方所有項目</string>
     <string name="edit">編輯</string>
     <string name="whats_new_autoplay_maybe_later_button">稍後再說</string>
     <string name="whats_new_autoplay_enable_button">立即啟用</string>
@@ -14,7 +42,6 @@ Language: zh_TW
     <string name="whats_new_autoplay_title">我們推出自動播放功能了！</string>
     <string name="filters_download_limit_3">3 集</string>
     <string name="settings_title_headphone_controls">耳機控制項</string>
-    <string name="settings_headphone_controls_summary">自訂由最常見耳機控制項完成的動作。</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">在透過耳機建立書籤後播放確認音效。</string>
     <string name="settings_headphone_controls_confirmation_sound">書籤確認音效</string>
     <string name="settings_headphone_controls_choice_skip_forward">快轉跳過</string>
@@ -28,8 +55,8 @@ Language: zh_TW
     <string name="bookmarks_not_found">尚未有書籤</string>
     <string name="bookmarks_create_instructions">你可以從播放器的動作選單儲存單集的時間戳記，或設定耳機動作來儲存。</string>
     <string name="bookmark_play">播放書籤位置 %s</string>
-    <string name="bookmarks_plural">%s 個書籤</string>
-    <string name="bookmarks_singular">%s 個書籤</string>
+    <string name="bookmarks_plural">%d 個書籤</string>
+    <string name="bookmarks_singular">1 個書籤</string>
     <string name="bookmarks">書籤</string>
     <string name="settings_autoplay">自動播放</string>
     <string name="player_sleep_add_1_minute">1 分鐘</string>
@@ -90,7 +117,6 @@ Language: zh_TW
     <string name="log_in_with_email">透過電子郵件登入</string>
     <string name="log_in_on_phone">在手機上登入</string>
     <string name="log_in_with_google">透過 Google 登入</string>
-    <string name="log_in_subtitle">開始聆聽你最愛的 Podcast</string>
     <string name="onboarding_upgrade_no_subscriptions_found">找不到訂閱。</string>
     <string name="trial_then_per_year">試用只要 %1$s，接著每年 %2$s</string>
     <string name="trial_then_per_month">試用只要 %1$s，接著每月 %2$s</string>
@@ -148,10 +174,8 @@ Language: zh_TW
     <string name="notifications_blocked_warning">通知已遭封鎖。 你可以透過「設定」更新權限。</string>
     <string name="settings_media_actions_show_subtitle">在 Android 13 媒體通知和 Android Auto 中顯示自訂媒體動作。</string>
     <string name="settings_media_actions_show_title">顯示自訂媒體動作</string>
-    <string name="settings_media_actions_customise">自訂媒體動作</string>
     <string name="settings_media_actions_prioritize_subtitle">你將可使用你的常用動作。</string>
     <string name="settings_media_actions_prioritize_title">為你的自訂媒體動作排定優先順序</string>
-    <string name="plus_take_your_podcasting_to_next_level">運用專屬功能和自訂選項，讓你的 Podcast 體驗更上一層樓。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">篩選 ID 或標題</string>
     <string name="filter_title">篩選標題</string>
@@ -210,7 +234,6 @@ Language: zh_TW
     <string name="onboarding_import_from_other_apps_step_1">尋找其他應用程式的匯出選項並匯出 OPML 檔案。</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts 可以從 OPML 檔案匯入 Podcast，因此如果你目前的應用程式可以匯出 OPML 檔案，請按照下列步驟操作：</string>
     <string name="onboarding_import_from_castbox_open">開啟 Castbox…</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">向下捲動到「OPML 匯出」並點選。</string>
     <string name="onboarding_import_from_castbox_step_3">點選「設定」。</string>
     <string name="onboarding_import_from_castbox_step_2">點選「個人」分頁。</string>
@@ -397,7 +420,6 @@ Language: zh_TW
     <string name="podcasts_empty_folder_summary">新增 Podcast 節目至您的資料夾後即會顯示在此處</string>
     <string name="podcasts_empty_folder">資料夾是空的</string>
     <string name="add_podcasts">新增 Podcast 節目</string>
-    <string name="plus_folder_body">你可以建立資料夾來整理你的 Podcast 收藏。</string>
     <string name="expand_details">展開詳細資訊</string>
     <string name="profile_help_support">升級帳號以支持 Pocket Casts</string>
     <string name="error_check_your_internet_connection">請檢查你的網際網路連線。</string>
@@ -773,7 +795,6 @@ Language: zh_TW
     <string name="settings_notification_actions_title">選取 3 個動作</string>
     <string name="settings_notification_sound_summary">播放的通知音效。</string>
     <string name="settings_notification_sound">通知音效</string>
-    <string name="settings_notification_play_over_summary">即使其他應用程式 (如通知或導航) 播放音效，仍繼續播放。</string>
     <string name="settings_notification_play_over">通知時繼續播放</string>
     <string name="settings_notification_notify_me">通知我</string>
     <string name="settings_notification_hide_on_pause">暫停時隱藏播放通知</string>
@@ -1153,7 +1174,6 @@ Language: zh_TW
     <string name="filters_create_filter_details">篩選條件詳細資訊</string>
     <string name="filters_create_filter_by">篩選依據</string>
     <string name="filters_create_filter">建立篩選條件</string>
-    <string name="filters_create_colour_icon">顏色和圖示</string>
     <string name="filters_create_add_more">新增更多條件，讓篩選更加精準。</string>
     <string name="filters_create">建立</string>
     <string name="filters_chosen_singular">已選擇 1 個篩選條件</string>
@@ -1193,8 +1213,8 @@ Language: zh_TW
     <string name="supporter_bundle">搭售方案</string>
     <string name="supporter">支持者</string>
     <string name="episode_sort_short_to_long">最短到最長</string>
-    <string name="episode_sort_oldest_to_newest">從最舊到最新</string>
-    <string name="episode_sort_newest_to_oldest">從最新到最舊</string>
+    <string name="sort_oldest_to_newest">從最舊到最新</string>
+    <string name="sort_newest_to_oldest">從最新到最舊</string>
     <string name="episode_sort_long_to_short">最長到最短</string>
     <string name="episode_row_waiting_for_wifi">正在等候 WiFi</string>
     <string name="episode_row_waiting_for_power">等待電力恢復</string>

@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 08:10:07+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="bookmark">Favorito</string>
+    <string name="details">Detalhes</string>
+    <string name="episode">Episódio</string>
+    <string name="bookmarks_search">Pesquisar favorito</string>
+    <string name="settings_storage_background_refresh_on_watch">O Pocket Casts fará sincronizações rotineiras da sua conta em segundo plano.</string>
+    <string name="settings_storage_background_refresh_off_watch">O Pocket Casts só sincronizará sua conta quando você abrir o aplicativo.</string>
+    <string name="settings_notification_play_over_always">Sempre</string>
+    <string name="settings_notification_play_over_duck">Ducking</string>
+    <string name="settings_notification_play_over_never">Nunca</string>
+    <string name="skipping_to">Pulando para %s</string>
+    <string name="playing_bookmark">Reproduzindo \"%s\"</string>
+    <string name="save_bookmark">Salvar favorito</string>
+    <string name="add_bookmark_title_hint">Adicione um título opcional para identificar este favorito</string>
+    <string name="change_title">Alterar título</string>
+    <string name="bookmark_added">Favorito \"%s\" adicionado</string>
+    <string name="add_bookmark_title">Adicionar favorito</string>
+    <string name="add_bookmark">Adicionar favorito</string>
+    <string name="filters_not_found">Nenhum filtro encontrado</string>
+    <string name="bookmarks_sort_timestamp">Data/hora</string>
+    <string name="bookmarks_select_option">Selecionar favoritos</string>
+    <string name="bookmarks_delete_summary_singular">Este favorito será excluído. Essa ação não pode ser desfeita.</string>
+    <string name="bookmarks_delete_summary_plural">%d favoritos serão excluídos. Essa ação não pode ser desfeita.</string>
+    <string name="bookmarks_deleted_singular">1 favorito excluído</string>
+    <string name="bookmarks_deleted_plural">%1$d favoritos excluídos</string>
+    <string name="bookmarks_delete_singular">Excluir favorito</string>
+    <string name="bookmarks_delete_plural">Excluir favoritos</string>
+    <string name="deselect_all_below">Desmarcar tudo abaixo</string>
     <string name="deselect_all">Desmarcar todos</string>
+    <string name="deselect_all_above">Desmarcar tudo acima</string>
     <string name="edit">Editar</string>
     <string name="whats_new_autoplay_maybe_later_button">Talvez depois</string>
     <string name="whats_new_autoplay_enable_button">Ativar agora</string>
@@ -14,7 +42,6 @@ Language: pt_BR
     <string name="whats_new_autoplay_title">Chegou a reprodução automática</string>
     <string name="filters_download_limit_3">3 episódios</string>
     <string name="settings_title_headphone_controls">Controles do fone</string>
-    <string name="settings_headphone_controls_summary">Personaliza as ações dos controles de fone mais comuns.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Reproduz um som de confirmação após a criação de um favorito com seus fones de ouvido.</string>
     <string name="settings_headphone_controls_confirmation_sound">Som de confirmação de favorito</string>
     <string name="settings_headphone_controls_choice_skip_forward">Avançar</string>
@@ -28,8 +55,8 @@ Language: pt_BR
     <string name="bookmarks_not_found">Ainda sem favoritos</string>
     <string name="bookmarks_create_instructions">Você pode salvar a data/hora dos episódios pelo menu de ações do reprodutor ou configurando uma ação com seu headset.</string>
     <string name="bookmark_play">Reproduzir na posição %s do favorito</string>
-    <string name="bookmarks_plural">%s favoritos</string>
-    <string name="bookmarks_singular">%s favorito</string>
+    <string name="bookmarks_plural">%d favoritos</string>
+    <string name="bookmarks_singular">1 favorito</string>
     <string name="bookmarks">Favoritos</string>
     <string name="settings_autoplay">Reprodução automática</string>
     <string name="player_sleep_add_1_minute">+ 1 minuto</string>
@@ -90,7 +117,6 @@ Language: pt_BR
     <string name="log_in_with_email">Fazer login com o e-mail</string>
     <string name="log_in_on_phone">Fazer login no celular</string>
     <string name="log_in_with_google">Fazer login com o Google</string>
-    <string name="log_in_subtitle">Comece a escutar seus podcasts favoritos</string>
     <string name="onboarding_upgrade_no_subscriptions_found">Nenhuma assinatura encontrada.</string>
     <string name="trial_then_per_year">Experimente o %1$s (depois %2$s por ano)</string>
     <string name="trial_then_per_month">Experimente o %1$s (depois %2$s por mês)</string>
@@ -148,10 +174,8 @@ Language: pt_BR
     <string name="notifications_blocked_warning">As notificações estão bloqueadas. Você pode atualizar a permissão em Configurações.</string>
     <string name="settings_media_actions_show_subtitle">Mostre ações de mídia personalizadas nas notificações de mídia do Android 13 e no Android Auto.</string>
     <string name="settings_media_actions_show_title">Mostrar ações de mídia personalizadas</string>
-    <string name="settings_media_actions_customise">Personalizar ações de mídia</string>
     <string name="settings_media_actions_prioritize_subtitle">Suas principais ações ficarão disponíveis.</string>
     <string name="settings_media_actions_prioritize_title">Priorizar suas ações de mídia personalizadas</string>
-    <string name="plus_take_your_podcasting_to_next_level">Leve sua experiência de criação de podcasts para um outro nível com acesso exclusivo a funcionalidades e opções de personalização.</string>
     <string name="onboarding_recommendations_more">Mais %s</string>
     <string name="filter_id_or_title">Título ou ID do filtro</string>
     <string name="filter_title">Título do filtro</string>
@@ -210,7 +234,6 @@ Language: pt_BR
     <string name="onboarding_import_from_other_apps_step_1">Encontre a opção de exportação de outro aplicativo e exporte um arquivo OPML.</string>
     <string name="onboarding_can_import_from_opml">O Pocket Casts pode importar podcasts de arquivos OPML, então, se seu aplicativo atual puder exportar um arquivo OPML, siga estas etapas:</string>
     <string name="onboarding_import_from_castbox_open">Abra o Castbox…</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">Role para baixo e toque em \"Exportação OPML\".</string>
     <string name="onboarding_import_from_castbox_step_3">Toque em \"Configurações\".</string>
     <string name="onboarding_import_from_castbox_step_2">Toque na guia \"Pessoal\".</string>
@@ -397,7 +420,6 @@ Language: pt_BR
     <string name="podcasts_empty_folder_summary">Adicione podcasts à sua pasta e eles aparecerão aqui.</string>
     <string name="podcasts_empty_folder">Sua pasta está vazia</string>
     <string name="add_podcasts">Adicionar podcasts</string>
-    <string name="plus_folder_body">Crie pastas para organizar sua coleção de podcasts.</string>
     <string name="expand_details">Expandir detalhes</string>
     <string name="profile_help_support">Apoie o Pocket Casts fazendo upgrade da sua conta</string>
     <string name="error_check_your_internet_connection">Verifique sua conexão com a Internet.</string>
@@ -773,7 +795,6 @@ Language: pt_BR
     <string name="settings_notification_actions_title">Selecionar três ações</string>
     <string name="settings_notification_sound_summary">Som de notificação reproduzido.</string>
     <string name="settings_notification_sound">Som de notificação</string>
-    <string name="settings_notification_play_over_summary">Continuar reproduzindo mesmo quando outros aplicativos, como de notificações ou navegação, reproduzirem sons.</string>
     <string name="settings_notification_play_over">Sobrepor reprodução às notificações</string>
     <string name="settings_notification_notify_me">Avise-me</string>
     <string name="settings_notification_hide_on_pause">Ocultar notificação de reprodução ao pausar</string>
@@ -1153,7 +1174,6 @@ Language: pt_BR
     <string name="filters_create_filter_details">Detalhes do filtro</string>
     <string name="filters_create_filter_by">FILTRAR POR</string>
     <string name="filters_create_filter">Criar filtro</string>
-    <string name="filters_create_colour_icon">COR E ÍCONE</string>
     <string name="filters_create_add_more">Adicione mais critérios para refinar seu filtro.</string>
     <string name="filters_create">Criar</string>
     <string name="filters_chosen_singular">1 filtro escolhido</string>
@@ -1193,8 +1213,8 @@ Language: pt_BR
     <string name="supporter_bundle">PLANO</string>
     <string name="supporter">Apoiador</string>
     <string name="episode_sort_short_to_long">Mais curto para o mais longo</string>
-    <string name="episode_sort_oldest_to_newest">Mais antigo para mais recente</string>
-    <string name="episode_sort_newest_to_oldest">Mais recente para mais antigo</string>
+    <string name="sort_oldest_to_newest">Mais antigo a mais recente</string>
+    <string name="sort_newest_to_oldest">Mais recente a mais antigo</string>
     <string name="episode_sort_long_to_short">Mais longo para o mais curto</string>
     <string name="episode_row_waiting_for_wifi">Aguardando rede Wi-Fi</string>
     <string name="episode_row_waiting_for_power">Aguardando energia</string>

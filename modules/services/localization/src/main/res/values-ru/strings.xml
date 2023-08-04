@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 15:54:03+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="bookmark">Закладка</string>
+    <string name="details">Подробнее</string>
+    <string name="episode">Выпуск</string>
+    <string name="bookmarks_search">Искать закладку</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts будет периодически синхронизировать учетную запись в фоновом режиме.</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts будет синхронизировать учетную запись, только когда приложение открыто.</string>
+    <string name="settings_notification_play_over_always">Всегда</string>
+    <string name="settings_notification_play_over_duck">Приглушать</string>
+    <string name="settings_notification_play_over_never">Никогда</string>
+    <string name="skipping_to">Переход к %s</string>
+    <string name="playing_bookmark">Воспроизведение «%s»</string>
+    <string name="save_bookmark">Сохранить закладку</string>
+    <string name="add_bookmark_title_hint">Добавьте название, чтобы отличать эту закладку от других</string>
+    <string name="change_title">Изменить название</string>
+    <string name="bookmark_added">Закладка «%s» добавлена</string>
+    <string name="add_bookmark_title">Добавление закладки</string>
+    <string name="add_bookmark">Добавить закладку</string>
+    <string name="filters_not_found">Фильтры не найдены</string>
+    <string name="bookmarks_sort_timestamp">Отметка времени</string>
+    <string name="bookmarks_select_option">Выбрать закладки</string>
+    <string name="bookmarks_delete_summary_singular">Закладка будет удалена. Это действие нельзя отменить.</string>
+    <string name="bookmarks_delete_summary_plural">Закладки (%d) будут удалены. Это действие нельзя отменить.</string>
+    <string name="bookmarks_deleted_singular">1 закладка удалена</string>
+    <string name="bookmarks_deleted_plural">Закладок удалено: %1$d</string>
+    <string name="bookmarks_delete_singular">Удалить закладку</string>
+    <string name="bookmarks_delete_plural">Удалить закладки</string>
+    <string name="deselect_all_below">Отменить выбор всех ниже</string>
     <string name="deselect_all">Снять выделение</string>
+    <string name="deselect_all_above">Отменить выбор всех выше</string>
     <string name="edit">Править</string>
     <string name="whats_new_autoplay_maybe_later_button">Возможно, позже</string>
     <string name="whats_new_autoplay_enable_button">Включить</string>
@@ -14,7 +42,6 @@ Language: ru
     <string name="whats_new_autoplay_title">А вот и автовоспроизведение!</string>
     <string name="filters_download_limit_3">3 выпуска</string>
     <string name="settings_title_headphone_controls">Элементы управления наушников</string>
-    <string name="settings_headphone_controls_summary">Настройте действия для основных элементов управления наушников.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Звук подтверждения при создании закладки с помощью наушников.</string>
     <string name="settings_headphone_controls_confirmation_sound">Звук добавления в закладки</string>
     <string name="settings_headphone_controls_choice_skip_forward">Перейти дальше</string>
@@ -28,8 +55,8 @@ Language: ru
     <string name="bookmarks_not_found">Пока нет закладок.</string>
     <string name="bookmarks_create_instructions">Вы можете сохранять отметки времени выпусков, используя меню действий проигрывателя или настроив действие с наушниками.</string>
     <string name="bookmark_play">Воспроизвести с закладки %s</string>
-    <string name="bookmarks_plural">Закладки: %s</string>
-    <string name="bookmarks_singular">%s закладка</string>
+    <string name="bookmarks_plural">Закладки: %d</string>
+    <string name="bookmarks_singular">1  закладка</string>
     <string name="bookmarks">Закладки</string>
     <string name="settings_autoplay">Автовоспроизведение</string>
     <string name="player_sleep_add_1_minute">+ 1 минута</string>
@@ -90,7 +117,6 @@ Language: ru
     <string name="log_in_with_email">Войти с помощью эл. почты</string>
     <string name="log_in_on_phone">Войти на телефоне</string>
     <string name="log_in_with_google">Войти через Google</string>
-    <string name="log_in_subtitle">Начните слушать любимые подкасты</string>
     <string name="onboarding_upgrade_no_subscriptions_found">Подписки не найдены.</string>
     <string name="trial_then_per_year">Попробуйте %1$s, затем %2$s в год</string>
     <string name="trial_then_per_month">Попробуйте %1$s, затем %2$s в месяц</string>
@@ -148,10 +174,8 @@ Language: ru
     <string name="notifications_blocked_warning">Уведомления заблокированы. Вы можете изменить разрешение в настройках.</string>
     <string name="settings_media_actions_show_subtitle">Отображение пользовательских действий с медиафайлами в соответствующих уведомлениях в Android 13 и Android Auto.</string>
     <string name="settings_media_actions_show_title">Показывать пользовательские действия с медиафайлами</string>
-    <string name="settings_media_actions_customise">Настроить действия с медиафайлами</string>
     <string name="settings_media_actions_prioritize_subtitle">Будут отображаться основные действия.</string>
     <string name="settings_media_actions_prioritize_title">Расставьте действия с медиафайлами в приоритетном порядке</string>
-    <string name="plus_take_your_podcasting_to_next_level">Получите доступ к эксклюзивным функциям и опциям настройки и выйдите на новый уровень прослушивания подкастов.</string>
     <string name="onboarding_recommendations_more">Другие %s</string>
     <string name="filter_id_or_title">ID или название фильтра</string>
     <string name="filter_title">Название фильтра</string>
@@ -210,7 +234,6 @@ Language: ru
     <string name="onboarding_import_from_other_apps_step_1">Найдите параметр экспорта в другом приложении и экспортируйте файл OPML.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts может импортировать подкасты из файлов OPML. Если ваше приложение поддерживает экспорт файлов OPML, выполните следующие действия:</string>
     <string name="onboarding_import_from_castbox_open">Откройте Castbox…</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">Прокрутите вниз до пункта \"Экспорт OPML\" и нажмите его.</string>
     <string name="onboarding_import_from_castbox_step_3">Нажмите \"Настройки\".</string>
     <string name="onboarding_import_from_castbox_step_2">Нажмите вкладку \"Личное\".</string>
@@ -397,7 +420,6 @@ Language: ru
     <string name="podcasts_empty_folder_summary">Добавляйте подкасты в папку, и они будут отображаться здесь.</string>
     <string name="podcasts_empty_folder">В папке нет файлов</string>
     <string name="add_podcasts">Добавить подкасты</string>
-    <string name="plus_folder_body">Создавайте папки для подкастов, чтобы навести порядок в своей коллекции.</string>
     <string name="expand_details">Развернуть сведения</string>
     <string name="profile_help_support">Поддержите Pocket Casts, перейдя на платную версию учётной записи</string>
     <string name="error_check_your_internet_connection">Проверьте подключение к Интернету.</string>
@@ -773,7 +795,6 @@ Language: ru
     <string name="settings_notification_actions_title">Выбрать три действия</string>
     <string name="settings_notification_sound_summary">Включается звук уведомления.</string>
     <string name="settings_notification_sound">Звук уведомления</string>
-    <string name="settings_notification_play_over_summary">Воспроизведение продолжается, даже когда другие приложения, например уведомления или навигация, воспроизводят звуки.</string>
     <string name="settings_notification_play_over">Воспроизводить другие уведомления</string>
     <string name="settings_notification_notify_me">Уведомить меня</string>
     <string name="settings_notification_hide_on_pause">Скрыть уведомление о воспроизведении во время паузы</string>
@@ -1153,7 +1174,6 @@ Language: ru
     <string name="filters_create_filter_details">Сведения о фильтре</string>
     <string name="filters_create_filter_by">ФИЛЬТРОВАТЬ ПО</string>
     <string name="filters_create_filter">Создать фильтр</string>
-    <string name="filters_create_colour_icon">ЦВЕТ И ЗНАЧОК</string>
     <string name="filters_create_add_more">Добавьте дополнительные условия, чтобы уточнить фильтр.</string>
     <string name="filters_create">Создать</string>
     <string name="filters_chosen_singular">Выбран 1 фильтр</string>
@@ -1193,8 +1213,8 @@ Language: ru
     <string name="supporter_bundle">ПАКЕТ</string>
     <string name="supporter">Спонсор</string>
     <string name="episode_sort_short_to_long">От коротких к длинным</string>
-    <string name="episode_sort_oldest_to_newest">От старых к новым</string>
-    <string name="episode_sort_newest_to_oldest">От новых к старым</string>
+    <string name="sort_oldest_to_newest">От старых к новым</string>
+    <string name="sort_newest_to_oldest">От новых к старым</string>
     <string name="episode_sort_long_to_short">От длинных к коротким</string>
     <string name="episode_row_waiting_for_wifi">В ожидании WiFi</string>
     <string name="episode_row_waiting_for_power">В ожидании сигнала</string>
