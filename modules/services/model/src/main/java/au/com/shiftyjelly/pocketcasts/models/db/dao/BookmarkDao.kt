@@ -101,4 +101,12 @@ abstract class BookmarkDao {
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
+
+    @Query(
+        """SELECT *
+            FROM bookmarks
+            JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
+            AND deleted = :deleted"""
+    )
+    abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 }
