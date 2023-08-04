@@ -26,6 +26,14 @@
         app:srcCompat="@drawable/ic_downloaded"
         app:tint="?attr/support_02" />
 
+    <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+        android:id="@+id/imgCloud"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        app:gradient="gradient_1"
+        android:layout_marginEnd="4dp" />
+
     <ImageView
         android:id="@+id/imgBookmark"
         android:layout_width="16dp"
@@ -35,14 +43,6 @@
         android:layout_gravity="center"
         android:layout_marginEnd="4dp"
         app:tint="?attr/support_05" />
-
-    <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
-        android:id="@+id/imgCloud"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="center"
-        app:gradient="gradient_1"
-        android:layout_marginEnd="4dp" />
 
     <au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
         android:id="@+id/progressCircle"
