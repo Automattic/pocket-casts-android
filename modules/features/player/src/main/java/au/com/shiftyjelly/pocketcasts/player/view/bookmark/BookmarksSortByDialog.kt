@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.player.view
+package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import android.content.Context
 import androidx.fragment.app.FragmentManager
