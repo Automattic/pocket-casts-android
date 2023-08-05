@@ -11,6 +11,8 @@
         ([#1204](https://github.com/Automattic/pocket-casts-android/pull/1204))
     *   Fixed watch background refresh description to not reference auto downloads
         ([#1212](https://github.com/Automattic/pocket-casts-android/pull/1212))
+    *   Fixed bug where the Add File toolbar would disappear on orientation change
+        ([#1235](https://github.com/Automattic/pocket-casts-android/pull/1235))
 
 7.44
 -----
