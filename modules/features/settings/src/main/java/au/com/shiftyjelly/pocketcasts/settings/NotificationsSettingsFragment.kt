@@ -33,8 +33,6 @@ import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -170,9 +168,6 @@ class NotificationsSettingsFragment :
                         mapOf("enabled" to checked)
                     )
 
-                    podcastManager.updateAllShowNotificationsRx(checked)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io()).onErrorComplete().subscribe()
                     if (checked) {
                         settings.setNotificationLastSeenToNow()
                     }
