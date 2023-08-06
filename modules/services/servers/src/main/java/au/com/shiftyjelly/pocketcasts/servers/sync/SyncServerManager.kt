@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
-import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerProtobufRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
@@ -49,7 +48,6 @@ import javax.inject.Singleton
 @Singleton
 open class SyncServerManager @Inject constructor(
     @SyncServerRetrofit retrofit: Retrofit,
-    @SyncServerProtobufRetrofit retrofitProtobuf: Retrofit,
     val settings: Settings,
     @SyncServerCache val cache: Cache,
 ) {
@@ -59,7 +57,6 @@ open class SyncServerManager @Inject constructor(
     }
 
     private val server: SyncServer = retrofit.create(SyncServer::class.java)
-    private val serverProtobuf: SyncServerProtobuf = retrofitProtobuf.create(SyncServerProtobuf::class.java)
 
     suspend fun register(email: String, password: String): LoginTokenResponse {
         val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
@@ -165,7 +162,7 @@ open class SyncServerManager @Inject constructor(
             .map { response -> response.filters?.mapNotNull { it.toFilter() } ?: emptyList() }
 
     suspend fun getBookmarks(token: AccessToken): List<Bookmark> {
-        return serverProtobuf.getBookmarkList(addBearer(token), bookmarkRequest {}).bookmarksList.map { it.toBookmark() }
+        return server.getBookmarkList(addBearer(token), bookmarkRequest {}).bookmarksList.map { it.toBookmark() }
     }
 
     fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> =

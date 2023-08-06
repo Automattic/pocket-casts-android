@@ -111,6 +111,7 @@ class ServersModule {
 
         fun provideRetrofit(baseUrl: String, okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
             return Retrofit.Builder()
+                .addConverterFactory(ProtoConverterFactory.create())
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(baseUrl)
@@ -267,18 +268,6 @@ class ServersModule {
     }
 
     @Provides
-    @SyncServerProtobufRetrofit
-    @Singleton
-    internal fun provideSyncApiProtobufRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(Settings.SERVER_API_URL)
-            .addConverterFactory(ProtoConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(okHttpClient)
-            .build()
-    }
-
-    @Provides
     @WpComServerRetrofit
     @Singleton
     internal fun provideWpComApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
@@ -412,10 +401,6 @@ annotation class ListUploadServerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SyncServerRetrofit
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class SyncServerProtobufRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
