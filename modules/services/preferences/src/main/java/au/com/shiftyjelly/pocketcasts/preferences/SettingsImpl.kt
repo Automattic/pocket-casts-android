@@ -561,7 +561,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        setDeleteCloudFileAfterPlaying(false)
+        deleteCloudFileAfterPlaying.set(false)
         setCloudAutoUpload(false)
         setCloudAutoDownload(false)
         setCloudOnlyWifi(false)
@@ -1095,21 +1095,22 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getDeleteLocalFileAfterPlaying(): Boolean {
-        return getBoolean("cloudDeleteAfterPlaying", false)
-    }
+    override val deleteLocalFileAfterPlaying = UserSetting.BoolPref(
+        sharedPrefKey = "deleteLocalFileAfterPlaying",
+        defaultValue =
+        // Use value stored under previous key if it exists
+        getBoolean("cloudDeleteAfterPlaying", false),
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setDeleteLocalFileAfterPlaying(value: Boolean) {
-        setBoolean("cloudDeleteAfterPlaying", value)
-    }
+    override val deleteCloudFileAfterPlaying = UserSetting.BoolPref(
+        sharedPrefKey = "deleteCloudFileAfterPlaying",
+        defaultValue =
+        // Use value stored under previous key if it exists
+        sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
+        sharedPrefs = sharedPreferences,
 
-    override fun getDeleteCloudFileAfterPlaying(): Boolean {
-        return getBoolean("cloudDeleteCloudAfterPlaying", false)
-    }
-
-    override fun setDeleteCloudFileAfterPlaying(value: Boolean) {
-        setBoolean("cloudDeleteCloudAfterPlaying", value)
-    }
+    )
 
     override fun getCloudAutoUpload(): Boolean {
         return getBoolean("cloudAutoUpload", false)

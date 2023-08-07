@@ -91,13 +91,13 @@ class CloudSettingsFragment : BaseFragment() {
             }
         }
         with(binding.swtDeleteLocalFileAfterPlaying) {
-            isChecked = settings.getDeleteLocalFileAfterPlaying()
+            isChecked = settings.deleteLocalFileAfterPlaying.flow.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setDeleteLocalFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtDeleteCloudFileAfterPlaying) {
-            isChecked = settings.getDeleteCloudFileAfterPlaying()
+            isChecked = settings.deleteCloudFileAfterPlaying.flow.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setDeleteCloudFileAfterPlaying(isChecked)
             }

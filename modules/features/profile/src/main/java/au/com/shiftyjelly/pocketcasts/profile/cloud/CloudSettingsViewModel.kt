@@ -41,7 +41,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setDeleteLocalFileAfterPlaying(enabled: Boolean) {
-        settings.setDeleteLocalFileAfterPlaying(enabled)
+        settings.deleteLocalFileAfterPlaying.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED,
             mapOf("enabled" to enabled)
@@ -49,7 +49,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setDeleteCloudFileAfterPlaying(enabled: Boolean) {
-        settings.setDeleteCloudFileAfterPlaying(enabled)
+        settings.deleteCloudFileAfterPlaying.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED,
             mapOf("enabled" to enabled)
