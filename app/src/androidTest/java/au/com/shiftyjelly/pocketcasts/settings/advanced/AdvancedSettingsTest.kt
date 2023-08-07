@@ -30,9 +30,9 @@ class AdvancedSettingsTest {
 
         // Non-advanced settings
         assertEquals(false, settings.warnOnMeteredNetwork())
-        assertEquals(true, settings.isPodcastAutoDownloadUnmeteredOnly())
-        assertEquals(false, settings.isPodcastAutoDownloadPowerOnly())
-        assertEquals(false, settings.isUpNextAutoDownloaded())
+        assertEquals(true, settings.autoDownloadUnmeteredOnly.flow.value)
+        assertEquals(false, settings.autoDownloadOnlyWhenCharging.flow.value)
+        assertEquals(false, settings.autoDownloadUpNext.flow.value)
         assertEquals(true, settings.refreshPodcastsAutomatically())
 
         // Advanced settings

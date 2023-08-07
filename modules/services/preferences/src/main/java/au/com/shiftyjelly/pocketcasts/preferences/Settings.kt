@@ -84,8 +84,6 @@ interface Settings {
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
-        const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED = "autoDownloadOnlyDownloadOnWifi"
-        const val PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING = "autoDownloadOnlyDownloadWhenCharging"
         const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
         const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
@@ -315,10 +313,9 @@ interface Settings {
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
 
-    fun isPodcastAutoDownloadUnmeteredOnly(): Boolean
-    fun isPodcastAutoDownloadPowerOnly(): Boolean
-    fun isUpNextAutoDownloaded(): Boolean
-    fun setUpNextAutoDownloaded(autoDownload: Boolean)
+    val autoDownloadUnmeteredOnly: UserSetting<Boolean>
+    val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
+    val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
 

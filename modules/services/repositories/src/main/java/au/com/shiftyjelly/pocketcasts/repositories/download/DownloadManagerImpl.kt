@@ -486,8 +486,8 @@ class DownloadManagerImpl @Inject constructor(
 
         val networkRequirements = NetworkRequirements.mostStringent()
 
-        networkRequirements.requiresUnmetered = settings.isPodcastAutoDownloadUnmeteredOnly()
-        networkRequirements.requiresPower = settings.isPodcastAutoDownloadPowerOnly()
+        networkRequirements.requiresUnmetered = settings.autoDownloadUnmeteredOnly.flow.value
+        networkRequirements.requiresPower = settings.autoDownloadOnlyWhenCharging.flow.value
 
         return networkRequirements
     }
