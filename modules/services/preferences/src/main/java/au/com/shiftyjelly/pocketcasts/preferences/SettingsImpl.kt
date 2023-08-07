@@ -24,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -961,19 +963,33 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAutoArchiveIncludeStarred(): Boolean {
-        return getBoolean(Settings.AUTO_ARCHIVE_INCLUDE_STARRED, false)
-    }
+    override val autoArchiveIncludeStarred = UserSetting.BoolPref(
+        sharedPrefKey = Settings.AUTO_ARCHIVE_INCLUDE_STARRED,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getAutoArchiveAfterPlaying(): Settings.AutoArchiveAfterPlaying {
-        val value = getString(Settings.AUTO_ARCHIVE_PLAYED_EPISODES_AFTER, null)
-        return Settings.AutoArchiveAfterPlaying.fromString(context, value)
-    }
+    override val autoArchiveAfterPlaying = UserSetting.PrefFromInt(
+        sharedPrefKey = "autoArchivePlayedEpisodesIndex",
+        defaultValue = getString("autoArchivePlayedEpisodes")?.let {
+            // Use the old String setting if it exists before falling back to the default value
+            AutoArchiveAfterPlayingSetting.fromString(it, context)
+        } ?: AutoArchiveAfterPlayingSetting.defaultValue(context),
+        sharedPrefs = sharedPreferences,
+        fromInt = { AutoArchiveAfterPlayingSetting.fromIndex(it) },
+        toInt = { it.toIndex() },
+    )
 
-    override fun getAutoArchiveInactive(): Settings.AutoArchiveInactive {
-        val value = getString(Settings.AUTO_ARCHIVE_INACTIVE, null)
-        return Settings.AutoArchiveInactive.fromString(context, value)
-    }
+    override val autoArchiveInactive = UserSetting.PrefFromInt(
+        sharedPrefKey = "autoArchiveInactiveIndex",
+        defaultValue = getString("autoArchiveInactiveEpisodes")?.let {
+            // Use the old String setting if it exists before falling back to the default value
+            AutoArchiveInactiveSetting.fromString(it, context)
+        } ?: AutoArchiveInactiveSetting.default,
+        sharedPrefs = sharedPreferences,
+        fromInt = { AutoArchiveInactiveSetting.fromIndex(it) },
+        toInt = { it.toIndex() },
+    )
 
     override fun getCustomStorageLimitGb(): Long {
         return getRemoteConfigLong(FirebaseConfig.CLOUD_STORAGE_LIMIT)

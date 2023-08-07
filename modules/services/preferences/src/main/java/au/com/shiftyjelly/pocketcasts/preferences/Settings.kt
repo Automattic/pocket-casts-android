@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
-import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
@@ -14,11 +13,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
@@ -112,8 +112,6 @@ interface Settings {
 
         const val AUTO_ARCHIVE_EXCLUDED_PODCASTS = "autoArchiveExcludedPodcasts"
         const val AUTO_ARCHIVE_INCLUDE_STARRED = "autoArchiveIncludeStarred"
-        const val AUTO_ARCHIVE_PLAYED_EPISODES_AFTER = "autoArchivePlayedEpisodes"
-        const val AUTO_ARCHIVE_INACTIVE = "autoArchiveInactiveEpisodes"
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
@@ -186,37 +184,6 @@ interface Settings {
         PREVIOUS_CHAPTER,
     }
 
-    sealed class AutoArchiveAfterPlaying(val timeSeconds: Int) {
-        companion object {
-            fun fromString(context: Context, value: String?): AutoArchiveAfterPlaying {
-                val isAutomotive = Util.isAutomotive(context)
-                val defaultValue = if (isAutomotive) Never else AfterPlaying
-
-                return when (value) {
-                    context.getString(LR.string.settings_auto_archive_played_never) -> Never
-                    context.getString(LR.string.settings_auto_archive_played_after_playing) -> AfterPlaying
-                    context.getString(LR.string.settings_auto_archive_played_after_24_hours) -> Hours24
-                    context.getString(LR.string.settings_auto_archive_played_after_2_days) -> Days2
-                    context.getString(LR.string.settings_auto_archive_played_after_1_week) -> Weeks1
-                    else -> defaultValue
-                }
-            }
-
-            val options
-                get() = listOf(Never, AfterPlaying, Hours24, Days2, Weeks1)
-
-            fun fromIndex(index: Int) = options[index]
-        }
-
-        object Never : AutoArchiveAfterPlaying(-1)
-        object AfterPlaying : AutoArchiveAfterPlaying(0)
-        object Hours24 : AutoArchiveAfterPlaying(24 * 60 * 60)
-        object Days2 : AutoArchiveAfterPlaying(2 * 24 * 60 * 60)
-        object Weeks1 : AutoArchiveAfterPlaying(7 * 24 * 60 * 60)
-
-        fun toIndex(): Int = options.indexOf(this)
-    }
-
     sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
 
         companion object {
@@ -246,38 +213,6 @@ interface Settings {
         object PlaybackSpeed : MediaNotificationControls(LR.string.playback_speed, IR.drawable.auto_1x, PLAYBACK_SPEED_KEY)
 
         object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
-    }
-
-    sealed class AutoArchiveInactive(val timeSeconds: Int) {
-        object Never : AutoArchiveInactive(-1)
-        object Hours24 : AutoArchiveInactive(24 * 60 * 60)
-        object Days2 : AutoArchiveInactive(2 * 24 * 60 * 60)
-        object Weeks1 : AutoArchiveInactive(7 * 24 * 60 * 60)
-        object Weeks2 : AutoArchiveInactive(14 * 24 * 60 * 60)
-        object Days30 : AutoArchiveInactive(30 * 24 * 60 * 60)
-        object Days90 : AutoArchiveInactive(90 * 24 * 60 * 60)
-
-        companion object {
-            fun fromString(context: Context, value: String?): AutoArchiveInactive {
-                return when (value) {
-                    context.getString(LR.string.settings_auto_archive_inactive_never) -> Never
-                    context.getString(LR.string.settings_auto_archive_inactive_24_hours) -> Hours24
-                    context.getString(LR.string.settings_auto_archive_inactive_2_days) -> Days2
-                    context.getString(LR.string.settings_auto_archive_inactive_1_week) -> Weeks1
-                    context.getString(LR.string.settings_auto_archive_inactive_2_weeks) -> Weeks2
-                    context.getString(LR.string.settings_auto_archive_inactive_30_days) -> Days30
-                    context.getString(LR.string.settings_auto_archive_inactive_3_months) -> Days90
-                    else -> Never
-                }
-            }
-
-            val options
-                get() = listOf(Never, Hours24, Days2, Weeks1, Weeks2, Days30, Days90)
-
-            fun fromIndex(index: Int) = options[index]
-        }
-
-        fun toIndex(): Int = options.indexOf(this)
     }
 
     val podcastLayoutObservable: Observable<Int>
@@ -444,9 +379,9 @@ interface Settings {
 
     fun getAutoArchiveExcludedPodcasts(): List<String>
     fun setAutoArchiveExcludedPodcasts(excluded: List<String>)
-    fun getAutoArchiveIncludeStarred(): Boolean
-    fun getAutoArchiveAfterPlaying(): AutoArchiveAfterPlaying
-    fun getAutoArchiveInactive(): AutoArchiveInactive
+    val autoArchiveIncludeStarred: UserSetting<Boolean>
+    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
+    val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
 
     fun selectedFilter(): String?
     fun setSelectedFilter(filterUUID: String?)
