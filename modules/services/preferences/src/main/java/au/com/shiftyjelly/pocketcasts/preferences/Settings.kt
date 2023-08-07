@@ -417,8 +417,7 @@ interface Settings {
     val deleteLocalFileAfterPlaying: UserSetting<Boolean>
     val deleteCloudFileAfterPlaying: UserSetting<Boolean>
     val cloudAutoUpload: UserSetting<Boolean>
-    fun getCloudAutoDownload(): Boolean
-    fun setCloudAutoDownload(value: Boolean)
+    val cloudAutoDownload: UserSetting<Boolean>
     fun getCachedSubscription(): SubscriptionStatus?
     fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
     fun getCloudOnlyWifi(): Boolean

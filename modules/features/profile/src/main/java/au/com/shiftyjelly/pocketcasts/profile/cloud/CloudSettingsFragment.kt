@@ -109,7 +109,7 @@ class CloudSettingsFragment : BaseFragment() {
             }
         }
         with(binding.swtAutoDownloadFromCloud) {
-            isChecked = settings.getCloudAutoDownload()
+            isChecked = settings.cloudAutoDownload.flow.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCloudAutoDownload(isChecked)
             }
