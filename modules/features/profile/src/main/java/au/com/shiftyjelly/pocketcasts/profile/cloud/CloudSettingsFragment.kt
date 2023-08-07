@@ -103,7 +103,7 @@ class CloudSettingsFragment : BaseFragment() {
             }
         }
         with(binding.swtAutoUploadToCloud) {
-            isChecked = settings.getCloudAutoUpload()
+            isChecked = settings.cloudAutoUpload.flow.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCloudAutoUpload(isChecked)
             }

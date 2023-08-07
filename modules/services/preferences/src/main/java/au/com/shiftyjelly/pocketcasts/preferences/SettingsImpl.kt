@@ -562,7 +562,7 @@ class SettingsImpl @Inject constructor(
 
     override fun clearPlusPreferences() {
         deleteCloudFileAfterPlaying.set(false)
-        setCloudAutoUpload(false)
+        cloudAutoUpload.set(false)
         setCloudAutoDownload(false)
         setCloudOnlyWifi(false)
         setCancelledAcknowledged(false)
@@ -1112,13 +1112,11 @@ class SettingsImpl @Inject constructor(
 
     )
 
-    override fun getCloudAutoUpload(): Boolean {
-        return getBoolean("cloudAutoUpload", false)
-    }
-
-    override fun setCloudAutoUpload(value: Boolean) {
-        setBoolean("cloudAutoUpload", value)
-    }
+    override val cloudAutoUpload = UserSetting.BoolPref(
+        sharedPrefKey = "cloudAutoUpload",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getCloudAutoDownload(): Boolean {
         return getBoolean("cloudAutoDownload", false)

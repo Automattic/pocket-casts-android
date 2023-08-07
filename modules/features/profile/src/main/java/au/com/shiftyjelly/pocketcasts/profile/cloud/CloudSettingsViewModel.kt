@@ -57,7 +57,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setCloudAutoUpload(enabled: Boolean) {
-        settings.setCloudAutoUpload(enabled)
+        settings.cloudAutoUpload.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_UPLOAD_TO_CLOUD_TOGGLED,
             mapOf("enabled" to enabled)
