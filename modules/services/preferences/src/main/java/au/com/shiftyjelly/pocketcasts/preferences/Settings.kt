@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
@@ -171,11 +172,6 @@ interface Settings {
         LONG_SHORT
     }
 
-    enum class AutoAddUpNextLimitBehaviour {
-        STOP_ADDING,
-        ONLY_ADD_TO_TOP
-    }
-
     enum class HeadphoneAction {
         ADD_BOOKMARK,
         SKIP_BACK,
@@ -225,8 +221,6 @@ interface Settings {
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
-    val autoAddUpNextLimitBehaviour: Observable<AutoAddUpNextLimitBehaviour>
-    val autoAddUpNextLimit: Observable<Int>
 
     val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
     val headphoneNextActionFlow: StateFlow<HeadphoneAction>
@@ -471,10 +465,8 @@ interface Settings {
     fun setLastPausedAt(pausedAt: Int)
     fun getLastPausedAt(): Int?
     val intelligentPlaybackResumption: UserSetting<Boolean>
-    fun getAutoAddUpNextLimit(): Int
-    fun setAutoAddUpNextLimit(limit: Int)
-    fun setAutoAddUpNextLimitBehaviour(value: AutoAddUpNextLimitBehaviour)
-    fun getAutoAddUpNextLimitBehaviour(): AutoAddUpNextLimitBehaviour
+    val autoAddUpNextLimit: UserSetting<Int>
+    val autoAddUpNextLimitBehaviour: UserSetting<AutoAddUpNextLimitBehaviour>
     fun getMaxUpNextEpisodes(): Int
     fun getUniqueDeviceId(): String
     fun setHomeGridNeedsRefresh(value: Boolean)

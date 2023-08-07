@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
@@ -86,8 +87,6 @@ class SettingsImpl @Inject constructor(
     override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
-    override val autoAddUpNextLimitBehaviour = BehaviorRelay.create<Settings.AutoAddUpNextLimitBehaviour>().apply { accept(getAutoAddUpNextLimitBehaviour()) }
-    override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
@@ -1236,27 +1235,28 @@ class SettingsImpl @Inject constructor(
         setBoolean("upnext_tour_shown", value)
     }
 
-    override fun getAutoAddUpNextLimit(): Int {
-        return getInt("auto_add_up_next_limit", DEFAULT_MAX_AUTO_ADD_LIMIT)
-    }
+    override val autoAddUpNextLimit = UserSetting.IntPref(
+        sharedPrefKey = "auto_add_up_next_limit",
+        defaultValue = DEFAULT_MAX_AUTO_ADD_LIMIT,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setAutoAddUpNextLimit(limit: Int) {
-        setInt("auto_add_up_next_limit", limit)
-        autoAddUpNextLimit.accept(limit)
-    }
-
-    override fun setAutoAddUpNextLimitBehaviour(value: Settings.AutoAddUpNextLimitBehaviour) {
-        setInt("auto_add_up_next_limit_reached", value.ordinal)
-        autoAddUpNextLimitBehaviour.accept(value)
-    }
-
-    override fun getAutoAddUpNextLimitBehaviour(): Settings.AutoAddUpNextLimitBehaviour {
-        val index = getInt("auto_add_up_next_limit_reached", 0)
-        return Settings.AutoAddUpNextLimitBehaviour.values().getOrNull(index) ?: Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING
+    override val autoAddUpNextLimitBehaviour = run {
+        val default = AutoAddUpNextLimitBehaviour.STOP_ADDING
+        UserSetting.PrefFromInt<AutoAddUpNextLimitBehaviour>(
+            sharedPrefKey = "auto_add_up_next_limit_reached",
+            defaultValue = default,
+            sharedPrefs = sharedPreferences,
+            fromInt = {
+                AutoAddUpNextLimitBehaviour.values().getOrNull(it)
+                    ?: default
+            },
+            toInt = { it.ordinal }
+        )
     }
 
     override fun getMaxUpNextEpisodes(): Int {
-        return max(DEFAULT_MAX_AUTO_ADD_LIMIT, getAutoAddUpNextLimit())
+        return max(DEFAULT_MAX_AUTO_ADD_LIMIT, autoAddUpNextLimit.flow.value)
     }
 
     private fun setStringList(key: String, array: List<String>) {
