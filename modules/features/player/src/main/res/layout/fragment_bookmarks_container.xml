@@ -32,7 +32,7 @@
             app:layout_constraintTop_toTopOf="@id/btnClose"
             app:layout_constraintBottom_toBottomOf="@id/btnClose"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textColor="?attr/primary_text_02" />
+            android:textColor="?attr/secondary_text_01" />
 
         <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
             android:id="@+id/multiSelectToolbar"
