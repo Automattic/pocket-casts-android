@@ -335,7 +335,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     fun download(episode: UserEpisode, isOnWifi: Boolean) {
         viewModel.trackOptionTapped(DOWNLOAD)
-        if (settings.warnOnMeteredNetwork() && !isOnWifi) {
+        if (settings.warnOnMeteredNetwork.flow.value && !isOnWifi) {
             warningsHelper.downloadWarning(episodeUUID, "user episode sheet")
                 .show(parentFragmentManager, "download_warning")
         } else {
@@ -345,7 +345,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun upload(episode: UserEpisode, isOnWifi: Boolean) {
         viewModel.trackOptionTapped(UPLOAD)
-        if (settings.warnOnMeteredNetwork() && !isOnWifi) {
+        if (settings.warnOnMeteredNetwork.flow.value && !isOnWifi) {
             warningsHelper.uploadWarning(episodeUUID, source = SourceView.FILES)
                 .show(parentFragmentManager, "upload_warning")
         } else {

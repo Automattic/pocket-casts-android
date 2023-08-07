@@ -333,7 +333,7 @@ class Support @Inject constructor(
             output.append("  Restrict Background Status: ").append(Network.getRestrictBackgroundStatusString(context)).append(eol)
             output.append(eol)
 
-            output.append("Warning when not on Wifi? ").append(yesNoString(settings.warnOnMeteredNetwork())).append(eol)
+            output.append("Warning when not on Wifi? ").append(yesNoString(settings.warnOnMeteredNetwork.flow.value)).append(eol)
             output.append(eol)
 
             output.append("Work Manager Tasks").append(eol)

@@ -426,13 +426,11 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
-    override fun warnOnMeteredNetwork(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI, false)
-    }
-
-    override fun setWarnOnMeteredNetwork(warn: Boolean) {
-        setBoolean(Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI, warn)
-    }
+    override val warnOnMeteredNetwork = UserSetting.BoolPref(
+        sharedPrefKey = Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getPopularPodcastCountryCode(): String {
         return sharedPreferences.getString(Settings.PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE, "") ?: ""

@@ -285,8 +285,7 @@ interface Settings {
     fun getDiscoveryCountryCode(): String
     fun setDiscoveryCountryCode(code: String)
 
-    fun warnOnMeteredNetwork(): Boolean
-    fun setWarnOnMeteredNetwork(warn: Boolean)
+    val warnOnMeteredNetwork: UserSetting<Boolean>
 
     fun getPopularPodcastCountryCode(): String
 

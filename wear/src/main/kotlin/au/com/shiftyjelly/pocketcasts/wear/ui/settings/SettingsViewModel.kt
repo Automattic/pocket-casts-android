@@ -37,7 +37,7 @@ class SettingsViewModel @Inject constructor(
         State(
             refreshState = null,
             signInState = userManager.getSignInState().blockingFirst(),
-            showDataWarning = settings.warnOnMeteredNetwork(),
+            showDataWarning = settings.warnOnMeteredNetwork.flow.value,
             refreshInBackground = settings.refreshPodcastsAutomatically(),
         )
     )
@@ -62,7 +62,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setWarnOnMeteredNetwork(warnOnMeteredNetwork: Boolean) {
-        settings.setWarnOnMeteredNetwork(warnOnMeteredNetwork)
+        settings.warnOnMeteredNetwork.set(warnOnMeteredNetwork)
         _state.update { it.copy(showDataWarning = warnOnMeteredNetwork) }
     }
 

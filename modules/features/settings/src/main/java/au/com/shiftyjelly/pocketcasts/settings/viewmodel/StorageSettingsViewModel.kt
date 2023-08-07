@@ -136,7 +136,7 @@ class StorageSettingsViewModel
             }
         ),
         storageDataWarningState = State.StorageDataWarningState(
-            isChecked = settings.warnOnMeteredNetwork(),
+            isChecked = settings.warnOnMeteredNetwork.flow.value,
             onCheckedChange = {
                 onStorageDataWarningCheckedChange(it)
                 analyticsTracker.track(
@@ -161,14 +161,14 @@ class StorageSettingsViewModel
     }
 
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
-        settings.setWarnOnMeteredNetwork(isChecked)
+        settings.warnOnMeteredNetwork.set(isChecked)
         updateMobileDataWarningState()
     }
 
     private fun updateMobileDataWarningState() {
         mutableState.value = mutableState.value.copy(
             storageDataWarningState = mutableState.value.storageDataWarningState.copy(
-                isChecked = settings.warnOnMeteredNetwork(),
+                isChecked = settings.warnOnMeteredNetwork.flow.value,
             )
         )
     }
