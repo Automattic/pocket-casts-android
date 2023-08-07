@@ -20,7 +20,7 @@
             android:src="@drawable/ic_chevron"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/primary_icon_02" />
+            app:tint="?attr/secondary_icon_01" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"
