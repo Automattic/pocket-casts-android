@@ -173,7 +173,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     override suspend fun add(episode: UserEpisode, playbackManager: PlaybackManager) {
         userEpisodeDao.insert(episode)
 
-        if (settings.getCloudAddToUpNext()) {
+        if (settings.cloudAddToUpNext.flow.value) {
             playbackManager.playLast(episode = episode, source = SourceView.FILES)
         }
     }

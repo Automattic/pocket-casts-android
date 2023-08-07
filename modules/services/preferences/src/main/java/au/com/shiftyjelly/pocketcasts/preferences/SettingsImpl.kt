@@ -1089,13 +1089,11 @@ class SettingsImpl @Inject constructor(
         return Settings.CloudSortOrder.values().getOrNull(getInt("cloud_sort_order", 0)) ?: Settings.CloudSortOrder.NEWEST_OLDEST
     }
 
-    override fun getCloudAddToUpNext(): Boolean {
-        return getBoolean("cloudUpNext", false)
-    }
-
-    override fun setCloudAddToUpNext(value: Boolean) {
-        setBoolean("cloudUpNext", value)
-    }
+    override val cloudAddToUpNext = UserSetting.BoolPref(
+        sharedPrefKey = "cloudUpNext",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getDeleteLocalFileAfterPlaying(): Boolean {
         return getBoolean("cloudDeleteAfterPlaying", false)

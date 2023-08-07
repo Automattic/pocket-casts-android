@@ -85,7 +85,7 @@ class CloudSettingsFragment : BaseFragment() {
         }
 
         with(binding.swtAutoAddToUpNext) {
-            isChecked = settings.getCloudAddToUpNext()
+            isChecked = settings.cloudAddToUpNext.flow.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setAddToUpNext(isChecked)
             }

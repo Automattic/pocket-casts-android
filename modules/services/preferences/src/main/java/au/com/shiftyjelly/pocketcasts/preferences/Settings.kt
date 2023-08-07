@@ -413,8 +413,7 @@ interface Settings {
 
     fun setCloudSortOrder(sortOrder: CloudSortOrder)
     fun getCloudSortOrder(): CloudSortOrder
-    fun getCloudAddToUpNext(): Boolean
-    fun setCloudAddToUpNext(value: Boolean)
+    val cloudAddToUpNext: UserSetting<Boolean>
     fun getDeleteLocalFileAfterPlaying(): Boolean
     fun setDeleteLocalFileAfterPlaying(value: Boolean)
     fun getDeleteCloudFileAfterPlaying(): Boolean
