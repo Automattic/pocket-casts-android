@@ -23,9 +23,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
@@ -141,13 +145,13 @@ class SettingsImpl @Inject constructor(
         return context.isScreenReaderOn()
     }
 
-    override val skipBackInSecs = UserSetting.PrefFromString.SkipAmount(
+    override val skipBackInSecs = UserSetting.SkipAmountPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
         defaultValue = 10,
         sharedPrefs = sharedPreferences,
     )
 
-    override val skipForwardInSecs = UserSetting.PrefFromString.SkipAmount(
+    override val skipForwardInSecs = UserSetting.SkipAmountPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_FORWARD,
         defaultValue = 30,
         sharedPrefs = sharedPreferences,
@@ -629,13 +633,11 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING, false)
     }
 
-    override fun getUseEmbeddedArtwork(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_USE_EMBEDDED_ARTWORK, false)
-    }
-
-    override fun setUseEmbeddedArtwork(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_USE_EMBEDDED_ARTWORK, value)
-    }
+    override val useEmbeddedArtwork = UserSetting.BoolPref(
+        sharedPrefKey = "useEmbeddedArtwork",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getGlobalPlaybackEffects(): PlaybackEffects {
         val effects = PlaybackEffects()
@@ -785,13 +787,11 @@ class SettingsImpl @Inject constructor(
         return getBoolean("showPlayedEpisodes", true)
     }
 
-    override fun showArtworkOnLockScreen(): Boolean {
-        return getBoolean("showArtworkOnLockScreen", true)
-    }
-
-    override fun setShowArtworkOnLockScreen(show: Boolean) {
-        setBoolean("showArtworkOnLockScreen", show)
-    }
+    override val showArtworkOnLockScreen = UserSetting.BoolPref(
+        sharedPrefKey = "showArtworkOnLockScreen",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun selectedFilter(): String? {
         return getString(Settings.PREFERENCE_SELECTED_FILTER, null)
@@ -963,19 +963,33 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAutoArchiveIncludeStarred(): Boolean {
-        return getBoolean(Settings.AUTO_ARCHIVE_INCLUDE_STARRED, false)
-    }
+    override val autoArchiveIncludeStarred = UserSetting.BoolPref(
+        sharedPrefKey = Settings.AUTO_ARCHIVE_INCLUDE_STARRED,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getAutoArchiveAfterPlaying(): Settings.AutoArchiveAfterPlaying {
-        val value = getString(Settings.AUTO_ARCHIVE_PLAYED_EPISODES_AFTER, null)
-        return Settings.AutoArchiveAfterPlaying.fromString(context, value)
-    }
+    override val autoArchiveAfterPlaying = UserSetting.PrefFromInt(
+        sharedPrefKey = "autoArchivePlayedEpisodesIndex",
+        defaultValue = getString("autoArchivePlayedEpisodes")?.let {
+            // Use the old String setting if it exists before falling back to the default value
+            AutoArchiveAfterPlayingSetting.fromString(it, context)
+        } ?: AutoArchiveAfterPlayingSetting.defaultValue(context),
+        sharedPrefs = sharedPreferences,
+        fromInt = { AutoArchiveAfterPlayingSetting.fromIndex(it) },
+        toInt = { it.toIndex() },
+    )
 
-    override fun getAutoArchiveInactive(): Settings.AutoArchiveInactive {
-        val value = getString(Settings.AUTO_ARCHIVE_INACTIVE, null)
-        return Settings.AutoArchiveInactive.fromString(context, value)
-    }
+    override val autoArchiveInactive = UserSetting.PrefFromInt(
+        sharedPrefKey = "autoArchiveInactiveIndex",
+        defaultValue = getString("autoArchiveInactiveEpisodes")?.let {
+            // Use the old String setting if it exists before falling back to the default value
+            AutoArchiveInactiveSetting.fromString(it, context)
+        } ?: AutoArchiveInactiveSetting.default,
+        sharedPrefs = sharedPreferences,
+        fromInt = { AutoArchiveInactiveSetting.fromIndex(it) },
+        toInt = { it.toIndex() },
+    )
 
     override fun getCustomStorageLimitGb(): Long {
         return getRemoteConfigLong(FirebaseConfig.CLOUD_STORAGE_LIMIT)
@@ -1390,4 +1404,39 @@ class SettingsImpl @Inject constructor(
                 BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
             )
         ]
+
+    override val theme = ThemeSetting.UserSettingPref(
+        sharedPrefKey = "pocketCastsTheme",
+        defaultValue = ThemeSetting.DARK,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val darkThemePreference = ThemeSetting.UserSettingPref(
+        sharedPrefKey = "PreferredDarkTheme",
+        defaultValue = ThemeSetting.DARK,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val lightThemePreference = ThemeSetting.UserSettingPref(
+        sharedPrefKey = "PreferredLightTheme",
+        defaultValue = ThemeSetting.LIGHT,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val useSystemTheme = UserSetting.BoolPref(
+        sharedPrefKey = "useSystemTheme",
+        defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q, // Only default on Android 10+
+        sharedPrefs = sharedPreferences
+    )
+
+    override val appIcon = UserSetting.PrefFromString(
+        sharedPrefKey = "pocketCastsAppIcon",
+        defaultValue = AppIconSetting.DEFAULT,
+        sharedPrefs = sharedPreferences,
+        fromString = { str ->
+            AppIconSetting.values().find { it.id == str }
+                ?: AppIconSetting.DEFAULT
+        },
+        toString = { it.id }
+    )
 }

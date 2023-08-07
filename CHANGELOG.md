@@ -1,3 +1,9 @@
+Unknown
+-----
+*   Bug Fixes:
+    *   Fixed auto archive settings getting lost when switching languages
+        ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
+
 7.45
 -----
 *   Bug Fixes:

@@ -353,7 +353,7 @@ class MediaSessionManager(
         Timber.i("MediaSession metadata. Episode: ${episode.uuid} ${episode.title} Duration: ${episode.durationMs.toLong()}")
         mediaSession.setMetadata(nowPlaying)
 
-        if (settings.showArtworkOnLockScreen()) {
+        if (settings.showArtworkOnLockScreen.flow.value) {
             if (Util.isAutomotive(context)) {
                 val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)

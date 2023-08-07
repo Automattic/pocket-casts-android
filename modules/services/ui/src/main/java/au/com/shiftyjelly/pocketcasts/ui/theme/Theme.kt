@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.ui.theme
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -15,10 +14,10 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -29,15 +28,8 @@ import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-const val PREFERENCE_THEME = "pocketCastsTheme"
-const val PREFERENCE_PREFERRED_DARK_THEME = "PreferredDarkTheme"
-const val PREFERENCE_PREFERRED_LIGHT_THEME = "PreferredLightTheme"
-const val PREFERENCE_USE_SYSTEM_THEME = "useSystemTheme"
-
 @Singleton
-class Theme @Inject constructor(
-    @PublicSharedPreferences private val sharedPreferences: SharedPreferences
-) {
+class Theme @Inject constructor(private val settings: Settings) {
     companion object {
         fun isDark(context: Context?): Boolean {
             val typedValue = TypedValue()
@@ -73,9 +65,17 @@ class Theme @Inject constructor(
         )
     }
 
-    enum class ThemeType(val id: String, @StringRes val labelId: Int, @StyleRes val resourceId: Int, @DrawableRes val iconResourceId: Int, val defaultLightIcons: Boolean, val darkTheme: Boolean, val isPlus: Boolean) {
+    enum class ThemeType(
+        internal val themeSetting: ThemeSetting,
+        @StringRes val labelId: Int,
+        @StyleRes val resourceId: Int,
+        @DrawableRes val iconResourceId: Int,
+        val defaultLightIcons: Boolean,
+        val darkTheme: Boolean,
+        val isPlus: Boolean,
+    ) {
         LIGHT(
-            id = "light",
+            themeSetting = ThemeSetting.LIGHT,
             labelId = LR.string.settings_theme_light,
             resourceId = R.style.ThemeLight,
             iconResourceId = IR.drawable.ic_apptheme0,
@@ -84,7 +84,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         DARK(
-            id = "dark",
+            themeSetting = ThemeSetting.DARK,
             labelId = LR.string.settings_theme_dark,
             resourceId = R.style.ThemeDark,
             iconResourceId = IR.drawable.ic_apptheme1,
@@ -93,7 +93,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         ROSE(
-            id = "rose",
+            themeSetting = ThemeSetting.ROSE,
             labelId = LR.string.settings_theme_rose,
             resourceId = R.style.Rose,
             iconResourceId = IR.drawable.ic_theme_rose,
@@ -102,7 +102,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         INDIGO(
-            id = "indigo",
+            themeSetting = ThemeSetting.INDIGO,
             labelId = LR.string.settings_theme_indigo,
             resourceId = R.style.Indigo,
             iconResourceId = IR.drawable.ic_indigo,
@@ -111,7 +111,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         EXTRA_DARK(
-            id = "extraDark",
+            themeSetting = ThemeSetting.EXTRA_DARK,
             labelId = LR.string.settings_theme_extra_dark,
             resourceId = R.style.ExtraThemeDark,
             iconResourceId = IR.drawable.ic_apptheme2,
@@ -120,7 +120,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         DARK_CONTRAST(
-            id = "darkContrast",
+            themeSetting = ThemeSetting.DARK_CONTRAST,
             labelId = LR.string.settings_theme_dark_contrast,
             resourceId = R.style.DarkContrast,
             iconResourceId = IR.drawable.ic_apptheme6,
@@ -129,7 +129,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         LIGHT_CONTRAST(
-            id = "lightContrast",
+            themeSetting = ThemeSetting.LIGHT_CONTRAST,
             labelId = LR.string.settings_theme_light_contrast,
             resourceId = R.style.LightContrast,
             iconResourceId = IR.drawable.ic_apptheme7,
@@ -138,7 +138,7 @@ class Theme @Inject constructor(
             isPlus = false
         ),
         ELECTRIC(
-            id = "electric",
+            themeSetting = ThemeSetting.ELECTRIC,
             labelId = LR.string.settings_theme_electricity,
             resourceId = R.style.Electric,
             iconResourceId = IR.drawable.ic_apptheme5,
@@ -147,7 +147,7 @@ class Theme @Inject constructor(
             isPlus = true
         ),
         CLASSIC_LIGHT(
-            id = "classicLight",
+            themeSetting = ThemeSetting.CLASSIC_LIGHT,
             labelId = LR.string.settings_theme_classic, // "Classic Light"
             resourceId = R.style.ClassicLight,
             iconResourceId = IR.drawable.ic_apptheme3,
@@ -156,7 +156,7 @@ class Theme @Inject constructor(
             isPlus = true
         ),
         RADIOACTIVE(
-            id = "radioactive",
+            themeSetting = ThemeSetting.RADIOACTIVE,
             labelId = LR.string.settings_theme_radioactivity,
             resourceId = R.style.Radioactive,
             iconResourceId = IR.drawable.ic_theme_radioactive,
@@ -166,8 +166,17 @@ class Theme @Inject constructor(
         );
 
         companion object {
-            fun fromString(value: String, default: ThemeType = DARK): ThemeType {
-                return ThemeType.values().find { it.id == value } ?: default
+            fun fromThemeSetting(themeSetting: ThemeSetting): ThemeType = when (themeSetting) {
+                ThemeSetting.LIGHT -> Theme.ThemeType.LIGHT
+                ThemeSetting.DARK -> Theme.ThemeType.DARK
+                ThemeSetting.ROSE -> Theme.ThemeType.ROSE
+                ThemeSetting.INDIGO -> Theme.ThemeType.INDIGO
+                ThemeSetting.EXTRA_DARK -> Theme.ThemeType.EXTRA_DARK
+                ThemeSetting.DARK_CONTRAST -> Theme.ThemeType.DARK_CONTRAST
+                ThemeSetting.LIGHT_CONTRAST -> Theme.ThemeType.LIGHT_CONTRAST
+                ThemeSetting.ELECTRIC -> Theme.ThemeType.ELECTRIC
+                ThemeSetting.CLASSIC_LIGHT -> Theme.ThemeType.CLASSIC_LIGHT
+                ThemeSetting.RADIOACTIVE -> Theme.ThemeType.RADIOACTIVE
             }
         }
     }
@@ -204,7 +213,7 @@ class Theme @Inject constructor(
 
     fun updateTheme(activity: AppCompatActivity, theme: Theme.ThemeType, configuration: Configuration = activity.resources.configuration) {
         activity.setTheme(theme.resourceId)
-        if (theme.id == activeTheme.id) return
+        if (theme == activeTheme) return
         activeTheme = theme
 
         when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
@@ -257,52 +266,36 @@ class Theme @Inject constructor(
         }
     }
 
-    private fun getThemeFromPreferences(): ThemeType {
-        val theme: String = sharedPreferences.getString(PREFERENCE_THEME, ThemeType.DARK.id) ?: ThemeType.DARK.id
-        return ThemeType.fromString(theme, ThemeType.DARK)
-    }
+    private fun getThemeFromPreferences(): ThemeType =
+        ThemeType.fromThemeSetting(settings.theme.flow.value)
 
     private fun setThemeToPreferences(theme: ThemeType) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_THEME, theme.id)
-        }
+        settings.theme.set(theme.themeSetting)
     }
 
-    private fun getPreferredDarkThemeFromPreferences(): ThemeType {
-        val theme: String = sharedPreferences.getString(PREFERENCE_PREFERRED_DARK_THEME, ThemeType.DARK.id) ?: ThemeType.DARK.id
-        return ThemeType.fromString(theme, ThemeType.DARK)
-    }
+    private fun getPreferredDarkThemeFromPreferences(): ThemeType =
+        ThemeType.fromThemeSetting(settings.darkThemePreference.flow.value)
 
-    private fun getPreferredLightFromPreferences(): ThemeType {
-        val theme: String = sharedPreferences.getString(PREFERENCE_PREFERRED_LIGHT_THEME, ThemeType.LIGHT.id) ?: ThemeType.LIGHT.id
-        return ThemeType.fromString(theme, ThemeType.LIGHT)
-    }
+    private fun getPreferredLightFromPreferences(): ThemeType =
+        ThemeType.fromThemeSetting(settings.lightThemePreference.flow.value)
 
     private fun setPreferredDarkThemeToPreferences(theme: ThemeType) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_PREFERRED_DARK_THEME, theme.id)
-        }
+        settings.darkThemePreference.set(theme.themeSetting)
     }
 
     private fun setPreferredLightThemeToPreferences(theme: ThemeType) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_PREFERRED_LIGHT_THEME, theme.id)
-        }
+        settings.lightThemePreference.set(theme.themeSetting)
     }
 
     fun setUseSystemTheme(value: Boolean, activity: AppCompatActivity?) {
-        sharedPreferences.edit(commit = true) {
-            putBoolean(PREFERENCE_USE_SYSTEM_THEME, value)
-        }
+        settings.useSystemTheme.set(value, commit = true)
 
         if (value && activity != null) {
             setupThemeForConfig(activity, activity.resources.configuration)
         }
     }
 
-    fun getUseSystemTheme(): Boolean {
-        return sharedPreferences.getBoolean(PREFERENCE_USE_SYSTEM_THEME, Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) // Only default on Android 10+
-    }
+    fun getUseSystemTheme(): Boolean = settings.useSystemTheme.flow.value
 
     fun getPodcastTintColor(podcast: Podcast): Int {
         return podcast.getTintColor(isDarkTheme)

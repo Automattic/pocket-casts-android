@@ -39,7 +39,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
 
     @UnstableApi
     fun read(tracks: Tracks?, settings: Settings, context: Context) {
-        return read(tracks, settings.getUseEmbeddedArtwork(), context)
+        return read(tracks, settings.useEmbeddedArtwork.flow.value, context)
     }
 
     @UnstableApi
