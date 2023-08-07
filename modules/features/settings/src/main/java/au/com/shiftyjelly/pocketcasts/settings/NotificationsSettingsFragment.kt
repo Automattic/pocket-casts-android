@@ -33,6 +33,8 @@ import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -168,6 +170,9 @@ class NotificationsSettingsFragment :
                         mapOf("enabled" to checked)
                     )
 
+                    podcastManager.updateAllShowNotificationsRx(checked)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()).onErrorComplete().subscribe()
                     if (checked) {
                         settings.setNotificationLastSeenToNow()
                     }
@@ -373,18 +378,22 @@ class NotificationsSettingsFragment :
     @OptIn(DelicateCoroutinesApi::class)
     private fun changePodcastsSummary() {
         GlobalScope.launch(Dispatchers.Default) {
-            val podcasts = podcastManager.findSubscribed()
-            val podcastCount = podcasts.size
-            val notificationCount = podcasts.count { it.isShowNotifications }
+            podcastManager.findSubscribedFlow().collect { podcasts ->
+                val podcastCount = podcasts.size
+                val notificationCount = podcasts.count { it.isShowNotifications }
 
-            val summary = when {
-                notificationCount == 0 -> resources.getString(LR.string.settings_podcasts_selected_zero)
-                notificationCount == 1 -> resources.getString(LR.string.settings_podcasts_selected_one)
-                notificationCount >= podcastCount -> resources.getString(LR.string.settings_podcasts_selected_all)
-                else -> resources.getString(LR.string.settings_podcasts_selected_x, notificationCount)
-            }
-            launch(Dispatchers.Main) {
-                notificationPodcasts?.summary = summary
+                val summary = when {
+                    notificationCount == 0 -> resources.getString(LR.string.settings_podcasts_selected_zero)
+                    notificationCount == 1 -> resources.getString(LR.string.settings_podcasts_selected_one)
+                    notificationCount >= podcastCount -> resources.getString(LR.string.settings_podcasts_selected_all)
+                    else -> resources.getString(
+                        LR.string.settings_podcasts_selected_x,
+                        notificationCount
+                    )
+                }
+                launch(Dispatchers.Main) {
+                    notificationPodcasts?.summary = summary
+                }
             }
         }
     }
