@@ -261,7 +261,7 @@ object FirebaseAnalyticsTracker {
     }
 
     private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
-        if (settings.getSendUsageStats()) {
+        if (settings.collectAnalytics.flow.value) {
             firebaseAnalytics.logEvent(name, bundle)
 
             Timber.d("Analytic event $name $bundle")

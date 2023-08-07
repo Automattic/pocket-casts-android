@@ -65,9 +65,6 @@ class SettingsImpl @Inject constructor(
     companion object {
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
-        private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
-        private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
-        private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
@@ -1310,26 +1307,23 @@ class SettingsImpl @Inject constructor(
     override fun getTimesToShowBatteryWarning(): Int =
         getInt(SHOWN_BATTERY_WARNING_KEY, 4)
 
-    override fun setSendUsageStats(value: Boolean) {
-        setBoolean(SEND_USAGE_STATS_KEY, value)
-    }
+    override val collectAnalytics = UserSetting.BoolPref(
+        sharedPrefKey = "SendUsageStatsKey",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getSendUsageStats(): Boolean =
-        getBoolean(SEND_USAGE_STATS_KEY, true)
+    override val sendCrashReports = UserSetting.BoolPref(
+        sharedPrefKey = "SendCrashReportsKey",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setSendCrashReports(value: Boolean) {
-        setBoolean(SEND_CRASH_REPORTS_KEY, value)
-    }
-
-    override fun getSendCrashReports(): Boolean =
-        getBoolean(SEND_CRASH_REPORTS_KEY, true)
-
-    override fun setLinkCrashReportsToUser(value: Boolean) {
-        setBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, value)
-    }
-
-    override fun getLinkCrashReportsToUser(): Boolean =
-        getBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, false)
+    override val linkCrashReportsToUser = UserSetting.BoolPref(
+        sharedPrefKey = "LinkCrashReportsToUserKey",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun setEndOfYearShowBadge2022(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, value)
