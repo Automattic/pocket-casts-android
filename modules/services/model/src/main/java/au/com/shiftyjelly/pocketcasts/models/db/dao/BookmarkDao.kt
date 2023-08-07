@@ -53,7 +53,7 @@ abstract class BookmarkDao {
     ): Flow<List<Bookmark>>
 
     @Query(
-        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
             FROM bookmarks
             JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
             WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
@@ -101,4 +101,12 @@ abstract class BookmarkDao {
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
+
+    @Query(
+        """SELECT *
+            FROM bookmarks
+            JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
+            AND deleted = :deleted"""
+    )
+    abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 }
