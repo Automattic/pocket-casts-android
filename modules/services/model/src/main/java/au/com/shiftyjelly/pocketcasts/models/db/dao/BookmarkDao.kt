@@ -53,7 +53,7 @@ abstract class BookmarkDao {
     ): Flow<List<Bookmark>>
 
     @Query(
-        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
             FROM bookmarks
             JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
             WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
