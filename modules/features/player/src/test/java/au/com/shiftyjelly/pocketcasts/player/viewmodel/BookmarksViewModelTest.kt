@@ -1,13 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.player.util.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -98,7 +99,7 @@ class BookmarksViewModelTest {
     fun `given free account, when bookmarks loaded, then PlusUpsell state shown`() = runTest {
         whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(false)
 
-        bookmarksViewModel.loadBookmarks(episodeUuid)
+        bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
         assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
     }
@@ -107,7 +108,7 @@ class BookmarksViewModelTest {
     fun `given plus or patron account, when bookmarks loaded, then PlusUpsell state not shown`() = runTest {
         whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(true)
 
-        bookmarksViewModel.loadBookmarks(episodeUuid)
+        bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
         assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
     }

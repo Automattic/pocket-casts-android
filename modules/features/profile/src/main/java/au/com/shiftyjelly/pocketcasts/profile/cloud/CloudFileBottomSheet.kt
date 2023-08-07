@@ -17,10 +17,13 @@ import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
@@ -207,6 +210,16 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     }
                 }
 
+                val layoutBookmark = binding.layoutBookmark
+                layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
+                layoutBookmark.setOnClickListener {
+                    dialog?.dismiss()
+                    BookmarksContainerFragment.newInstance(
+                        episodeUuid = episodeUUID,
+                        sourceView = SourceView.FILES
+                    ).show(parentFragmentManager, "bookmarks_container")
+                }
+
                 val errorLayout = binding.errorLayout
                 val lblError = binding.lblError
                 val lblErrorDetail = binding.lblErrorDetail
@@ -287,19 +300,23 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val binding = binding ?: return@Observer
                 val layoutCloud = binding.layoutCloud
                 val layoutLockedCloud = binding.layoutLockedCloud
+                val layoutBookmark = binding.layoutBookmark
                 when (signInState) {
                     is SignInState.SignedIn -> {
                         if (signInState.subscriptionStatus is SubscriptionStatus.Paid) {
                             layoutCloud.isVisible = true
                             layoutLockedCloud.isVisible = false
+                            layoutBookmark.isVisible = true
                         } else {
                             layoutCloud.isVisible = false
                             layoutLockedCloud.isVisible = true
+                            layoutBookmark.isVisible = false
                         }
                     }
                     else -> {
                         layoutCloud.isVisible = false
                         layoutLockedCloud.isVisible = true
+                        layoutBookmark.isVisible = false
                     }
                 }
             }

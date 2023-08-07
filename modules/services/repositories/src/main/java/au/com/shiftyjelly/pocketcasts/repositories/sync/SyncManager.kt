@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.accounts.Account
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
@@ -88,4 +89,5 @@ interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
     fun getFilters(): Single<List<Playlist>>
     suspend fun loadStats(): StatsBundle
     fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse>
+    suspend fun getBookmarks(): List<Bookmark>
 }

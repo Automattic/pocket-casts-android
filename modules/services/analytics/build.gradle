@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.analytics'
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {

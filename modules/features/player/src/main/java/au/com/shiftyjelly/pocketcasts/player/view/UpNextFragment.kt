@@ -206,6 +206,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
         playerViewModel.listDataLive.observe(viewLifecycleOwner) {
             adapter.isPlaying = it.podcastHeader.isPlaying
+            toolbar.menu.findItem(R.id.menu_select)?.isVisible = it.upNextEpisodes.isNotEmpty()
         }
 
         view.isClickable = true

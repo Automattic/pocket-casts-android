@@ -3,6 +3,7 @@ apply from: "../../modules.gradle"
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.endofyear'
     buildFeatures {
+        buildConfig true
         viewBinding true
         dataBinding = true
         compose true
@@ -24,4 +25,5 @@ dependencies {
     implementation project(':modules:services:ui')
     implementation project(':modules:services:utils')
     implementation project(':modules:services:views')
+    testImplementation project(':modules:services:sharedtest')
 }

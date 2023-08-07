@@ -57,6 +57,9 @@ android {
     }
 
     buildFeatures {
+        buildConfig true
+        viewBinding true
+        dataBinding = true
         compose true
     }
 
@@ -118,6 +121,7 @@ dependencies {
     implementation project(':modules:services:servers')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:utils')
+    testImplementation project(':modules:services:sharedtest')
 
     implementation project(':modules:features:account')
     implementation project(':modules:features:podcasts')

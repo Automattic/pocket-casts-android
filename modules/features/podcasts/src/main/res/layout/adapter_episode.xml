@@ -6,6 +6,7 @@
         <import type="au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode" />
         <variable name="episode" type="au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode" />
         <variable name="inUpNext" type="Boolean" />
+        <variable name="hasBookmarks" type="Boolean" />
     </data>
 
     <FrameLayout
@@ -202,6 +203,16 @@
                     app:tint="?attr/support_02"
                     android:visibility="gone"
                     android:layout_marginEnd="4dp" />
+                <ImageView
+                    android:id="@+id/imgBookmark"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@string/bookmarks"
+                    android:src="@drawable/ic_bookmark"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="4dp"
+                    android:visibility="@{hasBookmarks}"
+                    app:tint="?attr/support_05" />
                 <au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
                     android:id="@+id/progressCircle"
                     android:layout_width="16dp"

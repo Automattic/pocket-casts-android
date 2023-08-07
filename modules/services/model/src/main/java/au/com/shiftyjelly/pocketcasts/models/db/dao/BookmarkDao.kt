@@ -53,15 +53,45 @@ abstract class BookmarkDao {
     ): Flow<List<Bookmark>>
 
     @Query(
-        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
             FROM bookmarks
             JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
-            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted"""
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
+            ORDER BY 
+            CASE WHEN :isAsc = 1 THEN created_at END ASC, 
+            CASE WHEN :isAsc = 0 THEN created_at END DESC"""
     )
-    abstract fun findByPodcastFlow(
+    abstract fun findByPodcastOrderCreatedAtFlow(
+        podcastUuid: String,
+        isAsc: Boolean,
+        deleted: Boolean = false,
+    ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT bookmarks.*, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
+            FROM bookmarks
+            JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
+            ORDER BY publishedDate, time ASC"""
+    )
+    abstract fun findByPodcastOrderEpisodeAndTimeFlow(
         podcastUuid: String,
         deleted: Boolean = false,
     ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT bookmarks.*
+            FROM bookmarks
+            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+            WHERE bookmarks.podcast_uuid = :podcastUuid 
+            AND (UPPER(bookmarks.title) LIKE UPPER(:title) OR UPPER(podcast_episodes.title) LIKE UPPER(:title))
+            AND deleted = :deleted"""
+    )
+    abstract suspend fun searchInPodcastByTitle(
+        podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
 
     @Query("UPDATE bookmarks SET deleted = :deleted, deleted_modified = :deletedModified, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, deletedModified: Long, syncStatus: SyncStatus)
@@ -71,4 +101,12 @@ abstract class BookmarkDao {
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
+
+    @Query(
+        """SELECT *
+            FROM bookmarks
+            JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
+            AND deleted = :deleted"""
+    )
+    abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 }

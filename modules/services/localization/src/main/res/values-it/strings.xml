@@ -1,19 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 08:10:07+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="bookmark">Segnalibro</string>
+    <string name="details">Dettagli</string>
+    <string name="episode">Episodio</string>
+    <string name="bookmarks_search">Cerca il segnalibro</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts sincronizzerà periodicamente il tuo account in background.</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts sincronizzerà il tuo account solo quando aprirai l\'app.</string>
+    <string name="settings_notification_play_over_always">Sempre</string>
+    <string name="settings_notification_play_over_duck">Abbassa il volume</string>
+    <string name="settings_notification_play_over_never">Mai</string>
+    <string name="skipping_to">Passaggio a %s</string>
+    <string name="playing_bookmark">Riproduzione di \"%s\"</string>
+    <string name="save_bookmark">Salva il segnalibro</string>
+    <string name="add_bookmark_title_hint">Aggiungi un titolo opzionale per identificare questo segnalibro</string>
+    <string name="change_title">Modifica il titolo</string>
+    <string name="bookmark_added">Segnalibro \"%s\" aggiunto</string>
+    <string name="add_bookmark_title">Aggiungi segnalibro</string>
+    <string name="add_bookmark">Aggiungi segnalibro</string>
+    <string name="filters_not_found">Nessun filtro trovato</string>
+    <string name="bookmarks_sort_timestamp">Data e ora</string>
+    <string name="bookmarks_select_option">Seleziona segnalibri</string>
+    <string name="bookmarks_delete_summary_singular">Questo segnalibro sarà eliminato. Questa operazione non può essere annullata.</string>
+    <string name="bookmarks_delete_summary_plural">%d segnalibri saranno eliminati. Questa operazione non può essere annullata.</string>
+    <string name="bookmarks_deleted_singular">1 segnalibro eliminato</string>
+    <string name="bookmarks_deleted_plural">%1$d segnalibri eliminati</string>
+    <string name="bookmarks_delete_singular">Elimina segnalibro</string>
+    <string name="bookmarks_delete_plural">Elimina segnalibri</string>
+    <string name="deselect_all_below">Deseleziona tutti gli elementi di seguito</string>
     <string name="deselect_all">Deseleziona tutto</string>
+    <string name="deselect_all_above">Deseleziona tutti gli elementi in alto</string>
     <string name="edit">Modifica</string>
+    <string name="whats_new_autoplay_maybe_later_button">Forse dopo</string>
+    <string name="whats_new_autoplay_enable_button">Attiva ora</string>
+    <string name="whats_new_autoplay_body">Se inizi un episodio mentre Successivo è vuoto, l\'opzione Riproduzione automatica continuerà a riprodurre le puntate da quel podcast o da quell\'elenco.</string>
+    <string name="whats_new_autoplay_title">La riproduzione automatica è qui.</string>
+    <string name="filters_download_limit_3">3 episodi</string>
+    <string name="settings_title_headphone_controls">Controlli delle cuffie</string>
+    <string name="settings_headphone_controls_confirmation_sound_summary">Riproduci un suono di conferma dopo aver creato un segnalibro con le cuffie.</string>
+    <string name="settings_headphone_controls_confirmation_sound">Suono di conferma del segnalibro</string>
+    <string name="settings_headphone_controls_choice_skip_forward">Salta avanti</string>
+    <string name="settings_headphone_controls_choice_skip_back">Salta indietro</string>
+    <string name="settings_headphone_controls_choice_previous_chapter">Capitolo precedente</string>
+    <string name="settings_headphone_controls_choice_next_chapter">Capitolo successivo</string>
+    <string name="settings_headphone_controls_choice_add_bookmark">Aggiungi segnalibro</string>
+    <string name="settings_headphone_controls_action_previous">Azione precedente</string>
+    <string name="settings_headphone_controls_action_next">Azione successiva</string>
     <string name="bookmarks_headphone_settings">Impostazioni delle cuffie</string>
     <string name="bookmarks_not_found">Ancora nessun segnalibro</string>
     <string name="bookmarks_create_instructions">Puoi salvare data e ora degli episodi dal menu delle azioni nel lettore o configurando un\'azione con le cuffie.</string>
     <string name="bookmark_play">Riproduci alla posizione del segnalibro %s</string>
-    <string name="bookmarks_plural">%s segnalibri</string>
-    <string name="bookmarks_singular">%s segnalibro</string>
+    <string name="bookmarks_plural">%d segnalibri</string>
+    <string name="bookmarks_singular">1 segnalibro</string>
     <string name="bookmarks">Segnalibri</string>
     <string name="settings_autoplay">Riproduzione automatica</string>
     <string name="player_sleep_add_1_minute">+ 1 minuto</string>
@@ -74,7 +117,6 @@ Language: it
     <string name="log_in_with_email">Accedi con l\'e-mail</string>
     <string name="log_in_on_phone">Accedi al telefono</string>
     <string name="log_in_with_google">Accedi con Google</string>
-    <string name="log_in_subtitle">Inizia ad ascoltare i tuoi podcast preferiti</string>
     <string name="onboarding_upgrade_no_subscriptions_found">Nessun abbonamento trovato.</string>
     <string name="trial_then_per_year">Prova %1$s, quindi %2$s all\'anno</string>
     <string name="trial_then_per_month">Prova %1$s, quindi %2$s al mese</string>
@@ -132,10 +174,8 @@ Language: it
     <string name="notifications_blocked_warning">Le notifiche sono bloccate. Puoi aggiornare l\'autorizzazione in Impostazioni.</string>
     <string name="settings_media_actions_show_subtitle">Mostra azioni multimediali personalizzate nelle notifiche multimediali di Android 13 e Android Auto.</string>
     <string name="settings_media_actions_show_title">Mostra azioni multimediali personalizzate</string>
-    <string name="settings_media_actions_customise">Personalizza le azioni multimediali</string>
     <string name="settings_media_actions_prioritize_subtitle">Le tue azioni principali saranno disponibili.</string>
     <string name="settings_media_actions_prioritize_title">Assegna la priorità alle tue azioni multimediali personalizzate</string>
-    <string name="plus_take_your_podcasting_to_next_level">Porta la tua esperienza di podcasting a un livello superiore grazie all\'accesso esclusivo alle funzionalità e alle opzioni di personalizzazione.</string>
     <string name="onboarding_recommendations_more">Ulteriori informazioni %s</string>
     <string name="filter_id_or_title">ID filtro o titolo</string>
     <string name="filter_title">Titolo filtro</string>
@@ -194,7 +234,6 @@ Language: it
     <string name="onboarding_import_from_other_apps_step_1">Trova l\'opzione per l\'esportazione dell\'altra app ed esporta un file OPML.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts può importare podcast da file OPML, quindi se dalla tua app corrente è possibile esportare un file OPML, puoi seguire questi passaggi:</string>
     <string name="onboarding_import_from_castbox_open">Apri Castbox…</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">Scorri verso il basso fino a \"Esportazione OPML\" e tocca l\'opzione.</string>
     <string name="onboarding_import_from_castbox_step_3">Tocca \"Impostazioni\".</string>
     <string name="onboarding_import_from_castbox_step_2">Tocca la scheda \"Personale\".</string>
@@ -381,7 +420,6 @@ Language: it
     <string name="podcasts_empty_folder_summary">Aggiungi i podcast alla tua cartella e verranno visualizzati qui.</string>
     <string name="podcasts_empty_folder">La tua cartella è vuota</string>
     <string name="add_podcasts">Aggiungi podcast</string>
-    <string name="plus_folder_body">Crea cartelle per organizzare la tua raccolta di podcast.</string>
     <string name="expand_details">Espandi dettagli</string>
     <string name="profile_help_support">Aiuta a supportare Pocket Casts aggiornando il tuo account</string>
     <string name="error_check_your_internet_connection">Controlla la connessione a Internet.</string>
@@ -757,7 +795,6 @@ Language: it
     <string name="settings_notification_actions_title">Seleziona 3 azioni</string>
     <string name="settings_notification_sound_summary">Suono della notifica riprodotto.</string>
     <string name="settings_notification_sound">Suono della notifica</string>
-    <string name="settings_notification_play_over_summary">Continua a riprodurre l\'episodio anche quando ricevi notifiche (anche sonore) da altre app.</string>
     <string name="settings_notification_play_over">Continua a riprodurre sulle notifiche</string>
     <string name="settings_notification_notify_me">Ricevi una notifica</string>
     <string name="settings_notification_hide_on_pause">Nascondi la notifica di riproduzione quando in pausa</string>
@@ -1137,7 +1174,6 @@ Language: it
     <string name="filters_create_filter_details">Dettagli del filtro</string>
     <string name="filters_create_filter_by">FILTRA PER</string>
     <string name="filters_create_filter">Crea filtro</string>
-    <string name="filters_create_colour_icon">COLORE E ICONA</string>
     <string name="filters_create_add_more">Aggiungi più criteri per completare il perfezionamento del filtro.</string>
     <string name="filters_create">Crea</string>
     <string name="filters_chosen_singular">1 filtro scelto</string>
@@ -1177,8 +1213,8 @@ Language: it
     <string name="supporter_bundle">PACCHETTO</string>
     <string name="supporter">Promotore</string>
     <string name="episode_sort_short_to_long">Dal più corto al più lungo</string>
-    <string name="episode_sort_oldest_to_newest">Dal più vecchio al più recente</string>
-    <string name="episode_sort_newest_to_oldest">Dal più recente al più vecchio</string>
+    <string name="sort_oldest_to_newest">Dal più vecchio al più recente</string>
+    <string name="sort_newest_to_oldest">Dal più recente al più vecchio</string>
     <string name="episode_sort_long_to_short">Dal più lungo al più corto</string>
     <string name="episode_row_waiting_for_wifi">In attesa del WiFi</string>
     <string name="episode_row_waiting_for_power">In attesa dell\'alimentazione</string>

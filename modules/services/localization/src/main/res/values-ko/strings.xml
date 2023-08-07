@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 09:54:03+0000
+Translation-Revision-Date: 2023-08-03 08:10:06+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="details">세부사항</string>
+    <string name="episode">에피소드</string>
+    <string name="bookmarks_search">북마크 검색</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts에서는 정기적으로 계정이 백그라운드에서 동기화됩니다.</string>
+    <string name="settings_storage_background_refresh_off_watch">앱을 열 때만 Pocket Casts에서 계정이 동기화됩니다.</string>
+    <string name="settings_notification_play_over_always">항상</string>
+    <string name="settings_notification_play_over_duck">자동 음량 조정</string>
+    <string name="settings_notification_play_over_never">안 함</string>
+    <string name="skipping_to">%s(으)로 건너뛰는 중</string>
+    <string name="playing_bookmark">\"%s\" 재생 중</string>
+    <string name="save_bookmark">북마크 저장</string>
+    <string name="add_bookmark_title_hint">이 북마크를 식별할 선택적 제목 추가</string>
+    <string name="change_title">제목 변경</string>
+    <string name="bookmark_added">북마크 \"%s\" 추가됨</string>
+    <string name="add_bookmark_title">북마크 추가</string>
+    <string name="add_bookmark">북마크 추가</string>
+    <string name="filters_not_found">필터를 찾을 수 없음</string>
+    <string name="bookmarks_sort_timestamp">타임스탬프</string>
+    <string name="bookmarks_select_option">북마크 선택</string>
+    <string name="bookmarks_delete_summary_singular">이 북마크가 삭제됩니다. 실행하면 취소할 수 없습니다.</string>
+    <string name="bookmarks_delete_summary_plural">북마크 %d개가 삭제됩니다. 실행하면 취소할 수 없습니다.</string>
+    <string name="bookmarks_deleted_singular">북마크 1개 삭제됨</string>
+    <string name="bookmarks_deleted_plural">북마크 %1$d개 삭제됨</string>
+    <string name="bookmarks_delete_singular">북마크 삭제</string>
+    <string name="bookmarks_delete_plural">북마크 삭제</string>
+    <string name="deselect_all_below">아래 항목 모두 선택 해제</string>
     <string name="deselect_all">모두 선택 해제</string>
+    <string name="deselect_all_above">위 항목 모두 선택 해제</string>
     <string name="edit">수정</string>
     <string name="whats_new_autoplay_maybe_later_button">나중에 시작</string>
     <string name="whats_new_autoplay_enable_button">지금 활성화</string>
@@ -14,7 +41,6 @@ Language: ko_KR
     <string name="whats_new_autoplay_title">이제 자동 재생이 가능합니다!</string>
     <string name="filters_download_limit_3">에피소드 3개</string>
     <string name="settings_title_headphone_controls">헤드폰 제어 기능</string>
-    <string name="settings_headphone_controls_summary">가장 일반적인 헤드폰 제어 기능으로 수행한 작업을 사용자 정의하세요.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">북마크 생성 후 헤드폰으로 확인 소리를 재생하세요.</string>
     <string name="settings_headphone_controls_confirmation_sound">북마크 확인 소리</string>
     <string name="settings_headphone_controls_choice_skip_forward">앞으로 건너뛰기</string>
@@ -28,8 +54,8 @@ Language: ko_KR
     <string name="bookmarks_not_found">아직 북마크가 없습니다.</string>
     <string name="bookmarks_create_instructions">플레이어의 작업 메뉴에서 또는 헤드폰으로 작업을 구성하여 에피소드의 타임스탬프를 저장할 수 있습니다.</string>
     <string name="bookmark_play">북마크 위치에서 재생 %s</string>
-    <string name="bookmarks_plural">북마크 %s개</string>
-    <string name="bookmarks_singular">북마크 %s개</string>
+    <string name="bookmarks_plural">북마크 %d개</string>
+    <string name="bookmarks_singular">북마크 1개</string>
     <string name="bookmarks">북마크</string>
     <string name="settings_autoplay">자동 재생</string>
     <string name="player_sleep_add_1_minute">1분</string>
@@ -90,7 +116,6 @@ Language: ko_KR
     <string name="log_in_with_email">이메일로 로그인</string>
     <string name="log_in_on_phone">스마트폰에서 로그인</string>
     <string name="log_in_with_google">Google로 로그인</string>
-    <string name="log_in_subtitle">즐겨 찾는 팟캐스트 청취 시작</string>
     <string name="onboarding_upgrade_no_subscriptions_found">구독을 찾을 수 없습니다.</string>
     <string name="trial_then_per_year">%1$s 평가 후 %2$s/년</string>
     <string name="trial_then_per_month">%1$s 평가 후 %2$s/월</string>
@@ -148,10 +173,8 @@ Language: ko_KR
     <string name="notifications_blocked_warning">알림이 차단되었습니다. 설정을 통해 권한을 업데이트할 수 있습니다.</string>
     <string name="settings_media_actions_show_subtitle">Android 13 미디어 알림과 Android Auto에 사용자 정의 미디어 작업을 표시합니다.</string>
     <string name="settings_media_actions_show_title">사용자 정의 미디어 작업 표시</string>
-    <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
     <string name="settings_media_actions_prioritize_subtitle">상위 작업이 제공됩니다.</string>
     <string name="settings_media_actions_prioritize_title">사용자 정의 미디어 작업 우선순위 지정</string>
-    <string name="plus_take_your_podcasting_to_next_level">기능과 사용자 정의 옵션에 접근하는 독점 권한으로 팟캐스팅 환경의 수준을 높이세요.</string>
     <string name="onboarding_recommendations_more">%s 추가</string>
     <string name="filter_id_or_title">필터 ID 또는 제목</string>
     <string name="filter_title">필터 제목</string>
@@ -210,7 +233,6 @@ Language: ko_KR
     <string name="onboarding_import_from_other_apps_step_1">다른 앱의 내보내기 옵션을 찾아서 OPML 파일을 내보냅니다.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts에서는 OPML 파일에서 팟캐스트를 가져올 수 있으므로 현재 앱에서 OPML 파일을 내보낼 수 있으면 다음과 같은 단계를 진행할 수 있습니다.</string>
     <string name="onboarding_import_from_castbox_open">Castbox 열기…</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">“OPML 내보내기”까지 아래로 스크롤하여 누릅니다.</string>
     <string name="onboarding_import_from_castbox_step_3">\"설정\"을 누릅니다.</string>
     <string name="onboarding_import_from_castbox_step_2">\"개인\" 탭을 누릅니다.</string>
@@ -397,7 +419,6 @@ Language: ko_KR
     <string name="podcasts_empty_folder_summary">팟캐스트를 폴더에 추가하면 여기에 나타납니다.</string>
     <string name="podcasts_empty_folder">폴더가 비어 있습니다.</string>
     <string name="add_podcasts">팟캐스트 추가</string>
-    <string name="plus_folder_body">폴더를 생성하여 팟캐스트 컬렉션을 정리하세요.</string>
     <string name="expand_details">상세 정보 확장</string>
     <string name="profile_help_support">계정을 업그레이드하여 Pocket Casts 후원 돕기</string>
     <string name="error_check_your_internet_connection">인터넷 연결을 확인하세요.</string>
@@ -773,7 +794,6 @@ Language: ko_KR
     <string name="settings_notification_actions_title">작업 3개 선택</string>
     <string name="settings_notification_sound_summary">알림음이 재생됩니다.</string>
     <string name="settings_notification_sound">알림음</string>
-    <string name="settings_notification_play_over_summary">알림 또는 탐색과 같은 다른 앱에서 소리가 재생되더라도 계속 재생됩니다.</string>
     <string name="settings_notification_play_over">연속 재생 알림</string>
     <string name="settings_notification_notify_me">알림 받기</string>
     <string name="settings_notification_hide_on_pause">일시 중지 시 재생 알림 숨기기</string>
@@ -1153,7 +1173,6 @@ Language: ko_KR
     <string name="filters_create_filter_details">필터 상세 정보</string>
     <string name="filters_create_filter_by">필터링 기준</string>
     <string name="filters_create_filter">필터 생성</string>
-    <string name="filters_create_colour_icon">색상 및 아이콘</string>
     <string name="filters_create_add_more">필터 세분화를 마치려면 기준을 더 추가하세요.</string>
     <string name="filters_create">생성</string>
     <string name="filters_chosen_singular">필터 1개 추가됨</string>
@@ -1193,8 +1212,8 @@ Language: ko_KR
     <string name="supporter_bundle">번들</string>
     <string name="supporter">후원자</string>
     <string name="episode_sort_short_to_long">길이 오름차순</string>
-    <string name="episode_sort_oldest_to_newest">날짜/시각 오름차순</string>
-    <string name="episode_sort_newest_to_oldest">날짜/시각 내림차순</string>
+    <string name="sort_oldest_to_newest">날짜/시각 오름차순</string>
+    <string name="sort_newest_to_oldest">날짜/시각 내림차순</string>
     <string name="episode_sort_long_to_short">길이 내림차순</string>
     <string name="episode_row_waiting_for_wifi">WiFi 대기 중</string>
     <string name="episode_row_waiting_for_power">전원 대기 중</string>
@@ -1489,7 +1508,7 @@ Language: ko_KR
     <string name="subscribe">구독</string>
     <string name="stream">스트리밍</string>
     <string name="stop_downloading">다운로드 중지</string>
-    <string name="starred">별 표시됨</string>
+    <string name="starred">즐겨찾기</string>
     <string name="unstar_episode">에피소드 별 취소</string>
     <string name="unstar">별 취소</string>
     <string name="star_episode">에피소드 별 표시</string>

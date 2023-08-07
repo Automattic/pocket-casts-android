@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.settings.viewmodel.utils
+package au.com.shiftyjelly.pocketcasts.sharedtest
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

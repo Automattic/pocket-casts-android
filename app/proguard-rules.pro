@@ -23,6 +23,8 @@
 -dontwarn android.test.**
 -dontwarn org.junit.internal.runners.statements.**
 -dontwarn org.junit.rules.**
+-dontwarn org.hamcrest.SelfDescribing
+-dontwarn org.hamcrest.StringDescription
 # retrolambda
 -dontwarn java.lang.invoke.*
 # okhttp
@@ -155,3 +157,31 @@
 #-assumenosideeffects class au.com.shiftyjelly.pocketcasts.core.helper.log.TimberHelper {
 #    public static *** sql(...);
 #}
+
+# Resolve AGP 8.0 update missing class errors by keeping the current behavior 
+# Example failure:
+# 
+# > Task :modules:services:model:minifyReleaseWithR8 FAILED
+# ERROR: Missing classes detected while running R8. Please add the missing classes or apply additional keep rules that are generated in ~/pocket-casts-android/modules/services/model/build/outputs/mapping/release/missing_rules.txt.
+# ERROR: R8: Missing class au.com.shiftyjelly.pocketcasts.localization.R$string (referenced from: void au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency.<clinit>())
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$attr
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$color
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$drawable
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$id
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$layout
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$string
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$styleable
+-dontwarn com.google.android.material.R$attr
+-dontwarn com.google.android.material.R$dimen
+-dontwarn com.google.android.material.R$style
+-dontwarn com.google.android.material.R$styleable
+
+# The following Retrofit rules are only be required until Retrofit 2.10.0 is released as it's included https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
+
+# With R8 full mode generic signatures are stripped for classes that are not kept.
+# Suspend functions are wrapped in continuations where the type argument is used.
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+# R8 full mode strips generic signatures from return types if not kept.
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>

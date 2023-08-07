@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
+import com.pocketcasts.service.api.BookmarkRequest
+import com.pocketcasts.service.api.BookmarksResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
@@ -24,6 +26,7 @@ import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -138,4 +141,8 @@ interface SyncServer {
 
     @POST("/subscription/promo/validate")
     fun validatePromoCode(@Body request: PromoCodeRequest): Single<PromoCodeResponse>
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/user/bookmark/list")
+    suspend fun getBookmarkList(@Header("Authorization") authorization: String, @Body request: BookmarkRequest): BookmarksResponse
 }

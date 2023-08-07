@@ -118,6 +118,7 @@ class SearchFragment : BaseFragment() {
         super.onPause()
         binding?.let {
             UiUtil.hideKeyboard(it.searchView)
+            it.searchView.clearFocus()
         }
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }

@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-07-18 15:54:03+0000
+Translation-Revision-Date: 2023-08-04 08:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="bookmark">Als Lesezeichen markieren</string>
+    <string name="details">Details</string>
+    <string name="episode">Folge</string>
+    <string name="bookmarks_search">Lesezeichen suchen</string>
+    <string name="settings_storage_background_refresh_on_watch">Pocket Casts wird dein Konto regelmäßig im Hintergrund aktualisieren.</string>
+    <string name="settings_storage_background_refresh_off_watch">Pocket Casts wird dein Konto nur aktualisieren, wenn du die App öffnest.</string>
+    <string name="settings_notification_play_over_always">Immer</string>
+    <string name="settings_notification_play_over_duck">Ducking</string>
+    <string name="settings_notification_play_over_never">Nie</string>
+    <string name="skipping_to">Springen auf %s</string>
+    <string name="playing_bookmark">„%s“ wird abgespielt</string>
+    <string name="save_bookmark">Lesezeichen speichern</string>
+    <string name="add_bookmark_title_hint">Füge einen optionalen Titel hinzu, um dieses Lesezeichen zu beschreiben</string>
+    <string name="change_title">Titel ändern</string>
+    <string name="bookmark_added">Lesezeichen „%s“ hinzugefügt</string>
+    <string name="add_bookmark_title">Lesezeichen hinzufügen</string>
+    <string name="add_bookmark">Lesezeichen hinzufügen</string>
+    <string name="filters_not_found">Keine Filter gefunden</string>
+    <string name="bookmarks_sort_timestamp">Zeitstempel</string>
+    <string name="bookmarks_select_option">Lesezeichen auswählen</string>
+    <string name="bookmarks_delete_summary_singular">Dieses Lesezeichen wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="bookmarks_delete_summary_plural">%d Lesezeichen werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="bookmarks_deleted_singular">1 Lesezeichen gelöscht</string>
+    <string name="bookmarks_deleted_plural">%1$d Lesezeichen gelöscht</string>
+    <string name="bookmarks_delete_singular">Lesezeichen löschen</string>
+    <string name="bookmarks_delete_plural">Lesezeichen löschen</string>
+    <string name="deselect_all_below">Alle unten angezeigten abwählen</string>
     <string name="deselect_all">Alle abwählen</string>
+    <string name="deselect_all_above">Alle oben angezeigten abwählen</string>
     <string name="edit">Bearbeiten</string>
     <string name="whats_new_autoplay_maybe_later_button">Vielleicht später</string>
     <string name="whats_new_autoplay_enable_button">Jetzt aktivieren</string>
@@ -14,7 +42,6 @@ Language: de
     <string name="whats_new_autoplay_title">Autoplay ist da!</string>
     <string name="filters_download_limit_3">3 Folgen</string>
     <string name="settings_title_headphone_controls">Kopfhörersteuerungen</string>
-    <string name="settings_headphone_controls_summary">Passe die Aktionen der gängigsten Kopfhörersteuerungen an.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Spiele einen Bestätigungston, nachdem du ein Lesezeichen mit deinen Kopfhörern erstellt hast.</string>
     <string name="settings_headphone_controls_confirmation_sound">Bestätigungston für Lesezeichen</string>
     <string name="settings_headphone_controls_choice_skip_forward">Vor</string>
@@ -28,8 +55,8 @@ Language: de
     <string name="bookmarks_not_found">Noch keine Lesezeichen</string>
     <string name="bookmarks_create_instructions">Du kannst Zeitstempel von Folgen über das Aktionsmenü im Player speichern oder, indem du eine Aktion mit deinen Kopfhörern konfigurierst.</string>
     <string name="bookmark_play">Wiedergabe bei Lesezeichenposition %s</string>
-    <string name="bookmarks_plural">%s Lesezeichen</string>
-    <string name="bookmarks_singular">%s Lesezeichen</string>
+    <string name="bookmarks_plural">%d Lesezeichen</string>
+    <string name="bookmarks_singular">1 Lesezeichen</string>
     <string name="bookmarks">Lesezeichen</string>
     <string name="settings_autoplay">Automatische Wiedergabe</string>
     <string name="player_sleep_add_1_minute">+ 1 Minute</string>
@@ -90,7 +117,6 @@ Language: de
     <string name="log_in_with_email">Mit E-Mail-Adresse anmelden</string>
     <string name="log_in_on_phone">Auf Smartphone anmelden</string>
     <string name="log_in_with_google">Mit Google anmelden</string>
-    <string name="log_in_subtitle">Beginne damit, dir deine liebsten Podcasts anzuhören</string>
     <string name="onboarding_upgrade_no_subscriptions_found">Keine Abonnements gefunden.</string>
     <string name="trial_then_per_year">%1$s ausprobieren, dann %2$s pro Jahr</string>
     <string name="trial_then_per_month">%1$s ausprobieren, dann %2$s pro Monat</string>
@@ -148,10 +174,8 @@ Language: de
     <string name="notifications_blocked_warning">Benachrichtigungen sind blockiert. In den Einstellungen kannst du die Berechtigung aktualisieren.</string>
     <string name="settings_media_actions_show_subtitle">Zeige individuelle Medienaktionen in den Medienbenachrichtigungen von Android 13 und Android Auto an.</string>
     <string name="settings_media_actions_show_title">Individuelle Medienaktionen anzeigen</string>
-    <string name="settings_media_actions_customise">Medienaktionen anpassen</string>
     <string name="settings_media_actions_prioritize_subtitle">Deine häufigsten Aktionen werden verfügbar sein.</string>
     <string name="settings_media_actions_prioritize_title">Deine individuellen Medienaktionen priorisieren</string>
-    <string name="plus_take_your_podcasting_to_next_level">Bringe dein Podcast-Erlebnis auf die nächste Ebene mit exklusivem Zugriff auf Funktionen und Anpassungsoptionen.</string>
     <string name="onboarding_recommendations_more">Mehr %s</string>
     <string name="filter_id_or_title">Filter-ID oder -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -210,7 +234,6 @@ Language: de
     <string name="onboarding_import_from_other_apps_step_1">Finde die Exportoption der anderen App und exportiere eine OPML-Datei.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts kann Podcasts aus OPML-Dateien importieren. Wenn deine aktuelle App also eine OPML-Datei exportieren kann, befolge diese Schritte:</string>
     <string name="onboarding_import_from_castbox_open">Öffne Castbox …</string>
-    <string name="onboarding_import_from_castbox_step_5">\@string/onboarding_import_from_other_apps_step_2</string>
     <string name="onboarding_import_from_castbox_step_4">Scrolle herunter zu „OPML Export“ (OPML-Export) und tippe darauf.</string>
     <string name="onboarding_import_from_castbox_step_3">Tippe auf „Settings“ (Einstellungen).</string>
     <string name="onboarding_import_from_castbox_step_2">Tippe auf den Tab „Personal“ (Persönlich).</string>
@@ -397,7 +420,6 @@ Language: de
     <string name="podcasts_empty_folder_summary">Füge Podcasts zu deinem Ordner hinzu und sie werden hier angezeigt.</string>
     <string name="podcasts_empty_folder">Dein Ordner ist leer</string>
     <string name="add_podcasts">Podcasts hinzufügen</string>
-    <string name="plus_folder_body">Erstelle Ordner, um deine Podcast-Sammlung zu organisieren.</string>
     <string name="expand_details">Details erweitern</string>
     <string name="profile_help_support">Unterstütze Pocket Casts, indem du ein Upgrade für dein Konto durchführst</string>
     <string name="error_check_your_internet_connection">Überprüfe deine Internetverbindung.</string>
@@ -773,7 +795,6 @@ Language: de
     <string name="settings_notification_actions_title">Wähle 3 Aktionen aus:</string>
     <string name="settings_notification_sound_summary">Benachrichtigungston wird abgespielt.</string>
     <string name="settings_notification_sound">Benachrichtigungston</string>
-    <string name="settings_notification_play_over_summary">Wiedergabe fortsetzen, auch wenn andere Apps Töne wiedergeben, z. B. Benachrichtigungen oder die Navigation.</string>
     <string name="settings_notification_play_over">Wiedergabe über Benachrichtigungen</string>
     <string name="settings_notification_notify_me">Benachrichtigen</string>
     <string name="settings_notification_hide_on_pause">Wiedergabe-Benachrichtigung beim Pausieren ausblenden</string>
@@ -1153,7 +1174,6 @@ Language: de
     <string name="filters_create_filter_details">Filterdetails</string>
     <string name="filters_create_filter_by">FILTERN NACH</string>
     <string name="filters_create_filter">Filter erstellen</string>
-    <string name="filters_create_colour_icon">FARBE UND ICON</string>
     <string name="filters_create_add_more">Füge weitere Kriterien hinzu, um deinen Filter zu verfeinern.</string>
     <string name="filters_create">Erstellen</string>
     <string name="filters_chosen_singular">1 Filter ausgewählt</string>
@@ -1193,8 +1213,8 @@ Language: de
     <string name="supporter_bundle">PAKET</string>
     <string name="supporter">Unterstützer</string>
     <string name="episode_sort_short_to_long">Kurz nach lang</string>
-    <string name="episode_sort_oldest_to_newest">Alt nach neu</string>
-    <string name="episode_sort_newest_to_oldest">Neu nach alt</string>
+    <string name="sort_oldest_to_newest">Alt nach neu</string>
+    <string name="sort_newest_to_oldest">Neu nach alt</string>
     <string name="episode_sort_long_to_short">Lang nach kurz</string>
     <string name="episode_row_waiting_for_wifi">Auf WLAN warten</string>
     <string name="episode_row_waiting_for_power">Warten auf Strom</string>

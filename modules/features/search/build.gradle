@@ -3,6 +3,7 @@ apply from: "../../modules.gradle"
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.search'
     buildFeatures {
+        buildConfig true
         viewBinding true
         dataBinding = true
         compose true
@@ -21,4 +22,5 @@ dependencies {
     implementation project(':modules:services:servers')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:model')
+    testImplementation project(':modules:services:sharedtest')
 }

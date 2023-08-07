@@ -4,6 +4,9 @@ apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.repositories'
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
@@ -13,6 +16,7 @@ dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:model')
     implementation project(':modules:services:preferences')
+    implementation project(':modules:services:protobuf')
     implementation project(':modules:services:servers')
     implementation project(':modules:services:utils')
 }

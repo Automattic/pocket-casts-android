@@ -12,7 +12,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -91,7 +92,8 @@ class SettingsImpl @Inject constructor(
     override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
     override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
     override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
-    override val bookmarkSortTypeFlow = MutableStateFlow(getBookmarksSortType())
+    override val bookmarkSortTypeForPlayerFlow = MutableStateFlow(getBookmarksSortTypeForPlayer())
+    override val bookmarkSortTypeForPodcastFlow = MutableStateFlow(getBookmarksSortTypeForPodcast())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1394,19 +1396,6 @@ class SettingsImpl @Inject constructor(
     override fun getlastLoadedFromPodcastOrFilterUuid(): String? =
         getString(LAST_SELECTED_PODCAST_OR_FILTER_UUID)
 
-    override fun setBookmarksSortType(sortType: BookmarksSortType) {
-        setInt(Settings.PREFERENCE_BOOKMARKS_SORT, sortType.ordinal)
-        bookmarkSortTypeFlow.update { sortType }
-    }
-
-    override fun getBookmarksSortType() =
-        BookmarksSortType.values()[
-            getInt(
-                Settings.PREFERENCE_BOOKMARKS_SORT,
-                BookmarksSortType.DATE_ADDED_NEWEST_TO_OLDEST.ordinal
-            )
-        ]
-
     override val theme = ThemeSetting.UserSettingPref(
         sharedPrefKey = "pocketCastsTheme",
         defaultValue = ThemeSetting.DARK,
@@ -1441,4 +1430,33 @@ class SettingsImpl @Inject constructor(
         },
         toString = { it.id }
     )
+
+    override fun <T> setBookmarksSortType(sortType: T) {
+        when (sortType) {
+            is BookmarksSortTypeForPlayer -> {
+                setString(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER, sortType.key)
+                bookmarkSortTypeForPlayerFlow.update { sortType }
+            }
+            is BookmarksSortTypeForPodcast -> {
+                setString(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST, sortType.key)
+                bookmarkSortTypeForPodcastFlow.update { sortType }
+            }
+        }
+    }
+
+    override fun getBookmarksSortTypeForPlayer() =
+        BookmarksSortTypeForPlayer.fromString(
+            getString(
+                Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER,
+                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
+            )
+        ) ?: BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST
+
+    override fun getBookmarksSortTypeForPodcast() =
+        BookmarksSortTypeForPodcast.fromString(
+            getString(
+                Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
+                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
+            )
+        ) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST
 }

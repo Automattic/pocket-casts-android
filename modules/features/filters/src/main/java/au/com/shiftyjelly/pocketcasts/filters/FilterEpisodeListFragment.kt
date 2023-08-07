@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -191,7 +191,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private fun onRowClick(episode: BaseEpisode) {
         if (episode is PodcastEpisode) {
-            val fragment = EpisodeFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
+            val fragment = EpisodeContainerFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }

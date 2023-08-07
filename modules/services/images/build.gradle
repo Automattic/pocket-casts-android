@@ -4,4 +4,7 @@ apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.images'
+    buildFeatures {
+        buildConfig true
+    }
 }
