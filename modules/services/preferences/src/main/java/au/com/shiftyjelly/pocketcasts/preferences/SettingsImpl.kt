@@ -564,7 +564,7 @@ class SettingsImpl @Inject constructor(
         deleteCloudFileAfterPlaying.set(false)
         cloudAutoUpload.set(false)
         cloudAutoDownload.set(false)
-        setCloudOnlyWifi(false)
+        cloudDownloadOnlyOnWifi.set(false)
         setCancelledAcknowledged(false)
     }
 
@@ -1124,13 +1124,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getCloudOnlyWifi(): Boolean {
-        return getBoolean("cloudOnlyWifi", true)
-    }
-
-    override fun setCloudOnlyWifi(value: Boolean) {
-        setBoolean("cloudOnlyWifi", value)
-    }
+    override val cloudDownloadOnlyOnWifi = UserSetting.BoolPref(
+        sharedPrefKey = "cloudOnlyWifi",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getAppIconId(): String? {
         return getString("appIconId", "Default")

@@ -570,7 +570,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun autoUploadToCloudIfReq(episode: UserEpisode) {
         if (settings.cloudAutoUpload.flow.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
-            uploadToServer(episode, settings.getCloudOnlyWifi())
+            uploadToServer(episode, settings.cloudDownloadOnlyOnWifi.flow.value)
         }
     }
 

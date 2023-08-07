@@ -73,7 +73,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setCloudOnlyWifi(enabled: Boolean) {
-        settings.setCloudOnlyWifi(enabled)
+        settings.cloudDownloadOnlyOnWifi.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED,
             mapOf("enabled" to enabled)

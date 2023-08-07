@@ -115,7 +115,7 @@ class CloudSettingsFragment : BaseFragment() {
             }
         }
         with(binding.swtCloudOnlyOnWiFi) {
-            isChecked = settings.getCloudOnlyWifi()
+            isChecked = settings.cloudDownloadOnlyOnWifi.flow.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCloudOnlyWifi(isChecked)
             }

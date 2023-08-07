@@ -477,7 +477,7 @@ class DownloadManagerImpl @Inject constructor(
             } else NetworkRequirements.needsUnmetered()
         } else if (episode is UserEpisode) {
             // UserEpisodes have their own auto download setting
-            return if (settings.getCloudOnlyWifi()) {
+            return if (settings.cloudDownloadOnlyOnWifi.flow.value) {
                 NetworkRequirements.needsUnmetered()
             } else {
                 NetworkRequirements.runImmediately()
