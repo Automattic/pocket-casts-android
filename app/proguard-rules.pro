@@ -23,6 +23,8 @@
 -dontwarn android.test.**
 -dontwarn org.junit.internal.runners.statements.**
 -dontwarn org.junit.rules.**
+-dontwarn org.hamcrest.SelfDescribing
+-dontwarn org.hamcrest.StringDescription
 # retrolambda
 -dontwarn java.lang.invoke.*
 # okhttp
