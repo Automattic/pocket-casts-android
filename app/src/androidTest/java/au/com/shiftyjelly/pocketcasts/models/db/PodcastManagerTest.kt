@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
-import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
@@ -47,8 +46,8 @@ class PodcastManagerTest {
         val playlistManager = mock<PlaylistManager>()
 
         val settings = mock<Settings> {
-            on { podcastGroupingDefault } doReturn MockUserSetting(PodcastGrouping.None)
-            on { showArchivedDefault } doReturn MockUserSetting(false)
+            on { podcastGroupingDefault } doReturn UserSetting.Mock(PodcastGrouping.None, mock())
+            on { showArchivedDefault } doReturn UserSetting.Mock(false, mock())
         }
 
         val syncManagerSignedOut = mock<SyncManager> {
@@ -111,19 +110,5 @@ class PodcastManagerTest {
         podcastManagerSignedIn.unsubscribe(uuid, playbackManager)
         val daoPodcast = podcastDao.findByUuid(uuid)
         assertTrue("Podcast should be unsubscribed", daoPodcast?.isSubscribed == false)
-    }
-
-    // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
-    // from a mocked Settings class
-    private class MockUserSetting<T>(
-        private val initialValue: T,
-        sharedPrefKey: String = "a_shared_pref_key",
-        sharedPrefs: SharedPreferences = mock(),
-    ) : UserSetting<T>(
-        sharedPrefKey = sharedPrefKey,
-        sharedPrefs = sharedPrefs,
-    ) {
-        override fun get(): T = initialValue
-        override fun persist(value: T, commit: Boolean) {}
     }
 }

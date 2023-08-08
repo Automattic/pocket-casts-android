@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -66,9 +65,9 @@ class AutoArchiveTest {
         excludedPodcasts: List<String> = emptyList()
     ): EpisodeManager {
         val settings = mock<Settings> {
-            on { autoArchiveInactive } doReturn MockUserSetting(inactive)
-            on { autoArchiveAfterPlaying } doReturn MockUserSetting(played)
-            on { autoArchiveIncludeStarred } doReturn MockUserSetting(includeStarred)
+            on { autoArchiveInactive } doReturn UserSetting.Mock(inactive, mock())
+            on { autoArchiveAfterPlaying } doReturn UserSetting.Mock(played, mock())
+            on { autoArchiveIncludeStarred } doReturn UserSetting.Mock(includeStarred, mock())
             on { getAutoArchiveExcludedPodcasts() } doReturn excludedPodcasts
         }
         return EpisodeManagerImpl(settings, fileStorage, downloadManager, context, db, podcastCacheServerManager, userEpisodeManager)
@@ -83,7 +82,7 @@ class AutoArchiveTest {
 
     private fun upNextQueueFor(db: AppDatabase, episodeManager: EpisodeManager): UpNextQueue {
         val settings = mock<Settings>() {
-            on { autoDownloadUpNext } doReturn MockUserSetting(false)
+            on { autoDownloadUpNext } doReturn UserSetting.Mock(false, mock())
         }
         val context = mock<Context>()
         val syncManager = mock<SyncManager>()
@@ -550,19 +549,5 @@ class AutoArchiveTest {
 
         val updatedNewEpisodeInUpNextAfterInactive = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should not be archived as it was added to up next after being inactive", !updatedNewEpisodeInUpNextAfterInactive.isArchived)
-    }
-
-    // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
-    // from a mocked Settings class
-    private class MockUserSetting<T>(
-        private val initialValue: T,
-        sharedPrefKey: String = "a_shared_pref_key",
-        sharedPrefs: SharedPreferences = mock(),
-    ) : UserSetting<T>(
-        sharedPrefKey = sharedPrefKey,
-        sharedPrefs = sharedPrefs,
-    ) {
-        override fun get(): T = initialValue
-        override fun persist(value: T, commit: Boolean) {}
     }
 }

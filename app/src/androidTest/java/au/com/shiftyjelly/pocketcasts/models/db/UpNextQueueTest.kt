@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
-import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -36,7 +35,7 @@ class UpNextQueueTest {
         downloadManager = mock {}
         val episodeManager = mock<EpisodeManager> {}
         val settings = mock<Settings> {
-            on { autoDownloadUpNext } doReturn MockUserSetting(true)
+            on { autoDownloadUpNext } doReturn UserSetting.Mock(true, mock())
         }
         val syncManager = mock<SyncManager> {}
 
@@ -242,19 +241,5 @@ class UpNextQueueTest {
         val currentEpisode = upNextQueue.currentEpisode
         assertTrue("Current episode should still be first", currentEpisode?.uuid == uuids.first())
         assertTrue("Queue should be empty", upNextQueue.queueEpisodes.isEmpty())
-    }
-
-    // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
-    // from a mocked Settings class
-    private class MockUserSetting<T>(
-        private val initialValue: T,
-        sharedPrefKey: String = "a_shared_pref_key",
-        sharedPrefs: SharedPreferences = mock(),
-    ) : UserSetting<T>(
-        sharedPrefKey = sharedPrefKey,
-        sharedPrefs = sharedPrefs,
-    ) {
-        override fun get(): T = initialValue
-        override fun persist(value: T, commit: Boolean) {}
     }
 }

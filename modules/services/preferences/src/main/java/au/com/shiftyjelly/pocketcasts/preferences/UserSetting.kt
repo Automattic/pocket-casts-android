@@ -209,4 +209,17 @@ abstract class UserSetting<T>(
             intValue.toString()
         }
     )
+
+    // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
+    // from a mocked Settings class
+    class Mock<T>(
+        private val initialValue: T,
+        sharedPrefs: SharedPreferences,
+    ) : UserSetting<T>(
+        sharedPrefKey = "a_shared_pref_key",
+        sharedPrefs = sharedPrefs,
+    ) {
+        override fun get(): T = initialValue
+        override fun persist(value: T, commit: Boolean) {}
+    }
 }
