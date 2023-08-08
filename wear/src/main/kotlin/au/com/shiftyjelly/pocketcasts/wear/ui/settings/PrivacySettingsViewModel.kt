@@ -23,9 +23,9 @@ class PrivacySettingsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         State(
-            sendAnalytics = settings.getSendUsageStats(),
-            sendCrashReports = settings.getSendCrashReports(),
-            linkCrashReportsToUser = settings.getLinkCrashReportsToUser(),
+            sendAnalytics = settings.collectAnalytics.flow.value,
+            sendCrashReports = settings.sendCrashReports.flow.value,
+            linkCrashReportsToUser = settings.linkCrashReportsToUser.flow.value,
         )
     )
     val state = _state.asStateFlow()

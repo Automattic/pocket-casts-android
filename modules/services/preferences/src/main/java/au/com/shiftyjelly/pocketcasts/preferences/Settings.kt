@@ -467,16 +467,11 @@ interface Settings {
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int
 
-    // Only the AnalyticsTracker object should update or retrieve SendUsageState directly. Everything else
-    // should update/access this setting through the AnalyticsTracker.
-    fun setSendUsageStats(value: Boolean)
-    fun getSendUsageStats(): Boolean
-
-    fun setSendCrashReports(value: Boolean)
-    fun getSendCrashReports(): Boolean
-
-    fun setLinkCrashReportsToUser(value: Boolean)
-    fun getLinkCrashReportsToUser(): Boolean
+    // Only the AnalyticsTracker object should update SendUsageState directly. Everything else
+    // should update this setting through the AnalyticsTracker.
+    val collectAnalytics: UserSetting<Boolean>
+    val sendCrashReports: UserSetting<Boolean>
+    val linkCrashReportsToUser: UserSetting<Boolean>
 
     fun setEndOfYearShowBadge2022(value: Boolean)
     fun getEndOfYearShowBadge2022(): Boolean

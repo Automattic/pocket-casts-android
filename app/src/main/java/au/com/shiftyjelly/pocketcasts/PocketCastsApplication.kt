@@ -114,12 +114,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         }
 
         SentryAndroid.init(this) { options ->
-            options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
+            options.dsn = if (settings.sendCrashReports.flow.value) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.MOBILE.value)
         }
 
         // Link email to Sentry crash reports only if the user has opted in
-        if (settings.getLinkCrashReportsToUser()) {
+        if (settings.linkCrashReportsToUser.flow.value) {
             syncManager.getEmail()?.let { syncEmail ->
                 val user = User().apply { email = syncEmail }
                 Sentry.setUser(user)
