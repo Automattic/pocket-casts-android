@@ -173,7 +173,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     override suspend fun add(episode: UserEpisode, playbackManager: PlaybackManager) {
         userEpisodeDao.insert(episode)
 
-        if (settings.getCloudAddToUpNext()) {
+        if (settings.cloudAddToUpNext.flow.value) {
             playbackManager.playLast(episode = episode, source = SourceView.FILES)
         }
     }
@@ -385,7 +385,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 val newEpisode = it.toUserEpisode()
                 add(newEpisode, playbackManager)
 
-                if (settings.getCloudAutoDownload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
+                if (settings.cloudAutoDownload.flow.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
                     userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
                     newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
                     downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", false)
@@ -551,7 +551,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
-        if (settings.getDeleteLocalFileAfterPlaying()) {
+        if (settings.deleteLocalFileAfterPlaying.flow.value) {
             deleteFilesForEpisode(episode)
             userEpisodeDao.updateEpisodeStatus(episode.uuid, EpisodeStatusEnum.NOT_DOWNLOADED)
 
@@ -560,7 +560,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             }
         }
 
-        if (settings.getDeleteCloudFileAfterPlaying() && episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
+        if (settings.deleteCloudFileAfterPlaying.flow.value && episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
             removeFromCloud(episode)
             if (!episode.isDownloaded) {
                 delete(episode, playbackManager)
@@ -569,8 +569,8 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun autoUploadToCloudIfReq(episode: UserEpisode) {
-        if (settings.getCloudAutoUpload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
-            uploadToServer(episode, settings.getCloudOnlyWifi())
+        if (settings.cloudAutoUpload.flow.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
+            uploadToServer(episode, settings.cloudDownloadOnlyOnWifi.flow.value)
         }
     }
 

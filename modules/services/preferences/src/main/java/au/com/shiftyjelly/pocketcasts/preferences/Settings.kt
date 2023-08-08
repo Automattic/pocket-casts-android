@@ -413,20 +413,14 @@ interface Settings {
 
     fun setCloudSortOrder(sortOrder: CloudSortOrder)
     fun getCloudSortOrder(): CloudSortOrder
-    fun getCloudAddToUpNext(): Boolean
-    fun setCloudAddToUpNext(value: Boolean)
-    fun getDeleteLocalFileAfterPlaying(): Boolean
-    fun setDeleteLocalFileAfterPlaying(value: Boolean)
-    fun getDeleteCloudFileAfterPlaying(): Boolean
-    fun setDeleteCloudFileAfterPlaying(value: Boolean)
-    fun getCloudAutoUpload(): Boolean
-    fun setCloudAutoUpload(value: Boolean)
-    fun getCloudAutoDownload(): Boolean
-    fun setCloudAutoDownload(value: Boolean)
+    val cloudAddToUpNext: UserSetting<Boolean>
+    val deleteLocalFileAfterPlaying: UserSetting<Boolean>
+    val deleteCloudFileAfterPlaying: UserSetting<Boolean>
+    val cloudAutoUpload: UserSetting<Boolean>
+    val cloudAutoDownload: UserSetting<Boolean>
+    val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
     fun getCachedSubscription(): SubscriptionStatus?
     fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
-    fun getCloudOnlyWifi(): Boolean
-    fun setCloudOnlyWifi(value: Boolean)
     fun getAppIconId(): String?
     fun setAppIconId(value: String)
 

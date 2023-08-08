@@ -561,10 +561,10 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        setDeleteCloudFileAfterPlaying(false)
-        setCloudAutoUpload(false)
-        setCloudAutoDownload(false)
-        setCloudOnlyWifi(false)
+        deleteCloudFileAfterPlaying.set(false)
+        cloudAutoUpload.set(false)
+        cloudAutoDownload.set(false)
+        cloudDownloadOnlyOnWifi.set(false)
         setCancelledAcknowledged(false)
     }
 
@@ -1089,53 +1089,46 @@ class SettingsImpl @Inject constructor(
         return Settings.CloudSortOrder.values().getOrNull(getInt("cloud_sort_order", 0)) ?: Settings.CloudSortOrder.NEWEST_OLDEST
     }
 
-    override fun getCloudAddToUpNext(): Boolean {
-        return getBoolean("cloudUpNext", false)
-    }
+    override val cloudAddToUpNext = UserSetting.BoolPref(
+        sharedPrefKey = "cloudUpNext",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setCloudAddToUpNext(value: Boolean) {
-        setBoolean("cloudUpNext", value)
-    }
+    override val deleteLocalFileAfterPlaying = UserSetting.BoolPref(
+        sharedPrefKey = "deleteLocalFileAfterPlaying",
+        defaultValue =
+        // Use value stored under previous key if it exists
+        getBoolean("cloudDeleteAfterPlaying", false),
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getDeleteLocalFileAfterPlaying(): Boolean {
-        return getBoolean("cloudDeleteAfterPlaying", false)
-    }
+    override val deleteCloudFileAfterPlaying = UserSetting.BoolPref(
+        sharedPrefKey = "deleteCloudFileAfterPlaying",
+        defaultValue =
+        // Use value stored under previous key if it exists
+        sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
+        sharedPrefs = sharedPreferences,
 
-    override fun setDeleteLocalFileAfterPlaying(value: Boolean) {
-        setBoolean("cloudDeleteAfterPlaying", value)
-    }
+    )
 
-    override fun getDeleteCloudFileAfterPlaying(): Boolean {
-        return getBoolean("cloudDeleteCloudAfterPlaying", false)
-    }
+    override val cloudAutoUpload = UserSetting.BoolPref(
+        sharedPrefKey = "cloudAutoUpload",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setDeleteCloudFileAfterPlaying(value: Boolean) {
-        setBoolean("cloudDeleteCloudAfterPlaying", value)
-    }
+    override val cloudAutoDownload = UserSetting.BoolPref(
+        sharedPrefKey = "cloudAutoDownload",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getCloudAutoUpload(): Boolean {
-        return getBoolean("cloudAutoUpload", false)
-    }
-
-    override fun setCloudAutoUpload(value: Boolean) {
-        setBoolean("cloudAutoUpload", value)
-    }
-
-    override fun getCloudAutoDownload(): Boolean {
-        return getBoolean("cloudAutoDownload", false)
-    }
-
-    override fun setCloudAutoDownload(value: Boolean) {
-        setBoolean("cloudAutoDownload", value)
-    }
-
-    override fun getCloudOnlyWifi(): Boolean {
-        return getBoolean("cloudOnlyWifi", true)
-    }
-
-    override fun setCloudOnlyWifi(value: Boolean) {
-        setBoolean("cloudOnlyWifi", value)
-    }
+    override val cloudDownloadOnlyOnWifi = UserSetting.BoolPref(
+        sharedPrefKey = "cloudOnlyWifi",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getAppIconId(): String? {
         return getString("appIconId", "Default")
