@@ -54,7 +54,7 @@ class RefreshPodcastsTask @AssistedInject constructor(
         fun scheduleOrCancel(context: Context, settings: Settings) {
             val workManager = WorkManager.getInstance(context)
 
-            if (!settings.refreshPodcastsAutomatically()) {
+            if (!settings.backgroundRefreshPodcasts.flow.value) {
                 workManager.cancelAllWorkByTag(TAG_REFRESH_TASK)
                 return
             }
@@ -66,10 +66,10 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 .setRequiresBatteryNotLow(true)
                 .build()
 
-            val request = PeriodicWorkRequestBuilder<RefreshPodcastsTask>(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
+            val request = PeriodicWorkRequestBuilder<RefreshPodcastsTask>(20, TimeUnit.SECONDS)
                 .addTag(TAG_REFRESH_TASK)
                 .setConstraints(constraints)
-                .setInitialDelay(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
+                .setInitialDelay(20, TimeUnit.SECONDS)
                 .build()
 
             workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, request)

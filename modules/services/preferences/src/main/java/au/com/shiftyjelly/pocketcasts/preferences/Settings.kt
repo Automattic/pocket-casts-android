@@ -247,8 +247,7 @@ interface Settings {
     fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
     fun getWorkManagerNetworkTypeConstraint(): NetworkType
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
-    fun refreshPodcastsAutomatically(): Boolean
-    fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean)
+    val backgroundRefreshPodcasts: UserSetting<Boolean>
     fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)
     fun setPodcastsSortTypeNeedsSync(value: Boolean)
     fun getPodcastsSortTypeNeedsSync(): Boolean
@@ -285,8 +284,7 @@ interface Settings {
     fun getDiscoveryCountryCode(): String
     fun setDiscoveryCountryCode(code: String)
 
-    fun warnOnMeteredNetwork(): Boolean
-    fun setWarnOnMeteredNetwork(warn: Boolean)
+    val warnOnMeteredNetwork: UserSetting<Boolean>
 
     fun getPopularPodcastCountryCode(): String
 

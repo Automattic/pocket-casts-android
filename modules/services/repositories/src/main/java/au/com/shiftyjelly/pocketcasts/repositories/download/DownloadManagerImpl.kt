@@ -472,7 +472,7 @@ class DownloadManagerImpl @Inject constructor(
         // user has tapped download
         if (!episode.isAutoDownloaded) {
             // user said yes to warning dialog
-            return if (episode.isManualDownloadOverridingWifiSettings || !settings.warnOnMeteredNetwork()) {
+            return if (episode.isManualDownloadOverridingWifiSettings || !settings.warnOnMeteredNetwork.flow.value) {
                 NetworkRequirements.runImmediately()
             } else NetworkRequirements.needsUnmetered()
         } else if (episode is UserEpisode) {

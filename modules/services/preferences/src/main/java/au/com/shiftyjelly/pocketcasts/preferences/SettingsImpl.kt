@@ -227,14 +227,11 @@ class SettingsImpl @Inject constructor(
     override fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean =
         syncOnMeteredNetwork() || isUnmetered
 
-    override fun refreshPodcastsAutomatically(): Boolean {
-        val isWear = Util.isWearOs(context)
-        return getBoolean("backgroundRefresh", !isWear)
-    }
-
-    override fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean) {
-        return setBoolean("backgroundRefresh", shouldRefresh)
-    }
+    override val backgroundRefreshPodcasts = UserSetting.BoolPref(
+        sharedPrefKey = "backgroundRefresh",
+        defaultValue = !Util.isWearOs(context),
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean) {
         if (getPodcastsSortType() == sortType) {
@@ -426,13 +423,11 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
-    override fun warnOnMeteredNetwork(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI, false)
-    }
-
-    override fun setWarnOnMeteredNetwork(warn: Boolean) {
-        setBoolean(Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI, warn)
-    }
+    override val warnOnMeteredNetwork = UserSetting.BoolPref(
+        sharedPrefKey = Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getPopularPodcastCountryCode(): String {
         return sharedPreferences.getString(Settings.PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE, "") ?: ""
