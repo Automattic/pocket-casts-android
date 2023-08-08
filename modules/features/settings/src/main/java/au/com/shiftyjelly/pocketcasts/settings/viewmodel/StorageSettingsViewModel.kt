@@ -58,7 +58,7 @@ class StorageSettingsViewModel
     val permissionRequest = mutablePermissionRequest.asSharedFlow()
 
     private val backgroundRefreshSummary: Int
-        get() = if (settings.refreshPodcastsAutomatically()) {
+        get() = if (settings.backgroundRefreshPodcasts.flow.value) {
             LR.string.settings_storage_background_refresh_on
         } else {
             LR.string.settings_storage_background_refresh_off
@@ -126,7 +126,7 @@ class StorageSettingsViewModel
         ),
         backgroundRefreshState = State.BackgroundRefreshState(
             summary = backgroundRefreshSummary,
-            isChecked = settings.refreshPodcastsAutomatically(),
+            isChecked = settings.backgroundRefreshPodcasts.flow.value,
             onCheckedChange = {
                 onBackgroundRefreshCheckedChange(it)
                 analyticsTracker.track(
@@ -174,14 +174,14 @@ class StorageSettingsViewModel
     }
 
     private fun onBackgroundRefreshCheckedChange(isChecked: Boolean) {
-        settings.setRefreshPodcastsAutomatically(isChecked)
+        settings.backgroundRefreshPodcasts.set(isChecked)
         updateBackgroundRefreshState()
     }
 
     private fun updateBackgroundRefreshState() {
         mutableState.value = mutableState.value.copy(
             backgroundRefreshState = mutableState.value.backgroundRefreshState.copy(
-                isChecked = settings.refreshPodcastsAutomatically(),
+                isChecked = settings.backgroundRefreshPodcasts.flow.value,
                 summary = backgroundRefreshSummary
             )
         )

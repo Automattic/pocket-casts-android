@@ -38,7 +38,7 @@ class SettingsViewModel @Inject constructor(
             refreshState = null,
             signInState = userManager.getSignInState().blockingFirst(),
             showDataWarning = settings.warnOnMeteredNetwork.flow.value,
-            refreshInBackground = settings.refreshPodcastsAutomatically(),
+            refreshInBackground = settings.backgroundRefreshPodcasts.flow.value,
         )
     )
     val state = _state.asStateFlow()
@@ -67,7 +67,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setRefreshPodcastsInBackground(isChecked: Boolean) {
-        settings.setRefreshPodcastsAutomatically(isChecked)
+        settings.backgroundRefreshPodcasts.set(isChecked)
         _state.update { it.copy(refreshInBackground = isChecked) }
     }
 

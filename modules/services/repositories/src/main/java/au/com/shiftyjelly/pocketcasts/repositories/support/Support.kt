@@ -263,7 +263,7 @@ class Support @Inject constructor(
             output.append("Android version: ").append(Build.VERSION.RELEASE).append(" SDK ").append(Build.VERSION.SDK_INT).append(eol)
             output.append(eol)
 
-            output.append("Background refresh: ").append(settings.refreshPodcastsAutomatically()).append(eol)
+            output.append("Background refresh: ").append(settings.backgroundRefreshPodcasts.flow.value).append(eol)
             output.append("Battery restriction: ${systemBatteryRestrictions.status}")
             output.append(eol)
 
