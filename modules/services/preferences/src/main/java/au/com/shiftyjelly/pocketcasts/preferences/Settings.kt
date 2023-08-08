@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
@@ -143,16 +144,6 @@ interface Settings {
         SIGN_IN_ERROR(21483649),
     }
 
-    enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
-        LARGE_ARTWORK(id = 0, analyticsValue = "large_artwork"),
-        SMALL_ARTWORK(id = 1, analyticsValue = "small_artwork"),
-        LIST_VIEW(id = 2, analyticsValue = "list");
-        companion object {
-            fun fromLayoutId(id: Int) =
-                PodcastGridLayoutType.values().find { it.id == id } ?: LARGE_ARTWORK
-        }
-    }
-
     enum class UpNextAction {
         PLAY_NEXT,
         PLAY_LAST
@@ -206,7 +197,6 @@ interface Settings {
         object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
     }
 
-    val podcastLayoutObservable: Observable<Int>
     val podcastSortTypeObservable: Observable<PodcastsSortType>
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val playbackEffectsObservable: Observable<PlaybackEffects>
@@ -332,9 +322,7 @@ interface Settings {
     fun setMigratedVersionCode(versionCode: Int)
 
     val podcastBadgeType: UserSetting<BadgeType>
-    fun setPodcastsLayout(layout: Int)
-    fun getPodcastsLayout(): Int
-    fun isPodcastsLayoutListView(): Boolean
+    val podcastGridLayout: UserSetting<PodcastGridLayoutType>
 
     fun getNotificationLastSeen(): Date?
     fun setNotificationLastSeen(lastSeen: Date?)

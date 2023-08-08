@@ -16,8 +16,8 @@ import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.min
 
@@ -25,7 +25,7 @@ class FolderViewHolder(
     val composeView: ComposeView,
     val theme: Theme,
     val gridWidthDp: Int,
-    val podcastsLayout: Int,
+    val podcastsLayout: PodcastGridLayoutType,
     val onFolderClick: (Folder) -> Unit
 ) : RecyclerView.ViewHolder(composeView) {
 
@@ -37,7 +37,7 @@ class FolderViewHolder(
                 val color = MaterialTheme.theme.colors.getFolderColor(folder.color)
                 val podcastUuids = podcasts.map { it.uuid }
                 when (podcastsLayout) {
-                    Settings.PodcastGridLayoutType.LIST_VIEW.id -> {
+                    PodcastGridLayoutType.LIST_VIEW -> {
                         FolderListAdapter(
                             color = color,
                             name = folder.name,

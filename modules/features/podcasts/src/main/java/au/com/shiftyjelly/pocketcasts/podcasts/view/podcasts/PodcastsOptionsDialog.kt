@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListCreateActivity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -43,31 +44,31 @@ class PodcastsOptionsDialog(
                 ToggleButtonOption(
                     imageId = R.drawable.ic_largegrid,
                     descriptionId = LR.string.podcasts_layout_large_grid,
-                    isOn = { settings.getPodcastsLayout() == Settings.PodcastGridLayoutType.LARGE_ARTWORK.id },
+                    isOn = { settings.podcastGridLayout.flow.value == PodcastGridLayoutType.LARGE_ARTWORK },
                     click = {
-                        settings.setPodcastsLayout(Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)
+                        settings.podcastGridLayout.set(PodcastGridLayoutType.LARGE_ARTWORK)
                         trackTapOnModalOption(ModalOption.LAYOUT)
-                        trackLayoutChanged(Settings.PodcastGridLayoutType.LARGE_ARTWORK)
+                        trackLayoutChanged(PodcastGridLayoutType.LARGE_ARTWORK)
                     }
                 ),
                 ToggleButtonOption(
                     imageId = R.drawable.ic_smallgrid,
                     descriptionId = LR.string.podcasts_layout_small_grid,
-                    isOn = { settings.getPodcastsLayout() == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id },
+                    isOn = { settings.podcastGridLayout.flow.value == PodcastGridLayoutType.SMALL_ARTWORK },
                     click = {
-                        settings.setPodcastsLayout(Settings.PodcastGridLayoutType.SMALL_ARTWORK.id)
+                        settings.podcastGridLayout.set(PodcastGridLayoutType.SMALL_ARTWORK)
                         trackTapOnModalOption(ModalOption.LAYOUT)
-                        trackLayoutChanged(Settings.PodcastGridLayoutType.SMALL_ARTWORK)
+                        trackLayoutChanged(PodcastGridLayoutType.SMALL_ARTWORK)
                     }
                 ),
                 ToggleButtonOption(
                     imageId = R.drawable.ic_list,
                     descriptionId = LR.string.podcasts_layout_list_view,
-                    isOn = { settings.getPodcastsLayout() == Settings.PodcastGridLayoutType.LIST_VIEW.id },
+                    isOn = { settings.podcastGridLayout.flow.value == PodcastGridLayoutType.LIST_VIEW },
                     click = {
-                        settings.setPodcastsLayout(Settings.PodcastGridLayoutType.LIST_VIEW.id)
+                        settings.podcastGridLayout.set(PodcastGridLayoutType.LIST_VIEW)
                         trackTapOnModalOption(ModalOption.LAYOUT)
-                        trackLayoutChanged(Settings.PodcastGridLayoutType.LIST_VIEW)
+                        trackLayoutChanged(PodcastGridLayoutType.LIST_VIEW)
                     }
                 )
             )
@@ -171,7 +172,7 @@ class PodcastsOptionsDialog(
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SORT_ORDER_CHANGED, mapOf(SORT_BY_KEY to order.analyticsValue))
     }
 
-    private fun trackLayoutChanged(layoutType: Settings.PodcastGridLayoutType) {
+    private fun trackLayoutChanged(layoutType: PodcastGridLayoutType) {
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_LAYOUT_CHANGED, mapOf(LAYOUT_KEY to layoutType.analyticsValue))
     }
 

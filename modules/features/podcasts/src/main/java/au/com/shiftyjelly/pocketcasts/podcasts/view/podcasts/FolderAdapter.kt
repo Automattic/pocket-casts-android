@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
@@ -65,17 +66,23 @@ class FolderAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             FolderItem.Podcast.viewTypeId -> {
-                val layout = settings.getPodcastsLayout()
-                val isLayoutListView = settings.isPodcastsLayoutListView()
+                val isLayoutListView = settings.podcastGridLayout.flow.value == PodcastGridLayoutType.LIST_VIEW
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
                 imageLoader.radiusPx = if (isLayoutListView) 4.dpToPx(context) else 0
                 val view = parent.inflate(layoutId, attachToThis = false)
-                PodcastViewHolder(view, imageLoader, layout, theme)
+                val podcastGridLayout = settings.podcastGridLayout.flow.value
+                PodcastViewHolder(view, imageLoader, podcastGridLayout, theme)
             }
             FolderItem.Folder.viewTypeId -> {
-                val podcastsLayout = settings.getPodcastsLayout()
-                val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id, context = context).pxToDp(parent.context).toInt()
-                FolderViewHolder(ComposeView(parent.context), theme, gridWidthDp, podcastsLayout, onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) })
+                val podcastsLayout = settings.podcastGridLayout.flow.value
+                val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(parent.context).toInt()
+                FolderViewHolder(
+                    composeView = ComposeView(parent.context),
+                    theme = theme,
+                    gridWidthDp = gridWidthDp,
+                    podcastsLayout = podcastsLayout,
+                    onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) }
+                )
             }
             else -> throw Exception("Unknown view type $viewType")
         }
@@ -145,7 +152,7 @@ class FolderAdapter(
     class PodcastViewHolder(
         val view: View,
         private val imageLoader: PodcastImageLoader,
-        layout: Int,
+        podcastGridLayout: PodcastGridLayoutType,
         val theme: Theme
     ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
 
@@ -158,7 +165,7 @@ class FolderAdapter(
         val unplayedBackground: ImageView? = view.findViewById(R.id.unplayed_background)
         val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
-        val isListLayout: Boolean = layout == Settings.PodcastGridLayoutType.LIST_VIEW.id
+        val isListLayout: Boolean = podcastGridLayout == PodcastGridLayoutType.LIST_VIEW
 
         fun bind(podcast: Podcast, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
             button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }

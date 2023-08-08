@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -13,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -24,9 +22,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Flowable.combineLatest
-import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineLatest
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
@@ -181,10 +181,9 @@ class PodcastsViewModel
             }.toLiveData()
 
     // We only want the current badge type when loading for this observable or else it will rebind the adapter every time the badge changes. We use take(1) for this.
-    val layoutChangedLiveData = Observables.combineLatest(
-        settings.podcastLayoutObservable,
-        settings.podcastBadgeType.flow.asObservable(viewModelScope.coroutineContext).take(1),
-    )
+    val layoutChangedLiveData = settings.podcastGridLayout.flow
+        .combine(settings.podcastBadgeType.flow.take(1), ::Pair)
+        .asObservable(coroutineContext)
         .toFlowable(BackpressureStrategy.LATEST)
         .toLiveData()
 
@@ -268,7 +267,7 @@ class PodcastsViewModel
             properties[NUMBER_OF_FOLDERS_KEY] = folderManager.countFolders()
             properties[NUMBER_OF_PODCASTS_KEY] = podcastManager.countSubscribed()
             properties[BADGE_TYPE_KEY] = settings.podcastBadgeType.flow.value.analyticsValue
-            properties[LAYOUT_KEY] = PodcastGridLayoutType.fromLayoutId(settings.getPodcastsLayout()).analyticsValue
+            properties[LAYOUT_KEY] = settings.podcastGridLayout.flow.value.analyticsValue
             properties[SORT_ORDER_KEY] = settings.getPodcastsSortType().analyticsValue
             analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
         }

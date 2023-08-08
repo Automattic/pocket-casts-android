@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -77,7 +78,6 @@ class SettingsImpl @Inject constructor(
 
     private var languageCode: String? = null
 
-    override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
     override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
@@ -702,10 +702,13 @@ class SettingsImpl @Inject constructor(
         toInt = { it.persistedInt }
     )
 
-    override fun setPodcastsLayout(layout: Int) {
-        setInt("PODCAST_GRID_LAYOUT", layout)
-        podcastLayoutObservable.accept(layout)
-    }
+    override val podcastGridLayout = UserSetting.PrefFromInt<PodcastGridLayoutType>(
+        sharedPrefKey = "PODCAST_GRID_LAYOUT",
+        defaultValue = PodcastGridLayoutType.default,
+        sharedPrefs = sharedPreferences,
+        fromInt = { PodcastGridLayoutType.fromLayoutId(it) },
+        toInt = { it.id }
+    )
 
     override fun getNotificationLastSeen(): Date? {
         return getDate("NOTIFICATION_LAST_SEEN")
@@ -930,14 +933,6 @@ class SettingsImpl @Inject constructor(
             }
         },
     )
-
-    override fun getPodcastsLayout(): Int {
-        return getInt("PODCAST_GRID_LAYOUT", Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)
-    }
-
-    override fun isPodcastsLayoutListView(): Boolean {
-        return getPodcastsLayout() == Settings.PodcastGridLayoutType.LIST_VIEW.id
-    }
 
     override fun getAutoArchiveExcludedPodcasts(): List<String> {
         return sharedPreferences.getStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, null)?.toList() ?: emptyList()

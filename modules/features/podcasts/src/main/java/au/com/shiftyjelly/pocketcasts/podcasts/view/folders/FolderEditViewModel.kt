@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -48,7 +49,7 @@ class FolderEditViewModel
         val selectedUuids: List<String> = emptyList(),
         val searchText: String = "",
         val folder: Folder? = null,
-        val layout: Int = Settings.PodcastGridLayoutType.LARGE_ARTWORK.id
+        val layout: PodcastGridLayoutType = PodcastGridLayoutType.LARGE_ARTWORK
     ) {
         fun isSelected(podcast: Podcast): Boolean {
             return selectedUuids.contains(podcast.uuid)
@@ -130,7 +131,7 @@ class FolderEditViewModel
                     searchText = searchText,
                     folders = folders,
                     folder = folder,
-                    layout = settings.getPodcastsLayout()
+                    layout = settings.podcastGridLayout.flow.value
                 )
             }.collect {
                 mutableState.value = it
@@ -263,8 +264,8 @@ class FolderEditViewModel
         }
     }
 
-    fun getGridImageWidthDp(layout: Int, context: Context): Int {
-        return UiUtil.getGridImageWidthPx(smallArtwork = layout == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id, context = context).pxToDp(context).toInt()
+    fun getGridImageWidthDp(layout: PodcastGridLayoutType, context: Context): Int {
+        return UiUtil.getGridImageWidthPx(smallArtwork = layout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(context).toInt()
     }
 
     fun movePodcastToFolder(podcastUuid: String, folder: Folder) {

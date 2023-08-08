@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFr
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -320,10 +321,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     }
 
     private fun setupGridView(savedInstanceState: Parcelable? = listState) {
-        val layoutManager = when (settings.getPodcastsLayout()) {
-            Settings.PodcastGridLayoutType.LARGE_ARTWORK.id -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
-            Settings.PodcastGridLayoutType.SMALL_ARTWORK.id -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
-            else -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
+        val layoutManager = when (settings.podcastGridLayout.flow.value) {
+            PodcastGridLayoutType.LARGE_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
+            PodcastGridLayoutType.SMALL_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
+            PodcastGridLayoutType.LIST_VIEW -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         }
         val badgeType = settings.podcastBadgeType.flow.value
         val currentLayoutManager = realBinding?.recyclerView?.layoutManager
