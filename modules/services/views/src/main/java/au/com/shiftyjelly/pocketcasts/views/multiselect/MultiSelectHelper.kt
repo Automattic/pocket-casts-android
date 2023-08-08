@@ -60,6 +60,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         resources: Resources,
         fragmentManager: FragmentManager,
     ): Boolean
+    abstract fun deselect(multiSelectable: T)
 
     fun defaultLongPress(
         multiSelectable: T,
@@ -117,18 +118,6 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             selectedList.add(multiSelectable)
         }
         _selectedListLive.value = selectedList
-    }
-
-    fun deselect(multiSelectable: T) {
-        if (isSelected(multiSelectable)) {
-            selectedList.remove(multiSelectable)
-        }
-
-        _selectedListLive.value = selectedList
-
-        if (selectedList.isEmpty()) {
-            closeMultiSelect()
-        }
     }
 
     fun selectAll() {

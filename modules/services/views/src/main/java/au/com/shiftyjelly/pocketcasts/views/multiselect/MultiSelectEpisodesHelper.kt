@@ -143,6 +143,19 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
+    override fun deselect(multiSelectable: BaseEpisode) {
+        if (isSelected(multiSelectable)) {
+            val selectedItem = selectedList.firstOrNull { it.uuid == multiSelectable.uuid }
+            selectedItem?.let { selectedList.remove(it) }
+        }
+
+        _selectedListLive.value = selectedList
+
+        if (selectedList.isEmpty()) {
+            closeMultiSelect()
+        }
+    }
+
     fun markAsPlayed(shownWarning: Boolean = false, resources: Resources, fragmentManager: FragmentManager) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()

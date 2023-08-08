@@ -68,6 +68,19 @@ class MultiSelectBookmarksHelper @Inject constructor(
         }
     }
 
+    override fun deselect(multiSelectable: Bookmark) {
+        if (isSelected(multiSelectable)) {
+            val selectedItem = selectedList.firstOrNull { it.uuid == multiSelectable.uuid }
+            selectedItem?.let { selectedList.remove(it) }
+        }
+
+        _selectedListLive.value = selectedList
+
+        if (selectedList.isEmpty()) {
+            closeMultiSelect()
+        }
+    }
+
     private fun edit() {
         launch { _showEditBookmarkPage.emit(true) }
     }
