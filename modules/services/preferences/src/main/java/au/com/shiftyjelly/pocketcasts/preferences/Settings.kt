@@ -79,8 +79,6 @@ interface Settings {
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
-        const val PREFERENCE_PODCAST_LIBRARY_SORT = "podcastLibrarySort"
-        const val PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC = "podcastLibrarySortNeedsSync"
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
         const val PREFERENCE_WARN_WHEN_NOT_ON_WIFI = "warnWhenNotOnWifi"
         const val PREFERENCE_SYNC_ON_METERED = "SyncWhenOnMetered"
@@ -197,7 +195,6 @@ interface Settings {
         object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
     }
 
-    val podcastSortTypeObservable: Observable<PodcastsSortType>
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
@@ -232,10 +229,7 @@ interface Settings {
     fun getWorkManagerNetworkTypeConstraint(): NetworkType
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     val backgroundRefreshPodcasts: UserSetting<Boolean>
-    fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)
-    fun setPodcastsSortTypeNeedsSync(value: Boolean)
-    fun getPodcastsSortTypeNeedsSync(): Boolean
-    fun getPodcastsSortType(): PodcastsSortType
+    val podcastsSortType: UserSetting<PodcastsSortType>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType

@@ -25,7 +25,6 @@ import io.reactivex.Flowable.combineLatest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineLatest
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -87,7 +86,7 @@ class PodcastsViewModel
         // monitor the folder uuid
         folderUuidObservable.toFlowable(BackpressureStrategy.LATEST),
         // monitor the home folder sort order
-        settings.podcastSortTypeObservable.toFlowable(BackpressureStrategy.LATEST),
+        settings.podcastsSortType.flow.asObservable(coroutineContext).toFlowable(BackpressureStrategy.LATEST),
         // show folders for Plus users
         userManager.getSignInState()
     ) { podcasts, folders, folderUuidOptional, podcastSortOrder, signInState ->
@@ -245,7 +244,7 @@ class PodcastsViewModel
 
         val folder = folder
         if (folder == null) {
-            settings.setPodcastsSortType(sortType = PodcastsSortType.DRAG_DROP, sync = true)
+            settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, needsSync = true)
         } else {
             folderManager.updateSortType(folderUuid = folder.uuid, podcastsSortType = PodcastsSortType.DRAG_DROP)
         }
@@ -268,7 +267,7 @@ class PodcastsViewModel
             properties[NUMBER_OF_PODCASTS_KEY] = podcastManager.countSubscribed()
             properties[BADGE_TYPE_KEY] = settings.podcastBadgeType.flow.value.analyticsValue
             properties[LAYOUT_KEY] = settings.podcastGridLayout.flow.value.analyticsValue
-            properties[SORT_ORDER_KEY] = settings.getPodcastsSortType().analyticsValue
+            properties[SORT_ORDER_KEY] = settings.podcastsSortType.flow.value.analyticsValue
             analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
         }
     }

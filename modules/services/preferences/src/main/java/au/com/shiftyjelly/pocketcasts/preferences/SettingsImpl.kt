@@ -78,7 +78,6 @@ class SettingsImpl @Inject constructor(
 
     private var languageCode: String? = null
 
-    override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
@@ -230,33 +229,13 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean) {
-        if (getPodcastsSortType() == sortType) {
-            return
-        }
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.PREFERENCE_PODCAST_LIBRARY_SORT, sortType.clientId.toString())
-        editor.apply()
-        podcastSortTypeObservable.accept(sortType)
-        if (sync) {
-            setPodcastsSortTypeNeedsSync(true)
-        }
-    }
-
-    override fun setPodcastsSortTypeNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC, value)
-    }
-
-    override fun getPodcastsSortTypeNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC, false)
-    }
-
-    override fun getPodcastsSortType(): PodcastsSortType {
-        val default = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST
-        val defaultId = default.clientId.toString()
-        val sortOrderId = Integer.parseInt(getString(Settings.PREFERENCE_PODCAST_LIBRARY_SORT, defaultId) ?: defaultId)
-        return PodcastsSortType.values().find { it.clientId == sortOrderId } ?: default
-    }
+    override val podcastsSortType = UserSetting.PrefFromString(
+        sharedPrefKey = "podcastLibrarySort",
+        defaultValue = PodcastsSortType.default,
+        sharedPrefs = sharedPreferences,
+        fromString = { PodcastsSortType.fromClientIdString(it) },
+        toString = { it.clientId.toString() },
+    )
 
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
         sharedPreferences.edit().apply {

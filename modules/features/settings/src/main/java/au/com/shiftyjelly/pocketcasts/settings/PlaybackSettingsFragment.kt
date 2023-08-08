@@ -229,10 +229,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
                                 mapOf("value" to it)
                             )
-                            settings.skipForwardInSecs.run {
-                                set(it)
-                                needsSync = true
-                            }
+                            settings.skipForwardInSecs.set(it, needsSync = true)
                         }
                     )
 
@@ -245,10 +242,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_BACK_CHANGED,
                                 mapOf("value" to it)
                             )
-                            settings.skipBackInSecs.run {
-                                set(it)
-                                needsSync = true
-                            }
+                            settings.skipBackInSecs.set(it, needsSync = true)
                         }
                     )
 

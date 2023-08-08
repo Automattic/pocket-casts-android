@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.type
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
@@ -56,9 +57,25 @@ enum class PodcastsSortType(
     );
 
     companion object {
-        fun fromServerId(id: Int?): PodcastsSortType {
-            id ?: return DATE_ADDED_OLDEST_TO_NEWEST
-            return values().firstOrNull { it.serverId == id } ?: DATE_ADDED_OLDEST_TO_NEWEST
+        val default = DATE_ADDED_OLDEST_TO_NEWEST
+
+        fun fromServerId(serverId: Int?): PodcastsSortType {
+            val sortType = values().firstOrNull { it.serverId == serverId }
+            if (sortType == null) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid server ${PodcastsSortType::class.java.simpleName}: $serverId")
+                return default
+            }
+            return sortType
+        }
+
+        fun fromClientIdString(clientIdString: String): PodcastsSortType {
+            val clientId = clientIdString.toIntOrNull()
+            val sortType = PodcastsSortType.values().firstOrNull { it.clientId == clientId }
+            if (sortType == null) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid client ${PodcastsSortType::class.java.simpleName}: $clientIdString")
+                return default
+            }
+            return sortType
         }
 
         fun cleanStringForSort(value: String): String {

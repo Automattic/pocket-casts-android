@@ -396,7 +396,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun findSubscribedSorted(): List<Podcast> {
-        val sortType = settings.getPodcastsSortType()
+        val sortType = settings.podcastsSortType.flow.value
         // use a query to get the podcasts ordered by episode release date
         if (sortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
             return findPodcastsOrderByLatestEpisode(orderAsc = false)

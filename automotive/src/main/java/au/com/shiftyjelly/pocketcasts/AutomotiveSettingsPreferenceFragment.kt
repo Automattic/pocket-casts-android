@@ -84,10 +84,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceSkipForward?.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
-                settings.skipForwardInSecs.run {
-                    set(value)
-                    needsSync = true
-                }
+                settings.skipForwardInSecs.set(value, needsSync = true)
                 changeSkipTitles()
                 true
             } else {
@@ -98,10 +95,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceSkipBackward?.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
-                settings.skipBackInSecs.run {
-                    set(value)
-                    needsSync = true
-                }
+                settings.skipBackInSecs.set(value, needsSync = true)
                 changeSkipTitles()
                 true
             } else {

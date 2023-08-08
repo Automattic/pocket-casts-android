@@ -32,7 +32,7 @@ class PodcastsOptionsDialog(
             .addTextOption(
                 titleId = LR.string.podcasts_menu_sort_by,
                 imageId = IR.drawable.ic_sort,
-                valueId = settings.getPodcastsSortType().labelId,
+                valueId = settings.podcastsSortType.flow.value.labelId,
                 click = {
                     openSortOptions()
                     trackTapOnModalOption(ModalOption.SORT_BY)
@@ -101,7 +101,7 @@ class PodcastsOptionsDialog(
     }
 
     private fun openSortOptions() {
-        val sortOrder = settings.getPodcastsSortType()
+        val sortOrder = settings.podcastsSortType.flow.value
         val title = fragment.getString(LR.string.sort_by)
         val dialog = OptionsDialog().setTitle(title)
         for (order in PodcastsSortType.values()) {
@@ -109,7 +109,7 @@ class PodcastsOptionsDialog(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
                 click = {
-                    settings.setPodcastsSortType(sortType = order, sync = true)
+                    settings.podcastsSortType.set(order, needsSync = true)
                     trackSortByChanged(order)
                 }
             )
