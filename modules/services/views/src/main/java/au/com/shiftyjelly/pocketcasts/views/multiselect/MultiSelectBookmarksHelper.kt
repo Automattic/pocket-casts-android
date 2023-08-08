@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -22,6 +24,9 @@ class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
 ) : MultiSelectHelper<Bookmark>() {
     override val maxToolbarIcons = 2
+
+    private val _showEditBookmarkPage = MutableSharedFlow<Boolean>()
+    val showEditBookmarkPage = _showEditBookmarkPage.asSharedFlow()
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
@@ -45,7 +50,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
         return when (itemId) {
 
             UR.id.menu_edit -> {
-                // TODO: Bookmark - Add edit action
+                edit()
                 true
             }
 
@@ -61,6 +66,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
             else -> false
         }
+    }
+
+    private fun edit() {
+        launch { _showEditBookmarkPage.emit(true) }
     }
 
     fun delete(resources: Resources, fragmentManager: FragmentManager) {

@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.PlusUpsell
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import java.util.Date
 import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -41,7 +42,9 @@ fun BookmarksPage(
     textColor: Color,
     sourceView: SourceView,
     bookmarksViewModel: BookmarksViewModel,
+    multiSelectHelper: MultiSelectBookmarksHelper,
     onRowLongPressed: (Bookmark) -> Unit,
+    onEditBookmarkClick: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
 ) {
     val context = LocalContext.current
@@ -70,6 +73,13 @@ fun BookmarksPage(
         bookmarksViewModel.showOptionsDialog
             .collect { selectedValue ->
                 showOptionsDialog(selectedValue)
+            }
+    }
+
+    LaunchedEffect(context) {
+        multiSelectHelper.showEditBookmarkPage
+            .collect { show ->
+                if (show) onEditBookmarkClick()
             }
     }
 }

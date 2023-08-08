@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
@@ -16,8 +17,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -42,10 +45,12 @@ class BookmarksViewModel
 @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
+    private val podcastManager: PodcastManager,
     private val userManager: UserManager,
     private val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
+    private val theme: Theme,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -87,7 +92,10 @@ class BookmarksViewModel
                                 UiState.Loaded(
                                     bookmarks = bookmarks,
                                     isMultiSelecting = isMultiSelecting,
-                                    isSelected = { selectedList.contains(it) },
+                                    isSelected = { selectedBookmark ->
+                                        selectedList.map { bookmark -> bookmark.uuid }
+                                            .contains(selectedBookmark.uuid)
+                                    },
                                     onRowClick = ::onRowClick,
                                     sourceView = sourceView,
                                 )
@@ -183,6 +191,32 @@ class BookmarksViewModel
     fun play(bookmark: Bookmark) {
         val time = bookmark.timeSecs
         playbackManager.seekToTimeMs(positionMs = time * 1000)
+    }
+
+    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
+        (_uiState.value as? UiState.Loaded)?.let {
+            val bookmark =
+                it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
+            bookmark?.let {
+                val episodeUuid = bookmark.episodeUuid
+                viewModelScope.launch(ioDispatcher) {
+                    val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                    val timeSecs = bookmark.timeSecs
+                    val backgroundColor =
+                        if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
+                    val tintColor =
+                        if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
+                    val arguments = BookmarkArguments(
+                        bookmarkUuid = bookmark.uuid,
+                        episodeUuid = episodeUuid,
+                        timeSecs = timeSecs,
+                        backgroundColor = backgroundColor,
+                        tintColor = tintColor
+                    )
+                    onSuccess(arguments)
+                }
+            }
+        }
     }
 
     sealed class UiState {
