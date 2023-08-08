@@ -380,6 +380,19 @@ class PodcastViewModel
         settings.setBookmarksSortType(order)
     }
 
+    fun play(bookmark: Bookmark) {
+        val time = bookmark.timeSecs
+        val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+        bookmarkEpisode?.let {
+            val shouldPlayEpisode = !playbackManager.isPlaying() ||
+                playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+            if (shouldPlayEpisode) {
+                playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+            }
+        }
+        playbackManager.seekToTimeMs(time * 1000)
+    }
+
     fun multiSelectSelectNone() {
         val uiState = uiState.value as? UiState.Loaded ?: return
         when (uiState.showTab) {
