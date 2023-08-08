@@ -29,8 +29,13 @@ abstract class BookmarkDao {
     @Query("SELECT * FROM bookmarks WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): Bookmark?
 
-    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND time = :timeSecs LIMIT 1")
-    abstract suspend fun findByEpisodeTime(podcastUuid: String, episodeUuid: String, timeSecs: Int): Bookmark?
+    @Query("SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND time = :timeSecs AND deleted = :deleted LIMIT 1")
+    abstract suspend fun findByEpisodeTime(
+        podcastUuid: String,
+        episodeUuid: String,
+        timeSecs: Int,
+        deleted: Boolean = false,
+    ): Bookmark?
 
     @Query(
         "SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND deleted = :deleted " +
