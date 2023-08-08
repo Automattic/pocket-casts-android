@@ -14,6 +14,7 @@
     <string name="bookmark_added">Bookmark \"%s\" added</string>
     <string name="change_title">Change title</string>
     <string name="add_bookmark_title_hint">Add an optional title to identify this bookmark</string>
+    <string name="change_bookmark_title_hint">Change the title that identifies this bookmark</string>
     <string name="save_bookmark">Save bookmark</string>
     <string name="playing_bookmark">Playing \"%s\"</string>
     <string name="skipping_to">Skipping to %s</string>
