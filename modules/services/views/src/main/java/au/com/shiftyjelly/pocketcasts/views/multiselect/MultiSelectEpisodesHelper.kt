@@ -179,7 +179,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
-    fun markAsUnplayed(resources: Resources) {
+    private fun markAsUnplayed(resources: Resources) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -221,7 +221,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
-    fun unarchive(resources: Resources) {
+    private fun unarchive(resources: Resources) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -258,7 +258,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
-    fun unstar(resources: Resources) {
+    private fun unstar(resources: Resources) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -287,7 +287,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             .show(fragmentManager, "confirm_played_all_")
     }
 
-    fun archiveWarning(count: Int, resources: Resources, fragmentManager: FragmentManager) {
+    private fun archiveWarning(count: Int, resources: Resources, fragmentManager: FragmentManager) {
         val buttonString = resources.getStringPlural(count = count, singular = LR.string.archive_episodes_singular, plural = LR.string.archive_episodes_plural)
 
         ConfirmationDialog()
@@ -318,7 +318,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }?.show(fragmentManager, "multiselect_download")
     }
 
-    fun deleteDownload() {
+    private fun deleteDownload() {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -346,7 +346,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
-    fun playNext(resources: Resources) {
+    private fun playNext(resources: Resources) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -364,7 +364,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
     }
 
-    fun playLast(resources: Resources) {
+    private fun playLast(resources: Resources) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -440,7 +440,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         closeMultiSelect()
     }
 
-    fun removeFromUpNext(resources: Resources) {
+    private fun removeFromUpNext(resources: Resources) {
         val list = selectedList.toList()
         launch {
             list.forEach {
@@ -456,13 +456,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
         closeMultiSelect()
     }
 
-    fun moveToTop() {
+    private fun moveToTop() {
         val list = selectedList.toList()
         playbackManager.playEpisodesNext(episodes = list, source = source)
         closeMultiSelect()
     }
 
-    fun moveToBottom() {
+    private fun moveToBottom() {
         val list = selectedList.toList()
         playbackManager.playEpisodesLast(episodes = list, source = source)
         closeMultiSelect()
