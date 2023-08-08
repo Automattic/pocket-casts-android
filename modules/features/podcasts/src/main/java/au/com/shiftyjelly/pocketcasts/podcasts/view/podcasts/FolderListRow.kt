@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -29,7 +29,7 @@ fun FolderListRow(
     podcastUuids: List<String>,
     modifier: Modifier = Modifier,
     badgeCount: Int = 0,
-    badgeType: Settings.BadgeType = Settings.BadgeType.OFF,
+    badgeType: BadgeType = BadgeType.OFF,
     onClick: (() -> Unit)?
 ) {
     Row(
@@ -70,11 +70,11 @@ fun FolderListRow(
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
-        if (badgeType != Settings.BadgeType.OFF) {
+        if (badgeType != BadgeType.OFF) {
             Text(
-                text = if (badgeType != Settings.BadgeType.LATEST_EPISODE) badgeCount.toString() else "●",
+                text = if (badgeType != BadgeType.LATEST_EPISODE) badgeCount.toString() else "●",
                 fontSize = 14.sp,
-                color = if (badgeType == Settings.BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02
+                color = if (badgeType == BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02
             )
         }
     }

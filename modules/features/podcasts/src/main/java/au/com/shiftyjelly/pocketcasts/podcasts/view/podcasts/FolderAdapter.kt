@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
@@ -41,7 +42,7 @@ class FolderAdapter(
     val theme: Theme
 ) : ListAdapter<FolderItem, RecyclerView.ViewHolder>(FolderItemDiffCallback()) {
 
-    var badgeType = Settings.BadgeType.OFF
+    var badgeType = BadgeType.OFF
 
     private val imageLoader: PodcastImageLoaderThemed = PodcastImageLoaderThemed(context)
     private var podcastUuidToBadge: Map<String, Int> = emptyMap()
@@ -159,16 +160,16 @@ class FolderAdapter(
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
         val isListLayout: Boolean = layout == Settings.PodcastGridLayoutType.LIST_VIEW.id
 
-        fun bind(podcast: Podcast, badgeType: Settings.BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
+        fun bind(podcast: Podcast, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
             button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
             podcastTitle.show()
             author?.text = podcast.author
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
             val badgeCount = when (badgeType) {
-                Settings.BadgeType.OFF -> 0
-                Settings.BadgeType.ALL_UNFINISHED -> unplayedEpisodeCount
-                Settings.BadgeType.LATEST_EPISODE -> min(1, unplayedEpisodeCount)
+                BadgeType.OFF -> 0
+                BadgeType.ALL_UNFINISHED -> unplayedEpisodeCount
+                BadgeType.LATEST_EPISODE -> min(1, unplayedEpisodeCount)
             }
             setTextViewCount(unplayedBackground, unplayedText, badgeCount, badgeType)
 
@@ -176,21 +177,21 @@ class FolderAdapter(
                 UiUtil.setBackgroundColor(podcastTitle, ColorManager.getBackgroundColor(podcast))
                 unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
             } else {
-                if (badgeType == Settings.BadgeType.LATEST_EPISODE) {
+                if (badgeType == BadgeType.LATEST_EPISODE) {
                     unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
                 } else {
                     unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.primary_text_02))
                 }
             }
 
-            val badgeCountMessage = if (badgeType == Settings.BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
+            val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
             button.contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
 
             imageLoader.loadCoil(podcast.uuid, placeholder = false) { if (!isListLayout) podcastTitle.hide() }.into(podcastThumbnail)
         }
 
         @Suppress("NAME_SHADOWING")
-        private fun setTextViewCount(image: ImageView?, text: TextView, count: Int, badgeType: Settings.BadgeType) {
+        private fun setTextViewCount(image: ImageView?, text: TextView, count: Int, badgeType: BadgeType) {
             var count = count
             if (count == 0) {
                 text.hide()
@@ -206,7 +207,7 @@ class FolderAdapter(
                     (text.layoutParams as ViewGroup.MarginLayoutParams).setMargins(0, 0, if (count > 9) countTextMarginSmall else countTextMarginLarge, 0)
                 }
 
-                if (badgeType != Settings.BadgeType.LATEST_EPISODE) {
+                if (badgeType != BadgeType.LATEST_EPISODE) {
                     text.text = count.toString()
                 } else {
                     text.text = "●"

@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListCreateActivity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -73,7 +74,7 @@ class PodcastsOptionsDialog(
             .addTextOption(
                 titleId = LR.string.podcasts_menu_badges,
                 imageId = R.drawable.ic_badge,
-                valueId = settings.getPodcastBadgeType().labelId,
+                valueId = settings.podcastBadgeType.flow.value.labelId,
                 click = {
                     openBadgeOptions()
                     trackTapOnModalOption(ModalOption.BADGE)
@@ -119,34 +120,34 @@ class PodcastsOptionsDialog(
     }
 
     private fun openBadgeOptions() {
-        val badgeType: Settings.BadgeType = settings.getPodcastBadgeType()
+        val badgeType: BadgeType = settings.podcastBadgeType.flow.value
         val title = fragment.getString(LR.string.podcasts_menu_badges)
         val dialog = OptionsDialog()
             .setTitle(title)
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_off,
-                checked = badgeType == Settings.BadgeType.OFF,
+                checked = badgeType == BadgeType.OFF,
                 click = {
-                    val newBadgeType = Settings.BadgeType.OFF
-                    settings.setPodcastBadgeType(newBadgeType)
+                    val newBadgeType = BadgeType.OFF
+                    settings.podcastBadgeType.set(newBadgeType)
                     trackBadgeChanged(newBadgeType)
                 }
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_all_unfinished,
-                checked = badgeType == Settings.BadgeType.ALL_UNFINISHED,
+                checked = badgeType == BadgeType.ALL_UNFINISHED,
                 click = {
-                    val newBadgeType = Settings.BadgeType.ALL_UNFINISHED
-                    settings.setPodcastBadgeType(newBadgeType)
+                    val newBadgeType = BadgeType.ALL_UNFINISHED
+                    settings.podcastBadgeType.set(newBadgeType)
                     trackBadgeChanged(newBadgeType)
                 }
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_only_latest_episode,
-                checked = badgeType == Settings.BadgeType.LATEST_EPISODE,
+                checked = badgeType == BadgeType.LATEST_EPISODE,
                 click = {
-                    val newBadgeType = Settings.BadgeType.LATEST_EPISODE
-                    settings.setPodcastBadgeType(newBadgeType)
+                    val newBadgeType = BadgeType.LATEST_EPISODE
+                    settings.podcastBadgeType.set(newBadgeType)
                     trackBadgeChanged(newBadgeType)
                 }
             )
@@ -174,7 +175,7 @@ class PodcastsOptionsDialog(
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_LAYOUT_CHANGED, mapOf(LAYOUT_KEY to layoutType.analyticsValue))
     }
 
-    private fun trackBadgeChanged(badgeType: Settings.BadgeType) {
+    private fun trackBadgeChanged(badgeType: BadgeType) {
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_BADGES_CHANGED, mapOf(TYPE_KEY to badgeType.analyticsValue))
     }
 

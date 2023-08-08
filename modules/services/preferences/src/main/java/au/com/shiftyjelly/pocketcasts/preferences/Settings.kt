@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -142,12 +143,6 @@ interface Settings {
         SIGN_IN_ERROR(21483649),
     }
 
-    enum class BadgeType(val labelId: Int, val analyticsValue: String) {
-        OFF(labelId = LR.string.podcasts_badges_off, analyticsValue = "off"),
-        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode, analyticsValue = "only_latest_episode"),
-        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished, analyticsValue = "unfinished_episodes")
-    }
-
     enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
         LARGE_ARTWORK(id = 0, analyticsValue = "large_artwork"),
         SMALL_ARTWORK(id = 1, analyticsValue = "small_artwork"),
@@ -212,7 +207,6 @@ interface Settings {
     }
 
     val podcastLayoutObservable: Observable<Int>
-    val podcastBadgeTypeObservable: Observable<BadgeType>
     val podcastSortTypeObservable: Observable<PodcastsSortType>
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val playbackEffectsObservable: Observable<PlaybackEffects>
@@ -337,8 +331,7 @@ interface Settings {
 
     fun setMigratedVersionCode(versionCode: Int)
 
-    fun getPodcastBadgeType(): BadgeType
-    fun setPodcastBadgeType(badgeType: BadgeType)
+    val podcastBadgeType: UserSetting<BadgeType>
     fun setPodcastsLayout(layout: Int)
     fun getPodcastsLayout(): Int
     fun isPodcastsLayoutListView(): Boolean
