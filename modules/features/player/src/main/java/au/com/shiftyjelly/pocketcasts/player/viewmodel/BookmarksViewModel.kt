@@ -60,11 +60,14 @@ class BookmarksViewModel
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
+    private var sourceView: SourceView = SourceView.UNKNOWN
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
         episodeUuid: String,
         sourceView: SourceView,
     ) {
+        this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
@@ -190,7 +193,17 @@ class BookmarksViewModel
 
     fun play(bookmark: Bookmark) {
         val time = bookmark.timeSecs
-        playbackManager.seekToTimeMs(positionMs = time * 1000)
+        viewModelScope.launch {
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+            bookmarkEpisode?.let {
+                val shouldPlayEpisode = !playbackManager.isPlaying() ||
+                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+                if (shouldPlayEpisode) {
+                    playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+                }
+            }
+            playbackManager.seekToTimeMs(positionMs = time * 1000)
+        }
     }
 
     fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
