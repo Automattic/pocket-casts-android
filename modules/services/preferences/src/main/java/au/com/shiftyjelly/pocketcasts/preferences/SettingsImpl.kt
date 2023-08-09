@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
-import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
@@ -120,10 +119,6 @@ class SettingsImpl @Inject constructor(
         } catch (e: NameNotFoundException) {
             ""
         }
-    }
-
-    override fun isScreenReaderOn(): Boolean {
-        return context.isScreenReaderOn()
     }
 
     override val skipBackInSecs = UserSetting.SkipAmountPref(

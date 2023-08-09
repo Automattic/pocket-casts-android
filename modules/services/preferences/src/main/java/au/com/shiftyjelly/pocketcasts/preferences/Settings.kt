@@ -210,8 +210,6 @@ interface Settings {
 
     fun getSentryDsn(): String
 
-    fun isScreenReaderOn(): Boolean
-
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
 
