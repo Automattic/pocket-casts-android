@@ -46,6 +46,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             field = value
             _isMultiSelectingLive.value = value
             selectedList.clear()
+            _selectedListLive.value = emptyList()
         }
 
     var coordinatorLayout: View? = null
