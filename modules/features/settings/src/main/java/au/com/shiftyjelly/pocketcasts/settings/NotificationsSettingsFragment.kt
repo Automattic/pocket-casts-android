@@ -114,8 +114,6 @@ class NotificationsSettingsFragment :
             }
         }
 
-        updateNotificationsEnabled()
-
         hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
             val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
             settings.hideNotificationOnPause.set(newBool)
@@ -155,48 +153,6 @@ class NotificationsSettingsFragment :
             )
 
             true
-        }
-    }
-
-    private fun updateNotificationsEnabled() {
-        launch(Dispatchers.Default) {
-            val enabled = settings.notifyRefreshPodcast.flow.value
-
-            launch(Dispatchers.Main) {
-                enabledPreference?.isChecked = enabled
-                enabledPreferences(enabled)
-
-                enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
-                    val checked = newValue as Boolean
-                    settings.notifyRefreshPodcast.set(checked)
-
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
-                        mapOf("enabled" to checked)
-                    )
-
-                    podcastManager.updateAllShowNotificationsRx(checked)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io()).onErrorComplete().subscribe()
-                    if (checked) {
-                        settings.setNotificationLastSeenToNow()
-                    }
-                    changePodcastsSummary()
-                    enabledPreferences(checked)
-
-                    true
-                }
-
-                notificationPodcasts?.setOnPreferenceClickListener {
-                    openSelectPodcasts()
-                    true
-                }
-
-                changePodcastsSummary()
-                changeVibrateSummary()
-                changeNotificationSoundSummary()
-                setupActions()
-            }
         }
     }
 
@@ -447,7 +403,45 @@ class NotificationsSettingsFragment :
     }
 
     private fun setupEnabledNotifications() {
-        enabledPreference?.isChecked = settings.notifyRefreshPodcast.flow.value
+        launch(Dispatchers.Default) {
+            val enabled = settings.notifyRefreshPodcast.flow.value
+
+            launch(Dispatchers.Main) {
+                enabledPreference?.isChecked = enabled
+                enabledPreferences(enabled)
+
+                enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
+                    val checked = newValue as Boolean
+                    settings.notifyRefreshPodcast.set(checked)
+
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
+                        mapOf("enabled" to checked)
+                    )
+
+                    podcastManager.updateAllShowNotificationsRx(checked)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()).onErrorComplete().subscribe()
+                    if (checked) {
+                        settings.setNotificationLastSeenToNow()
+                    }
+                    changePodcastsSummary()
+                    enabledPreferences(checked)
+
+                    true
+                }
+
+                notificationPodcasts?.setOnPreferenceClickListener {
+                    openSelectPodcasts()
+                    true
+                }
+
+                changePodcastsSummary()
+                changeVibrateSummary()
+                changeNotificationSoundSummary()
+                setupActions()
+            }
+        }
     }
 
     private fun setupNotificationVibrate() {
