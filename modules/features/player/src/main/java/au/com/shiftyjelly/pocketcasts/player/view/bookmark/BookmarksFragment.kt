@@ -99,6 +99,7 @@ class BookmarksFragment : BaseFragment() {
                             textColor = requireNotNull(textColor(listData)),
                             sourceView = sourceView,
                             bookmarksViewModel = bookmarksViewModel,
+                            multiSelectHelper = multiSelectHelper,
                             onRowLongPressed = { bookmark ->
                                 multiSelectHelper.defaultLongPress(
                                     multiSelectable = bookmark,
@@ -106,6 +107,7 @@ class BookmarksFragment : BaseFragment() {
                                     forceDarkTheme = sourceView == SourceView.PLAYER,
                                 )
                             },
+                            onEditBookmarkClick = ::onEditBookmarkClick,
                             showOptionsDialog = { showOptionsDialog(it) }
                         )
                     }
@@ -162,6 +164,12 @@ class BookmarksFragment : BaseFragment() {
                         )
                     }
                 ).show(it, "bookmarks_options_dialog")
+        }
+    }
+
+    private fun onEditBookmarkClick() {
+        bookmarksViewModel.buildBookmarkArguments { arguments ->
+            startActivity(arguments.getIntent(requireContext()))
         }
     }
 }

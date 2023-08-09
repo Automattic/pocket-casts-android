@@ -7,8 +7,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -39,6 +41,9 @@ class BookmarksViewModelTest {
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
+    private lateinit var podcastManager: PodcastManager
+
+    @Mock
     private lateinit var userManager: UserManager
 
     @Mock
@@ -56,6 +61,9 @@ class BookmarksViewModelTest {
     @Mock
     private lateinit var playbackManager: PlaybackManager
 
+    @Mock
+    private lateinit var theme: Theme
+
     private lateinit var bookmarksViewModel: BookmarksViewModel
     private val episodeUuid = UUID.randomUUID().toString()
 
@@ -69,10 +77,12 @@ class BookmarksViewModelTest {
         bookmarksViewModel = BookmarksViewModel(
             bookmarkManager = bookmarkManager,
             episodeManager = episodeManager,
+            podcastManager = podcastManager,
             userManager = userManager,
             multiSelectHelper = multiSelectHelper,
             settings = settings,
             playbackManager = playbackManager,
+            theme = theme,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
