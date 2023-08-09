@@ -196,7 +196,6 @@ interface Settings {
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
     val marketingOptObservable: Observable<Boolean>
-    val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
 

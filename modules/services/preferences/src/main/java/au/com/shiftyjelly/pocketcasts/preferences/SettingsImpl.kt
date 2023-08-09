@@ -80,7 +80,6 @@ class SettingsImpl @Inject constructor(
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
-    override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
 
@@ -453,7 +452,6 @@ class SettingsImpl @Inject constructor(
         val editor = sharedPreferences.edit()
         editor.putBoolean(Settings.PREFERENCE_FIRST_SYNC_RUN, firstRun)
         editor.apply()
-        isFirstSyncRunObservable.accept(firstRun)
     }
 
     override fun isRestoreFromBackup(): Boolean {
