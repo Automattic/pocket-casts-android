@@ -208,8 +208,6 @@ interface Settings {
     fun getVersion(): String
     fun getVersionCode(): Int
 
-    fun getGitHash(): String?
-
     fun getSentryDsn(): String
 
     fun isScreenReaderOn(): Boolean
