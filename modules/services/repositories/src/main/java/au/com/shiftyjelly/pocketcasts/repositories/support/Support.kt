@@ -408,7 +408,7 @@ class Support @Inject constructor(
                 output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause.flow.value) "yes" else "no").append(eol)
                 output.append(eol)
 
-                val effects = settings.getGlobalPlaybackEffects()
+                val effects = settings.globalPlaybackEffects.flow.value
                 output.append("Effects").append(eol)
                 output.append("Global Audio effects: ")
                     .append(" Playback speed: ").append(effects.playbackSpeed).append(eol)

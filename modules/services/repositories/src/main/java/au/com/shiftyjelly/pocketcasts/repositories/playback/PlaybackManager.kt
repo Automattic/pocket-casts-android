@@ -1586,7 +1586,11 @@ open class PlaybackManager @Inject constructor(
         player?.setPodcast(podcast)
         player?.setEpisode(episode)
 
-        val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) podcast.playbackEffects else settings.getGlobalPlaybackEffects()
+        val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
+            podcast.playbackEffects
+        } else {
+            settings.globalPlaybackEffects.flow.value
+        }
 
         val previousPlaybackState = playbackStateRelay.blockingFirst()
         val playbackState = PlaybackState(

@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
@@ -194,7 +193,6 @@ interface Settings {
     }
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
@@ -295,12 +293,7 @@ interface Settings {
 
     val useEmbeddedArtwork: UserSetting<Boolean>
 
-    fun getGlobalPlaybackEffects(): PlaybackEffects
-    fun getGlobalPlaybackSpeed(): Double
-    fun getGlobalAudioEffectRemoveSilence(): TrimMode
-    fun getGlobalAudioEffectVolumeBoost(): Boolean
-
-    fun setGlobalAudioEffects(playbackSpeed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean)
+    val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
     fun allowOtherAppsAccessToEpisodes(): Boolean
 

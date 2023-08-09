@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.clipToRange
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +28,7 @@ class EffectsViewModel
         playbackManager.playbackStateRelay
             .asFlow()
             .map {
-                State.Loaded(settings.getGlobalPlaybackEffects())
+                State.Loaded(settings.globalPlaybackEffects.flow.value)
             }
             .stateIn(
                 scope = viewModelScope,
@@ -74,7 +73,7 @@ class EffectsViewModel
     private fun saveEffects(effects: PlaybackEffects) {
         viewModelScope.launch {
             playbackManager.updatePlayerEffects(effects)
-            effects.saveToGlobalSettings(settings)
+            settings.globalPlaybackEffects.set(effects)
         }
     }
 

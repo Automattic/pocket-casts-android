@@ -128,10 +128,40 @@ abstract class UserSetting<T>(
         }
     }
 
+    // This persists the parameterized object as a Float in shared preferences.
+    open class PrefFromFloat<T>(
+        sharedPrefKey: String,
+        private val defaultValue: T,
+        sharedPrefs: SharedPreferences,
+        private val fromFloat: (Float) -> T,
+        private val toFloat: (T) -> Float,
+    ) : UserSetting<T>(
+        sharedPrefKey = sharedPrefKey,
+        sharedPrefs = sharedPrefs,
+    ) {
+        override fun get(): T {
+            val persistedInt = sharedPrefs.getFloat(sharedPrefKey, toFloat(defaultValue))
+            return fromFloat(persistedInt)
+        }
+
+        @SuppressLint("ApplySharedPref")
+        override fun persist(value: T, commit: Boolean) {
+            val floatValue = toFloat(value)
+            sharedPrefs.edit().run {
+                putFloat(sharedPrefKey, floatValue)
+                if (commit) {
+                    commit()
+                } else {
+                    apply()
+                }
+            }
+        }
+    }
+
     // This persists the parameterized object as a String in shared preferences.
     open class PrefFromString<T>(
         sharedPrefKey: String,
-        private val defaultValue: T,
+        defaultValue: T,
         sharedPrefs: SharedPreferences,
         private val fromString: (String) -> T,
         private val toString: (T) -> String,

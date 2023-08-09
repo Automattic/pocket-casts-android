@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -668,9 +667,9 @@ class MediaSessionManager(
                 }
             }
             // update global playback speed
-            val effects = settings.getGlobalPlaybackEffects()
+            val effects = settings.globalPlaybackEffects.flow.value
             effects.playbackSpeed = newSpeed
-            effects.saveToGlobalSettings(settings)
+            settings.globalPlaybackEffects.set(effects)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }
