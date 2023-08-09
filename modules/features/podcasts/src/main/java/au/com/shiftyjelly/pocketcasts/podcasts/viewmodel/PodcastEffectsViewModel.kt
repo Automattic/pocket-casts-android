@@ -47,7 +47,7 @@ class PodcastEffectsViewModel
         launch {
             podcastManager.updateOverrideGlobalEffects(podcast, override)
             if (shouldUpdatePlaybackManager()) {
-                val effects = if (override) podcast.playbackEffects else settings.getGlobalPlaybackEffects()
+                val effects = if (override) podcast.playbackEffects else settings.globalPlaybackEffects.flow.value
                 playbackManager.updatePlayerEffects(effects)
             }
         }
