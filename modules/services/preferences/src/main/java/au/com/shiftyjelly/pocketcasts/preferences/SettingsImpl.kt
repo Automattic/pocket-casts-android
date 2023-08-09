@@ -80,7 +80,6 @@ class SettingsImpl @Inject constructor(
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
-    override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
     override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
@@ -154,22 +153,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getMarketingOptIn(): Boolean {
-        return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, false)
-    }
-
-    override fun setMarketingOptIn(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, value)
-        marketingOptObservable.accept(value)
-    }
-
-    override fun getMarketingOptInNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC, false)
-    }
-
-    override fun setMarketingOptInNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC, value)
-    }
+    override val marketingOptIn = UserSetting.BoolPref(
+        sharedPrefKey = "marketingOptIn",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getFreeGiftAcknowledged(): Boolean {
         return getBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED, false)

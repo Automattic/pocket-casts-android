@@ -12,18 +12,14 @@ abstract class UserSetting<T>(
 
     private val needsSyncKey = "${sharedPrefKey}NeedsSync"
 
-    fun hasBeenSynced() {
-        setNeedsSync(false)
-    }
-
-    private fun setNeedsSync(needsSync: Boolean) {
-        sharedPrefs.edit().run {
-            putBoolean(needsSyncKey, needsSync)
-            apply()
+    var needsSync: Boolean
+        get() = sharedPrefs.getBoolean(needsSyncKey, false)
+        set(value) {
+            sharedPrefs.edit().run {
+                putBoolean(needsSyncKey, value)
+                apply()
+            }
         }
-    }
-
-    private fun getNeedsSync() = sharedPrefs.getBoolean(needsSyncKey, false)
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
     fun getSyncValue(): T? {
@@ -31,10 +27,10 @@ abstract class UserSetting<T>(
         return if (needsSync) flow.value else null
     }
 
+    // These are lazy because (1) the class needs to initialize before calling get() and
+    // (2) we don't want to get the current value from SharedPreferences for every
+    // setting immediately on app startup.
     private val _flow by lazy { MutableStateFlow(get()) }
-    // lazy (1) because the class needs to initialize before calling get() and (2) we don't
-    // want to get the current value from SharedPreferences for every setting immediately on
-    // app startup.
     val flow: StateFlow<T> by lazy { _flow }
 
     // external callers should use the flow.value to get the current value or, even
@@ -46,8 +42,11 @@ abstract class UserSetting<T>(
     fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
         persist(value, commit)
         _flow.value = value
+
+        // Since this parameter is defaulted to false, let's not let the default overwrite
+        // a previous request to sync.
         if (needsSync) {
-            setNeedsSync(true)
+            this.needsSync = true
         }
     }
 
