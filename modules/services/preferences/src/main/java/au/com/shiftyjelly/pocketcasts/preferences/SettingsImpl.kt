@@ -79,7 +79,6 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
     override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
@@ -613,43 +612,48 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getGlobalPlaybackEffects(): PlaybackEffects {
-        val effects = PlaybackEffects()
-        effects.playbackSpeed = getGlobalPlaybackSpeed()
-        effects.trimMode = getGlobalAudioEffectRemoveSilence()
-        effects.isVolumeBoosted = getGlobalAudioEffectVolumeBoost()
-        return effects
+    override val globalPlaybackEffects = object : UserSetting<PlaybackEffects>(
+        sharedPrefKey = "globalPlaybackEffects",
+        sharedPrefs = sharedPreferences,
+    ) {
+        override fun get(): PlaybackEffects = PlaybackEffects().apply {
+            playbackSpeed = globalPlaybackSpeed.flow.value
+            trimMode = globalAudioEffectRemoveSilence.flow.value
+            isVolumeBoosted = globalAudioEffectVolumeBoost.flow.value
+        }
+
+        override fun persist(value: PlaybackEffects, commit: Boolean) {
+            globalPlaybackSpeed.set(value.playbackSpeed)
+            globalAudioEffectRemoveSilence.set(value.trimMode)
+            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted)
+        }
     }
 
-    override fun getGlobalPlaybackSpeed(): Double {
-        return java.lang.Double.valueOf("" + sharedPreferences.getFloat("globalPlaybackSpeed", 1f))
-    }
+    private val globalPlaybackSpeed = UserSetting.PrefFromFloat(
+        sharedPrefKey = "globalPlaybackSpeed",
+        defaultValue = 1.0,
+        sharedPrefs = sharedPreferences,
+        fromFloat = { it.toDouble() },
+        toFloat = { it.toFloat() },
+    )
 
-    override fun getGlobalAudioEffectRemoveSilence(): TrimMode {
+    private val globalAudioEffectRemoveSilence = run {
         val oldDefault = sharedPreferences.getBoolean("globalAudioEffectRemoveSilence", false)
-        val default = if (oldDefault) 1 else 0
-
-        val trimModeIndex = sharedPreferences.getInt("globalTrimMode", default)
-        return TrimMode.values().getOrNull(trimModeIndex) ?: TrimMode.OFF
+        val default = if (oldDefault) TrimMode.LOW else TrimMode.OFF
+        UserSetting.PrefFromInt(
+            sharedPrefKey = "globalTrimMode",
+            defaultValue = default,
+            sharedPrefs = sharedPreferences,
+            fromInt = { TrimMode.values().getOrNull(it) ?: default },
+            toInt = { it.ordinal },
+        )
     }
 
-    override fun getGlobalAudioEffectVolumeBoost(): Boolean {
-        return sharedPreferences.getBoolean("globalAudioEffectVolumeBoost", false)
-    }
-
-    override fun setGlobalAudioEffects(playbackSpeed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean) {
-        val editor = sharedPreferences.edit()
-        editor.putFloat("globalPlaybackSpeed", playbackSpeed.toFloat())
-        editor.putBoolean("globalAudioEffectRemoveSilence", trimMode != TrimMode.OFF)
-        editor.putInt("globalTrimMode", trimMode.ordinal)
-        editor.putBoolean("globalAudioEffectVolumeBoost", isVolumeBoosted)
-        editor.apply()
-        val effects = PlaybackEffects()
-        effects.playbackSpeed = playbackSpeed
-        effects.trimMode = trimMode
-        effects.isVolumeBoosted = isVolumeBoosted
-        playbackEffectsObservable.accept(effects)
-    }
+    private val globalAudioEffectVolumeBoost = UserSetting.BoolPref(
+        sharedPrefKey = "globalAudioEffectVolumeBoost",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun allowOtherAppsAccessToEpisodes(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_ALLOW_OTHER_APPS_ACCESS, false)
