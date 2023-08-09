@@ -33,7 +33,7 @@ sealed class MultiSelectBookmarkAction(
     data class EditBookmark(override val isVisible: Boolean) : MultiSelectBookmarkAction(
         UR.id.menu_edit,
         UR.id.menu_edit,
-        LR.string.delete,
+        LR.string.edit,
         IR.drawable.ic_edit,
         "edit",
         isVisible = isVisible
