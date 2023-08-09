@@ -168,9 +168,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             itemTouchHelper.attachToRecyclerView(it)
         }
 
-        viewModel.cloudFilesList.observe(viewLifecycleOwner) {
-            binding?.emptyLayout?.isVisible = it.isEmpty()
-            adapter.submitList(it)
+        viewModel.uiState.observe(viewLifecycleOwner) {
+            binding?.emptyLayout?.isVisible = it.userEpisodes.isEmpty()
+            adapter.submitList(it.userEpisodes)
+            adapter.notifyDataSetChanged()
         }
 
         binding?.layoutUsage?.isVisible = false

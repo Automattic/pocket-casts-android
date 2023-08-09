@@ -464,8 +464,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         viewModel.onTabClicked(tab)
     }
 
-    private val onBookmarkPlayClicked: (bookmark: Bookmark) -> Unit = {
-        // TODO: Add play action
+    private val onBookmarkPlayClicked: (bookmark: Bookmark) -> Unit = { bookmark ->
+        viewModel.play(bookmark)
     }
 
     val podcastUuid

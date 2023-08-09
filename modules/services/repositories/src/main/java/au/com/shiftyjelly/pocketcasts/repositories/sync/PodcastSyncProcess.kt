@@ -132,6 +132,7 @@ class PodcastSyncProcess(
                 cacheStats()
                     .andThen(downloadAndImportHomeFolder())
                     .andThen(downloadAndImportFilters())
+                    .andThen(rxCompletable { downloadAndImportBookmarks() })
                     .andThen(Completable.fromAction { settings.setLastModified(lastSyncAt) })
             }
     }
@@ -213,6 +214,14 @@ class PodcastSyncProcess(
     private fun downloadAndImportFilters(): Completable {
         return syncManager.getFilters()
             .flatMapCompletable { filters -> importFilters(filters) }
+    }
+
+    private suspend fun downloadAndImportBookmarks() {
+        if (!FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            return
+        }
+        val bookmarks = syncManager.getBookmarks()
+        importBookmarks(bookmarks)
     }
 
     private fun importPodcast(podcastResponse: PodcastResponse?): Maybe<Podcast> {
@@ -552,7 +561,7 @@ class PodcastSyncProcess(
             .andThen(importPodcasts(response.podcasts))
             .andThen(importFilters(response.playlists))
             .andThen(importFolders(response.folders))
-            .andThen(importBookmarks(response.bookmarks))
+            .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
             .andThen(updateShortcuts(response.playlists))
             .andThen(cacheStats())
@@ -630,11 +639,12 @@ class PodcastSyncProcess(
             .flatMapCompletable { folder -> importFolder(folder) }
     }
 
-    private fun importBookmarks(bookmarks: List<Bookmark>): Completable {
-        return if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            Observable.fromIterable(bookmarks).flatMapCompletable { bookmark -> importBookmark(bookmark) }
-        } else {
-            Completable.complete()
+    private suspend fun importBookmarks(bookmarks: List<Bookmark>) {
+        if (!FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            return
+        }
+        for (bookmark in bookmarks) {
+            importBookmark(bookmark)
         }
     }
 
@@ -842,13 +852,11 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun importBookmark(bookmark: Bookmark): Completable {
-        return rxCompletable {
-            if (bookmark.deleted) {
-                bookmarkManager.deleteSynced(bookmark.uuid)
-            } else {
-                bookmarkManager.upsertSynced(bookmark)
-            }
+    private suspend fun importBookmark(bookmark: Bookmark) {
+        if (bookmark.deleted) {
+            bookmarkManager.deleteSynced(bookmark.uuid)
+        } else {
+            bookmarkManager.upsertSynced(bookmark)
         }
     }
 }

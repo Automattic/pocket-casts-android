@@ -86,8 +86,9 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        val titleRes = if (isNewBookmark) R.string.add_bookmark_title_hint else R.string.change_bookmark_title_hint
         TextP40(
-            text = stringResource(R.string.add_bookmark_title_hint),
+            text = stringResource(titleRes),
             color = Color.White.copy(alpha = 0.5f),
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(100.dp, 240.dp)

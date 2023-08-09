@@ -228,6 +228,7 @@ project.ext {
             // Retrofit
             retrofit: "com.squareup.retrofit2:retrofit:$versionRetrofit",
             retrofitMoshi: "com.squareup.retrofit2:converter-moshi:$versionRetrofit",
+            retrofitProtobuf: "com.squareup.retrofit2:converter-protobuf:$versionRetrofit",
             retrofitRxJava: "com.squareup.retrofit2:adapter-rxjava2:$versionRetrofit",
             moshi: "com.squareup.moshi:moshi:$versionMoshi",
             moshiKotlinCompile: "com.squareup.moshi:moshi-kotlin-codegen:$versionMoshi",
@@ -279,6 +280,12 @@ project.ext {
             testMokitoKotlinInline: 'org.mockito:mockito-inline:4.4.0',
             // MaterialProgressBar
             materialProgressBar: "me.zhanghai.android.materialprogressbar:library:1.6.1",
+            // Protocol Buffers
+            // For Android users, it's recommended to use protobuf Java Lite runtime because of its smaller code size.
+            // Java Lite runtime also works better with Proguard because it doesn't rely on Java reflection and is optimized
+            // to allow as much code stripping as possible.
+            protobufKotlinLite: 'com.google.protobuf:protobuf-kotlin-lite:3.23.4',
+            protobufJavaLite: 'com.google.protobuf:protobuf-javalite:3.23.4',
             // JSONassert - https://github.com/skyscreamer/JSONassert
             jsonAssert: 'org.skyscreamer:jsonassert:1.5.0',
             mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
