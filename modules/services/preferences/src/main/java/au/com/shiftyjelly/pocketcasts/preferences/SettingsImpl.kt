@@ -174,16 +174,6 @@ class SettingsImpl @Inject constructor(
         setBoolean("cancelled_acknowledged", value)
     }
 
-    override fun getLastScreenOpened(): String? {
-        return sharedPreferences.getString(Settings.LAST_MAIN_NAV_SCREEN_OPENED, null)
-    }
-
-    override fun setLastScreenOpened(screenId: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.LAST_MAIN_NAV_SCREEN_OPENED, screenId)
-        editor.apply()
-    }
-
     override fun syncOnMeteredNetwork(): Boolean {
         return getBoolean(Settings.PREFERENCE_SYNC_ON_METERED, true)
     }

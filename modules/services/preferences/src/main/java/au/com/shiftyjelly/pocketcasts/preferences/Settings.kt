@@ -107,8 +107,6 @@ interface Settings {
         const val LEGACY_STORAGE_ON_PHONE = "phone"
         const val LEGACY_STORAGE_ON_SD_CARD = "external"
 
-        const val LAST_MAIN_NAV_SCREEN_OPENED = "last_main_screen"
-
         const val AUTO_ARCHIVE_EXCLUDED_PODCASTS = "autoArchiveExcludedPodcasts"
         const val AUTO_ARCHIVE_INCLUDE_STARRED = "autoArchiveIncludeStarred"
 
@@ -212,9 +210,6 @@ interface Settings {
 
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
-
-    fun getLastScreenOpened(): String?
-    fun setLastScreenOpened(screenId: String)
 
     fun syncOnMeteredNetwork(): Boolean
     fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
