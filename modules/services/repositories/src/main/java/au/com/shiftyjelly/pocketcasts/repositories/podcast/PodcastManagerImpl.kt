@@ -627,6 +627,9 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
+        if (show) {
+            settings.notifyRefreshPodcast.set(true)
+        }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }
 

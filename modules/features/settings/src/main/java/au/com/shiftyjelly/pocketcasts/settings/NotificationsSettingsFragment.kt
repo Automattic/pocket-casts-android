@@ -160,8 +160,7 @@ class NotificationsSettingsFragment :
 
     private fun updateNotificationsEnabled() {
         launch(Dispatchers.Default) {
-            val notificationCount = podcastManager.countNotificationsOn()
-            val enabled = notificationCount > 0
+            val enabled = settings.notifyRefreshPodcast.flow.value
 
             launch(Dispatchers.Main) {
                 enabledPreference?.isChecked = enabled
@@ -169,6 +168,7 @@ class NotificationsSettingsFragment :
 
                 enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
                     val checked = newValue as Boolean
+                    settings.notifyRefreshPodcast.set(checked)
 
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
@@ -403,6 +403,7 @@ class NotificationsSettingsFragment :
 
     override fun onResume() {
         super.onResume()
+        setupEnabledNotifications()
         setupNotificationVibrate()
         setupPlayOverNotifications()
         changePodcastsSummary()
@@ -443,6 +444,10 @@ class NotificationsSettingsFragment :
                 it.summary = getRingtoneValue(notificationSoundPath)
             }
         }
+    }
+
+    private fun setupEnabledNotifications() {
+        enabledPreference?.isChecked = settings.notifyRefreshPodcast.flow.value
     }
 
     private fun setupNotificationVibrate() {
