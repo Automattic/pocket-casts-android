@@ -213,7 +213,6 @@ class BookmarksViewModel
                 val episodeUuid = bookmark.episodeUuid
                 viewModelScope.launch(ioDispatcher) {
                     val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
-                    val timeSecs = bookmark.timeSecs
                     val backgroundColor =
                         if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
                     val tintColor =
@@ -221,33 +220,7 @@ class BookmarksViewModel
                     val arguments = BookmarkArguments(
                         bookmarkUuid = bookmark.uuid,
                         episodeUuid = episodeUuid,
-                        timeSecs = timeSecs,
-                        backgroundColor = backgroundColor,
-                        tintColor = tintColor
-                    )
-                    onSuccess(arguments)
-                }
-            }
-        }
-    }
-
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
-        (_uiState.value as? UiState.Loaded)?.let {
-            val bookmark =
-                it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
-            bookmark?.let {
-                val episodeUuid = bookmark.episodeUuid
-                viewModelScope.launch(ioDispatcher) {
-                    val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
-                    val timeSecs = bookmark.timeSecs
-                    val backgroundColor =
-                        if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
-                    val tintColor =
-                        if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
-                    val arguments = BookmarkArguments(
-                        bookmarkUuid = bookmark.uuid,
-                        episodeUuid = episodeUuid,
-                        timeSecs = timeSecs,
+                        timeSecs = bookmark.timeSecs,
                         backgroundColor = backgroundColor,
                         tintColor = tintColor
                     )
