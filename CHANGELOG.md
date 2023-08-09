@@ -3,6 +3,8 @@ Unknown
 *   Bug Fixes:
     *   Fixed auto archive settings getting lost when switching languages
         ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
+    *   Improved handling of enabling/disabling new episode notifications
+        ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
 
 7.46
 -----
