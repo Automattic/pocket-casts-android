@@ -381,7 +381,6 @@ class PodcastViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        val time = bookmark.timeSecs
         val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
         bookmarkEpisode?.let {
             val shouldPlayEpisode = !playbackManager.isPlaying() ||
@@ -390,7 +389,7 @@ class PodcastViewModel
                 playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
             }
         }
-        playbackManager.seekToTimeMs(time * 1000)
+        playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
     }
 
     fun multiSelectSelectNone() {

@@ -192,7 +192,6 @@ class BookmarksViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        val time = bookmark.timeSecs
         viewModelScope.launch {
             val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
             bookmarkEpisode?.let {
@@ -202,7 +201,7 @@ class BookmarksViewModel
                     playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
                 }
             }
-            playbackManager.seekToTimeMs(positionMs = time * 1000)
+            playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
         }
     }
 
