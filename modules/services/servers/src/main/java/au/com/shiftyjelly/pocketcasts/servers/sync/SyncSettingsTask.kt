@@ -18,7 +18,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         skipBack = settings.skipBackInSecs.getSyncValue(),
                         marketingOptIn = if (settings.getMarketingOptInNeedsSync()) settings.getMarketingOptIn() else null,
                         freeGiftAcknowledged = if (settings.getFreeGiftAcknowledgedNeedsSync()) settings.getFreeGiftAcknowledged() else null,
-                        gridOrder = if (settings.getPodcastsSortTypeNeedsSync()) settings.getPodcastsSortType().serverId else null,
+                        gridOrder = settings.podcastsSortType.getSyncValue()?.serverId,
                     )
                 )
 
@@ -31,7 +31,10 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             when (key) {
                                 "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt())
                                 "skipBack" -> settings.skipBackInSecs.set(value.value.toInt())
-                                "gridOrder" -> settings.setPodcastsSortType(sortType = PodcastsSortType.fromServerId(value.value.toInt()), sync = false)
+                                "gridOrder" -> {
+                                    val sortType = PodcastsSortType.fromServerId(value.value.toInt())
+                                    settings.podcastsSortType.set(sortType)
+                                }
                             }
                         } else if (value.value is Boolean) {
                             when (key) {
@@ -48,11 +51,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return Result.failure()
             }
 
-            settings.skipBackInSecs.needsSync = false
-            settings.skipForwardInSecs.needsSync = false
+            listOf(
+                settings.skipBackInSecs,
+                settings.skipForwardInSecs,
+                settings.podcastsSortType,
+            ).forEach {
+                it.hasBeenSynced()
+            }
             settings.setMarketingOptInNeedsSync(false)
             settings.setFreeGiftAcknowledgedNeedsSync(false)
-            settings.setPodcastsSortTypeNeedsSync(false)
 
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 

@@ -28,9 +28,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -76,9 +78,6 @@ class SettingsImpl @Inject constructor(
 
     private var languageCode: String? = null
 
-    override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
-    override val podcastBadgeTypeObservable = BehaviorRelay.create<Settings.BadgeType>().apply { accept(getPodcastBadgeType()) }
-    override val podcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getPodcastsSortType()) }
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val playbackEffectsObservable = BehaviorRelay.create<PlaybackEffects>().apply { accept(getGlobalPlaybackEffects()) }
     override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
@@ -230,33 +229,13 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean) {
-        if (getPodcastsSortType() == sortType) {
-            return
-        }
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.PREFERENCE_PODCAST_LIBRARY_SORT, sortType.clientId.toString())
-        editor.apply()
-        podcastSortTypeObservable.accept(sortType)
-        if (sync) {
-            setPodcastsSortTypeNeedsSync(true)
-        }
-    }
-
-    override fun setPodcastsSortTypeNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC, value)
-    }
-
-    override fun getPodcastsSortTypeNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC, false)
-    }
-
-    override fun getPodcastsSortType(): PodcastsSortType {
-        val default = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST
-        val defaultId = default.clientId.toString()
-        val sortOrderId = Integer.parseInt(getString(Settings.PREFERENCE_PODCAST_LIBRARY_SORT, defaultId) ?: defaultId)
-        return PodcastsSortType.values().find { it.clientId == sortOrderId } ?: default
-    }
+    override val podcastsSortType = UserSetting.PrefFromString(
+        sharedPrefKey = "podcastLibrarySort",
+        defaultValue = PodcastsSortType.default,
+        sharedPrefs = sharedPreferences,
+        fromString = { PodcastsSortType.fromClientIdString(it) },
+        toString = { it.clientId.toString() },
+    )
 
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
         sharedPreferences.edit().apply {
@@ -694,19 +673,21 @@ class SettingsImpl @Inject constructor(
         setInt("MIGRATED_VERSION_CODE", versionCode)
     }
 
-    override fun getPodcastBadgeType(): Settings.BadgeType {
-        return Settings.BadgeType.values()[getInt("PODCAST_BADGE_TYPE", Settings.BadgeType.OFF.ordinal)]
-    }
+    override val podcastBadgeType = UserSetting.PrefFromInt<BadgeType>(
+        sharedPrefKey = "PODCAST_BADGE_TYPE",
+        defaultValue = BadgeType.defaultValue,
+        sharedPrefs = sharedPreferences,
+        fromInt = { BadgeType.fromPersistedInt(it) },
+        toInt = { it.persistedInt }
+    )
 
-    override fun setPodcastBadgeType(badgeType: Settings.BadgeType) {
-        setInt("PODCAST_BADGE_TYPE", badgeType.ordinal)
-        podcastBadgeTypeObservable.accept(badgeType)
-    }
-
-    override fun setPodcastsLayout(layout: Int) {
-        setInt("PODCAST_GRID_LAYOUT", layout)
-        podcastLayoutObservable.accept(layout)
-    }
+    override val podcastGridLayout = UserSetting.PrefFromInt<PodcastGridLayoutType>(
+        sharedPrefKey = "PODCAST_GRID_LAYOUT",
+        defaultValue = PodcastGridLayoutType.default,
+        sharedPrefs = sharedPreferences,
+        fromInt = { PodcastGridLayoutType.fromLayoutId(it) },
+        toInt = { it.id }
+    )
 
     override fun getNotificationLastSeen(): Date? {
         return getDate("NOTIFICATION_LAST_SEEN")
@@ -931,14 +912,6 @@ class SettingsImpl @Inject constructor(
             }
         },
     )
-
-    override fun getPodcastsLayout(): Int {
-        return getInt("PODCAST_GRID_LAYOUT", Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)
-    }
-
-    override fun isPodcastsLayoutListView(): Boolean {
-        return getPodcastsLayout() == Settings.PodcastGridLayoutType.LIST_VIEW.id
-    }
 
     override fun getAutoArchiveExcludedPodcasts(): List<String> {
         return sharedPreferences.getStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, null)?.toList() ?: emptyList()

@@ -90,7 +90,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -105,7 +105,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -121,6 +121,6 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onApplicationUpgrade(VERSION_CODE_AFTER_FIRST_INSTALL)
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
     }
 }

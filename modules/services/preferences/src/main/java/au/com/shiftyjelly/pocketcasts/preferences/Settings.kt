@@ -17,9 +17,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
@@ -77,8 +79,6 @@ interface Settings {
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
-        const val PREFERENCE_PODCAST_LIBRARY_SORT = "podcastLibrarySort"
-        const val PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC = "podcastLibrarySortNeedsSync"
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
         const val PREFERENCE_WARN_WHEN_NOT_ON_WIFI = "warnWhenNotOnWifi"
         const val PREFERENCE_SYNC_ON_METERED = "SyncWhenOnMetered"
@@ -142,22 +142,6 @@ interface Settings {
         SIGN_IN_ERROR(21483649),
     }
 
-    enum class BadgeType(val labelId: Int, val analyticsValue: String) {
-        OFF(labelId = LR.string.podcasts_badges_off, analyticsValue = "off"),
-        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode, analyticsValue = "only_latest_episode"),
-        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished, analyticsValue = "unfinished_episodes")
-    }
-
-    enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
-        LARGE_ARTWORK(id = 0, analyticsValue = "large_artwork"),
-        SMALL_ARTWORK(id = 1, analyticsValue = "small_artwork"),
-        LIST_VIEW(id = 2, analyticsValue = "list");
-        companion object {
-            fun fromLayoutId(id: Int) =
-                PodcastGridLayoutType.values().find { it.id == id } ?: LARGE_ARTWORK
-        }
-    }
-
     enum class UpNextAction {
         PLAY_NEXT,
         PLAY_LAST
@@ -211,9 +195,6 @@ interface Settings {
         object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
     }
 
-    val podcastLayoutObservable: Observable<Int>
-    val podcastBadgeTypeObservable: Observable<BadgeType>
-    val podcastSortTypeObservable: Observable<PodcastsSortType>
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
@@ -248,10 +229,7 @@ interface Settings {
     fun getWorkManagerNetworkTypeConstraint(): NetworkType
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     val backgroundRefreshPodcasts: UserSetting<Boolean>
-    fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)
-    fun setPodcastsSortTypeNeedsSync(value: Boolean)
-    fun getPodcastsSortTypeNeedsSync(): Boolean
-    fun getPodcastsSortType(): PodcastsSortType
+    val podcastsSortType: UserSetting<PodcastsSortType>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
@@ -337,11 +315,8 @@ interface Settings {
 
     fun setMigratedVersionCode(versionCode: Int)
 
-    fun getPodcastBadgeType(): BadgeType
-    fun setPodcastBadgeType(badgeType: BadgeType)
-    fun setPodcastsLayout(layout: Int)
-    fun getPodcastsLayout(): Int
-    fun isPodcastsLayoutListView(): Boolean
+    val podcastBadgeType: UserSetting<BadgeType>
+    val podcastGridLayout: UserSetting<PodcastGridLayoutType>
 
     fun getNotificationLastSeen(): Date?
     fun setNotificationLastSeen(lastSeen: Date?)

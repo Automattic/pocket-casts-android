@@ -10,17 +10,26 @@ abstract class UserSetting<T>(
     protected val sharedPrefs: SharedPreferences,
 ) {
 
-    var needsSync: Boolean
-        get() = sharedPrefs.getBoolean("${sharedPrefKey}NeedsSync", false)
-        set(value) {
-            sharedPrefs.edit().run {
-                putBoolean("${sharedPrefKey}NeedsSync", value)
-                apply()
-            }
-        }
+    private val needsSyncKey = "${sharedPrefKey}NeedsSync"
 
-    fun getSyncValue(): T? =
-        if (needsSync) get() else null
+    fun hasBeenSynced() {
+        setNeedsSync(false)
+    }
+
+    private fun setNeedsSync(needsSync: Boolean) {
+        sharedPrefs.edit().run {
+            putBoolean(needsSyncKey, needsSync)
+            apply()
+        }
+    }
+
+    private fun getNeedsSync() = sharedPrefs.getBoolean(needsSyncKey, false)
+
+    // Returns the value to sync if sync is needed. Returns null if sync is not needed.
+    fun getSyncValue(): T? {
+        val needsSync = sharedPrefs.getBoolean(needsSyncKey, false)
+        return if (needsSync) flow.value else null
+    }
 
     private val _flow by lazy { MutableStateFlow(get()) }
     // lazy (1) because the class needs to initialize before calling get() and (2) we don't
@@ -29,14 +38,17 @@ abstract class UserSetting<T>(
     val flow: StateFlow<T> by lazy { _flow }
 
     // external callers should use the flow.value to get the current value or, even
-    // better, use the flow itself to observe changes.
+    // better, use the flow to observe changes.
     protected abstract fun get(): T
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    fun set(value: T, commit: Boolean = false) {
+    fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
         persist(value, commit)
         _flow.value = value
+        if (needsSync) {
+            setNeedsSync(true)
+        }
     }
 
     class BoolPref(

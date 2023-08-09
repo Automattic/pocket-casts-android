@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
@@ -57,7 +57,7 @@ fun FolderImage(
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 11.sp,
     badgeCount: Int = 0,
-    badgeType: Settings.BadgeType = Settings.BadgeType.OFF
+    badgeType: BadgeType = BadgeType.OFF
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -148,7 +148,7 @@ fun FolderImage(
 }
 
 @Composable
-private fun PodcastBadge(modifier: Modifier = Modifier, count: Int, badgeType: Settings.BadgeType) {
+private fun PodcastBadge(modifier: Modifier = Modifier, count: Int, badgeType: BadgeType) {
     if (count == 0) {
         return
     }
@@ -166,7 +166,7 @@ private fun PodcastBadge(modifier: Modifier = Modifier, count: Int, badgeType: S
         )
     }
     Text(
-        text = if (badgeType != Settings.BadgeType.LATEST_EPISODE) count.toString() else "●",
+        text = if (badgeType != BadgeType.LATEST_EPISODE) count.toString() else "●",
         fontSize = if (count > 9) 12.sp else 14.sp,
         fontWeight = FontWeight.Bold,
         color = Color.White,
@@ -244,7 +244,7 @@ private fun FolderImagePreview() {
         color = Color.Blue,
         podcastUuids = emptyList(),
         badgeCount = 1,
-        badgeType = Settings.BadgeType.ALL_UNFINISHED,
+        badgeType = BadgeType.ALL_UNFINISHED,
         modifier = Modifier.size(100.dp)
     )
 }

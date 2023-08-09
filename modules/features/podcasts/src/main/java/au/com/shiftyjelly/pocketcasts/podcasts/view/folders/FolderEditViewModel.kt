@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.asObservable
 import java.util.Locale
 import java.util.Optional
 import javax.inject.Inject
@@ -48,7 +50,7 @@ class FolderEditViewModel
         val selectedUuids: List<String> = emptyList(),
         val searchText: String = "",
         val folder: Folder? = null,
-        val layout: Int = Settings.PodcastGridLayoutType.LARGE_ARTWORK.id
+        val layout: PodcastGridLayoutType = PodcastGridLayoutType.LARGE_ARTWORK
     ) {
         fun isSelected(podcast: Podcast): Boolean {
             return selectedUuids.contains(podcast.uuid)
@@ -84,7 +86,9 @@ class FolderEditViewModel
     init {
         viewModelScope.launch {
             combine(
-                settings.podcastSortTypeObservable.toFlowable(BackpressureStrategy.LATEST)
+                settings.podcastsSortType.flow
+                    .asObservable(coroutineContext)
+                    .toFlowable(BackpressureStrategy.LATEST)
                     .switchMap { podcastSortOrder ->
                         if (podcastSortOrder == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
                             podcastManager.observePodcastsOrderByLatestEpisode()
@@ -130,7 +134,7 @@ class FolderEditViewModel
                     searchText = searchText,
                     folders = folders,
                     folder = folder,
-                    layout = settings.getPodcastsLayout()
+                    layout = settings.podcastGridLayout.flow.value
                 )
             }.collect {
                 mutableState.value = it
@@ -145,11 +149,11 @@ class FolderEditViewModel
 
     private fun sortPodcasts(podcastsSortedByReleaseDate: List<Podcast>): List<Podcast> {
         val podcasts = podcastsSortedByReleaseDate
-        return when (settings.getPodcastsSortType()) {
+        return when (settings.podcastsSortType.flow.value) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastsSortedByReleaseDate
             PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST -> podcasts.sortedWith(compareBy { it.addedDate })
             PodcastsSortType.DRAG_DROP -> podcasts.sortedWith(compareBy { it.sortPosition })
-            else -> podcasts.sortedWith(compareBy { PodcastsSortType.cleanStringForSort(it.title) })
+            PodcastsSortType.NAME_A_TO_Z -> podcasts.sortedWith(compareBy { PodcastsSortType.cleanStringForSort(it.title) })
         }
     }
 
@@ -225,7 +229,7 @@ class FolderEditViewModel
                 val newFolder = folderManager.create(
                     name = name,
                     color = colorId.value,
-                    podcastsSortType = settings.getPodcastsSortType(),
+                    podcastsSortType = settings.podcastsSortType.flow.value,
                     podcastUuids = podcastUuids
                 )
                 onComplete(newFolder)
@@ -263,8 +267,8 @@ class FolderEditViewModel
         }
     }
 
-    fun getGridImageWidthDp(layout: Int, context: Context): Int {
-        return UiUtil.getGridImageWidthPx(smallArtwork = layout == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id, context = context).pxToDp(context).toInt()
+    fun getGridImageWidthDp(layout: PodcastGridLayoutType, context: Context): Int {
+        return UiUtil.getGridImageWidthPx(smallArtwork = layout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(context).toInt()
     }
 
     fun movePodcastToFolder(podcastUuid: String, folder: Folder) {
