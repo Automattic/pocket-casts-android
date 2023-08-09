@@ -404,16 +404,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getPopularPodcastCountryCode(): String {
-        return sharedPreferences.getString(Settings.PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE, "") ?: ""
-    }
-
-    override fun setPopularPodcastCountryCode(code: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE, code)
-        editor.apply()
-    }
-
     override fun getAutoSubscribeToPlayed(): Boolean {
         return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
     }

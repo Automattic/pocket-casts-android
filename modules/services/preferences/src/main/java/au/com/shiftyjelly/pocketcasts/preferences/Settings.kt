@@ -96,7 +96,6 @@ interface Settings {
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
         const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
-        const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
@@ -261,10 +260,6 @@ interface Settings {
     fun setDiscoveryCountryCode(code: String)
 
     val warnOnMeteredNetwork: UserSetting<Boolean>
-
-    fun getPopularPodcastCountryCode(): String
-
-    fun setPopularPodcastCountryCode(code: String)
 
     val playOverNotification: UserSetting<PlayOverNotificationSetting>
 
