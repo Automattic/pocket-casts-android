@@ -60,11 +60,14 @@ class BookmarksViewModel
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
+    private var sourceView: SourceView = SourceView.UNKNOWN
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
         episodeUuid: String,
         sourceView: SourceView,
     ) {
+        this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
@@ -189,8 +192,43 @@ class BookmarksViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        val time = bookmark.timeSecs
-        playbackManager.seekToTimeMs(positionMs = time * 1000)
+        viewModelScope.launch {
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+            bookmarkEpisode?.let {
+                val shouldPlayEpisode = !playbackManager.isPlaying() ||
+                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+                if (shouldPlayEpisode) {
+                    playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+                }
+            }
+            playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
+        }
+    }
+
+    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
+        (_uiState.value as? UiState.Loaded)?.let {
+            val bookmark =
+                it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
+            bookmark?.let {
+                val episodeUuid = bookmark.episodeUuid
+                viewModelScope.launch(ioDispatcher) {
+                    val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                    val timeSecs = bookmark.timeSecs
+                    val backgroundColor =
+                        if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
+                    val tintColor =
+                        if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
+                    val arguments = BookmarkArguments(
+                        bookmarkUuid = bookmark.uuid,
+                        episodeUuid = episodeUuid,
+                        timeSecs = timeSecs,
+                        backgroundColor = backgroundColor,
+                        tintColor = tintColor
+                    )
+                    onSuccess(arguments)
+                }
+            }
+        }
     }
 
     fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
