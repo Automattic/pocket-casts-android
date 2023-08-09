@@ -17,7 +17,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         skipForward = settings.skipForwardInSecs.getSyncValue(),
                         skipBack = settings.skipBackInSecs.getSyncValue(),
                         marketingOptIn = if (settings.getMarketingOptInNeedsSync()) settings.getMarketingOptIn() else null,
-                        freeGiftAcknowledged = if (settings.getFreeGiftAcknowledgedNeedsSync()) settings.getFreeGiftAcknowledged() else null,
+                        freeGiftAcknowledged = settings.freeGiftAcknowledged.getSyncValue(),
                         gridOrder = settings.podcastsSortType.getSyncValue()?.serverId,
                     )
                 )
@@ -39,7 +39,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         } else if (value.value is Boolean) {
                             when (key) {
                                 "marketingOptIn" -> settings.setMarketingOptIn(value.value)
-                                "freeGiftAcknowledgement" -> settings.setFreeGiftAcknowledged(value.value)
+                                "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value)
                             }
                         }
                     } else {
@@ -52,6 +52,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             }
 
             listOf(
+                settings.freeGiftAcknowledged,
+                settings.podcastsSortType,
                 settings.skipBackInSecs,
                 settings.skipForwardInSecs,
                 settings.podcastsSortType,
@@ -59,8 +61,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 it.hasBeenSynced()
             }
             settings.setMarketingOptInNeedsSync(false)
-            settings.setFreeGiftAcknowledgedNeedsSync(false)
-
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 
             return Result.success()

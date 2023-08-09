@@ -73,8 +73,6 @@ interface Settings {
 
         const val PREFERENCE_MARKETING_OPT_IN = "marketingOptIn"
         const val PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC = "marketingOptInNeedsSync"
-        const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED = "freeGiftAck"
-        const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC = "freeGiftAckNeedsSync"
 
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
@@ -379,10 +377,7 @@ interface Settings {
     fun getMarketingOptInNeedsSync(): Boolean
     fun setMarketingOptInNeedsSync(value: Boolean)
 
-    fun getFreeGiftAcknowledged(): Boolean
-    fun setFreeGiftAcknowledged(value: Boolean)
-    fun getFreeGiftAcknowledgedNeedsSync(): Boolean
-    fun setFreeGiftAcknowledgedNeedsSync(value: Boolean)
+    val freeGiftAcknowledged: UserSetting<Boolean>
 
     fun setCloudSortOrder(sortOrder: CloudSortOrder)
     fun getCloudSortOrder(): CloudSortOrder
