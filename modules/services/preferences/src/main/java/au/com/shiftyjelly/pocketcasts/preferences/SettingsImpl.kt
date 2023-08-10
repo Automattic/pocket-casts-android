@@ -598,16 +598,6 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getBoolean(Settings.PREFERENCE_ALLOW_OTHER_APPS_ACCESS, false)
     }
 
-    override fun setHideSyncSetupMenu(hide: Boolean) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean(Settings.PREFERENCE_HIDE_SYNC_SETUP_MENU, hide)
-        editor.apply()
-    }
-
-    override fun isSyncSetupMenuHidden(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_HIDE_SYNC_SETUP_MENU, false)
-    }
-
     override fun getMigratedVersionCode(): Int {
         return getInt("MIGRATED_VERSION_CODE", 0)
     }

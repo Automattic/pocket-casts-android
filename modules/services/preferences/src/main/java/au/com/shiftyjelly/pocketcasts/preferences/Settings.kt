@@ -84,7 +84,6 @@ interface Settings {
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
         const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
-        const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
@@ -278,10 +277,6 @@ interface Settings {
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
     fun allowOtherAppsAccessToEpisodes(): Boolean
-
-    fun setHideSyncSetupMenu(hide: Boolean)
-
-    fun isSyncSetupMenuHidden(): Boolean
 
     fun getMigratedVersionCode(): Int
 
