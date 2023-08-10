@@ -1097,7 +1097,7 @@ class SettingsImpl @Inject constructor(
         shelfItemsObservable.accept(items)
     }
 
-    override fun getMultiSelectItems(): List<Int> {
+    private fun getMultiSelectItems(): List<Int> {
         return getStringList("multi_select_items").map { it.toInt() }
     }
 

@@ -383,7 +383,6 @@ interface Settings {
     val showArchivedDefault: UserSetting<Boolean>
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
     fun setMultiSelectItems(items: List<Int>)
-    fun getMultiSelectItems(): List<Int>
     fun setLastPauseTime(date: Date)
     fun getLastPauseTime(): Date?
     fun setLastPausedUUID(uuid: String)
