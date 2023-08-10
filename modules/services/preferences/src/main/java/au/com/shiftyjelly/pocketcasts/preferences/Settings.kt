@@ -326,11 +326,8 @@ interface Settings {
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>
 
-    fun getHeadphoneControlsNextAction(): HeadphoneAction
     fun setHeadphoneControlsNextAction(action: HeadphoneAction)
-    fun getHeadphoneControlsPreviousAction(): HeadphoneAction
     fun setHeadphoneControlsPreviousAction(action: HeadphoneAction)
-    fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean
     fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean)
 
     // Firebase remote config

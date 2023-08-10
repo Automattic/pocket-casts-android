@@ -927,7 +927,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
+    private fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
         return Settings.HeadphoneAction.values()[getInt("headphone_controls_next_action", Settings.HeadphoneAction.SKIP_FORWARD.ordinal)]
     }
 
@@ -936,7 +936,7 @@ class SettingsImpl @Inject constructor(
         headphoneNextActionFlow.update { action }
     }
 
-    override fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
+    private fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
         return Settings.HeadphoneAction.values()[getInt("headphone_controls_previous_action", Settings.HeadphoneAction.SKIP_BACK.ordinal)]
     }
 
@@ -945,7 +945,7 @@ class SettingsImpl @Inject constructor(
         headphonePreviousActionFlow.update { action }
     }
 
-    override fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean {
+    private fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean {
         return getBoolean("headphone_controls_play_bookmark_confirmation_sound", true)
     }
 
