@@ -103,7 +103,6 @@ interface Settings {
         const val LEGACY_STORAGE_ON_PHONE = "phone"
         const val LEGACY_STORAGE_ON_SD_CARD = "external"
 
-        const val AUTO_ARCHIVE_EXCLUDED_PODCASTS = "autoArchiveExcludedPodcasts"
         const val AUTO_ARCHIVE_INCLUDE_STARRED = "autoArchiveIncludeStarred"
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
@@ -301,8 +300,6 @@ interface Settings {
     val showArtworkOnLockScreen: UserSetting<Boolean>
     val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
-    fun getAutoArchiveExcludedPodcasts(): List<String>
-    fun setAutoArchiveExcludedPodcasts(excluded: List<String>)
     val autoArchiveIncludeStarred: UserSetting<Boolean>
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
     val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>

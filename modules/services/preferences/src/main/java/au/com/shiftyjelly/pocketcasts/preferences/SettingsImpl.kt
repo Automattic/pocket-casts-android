@@ -824,14 +824,6 @@ class SettingsImpl @Inject constructor(
         },
     )
 
-    override fun getAutoArchiveExcludedPodcasts(): List<String> {
-        return sharedPreferences.getStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, null)?.toList() ?: emptyList()
-    }
-
-    override fun setAutoArchiveExcludedPodcasts(excluded: List<String>) {
-        sharedPreferences.edit().putStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, excluded.toSet()).apply()
-    }
-
     override val autoPlayNextEpisodeOnEmpty = UserSetting.BoolPref(
         sharedPrefKey = "autoUpNextEmpty",
         defaultValue = when (Util.getAppPlatform(context)) {
