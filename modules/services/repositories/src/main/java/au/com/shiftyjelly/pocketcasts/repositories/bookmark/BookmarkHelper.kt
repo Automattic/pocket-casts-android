@@ -68,7 +68,7 @@ private fun buildAndShowNotification(
     context: Context,
 ) {
     val changeTitleAction = NotificationCompat.Action(
-        IR.drawable.ic_edit,
+        IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
         buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK)
     )
