@@ -630,10 +630,6 @@ class SettingsImpl @Inject constructor(
         setNotificationLastSeen(Date())
     }
 
-    override fun isShowNotesImagesOn(): Boolean {
-        return getBoolean(Settings.PREFERENCE_SHOW_NOTE_IMAGES_ON, true)
-    }
-
     override fun setUpNextServerModified(timeMs: Long) {
         setLong("upNextModified", timeMs)
     }

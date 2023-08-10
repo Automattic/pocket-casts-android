@@ -1,16 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import timber.log.Timber
 import java.text.Bidi
 import java.util.*
 import java.util.regex.Pattern
 
-class ShowNotesFormatter(settings: Settings?, private val context: Context) {
+class ShowNotesFormatter(private val context: Context) {
 
-    private val showImages: Boolean = settings != null && settings.isShowNotesImagesOn()
     private var padding = "0px"
     private var convertTimesToLinks: Boolean = false
 
@@ -102,12 +100,7 @@ class ShowNotesFormatter(settings: Settings?, private val context: Context) {
         html.append(".separator { padding: 0 2px; color: #D8D8D8; } \n")
         html.append("p { margin: 4px 0 8px 0; } \n")
         html.append("a, .pageHeader { color:").append(linkColor).append("; font-weight: 400; } \n")
-        if (showImages) {
-            html.append("img { width: auto !important; height: auto !important; max-width:100%; max-height: auto; padding-bottom: 10px; padding-top: 10px; display: block; }\nimg[src*='coverart'], img[src*='CoverArt'], img[src*='COVERART'], img[src*='feeds.feedburner.com'] { display: none; } \n")
-        } else {
-            html.append("img { display: none; } \n")
-        }
-
+        html.append("img { width: auto !important; height: auto !important; max-width:100%; max-height: auto; padding-bottom: 10px; padding-top: 10px; display: block; }\nimg[src*='coverart'], img[src*='CoverArt'], img[src*='COVERART'], img[src*='feeds.feedburner.com'] { display: none; } \n")
         html.append("</style></head>\n")
     }
 }

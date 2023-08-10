@@ -152,7 +152,7 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun createShowNotesFormatter(context: Context): ShowNotesFormatter {
-        val showNotesFormatter = ShowNotesFormatter(settings, context)
+        val showNotesFormatter = ShowNotesFormatter(context)
         showNotesFormatter.apply {
             setBackgroundThemeColor(UR.attr.primary_ui_01)
             setTextThemeColor(UR.attr.primary_text_01)
