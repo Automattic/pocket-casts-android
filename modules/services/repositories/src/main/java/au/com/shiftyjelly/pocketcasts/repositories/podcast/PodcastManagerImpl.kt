@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -560,12 +559,8 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateAllAutoDownloadStatus(autoDownloadStatus)
     }
 
-    override fun updateAllShowNotifications(showNotifications: Boolean) {
+    override suspend fun updateAllShowNotifications(showNotifications: Boolean) {
         podcastDao.updateAllShowNotifications(showNotifications)
-    }
-
-    override fun updateAllShowNotificationsRx(showNotifications: Boolean): Completable {
-        return Completable.fromAction { updateAllShowNotifications(showNotifications) }
     }
 
     override fun updateAutoDownloadStatus(podcast: Podcast, autoDownloadStatus: Int) {

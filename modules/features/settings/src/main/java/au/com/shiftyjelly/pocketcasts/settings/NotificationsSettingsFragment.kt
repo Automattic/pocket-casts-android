@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -34,15 +35,12 @@ import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -170,7 +168,7 @@ class NotificationsSettingsFragment :
             podcastManager.findSubscribed().forEach {
                 podcastManager.updateShowNotifications(it, newSelection.contains(it.uuid))
             }
-            launch(Dispatchers.Main) { changePodcastsSummary() }
+            changePodcastsSummary()
         }
     }
 
@@ -338,22 +336,19 @@ class NotificationsSettingsFragment :
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun changePodcastsSummary() {
-        GlobalScope.launch(Dispatchers.Default) {
-            val podcasts = podcastManager.findSubscribed()
-            val podcastCount = podcasts.size
-            val notificationCount = podcasts.count { it.isShowNotifications }
-
-            val summary = when {
-                notificationCount == 0 -> resources.getString(LR.string.settings_podcasts_selected_zero)
-                notificationCount == 1 -> resources.getString(LR.string.settings_podcasts_selected_one)
-                notificationCount >= podcastCount -> resources.getString(LR.string.settings_podcasts_selected_all)
-                else -> resources.getString(LR.string.settings_podcasts_selected_x, notificationCount)
-            }
-            launch(Dispatchers.Main) {
-                notificationPodcasts?.summary = summary
-            }
+    private suspend fun changePodcastsSummary() {
+        val podcasts = withContext(Dispatchers.IO) {
+            podcastManager.findSubscribed()
+        }
+        val notificationCount = podcasts.count { it.isShowNotifications }
+        val summary = when {
+            notificationCount == 0 -> resources.getString(LR.string.settings_podcasts_selected_zero)
+            notificationCount == 1 -> resources.getString(LR.string.settings_podcasts_selected_one)
+            notificationCount >= podcasts.size -> resources.getString(LR.string.settings_podcasts_selected_all)
+            else -> resources.getString(LR.string.settings_podcasts_selected_x, notificationCount)
+        }
+        withContext(Dispatchers.Main) {
+            notificationPodcasts?.summary = summary
         }
     }
 
@@ -362,7 +357,9 @@ class NotificationsSettingsFragment :
         setupEnabledNotifications()
         setupNotificationVibrate()
         setupPlayOverNotifications()
-        changePodcastsSummary()
+        launch {
+            changePodcastsSummary()
+        }
         setupHidePlaybackNotifications()
     }
 
@@ -419,13 +416,14 @@ class NotificationsSettingsFragment :
                         mapOf("enabled" to checked)
                     )
 
-                    podcastManager.updateAllShowNotificationsRx(checked)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io()).onErrorComplete().subscribe()
+                    lifecycleScope.launch {
+                        podcastManager.updateAllShowNotifications(checked)
+                        // Don't change the podcasts summary until after the podcasts have been updated
+                        changePodcastsSummary()
+                    }
                     if (checked) {
                         settings.setNotificationLastSeenToNow()
                     }
-                    changePodcastsSummary()
                     enabledPreferences(checked)
 
                     true
