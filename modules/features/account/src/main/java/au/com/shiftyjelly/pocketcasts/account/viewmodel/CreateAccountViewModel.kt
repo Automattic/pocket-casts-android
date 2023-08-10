@@ -178,8 +178,7 @@ class CreateAccountViewModel
         )
         newsletter.value = isChecked
         newsletter.value?.let {
-            settings.setMarketingOptIn(it)
-            settings.setMarketingOptInNeedsSync(true)
+            settings.marketingOptIn.set(it, needsSync = true)
         }
     }
 

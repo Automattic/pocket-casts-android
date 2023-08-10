@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
@@ -70,10 +69,6 @@ interface Settings {
         const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
-
-        const val PREFERENCE_MARKETING_OPT_IN = "marketingOptIn"
-        const val PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC = "marketingOptInNeedsSync"
-
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
@@ -94,7 +89,6 @@ interface Settings {
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
-        const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
@@ -194,9 +188,7 @@ interface Settings {
     }
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val playbackEffectsObservable: Observable<PlaybackEffects>
     val refreshStateObservable: Observable<RefreshState>
-    val marketingOptObservable: Observable<Boolean>
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
@@ -257,8 +249,7 @@ interface Settings {
     fun getBooleanForKey(key: String, defaultValue: Boolean): Boolean
     fun setBooleanForKey(key: String, value: Boolean)
 
-    fun getDiscoveryCountryCode(): String
-    fun setDiscoveryCountryCode(code: String)
+    val discoverCountryCode: UserSetting<String>
 
     val warnOnMeteredNetwork: UserSetting<Boolean>
 
@@ -282,8 +273,6 @@ interface Settings {
 
     fun clearPlusPreferences()
 
-    fun getLanguageCode(): String
-
     val hideNotificationOnPause: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
@@ -296,12 +285,7 @@ interface Settings {
 
     val useEmbeddedArtwork: UserSetting<Boolean>
 
-    fun getGlobalPlaybackEffects(): PlaybackEffects
-    fun getGlobalPlaybackSpeed(): Double
-    fun getGlobalAudioEffectRemoveSilence(): TrimMode
-    fun getGlobalAudioEffectVolumeBoost(): Boolean
-
-    fun setGlobalAudioEffects(playbackSpeed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean)
+    val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
     fun allowOtherAppsAccessToEpisodes(): Boolean
 
@@ -372,10 +356,7 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
-    fun getMarketingOptIn(): Boolean
-    fun setMarketingOptIn(value: Boolean)
-    fun getMarketingOptInNeedsSync(): Boolean
-    fun setMarketingOptInNeedsSync(value: Boolean)
+    val marketingOptIn: UserSetting<Boolean>
 
     val freeGiftAcknowledged: UserSetting<Boolean>
 
