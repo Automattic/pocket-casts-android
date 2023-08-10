@@ -5,6 +5,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
@@ -381,6 +382,12 @@ class SyncManagerImpl @Inject constructor(
         getCacheTokenOrLoginRxSingle { token ->
             syncServerManager.getFilters(token)
         }
+
+    override suspend fun getBookmarks(): List<Bookmark> {
+        return getCacheTokenOrLogin { token ->
+            syncServerManager.getBookmarks(token)
+        }
+    }
 
     override suspend fun loadStats(): StatsBundle =
         getCacheTokenOrLogin { token ->
