@@ -343,9 +343,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAutoShowPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)
-    }
+    override val autoShowPlayed = UserSetting.BoolPref(
+        sharedPrefKey = "autoShowPlayed",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val playOverNotification = UserSetting.PrefFromString<PlayOverNotificationSetting>(
         sharedPrefKey = "overrideNotificationAudio",

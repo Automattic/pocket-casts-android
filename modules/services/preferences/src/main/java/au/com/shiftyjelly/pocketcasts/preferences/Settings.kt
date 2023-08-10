@@ -82,8 +82,6 @@ interface Settings {
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
 
-        const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
-
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
@@ -348,7 +346,7 @@ interface Settings {
     fun setTrialFinishedSeen(seen: Boolean)
     fun getTrialFinishedSeen(): Boolean
     val autoSubscribeToPlayed: UserSetting<Boolean>
-    fun getAutoShowPlayed(): Boolean
+    val autoShowPlayed: UserSetting<Boolean>
     val autoPlayNextEpisodeOnEmpty: UserSetting<Boolean>
     val showArchivedDefault: UserSetting<Boolean>
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
