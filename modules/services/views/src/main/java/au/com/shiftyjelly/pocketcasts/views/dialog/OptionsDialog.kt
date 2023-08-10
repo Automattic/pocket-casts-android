@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.app.Dialog
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.doOnLayout
@@ -36,6 +38,32 @@ class OptionsDialog : BottomSheetDialogFragment() {
     private val options = mutableListOf<OptionsDialogOption>()
     private var onDismiss: (() -> Unit)? = null
     private var forceDarkTheme: Boolean = false
+
+    companion object {
+        private const val KEY_FORCE_DARK_THEME = "force_dark_theme"
+        private const val KEY_TITLE = "title"
+        private const val KEY_OPTIONS = "options"
+        private const val KEY_ICON_COLOR = "iconColor"
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        savedInstanceState?.let {
+            options.addAll(it.getParcelableArrayList(KEY_OPTIONS, OptionsDialogOption::class.java) ?: mutableListOf())
+            forceDarkTheme = it.getBoolean(KEY_FORCE_DARK_THEME)
+            title = it.getString(KEY_TITLE)
+            iconColor = it.getInt(KEY_ICON_COLOR)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList(KEY_OPTIONS, ArrayList(options))
+        outState.putString(KEY_TITLE, title)
+        iconColor?.let { outState.putInt(KEY_ICON_COLOR, it) }
+        outState.putBoolean(KEY_FORCE_DARK_THEME, forceDarkTheme)
+    }
 
     fun setForceDarkTheme(force: Boolean): OptionsDialog {
         this.forceDarkTheme = force
@@ -85,11 +113,12 @@ class OptionsDialog : BottomSheetDialogFragment() {
         var closeAndClick: (() -> Unit)? = null
         if (click != null) {
             closeAndClick = {
-                click.invoke()
-                dismiss()
+                if (isAdded) {
+                    click.invoke()
+                    dismiss()
+                }
             }
         }
-
         options.add(OptionsDialogOption(titleId = titleId, titleString = titleString, titleColor = titleColor, valueId = valueId, imageId = imageId, imageColor = imageColor, checked = checked, click = closeAndClick, toggleOptions = toggleOptions, onSwitch = onSwitch))
     }
 
