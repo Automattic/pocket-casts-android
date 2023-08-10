@@ -370,7 +370,6 @@ interface Settings {
     fun getCustomStorageLimitGb(): Long
     fun getCancelledAcknowledged(): Boolean
     fun setCancelledAcknowledged(value: Boolean)
-    fun getShelfItems(): List<String>
     fun setShelfItems(items: List<String>)
     fun getSeenPlayerTour(): Boolean
     fun setSeenPlayerTour(value: Boolean)

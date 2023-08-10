@@ -1088,7 +1088,7 @@ class SettingsImpl @Inject constructor(
         }
     }
 
-    override fun getShelfItems(): List<String> {
+    private fun getShelfItems(): List<String> {
         return getStringList("shelfItems")
     }
 
