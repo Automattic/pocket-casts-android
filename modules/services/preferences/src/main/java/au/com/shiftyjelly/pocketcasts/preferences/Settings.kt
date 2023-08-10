@@ -66,7 +66,6 @@ interface Settings {
         const val SYNC_HISTORY_VERSION = 1
         const val SYNC_API_MODEL = "mobile"
         const val LAST_UPDATE_TIME = "LastUpdateTime"
-        const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
@@ -78,9 +77,6 @@ interface Settings {
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
-        const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
-        const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
-        const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
@@ -89,7 +85,6 @@ interface Settings {
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
-        const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
@@ -101,9 +96,6 @@ interface Settings {
         const val LEGACY_STORAGE_ON_PHONE = "phone"
         const val LEGACY_STORAGE_ON_SD_CARD = "external"
 
-        const val LAST_MAIN_NAV_SCREEN_OPENED = "last_main_screen"
-
-        const val AUTO_ARCHIVE_EXCLUDED_PODCASTS = "autoArchiveExcludedPodcasts"
         const val AUTO_ARCHIVE_INCLUDE_STARRED = "autoArchiveIncludeStarred"
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
@@ -189,7 +181,6 @@ interface Settings {
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
 
@@ -202,17 +193,10 @@ interface Settings {
     fun getVersion(): String
     fun getVersionCode(): Int
 
-    fun getGitHash(): String?
-
     fun getSentryDsn(): String
-
-    fun isScreenReaderOn(): Boolean
 
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
-
-    fun getLastScreenOpened(): String?
-    fun setLastScreenOpened(screenId: String)
 
     fun syncOnMeteredNetwork(): Boolean
     fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
@@ -238,8 +222,6 @@ interface Settings {
 
     fun getLastRefreshTime(): Long
     fun getLastRefreshDate(): Date?
-    fun setLastSyncTime(lastSyncTime: Long)
-    fun getLastSyncTime(): Long
     fun setRefreshState(refreshState: RefreshState)
     fun getRefreshState(): RefreshState?
     fun getLastSuccessRefreshState(): RefreshState?
@@ -253,14 +235,7 @@ interface Settings {
 
     val warnOnMeteredNetwork: UserSetting<Boolean>
 
-    fun getPopularPodcastCountryCode(): String
-
-    fun setPopularPodcastCountryCode(code: String)
-
     val playOverNotification: UserSetting<PlayOverNotificationSetting>
-
-    fun hasBlockAlreadyRun(label: String): Boolean
-    fun setBlockAlreadyRun(label: String, hasRun: Boolean)
 
     fun setLastModified(lastModified: String?)
     fun getLastModified(): String?
@@ -287,14 +262,7 @@ interface Settings {
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
-    fun allowOtherAppsAccessToEpisodes(): Boolean
-
-    fun setHideSyncSetupMenu(hide: Boolean)
-
-    fun isSyncSetupMenuHidden(): Boolean
-
     fun getMigratedVersionCode(): Int
-
     fun setMigratedVersionCode(versionCode: Int)
 
     val podcastBadgeType: UserSetting<BadgeType>
@@ -303,8 +271,6 @@ interface Settings {
     fun getNotificationLastSeen(): Date?
     fun setNotificationLastSeen(lastSeen: Date?)
     fun setNotificationLastSeenToNow()
-
-    fun isShowNotesImagesOn(): Boolean
 
     fun setUpNextServerModified(timeMs: Long)
     fun getUpNextServerModified(): Long
@@ -317,17 +283,12 @@ interface Settings {
     fun setSleepTimerCustomMins(minutes: Int)
     fun getSleepTimerCustomMins(): Int
 
-    fun getImageSignature(): String
-    fun changeImageSignature(): String
-
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
 
     val showArtworkOnLockScreen: UserSetting<Boolean>
     val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
-    fun getAutoArchiveExcludedPodcasts(): List<String>
-    fun setAutoArchiveExcludedPodcasts(excluded: List<String>)
     val autoArchiveIncludeStarred: UserSetting<Boolean>
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
     val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
@@ -338,16 +299,12 @@ interface Settings {
     fun setSelectedTab(selected: Int?)
 
     fun contains(key: String): Boolean
-    fun getLastRefreshError(): String?
 
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>
 
-    fun getHeadphoneControlsNextAction(): HeadphoneAction
     fun setHeadphoneControlsNextAction(action: HeadphoneAction)
-    fun getHeadphoneControlsPreviousAction(): HeadphoneAction
     fun setHeadphoneControlsPreviousAction(action: HeadphoneAction)
-    fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean
     fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean)
 
     // Firebase remote config
@@ -370,8 +327,6 @@ interface Settings {
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
     fun getCachedSubscription(): SubscriptionStatus?
     fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
-    fun getAppIconId(): String?
-    fun setAppIconId(value: String)
 
     fun setUpgradeClosedProfile(value: Boolean)
     fun getUpgradeClosedProfile(): Boolean
@@ -386,7 +341,6 @@ interface Settings {
     fun getCustomStorageLimitGb(): Long
     fun getCancelledAcknowledged(): Boolean
     fun setCancelledAcknowledged(value: Boolean)
-    fun getShelfItems(): List<String>
     fun setShelfItems(items: List<String>)
     fun getSeenPlayerTour(): Boolean
     fun setSeenPlayerTour(value: Boolean)
@@ -400,7 +354,6 @@ interface Settings {
     val showArchivedDefault: UserSetting<Boolean>
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
     fun setMultiSelectItems(items: List<Int>)
-    fun getMultiSelectItems(): List<Int>
     fun setLastPauseTime(date: Date)
     fun getLastPauseTime(): Date?
     fun setLastPausedUUID(uuid: String)

@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
@@ -31,12 +30,11 @@ class NotesViewModel
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val serverShowNotesManager: ServerShowNotesManager,
-    settings: Settings,
     @ApplicationContext context: Context
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    private val showNotesFormatter = ShowNotesFormatter(settings, context).apply {
+    private val showNotesFormatter = ShowNotesFormatter(context).apply {
         backgroundColor = "#FFFFFF"
         textColor = "#FFFFFF"
         linkColor = "#FFFFFF"

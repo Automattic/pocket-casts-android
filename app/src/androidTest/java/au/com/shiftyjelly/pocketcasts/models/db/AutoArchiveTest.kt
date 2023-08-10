@@ -62,13 +62,11 @@ class AutoArchiveTest {
         played: AutoArchiveAfterPlayingSetting,
         inactive: AutoArchiveInactiveSetting,
         includeStarred: Boolean = false,
-        excludedPodcasts: List<String> = emptyList()
     ): EpisodeManager {
         val settings = mock<Settings> {
             on { autoArchiveInactive } doReturn UserSetting.Mock(inactive, mock())
             on { autoArchiveAfterPlaying } doReturn UserSetting.Mock(played, mock())
             on { autoArchiveIncludeStarred } doReturn UserSetting.Mock(includeStarred, mock())
-            on { getAutoArchiveExcludedPodcasts() } doReturn excludedPodcasts
         }
         return EpisodeManagerImpl(settings, fileStorage, downloadManager, context, db, podcastCacheServerManager, userEpisodeManager)
     }

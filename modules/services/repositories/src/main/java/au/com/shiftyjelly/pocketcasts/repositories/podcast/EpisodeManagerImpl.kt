@@ -664,7 +664,6 @@ class EpisodeManagerImpl @Inject constructor(
             val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
 
             if (shouldArchiveBasedOnSettings &&
-                !settings.getAutoArchiveExcludedPodcasts().contains(episode.podcastUuid) &&
                 (settings.autoArchiveIncludeStarred.flow.value || !episode.isStarred)
             ) {
                 if (sync) {
@@ -688,8 +687,6 @@ class EpisodeManagerImpl @Inject constructor(
     private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
         val episodesWithoutStarred = if (!settings.autoArchiveIncludeStarred.flow.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
         val episodesByPodcast = episodesWithoutStarred.groupBy { it.podcastUuid }.toMutableMap() // Sort in to podcasts
-        val excludedPodcasts = settings.getAutoArchiveExcludedPodcasts()
-        excludedPodcasts.forEach { episodesByPodcast.remove(it) } // Remove all excluded podcasts
 
         for ((podcastUuid, episodes) in episodesByPodcast) {
             val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: continue

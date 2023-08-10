@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
-import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
@@ -79,7 +78,6 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val isFirstSyncRunObservable = BehaviorRelay.create<Boolean>().apply { accept(isFirstSyncRun()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
 
@@ -108,20 +106,6 @@ class SettingsImpl @Inject constructor(
         return BuildConfig.VERSION_CODE
     }
 
-    override fun getGitHash(): String? {
-        try {
-            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            }
-            return applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.gitHash")
-        } catch (e: NameNotFoundException) {
-            return null
-        }
-    }
-
     override fun getSentryDsn(): String {
         return try {
             val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -134,10 +118,6 @@ class SettingsImpl @Inject constructor(
         } catch (e: NameNotFoundException) {
             ""
         }
-    }
-
-    override fun isScreenReaderOn(): Boolean {
-        return context.isScreenReaderOn()
     }
 
     override val skipBackInSecs = UserSetting.SkipAmountPref(
@@ -170,16 +150,6 @@ class SettingsImpl @Inject constructor(
 
     override fun setCancelledAcknowledged(value: Boolean) {
         setBoolean("cancelled_acknowledged", value)
-    }
-
-    override fun getLastScreenOpened(): String? {
-        return sharedPreferences.getString(Settings.LAST_MAIN_NAV_SCREEN_OPENED, null)
-    }
-
-    override fun setLastScreenOpened(screenId: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.LAST_MAIN_NAV_SCREEN_OPENED, screenId)
-        editor.apply()
     }
 
     override fun syncOnMeteredNetwork(): Boolean {
@@ -327,22 +297,12 @@ class SettingsImpl @Inject constructor(
         return getLastRefreshDate()?.let { RefreshState.Success(it) }
     }
 
-    override fun getLastRefreshError(): String? {
+    private fun getLastRefreshError(): String? {
         return getString("last_refresh_error", null)
     }
 
     private fun setLastRefreshError(error: String?) {
         setString("last_refresh_error", error, true)
-    }
-
-    override fun setLastSyncTime(lastSyncTime: Long) {
-        val editor = sharedPreferences.edit()
-        editor.putLong(Settings.LAST_SYNC_TIME, lastSyncTime)
-        editor.apply()
-    }
-
-    override fun getLastSyncTime(): Long {
-        return sharedPreferences.getLong(Settings.LAST_SYNC_TIME, 0)
     }
 
     override fun getLongForKey(key: String, defaultValue: Long): Long {
@@ -377,16 +337,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getPopularPodcastCountryCode(): String {
-        return sharedPreferences.getString(Settings.PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE, "") ?: ""
-    }
-
-    override fun setPopularPodcastCountryCode(code: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE, code)
-        editor.apply()
-    }
-
     override fun getAutoSubscribeToPlayed(): Boolean {
         return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
     }
@@ -408,16 +358,6 @@ class SettingsImpl @Inject constructor(
         toString = { it.preferenceInt.toString() }
     )
 
-    override fun hasBlockAlreadyRun(label: String): Boolean {
-        return sharedPreferences.getBoolean("blockAlreadyRun$label", false)
-    }
-
-    override fun setBlockAlreadyRun(label: String, hasRun: Boolean) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("blockAlreadyRun$label", hasRun)
-        editor.apply()
-    }
-
     override fun setLastModified(lastModified: String?) {
         val editor = sharedPreferences.edit()
         editor.putString(Settings.PREFERENCE_LAST_MODIFIED, lastModified)
@@ -436,7 +376,6 @@ class SettingsImpl @Inject constructor(
         val editor = sharedPreferences.edit()
         editor.putBoolean(Settings.PREFERENCE_FIRST_SYNC_RUN, firstRun)
         editor.apply()
-        isFirstSyncRunObservable.accept(firstRun)
     }
 
     override fun isRestoreFromBackup(): Boolean {
@@ -628,20 +567,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun allowOtherAppsAccessToEpisodes(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_ALLOW_OTHER_APPS_ACCESS, false)
-    }
-
-    override fun setHideSyncSetupMenu(hide: Boolean) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean(Settings.PREFERENCE_HIDE_SYNC_SETUP_MENU, hide)
-        editor.apply()
-    }
-
-    override fun isSyncSetupMenuHidden(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_HIDE_SYNC_SETUP_MENU, false)
-    }
-
     override fun getMigratedVersionCode(): Int {
         return getInt("MIGRATED_VERSION_CODE", 0)
     }
@@ -678,10 +603,6 @@ class SettingsImpl @Inject constructor(
         setNotificationLastSeen(Date())
     }
 
-    override fun isShowNotesImagesOn(): Boolean {
-        return getBoolean(Settings.PREFERENCE_SHOW_NOTE_IMAGES_ON, true)
-    }
-
     override fun setUpNextServerModified(timeMs: Long) {
         setLong("upNextModified", timeMs)
     }
@@ -716,20 +637,6 @@ class SettingsImpl @Inject constructor(
 
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
-    }
-
-    override fun getImageSignature(): String {
-        var signature = getString("imageSignature", null)
-        if (signature == null) {
-            signature = changeImageSignature()
-        }
-        return signature
-    }
-
-    override fun changeImageSignature(): String {
-        val signature = System.currentTimeMillis().toString()
-        setString("imageSignature", signature)
-        return signature
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
@@ -890,14 +797,6 @@ class SettingsImpl @Inject constructor(
         },
     )
 
-    override fun getAutoArchiveExcludedPodcasts(): List<String> {
-        return sharedPreferences.getStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, null)?.toList() ?: emptyList()
-    }
-
-    override fun setAutoArchiveExcludedPodcasts(excluded: List<String>) {
-        sharedPreferences.edit().putStringSet(Settings.AUTO_ARCHIVE_EXCLUDED_PODCASTS, excluded.toSet()).apply()
-    }
-
     override val autoPlayNextEpisodeOnEmpty = UserSetting.BoolPref(
         sharedPrefKey = "autoUpNextEmpty",
         defaultValue = when (Util.getAppPlatform(context)) {
@@ -971,7 +870,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
+    private fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
         return Settings.HeadphoneAction.values()[getInt("headphone_controls_next_action", Settings.HeadphoneAction.SKIP_FORWARD.ordinal)]
     }
 
@@ -980,7 +879,7 @@ class SettingsImpl @Inject constructor(
         headphoneNextActionFlow.update { action }
     }
 
-    override fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
+    private fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
         return Settings.HeadphoneAction.values()[getInt("headphone_controls_previous_action", Settings.HeadphoneAction.SKIP_BACK.ordinal)]
     }
 
@@ -989,7 +888,7 @@ class SettingsImpl @Inject constructor(
         headphonePreviousActionFlow.update { action }
     }
 
-    override fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean {
+    private fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean {
         return getBoolean("headphone_controls_play_bookmark_confirmation_sound", true)
     }
 
@@ -1072,14 +971,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAppIconId(): String? {
-        return getString("appIconId", "Default")
-    }
-
-    override fun setAppIconId(value: String) {
-        setString("appIconId", value)
-    }
-
     override fun getUpgradeClosedProfile(): Boolean {
         return getBoolean("upgradeClosedProfile", false)
     }
@@ -1140,7 +1031,7 @@ class SettingsImpl @Inject constructor(
         }
     }
 
-    override fun getShelfItems(): List<String> {
+    private fun getShelfItems(): List<String> {
         return getStringList("shelfItems")
     }
 
@@ -1149,7 +1040,7 @@ class SettingsImpl @Inject constructor(
         shelfItemsObservable.accept(items)
     }
 
-    override fun getMultiSelectItems(): List<Int> {
+    private fun getMultiSelectItems(): List<Int> {
         return getStringList("multi_select_items").map { it.toInt() }
     }
 

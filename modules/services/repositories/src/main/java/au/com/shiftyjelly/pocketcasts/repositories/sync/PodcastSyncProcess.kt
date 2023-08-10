@@ -597,7 +597,6 @@ class PodcastSyncProcess(
     private fun updateSettings(response: SyncUpdateResponse): Completable {
         return Completable.fromAction {
             settings.setLastModified(response.lastModified)
-            settings.setLastSyncTime(System.currentTimeMillis())
         }
     }
 
