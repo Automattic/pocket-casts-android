@@ -114,7 +114,11 @@ class MediaSessionManager(
         extras.putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
         mediaSession.setExtras(extras)
 
-        bookmarkHelper = BookmarkHelper(playbackManager, bookmarkManager)
+        bookmarkHelper = BookmarkHelper(
+            playbackManager,
+            bookmarkManager,
+            settings
+        )
 
         connect()
     }

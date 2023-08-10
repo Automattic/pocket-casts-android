@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class BookmarkHelper @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val bookmarkManager: BookmarkManager,
+    private val settings: Settings,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -56,6 +57,10 @@ class BookmarkHelper @Inject constructor(
                         timeSecs = timeInSecs,
                         title = context.getString(LR.string.bookmark)
                     )
+                }
+
+                if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
+                    playbackManager.playTone()
                 }
 
                 buildAndShowNotification(context)

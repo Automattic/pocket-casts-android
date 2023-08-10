@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.widget.Toast
@@ -145,6 +147,13 @@ open class PlaybackManager @Inject constructor(
     }
     private var audioNoisyManager =
         AudioNoisyManager(application)
+
+    private val tonePlayer: MediaPlayer by lazy {
+        MediaPlayer().apply {
+            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.tone}"))
+            prepare()
+        }
+    }
 
     val playbackStateRelay: Relay<PlaybackState> by lazy {
         val relay = BehaviorRelay.create<PlaybackState>().toSerialized()
@@ -2047,6 +2056,14 @@ open class PlaybackManager @Inject constructor(
                 lastChangeFrom = "updatePausedPlaybackState"
             )
             playbackStateRelay.accept(playbackState)
+        }
+    }
+
+    fun playTone() {
+        try {
+            tonePlayer.start()
+        } catch (e: Exception) {
+            Timber.e("Unable to play tone: $e")
         }
     }
 

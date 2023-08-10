@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.HeadphoneAction
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class HeadphoneControlsSettingsFragment : BaseFragment() {
     @Inject
     lateinit var settings: Settings
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,7 +63,12 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                     nextAction = nextAction,
                     onNextActionSave = { settings.setHeadphoneControlsNextAction(it) },
                     confirmationSound = confirmationSound,
-                    onConfirmationSoundSave = { settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it) },
+                    onConfirmationSoundSave = {
+                        settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it)
+                        if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
+                            playbackManager.playTone()
+                        }
+                    },
                     onBackPressed = {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
