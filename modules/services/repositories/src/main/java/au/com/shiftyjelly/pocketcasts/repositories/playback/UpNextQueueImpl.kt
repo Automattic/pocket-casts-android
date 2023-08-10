@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -163,7 +164,9 @@ class UpNextQueueImpl @Inject constructor(
         if (queueEpisodes.isEmpty()) {
             // when the upNextQueue is empty, save the source for auto playing the next episode
             automaticUpNextSource?.let {
-                settings.setlastLoadedFromPodcastOrFilterUuid(it.uuid)
+                LastPlayedList.fromString(it.uuid).let { lastPlayedList ->
+                    settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
+                }
             }
             saveChanges(UpNextAction.ClearAll)
         }
@@ -307,7 +310,7 @@ class UpNextQueueImpl @Inject constructor(
         // clear last loaded uuid if anything gets added to the up next queue
         val hasQueuedItems = currentEpisode != null
         if (hasQueuedItems) {
-            settings.setlastLoadedFromPodcastOrFilterUuid(null)
+            settings.lastLoadedFromPodcastOrFilterUuid.set(LastPlayedList.None)
         }
     }
 

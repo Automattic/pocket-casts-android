@@ -1151,7 +1151,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
-        val lastPodcastOrFilterUuid = settings.getlastLoadedFromPodcastOrFilterUuid()
+        val lastPodcastOrFilterUuid = settings.lastLoadedFromPodcastOrFilterUuid.value.uuid
         val lastEpisodeUuid = lastPlayedEpisodeUuid
         if (lastEpisodeUuid == null || lastPodcastOrFilterUuid == null) {
             return null

@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
+import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -570,7 +571,9 @@ class MediaSessionManager(
                 val episodeId = autoMediaId.episodeId
                 episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
                     playbackManager.playNow(episode, sourceView = source)
-                    settings.setlastLoadedFromPodcastOrFilterUuid(autoMediaId.sourceId)
+                    LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
+                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
+                    }
                 }
             }
         }

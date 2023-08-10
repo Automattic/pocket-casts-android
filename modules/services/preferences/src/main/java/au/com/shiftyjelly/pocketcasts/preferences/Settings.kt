@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehavi
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -402,8 +403,7 @@ interface Settings {
     fun setFullySignedOut(boolean: Boolean)
     fun getFullySignedOut(): Boolean
 
-    fun getlastLoadedFromPodcastOrFilterUuid(): String?
-    fun setlastLoadedFromPodcastOrFilterUuid(uuid: String?)
+    val lastLoadedFromPodcastOrFilterUuid: UserSetting<LastPlayedList>
 
     // It would be better to have this be a UserSetting<ThemeType>, but that
     // is not easy due to the way our modules are structured.
