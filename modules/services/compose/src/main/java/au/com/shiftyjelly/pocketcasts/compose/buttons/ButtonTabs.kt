@@ -6,12 +6,13 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -80,8 +81,7 @@ fun ButtonTabs(
                     pressedElevation = 0.dp,
                     focusedElevation = 0.dp
                 ),
-                interactionSource = interactionSource,
-                modifier = Modifier.padding(end = 6.dp)
+                interactionSource = interactionSource
             ) {
                 Text(
                     text = stringResource(tab.labelResId),
@@ -91,6 +91,7 @@ fun ButtonTabs(
                     color = textColor
                 )
             }
+            Spacer(Modifier.width(6.dp))
         }
     }
 }
