@@ -93,7 +93,6 @@ interface Settings {
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
-        const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
@@ -254,8 +253,7 @@ interface Settings {
     fun getBooleanForKey(key: String, defaultValue: Boolean): Boolean
     fun setBooleanForKey(key: String, value: Boolean)
 
-    fun getDiscoveryCountryCode(): String
-    fun setDiscoveryCountryCode(code: String)
+    val discoverCountryCode: UserSetting<String>
 
     val warnOnMeteredNetwork: UserSetting<Boolean>
 
@@ -278,8 +276,6 @@ interface Settings {
     fun setRestoreFromBackupEnded()
 
     fun clearPlusPreferences()
-
-    fun getLanguageCode(): String
 
     val hideNotificationOnPause: UserSetting<Boolean>
 

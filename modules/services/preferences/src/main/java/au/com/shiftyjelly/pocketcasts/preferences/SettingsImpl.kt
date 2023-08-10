@@ -375,16 +375,11 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
-    override fun getDiscoveryCountryCode(): String {
-        val countryCode = sharedPreferences.getString(Settings.PREFERENCE_DISCOVERY_COUNTRY_CODE, null)
-        return countryCode ?: getLanguageCode()
-    }
-
-    override fun setDiscoveryCountryCode(code: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.PREFERENCE_DISCOVERY_COUNTRY_CODE, code)
-        editor.apply()
-    }
+    override val discoverCountryCode = UserSetting.StringPref(
+        sharedPrefKey = "discovery_country_code",
+        defaultValue = getDefaultCountryCode(),
+        sharedPrefs = sharedPreferences,
+    )
 
     override val warnOnMeteredNetwork = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI,
@@ -526,7 +521,7 @@ class SettingsImpl @Inject constructor(
         setCancelledAcknowledged(false)
     }
 
-    override fun getLanguageCode(): String {
+    private fun getDefaultCountryCode(): String {
         val languageCode = languageCode
         if (languageCode != null) {
             return languageCode
