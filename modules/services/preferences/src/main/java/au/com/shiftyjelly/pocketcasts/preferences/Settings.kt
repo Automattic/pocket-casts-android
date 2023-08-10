@@ -70,8 +70,6 @@ interface Settings {
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
 
-        const val PREFERENCE_MARKETING_OPT_IN = "marketingOptIn"
-        const val PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC = "marketingOptInNeedsSync"
         const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED = "freeGiftAck"
         const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC = "freeGiftAckNeedsSync"
 
@@ -196,7 +194,6 @@ interface Settings {
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val marketingOptObservable: Observable<Boolean>
     val isFirstSyncRunObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
@@ -367,10 +364,7 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
-    fun getMarketingOptIn(): Boolean
-    fun setMarketingOptIn(value: Boolean)
-    fun getMarketingOptInNeedsSync(): Boolean
-    fun setMarketingOptInNeedsSync(value: Boolean)
+    val marketingOptIn: UserSetting<Boolean>
 
     fun getFreeGiftAcknowledged(): Boolean
     fun setFreeGiftAcknowledged(value: Boolean)
