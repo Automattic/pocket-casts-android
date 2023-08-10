@@ -327,16 +327,6 @@ class SettingsImpl @Inject constructor(
         setString("last_refresh_error", error, true)
     }
 
-    override fun setLastSyncTime(lastSyncTime: Long) {
-        val editor = sharedPreferences.edit()
-        editor.putLong(Settings.LAST_SYNC_TIME, lastSyncTime)
-        editor.apply()
-    }
-
-    override fun getLastSyncTime(): Long {
-        return sharedPreferences.getLong(Settings.LAST_SYNC_TIME, 0)
-    }
-
     override fun getLongForKey(key: String, defaultValue: Long): Long {
         return sharedPreferences.getLong(key, defaultValue)
     }

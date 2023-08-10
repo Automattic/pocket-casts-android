@@ -66,7 +66,6 @@ interface Settings {
         const val SYNC_HISTORY_VERSION = 1
         const val SYNC_API_MODEL = "mobile"
         const val LAST_UPDATE_TIME = "LastUpdateTime"
-        const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
 
@@ -235,8 +234,6 @@ interface Settings {
 
     fun getLastRefreshTime(): Long
     fun getLastRefreshDate(): Date?
-    fun setLastSyncTime(lastSyncTime: Long)
-    fun getLastSyncTime(): Long
     fun setRefreshState(refreshState: RefreshState)
     fun getRefreshState(): RefreshState?
     fun getLastSuccessRefreshState(): RefreshState?
