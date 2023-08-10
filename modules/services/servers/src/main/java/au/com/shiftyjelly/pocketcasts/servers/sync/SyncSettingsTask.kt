@@ -56,7 +56,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 settings.podcastsSortType,
                 settings.skipBackInSecs,
                 settings.skipForwardInSecs,
-                settings.podcastsSortType,
             ).forEach {
                 it.hasBeenSynced()
             }
