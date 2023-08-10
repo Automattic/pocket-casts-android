@@ -356,8 +356,6 @@ interface Settings {
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
     fun getCachedSubscription(): SubscriptionStatus?
     fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
-    fun getAppIconId(): String?
-    fun setAppIconId(value: String)
 
     fun setUpgradeClosedProfile(value: Boolean)
     fun getUpgradeClosedProfile(): Boolean

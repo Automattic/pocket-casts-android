@@ -1028,14 +1028,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAppIconId(): String? {
-        return getString("appIconId", "Default")
-    }
-
-    override fun setAppIconId(value: String) {
-        setString("appIconId", value)
-    }
-
     override fun getUpgradeClosedProfile(): Boolean {
         return getBoolean("upgradeClosedProfile", false)
     }
