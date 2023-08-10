@@ -57,12 +57,10 @@ class BookmarkHeaderViewHolder(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
+                .padding(start = 16.dp, top = 4.dp, bottom = 12.dp)
         ) {
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 16.dp)
-                    .padding(vertical = 16.dp)
+                modifier = Modifier.weight(1f)
             ) {
                 SearchView(
                     bookmarkHeader = bookmarkHeader,
@@ -113,7 +111,7 @@ class BookmarkHeaderViewHolder(
             color = MaterialTheme.theme.colors.primaryText02,
             modifier = Modifier
                 .padding(start = 16.dp)
-                .padding(vertical = 16.dp)
+                .padding(vertical = 14.dp)
         )
     }
 }
