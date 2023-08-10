@@ -594,10 +594,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun allowOtherAppsAccessToEpisodes(): Boolean {
-        return sharedPreferences.getBoolean(Settings.PREFERENCE_ALLOW_OTHER_APPS_ACCESS, false)
-    }
-
     override fun getMigratedVersionCode(): Int {
         return getInt("MIGRATED_VERSION_CODE", 0)
     }

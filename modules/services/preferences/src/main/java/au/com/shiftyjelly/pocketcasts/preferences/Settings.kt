@@ -83,7 +83,6 @@ interface Settings {
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
-        const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
@@ -275,8 +274,6 @@ interface Settings {
     val useEmbeddedArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
-
-    fun allowOtherAppsAccessToEpisodes(): Boolean
 
     fun getMigratedVersionCode(): Int
     fun setMigratedVersionCode(versionCode: Int)
