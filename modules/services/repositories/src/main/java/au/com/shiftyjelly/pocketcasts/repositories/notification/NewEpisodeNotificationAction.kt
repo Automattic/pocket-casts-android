@@ -72,7 +72,7 @@ enum class NewEpisodeNotificationAction(
         }
 
         fun loadFromSettings(settings: Settings): List<NewEpisodeNotificationAction> {
-            val setting = settings.newEpisodeNotificationActions.flow.value
+            val setting = settings.newEpisodeNotificationActions.value
             return when (setting) {
                 NewEpisodeNotificationActionSetting.Default -> DEFAULT_ACTIONS
                 is NewEpisodeNotificationActionSetting.ValueOf -> actionsFromString(setting.value)

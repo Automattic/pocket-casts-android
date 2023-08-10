@@ -32,7 +32,7 @@ class PodcastsOptionsDialog(
             .addTextOption(
                 titleId = LR.string.podcasts_menu_sort_by,
                 imageId = IR.drawable.ic_sort,
-                valueId = settings.podcastsSortType.flow.value.labelId,
+                valueId = settings.podcastsSortType.value.labelId,
                 click = {
                     openSortOptions()
                     trackTapOnModalOption(ModalOption.SORT_BY)
@@ -44,7 +44,7 @@ class PodcastsOptionsDialog(
                 ToggleButtonOption(
                     imageId = R.drawable.ic_largegrid,
                     descriptionId = LR.string.podcasts_layout_large_grid,
-                    isOn = { settings.podcastGridLayout.flow.value == PodcastGridLayoutType.LARGE_ARTWORK },
+                    isOn = { settings.podcastGridLayout.value == PodcastGridLayoutType.LARGE_ARTWORK },
                     click = {
                         settings.podcastGridLayout.set(PodcastGridLayoutType.LARGE_ARTWORK)
                         trackTapOnModalOption(ModalOption.LAYOUT)
@@ -54,7 +54,7 @@ class PodcastsOptionsDialog(
                 ToggleButtonOption(
                     imageId = R.drawable.ic_smallgrid,
                     descriptionId = LR.string.podcasts_layout_small_grid,
-                    isOn = { settings.podcastGridLayout.flow.value == PodcastGridLayoutType.SMALL_ARTWORK },
+                    isOn = { settings.podcastGridLayout.value == PodcastGridLayoutType.SMALL_ARTWORK },
                     click = {
                         settings.podcastGridLayout.set(PodcastGridLayoutType.SMALL_ARTWORK)
                         trackTapOnModalOption(ModalOption.LAYOUT)
@@ -64,7 +64,7 @@ class PodcastsOptionsDialog(
                 ToggleButtonOption(
                     imageId = R.drawable.ic_list,
                     descriptionId = LR.string.podcasts_layout_list_view,
-                    isOn = { settings.podcastGridLayout.flow.value == PodcastGridLayoutType.LIST_VIEW },
+                    isOn = { settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW },
                     click = {
                         settings.podcastGridLayout.set(PodcastGridLayoutType.LIST_VIEW)
                         trackTapOnModalOption(ModalOption.LAYOUT)
@@ -75,7 +75,7 @@ class PodcastsOptionsDialog(
             .addTextOption(
                 titleId = LR.string.podcasts_menu_badges,
                 imageId = R.drawable.ic_badge,
-                valueId = settings.podcastBadgeType.flow.value.labelId,
+                valueId = settings.podcastBadgeType.value.labelId,
                 click = {
                     openBadgeOptions()
                     trackTapOnModalOption(ModalOption.BADGE)
@@ -101,7 +101,7 @@ class PodcastsOptionsDialog(
     }
 
     private fun openSortOptions() {
-        val sortOrder = settings.podcastsSortType.flow.value
+        val sortOrder = settings.podcastsSortType.value
         val title = fragment.getString(LR.string.sort_by)
         val dialog = OptionsDialog().setTitle(title)
         for (order in PodcastsSortType.values()) {
@@ -121,7 +121,7 @@ class PodcastsOptionsDialog(
     }
 
     private fun openBadgeOptions() {
-        val badgeType: BadgeType = settings.podcastBadgeType.flow.value
+        val badgeType: BadgeType = settings.podcastBadgeType.value
         val title = fragment.getString(LR.string.podcasts_menu_badges)
         val dialog = OptionsDialog()
             .setTitle(title)

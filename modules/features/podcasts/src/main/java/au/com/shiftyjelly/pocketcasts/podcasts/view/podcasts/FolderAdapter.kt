@@ -66,15 +66,15 @@ class FolderAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             FolderItem.Podcast.viewTypeId -> {
-                val isLayoutListView = settings.podcastGridLayout.flow.value == PodcastGridLayoutType.LIST_VIEW
+                val isLayoutListView = settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
                 imageLoader.radiusPx = if (isLayoutListView) 4.dpToPx(context) else 0
                 val view = parent.inflate(layoutId, attachToThis = false)
-                val podcastGridLayout = settings.podcastGridLayout.flow.value
+                val podcastGridLayout = settings.podcastGridLayout.value
                 PodcastViewHolder(view, imageLoader, podcastGridLayout, theme)
             }
             FolderItem.Folder.viewTypeId -> {
-                val podcastsLayout = settings.podcastGridLayout.flow.value
+                val podcastsLayout = settings.podcastGridLayout.value
                 val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(parent.context).toInt()
                 FolderViewHolder(
                     composeView = ComposeView(parent.context),

@@ -294,8 +294,8 @@ class PodcastAdapter(
             fromListUuid = fromListUuid,
             tintColor = ThemeColor.podcastIcon02(theme.activeTheme, tintColor),
             playButtonListener = playButtonListener,
-            streamByDefault = settings.streamingMode.flow.value || castConnected,
-            upNextAction = settings.upNextSwipe.flow.value,
+            streamByDefault = settings.streamingMode.value || castConnected,
+            upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             disposables = disposables

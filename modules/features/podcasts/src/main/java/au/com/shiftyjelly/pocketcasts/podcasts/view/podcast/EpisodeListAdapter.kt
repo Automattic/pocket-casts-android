@@ -104,8 +104,8 @@ class EpisodeListAdapter(
             fromListUuid = fromListUuid,
             tintColor = tintColor,
             playButtonListener = playButtonListener,
-            streamByDefault = settings.streamingMode.flow.value,
-            upNextAction = settings.upNextSwipe.flow.value,
+            streamByDefault = settings.streamingMode.value,
+            upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
             disposables = disposables
@@ -131,8 +131,8 @@ class EpisodeListAdapter(
             episode = userEpisode,
             tintColor = tintColor,
             playButtonListener = playButtonListener,
-            streamByDefault = settings.streamingMode.flow.value,
-            upNextAction = settings.upNextSwipe.flow.value,
+            streamByDefault = settings.streamingMode.value,
+            upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(userEpisode)
         )

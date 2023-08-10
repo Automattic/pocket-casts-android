@@ -596,7 +596,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                     onItemUpdated = ::notifyItemChanged,
-                    defaultUpNextSwipeAction = { settings.upNextSwipe.flow.value },
+                    defaultUpNextSwipeAction = { settings.upNextSwipe.value },
                     context = context,
                     fragmentManager = parentFragmentManager,
                     swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,

@@ -130,9 +130,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
     }
 
     private fun changeSkipTitles() {
-        val skipForwardSummary = resources.getStringPluralSeconds(settings.skipForwardInSecs.flow.value)
+        val skipForwardSummary = resources.getStringPluralSeconds(settings.skipForwardInSecs.value)
         preferenceSkipForward?.summary = skipForwardSummary
-        val skipBackwardSummary = resources.getStringPluralSeconds(settings.skipBackInSecs.flow.value)
+        val skipBackwardSummary = resources.getStringPluralSeconds(settings.skipBackInSecs.value)
         preferenceSkipBackward?.summary = skipBackwardSummary
     }
 }

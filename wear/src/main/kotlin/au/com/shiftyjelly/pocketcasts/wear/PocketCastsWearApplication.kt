@@ -68,12 +68,12 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     private fun setupSentry() {
         SentryAndroid.init(this) { options ->
-            options.dsn = if (settings.sendCrashReports.flow.value) settings.getSentryDsn() else ""
+            options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.WEAR.value)
         }
 
         // Link email to Sentry crash reports only if the user has opted in
-        if (settings.linkCrashReportsToUser.flow.value) {
+        if (settings.linkCrashReportsToUser.value) {
             syncManager.getEmail()?.let { syncEmail ->
                 val user = User().apply { email = syncEmail }
                 Sentry.setUser(user)

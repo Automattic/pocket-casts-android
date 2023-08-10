@@ -83,7 +83,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = ::lazyNotifyItemChanged,
-                defaultUpNextSwipeAction = { settings.upNextSwipe.flow.value },
+                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,

@@ -267,17 +267,17 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     private fun getThemeFromPreferences(): ThemeType =
-        ThemeType.fromThemeSetting(settings.theme.flow.value)
+        ThemeType.fromThemeSetting(settings.theme.value)
 
     private fun setThemeToPreferences(theme: ThemeType) {
         settings.theme.set(theme.themeSetting)
     }
 
     private fun getPreferredDarkThemeFromPreferences(): ThemeType =
-        ThemeType.fromThemeSetting(settings.darkThemePreference.flow.value)
+        ThemeType.fromThemeSetting(settings.darkThemePreference.value)
 
     private fun getPreferredLightFromPreferences(): ThemeType =
-        ThemeType.fromThemeSetting(settings.lightThemePreference.flow.value)
+        ThemeType.fromThemeSetting(settings.lightThemePreference.value)
 
     private fun setPreferredDarkThemeToPreferences(theme: ThemeType) {
         settings.darkThemePreference.set(theme.themeSetting)
@@ -295,7 +295,7 @@ class Theme @Inject constructor(private val settings: Settings) {
         }
     }
 
-    fun getUseSystemTheme(): Boolean = settings.useSystemTheme.flow.value
+    fun getUseSystemTheme(): Boolean = settings.useSystemTheme.value
 
     fun getPodcastTintColor(podcast: Podcast): Int {
         return podcast.getTintColor(isDarkTheme)

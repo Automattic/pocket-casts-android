@@ -41,7 +41,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
     }
 
-    fun getAutoDownloadUpNext() = settings.autoDownloadUpNext.flow.value
+    fun getAutoDownloadUpNext() = settings.autoDownloadUpNext.value
 
     fun onNewEpisodesChange(newValue: Boolean) {
         analyticsTracker.track(
@@ -70,7 +70,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
     }
 
-    fun getAutoDownloadUnmeteredOnly() = settings.autoDownloadUnmeteredOnly.flow.value
+    fun getAutoDownloadUnmeteredOnly() = settings.autoDownloadUnmeteredOnly.value
 
     fun onDownloadOnlyWhenChargingChange(enabled: Boolean) {
         settings.autoDownloadOnlyWhenCharging.set(enabled)
@@ -80,5 +80,5 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
     }
 
-    fun getAutoDownloadOnlyWhenCharging() = settings.autoDownloadOnlyWhenCharging.flow.value
+    fun getAutoDownloadOnlyWhenCharging() = settings.autoDownloadOnlyWhenCharging.value
 }

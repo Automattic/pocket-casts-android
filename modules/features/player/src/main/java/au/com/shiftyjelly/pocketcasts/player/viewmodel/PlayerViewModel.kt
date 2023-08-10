@@ -271,7 +271,7 @@ class PlayerViewModel @Inject constructor(
                 Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
             }
         }
-        .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.globalPlaybackEffects.flow.value) }
+        .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.globalPlaybackEffects.value) }
         .doOnNext { Timber.i("Effects: Podcast: ${it.podcast.overrideGlobalEffects} ${it.effects}") }
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()
@@ -587,7 +587,7 @@ class PlayerViewModel @Inject constructor(
     fun clearPodcastEffects(podcast: Podcast) {
         launch {
             podcastManager.updateOverrideGlobalEffects(podcast, false)
-            playbackManager.updatePlayerEffects(settings.globalPlaybackEffects.flow.value)
+            playbackManager.updatePlayerEffects(settings.globalPlaybackEffects.value)
         }
     }
 

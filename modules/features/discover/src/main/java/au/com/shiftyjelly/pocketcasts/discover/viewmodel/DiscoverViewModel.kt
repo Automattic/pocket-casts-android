@@ -49,7 +49,7 @@ class DiscoverViewModel @Inject constructor(
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
-    var currentRegionCode: String? = settings.discoverCountryCode.flow.value
+    var currentRegionCode: String? = settings.discoverCountryCode.value
     var replacements = emptyMap<String, String>()
     private var isFragmentChangingConfigurations: Boolean = false
 

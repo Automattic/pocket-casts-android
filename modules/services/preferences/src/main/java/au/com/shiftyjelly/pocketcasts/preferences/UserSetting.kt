@@ -24,7 +24,7 @@ abstract class UserSetting<T>(
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
     fun getSyncValue(): T? {
         val needsSync = sharedPrefs.getBoolean(needsSyncKey, false)
-        return if (needsSync) flow.value else null
+        return if (needsSync) value else null
     }
 
     // These are lazy because (1) the class needs to initialize before calling get() and
@@ -33,9 +33,13 @@ abstract class UserSetting<T>(
     private val _flow by lazy { MutableStateFlow(get()) }
     val flow: StateFlow<T> by lazy { _flow }
 
-    // external callers should use the flow.value to get the current value or, even
-    // better, use the flow to observe changes.
+    // External callers should use [value] to get the current value if they can't
+    // listen to the flow for changes. This method is solely to be used to intitialize
+    // the flow.
     protected abstract fun get(): T
+
+    val value: T
+        get() = flow.value
 
     protected abstract fun persist(value: T, commit: Boolean)
 
