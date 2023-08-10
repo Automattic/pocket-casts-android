@@ -279,7 +279,6 @@ interface Settings {
     fun allowOtherAppsAccessToEpisodes(): Boolean
 
     fun getMigratedVersionCode(): Int
-
     fun setMigratedVersionCode(versionCode: Int)
 
     val podcastBadgeType: UserSetting<BadgeType>
@@ -323,7 +322,6 @@ interface Settings {
     fun setSelectedTab(selected: Int?)
 
     fun contains(key: String): Boolean
-    fun getLastRefreshError(): String?
 
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>

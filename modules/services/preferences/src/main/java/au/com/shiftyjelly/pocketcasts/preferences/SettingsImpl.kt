@@ -319,7 +319,7 @@ class SettingsImpl @Inject constructor(
         return getLastRefreshDate()?.let { RefreshState.Success(it) }
     }
 
-    override fun getLastRefreshError(): String? {
+    private fun getLastRefreshError(): String? {
         return getString("last_refresh_error", null)
     }
 
