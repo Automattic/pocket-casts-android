@@ -8,6 +8,7 @@ import androidx.lifecycle.toLiveData
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
@@ -37,6 +38,14 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_auto)
+
+        preferenceManager.findPreference<SwitchPreference>("autoSubscribeToPlayed")?.apply {
+            isChecked = settings.autoSubscribeToPlayed.value
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoSubscribeToPlayed.set(newValue as Boolean)
+                true
+            }
+        }
 
         preferenceSkipForward = preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_FORWARD)?.apply {
             setInputAsSeconds()

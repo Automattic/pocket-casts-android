@@ -1564,7 +1564,7 @@ open class PlaybackManager @Inject constructor(
         // podcast start from
         if (episode is PodcastEpisode) {
             // Auto subscribe to played podcasts (used in Automotive)
-            if (podcast != null && settings.getAutoSubscribeToPlayed() && !podcast.isSubscribed && episode.episodeType !is PodcastEpisode.EpisodeType.Trailer) {
+            if (podcast != null && settings.autoSubscribeToPlayed.value && !podcast.isSubscribed && episode.episodeType !is PodcastEpisode.EpisodeType.Trailer) {
                 podcastManager.subscribeToPodcast(podcast.uuid, sync = true)
             }
         }

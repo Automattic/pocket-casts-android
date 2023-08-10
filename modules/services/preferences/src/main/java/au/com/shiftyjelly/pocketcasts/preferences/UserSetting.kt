@@ -37,6 +37,9 @@ abstract class UserSetting<T>(
     // better, use the flow to observe changes.
     protected abstract fun get(): T
 
+    val value: T
+        get() = flow.value
+
     protected abstract fun persist(value: T, commit: Boolean)
 
     fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {

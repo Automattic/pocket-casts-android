@@ -337,9 +337,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
-    }
+    override val autoSubscribeToPlayed = UserSetting.BoolPref(
+        sharedPrefKey = "autoSubscribeToPlayed",
+        defaultValue = Util.isAutomotive(context),
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getAutoShowPlayed(): Boolean {
         return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)

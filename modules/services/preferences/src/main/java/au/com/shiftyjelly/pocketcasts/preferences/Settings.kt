@@ -82,7 +82,6 @@ interface Settings {
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
 
-        const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
@@ -348,7 +347,7 @@ interface Settings {
     fun getSeenUpNextTour(): Boolean
     fun setTrialFinishedSeen(seen: Boolean)
     fun getTrialFinishedSeen(): Boolean
-    fun getAutoSubscribeToPlayed(): Boolean
+    val autoSubscribeToPlayed: UserSetting<Boolean>
     fun getAutoShowPlayed(): Boolean
     val autoPlayNextEpisodeOnEmpty: UserSetting<Boolean>
     val showArchivedDefault: UserSetting<Boolean>
