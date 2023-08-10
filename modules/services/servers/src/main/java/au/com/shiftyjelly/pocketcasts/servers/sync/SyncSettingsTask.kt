@@ -17,7 +17,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         skipForward = settings.skipForwardInSecs.getSyncValue(),
                         skipBack = settings.skipBackInSecs.getSyncValue(),
                         marketingOptIn = settings.marketingOptIn.getSyncValue(),
-                        freeGiftAcknowledged = if (settings.getFreeGiftAcknowledgedNeedsSync()) settings.getFreeGiftAcknowledged() else null,
+                        freeGiftAcknowledged = settings.freeGiftAcknowledged.getSyncValue(),
                         gridOrder = settings.podcastsSortType.getSyncValue()?.serverId,
                     )
                 )
@@ -39,7 +39,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         } else if (value.value is Boolean) {
                             when (key) {
                                 "marketingOptIn" -> settings.marketingOptIn.set(value.value)
-                                "freeGiftAcknowledgement" -> settings.setFreeGiftAcknowledged(value.value)
+                                "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value)
                             }
                         }
                     } else {
@@ -52,6 +52,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             }
 
             listOf(
+                settings.freeGiftAcknowledged,
                 settings.marketingOptIn,
                 settings.podcastsSortType,
                 settings.skipBackInSecs,
@@ -59,8 +60,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             ).forEach {
                 it.needsSync = false
             }
-            settings.setFreeGiftAcknowledgedNeedsSync(false)
-
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 
             return Result.success()

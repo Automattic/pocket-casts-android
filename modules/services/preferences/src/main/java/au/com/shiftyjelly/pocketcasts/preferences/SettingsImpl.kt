@@ -158,21 +158,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getFreeGiftAcknowledged(): Boolean {
-        return getBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED, false)
-    }
-
-    override fun setFreeGiftAcknowledged(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED, value)
-    }
-
-    override fun getFreeGiftAcknowledgedNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC, false)
-    }
-
-    override fun setFreeGiftAcknowledgedNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC, value)
-    }
+    override val freeGiftAcknowledged = UserSetting.BoolPref(
+        sharedPrefKey = "freeGiftAck",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getCancelledAcknowledged(): Boolean {
         return getBoolean("cancelled_acknowledged", false)

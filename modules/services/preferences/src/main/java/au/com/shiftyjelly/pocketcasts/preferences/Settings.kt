@@ -69,10 +69,6 @@ interface Settings {
         const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
-
-        const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED = "freeGiftAck"
-        const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC = "freeGiftAckNeedsSync"
-
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
@@ -362,10 +358,7 @@ interface Settings {
 
     val marketingOptIn: UserSetting<Boolean>
 
-    fun getFreeGiftAcknowledged(): Boolean
-    fun setFreeGiftAcknowledged(value: Boolean)
-    fun getFreeGiftAcknowledgedNeedsSync(): Boolean
-    fun setFreeGiftAcknowledgedNeedsSync(value: Boolean)
+    val freeGiftAcknowledged: UserSetting<Boolean>
 
     fun setCloudSortOrder(sortOrder: CloudSortOrder)
     fun getCloudSortOrder(): CloudSortOrder
