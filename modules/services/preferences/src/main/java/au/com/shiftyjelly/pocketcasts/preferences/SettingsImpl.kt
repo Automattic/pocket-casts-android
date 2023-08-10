@@ -529,9 +529,9 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     ) {
         override fun get(): PlaybackEffects = PlaybackEffects().apply {
-            playbackSpeed = globalPlaybackSpeed.flow.value
-            trimMode = globalAudioEffectRemoveSilence.flow.value
-            isVolumeBoosted = globalAudioEffectVolumeBoost.flow.value
+            playbackSpeed = globalPlaybackSpeed.value
+            trimMode = globalAudioEffectRemoveSilence.value
+            isVolumeBoosted = globalAudioEffectVolumeBoost.value
         }
 
         override fun persist(value: PlaybackEffects, commit: Boolean) {
@@ -1086,7 +1086,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getMaxUpNextEpisodes(): Int {
-        return max(DEFAULT_MAX_AUTO_ADD_LIMIT, autoAddUpNextLimit.flow.value)
+        return max(DEFAULT_MAX_AUTO_ADD_LIMIT, autoAddUpNextLimit.value)
     }
 
     private fun setStringList(key: String, array: List<String>) {

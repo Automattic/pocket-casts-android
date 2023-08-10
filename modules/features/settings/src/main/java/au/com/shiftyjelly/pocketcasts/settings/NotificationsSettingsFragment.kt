@@ -247,7 +247,7 @@ class NotificationsSettingsFragment :
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
 
-            val existingValue = settings.notificationSound.flow.value.path
+            val existingValue = settings.notificationSound.value.path
             // Select "Silent" if empty
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, if (existingValue.isEmpty()) null else Uri.parse(existingValue))
 
@@ -410,7 +410,7 @@ class NotificationsSettingsFragment :
     }
 
     private fun changeVibrateSummary() {
-        vibratePreference?.summary = getString(settings.notificationVibrate.flow.value.summary)
+        vibratePreference?.summary = getString(settings.notificationVibrate.value.summary)
     }
 
     private fun getRingtoneValue(ringtonePath: String): String {
@@ -438,7 +438,7 @@ class NotificationsSettingsFragment :
                 preference.summary = getRingtoneValue(newValue as String)
                 true
             }
-            settings.notificationSound.flow.value.path.let { notificationSoundPath ->
+            settings.notificationSound.value.path.let { notificationSoundPath ->
                 it.setDefaultValue(notificationSoundPath)
                 it.summary = getRingtoneValue(notificationSoundPath)
             }
@@ -458,12 +458,12 @@ class NotificationsSettingsFragment :
             it.entryValues = options.map {
                 it.intValue.toString()
             }.toTypedArray()
-            it.value = settings.notificationVibrate.flow.value.intValue.toString()
+            it.value = settings.notificationVibrate.value.intValue.toString()
         }
     }
 
     private fun setupHidePlaybackNotifications() {
-        hidePlaybackNotificationsPreference?.isChecked = settings.hideNotificationOnPause.flow.value
+        hidePlaybackNotificationsPreference?.isChecked = settings.hideNotificationOnPause.value
     }
 
     private fun setupPlayOverNotifications() {
@@ -475,13 +475,13 @@ class NotificationsSettingsFragment :
             )
             entries = options.map { getString(it.titleRes) }.toTypedArray()
             entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
-            value = settings.playOverNotification.flow.value.preferenceInt.toString()
+            value = settings.playOverNotification.value.preferenceInt.toString()
         }
         changePlayOverNotificationSummary()
     }
 
     private fun changePlayOverNotificationSummary() {
-        playOverNotificationPreference?.summary = getString(settings.playOverNotification.flow.value.titleRes)
+        playOverNotificationPreference?.summary = getString(settings.playOverNotification.value.titleRes)
     }
 
     override fun getBackstackCount(): Int {

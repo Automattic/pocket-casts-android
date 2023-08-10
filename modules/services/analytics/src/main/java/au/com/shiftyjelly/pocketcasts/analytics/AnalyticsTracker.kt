@@ -42,5 +42,5 @@ object AnalyticsTracker {
         }
     }
 
-    fun getSendUsageStats() = settings.collectAnalytics.flow.value
+    fun getSendUsageStats() = settings.collectAnalytics.value
 }

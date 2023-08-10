@@ -352,7 +352,7 @@ class MediaSessionManager(
         Timber.i("MediaSession metadata. Episode: ${episode.uuid} ${episode.title} Duration: ${episode.durationMs.toLong()}")
         mediaSession.setMetadata(nowPlaying)
 
-        if (settings.showArtworkOnLockScreen.flow.value) {
+        if (settings.showArtworkOnLockScreen.value) {
             if (Util.isAutomotive(context)) {
                 val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
@@ -374,8 +374,8 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        val visibleCount = if (settings.customMediaActionsVisibility.flow.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
-        settings.mediaControlItems.flow.value.take(visibleCount).forEach { mediaControl ->
+        val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
+        settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
@@ -667,7 +667,7 @@ class MediaSessionManager(
                 }
             }
             // update global playback speed
-            val effects = settings.globalPlaybackEffects.flow.value
+            val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
             settings.globalPlaybackEffects.set(effects)
             playbackManager.updatePlayerEffects(effects = effects)

@@ -112,7 +112,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
-        updateMediaActionsVisibility(settings.customMediaActionsVisibility.flow.value)
+        updateMediaActionsVisibility(settings.customMediaActionsVisibility.value)
 
         val callback = MediaActionTouchCallback(listener = this)
         itemTouchHelper = ItemTouchHelper(callback)

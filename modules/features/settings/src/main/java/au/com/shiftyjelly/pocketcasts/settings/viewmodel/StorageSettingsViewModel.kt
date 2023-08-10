@@ -58,7 +58,7 @@ class StorageSettingsViewModel
     val permissionRequest = mutablePermissionRequest.asSharedFlow()
 
     private val backgroundRefreshSummary: Int
-        get() = if (settings.backgroundRefreshPodcasts.flow.value) {
+        get() = if (settings.backgroundRefreshPodcasts.value) {
             LR.string.settings_storage_background_refresh_on
         } else {
             LR.string.settings_storage_background_refresh_off
@@ -126,7 +126,7 @@ class StorageSettingsViewModel
         ),
         backgroundRefreshState = State.BackgroundRefreshState(
             summary = backgroundRefreshSummary,
-            isChecked = settings.backgroundRefreshPodcasts.flow.value,
+            isChecked = settings.backgroundRefreshPodcasts.value,
             onCheckedChange = {
                 onBackgroundRefreshCheckedChange(it)
                 analyticsTracker.track(
@@ -136,7 +136,7 @@ class StorageSettingsViewModel
             }
         ),
         storageDataWarningState = State.StorageDataWarningState(
-            isChecked = settings.warnOnMeteredNetwork.flow.value,
+            isChecked = settings.warnOnMeteredNetwork.value,
             onCheckedChange = {
                 onStorageDataWarningCheckedChange(it)
                 analyticsTracker.track(
@@ -168,7 +168,7 @@ class StorageSettingsViewModel
     private fun updateMobileDataWarningState() {
         mutableState.value = mutableState.value.copy(
             storageDataWarningState = mutableState.value.storageDataWarningState.copy(
-                isChecked = settings.warnOnMeteredNetwork.flow.value,
+                isChecked = settings.warnOnMeteredNetwork.value,
             )
         )
     }
@@ -181,7 +181,7 @@ class StorageSettingsViewModel
     private fun updateBackgroundRefreshState() {
         mutableState.value = mutableState.value.copy(
             backgroundRefreshState = mutableState.value.backgroundRefreshState.copy(
-                isChecked = settings.backgroundRefreshPodcasts.flow.value,
+                isChecked = settings.backgroundRefreshPodcasts.value,
                 summary = backgroundRefreshSummary
             )
         )

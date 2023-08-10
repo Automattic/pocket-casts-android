@@ -13,7 +13,7 @@ class ResumptionHelper(val settings: Settings) {
     private var lastPauseTime: Date? = settings.getLastPauseTime()
 
     fun adjustedStartTimeMsFor(episode: BaseEpisode): Int {
-        if (!settings.intelligentPlaybackResumption.flow.value ||
+        if (!settings.intelligentPlaybackResumption.value ||
             settings.getLastPausedUUID() != episode.uuid ||
             (settings.getLastPausedAt() ?: 0) != episode.playedUpToMs
         ) return episode.playedUpToMs

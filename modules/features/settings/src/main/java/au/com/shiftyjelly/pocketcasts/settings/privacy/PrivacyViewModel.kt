@@ -33,8 +33,8 @@ class PrivacyViewModel @Inject constructor(
     private val mutableUiState = MutableStateFlow<UiState>(
         UiState.Loaded(
             analytics = analyticsTracker.getSendUsageStats(),
-            crashReports = settings.sendCrashReports.flow.value,
-            linkAccount = settings.linkCrashReportsToUser.flow.value,
+            crashReports = settings.sendCrashReports.value,
+            linkAccount = settings.linkCrashReportsToUser.value,
             getUserEmail = { syncManager.getEmail() }
         )
     )

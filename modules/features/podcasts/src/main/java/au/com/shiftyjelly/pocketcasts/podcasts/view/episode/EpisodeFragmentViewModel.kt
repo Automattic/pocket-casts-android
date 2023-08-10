@@ -246,7 +246,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     }
 
     fun shouldShowStreamingWarning(context: Context): Boolean {
-        return isPlaying.value == false && episode?.isDownloaded == false && settings.warnOnMeteredNetwork.flow.value && !Network.isUnmeteredConnection(context)
+        return isPlaying.value == false && episode?.isDownloaded == false && settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context)
     }
 
     fun playClickedGetShouldClose(

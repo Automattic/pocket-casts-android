@@ -37,8 +37,8 @@ class SettingsViewModel @Inject constructor(
         State(
             refreshState = null,
             signInState = userManager.getSignInState().blockingFirst(),
-            showDataWarning = settings.warnOnMeteredNetwork.flow.value,
-            refreshInBackground = settings.backgroundRefreshPodcasts.flow.value,
+            showDataWarning = settings.warnOnMeteredNetwork.value,
+            refreshInBackground = settings.backgroundRefreshPodcasts.value,
         )
     )
     val state = _state.asStateFlow()

@@ -85,37 +85,37 @@ class CloudSettingsFragment : BaseFragment() {
         }
 
         with(binding.swtAutoAddToUpNext) {
-            isChecked = settings.cloudAddToUpNext.flow.value
+            isChecked = settings.cloudAddToUpNext.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setAddToUpNext(isChecked)
             }
         }
         with(binding.swtDeleteLocalFileAfterPlaying) {
-            isChecked = settings.deleteLocalFileAfterPlaying.flow.value
+            isChecked = settings.deleteLocalFileAfterPlaying.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setDeleteLocalFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtDeleteCloudFileAfterPlaying) {
-            isChecked = settings.deleteCloudFileAfterPlaying.flow.value
+            isChecked = settings.deleteCloudFileAfterPlaying.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setDeleteCloudFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtAutoUploadToCloud) {
-            isChecked = settings.cloudAutoUpload.flow.value
+            isChecked = settings.cloudAutoUpload.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCloudAutoUpload(isChecked)
             }
         }
         with(binding.swtAutoDownloadFromCloud) {
-            isChecked = settings.cloudAutoDownload.flow.value
+            isChecked = settings.cloudAutoDownload.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCloudAutoDownload(isChecked)
             }
         }
         with(binding.swtCloudOnlyOnWiFi) {
-            isChecked = settings.cloudDownloadOnlyOnWifi.flow.value
+            isChecked = settings.cloudDownloadOnlyOnWifi.value
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setCloudOnlyWifi(isChecked)
             }

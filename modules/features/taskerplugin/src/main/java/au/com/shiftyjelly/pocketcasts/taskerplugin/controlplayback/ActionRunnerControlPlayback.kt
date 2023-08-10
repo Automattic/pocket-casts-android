@@ -82,7 +82,7 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
         val playbackEffects: PlaybackEffects = if (overrideGlobalEffects) {
             currentPodcast.playbackEffects
         } else {
-            settings.globalPlaybackEffects.flow.value
+            settings.globalPlaybackEffects.value
         }
         playbackEffects.updater()
         if (overrideGlobalEffects) {

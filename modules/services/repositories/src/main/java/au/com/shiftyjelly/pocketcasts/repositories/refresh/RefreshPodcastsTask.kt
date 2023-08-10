@@ -54,7 +54,7 @@ class RefreshPodcastsTask @AssistedInject constructor(
         fun scheduleOrCancel(context: Context, settings: Settings) {
             val workManager = WorkManager.getInstance(context)
 
-            if (!settings.backgroundRefreshPodcasts.flow.value) {
+            if (!settings.backgroundRefreshPodcasts.value) {
                 workManager.cancelAllWorkByTag(TAG_REFRESH_TASK)
                 return
             }

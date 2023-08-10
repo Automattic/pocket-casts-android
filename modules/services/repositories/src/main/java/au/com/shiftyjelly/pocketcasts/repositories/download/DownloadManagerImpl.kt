@@ -472,12 +472,12 @@ class DownloadManagerImpl @Inject constructor(
         // user has tapped download
         if (!episode.isAutoDownloaded) {
             // user said yes to warning dialog
-            return if (episode.isManualDownloadOverridingWifiSettings || !settings.warnOnMeteredNetwork.flow.value) {
+            return if (episode.isManualDownloadOverridingWifiSettings || !settings.warnOnMeteredNetwork.value) {
                 NetworkRequirements.runImmediately()
             } else NetworkRequirements.needsUnmetered()
         } else if (episode is UserEpisode) {
             // UserEpisodes have their own auto download setting
-            return if (settings.cloudDownloadOnlyOnWifi.flow.value) {
+            return if (settings.cloudDownloadOnlyOnWifi.value) {
                 NetworkRequirements.needsUnmetered()
             } else {
                 NetworkRequirements.runImmediately()
@@ -486,8 +486,8 @@ class DownloadManagerImpl @Inject constructor(
 
         val networkRequirements = NetworkRequirements.mostStringent()
 
-        networkRequirements.requiresUnmetered = settings.autoDownloadUnmeteredOnly.flow.value
-        networkRequirements.requiresPower = settings.autoDownloadOnlyWhenCharging.flow.value
+        networkRequirements.requiresUnmetered = settings.autoDownloadUnmeteredOnly.value
+        networkRequirements.requiresPower = settings.autoDownloadOnlyWhenCharging.value
 
         return networkRequirements
     }

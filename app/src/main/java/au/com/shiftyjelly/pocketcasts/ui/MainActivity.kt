@@ -684,7 +684,7 @@ class MainActivity :
                     viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid ||
                         (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)
                     ) &&
-                settings.openPlayerAutomatically.flow.value
+                settings.openPlayerAutomatically.value
             ) {
                 binding.playerBottomSheet.openPlayer()
             }
@@ -798,7 +798,7 @@ class MainActivity :
     private fun updatePlaybackState(state: PlaybackState) {
         binding.playerBottomSheet.setPlaybackState(state)
 
-        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake.flow.value) {
+        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake.value) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

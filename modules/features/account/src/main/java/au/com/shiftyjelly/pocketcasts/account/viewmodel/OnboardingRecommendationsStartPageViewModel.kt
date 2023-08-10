@@ -135,7 +135,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 return@launch
             }
 
-            val regionCode = settings.discoverCountryCode.flow.value
+            val regionCode = settings.discoverCountryCode.value
             val region = feed.regions[regionCode]
                 ?: feed.regions[feed.defaultRegionCode]
                     .let {

@@ -28,7 +28,7 @@ class EffectsViewModel
         playbackManager.playbackStateRelay
             .asFlow()
             .map {
-                State.Loaded(settings.globalPlaybackEffects.flow.value)
+                State.Loaded(settings.globalPlaybackEffects.value)
             }
             .stateIn(
                 scope = viewModelScope,

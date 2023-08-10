@@ -134,7 +134,7 @@ class FolderEditViewModel
                     searchText = searchText,
                     folders = folders,
                     folder = folder,
-                    layout = settings.podcastGridLayout.flow.value
+                    layout = settings.podcastGridLayout.value
                 )
             }.collect {
                 mutableState.value = it
@@ -149,7 +149,7 @@ class FolderEditViewModel
 
     private fun sortPodcasts(podcastsSortedByReleaseDate: List<Podcast>): List<Podcast> {
         val podcasts = podcastsSortedByReleaseDate
-        return when (settings.podcastsSortType.flow.value) {
+        return when (settings.podcastsSortType.value) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastsSortedByReleaseDate
             PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST -> podcasts.sortedWith(compareBy { it.addedDate })
             PodcastsSortType.DRAG_DROP -> podcasts.sortedWith(compareBy { it.sortPosition })
@@ -229,7 +229,7 @@ class FolderEditViewModel
                 val newFolder = folderManager.create(
                     name = name,
                     color = colorId.value,
-                    podcastsSortType = settings.podcastsSortType.flow.value,
+                    podcastsSortType = settings.podcastsSortType.value,
                     podcastUuids = podcastUuids
                 )
                 onComplete(newFolder)

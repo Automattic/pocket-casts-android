@@ -93,10 +93,10 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
                     LR.string.settings_auto_up_next_limit
                 ),
                 getString(
-                    LR.string.episodes_plural, settings.autoAddUpNextLimit.flow.value
+                    LR.string.episodes_plural, settings.autoAddUpNextLimit.value
                 )
             ) {
-                val currentLimit = settings.autoAddUpNextLimit.flow.value
+                val currentLimit = settings.autoAddUpNextLimit.value
                 OptionsDialog()
                     .setTitle(getString(LR.string.settings_auto_up_next_limit))
                     .addCheckedOption(titleString = getString(LR.string.episodes_plural, 10), checked = currentLimit == 10) { viewModel.autoAddUpNextLimitChanged(10) }

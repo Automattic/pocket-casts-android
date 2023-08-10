@@ -154,7 +154,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
 
         viewModel.podcastUuidToBadge.observe(viewLifecycleOwner) { podcastUuidToBadge ->
-            adapter?.badgeType = settings.podcastBadgeType.flow.value
+            adapter?.badgeType = settings.podcastBadgeType.value
             adapter?.setBadges(podcastUuidToBadge)
         }
 
@@ -321,12 +321,12 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     }
 
     private fun setupGridView(savedInstanceState: Parcelable? = listState) {
-        val layoutManager = when (settings.podcastGridLayout.flow.value) {
+        val layoutManager = when (settings.podcastGridLayout.value) {
             PodcastGridLayoutType.LARGE_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
             PodcastGridLayoutType.SMALL_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
             PodcastGridLayoutType.LIST_VIEW -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         }
-        val badgeType = settings.podcastBadgeType.flow.value
+        val badgeType = settings.podcastBadgeType.value
         val currentLayoutManager = realBinding?.recyclerView?.layoutManager
 
         // We only want to reset the adapter if something actually changed, or else it will flash

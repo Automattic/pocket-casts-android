@@ -265,9 +265,9 @@ class PodcastsViewModel
             val properties = HashMap<String, Any>()
             properties[NUMBER_OF_FOLDERS_KEY] = folderManager.countFolders()
             properties[NUMBER_OF_PODCASTS_KEY] = podcastManager.countSubscribed()
-            properties[BADGE_TYPE_KEY] = settings.podcastBadgeType.flow.value.analyticsValue
-            properties[LAYOUT_KEY] = settings.podcastGridLayout.flow.value.analyticsValue
-            properties[SORT_ORDER_KEY] = settings.podcastsSortType.flow.value.analyticsValue
+            properties[BADGE_TYPE_KEY] = settings.podcastBadgeType.value.analyticsValue
+            properties[LAYOUT_KEY] = settings.podcastGridLayout.value.analyticsValue
+            properties[SORT_ORDER_KEY] = settings.podcastsSortType.value.analyticsValue
             analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
         }
     }

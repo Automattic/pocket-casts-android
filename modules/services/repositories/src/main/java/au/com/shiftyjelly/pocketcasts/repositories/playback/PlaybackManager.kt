@@ -229,7 +229,7 @@ open class PlaybackManager @Inject constructor(
             return nextEpisode
         }
 
-        if (!settings.autoPlayNextEpisodeOnEmpty.flow.value) {
+        if (!settings.autoPlayNextEpisodeOnEmpty.value) {
             return null
         }
 
@@ -351,7 +351,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
-        return settings.warnOnMeteredNetwork.flow.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
+        return settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
     }
 
     fun getPlaybackSpeed(): Double {
@@ -715,7 +715,7 @@ open class PlaybackManager @Inject constructor(
 
     fun skipForward(
         sourceView: SourceView = SourceView.UNKNOWN,
-        jumpAmountSeconds: Int = settings.skipForwardInSecs.flow.value,
+        jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
     ) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
@@ -740,7 +740,7 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, sourceView)
     }
 
-    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.flow.value) {
+    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 
@@ -1495,7 +1495,7 @@ open class PlaybackManager @Inject constructor(
         if (!episode.isDownloaded) {
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) && // The watch handles these warnings before this is called
-                settings.warnOnMeteredNetwork.flow.value &&
+                settings.warnOnMeteredNetwork.value &&
                 !Network.isUnmeteredConnection(application) &&
                 !forceStream &&
                 play
@@ -1589,7 +1589,7 @@ open class PlaybackManager @Inject constructor(
         val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
             podcast.playbackEffects
         } else {
-            settings.globalPlaybackEffects.flow.value
+            settings.globalPlaybackEffects.value
         }
 
         val previousPlaybackState = playbackStateRelay.blockingFirst()
@@ -1709,7 +1709,7 @@ open class PlaybackManager @Inject constructor(
         val notification = builder.build()
 
         // Add sound and vibrations
-        val sound = settings.notificationSound.flow.value.uri
+        val sound = settings.notificationSound.value.uri
         if (sound != null) {
             notification.sound = sound
         }
