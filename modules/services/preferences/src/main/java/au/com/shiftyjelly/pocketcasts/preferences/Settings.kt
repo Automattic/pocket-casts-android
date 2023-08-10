@@ -68,12 +68,6 @@ interface Settings {
         const val LAST_UPDATE_TIME = "LastUpdateTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
-
-        const val PREFERENCE_MARKETING_OPT_IN = "marketingOptIn"
-        const val PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC = "marketingOptInNeedsSync"
-        const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED = "freeGiftAck"
-        const val PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC = "freeGiftAckNeedsSync"
-
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
         const val PREFERENCE_STORAGE_CHOICE_NAME = "storageChoiceName"
         const val PREFERENCE_STORAGE_CUSTOM_FOLDER = "storageCustomFolder"
@@ -91,7 +85,6 @@ interface Settings {
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
         const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
-        const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
@@ -188,7 +181,6 @@ interface Settings {
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val marketingOptObservable: Observable<Boolean>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
 
@@ -239,8 +231,7 @@ interface Settings {
     fun getBooleanForKey(key: String, defaultValue: Boolean): Boolean
     fun setBooleanForKey(key: String, value: Boolean)
 
-    fun getDiscoveryCountryCode(): String
-    fun setDiscoveryCountryCode(code: String)
+    val discoverCountryCode: UserSetting<String>
 
     val warnOnMeteredNetwork: UserSetting<Boolean>
 
@@ -256,8 +247,6 @@ interface Settings {
     fun setRestoreFromBackupEnded()
 
     fun clearPlusPreferences()
-
-    fun getLanguageCode(): String
 
     val hideNotificationOnPause: UserSetting<Boolean>
 
@@ -324,15 +313,9 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
-    fun getMarketingOptIn(): Boolean
-    fun setMarketingOptIn(value: Boolean)
-    fun getMarketingOptInNeedsSync(): Boolean
-    fun setMarketingOptInNeedsSync(value: Boolean)
+    val marketingOptIn: UserSetting<Boolean>
 
-    fun getFreeGiftAcknowledged(): Boolean
-    fun setFreeGiftAcknowledged(value: Boolean)
-    fun getFreeGiftAcknowledgedNeedsSync(): Boolean
-    fun setFreeGiftAcknowledgedNeedsSync(value: Boolean)
+    val freeGiftAcknowledged: UserSetting<Boolean>
 
     fun setCloudSortOrder(sortOrder: CloudSortOrder)
     fun getCloudSortOrder(): CloudSortOrder

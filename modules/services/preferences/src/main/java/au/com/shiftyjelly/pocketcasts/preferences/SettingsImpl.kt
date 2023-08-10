@@ -78,7 +78,6 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val marketingOptObservable = BehaviorRelay.create<Boolean>().apply { accept(getMarketingOptIn()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
 
@@ -133,38 +132,17 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getMarketingOptIn(): Boolean {
-        return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, false)
-    }
+    override val marketingOptIn = UserSetting.BoolPref(
+        sharedPrefKey = "marketingOptIn",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun setMarketingOptIn(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, value)
-        marketingOptObservable.accept(value)
-    }
-
-    override fun getMarketingOptInNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC, false)
-    }
-
-    override fun setMarketingOptInNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_MARKETING_OPT_IN_NEEDS_SYNC, value)
-    }
-
-    override fun getFreeGiftAcknowledged(): Boolean {
-        return getBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED, false)
-    }
-
-    override fun setFreeGiftAcknowledged(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED, value)
-    }
-
-    override fun getFreeGiftAcknowledgedNeedsSync(): Boolean {
-        return getBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC, false)
-    }
-
-    override fun setFreeGiftAcknowledgedNeedsSync(value: Boolean) {
-        setBoolean(Settings.PREFERENCE_FREE_GIFT_ACKNOWLEDGED_NEEDS_SYNC, value)
-    }
+    override val freeGiftAcknowledged = UserSetting.BoolPref(
+        sharedPrefKey = "freeGiftAck",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getCancelledAcknowledged(): Boolean {
         return getBoolean("cancelled_acknowledged", false)
@@ -347,16 +325,11 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
-    override fun getDiscoveryCountryCode(): String {
-        val countryCode = sharedPreferences.getString(Settings.PREFERENCE_DISCOVERY_COUNTRY_CODE, null)
-        return countryCode ?: getLanguageCode()
-    }
-
-    override fun setDiscoveryCountryCode(code: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(Settings.PREFERENCE_DISCOVERY_COUNTRY_CODE, code)
-        editor.apply()
-    }
+    override val discoverCountryCode = UserSetting.StringPref(
+        sharedPrefKey = "discovery_country_code",
+        defaultValue = getDefaultCountryCode(),
+        sharedPrefs = sharedPreferences,
+    )
 
     override val warnOnMeteredNetwork = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_WARN_WHEN_NOT_ON_WIFI,
@@ -477,7 +450,7 @@ class SettingsImpl @Inject constructor(
         setCancelledAcknowledged(false)
     }
 
-    override fun getLanguageCode(): String {
+    private fun getDefaultCountryCode(): String {
         val languageCode = languageCode
         if (languageCode != null) {
             return languageCode
