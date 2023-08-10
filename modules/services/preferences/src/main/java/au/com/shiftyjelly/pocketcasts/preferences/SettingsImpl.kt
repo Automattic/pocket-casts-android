@@ -666,20 +666,6 @@ class SettingsImpl @Inject constructor(
         return getInt("sleepTimerCustomMins", 5)
     }
 
-    override fun getImageSignature(): String {
-        var signature = getString("imageSignature", null)
-        if (signature == null) {
-            signature = changeImageSignature()
-        }
-        return signature
-    }
-
-    override fun changeImageSignature(): String {
-        val signature = System.currentTimeMillis().toString()
-        setString("imageSignature", signature)
-        return signature
-    }
-
     override fun setShowPlayedEpisodes(show: Boolean) {
         setBoolean("showPlayedEpisodes", show)
     }

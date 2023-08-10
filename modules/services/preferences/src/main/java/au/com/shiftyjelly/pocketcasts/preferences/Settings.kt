@@ -295,9 +295,6 @@ interface Settings {
     fun setSleepTimerCustomMins(minutes: Int)
     fun getSleepTimerCustomMins(): Int
 
-    fun getImageSignature(): String
-    fun changeImageSignature(): String
-
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
 
