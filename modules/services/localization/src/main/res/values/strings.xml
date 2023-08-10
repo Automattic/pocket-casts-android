@@ -1083,8 +1083,7 @@
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
     <string name="settings_get_plus_and_more">Get Pocket Casts Plus to unlock this feature and more!</string>
-    <string name="settings_headphone_controls_action_next">Next action</string>
-    <string name="settings_headphone_controls_action_previous">Previous action</string>
+    <string name="settings_headphone_controls_action_next">Double tap headset hook button</string>
     <string name="settings_headphone_controls_choice_add_bookmark">Add bookmark</string>
     <string name="settings_headphone_controls_choice_next_chapter">Next chapter</string>
     <string name="settings_headphone_controls_choice_previous_chapter">Previous chapter</string>
