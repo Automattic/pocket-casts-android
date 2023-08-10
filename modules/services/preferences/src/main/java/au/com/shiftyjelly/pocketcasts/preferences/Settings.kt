@@ -250,9 +250,6 @@ interface Settings {
 
     val playOverNotification: UserSetting<PlayOverNotificationSetting>
 
-    fun hasBlockAlreadyRun(label: String): Boolean
-    fun setBlockAlreadyRun(label: String, hasRun: Boolean)
-
     fun setLastModified(lastModified: String?)
     fun getLastModified(): String?
 

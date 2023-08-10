@@ -385,16 +385,6 @@ class SettingsImpl @Inject constructor(
         toString = { it.preferenceInt.toString() }
     )
 
-    override fun hasBlockAlreadyRun(label: String): Boolean {
-        return sharedPreferences.getBoolean("blockAlreadyRun$label", false)
-    }
-
-    override fun setBlockAlreadyRun(label: String, hasRun: Boolean) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("blockAlreadyRun$label", hasRun)
-        editor.apply()
-    }
-
     override fun setLastModified(lastModified: String?) {
         val editor = sharedPreferences.edit()
         editor.putString(Settings.PREFERENCE_LAST_MODIFIED, lastModified)
