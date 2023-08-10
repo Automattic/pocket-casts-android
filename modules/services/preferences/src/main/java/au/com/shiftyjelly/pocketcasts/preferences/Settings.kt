@@ -133,6 +133,8 @@ interface Settings {
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
+        const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
+        const val INTENT_OPEN_APP_VIEW_BOOKMARKS = "INTENT_OPEN_APP_VIEW_BOOKMARKS"
         const val INTENT_LINK_CLOUD_FILES = "pktc://cloudfiles"
         const val INTENT_LINK_UPGRADE = "pktc://upgrade"
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"

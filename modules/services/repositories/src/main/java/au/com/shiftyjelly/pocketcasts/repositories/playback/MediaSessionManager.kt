@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
@@ -63,9 +65,11 @@ class MediaSessionManager(
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
+    val bookmarkManager: BookmarkManager,
 ) : CoroutineScope {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
+        const val ACTION_NOT_SUPPORTED = "action_not_supported"
 
         // there's an issue on Samsung phones that if you don't say you support ACTION_SKIP_TO_PREVIOUS and
         // ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled. We work around this
@@ -92,6 +96,8 @@ class MediaSessionManager(
     val disposables = CompositeDisposable()
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
+    private var bookmarkHelper: BookmarkHelper
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -107,6 +113,8 @@ class MediaSessionManager(
         val extras = Bundle()
         extras.putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
         mediaSession.setExtras(extras)
+
+        bookmarkHelper = BookmarkHelper(playbackManager, bookmarkManager)
 
         connect()
     }
@@ -469,6 +477,11 @@ class MediaSessionManager(
             return super.onMediaButtonEvent(mediaButtonEvent)
         }
 
+        private fun onAddBookmark() {
+            logEvent("add bookmark")
+            bookmarkHelper.handleAddBookmarkAction(context)
+        }
+
         private fun getCurrentControllerInfo(): String {
             val info = mediaSession.currentControllerInfo
             return "Controller: ${info.packageName} pid: ${info.pid} uid: ${info.uid}"
@@ -500,7 +513,13 @@ class MediaSessionManager(
                 playPauseTimer = null
 
                 logEvent("skip forwards from headset hook")
-                playbackManager.skipForward(sourceView = source)
+                when (settings.headphoneNextActionFlow.value) {
+                    Settings.HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
+                    Settings.HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
+                    Settings.HeadphoneAction.SKIP_BACK,
+                    Settings.HeadphoneAction.NEXT_CHAPTER,
+                    Settings.HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
+                }
             }
         }
 

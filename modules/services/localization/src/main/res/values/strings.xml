@@ -1706,6 +1706,10 @@
     <string name="bookmarks_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
     <string name="bookmarks_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
     <string name="bookmarks_sort_timestamp">Timestamp</string>
+    <string name="bookmark_notification_title_added">Bookmark Added</string>
+    <string name="bookmark_notification_content_tap_to_view">Tap to view</string>
+    <string name="bookmark_notification_action_change_title">Change title</string>
+
 
     <!--    Tasker Plugin-->
 

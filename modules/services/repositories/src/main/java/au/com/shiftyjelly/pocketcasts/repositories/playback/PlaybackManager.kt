@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
@@ -115,6 +116,7 @@ open class PlaybackManager @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics,
     private val syncManager: SyncManager,
     private val cloudFilesManager: CloudFilesManager,
+    private val bookmarkManager: BookmarkManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -177,7 +179,8 @@ open class PlaybackManager @Inject constructor(
         playlistManager = playlistManager,
         settings = settings,
         context = application,
-        episodeAnalytics = episodeAnalytics
+        episodeAnalytics = episodeAnalytics,
+        bookmarkManager = bookmarkManager,
     )
     var sleepAfterEpisode: Boolean = false
 
@@ -312,7 +315,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun getCurrentTimeMs(episode: BaseEpisode): Int {
+    suspend fun getCurrentTimeMs(episode: BaseEpisode): Int {
         val player = player
         if (player != null) {
             val currentTimeMs = player.getCurrentPositionMs()
