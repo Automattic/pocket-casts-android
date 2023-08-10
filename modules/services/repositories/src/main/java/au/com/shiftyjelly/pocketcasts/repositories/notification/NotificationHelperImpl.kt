@@ -78,6 +78,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(signInErrorChannel)
 
+        val bookmarkChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id, "Bookmark", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "Shows when bookmark is added using broadcast"
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(bookmarkChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
@@ -99,6 +107,10 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
 
     override fun podcastImportChannelBuilder(): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PODCAST.id)
+    }
+
+    override fun bookmarkChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id)
     }
 
     /**
