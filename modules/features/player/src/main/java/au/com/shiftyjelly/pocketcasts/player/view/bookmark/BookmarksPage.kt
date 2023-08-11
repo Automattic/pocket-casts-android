@@ -16,6 +16,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -47,6 +48,7 @@ fun BookmarksPage(
     onEditBookmarkClick: () -> Unit,
     onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
+    openFragment: (Fragment) -> Unit,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
@@ -66,6 +68,7 @@ fun BookmarksPage(
             bookmarksViewModel.play(bookmark)
         },
         onUpgradeClicked = onUpgradeClicked,
+        openFragment = openFragment,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -95,6 +98,7 @@ private fun Content(
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClicked: () -> Unit,
     onUpgradeClicked: () -> Unit,
+    openFragment: (Fragment) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -110,7 +114,7 @@ private fun Content(
                 onPlayClick = onPlayClick,
             )
 
-            is UiState.Empty -> NoBookmarksView(state.colors)
+            is UiState.Empty -> NoBookmarksView(state.colors, openFragment)
             is UiState.PlusUpsell -> PlusUpsellView(
                 style = state.colors,
                 onClick = onUpgradeClicked,
@@ -201,7 +205,8 @@ private fun BookmarksPreview(
             onPlayClick = {},
             onRowLongPressed = {},
             onBookmarksOptionsMenuClicked = {},
-            onUpgradeClicked = {}
+            onUpgradeClicked = {},
+            openFragment = {},
         )
     }
 }
