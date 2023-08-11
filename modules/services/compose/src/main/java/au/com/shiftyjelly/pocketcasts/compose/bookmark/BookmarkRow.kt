@@ -86,7 +86,7 @@ sealed class BookmarkRowColors {
             return if (isMultiSelecting() && isSelected) {
                 MaterialTheme.theme.colors.primaryUi02Selected
             } else {
-                MaterialTheme.theme.colors.primaryUi01
+                MaterialTheme.theme.colors.primaryUi02
             }
         }
         @Composable
