@@ -463,15 +463,15 @@ class MediaSessionManager(
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
-                            handlePlayPauseEvent()
+                            handleMediaButtonSingleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                            onSkipToNext()
+                            handleMediaButtonDoubleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                            onSkipToPrevious()
+                            handleMediaButtonTripleTap()
                             return true
                         }
                     }
@@ -496,7 +496,7 @@ class MediaSessionManager(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${if (inSessionCallback) getCurrentControllerInfo() else ""}")
         }
 
-        private fun handlePlayPauseEvent() {
+        private fun handleMediaButtonSingleTap() {
             // this code allows the user to double tap their play pause button to skip ahead. Basically it allows them 600ms to press it again to cause a skip instead of a play/pause
             if (playPauseTimer == null) {
                 playPauseTimer = Timer().apply {
@@ -516,14 +516,25 @@ class MediaSessionManager(
                 playPauseTimer?.cancel()
                 playPauseTimer = null
 
-                logEvent("skip forwards from headset hook")
-                when (settings.headphoneNextActionFlow.value) {
-                    Settings.HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
-                    Settings.HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
-                    Settings.HeadphoneAction.SKIP_BACK,
-                    Settings.HeadphoneAction.NEXT_CHAPTER,
-                    Settings.HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
-                }
+                playbackManager.skipForward(sourceView = source)
+            }
+        }
+
+        private fun handleMediaButtonDoubleTap() {
+            handleMediaButtonAction(settings.headphoneNextActionFlow.value)
+        }
+
+        private fun handleMediaButtonTripleTap() {
+            handleMediaButtonAction(settings.headphonePreviousActionFlow.value)
+        }
+
+        private fun handleMediaButtonAction(action: Settings.HeadphoneAction) {
+            when (action) {
+                Settings.HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
+                Settings.HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
+                Settings.HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
+                Settings.HeadphoneAction.NEXT_CHAPTER,
+                Settings.HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 
