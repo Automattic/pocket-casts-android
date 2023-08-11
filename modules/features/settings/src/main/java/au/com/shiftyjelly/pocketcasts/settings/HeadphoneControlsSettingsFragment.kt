@@ -62,6 +62,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                     previousAction = previousAction,
                     nextAction = nextAction,
                     onNextActionSave = { settings.setHeadphoneControlsNextAction(it) },
+                    onPreviousActionSave = { settings.setHeadphoneControlsPreviousAction(it) },
                     confirmationSound = confirmationSound,
                     onConfirmationSoundSave = {
                         settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it)
@@ -82,6 +83,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
     private fun HeadphoneControlsSettingsPage(
         previousAction: HeadphoneAction,
         nextAction: HeadphoneAction,
+        onPreviousActionSave: (HeadphoneAction) -> Unit,
         onNextActionSave: (HeadphoneAction) -> Unit,
         confirmationSound: Boolean,
         onConfirmationSoundSave: (Boolean) -> Unit,
@@ -106,6 +108,10 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                     saved = nextAction,
                     onSave = onNextActionSave
                 )
+                PreviousActionRow(
+                    saved = previousAction,
+                    onSave = onPreviousActionSave
+                )
                 if (previousAction == HeadphoneAction.ADD_BOOKMARK || nextAction == HeadphoneAction.ADD_BOOKMARK) {
                     ConfirmationSoundRow(
                         saved = confirmationSound,
@@ -127,7 +133,28 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
             icon = painterResource(IR.drawable.ic_skip_forward),
             options = listOf(
                 HeadphoneAction.SKIP_FORWARD,
-                HeadphoneAction.ADD_BOOKMARK
+                HeadphoneAction.SKIP_BACK,
+                HeadphoneAction.ADD_BOOKMARK,
+            ),
+            savedOption = saved,
+            onSave = onSave,
+            optionToLocalisedString = { getString(headphoneActionToStringRes(it)) },
+        )
+    }
+
+    @Composable
+    private fun PreviousActionRow(
+        saved: HeadphoneAction,
+        onSave: (HeadphoneAction) -> Unit,
+    ) {
+        SettingRadioDialogRow(
+            primaryText = stringResource(LR.string.settings_headphone_controls_action_previous),
+            secondaryText = stringResource(headphoneActionToStringRes(saved)),
+            icon = painterResource(IR.drawable.ic_skip_back),
+            options = listOf(
+                HeadphoneAction.SKIP_BACK,
+                HeadphoneAction.SKIP_FORWARD,
+                HeadphoneAction.ADD_BOOKMARK,
             ),
             savedOption = saved,
             onSave = onSave,
@@ -166,6 +193,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
             HeadphoneControlsSettingsPage(
                 previousAction = HeadphoneAction.SKIP_BACK,
                 nextAction = HeadphoneAction.ADD_BOOKMARK,
+                onPreviousActionSave = {},
                 onNextActionSave = {},
                 confirmationSound = true,
                 onConfirmationSoundSave = {},
