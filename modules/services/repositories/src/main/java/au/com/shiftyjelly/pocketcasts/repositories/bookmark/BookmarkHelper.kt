@@ -85,7 +85,7 @@ private fun buildAndShowNotification(
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setContentTitle(context.getString(LR.string.bookmark_notification_title_added))
         .setContentText(context.getString(LR.string.bookmark_notification_content_tap_to_view))
-        .setSmallIcon(IR.drawable.ic_launcher_foreground)
+        .setSmallIcon(IR.drawable.notification)
         .setAutoCancel(true)
         .setOnlyAlertOnce(true)
         .setContentIntent(buildPendingIntent(context, INTENT_OPEN_APP_VIEW_BOOKMARKS))
