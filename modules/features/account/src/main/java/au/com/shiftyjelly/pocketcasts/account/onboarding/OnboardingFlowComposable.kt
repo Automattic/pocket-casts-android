@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -125,21 +126,7 @@ private fun Content(
                     if (state.isNewAccount) {
                         onAccountCreated()
                     } else {
-                        when (flow) {
-                            OnboardingFlow.InitialOnboarding,
-                            OnboardingFlow.LoggedOut,
-                            is OnboardingFlow.PlusAccountUpgrade,
-                            is OnboardingFlow.PlusUpsell -> exitOnboarding()
-
-                            is OnboardingFlow.PatronAccountUpgrade,
-                            OnboardingFlow.PlusAccountUpgradeNeedsLogin ->
-                                navController.navigate(
-                                    OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
-                                ) {
-                                    // clear backstack after successful login
-                                    popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
-                                }
-                        }
+                        onLoginToExistingAccount(flow, exitOnboarding, navController)
                     }
                 },
             )
@@ -158,20 +145,7 @@ private fun Content(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
                 onLoginComplete = {
-                    when (flow) {
-                        OnboardingFlow.InitialOnboarding,
-                        OnboardingFlow.LoggedOut -> exitOnboarding()
-
-                        is OnboardingFlow.PlusAccountUpgrade,
-                        is OnboardingFlow.PatronAccountUpgrade,
-                        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                        is OnboardingFlow.PlusUpsell -> navController.navigate(
-                            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
-                        ) {
-                            // clear backstack after successful login
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
-                        }
-                    }
+                    onLoginToExistingAccount(flow, exitOnboarding, navController)
                 },
                 onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
             )
@@ -264,6 +238,27 @@ private fun Content(
                     }
                 },
             )
+        }
+    }
+}
+
+private fun onLoginToExistingAccount(
+    flow: OnboardingFlow,
+    exitOnboarding: () -> Unit,
+    navController: NavHostController
+) {
+    when (flow) {
+        OnboardingFlow.InitialOnboarding,
+        OnboardingFlow.LoggedOut -> exitOnboarding()
+
+        is OnboardingFlow.PlusAccountUpgrade,
+        is OnboardingFlow.PatronAccountUpgrade,
+        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+        is OnboardingFlow.PlusUpsell -> navController.navigate(
+            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
+        ) {
+            // clear backstack after successful login
+            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
         }
     }
 }
