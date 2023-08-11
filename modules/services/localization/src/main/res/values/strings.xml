@@ -1686,6 +1686,16 @@
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
     <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts. Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
 
+    <!-- Notification channel -->
+
+    <string name="notification_channel_description_download">Shows while Pocket Casts is downloading episodes</string>
+    <string name="notification_channel_description_episode">Shows when a new episode comes out</string>
+    <string name="notification_channel_description_playback_error">Errors during playback</string>
+    <string name="notification_channel_description_playback">Shows while Pocket Casts is playing audio</string>
+    <string name="notification_channel_description_podcast_import">Import podcast collections</string>
+    <string name="notification_channel_description_sign_in_error">Shows when signed out in background and cannot auto re sign-in</string>
+    <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
+
     <!-- Bookmarks -->
 
     <string name="bookmark_play">Play at bookmark position %s</string>
@@ -1706,6 +1716,10 @@
     <string name="bookmarks_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
     <string name="bookmarks_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
     <string name="bookmarks_sort_timestamp">Timestamp</string>
+    <string name="bookmark_notification_title_added">Bookmark added</string>
+    <string name="bookmark_notification_content_tap_to_view">Tap to view</string>
+    <string name="bookmark_notification_action_change_title">Change title</string>
+
 
     <!--    Tasker Plugin-->
 

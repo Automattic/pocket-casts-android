@@ -133,6 +133,8 @@ interface Settings {
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
+        const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
+        const val INTENT_OPEN_APP_VIEW_BOOKMARKS = "INTENT_OPEN_APP_VIEW_BOOKMARKS"
         const val INTENT_LINK_CLOUD_FILES = "pktc://cloudfiles"
         const val INTENT_LINK_UPGRADE = "pktc://upgrade"
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
@@ -149,6 +151,7 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_PLAYBACK_ERROR("playbackError"),
         NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
         NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
+        NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
     }
 
     enum class NotificationId(val value: Int) {
@@ -156,6 +159,7 @@ interface Settings {
         PLAYING(21483647),
         DOWNLOADING(21483648),
         SIGN_IN_ERROR(21483649),
+        BOOKMARK(21483650),
     }
 
     enum class BadgeType(val labelId: Int, val analyticsValue: String) {
