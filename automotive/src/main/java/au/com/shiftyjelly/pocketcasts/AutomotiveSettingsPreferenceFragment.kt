@@ -31,6 +31,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
 
+    private lateinit var preferenceAutoPlay: SwitchPreference
     private lateinit var preferenceAutoSubscribeToPlayed: SwitchPreference
     private lateinit var preferenceAutoShowPlayed: SwitchPreference
     private var preferenceRefreshNow: Preference? = null
@@ -41,8 +42,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_auto)
 
-        preferenceAutoSubscribeToPlayed = preferenceManager.findPreference<SwitchPreference>("autoSubscribeToPlayed")!!
-        preferenceAutoShowPlayed = preferenceManager.findPreference<SwitchPreference>("autoShowPlayed")!!
+        preferenceAutoPlay = preferenceManager.findPreference("autoUpNextEmpty")!!
+        preferenceAutoSubscribeToPlayed = preferenceManager.findPreference("autoSubscribeToPlayed")!!
+        preferenceAutoShowPlayed = preferenceManager.findPreference("autoShowPlayed")!!
 
         preferenceSkipForward = preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_FORWARD)?.apply {
             setInputAsSeconds()
@@ -58,6 +60,14 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
 
     override fun onResume() {
         super.onResume()
+        preferenceAutoPlay.apply {
+            isChecked = settings.autoPlayNextEpisodeOnEmpty.value
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean)
+                true
+            }
+        }
+
         preferenceAutoSubscribeToPlayed.apply {
             isChecked = settings.autoSubscribeToPlayed.value
             setOnPreferenceChangeListener { _, newValue ->
