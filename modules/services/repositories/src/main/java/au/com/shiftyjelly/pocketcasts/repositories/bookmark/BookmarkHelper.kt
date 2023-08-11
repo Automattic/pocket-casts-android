@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
@@ -33,6 +35,7 @@ class BookmarkHelper @Inject constructor(
     fun handleAddBookmarkAction(
         context: Context,
     ) {
+        if (!shouldAllowAddBookmark()) return
         if (context.isAppForeground()) {
             val bookmarkIntent =
                 context.packageManager.getLaunchIntentForPackage(context.packageName)
@@ -66,6 +69,12 @@ class BookmarkHelper @Inject constructor(
                 buildAndShowNotification(context)
             }
         }
+    }
+
+    private fun shouldAllowAddBookmark(): Boolean {
+        return settings.getCachedSubscription()?.let { subscriptionStatus ->
+            subscriptionStatus is SubscriptionStatus.Paid && subscriptionStatus.tier == SubscriptionTier.PATRON
+        } ?: false
     }
 }
 
