@@ -71,44 +71,44 @@ class BookmarksViewModel
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
-//                if (!it.isSignedInAsPatron) {
-//                    _uiState.value = UiState.PlusUpsell(sourceView)
-//                } else {
-                episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                    val bookmarksFlow =
-                        settings.bookmarkSortTypeForPlayerFlow.flatMapLatest { sortType ->
-                            bookmarkManager.findEpisodeBookmarksFlow(
-                                episode = episode,
-                                sortType = sortType,
-                            )
-                        }
-                    val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
-                    val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
-                    combine(
-                        bookmarksFlow,
-                        isMultiSelectingFlow,
-                        selectedListFlow,
-                    ) { bookmarks, isMultiSelecting, selectedList ->
-                        _uiState.value = if (bookmarks.isEmpty()) {
-                            UiState.Empty(sourceView)
-                        } else {
-                            UiState.Loaded(
-                                bookmarks = bookmarks,
-                                isMultiSelecting = isMultiSelecting,
-                                isSelected = { selectedBookmark ->
-                                    selectedList.map { bookmark -> bookmark.uuid }
-                                        .contains(selectedBookmark.uuid)
-                                },
-                                onRowClick = ::onRowClick,
-                                sourceView = sourceView,
-                            )
-                        }
-                    }.stateIn(viewModelScope)
-                } ?: run { // This shouldn't happen in the ideal world
-                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
-                    _uiState.value = UiState.Empty(sourceView)
+                if (!it.isSignedInAsPatron) {
+                    _uiState.value = UiState.PlusUpsell(sourceView)
+                } else {
+                    episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                        val bookmarksFlow =
+                            settings.bookmarkSortTypeForPlayerFlow.flatMapLatest { sortType ->
+                                bookmarkManager.findEpisodeBookmarksFlow(
+                                    episode = episode,
+                                    sortType = sortType,
+                                )
+                            }
+                        val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
+                        val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
+                        combine(
+                            bookmarksFlow,
+                            isMultiSelectingFlow,
+                            selectedListFlow,
+                        ) { bookmarks, isMultiSelecting, selectedList ->
+                            _uiState.value = if (bookmarks.isEmpty()) {
+                                UiState.Empty(sourceView)
+                            } else {
+                                UiState.Loaded(
+                                    bookmarks = bookmarks,
+                                    isMultiSelecting = isMultiSelecting,
+                                    isSelected = { selectedBookmark ->
+                                        selectedList.map { bookmark -> bookmark.uuid }
+                                            .contains(selectedBookmark.uuid)
+                                    },
+                                    onRowClick = ::onRowClick,
+                                    sourceView = sourceView,
+                                )
+                            }
+                        }.stateIn(viewModelScope)
+                    } ?: run { // This shouldn't happen in the ideal world
+                        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
+                        _uiState.value = UiState.Empty(sourceView)
+                    }
                 }
-//                }
             }
         }
 

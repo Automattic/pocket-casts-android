@@ -690,7 +690,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         viewModel.loadPodcast(podcastUuid, resources)
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-            adapter?.setSignedInAsPlusOrPatron(signInState.isSignedInAsPlusOrPatron)
+            adapter?.setSignInState(signInState)
         }
 
         viewModel.podcast.observe(

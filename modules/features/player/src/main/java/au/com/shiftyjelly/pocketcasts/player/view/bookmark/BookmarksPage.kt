@@ -4,9 +4,12 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -114,10 +117,19 @@ private fun Content(
                 onPlayClick = onPlayClick,
             )
 
-            is UiState.Empty -> NoBookmarksView(state.colors, openFragment)
+            is UiState.Empty -> NoBookmarksView(
+                style = state.colors,
+                openFragment = openFragment,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+            )
             is UiState.PlusUpsell -> PlusUpsellView(
                 style = state.colors,
                 onClick = onUpgradeClicked,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
             )
         }
     }

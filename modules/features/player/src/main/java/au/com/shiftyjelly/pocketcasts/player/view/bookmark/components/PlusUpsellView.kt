@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PlusUpsellView(
     style: MessageViewColors,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     MessageView(
         titleView = {
@@ -26,7 +28,8 @@ fun PlusUpsellView(
         },
         buttonTitleRes = LR.string.subscribe, // TODO: Bookmarks update upsell button title based on subscription status
         buttonAction = onClick,
-        style = style
+        style = style,
+        modifier = modifier,
     )
 }
 

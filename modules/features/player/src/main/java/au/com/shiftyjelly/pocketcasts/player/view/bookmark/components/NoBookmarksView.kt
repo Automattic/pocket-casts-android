@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun NoBookmarksView(
     style: NoBookmarksViewColors,
     openFragment: (Fragment) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     MessageView(
         titleView = {
@@ -30,6 +32,7 @@ fun NoBookmarksView(
         buttonTitleRes = LR.string.bookmarks_headphone_settings,
         buttonAction = { openFragment(HeadphoneControlsSettingsFragment()) },
         style = style.toMessageViewColors(),
+        modifier = modifier,
     )
 }
 
