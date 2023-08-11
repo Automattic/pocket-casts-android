@@ -45,6 +45,7 @@ fun BookmarksPage(
     multiSelectHelper: MultiSelectBookmarksHelper,
     onRowLongPressed: (Bookmark) -> Unit,
     onEditBookmarkClick: () -> Unit,
+    onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
 ) {
     val context = LocalContext.current
@@ -64,6 +65,7 @@ fun BookmarksPage(
             ).show()
             bookmarksViewModel.play(bookmark)
         },
+        onUpgradeClicked = onUpgradeClicked,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -92,6 +94,7 @@ private fun Content(
     onRowLongPressed: (Bookmark) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClicked: () -> Unit,
+    onUpgradeClicked: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -108,7 +111,10 @@ private fun Content(
             )
 
             is UiState.Empty -> NoBookmarksView(state.colors)
-            is UiState.PlusUpsell -> PlusUpsellView(state.colors)
+            is UiState.PlusUpsell -> PlusUpsellView(
+                style = state.colors,
+                onClick = onUpgradeClicked,
+            )
         }
     }
 }
@@ -195,6 +201,7 @@ private fun BookmarksPreview(
             onPlayClick = {},
             onRowLongPressed = {},
             onBookmarksOptionsMenuClicked = {},
+            onUpgradeClicked = {}
         )
     }
 }

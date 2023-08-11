@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PlusUpsellView(
     style: MessageViewColors,
+    onClick: () -> Unit,
 ) {
     MessageView(
         titleView = {
@@ -24,7 +25,7 @@ fun PlusUpsellView(
             )
         },
         buttonTitleRes = LR.string.subscribe, // TODO: Bookmarks update upsell button title based on subscription status
-        buttonAction = { /* TODO */ },
+        buttonAction = onClick,
         style = style
     )
 }
@@ -35,6 +36,6 @@ private fun PlusUpsellPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        PlusUpsellView(MessageViewColors.Default)
+        PlusUpsellView(MessageViewColors.Default, {})
     }
 }

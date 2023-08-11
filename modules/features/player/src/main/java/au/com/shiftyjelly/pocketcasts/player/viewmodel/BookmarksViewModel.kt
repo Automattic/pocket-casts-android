@@ -71,7 +71,7 @@ class BookmarksViewModel
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
-                if (!it.isSignedInAsPlusOrPatron) {
+                if (!it.isSignedInAsPatron) {
                     _uiState.value = UiState.PlusUpsell(sourceView)
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->

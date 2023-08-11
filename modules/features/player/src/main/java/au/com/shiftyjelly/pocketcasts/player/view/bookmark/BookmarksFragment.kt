@@ -24,6 +24,9 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -108,6 +111,7 @@ class BookmarksFragment : BaseFragment() {
                                 )
                             },
                             onEditBookmarkClick = ::onEditBookmarkClick,
+                            onUpgradeClicked = ::onUpgradeClicked,
                             showOptionsDialog = { showOptionsDialog(it) }
                         )
                     }
@@ -171,5 +175,11 @@ class BookmarksFragment : BaseFragment() {
         bookmarksViewModel.buildBookmarkArguments { arguments ->
             startActivity(arguments.getIntent(requireContext()))
         }
+    }
+
+    private fun onUpgradeClicked() {
+        val source = OnboardingUpgradeSource.BOOKMARKS
+        val onboardingFlow = OnboardingFlow.PlusUpsell(source, true)
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }

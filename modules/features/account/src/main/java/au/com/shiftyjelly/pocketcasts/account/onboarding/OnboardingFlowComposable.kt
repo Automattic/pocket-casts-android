@@ -220,7 +220,8 @@ private fun Content(
                 OnboardingUpgradeSource.PLUS_DETAILS,
                 OnboardingUpgradeSource.PROFILE,
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
-                OnboardingUpgradeSource.SETTINGS -> false
+                OnboardingUpgradeSource.SETTINGS,
+                OnboardingUpgradeSource.BOOKMARKS -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }
