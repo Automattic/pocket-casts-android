@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
@@ -132,6 +133,7 @@ class PodcastAdapter(
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
+    private val onHeadsetSettingsClicked: () -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -158,12 +160,14 @@ class PodcastAdapter(
         val isSelected: (Bookmark) -> Boolean,
     )
     object BookmarkUpsell
+    object NoBookmarkMessage
 
     companion object {
         private const val VIEW_TYPE_TABS = 100
         private const val VIEW_TYPE_BOOKMARKS = 101
         private const val VIEW_TYPE_BOOKMARK_HEADER = 102
         private const val VIEW_TYPE_BOOKMARK_UPSELL = 103
+        private const val VIEW_TYPE_NO_BOOKMARK = 104
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
@@ -199,6 +203,7 @@ class PodcastAdapter(
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
                 viewMode = EpisodeViewHolder.ViewMode.NoArtwork,
@@ -222,6 +227,7 @@ class PodcastAdapter(
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
             is BookmarkUpsellViewHolder -> holder.bind()
+            is NoBookmarkViewHolder -> holder.bind()
         }
     }
 
@@ -429,6 +435,8 @@ class PodcastAdapter(
 
                 if (!signInState.isSignedInAsPatron) {
                     add(BookmarkUpsell)
+                } else if (bookmarks.isEmpty()) {
+                    add(NoBookmarkMessage)
                 } else {
                     add(
                         BookmarkHeader(
@@ -476,6 +484,7 @@ class PodcastAdapter(
             is BookmarkItemData -> VIEW_TYPE_BOOKMARKS
             is BookmarkHeader -> VIEW_TYPE_BOOKMARK_HEADER
             is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
+            is NoBookmarkMessage -> VIEW_TYPE_NO_BOOKMARK
             else -> R.layout.adapter_episode
         }
     }
@@ -490,6 +499,7 @@ class PodcastAdapter(
             is TabsHeader -> Long.MAX_VALUE - 4
             is BookmarkHeader -> Long.MAX_VALUE - 5
             is BookmarkUpsell -> Long.MAX_VALUE - 6
+            is NoBookmarkMessage -> Long.MAX_VALUE - 7
             is DividerRow -> item.groupIndex.toLong()
             is PodcastEpisode -> item.adapterId
             is BookmarkItemData -> item.bookmark.adapterId
