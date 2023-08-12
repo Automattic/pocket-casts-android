@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.widget.Toast
@@ -33,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
@@ -115,6 +118,7 @@ open class PlaybackManager @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics,
     private val syncManager: SyncManager,
     private val cloudFilesManager: CloudFilesManager,
+    private val bookmarkManager: BookmarkManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -143,6 +147,13 @@ open class PlaybackManager @Inject constructor(
     }
     private var audioNoisyManager =
         AudioNoisyManager(application)
+
+    private val tonePlayer: MediaPlayer by lazy {
+        MediaPlayer().apply {
+            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.tone}"))
+            prepare()
+        }
+    }
 
     val playbackStateRelay: Relay<PlaybackState> by lazy {
         val relay = BehaviorRelay.create<PlaybackState>().toSerialized()
@@ -177,7 +188,8 @@ open class PlaybackManager @Inject constructor(
         playlistManager = playlistManager,
         settings = settings,
         context = application,
-        episodeAnalytics = episodeAnalytics
+        episodeAnalytics = episodeAnalytics,
+        bookmarkManager = bookmarkManager,
     )
     var sleepAfterEpisode: Boolean = false
 
@@ -312,7 +324,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun getCurrentTimeMs(episode: BaseEpisode): Int {
+    suspend fun getCurrentTimeMs(episode: BaseEpisode): Int {
         val player = player
         if (player != null) {
             val currentTimeMs = player.getCurrentPositionMs()
@@ -2044,6 +2056,14 @@ open class PlaybackManager @Inject constructor(
                 lastChangeFrom = "updatePausedPlaybackState"
             )
             playbackStateRelay.accept(playbackState)
+        }
+    }
+
+    fun playTone() {
+        try {
+            tonePlayer.start()
+        } catch (e: Exception) {
+            Timber.e("Unable to play tone: $e")
         }
     }
 
