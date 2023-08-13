@@ -52,8 +52,12 @@ class CloudFilesViewModel @Inject constructor(
                 bookmarkManager.findUserEpisodesBookmarksFlow()
             ) { cloudFiles, bookmarks ->
                 val cloudFilesWithBookmarkInfo = cloudFiles.map { file ->
-                    file.hasBookmark = bookmarks.map { it.episodeUuid }.contains(file.uuid) &&
-                        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
+                    if (bookmarks.any { (it.episodeUuid == file.uuid) && it.deleted }) {
+                        file.hasBookmark = false
+                    } else {
+                        file.hasBookmark = bookmarks.any { it.episodeUuid == file.uuid } &&
+                            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
+                    }
                     file
                 }
                 _uiState.value = UiState(cloudFilesWithBookmarkInfo)
