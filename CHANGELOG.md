@@ -1,6 +1,9 @@
 7.46
 -----
 
+*   Bug Fixes:
+    *    Improved upgrade flow when signing in with Google account
+         ([#1275](https://github.com/Automattic/pocket-casts-android/pull/1275))
 
 7.45
 -----
