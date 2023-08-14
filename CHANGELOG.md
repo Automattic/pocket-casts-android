@@ -1,6 +1,8 @@
 7.46
 -----
-
+*   New Feature:
+    *   Added a support section to the Automotive app
+        ([#1277](https://github.com/Automattic/pocket-casts-android/pull/1277))
 
 7.45
 -----
