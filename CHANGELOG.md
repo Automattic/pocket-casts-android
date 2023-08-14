@@ -1,6 +1,9 @@
 7.46
 -----
 
+*   New Feature:
+    *   Added a support section to the Automotive app
+        ([#1277](https://github.com/Automattic/pocket-casts-android/pull/1277))
 *   Bug Fixes:
     *    Improved upgrade flow when signing in with Google account
          ([#1275](https://github.com/Automattic/pocket-casts-android/pull/1275))
