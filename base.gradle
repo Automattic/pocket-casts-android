@@ -281,6 +281,7 @@ dependencies {
     androidTestImplementation androidLibs.androidTestCore
     androidTestImplementation androidLibs.roomTest
     androidTestImplementation androidLibs.annotations
+    androidTestImplementation androidLibs.navigationTest
     androidTestImplementation androidLibs.testRunner
     androidTestImplementation androidLibs.testRules
     androidTestImplementation androidLibs.testEspressoCore

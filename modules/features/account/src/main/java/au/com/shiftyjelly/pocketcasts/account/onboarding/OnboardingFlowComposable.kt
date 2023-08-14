@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -25,7 +26,8 @@ fun OnboardingFlowComposable(
     flow: OnboardingFlow,
     exitOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
-    signInState: SignInState
+    signInState: SignInState,
+    navController: NavHostController = rememberNavController(),
 ) {
     if (flow is OnboardingFlow.PlusAccountUpgrade) {
         Content(
@@ -33,7 +35,8 @@ fun OnboardingFlowComposable(
             flow = flow,
             exitOnboarding = exitOnboarding,
             completeOnboardingToDiscover = completeOnboardingToDiscover,
-            signInState = signInState
+            signInState = signInState,
+            navController = navController,
         )
     } else {
         AppThemeWithBackground(theme) {
@@ -42,7 +45,8 @@ fun OnboardingFlowComposable(
                 flow = flow,
                 exitOnboarding = exitOnboarding,
                 completeOnboardingToDiscover = completeOnboardingToDiscover,
-                signInState = signInState
+                signInState = signInState,
+                navController = navController,
             )
         }
     }
@@ -54,10 +58,9 @@ private fun Content(
     flow: OnboardingFlow,
     exitOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
-    signInState: SignInState
+    signInState: SignInState,
+    navController: NavHostController,
 ) {
-    val navController = rememberNavController()
-
     val startDestination = when (flow) {
         OnboardingFlow.LoggedOut,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
@@ -263,7 +266,8 @@ private fun onLoginToExistingAccount(
     }
 }
 
-private object OnboardingNavRoute {
+@VisibleForTesting
+object OnboardingNavRoute {
 
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
