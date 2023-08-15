@@ -839,9 +839,9 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) = withContext(Dispatchers.IO) {
+    override suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, removeFromUpNext: Boolean) = withContext(Dispatchers.IO) {
         episodes.toList().forEach {
-            deleteEpisodeFile(it, playbackManager, removeFromUpNext = true, disableAutoDownload = false)
+            deleteEpisodeFile(it, playbackManager, removeFromUpNext = removeFromUpNext, disableAutoDownload = false)
         }
     }
 

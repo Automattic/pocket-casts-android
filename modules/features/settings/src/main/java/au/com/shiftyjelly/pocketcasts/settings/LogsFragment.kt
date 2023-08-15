@@ -14,25 +14,35 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.VerticalAlignBottom
+import androidx.compose.material.icons.filled.VerticalAlignTop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.LogsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -64,53 +74,141 @@ private fun LogsPage(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
+    LogsContent(
+        onBackPressed = onBackPressed,
+        onCopyToClipboard = { logs?.let { clipboardManager.setText(AnnotatedString(it)) } },
+        onShareLogs = { viewModel.shareLogs(context) },
+        includeAppBar = !Util.isAutomotive(context),
+        logs = logs
+    )
+}
+
+@Composable
+private fun LogsContent(
+    onBackPressed: () -> Unit,
+    onCopyToClipboard: () -> Unit,
+    onShareLogs: () -> Unit,
+    logs: String?,
+    includeAppBar: Boolean
+) {
+    val logScrollState = rememberScrollState(0)
     Column {
-
-        ThemedTopAppBar(
-            title = stringResource(LR.string.settings_logs),
-            onNavigationClick = onBackPressed,
-            actions = {
-                IconButton(
-                    onClick = {
-                        logs?.let {
-                            clipboardManager.setText(AnnotatedString(it))
-                        }
-                    },
-                    enabled = logs != null
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CopyAll,
-                        contentDescription = stringResource(LR.string.share)
-                    )
-                }
-
-                IconButton(
-                    onClick = { viewModel.shareLogs(context) },
-                    enabled = logs != null
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = stringResource(LR.string.share)
-                    )
-                }
-            }
-        )
-
+        if (includeAppBar) {
+            val coroutineScope = rememberCoroutineScope()
+            AppBarWithShare(
+                onBackPressed = onBackPressed,
+                onCopyToClipboard = onCopyToClipboard,
+                onShareLogs = onShareLogs,
+                onScrollToTop = {
+                    coroutineScope.launch {
+                        logScrollState.animateScrollTo(0)
+                    }
+                },
+                onScrollToBottom = {
+                    coroutineScope.launch {
+                        logScrollState.animateScrollTo(Int.MAX_VALUE)
+                    }
+                },
+                logsAvailable = logs != null,
+            )
+        }
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(logScrollState)
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-
             if (logs == null) {
-                TextH30(
-                    text = stringResource(LR.string.loading),
-                    modifier = Modifier.padding(vertical = 24.dp)
-                )
+                LoadingView()
             } else {
                 TextP60(logs)
             }
         }
+    }
+    // scroll to the end to show the latest logs
+    LaunchedEffect(logs) {
+        logScrollState.scrollTo(logScrollState.maxValue)
+    }
+}
+
+@Composable
+private fun AppBarWithShare(
+    onBackPressed: () -> Unit,
+    onCopyToClipboard: () -> Unit,
+    onShareLogs: () -> Unit,
+    onScrollToTop: () -> Unit,
+    onScrollToBottom: () -> Unit,
+    logsAvailable: Boolean,
+    modifier: Modifier = Modifier
+) {
+    ThemedTopAppBar(
+        title = stringResource(LR.string.settings_logs),
+        onNavigationClick = onBackPressed,
+        actions = {
+            IconButton(
+                onClick = onScrollToTop,
+                enabled = logsAvailable,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VerticalAlignTop,
+                    contentDescription = stringResource(LR.string.go_to_top)
+                )
+            }
+            IconButton(
+                onClick = onScrollToBottom,
+                enabled = logsAvailable,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VerticalAlignBottom,
+                    contentDescription = stringResource(LR.string.go_to_bottom)
+                )
+            }
+            IconButton(
+                onClick = onCopyToClipboard,
+                enabled = logsAvailable
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CopyAll,
+                    contentDescription = stringResource(LR.string.share)
+                )
+            }
+            IconButton(
+                onClick = onShareLogs,
+                enabled = logsAvailable
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = stringResource(LR.string.share)
+                )
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+@Preview
+private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+    AppThemeWithBackground(themeType) {
+        LogsContent(
+            onBackPressed = {},
+            onCopyToClipboard = {},
+            onShareLogs = {},
+            logs = "This is a preview",
+            includeAppBar = true
+        )
+    }
+}
+@Composable
+@Preview
+private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+    AppThemeWithBackground(themeType) {
+        LogsContent(
+            onBackPressed = {},
+            onCopyToClipboard = {},
+            onShareLogs = {},
+            logs = null,
+            includeAppBar = true
+        )
     }
 }

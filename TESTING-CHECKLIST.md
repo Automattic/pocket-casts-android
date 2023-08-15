@@ -2,7 +2,7 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 
 ## Manual Tests
 
-#### Account
+### Account
 
 - [ ] Create an account.
 - [ ] Change email.
@@ -12,7 +12,36 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] Login to account.
 - [ ] Purchase Pocket Casts Plus.
 
-#### Podcasts
+### Onboarding
+
+#### Onboarding: Create Account
+- [ ] With username/password
+- [ ] With Google
+
+#### Onboarding: Log into existing account
+- [ ] With username/password
+- [ ] With Google
+
+#### Onboarding: Upgrade
+Test the following routes into the upgrade screen:
+
+- [ ] Folder icon on Podcasts tab
+- [ ] Upsell prompt on Profile tab
+- [ ] Upsell prompt on Account screen
+- [ ] Bookmarks (accessible from podcast screen, episode screen, and now playing screen)
+- [ ] Settings: Pocket Casts Plus section
+- [ ] Settings: Appearance
+- [ ] Files: bottom of add file screen prompt
+- [ ] Files: Upload to cloud button
+
+For each of the following setups:
+1. not logged in—making sure you are prompted to log in during the onboarding flow and logging in
+   1. With a Google account
+   2. With username/password
+2. when logged in to a free account
+3. when logged in to a Plus account (will not see upgrade prompts for Plus features)
+
+### Podcasts
 
 - [ ] Subscribe to a new podcast in discover.
 - [ ] Stream an episode.
@@ -31,9 +60,9 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] Swipe an episode row to add to Up Next in first position.
 - [ ] Swipe an episode row to add to Up Next in last position.
 
-#### Folders
+### Folders
 
-##### Folders: Create
+#### Folders: Create
 
 - [ ] When creating a folder the search should filter the list of podcasts to add.
 - [ ] When creating a folder check the sort works for ‘name’, ‘episode release date’ and ‘date added’.
@@ -42,7 +71,7 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] After creating a folder you should be taken to the created folder page and not the root folder.
 - [ ] The new folder’s sort type should default to the same as the home folder’s.
 
-##### Folders: Edit
+#### Folders: Edit
 
 - [ ] Edit the folder name and colour.
 - [ ] Make sure the folder name can't be empty.  
@@ -51,7 +80,7 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] When in drag and drop mode, added podcasts should appear at the end of the folder.
 - [ ] When the home folder is in drag and drop mode, removed podcasts should appear at the end of the home folder.
 
-##### Folders: Podcasts Tab
+#### Folders: Podcasts Tab
 
 - [ ] The folder artwork should show the podcasts in the sort order in the folder.
 - [ ] When the home folder is sorted by drag & drop a created folder should be added to the top of the list.
@@ -65,7 +94,7 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] The podcast search should include a folder if the name matches. Tapping the folder should open the folder podcasts page.
 - [ ] If the user doesn't have Pocket Casts Plus the folder shouldn't appear in the search results.
 
-##### Folders: Open Folder Page
+#### Folders: Open Folder Page
 
 - [ ] The create folder icon only appears on the root folder page.
 - [ ] The podcast search only appears on the root folder page.
@@ -74,21 +103,21 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] The sort in the folder should be separate from the home folder. Also different folders can have their own sort orders.
 - [ ] Podcasts in folders should be able to be sorted by ‘Name’, ‘Episode Release Date’, ‘Date Added’, and ‘Drag and Drop’.
 
-##### Folders: Podcast Page
+#### Folders: Podcast Page
 
 - [ ] On the podcast page there should be a folder icon so the podcast can be added to a folder, or moved if it is already in a folder.
 - [ ] Pocket Casts Plus
 - [ ] You will only see folders if you are signed in to an account with a Pocket Casts Plus subscription.
 - [ ] You will still see the create folder icon if you aren’t paying for a Plus subscription, tapping it will show an upgrade page.
 
-#### Mini Player
+### Mini Player
 - [ ] Play and pause an episode.
 - [ ] Skip forward and back.
 - [ ] Tap the Up Next icon to open the Up Next.
 - [ ] Tap near the artwork to open the full screen player.
 - [ ] Swipe down to close the full screen player.
 
-#### Full Screen Player
+### Full Screen Player
 
 - [ ] Play / pause an episode.
 - [ ] Skip forward / backward.
@@ -106,13 +135,13 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] Tap the video picture in picture button
 - [ ] With picture in picture check the play, pause, skip and close buttons work.
 
-#### Chromecast
+### Chromecast
 
 - [ ] Play and pause episode through Chromecast.
 - [ ] Skip forward / backward.
 - [ ] Check when an episode finishes the next starts playing.
 
-#### Up Next
+### Up Next
 
 - [ ] Rearrange Up Next episodes.
 - [ ] Remove an episode.
@@ -121,13 +150,13 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] Sign in to your account, add episodes to your Up Next, sign out of your account, change the Up Next, sign back in and your local Up Next shouldn't change.
 - [ ] Sign in to your account, add episodes to your Up Next, sign out of your account, clear your Up Next, sign back in and your server Up Next should be seen on your device.
 
-#### Search
+### Search
 
 - [ ] Search for a podcast and subscribe to it.
 - [ ] The podcasts tab search should return your subscribed local podcasts first. The subscribed podcasts should be sorted A to Z. After these should be the server search results.  
 - [ ] The discover tab search should not return your local podcasts first.
 
-#### Podcast Grid
+### Podcast Grid
 
 - [ ] Turn badges on and off.
 - [ ] Change the layout.
@@ -135,17 +164,17 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] Drag and drop podcasts to a new position.
 - [ ] Share a podcast list.
 
-#### Podcast shares
+### Podcast shares
 
 - [ ] Open a podcast share list.
 
-#### Discover
+### Discover
 
 - [ ] Tap show all on a list.
 - [ ] Open a category list.
 - [ ] Change your region.
 
-#### Profile
+### Profile
 
 - [ ] Open Stats.
 - [ ] Open Downloads.
@@ -153,26 +182,26 @@ Note: (A) means Automated Test. If automated UI tests were executed for the app,
 - [ ] Open Starred.
 - [ ] Open Listening History.
 
-#### Settings
+### Settings
 
 - [ ] Open up every section.
 - [ ] Opml export / import.
 
-#### Android Auto
+### Android Auto
 
 - [ ] Press all the buttons.
 
-#### Android Automotive
+### Android Automotive
 
 - [ ] Try the app in the Polestar emulator.
 - [ ] Try the app in a landscape emulator.
 
-#### Playback Notification
+### Playback Notification
 
 - [ ] Test the player controls work.
 - [ ] Test the seek bar works.
 
-#### Sonos
+### Sonos
 
 - [ ] Make sure you can link an account.
 - [ ] Check your podcasts and filters lists.
