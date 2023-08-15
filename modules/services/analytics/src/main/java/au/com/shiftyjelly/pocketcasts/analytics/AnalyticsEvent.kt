@@ -8,6 +8,10 @@ enum class AnalyticsEvent(val key: String) {
     APPLICATION_OPENED("application_opened"),
     APPLICATION_CLOSED("application_closed"),
 
+    /* Bookmarks */
+    BOOKMARK_CREATED("bookmark_created"),
+    BOOKMARK_UPDATE_TITLE("bookmark_update_title"),
+
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
     USER_SIGNED_IN_WATCH_FROM_PHONE("user_signed_in_watch_from_phone"),

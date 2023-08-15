@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -18,6 +20,7 @@ import kotlin.coroutines.CoroutineContext
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : BookmarkManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -48,6 +51,7 @@ class BookmarkManagerImpl @Inject constructor(
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_CREATED)
         return bookmark
     }
 
@@ -58,6 +62,7 @@ class BookmarkManagerImpl @Inject constructor(
             titleModified = System.currentTimeMillis(),
             syncStatus = SyncStatus.NOT_SYNCED
         )
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_UPDATE_TITLE)
     }
 
     /**
