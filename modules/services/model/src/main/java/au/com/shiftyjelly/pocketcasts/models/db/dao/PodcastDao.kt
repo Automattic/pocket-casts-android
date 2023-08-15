@@ -332,7 +332,7 @@ abstract class PodcastDao {
     abstract fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
 
     @Query("UPDATE podcasts SET show_notifications = :showNotifications")
-    abstract fun updateAllShowNotifications(showNotifications: Boolean)
+    abstract suspend fun updateAllShowNotifications(showNotifications: Boolean)
 
     @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
