@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -38,7 +39,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -151,6 +151,7 @@ class NotificationsSettingsFragment :
 
             true
         }
+        changePodcastsSummary()
     }
 
     private fun updateNotificationsEnabled() {
@@ -176,7 +177,6 @@ class NotificationsSettingsFragment :
                     if (checked) {
                         settings.setNotificationLastSeenToNow()
                     }
-                    changePodcastsSummary()
                     enabledPreferences(checked)
 
                     true
@@ -187,7 +187,6 @@ class NotificationsSettingsFragment :
                     true
                 }
 
-                changePodcastsSummary()
                 changeVibrateSummary()
                 changeNotificationSoundSummary()
                 setupActions()
@@ -209,7 +208,6 @@ class NotificationsSettingsFragment :
             podcastManager.findSubscribed().forEach {
                 podcastManager.updateShowNotifications(it, newSelection.contains(it.uuid))
             }
-            launch(Dispatchers.Main) { changePodcastsSummary() }
         }
     }
 
@@ -377,7 +375,7 @@ class NotificationsSettingsFragment :
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun changePodcastsSummary() {
-        GlobalScope.launch(Dispatchers.Default) {
+        lifecycleScope.launch(Dispatchers.Default) {
             podcastManager.findSubscribedFlow().collect { podcasts ->
                 val podcastCount = podcasts.size
                 val notificationCount = podcasts.count { it.isShowNotifications }
@@ -402,7 +400,6 @@ class NotificationsSettingsFragment :
         super.onResume()
         setupNotificationVibrate()
         setupPlayOverNotifications()
-        changePodcastsSummary()
         preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
 
