@@ -132,18 +132,18 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 when {
                     adapter.isPlayerTab(position) -> {
                         if (previousPosition == INVALID_TAB_POSITION) return
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "now_playing"))
                         FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
                     adapter.isNotesTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "show_notes"))
                         FirebaseAnalyticsTracker.openedPlayerNotes()
                     }
                     adapter.isBookmarksTab(position) -> {
-                        // TODO: Bookmarks - Add analytics event
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "bookmarks"))
                     }
                     adapter.isChaptersTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "chapters"))
                         FirebaseAnalyticsTracker.openedPlayerChapters()
                     }
                     else -> {
@@ -265,9 +265,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         private const val INVALID_TAB_POSITION = -1
         private const val SOURCE_KEY = "source"
         private const val TAB_KEY = "tab"
-        private const val NOW_PLAYING = "now_playing"
-        private const val SHOW_NOTES = "show_notes"
-        private const val CHAPTERS = "chapters"
     }
 }
 
