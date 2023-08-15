@@ -170,6 +170,7 @@ project.ext {
             workManagerTest: "androidx.work:work-testing:$versionWork",
             navigationFragment: "androidx.navigation:navigation-fragment-ktx:$versionNavigation",
             navigationUi: "androidx.navigation:navigation-ui-ktx:$versionNavigation",
+            navigationTest: "androidx.navigation:navigation-testing:$versionNavigation",
             viewPager: "androidx.viewpager2:viewpager2:1.0.0",
             composeActivity: "androidx.activity:activity-compose:1.5.1",
             composeAnimation: "androidx.compose.animation:animation:$versionCompose",

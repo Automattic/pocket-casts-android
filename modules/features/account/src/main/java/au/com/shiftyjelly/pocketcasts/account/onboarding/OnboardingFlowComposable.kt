@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +26,8 @@ fun OnboardingFlowComposable(
     flow: OnboardingFlow,
     exitOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
-    signInState: SignInState
+    signInState: SignInState,
+    navController: NavHostController = rememberNavController(),
 ) {
     if (flow is OnboardingFlow.PlusAccountUpgrade) {
         Content(
@@ -32,7 +35,8 @@ fun OnboardingFlowComposable(
             flow = flow,
             exitOnboarding = exitOnboarding,
             completeOnboardingToDiscover = completeOnboardingToDiscover,
-            signInState = signInState
+            signInState = signInState,
+            navController = navController,
         )
     } else {
         AppThemeWithBackground(theme) {
@@ -41,7 +45,8 @@ fun OnboardingFlowComposable(
                 flow = flow,
                 exitOnboarding = exitOnboarding,
                 completeOnboardingToDiscover = completeOnboardingToDiscover,
-                signInState = signInState
+                signInState = signInState,
+                navController = navController,
             )
         }
     }
@@ -53,10 +58,9 @@ private fun Content(
     flow: OnboardingFlow,
     exitOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
-    signInState: SignInState
+    signInState: SignInState,
+    navController: NavHostController,
 ) {
-    val navController = rememberNavController()
-
     val startDestination = when (flow) {
         OnboardingFlow.LoggedOut,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
@@ -125,21 +129,7 @@ private fun Content(
                     if (state.isNewAccount) {
                         onAccountCreated()
                     } else {
-                        when (flow) {
-                            OnboardingFlow.InitialOnboarding,
-                            OnboardingFlow.LoggedOut,
-                            is OnboardingFlow.PlusAccountUpgrade,
-                            is OnboardingFlow.PlusUpsell -> exitOnboarding()
-
-                            is OnboardingFlow.PatronAccountUpgrade,
-                            OnboardingFlow.PlusAccountUpgradeNeedsLogin ->
-                                navController.navigate(
-                                    OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
-                                ) {
-                                    // clear backstack after successful login
-                                    popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
-                                }
-                        }
+                        onLoginToExistingAccount(flow, exitOnboarding, navController)
                     }
                 },
             )
@@ -158,20 +148,7 @@ private fun Content(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
                 onLoginComplete = {
-                    when (flow) {
-                        OnboardingFlow.InitialOnboarding,
-                        OnboardingFlow.LoggedOut -> exitOnboarding()
-
-                        is OnboardingFlow.PlusAccountUpgrade,
-                        is OnboardingFlow.PatronAccountUpgrade,
-                        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                        is OnboardingFlow.PlusUpsell -> navController.navigate(
-                            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
-                        ) {
-                            // clear backstack after successful login
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
-                        }
-                    }
+                    onLoginToExistingAccount(flow, exitOnboarding, navController)
                 },
                 onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
             )
@@ -268,7 +245,29 @@ private fun Content(
     }
 }
 
-private object OnboardingNavRoute {
+private fun onLoginToExistingAccount(
+    flow: OnboardingFlow,
+    exitOnboarding: () -> Unit,
+    navController: NavHostController
+) {
+    when (flow) {
+        OnboardingFlow.InitialOnboarding,
+        OnboardingFlow.LoggedOut -> exitOnboarding()
+
+        is OnboardingFlow.PlusAccountUpgrade,
+        is OnboardingFlow.PatronAccountUpgrade,
+        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+        is OnboardingFlow.PlusUpsell -> navController.navigate(
+            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
+        ) {
+            // clear backstack after successful login
+            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+        }
+    }
+}
+
+@VisibleForTesting
+object OnboardingNavRoute {
 
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"

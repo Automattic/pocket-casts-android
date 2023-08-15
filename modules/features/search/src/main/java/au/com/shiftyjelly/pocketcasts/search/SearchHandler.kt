@@ -47,7 +47,7 @@ class SearchHandler @Inject constructor(
     private val onlySearchRemoteObservable = BehaviorRelay.create<Boolean>().apply {
         accept(false)
     }
-    private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut()).toObservable()
+    private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut).toObservable()
 
     private val localPodcastsResults = Observable
         .combineLatest(searchQuery, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->

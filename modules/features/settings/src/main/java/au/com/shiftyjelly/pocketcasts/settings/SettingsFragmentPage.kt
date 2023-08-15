@@ -288,7 +288,7 @@ private fun rowModifier(onClick: () -> Unit) =
 private fun SettingsPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         SettingsFragmentPage(
-            signInState = SignInState.SignedOut(),
+            signInState = SignInState.SignedOut,
             isDebug = true,
             isUnrestrictedBattery = false,
             onBackPressed = {},
