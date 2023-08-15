@@ -187,6 +187,7 @@ class PodcastViewModel
     }
 
     fun onTabClicked(tab: PodcastTab) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_SCREEN_TAB_TAPPED, mapOf("value" to tab.analyticsValue))
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }
 
@@ -520,9 +521,9 @@ class PodcastViewModel
     private fun getCurrentTab() =
         (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
-    enum class PodcastTab(@StringRes val labelResId: Int) {
-        EPISODES(LR.string.episodes),
-        BOOKMARKS(LR.string.bookmarks),
+    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
+        EPISODES(LR.string.episodes, "episodes"),
+        BOOKMARKS(LR.string.bookmarks, "bookmarks"),
     }
 
     sealed class UiState {
