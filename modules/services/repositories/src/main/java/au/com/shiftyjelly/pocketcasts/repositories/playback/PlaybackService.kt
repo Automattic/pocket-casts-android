@@ -521,7 +521,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
 
-                val showPlayed = settings.getAutoShowPlayed()
+                val showPlayed = settings.autoShowPlayed.value
                 val episodes = episodeManager
                     .findEpisodesByPodcastOrdered(podcast)
                     .filterNot { !showPlayed && (it.isFinished || it.isArchived) }

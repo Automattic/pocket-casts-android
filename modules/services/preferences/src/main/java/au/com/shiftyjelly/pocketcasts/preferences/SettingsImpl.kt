@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehavi
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -72,7 +73,6 @@ class SettingsImpl @Inject constructor(
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
-        private const val LAST_SELECTED_PODCAST_OR_FILTER_UUID = "LastSelectedPodcastOrFilterUuid"
     }
 
     private var languageCode: String? = null
@@ -337,13 +337,17 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
-    }
+    override val autoSubscribeToPlayed = UserSetting.BoolPref(
+        sharedPrefKey = "autoSubscribeToPlayed",
+        defaultValue = Util.isAutomotive(context),
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getAutoShowPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)
-    }
+    override val autoShowPlayed = UserSetting.BoolPref(
+        sharedPrefKey = "autoShowPlayed",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val playOverNotification = UserSetting.PrefFromString<PlayOverNotificationSetting>(
         sharedPrefKey = "overrideNotificationAudio",
@@ -1212,12 +1216,24 @@ class SettingsImpl @Inject constructor(
     override fun getFullySignedOut(): Boolean =
         getBoolean(PROCESSED_SIGNOUT_KEY, true)
 
-    override fun setlastLoadedFromPodcastOrFilterUuid(uuid: String?) {
-        setString(LAST_SELECTED_PODCAST_OR_FILTER_UUID, uuid)
-    }
-
-    override fun getlastLoadedFromPodcastOrFilterUuid(): String? =
-        getString(LAST_SELECTED_PODCAST_OR_FILTER_UUID)
+    override val lastLoadedFromPodcastOrFilterUuid = UserSetting.PrefFromString(
+        sharedPrefKey = "LastSelectedPodcastOrFilterUuid",
+        defaultValue = LastPlayedList.default,
+        sharedPrefs = sharedPreferences,
+        fromString = {
+            if (it.isEmpty()) {
+                LastPlayedList.default
+            } else {
+                LastPlayedList.Uuid(it)
+            }
+        },
+        toString = {
+            when (it) {
+                LastPlayedList.None -> ""
+                is LastPlayedList.Uuid -> it.uuid
+            }
+        }
+    )
 
     override val theme = ThemeSetting.UserSettingPref(
         sharedPrefKey = "pocketCastsTheme",
