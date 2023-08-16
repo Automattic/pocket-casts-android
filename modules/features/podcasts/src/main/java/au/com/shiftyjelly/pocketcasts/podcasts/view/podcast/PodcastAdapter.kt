@@ -180,7 +180,7 @@ class PodcastAdapter(
 
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
-    private var signInState: SignInState = SignInState.SignedOut()
+    private var signInState: SignInState = SignInState.SignedOut
     var castConnected: Boolean = false
         set(value) {
             field = value
