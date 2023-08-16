@@ -52,7 +52,7 @@ fun UpsellView(
 
 @Preview
 @Composable
-private fun PlusUpsellPreview(
+private fun UpsellPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
