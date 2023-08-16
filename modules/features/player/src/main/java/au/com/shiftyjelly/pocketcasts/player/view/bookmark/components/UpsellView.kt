@@ -12,6 +12,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -25,8 +27,10 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 fun UpsellView(
     style: MessageViewColors,
     onClick: () -> Unit,
+    sourceView: SourceView,
     modifier: Modifier = Modifier,
 ) {
+    val viewModel = hiltViewModel<PlusUpsellViewModel>()
     MessageView(
         titleView = {
             Row(
@@ -44,7 +48,10 @@ fun UpsellView(
             }
         },
         buttonTitleRes = LR.string.subscribe, // TODO: Bookmarks update upsell button title based on subscription status
-        buttonAction = onClick,
+        buttonAction = {
+            viewModel.onClick(sourceView)
+            onClick()
+        },
         style = style,
         modifier = modifier,
     )
@@ -56,6 +63,10 @@ private fun UpsellPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        UpsellView(MessageViewColors.Default, {})
+        UpsellView(
+            style = MessageViewColors.Default,
+            onClick = {},
+            sourceView = SourceView.PLAYER,
+        )
     }
 }

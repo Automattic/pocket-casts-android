@@ -11,6 +11,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Bookmarks */
     BOOKMARK_CREATED("bookmark_created"),
     BOOKMARK_UPDATE_TITLE("bookmark_update_title"),
+    BOOKMARKS_UPGRADE_BUTTON_TAPPED("bookmarks_upgrade_button_tapped"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
