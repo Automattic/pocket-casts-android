@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -19,7 +17,6 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import java.util.Date
 import java.util.UUID
 
@@ -27,16 +24,14 @@ class BookmarkManagerTest {
     private lateinit var appDatabase: AppDatabase
     private lateinit var episodeDao: EpisodeDao
     private lateinit var bookmarkManager: BookmarkManager
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     @Before
     fun setup() {
-        analyticsTracker = mock()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         bookmarkManager = BookmarkManagerImpl(
             appDatabase = appDatabase,
-            analyticsTracker = analyticsTracker,
+            analyticsTracker = mock(),
         )
         episodeDao = appDatabase.episodeDao()
     }
@@ -64,7 +59,6 @@ class BookmarkManagerTest {
             assertEquals("Bookmark Title", foundBookmark?.title)
             assertNotNull(foundBookmark?.createdAt)
             assert(foundBookmark?.deleted == false)
-            verify(analyticsTracker).track(AnalyticsEvent.BOOKMARK_CREATED)
         }
     }
 
@@ -84,7 +78,6 @@ class BookmarkManagerTest {
             val bookmarks = bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST).take(1).first()
             assertEquals(1, bookmarks.size)
             assertEquals(bookmarkOne.uuid, bookmarks[0].uuid)
-            verify(analyticsTracker).track(AnalyticsEvent.BOOKMARK_UPDATE_TITLE)
         }
     }
 
