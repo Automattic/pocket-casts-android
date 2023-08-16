@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
@@ -60,6 +61,11 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                 val confirmationSound = settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value
 
                 val viewModel = hiltViewModel<HeadphoneControlsSettingsPageViewModel>()
+
+                CallOnce {
+                    viewModel.onShown()
+                }
+
                 HeadphoneControlsSettingsPage(
                     previousAction = previousAction,
                     nextAction = nextAction,

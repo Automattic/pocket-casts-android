@@ -491,6 +491,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
 
     /* Settings - Headphone controls */
+    SETTINGS_HEADPHONE_CONTROLS_SHOWN("settings_headphone_controls_shown"),
     SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED("settings_headphone_controls_next_changed"),
     SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED("settings_headphone_controls_previous_changed"),
 

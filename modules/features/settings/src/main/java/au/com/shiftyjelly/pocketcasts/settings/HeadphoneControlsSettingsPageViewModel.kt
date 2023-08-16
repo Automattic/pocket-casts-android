@@ -12,6 +12,10 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_SHOWN)
+    }
+
     fun onNextActionChanged(action: Settings.HeadphoneAction) {
         trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED)
     }
