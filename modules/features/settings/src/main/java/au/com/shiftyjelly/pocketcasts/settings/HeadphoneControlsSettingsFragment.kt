@@ -83,6 +83,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                         if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
                             playbackManager.playTone()
                         }
+                        viewModel.onConfirmationSoundChanged(it)
                     },
                     onBackPressed = {
                         @Suppress("DEPRECATION")

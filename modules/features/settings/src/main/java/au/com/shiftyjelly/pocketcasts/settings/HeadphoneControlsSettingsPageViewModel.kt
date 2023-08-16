@@ -16,6 +16,13 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_SHOWN)
     }
 
+    fun onConfirmationSoundChanged(playConfirmationSound: Boolean) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_CONFIRMATION_SOUND,
+            mapOf("value" to playConfirmationSound)
+        )
+    }
+
     fun onNextActionChanged(action: Settings.HeadphoneAction) {
         trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED)
     }
