@@ -73,7 +73,7 @@ class BookmarkHelper @Inject constructor(
 
     private fun shouldAllowAddBookmark(): Boolean {
         return settings.getCachedSubscription()?.let { subscriptionStatus ->
-            subscriptionStatus is SubscriptionStatus.Paid && subscriptionStatus.tier == SubscriptionTier.PATRON
+            (subscriptionStatus as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
         } ?: false
     }
 }
