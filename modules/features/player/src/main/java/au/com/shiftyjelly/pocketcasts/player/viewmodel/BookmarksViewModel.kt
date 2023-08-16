@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
@@ -43,6 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarksViewModel
 @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
@@ -202,6 +205,13 @@ class BookmarksViewModel
                 }
             }
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
+            analyticsTracker.track(
+                AnalyticsEvent.BOOKMARK_PLAY_TAPPED,
+                mapOf(
+                    "source" to sourceView.analyticsValue,
+                    "episode_uuid" to bookmark.episodeUuid,
+                ),
+            )
         }
     }
 

@@ -13,6 +13,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_UPDATE_TITLE("bookmark_update_title"),
     BOOKMARKS_UPGRADE_BUTTON_TAPPED("bookmarks_upgrade_button_tapped"),
     BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS("bookmarks_empty_go_to_headphone_settings"),
+    BOOKMARK_PLAY_TAPPED("bookmark_play_tapped"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
