@@ -58,7 +58,8 @@ class BookmarkHelper @Inject constructor(
                     bookmarkManager.add(
                         episode = episode,
                         timeSecs = timeInSecs,
-                        title = context.getString(LR.string.bookmark)
+                        title = context.getString(LR.string.bookmark),
+                        source = BookmarkManager.Source.HEADPHONES,
                     )
                 }
 

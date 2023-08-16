@@ -31,7 +31,12 @@ class BookmarkManagerImpl @Inject constructor(
     /**
      * Add a bookmark for the given episode.
      */
-    override suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String): Bookmark {
+    override suspend fun add(
+        episode: BaseEpisode,
+        timeSecs: Int,
+        title: String,
+        source: BookmarkManager.Source
+    ): Bookmark {
         // Prevent adding more than one bookmark at the same place
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
@@ -51,7 +56,10 @@ class BookmarkManagerImpl @Inject constructor(
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_CREATED)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARK_CREATED,
+            mapOf("source" to source.analyticsValue)
+        )
         return bookmark
     }
 
