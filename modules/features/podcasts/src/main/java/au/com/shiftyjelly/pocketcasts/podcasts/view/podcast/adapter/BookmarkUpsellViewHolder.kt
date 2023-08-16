@@ -5,7 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.PlusUpsellView
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -20,7 +20,7 @@ class BookmarkUpsellViewHolder(
         composeView.setContent {
             AppTheme(theme.activeTheme) {
                 val context = LocalContext.current
-                PlusUpsellView(
+                UpsellView(
                     style = MessageViewColors.Default,
                     onClick = {
                         val source = OnboardingUpgradeSource.BOOKMARKS

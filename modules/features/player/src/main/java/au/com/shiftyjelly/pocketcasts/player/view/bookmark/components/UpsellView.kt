@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
-fun PlusUpsellView(
+fun UpsellView(
     style: MessageViewColors,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -56,6 +56,6 @@ private fun PlusUpsellPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        PlusUpsellView(MessageViewColors.Default, {})
+        UpsellView(MessageViewColors.Default, {})
     }
 }

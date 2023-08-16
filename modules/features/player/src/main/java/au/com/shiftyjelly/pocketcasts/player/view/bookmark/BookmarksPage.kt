@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.PlusUpsellView
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -124,7 +124,7 @@ private fun Content(
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
             )
-            is UiState.Upsell -> PlusUpsellView(
+            is UiState.Upsell -> UpsellView(
                 style = state.colors,
                 onClick = onUpgradeClicked,
                 modifier = Modifier
