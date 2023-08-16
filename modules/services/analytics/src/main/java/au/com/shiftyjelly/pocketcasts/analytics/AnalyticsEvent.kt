@@ -490,6 +490,10 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
     SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
 
+    /* Settings - Headphone controls */
+    SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED("settings_headphone_controls_next_changed"),
+    SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED("settings_headphone_controls_previous_changed"),
+
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),
     SETTINGS_LEAVE_FEEDBACK("settings_leave_feedback"),

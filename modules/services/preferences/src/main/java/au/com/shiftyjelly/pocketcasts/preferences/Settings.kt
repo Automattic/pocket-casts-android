@@ -198,12 +198,12 @@ interface Settings {
         ONLY_ADD_TO_TOP
     }
 
-    enum class HeadphoneAction {
-        ADD_BOOKMARK,
-        SKIP_BACK,
-        SKIP_FORWARD,
-        NEXT_CHAPTER,
-        PREVIOUS_CHAPTER,
+    enum class HeadphoneAction(val analyticsValue: String) {
+        ADD_BOOKMARK("add_bookmark"),
+        SKIP_BACK("skip_back"),
+        SKIP_FORWARD("skip_forward"),
+        NEXT_CHAPTER("next_chapter"),
+        PREVIOUS_CHAPTER("previous_chapter"),
     }
 
     sealed class AutoArchiveAfterPlaying(val timeSeconds: Int) {
