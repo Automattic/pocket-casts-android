@@ -12,7 +12,7 @@ private val paidSubscriptionPlatforms = listOf(SubscriptionPlatform.ANDROID, Sub
 
 sealed class SignInState {
     data class SignedIn(val email: String, val subscriptionStatus: SubscriptionStatus) : SignInState()
-    class SignedOut : SignInState()
+    object SignedOut : SignInState()
 
     val isSignedIn: Boolean
         get() = this is SignedIn

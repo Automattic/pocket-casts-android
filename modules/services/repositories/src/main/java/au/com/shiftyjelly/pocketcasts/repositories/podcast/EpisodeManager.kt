@@ -139,7 +139,7 @@ interface EpisodeManager {
     fun setDownloadFailed(episode: BaseEpisode, errorMessage: String)
     fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
-    suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
+    suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, removeFromUpNext: Boolean = true)
     suspend fun findStaleDownloads(): List<PodcastEpisode>
     suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
     suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
