@@ -76,7 +76,7 @@ fun SettingsFragmentPage(
                     if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
                         OnboardingLauncher.openOnboardingFlow(
                             context.getActivity(),
-                            OnboardingFlow.PlusUpsell(
+                            OnboardingFlow.Upsell(
                                 OnboardingUpgradeSource.SETTINGS
                             )
                         )

@@ -192,7 +192,7 @@ class BookmarksFragment : BaseFragment() {
 
     private fun onUpgradeClicked() {
         val source = OnboardingUpgradeSource.BOOKMARKS
-        val onboardingFlow = OnboardingFlow.PlusUpsell(source, true)
+        val onboardingFlow = OnboardingFlow.Upsell(source, true)
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }

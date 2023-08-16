@@ -204,7 +204,7 @@ class ProfileFragment : BaseFragment() {
         upgradeLayout.root.setOnClickListener {
             OnboardingLauncher.openOnboardingFlow(
                 activity = activity,
-                onboardingFlow = OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.PROFILE)
+                onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE)
             )
         }
 

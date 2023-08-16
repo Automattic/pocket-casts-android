@@ -112,7 +112,7 @@ private fun Content(
                         is OnboardingFlow.PatronAccountUpgrade -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
 
                         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                        is OnboardingFlow.PlusUpsell -> {
+                        is OnboardingFlow.Upsell -> {
                             val popped = navController.popBackStack()
                             if (!popped) {
                                 exitOnboarding()
@@ -177,7 +177,7 @@ private fun Content(
                 navArgument(OnboardingNavRoute.PlusUpgrade.showPatronOnlyArgumentKey) {
                     type = NavType.BoolType
                     defaultValue = when (flow) {
-                        is OnboardingFlow.PlusUpsell -> flow.showPatronOnly
+                        is OnboardingFlow.Upsell -> flow.showPatronOnly
                         else -> false
                     }
                 }
@@ -258,7 +258,7 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-        is OnboardingFlow.PlusUpsell -> navController.navigate(
+        is OnboardingFlow.Upsell -> navController.navigate(
             OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
         ) {
             // clear backstack after successful login

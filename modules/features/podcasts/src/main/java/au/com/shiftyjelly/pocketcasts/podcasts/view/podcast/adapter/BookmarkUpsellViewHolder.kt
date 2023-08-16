@@ -24,7 +24,7 @@ class BookmarkUpsellViewHolder(
                     style = MessageViewColors.Default,
                     onClick = {
                         val source = OnboardingUpgradeSource.BOOKMARKS
-                        val onboardingFlow = OnboardingFlow.PlusUpsell(source, true)
+                        val onboardingFlow = OnboardingFlow.Upsell(source, true)
                         OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
                     }
                 )

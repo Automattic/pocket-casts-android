@@ -51,7 +51,7 @@ fun OnboardingUpgradeFlow(
     val coroutineScope = rememberCoroutineScope()
     val activity = LocalContext.current.getActivity()
 
-    val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.PlusUpsell &&
+    val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.Upsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
 
     if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) {
