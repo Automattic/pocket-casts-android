@@ -37,7 +37,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -373,7 +372,6 @@ class NotificationsSettingsFragment :
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun changePodcastsSummary() {
         lifecycleScope.launch(Dispatchers.Default) {
             podcastManager.findSubscribedFlow().collect { podcasts ->
