@@ -98,7 +98,7 @@ private fun Content(
     Box(
         modifier = Modifier
             .background(color = backgroundColor)
-            .padding(bottom = 20.dp)
+            .padding(bottom = 28.dp)
     ) {
         when (state) {
             is UiState.Loading -> LoadingView()
