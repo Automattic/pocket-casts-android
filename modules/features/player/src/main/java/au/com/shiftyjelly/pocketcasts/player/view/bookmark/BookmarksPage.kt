@@ -125,6 +125,7 @@ private fun Content(
             is UiState.Empty -> NoBookmarksView(
                 style = state.colors,
                 openFragment = openFragment,
+                sourceView = sourceView,
                 modifier = Modifier
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
