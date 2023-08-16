@@ -124,7 +124,7 @@ private fun Content(
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
             )
-            is UiState.PlusUpsell -> PlusUpsellView(
+            is UiState.Upsell -> PlusUpsellView(
                 style = state.colors,
                 onClick = onUpgradeClicked,
                 modifier = Modifier

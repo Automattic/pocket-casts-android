@@ -111,7 +111,7 @@ class BookmarksViewModelTest {
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
-        assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
+        assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Upsell)
     }
 
     @Test
@@ -120,6 +120,6 @@ class BookmarksViewModelTest {
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
-        assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
+        assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Upsell)
     }
 }
