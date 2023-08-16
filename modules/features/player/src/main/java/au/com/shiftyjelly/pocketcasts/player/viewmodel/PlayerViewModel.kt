@@ -210,9 +210,11 @@ class PlayerViewModel @Inject constructor(
         .toFlowable(BackpressureStrategy.LATEST)
         .combineLatest(userManager.getSignInState()).map { (shelfItems, signInState) ->
             shelfItems.filter { item ->
-                (item.tier == SubscriptionTier.NONE) ||
-                    (item.tier == SubscriptionTier.PLUS && signInState.isSignedInAsPlusOrPatron) ||
-                    (item.tier == SubscriptionTier.PATRON && signInState.isSignedInAsPatron)
+                when (item.tier) {
+                    SubscriptionTier.NONE -> true
+                    SubscriptionTier.PLUS -> signInState.isSignedInAsPlusOrPatron
+                    SubscriptionTier.PATRON -> signInState.isSignedInAsPatron
+                }
             }
         }
 
