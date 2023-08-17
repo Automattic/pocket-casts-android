@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
@@ -25,6 +26,8 @@ interface BookmarkManager {
     fun findBookmarksToSync(): List<Bookmark>
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     suspend fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
+
+    var sourceView: SourceView
 
     enum class CreationSource(val analyticsValue: String) {
         HEADPHONES("headphones"),

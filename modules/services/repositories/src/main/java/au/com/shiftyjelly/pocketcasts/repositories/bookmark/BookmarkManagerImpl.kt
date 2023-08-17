@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -25,6 +26,8 @@ class BookmarkManagerImpl @Inject constructor(
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    override var sourceView = SourceView.UNKNOWN
 
     private val bookmarkDao = appDatabase.bookmarkDao()
 
@@ -70,7 +73,10 @@ class BookmarkManagerImpl @Inject constructor(
             titleModified = System.currentTimeMillis(),
             syncStatus = SyncStatus.NOT_SYNCED
         )
-        analyticsTracker.track(AnalyticsEvent.BOOKMARK_UPDATE_TITLE)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARK_UPDATE_TITLE,
+            mapOf("source" to sourceView.analyticsValue)
+        )
     }
 
     /**

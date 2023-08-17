@@ -31,6 +31,8 @@ class MultiSelectBookmarksHelper @Inject constructor(
     private val _showEditBookmarkPage = MutableSharedFlow<Boolean>()
     val showEditBookmarkPage = _showEditBookmarkPage.asSharedFlow()
 
+    override var source by bookmarkManager::sourceView
+
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
             listOf(
