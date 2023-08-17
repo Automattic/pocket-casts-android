@@ -14,10 +14,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.VerticalAlignBottom
+import androidx.compose.material.icons.filled.VerticalAlignTop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -39,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -90,11 +94,22 @@ private fun LogsContent(
     val logScrollState = rememberScrollState(0)
     Column {
         if (includeAppBar) {
+            val coroutineScope = rememberCoroutineScope()
             AppBarWithShare(
                 onBackPressed = onBackPressed,
                 onCopyToClipboard = onCopyToClipboard,
                 onShareLogs = onShareLogs,
-                logsAvailable = logs != null
+                onScrollToTop = {
+                    coroutineScope.launch {
+                        logScrollState.animateScrollTo(0)
+                    }
+                },
+                onScrollToBottom = {
+                    coroutineScope.launch {
+                        logScrollState.animateScrollTo(Int.MAX_VALUE)
+                    }
+                },
+                logsAvailable = logs != null,
             )
         }
         Column(
@@ -121,6 +136,8 @@ private fun AppBarWithShare(
     onBackPressed: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onShareLogs: () -> Unit,
+    onScrollToTop: () -> Unit,
+    onScrollToBottom: () -> Unit,
     logsAvailable: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -128,6 +145,24 @@ private fun AppBarWithShare(
         title = stringResource(LR.string.settings_logs),
         onNavigationClick = onBackPressed,
         actions = {
+            IconButton(
+                onClick = onScrollToTop,
+                enabled = logsAvailable,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VerticalAlignTop,
+                    contentDescription = stringResource(LR.string.go_to_top)
+                )
+            }
+            IconButton(
+                onClick = onScrollToBottom,
+                enabled = logsAvailable,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VerticalAlignBottom,
+                    contentDescription = stringResource(LR.string.go_to_bottom)
+                )
+            }
             IconButton(
                 onClick = onCopyToClipboard,
                 enabled = logsAvailable

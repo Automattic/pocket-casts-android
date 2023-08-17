@@ -4,10 +4,13 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -28,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.PlusUpsellView
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -47,7 +51,9 @@ fun BookmarksPage(
     multiSelectHelper: MultiSelectBookmarksHelper,
     onRowLongPressed: (Bookmark) -> Unit,
     onEditBookmarkClick: () -> Unit,
+    onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
+    openFragment: (Fragment) -> Unit,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
@@ -66,6 +72,8 @@ fun BookmarksPage(
             ).show()
             bookmarksViewModel.play(bookmark)
         },
+        onUpgradeClicked = onUpgradeClicked,
+        openFragment = openFragment,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -94,6 +102,8 @@ private fun Content(
     onRowLongPressed: (Bookmark) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClicked: () -> Unit,
+    onUpgradeClicked: () -> Unit,
+    openFragment: (Fragment) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -110,8 +120,20 @@ private fun Content(
                 onPlayClick = onPlayClick,
             )
 
-            is UiState.Empty -> NoBookmarksView(state.colors)
-            is UiState.PlusUpsell -> PlusUpsellView(state.colors)
+            is UiState.Empty -> NoBookmarksView(
+                style = state.colors,
+                openFragment = openFragment,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+            )
+            is UiState.Upsell -> UpsellView(
+                style = state.colors,
+                onClick = onUpgradeClicked,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+            )
         }
     }
 }
@@ -198,6 +220,8 @@ private fun BookmarksPreview(
             onPlayClick = {},
             onRowLongPressed = {},
             onBookmarksOptionsMenuClicked = {},
+            onUpgradeClicked = {},
+            openFragment = {},
         )
     }
 }

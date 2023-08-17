@@ -51,7 +51,7 @@ fun OnboardingUpgradeFlow(
     val coroutineScope = rememberCoroutineScope()
     val activity = LocalContext.current.getActivity()
 
-    val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.PlusUpsell &&
+    val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.Upsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
 
     if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) {
@@ -69,7 +69,7 @@ fun OnboardingUpgradeFlow(
     val startInExpandedState =
         // Only start with expanded state if there are any subscriptions
         hasSubscriptions && (
-            // The hidden state is shown as the first screen in the PlusUpsell flow, so when we return
+            // The hidden state is shown as the first screen in the Upsell flow, so when we return
             // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
             (!FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) ||
                 // User already indicated they want to upgrade, so go straight to purchase modal
