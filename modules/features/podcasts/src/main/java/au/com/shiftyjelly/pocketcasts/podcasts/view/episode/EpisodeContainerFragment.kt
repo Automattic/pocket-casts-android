@@ -23,9 +23,12 @@ import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -120,6 +123,8 @@ class EpisodeContainerFragment :
     private lateinit var adapter: ViewPagerAdapter
     @Inject
     lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    @Inject
+    lateinit var settings: Settings
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (!forceDarkTheme || theme.isDarkTheme) {
@@ -177,12 +182,15 @@ class EpisodeContainerFragment :
             overridePodcastLink = overridePodcastLink,
             podcastUuid = podcastUuid,
             fromListUuid = fromListUuid,
-            forceDarkTheme = forceDarkTheme
+            forceDarkTheme = forceDarkTheme,
+            settings = settings,
         )
 
         viewPager.adapter = adapter
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+            (settings.getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+        ) {
             TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
                 tab.setText(adapter.pageTitle(position))
             }.attach()
@@ -232,6 +240,7 @@ class EpisodeContainerFragment :
         private val podcastUuid: String?,
         private val fromListUuid: String?,
         private val forceDarkTheme: Boolean,
+        private val settings: Settings,
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
         private sealed class Section(@StringRes val titleRes: Int) {
@@ -240,7 +249,9 @@ class EpisodeContainerFragment :
         }
 
         private var sections = mutableListOf<Section>(Section.Details).apply {
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+                (settings.getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+            ) {
                 add(Section.Bookmarks)
             }
         }.toList()

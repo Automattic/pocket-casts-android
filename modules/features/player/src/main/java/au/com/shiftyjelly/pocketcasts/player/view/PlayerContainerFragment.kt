@@ -24,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
@@ -74,7 +76,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+        adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle, settings)
 
         val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
@@ -271,7 +273,11 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 }
 
-private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
+private class ViewPagerAdapter(
+    fragmentManager: FragmentManager,
+    lifecycle: Lifecycle,
+    private val settings: Settings,
+) : FragmentStateAdapter(fragmentManager, lifecycle) {
     private sealed class Section(@StringRes val titleRes: Int) {
         object Player : Section(VR.string.player_tab_playing)
         object Notes : Section(LR.string.player_tab_notes)
@@ -301,7 +307,9 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             newSections.add(Section.Notes)
         }
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+            (settings.getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+        ) {
             newSections.add(Section.Bookmarks)
         }
 

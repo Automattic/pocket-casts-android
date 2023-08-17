@@ -394,7 +394,7 @@ class PodcastAdapter(
         }
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && signInState.isSignedInAsPatron) {
                 add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
             }
             add(
@@ -429,7 +429,7 @@ class PodcastAdapter(
         searchTerm: String,
     ) {
         val content = mutableListOf<Any>().apply {
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && signInState.isSignedInAsPatron) {
                 add(Podcast())
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
 
