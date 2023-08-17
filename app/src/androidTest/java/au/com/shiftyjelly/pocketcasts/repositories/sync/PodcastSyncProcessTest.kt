@@ -91,7 +91,7 @@ class PodcastSyncProcessTest {
                 ),
                 timeSecs = 23,
                 title = "Bookmark",
-                source = BookmarkManager.Source.PLAYER,
+                creationSource = BookmarkManager.CreationSource.PLAYER,
             )
             val bookmarkToDelete = bookmarkManager.add(
                 episode = PodcastEpisode(
@@ -101,7 +101,7 @@ class PodcastSyncProcessTest {
                 ),
                 timeSecs = 875,
                 title = "Bookmark Deleted",
-                source = BookmarkManager.Source.PLAYER,
+                creationSource = BookmarkManager.CreationSource.PLAYER,
             )
             val bookmarkUuidToAdd = "d0f337c2-4d85-40b7-ae59-893a75fe42bc"
 

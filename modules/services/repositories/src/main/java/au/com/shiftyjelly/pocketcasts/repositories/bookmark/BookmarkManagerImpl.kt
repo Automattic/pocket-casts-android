@@ -35,7 +35,7 @@ class BookmarkManagerImpl @Inject constructor(
         episode: BaseEpisode,
         timeSecs: Int,
         title: String,
-        source: BookmarkManager.Source
+        creationSource: BookmarkManager.CreationSource
     ): Bookmark {
         // Prevent adding more than one bookmark at the same place
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
@@ -58,7 +58,7 @@ class BookmarkManagerImpl @Inject constructor(
         bookmarkDao.insert(bookmark)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARK_CREATED,
-            mapOf("source" to source.analyticsValue)
+            mapOf("source" to creationSource.analyticsValue)
         )
         return bookmark
     }

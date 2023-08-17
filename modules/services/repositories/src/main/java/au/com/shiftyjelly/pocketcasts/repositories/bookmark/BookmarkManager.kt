@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import kotlinx.coroutines.flow.Flow
 
 interface BookmarkManager {
-    suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String, source: Source): Bookmark
+    suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String, creationSource: CreationSource): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)
     suspend fun findBookmark(bookmarkUuid: String): Bookmark?
     suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark?
@@ -26,7 +26,7 @@ interface BookmarkManager {
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     suspend fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
 
-    enum class Source(val analyticsValue: String) {
+    enum class CreationSource(val analyticsValue: String) {
         HEADPHONES("headphones"),
         PLAYER("player"),
     }

@@ -59,7 +59,7 @@ class BookmarkHelper @Inject constructor(
                         episode = episode,
                         timeSecs = timeInSecs,
                         title = context.getString(LR.string.bookmark),
-                        source = BookmarkManager.Source.HEADPHONES,
+                        creationSource = BookmarkManager.CreationSource.HEADPHONES,
                     )
                 }
 

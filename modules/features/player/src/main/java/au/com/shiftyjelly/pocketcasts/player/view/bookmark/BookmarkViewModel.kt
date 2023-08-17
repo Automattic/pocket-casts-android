@@ -99,7 +99,7 @@ class BookmarkViewModel
                         episode = episode,
                         timeSecs = arguments.timeSecs,
                         title = state.title.text,
-                        source = BookmarkManager.Source.PLAYER,
+                        creationSource = BookmarkManager.CreationSource.PLAYER,
                     )
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, state.title.text)
