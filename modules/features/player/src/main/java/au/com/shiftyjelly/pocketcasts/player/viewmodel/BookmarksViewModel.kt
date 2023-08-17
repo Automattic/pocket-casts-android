@@ -64,6 +64,10 @@ class BookmarksViewModel
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
     private var sourceView: SourceView = SourceView.UNKNOWN
+        set(value) {
+            field = value
+            multiSelectHelper.source = value
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
@@ -189,7 +193,7 @@ class BookmarksViewModel
         }
     }
 
-    fun changeSortOrder(order: BookmarksSortType, sourceView: SourceView) {
+    fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPlayer) return
         settings.setBookmarksSortType(order)
         analyticsTracker.track(
@@ -208,7 +212,7 @@ class BookmarksViewModel
                 val shouldPlayEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
                 if (shouldPlayEpisode) {
-                    playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+                    playbackManager.playNow(it, sourceView = sourceView)
                 }
             }
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)

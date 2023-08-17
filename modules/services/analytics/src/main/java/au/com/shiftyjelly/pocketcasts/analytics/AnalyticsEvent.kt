@@ -15,6 +15,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS("bookmarks_empty_go_to_headphone_settings"),
     BOOKMARK_PLAY_TAPPED("bookmark_play_tapped"),
     BOOKMARKS_SORT_BY_CHANGED("bookmarks_sort_by_changed"),
+    BOOKMARK_DELETED("bookmark_deleted"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),

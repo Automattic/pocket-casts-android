@@ -81,7 +81,8 @@ class PodcastViewModel
     private val bookmarkSearchHandler: BookmarkSearchHandler,
     private val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
-    private val settings: Settings
+    private val settings: Settings,
+    private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -105,9 +106,14 @@ class PodcastViewModel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    init {
+        podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = {
+            multiSelectBookmarksHelper.source = SourceView.PODCAST_SCREEN
+        }
+    }
+
     fun loadPodcast(uuid: String, resources: Resources) {
         viewModelScope.launch {
-
             this@PodcastViewModel.podcastUuid = uuid
             val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
             val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
@@ -397,7 +403,7 @@ class PodcastViewModel
             val shouldPlayEpisode = !playbackManager.isPlaying() ||
                 playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
             if (shouldPlayEpisode) {
-                playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+                playbackManager.playNow(it, sourceView = SourceView.PODCAST_SCREEN)
             }
         }
         playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
