@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,16 +24,20 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -43,8 +48,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class HeadphoneControlsSettingsFragment : BaseFragment() {
     @Inject
     lateinit var settings: Settings
+
     @Inject
     lateinit var playbackManager: PlaybackManager
+
+    private val isAddBookmarkEnabled: Boolean
+        get() = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+            (settings.getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +66,8 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 val previousAction = settings.headphonePreviousActionFlow.collectAsState().value
                 val nextAction = settings.headphoneNextActionFlow.collectAsState().value
-                val confirmationSound = settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value
+                val confirmationSound =
+                    settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value
 
                 HeadphoneControlsSettingsPage(
                     previousAction = previousAction,
@@ -127,18 +138,38 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         saved: HeadphoneAction,
         onSave: (HeadphoneAction) -> Unit,
     ) {
-        SettingRadioDialogRow(
+        SettingRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_next),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
             icon = painterResource(IR.drawable.ic_skip_forward),
-            options = listOf(
-                HeadphoneAction.SKIP_FORWARD,
-                HeadphoneAction.SKIP_BACK,
-                HeadphoneAction.ADD_BOOKMARK,
-            ),
-            savedOption = saved,
-            onSave = onSave,
-            optionToLocalisedString = { getString(headphoneActionToStringRes(it)) },
+            modifier = Modifier
+                .clickable {
+                    var optionsDialog = OptionsDialog()
+                        .setTitle(getString(LR.string.settings_headphone_controls_action_next))
+                        .addCheckedOption(
+                            titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_FORWARD),
+                            checked = saved == HeadphoneAction.SKIP_FORWARD
+                        ) {
+                            onSave(HeadphoneAction.SKIP_FORWARD)
+                        }
+                        .addCheckedOption(
+                            titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_BACK),
+                            checked = saved == HeadphoneAction.SKIP_BACK
+                        ) {
+                            onSave(HeadphoneAction.SKIP_BACK)
+                        }
+
+                    if (isAddBookmarkEnabled) {
+                        optionsDialog = optionsDialog.addCheckedOption(
+                            titleId = headphoneActionToStringRes(HeadphoneAction.ADD_BOOKMARK),
+                            checked = saved == HeadphoneAction.ADD_BOOKMARK,
+                        ) {
+                            onSave(HeadphoneAction.ADD_BOOKMARK)
+                        }
+                    }
+
+                    optionsDialog.show(childFragmentManager, "action_next_options")
+                }
         )
     }
 
@@ -147,18 +178,38 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         saved: HeadphoneAction,
         onSave: (HeadphoneAction) -> Unit,
     ) {
-        SettingRadioDialogRow(
+        SettingRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_previous),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
             icon = painterResource(IR.drawable.ic_skip_back),
-            options = listOf(
-                HeadphoneAction.SKIP_BACK,
-                HeadphoneAction.SKIP_FORWARD,
-                HeadphoneAction.ADD_BOOKMARK,
-            ),
-            savedOption = saved,
-            onSave = onSave,
-            optionToLocalisedString = { getString(headphoneActionToStringRes(it)) },
+            modifier = Modifier
+                .clickable {
+                    var optionsDialog = OptionsDialog()
+                        .setTitle(getString(LR.string.settings_headphone_controls_action_previous))
+                        .addCheckedOption(
+                            titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_BACK),
+                            checked = saved == HeadphoneAction.SKIP_BACK
+                        ) {
+                            onSave(HeadphoneAction.SKIP_BACK)
+                        }
+                        .addCheckedOption(
+                            titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_FORWARD),
+                            checked = saved == HeadphoneAction.SKIP_FORWARD
+                        ) {
+                            onSave(HeadphoneAction.SKIP_FORWARD)
+                        }
+
+                    if (isAddBookmarkEnabled) {
+                        optionsDialog = optionsDialog.addCheckedOption(
+                            titleId = headphoneActionToStringRes(HeadphoneAction.ADD_BOOKMARK),
+                            checked = saved == HeadphoneAction.ADD_BOOKMARK,
+                        ) {
+                            onSave(HeadphoneAction.ADD_BOOKMARK)
+                        }
+                    }
+                    optionsDialog.show(childFragmentManager, "action_previous_options")
+                }
+                .padding(vertical = 6.dp)
         )
     }
 
