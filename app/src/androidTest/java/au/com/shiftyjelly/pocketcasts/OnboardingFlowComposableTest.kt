@@ -98,7 +98,7 @@ class OnboardingFlowComposableTest {
     fun startDestination_PlusFlow_PlusUpsell() {
         assertStartDestinationForFlow(
             startDestination = OnboardingNavRoute.PlusUpgrade.route,
-            flow = OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.ACCOUNT_DETAILS),
+            flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.ACCOUNT_DETAILS),
         )
     }
 

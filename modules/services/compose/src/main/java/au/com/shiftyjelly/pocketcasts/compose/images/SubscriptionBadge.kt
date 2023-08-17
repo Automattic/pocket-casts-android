@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding.components
+package au.com.shiftyjelly.pocketcasts.compose.images
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

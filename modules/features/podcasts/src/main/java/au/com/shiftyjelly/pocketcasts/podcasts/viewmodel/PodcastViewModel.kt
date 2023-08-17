@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -149,13 +150,15 @@ class PodcastViewModel
                     Observables.combineLatest(
                         Observable.just(it),
                         episodeSearchResults,
-                        bookmarkSearchResults
-                    ) { podcast, episodeSearchResults, bookmarkSearchResults ->
+                        bookmarkSearchResults,
+                        userManager.getSignInState().toObservable()
+                    ) { podcast, episodeSearchResults, bookmarkSearchResults, signInState ->
                         CombinedEpisodeAndBookmarkData(
                             podcast = podcast,
                             showingArchived = podcast.showArchived,
                             episodeSearchResult = episodeSearchResults,
                             bookmarkSearchResult = bookmarkSearchResults,
+                            signInState = signInState
                         )
                     }.toFlowable(BackpressureStrategy.LATEST)
                 }
@@ -567,6 +570,7 @@ private data class CombinedEpisodeAndBookmarkData(
     val showingArchived: Boolean,
     val episodeSearchResult: SearchHandler.SearchResult,
     val bookmarkSearchResult: SearchHandler.SearchResult,
+    val signInState: SignInState
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -575,7 +579,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
     bookmarkManager: BookmarkManager,
     settings: Settings,
 ): Flowable<PodcastViewModel.UiState> {
-    return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
+    return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults, signInState) ->
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
             "Observing podcast ${podcast.uuid} episode changes"
@@ -633,6 +637,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
 
             val episodesWithBookmarkInfo = filteredList.map { episode ->
                 episode.hasBookmark = bookmarks.map { it.episodeUuid }.contains(episode.uuid) &&
+                    signInState.isSignedInAsPatron &&
                     FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 episode
             }

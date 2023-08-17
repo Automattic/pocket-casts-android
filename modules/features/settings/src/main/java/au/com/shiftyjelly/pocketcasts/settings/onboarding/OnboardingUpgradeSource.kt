@@ -10,4 +10,5 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     ACCOUNT_DETAILS("account_details"),
     RECOMMENDATIONS("recommendations"),
     SETTINGS("settings"),
+    BOOKMARKS("bookmarks"),
 }

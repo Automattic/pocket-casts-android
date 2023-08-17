@@ -69,7 +69,7 @@ class BookmarksViewModelTest {
 
     @Before
     fun setUp() = runTest {
-        whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(true)
+        whenever(signInState.isSignedInAsPatron).thenReturn(true)
         whenever(userManager.getSignInState()).thenReturn(flowOf(signInState).asFlowable())
 
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
@@ -106,20 +106,20 @@ class BookmarksViewModelTest {
     }*/
 
     @Test
-    fun `given free account, when bookmarks loaded, then PlusUpsell state shown`() = runTest {
-        whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(false)
+    fun `given free account, when bookmarks loaded, then Upsell state shown`() = runTest {
+        whenever(signInState.isSignedInAsPatron).thenReturn(false)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
-        assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
+        assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Upsell)
     }
 
     @Test
-    fun `given plus or patron account, when bookmarks loaded, then PlusUpsell state not shown`() = runTest {
-        whenever(signInState.isSignedInAsPlusOrPatron).thenReturn(true)
+    fun `given patron account, when bookmarks loaded, then Upsell state not shown`() = runTest {
+        whenever(signInState.isSignedInAsPatron).thenReturn(true)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
-        assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.PlusUpsell)
+        assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Upsell)
     }
 }

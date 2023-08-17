@@ -71,8 +71,8 @@ class BookmarksViewModel
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
-                if (!it.isSignedInAsPlusOrPatron) {
-                    _uiState.value = UiState.PlusUpsell(sourceView)
+                if (!it.isSignedInAsPatron) {
+                    _uiState.value = UiState.Upsell(sourceView)
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                         val bookmarksFlow =
@@ -264,7 +264,7 @@ class BookmarksViewModel
                 }
         }
 
-        data class PlusUpsell(val sourceView: SourceView) : UiState() {
+        data class Upsell(val sourceView: SourceView) : UiState() {
             val colors: MessageViewColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> MessageViewColors.Player

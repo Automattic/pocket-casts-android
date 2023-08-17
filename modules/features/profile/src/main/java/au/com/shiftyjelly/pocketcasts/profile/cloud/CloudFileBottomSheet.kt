@@ -269,7 +269,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
                     OnboardingLauncher.openOnboardingFlow(
                         activity,
-                        OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FILES)
+                        OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES)
                     )
                 }
 
