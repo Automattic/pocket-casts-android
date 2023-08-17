@@ -44,6 +44,7 @@ interface Settings {
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
         const val INFO_CANCEL_URL = "https://support.pocketcasts.com/article/subscription-info/"
+        const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
 
         const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
 
