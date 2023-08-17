@@ -172,7 +172,7 @@ class BookmarksFragment : BaseFragment() {
                     click = {
                         BookmarksSortByDialog(
                             settings = settings,
-                            changeSortOrder = bookmarksViewModel::changeSortOrder,
+                            changeSortOrder = { bookmarksViewModel.changeSortOrder(it, sourceView) },
                             sourceView = SourceView.PLAYER,
                             forceDarkTheme = true,
                         ).show(

@@ -382,6 +382,13 @@ class PodcastViewModel
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
         settings.setBookmarksSortType(order)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
+            mapOf(
+                "sort_order" to order.key,
+                "source" to SourceView.PODCAST_SCREEN.analyticsValue,
+            ),
+        )
     }
 
     fun play(bookmark: Bookmark) {

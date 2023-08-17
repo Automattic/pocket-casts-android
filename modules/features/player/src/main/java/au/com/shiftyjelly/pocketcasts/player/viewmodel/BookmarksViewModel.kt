@@ -189,9 +189,16 @@ class BookmarksViewModel
         }
     }
 
-    fun changeSortOrder(order: BookmarksSortType) {
+    fun changeSortOrder(order: BookmarksSortType, sourceView: SourceView) {
         if (order !is BookmarksSortTypeForPlayer) return
         settings.setBookmarksSortType(order)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
+            mapOf(
+                "sort_order" to order.key,
+                "source" to sourceView.analyticsValue,
+            )
+        )
     }
 
     fun play(bookmark: Bookmark) {
