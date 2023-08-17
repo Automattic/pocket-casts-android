@@ -17,11 +17,10 @@ import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -211,7 +210,6 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 val layoutBookmark = binding.layoutBookmark
-                layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
                     BookmarksContainerFragment.newInstance(
@@ -303,14 +301,13 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val layoutBookmark = binding.layoutBookmark
                 when (signInState) {
                     is SignInState.SignedIn -> {
+                        layoutBookmark.isVisible = (signInState.subscriptionStatus as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
                         if (signInState.subscriptionStatus is SubscriptionStatus.Paid) {
                             layoutCloud.isVisible = true
                             layoutLockedCloud.isVisible = false
-                            layoutBookmark.isVisible = true
                         } else {
                             layoutCloud.isVisible = false
                             layoutLockedCloud.isVisible = true
-                            layoutBookmark.isVisible = false
                         }
                     }
                     else -> {
