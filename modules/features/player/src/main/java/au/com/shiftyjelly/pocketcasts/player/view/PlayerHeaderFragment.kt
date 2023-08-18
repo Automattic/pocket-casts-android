@@ -180,7 +180,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Download.analyticsValue)
             viewModel.downloadCurrentlyPlaying()
         }
-        binding.bookmark.setOnClickListener { onAddBookmarkClick() }
+        binding.bookmark.setOnClickListener {
+            trackShelfAction(ShelfItem.Bookmark.analyticsValue)
+            onAddBookmarkClick()
+        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
@@ -470,7 +473,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     fun onAddBookmarkClick() {
-        trackShelfAction(ShelfItem.Bookmark.analyticsValue)
         viewModel.buildBookmarkArguments { arguments ->
             activityLauncher.launch(arguments.getIntent(requireContext()))
         }
