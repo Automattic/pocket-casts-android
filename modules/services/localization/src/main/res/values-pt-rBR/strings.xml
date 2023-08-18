@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-04 08:10:07+0000
+Translation-Revision-Date: 2023-08-15 02:10:08+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="support">Suporte</string>
+    <string name="bookmark_notification_action_change_title">Alterar título</string>
+    <string name="bookmark_notification_content_tap_to_view">Toque para visualizar</string>
+    <string name="bookmark_notification_title_added">Favorito adicionado</string>
+    <string name="notification_channel_description_bookmark">Aparece quando um favorito é adicionado usando um headset</string>
+    <string name="notification_channel_description_sign_in_error">Aparece quando o usuário é desconectado em segundo plano e não é possível refazer login automaticamente</string>
+    <string name="notification_channel_description_podcast_import">Importar coleções de podcast</string>
+    <string name="notification_channel_description_playback">Aparece quando o Pocket Casts está reproduzindo áudio</string>
+    <string name="notification_channel_description_playback_error">Erros durante a reprodução</string>
+    <string name="notification_channel_description_episode">Aparece quando um novo episódio é lançado</string>
+    <string name="notification_channel_description_download">Aparece quando o Pocket Casts está fazendo download de episódios</string>
+    <string name="change_bookmark_title_hint">Altere o título que identifica este favorito</string>
     <string name="bookmark">Favorito</string>
     <string name="details">Detalhes</string>
     <string name="episode">Episódio</string>
@@ -42,6 +54,7 @@ Language: pt_BR
     <string name="whats_new_autoplay_title">Chegou a reprodução automática</string>
     <string name="filters_download_limit_3">3 episódios</string>
     <string name="settings_title_headphone_controls">Controles do fone</string>
+    <string name="settings_headphone_controls_summary">Personalize as ações dos controles de fone mais comuns.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Reproduz um som de confirmação após a criação de um favorito com seus fones de ouvido.</string>
     <string name="settings_headphone_controls_confirmation_sound">Som de confirmação de favorito</string>
     <string name="settings_headphone_controls_choice_skip_forward">Avançar</string>
@@ -117,6 +130,7 @@ Language: pt_BR
     <string name="log_in_with_email">Fazer login com o e-mail</string>
     <string name="log_in_on_phone">Fazer login no celular</string>
     <string name="log_in_with_google">Fazer login com o Google</string>
+    <string name="log_in_subtitle">Comece a escutar seus podcasts favoritos</string>
     <string name="onboarding_upgrade_no_subscriptions_found">Nenhuma assinatura encontrada.</string>
     <string name="trial_then_per_year">Experimente o %1$s (depois %2$s por ano)</string>
     <string name="trial_then_per_month">Experimente o %1$s (depois %2$s por mês)</string>
@@ -174,8 +188,10 @@ Language: pt_BR
     <string name="notifications_blocked_warning">As notificações estão bloqueadas. Você pode atualizar a permissão em Configurações.</string>
     <string name="settings_media_actions_show_subtitle">Mostre ações de mídia personalizadas nas notificações de mídia do Android 13 e no Android Auto.</string>
     <string name="settings_media_actions_show_title">Mostrar ações de mídia personalizadas</string>
+    <string name="settings_media_actions_customise">Personalizar ações de mídia</string>
     <string name="settings_media_actions_prioritize_subtitle">Suas principais ações ficarão disponíveis.</string>
     <string name="settings_media_actions_prioritize_title">Priorizar suas ações de mídia personalizadas</string>
+    <string name="plus_take_your_podcasting_to_next_level">Leve sua experiência de criação de podcasts para um outro nível com acesso exclusivo a funcionalidades e opções de personalização.</string>
     <string name="onboarding_recommendations_more">Mais %s</string>
     <string name="filter_id_or_title">Título ou ID do filtro</string>
     <string name="filter_title">Título do filtro</string>
@@ -420,6 +436,7 @@ Language: pt_BR
     <string name="podcasts_empty_folder_summary">Adicione podcasts à sua pasta e eles aparecerão aqui.</string>
     <string name="podcasts_empty_folder">Sua pasta está vazia</string>
     <string name="add_podcasts">Adicionar podcasts</string>
+    <string name="plus_folder_body">Crie pastas para organizar sua coleção de podcasts.</string>
     <string name="expand_details">Expandir detalhes</string>
     <string name="profile_help_support">Apoie o Pocket Casts fazendo upgrade da sua conta</string>
     <string name="error_check_your_internet_connection">Verifique sua conexão com a Internet.</string>
@@ -1174,6 +1191,7 @@ Language: pt_BR
     <string name="filters_create_filter_details">Detalhes do filtro</string>
     <string name="filters_create_filter_by">FILTRAR POR</string>
     <string name="filters_create_filter">Criar filtro</string>
+    <string name="filters_create_colour_icon">COR E ÍCONE</string>
     <string name="filters_create_add_more">Adicione mais critérios para refinar seu filtro.</string>
     <string name="filters_create">Criar</string>
     <string name="filters_chosen_singular">1 filtro escolhido</string>

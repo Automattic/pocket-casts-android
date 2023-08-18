@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-04 08:10:07+0000
+Translation-Revision-Date: 2023-08-15 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="support">Support</string>
+    <string name="bookmark_notification_action_change_title">Ändra rubrik</string>
+    <string name="bookmark_notification_content_tap_to_view">Tryck för att visa</string>
+    <string name="bookmark_notification_title_added">Bokmärke tillagt</string>
+    <string name="notification_channel_description_bookmark">Visas när ett bokmärke läggs till med hörlurar</string>
+    <string name="notification_channel_description_sign_in_error">Visas vid utloggning i bakgrunden när automatisk återinloggning inte är möjlig</string>
+    <string name="notification_channel_description_podcast_import">Importera podcastsamlingar</string>
+    <string name="notification_channel_description_playback">Visas när Pocket Casts spelar upp ljud</string>
+    <string name="notification_channel_description_playback_error">Fel vid uppspelning</string>
+    <string name="notification_channel_description_episode">Visas när ett nytt avsnitt släpps</string>
+    <string name="notification_channel_description_download">Visas när Pocket Casts laddar ner avsnitt</string>
+    <string name="change_bookmark_title_hint">Ändra rubriken som identifierar detta bokmärke</string>
     <string name="bookmark">Bokmärk</string>
     <string name="details">Detaljer</string>
     <string name="episode">Avsnitt</string>
@@ -42,6 +54,7 @@ Language: sv_SE
     <string name="whats_new_autoplay_title">Spela upp automatiskt är här.</string>
     <string name="filters_download_limit_3">3 avsnitt</string>
     <string name="settings_title_headphone_controls">Hörlurskontroller</string>
+    <string name="settings_headphone_controls_summary">Anpassa åtgärder som utförs med de vanligaste hörlurskontrollerna.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Spela upp ett bekräftelseljud när ett bokmärke har skapats med dina hörlurar.</string>
     <string name="settings_headphone_controls_confirmation_sound">Bekräftelseljud för bokmärke</string>
     <string name="settings_headphone_controls_choice_skip_forward">Hoppa framåt</string>

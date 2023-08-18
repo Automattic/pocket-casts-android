@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-04 08:10:07+0000
+Translation-Revision-Date: 2023-08-18 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="support">支援</string>
+    <string name="bookmark_notification_action_change_title">變更名稱</string>
+    <string name="bookmark_notification_content_tap_to_view">點選以檢視</string>
+    <string name="bookmark_notification_title_added">已新增書籤</string>
+    <string name="notification_channel_description_bookmark">透過耳機新增書籤時顯示</string>
+    <string name="notification_channel_description_sign_in_error">已在背景登出且無法自動重新登入時顯示</string>
+    <string name="notification_channel_description_podcast_import">匯入 Podcast 收藏</string>
+    <string name="notification_channel_description_playback">Pocket Casts 正在播放音訊時顯示</string>
+    <string name="notification_channel_description_playback_error">播放時發生錯誤</string>
+    <string name="notification_channel_description_episode">新單集推出時顯示</string>
+    <string name="notification_channel_description_download">Pocket Casts 正在下載單集時顯示</string>
+    <string name="change_bookmark_title_hint">變更識別此書籤的名稱</string>
     <string name="bookmark">書籤</string>
     <string name="details">詳細資料</string>
     <string name="episode">單集</string>
@@ -42,6 +54,7 @@ Language: zh_TW
     <string name="whats_new_autoplay_title">我們推出自動播放功能了！</string>
     <string name="filters_download_limit_3">3 集</string>
     <string name="settings_title_headphone_controls">耳機控制項</string>
+    <string name="settings_headphone_controls_summary">自訂常用耳機控制項執行的動作。</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">在透過耳機建立書籤後播放確認音效。</string>
     <string name="settings_headphone_controls_confirmation_sound">書籤確認音效</string>
     <string name="settings_headphone_controls_choice_skip_forward">快轉跳過</string>
@@ -117,6 +130,7 @@ Language: zh_TW
     <string name="log_in_with_email">透過電子郵件登入</string>
     <string name="log_in_on_phone">在手機上登入</string>
     <string name="log_in_with_google">透過 Google 登入</string>
+    <string name="log_in_subtitle">開始聆聽你喜愛的 Podcast</string>
     <string name="onboarding_upgrade_no_subscriptions_found">找不到訂閱。</string>
     <string name="trial_then_per_year">試用只要 %1$s，接著每年 %2$s</string>
     <string name="trial_then_per_month">試用只要 %1$s，接著每月 %2$s</string>
@@ -174,8 +188,10 @@ Language: zh_TW
     <string name="notifications_blocked_warning">通知已遭封鎖。 你可以透過「設定」更新權限。</string>
     <string name="settings_media_actions_show_subtitle">在 Android 13 媒體通知和 Android Auto 中顯示自訂媒體動作。</string>
     <string name="settings_media_actions_show_title">顯示自訂媒體動作</string>
+    <string name="settings_media_actions_customise">自訂媒體動作</string>
     <string name="settings_media_actions_prioritize_subtitle">你將可使用你的常用動作。</string>
     <string name="settings_media_actions_prioritize_title">為你的自訂媒體動作排定優先順序</string>
+    <string name="plus_take_your_podcasting_to_next_level">運用專屬功能和自訂選項，讓你的 Podcast 體驗更上一層樓。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">篩選 ID 或標題</string>
     <string name="filter_title">篩選標題</string>
@@ -420,6 +436,7 @@ Language: zh_TW
     <string name="podcasts_empty_folder_summary">新增 Podcast 節目至您的資料夾後即會顯示在此處</string>
     <string name="podcasts_empty_folder">資料夾是空的</string>
     <string name="add_podcasts">新增 Podcast 節目</string>
+    <string name="plus_folder_body">你可以建立資料夾來分類 Podcast 收藏。</string>
     <string name="expand_details">展開詳細資訊</string>
     <string name="profile_help_support">升級帳號以支持 Pocket Casts</string>
     <string name="error_check_your_internet_connection">請檢查你的網際網路連線。</string>
@@ -1174,6 +1191,7 @@ Language: zh_TW
     <string name="filters_create_filter_details">篩選條件詳細資訊</string>
     <string name="filters_create_filter_by">篩選依據</string>
     <string name="filters_create_filter">建立篩選條件</string>
+    <string name="filters_create_colour_icon">顏色和圖示</string>
     <string name="filters_create_add_more">新增更多條件，讓篩選更加精準。</string>
     <string name="filters_create">建立</string>
     <string name="filters_chosen_singular">已選擇 1 個篩選條件</string>
