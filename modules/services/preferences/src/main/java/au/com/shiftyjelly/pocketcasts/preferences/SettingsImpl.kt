@@ -873,18 +873,43 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val cachedSubscriptionStatus = UserSetting.PrefFromString<SubscriptionStatus?>(
+        sharedPrefKey = "accountstatus",
+        defaultValue = null,
+        sharedPrefs = privatePreferences,
+        fromString = {
+            if (it.isEmpty()) {
+                return@PrefFromString null
+            }
+            val str = decrypt(it) ?: return@PrefFromString null
+            try {
+                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
+                adapter.fromJson(str)
+            } catch (e: Exception) {
+                null
+            }
+        },
+        toString = {
+            (it as? SubscriptionStatus.Paid)?.let { paidSubscriptionStatus ->
+                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
+                val str = adapter.toJson(paidSubscriptionStatus)
+                encrypt(str)
+            } ?: ""
+        }
+    )
+
     override val headphoneControlsNextAction = HeadphoneActionUserSetting(
         sharedPrefKey = "headphone_controls_next_action",
         defaultAction = HeadphoneAction.SKIP_FORWARD,
         sharedPrefs = sharedPreferences,
-        subscriptionStatus = { cachedSubscriptionStatus.value },
+        subscriptionStatusFlow = cachedSubscriptionStatus.flow,
     )
 
     override val headphoneControlsPreviousAction = HeadphoneActionUserSetting(
         sharedPrefKey = "headphone_controls_previous_action",
         defaultAction = HeadphoneAction.SKIP_BACK,
         sharedPrefs = sharedPreferences,
-        subscriptionStatus = { cachedSubscriptionStatus.value },
+        subscriptionStatusFlow = cachedSubscriptionStatus.flow,
     )
 
     override val headphoneControlsPlayBookmarkConfirmationSound = UserSetting.BoolPref(
@@ -1006,31 +1031,6 @@ class SettingsImpl @Inject constructor(
     override fun setWhatsNewVersionCode(value: Int) {
         setInt("WhatsNewVersionCode", value)
     }
-
-    override val cachedSubscriptionStatus = UserSetting.PrefFromString<SubscriptionStatus?>(
-        sharedPrefKey = "accountstatus",
-        defaultValue = null,
-        sharedPrefs = privatePreferences,
-        fromString = {
-            if (it.isEmpty()) {
-                return@PrefFromString null
-            }
-            val str = decrypt(it) ?: return@PrefFromString null
-            try {
-                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
-                adapter.fromJson(str)
-            } catch (e: Exception) {
-                null
-            }
-        },
-        toString = {
-            (it as? SubscriptionStatus.Paid)?.let { paidSubscriptionStatus ->
-                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
-                val str = adapter.toJson(paidSubscriptionStatus)
-                encrypt(str)
-            } ?: ""
-        }
-    )
 
     private fun getShelfItems(): List<String> {
         return getStringList("shelfItems")
