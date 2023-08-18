@@ -63,7 +63,7 @@ class BookmarkHelper @Inject constructor(
                     )
                 }
 
-                if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
+                if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
                     playbackManager.playTone()
                 }
 
