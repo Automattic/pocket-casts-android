@@ -194,8 +194,8 @@ class AppearanceSettingsFragment : BaseFragment() {
 
     private fun openOnboardingFlow(tier: SubscriptionTier? = null) {
         val onboardingFlow = tier?.takeIf { tier == SubscriptionTier.PATRON }?.let {
-            OnboardingFlow.PlusUpsell(source = OnboardingUpgradeSource.APPEARANCE, showPatronOnly = true)
-        } ?: OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.APPEARANCE)
+            OnboardingFlow.Upsell(source = OnboardingUpgradeSource.APPEARANCE, showPatronOnly = true)
+        } ?: OnboardingFlow.Upsell(OnboardingUpgradeSource.APPEARANCE)
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 

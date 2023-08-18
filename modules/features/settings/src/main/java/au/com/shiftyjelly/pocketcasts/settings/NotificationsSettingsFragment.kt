@@ -40,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -152,6 +151,7 @@ class NotificationsSettingsFragment :
 
             true
         }
+        changePodcastsSummary()
     }
 
     private fun openSelectPodcasts() {
@@ -168,7 +168,6 @@ class NotificationsSettingsFragment :
             podcastManager.findSubscribed().forEach {
                 podcastManager.updateShowNotifications(it, newSelection.contains(it.uuid))
             }
-            changePodcastsSummary()
         }
     }
 
@@ -336,19 +335,25 @@ class NotificationsSettingsFragment :
         }
     }
 
-    private suspend fun changePodcastsSummary() {
-        val podcasts = withContext(Dispatchers.IO) {
-            podcastManager.findSubscribed()
-        }
-        val notificationCount = podcasts.count { it.isShowNotifications }
-        val summary = when {
-            notificationCount == 0 -> resources.getString(LR.string.settings_podcasts_selected_zero)
-            notificationCount == 1 -> resources.getString(LR.string.settings_podcasts_selected_one)
-            notificationCount >= podcasts.size -> resources.getString(LR.string.settings_podcasts_selected_all)
-            else -> resources.getString(LR.string.settings_podcasts_selected_x, notificationCount)
-        }
-        withContext(Dispatchers.Main) {
-            notificationPodcasts?.summary = summary
+    private fun changePodcastsSummary() {
+        lifecycleScope.launch(Dispatchers.Default) {
+            podcastManager.findSubscribedFlow().collect { podcasts ->
+                val podcastCount = podcasts.size
+                val notificationCount = podcasts.count { it.isShowNotifications }
+
+                val summary = when {
+                    notificationCount == 0 -> resources.getString(LR.string.settings_podcasts_selected_zero)
+                    notificationCount == 1 -> resources.getString(LR.string.settings_podcasts_selected_one)
+                    notificationCount >= podcastCount -> resources.getString(LR.string.settings_podcasts_selected_all)
+                    else -> resources.getString(
+                        LR.string.settings_podcasts_selected_x,
+                        notificationCount
+                    )
+                }
+                launch(Dispatchers.Main) {
+                    notificationPodcasts?.summary = summary
+                }
+            }
         }
     }
 
@@ -357,10 +362,6 @@ class NotificationsSettingsFragment :
         setupEnabledNotifications()
         setupNotificationVibrate()
         setupPlayOverNotifications()
-        launch {
-            changePodcastsSummary()
-        }
-        setupHidePlaybackNotifications()
     }
 
     private fun changeVibrateSummary() {

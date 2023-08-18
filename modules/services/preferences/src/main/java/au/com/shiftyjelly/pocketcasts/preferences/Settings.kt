@@ -51,6 +51,7 @@ interface Settings {
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
         const val INFO_CANCEL_URL = "https://support.pocketcasts.com/article/subscription-info/"
+        const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
 
         const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
 
@@ -99,6 +100,8 @@ interface Settings {
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
+        const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
+        const val INTENT_OPEN_APP_VIEW_BOOKMARKS = "INTENT_OPEN_APP_VIEW_BOOKMARKS"
         const val INTENT_LINK_CLOUD_FILES = "pktc://cloudfiles"
         const val INTENT_LINK_UPGRADE = "pktc://upgrade"
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
@@ -115,6 +118,7 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_PLAYBACK_ERROR("playbackError"),
         NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
         NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
+        NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
     }
 
     enum class NotificationId(val value: Int) {
@@ -122,6 +126,7 @@ interface Settings {
         PLAYING(21483647),
         DOWNLOADING(21483648),
         SIGN_IN_ERROR(21483649),
+        BOOKMARK(21483650),
     }
 
     enum class UpNextAction {
@@ -138,12 +143,12 @@ interface Settings {
         LONG_SHORT
     }
 
-    enum class HeadphoneAction {
-        ADD_BOOKMARK,
-        SKIP_BACK,
-        SKIP_FORWARD,
-        NEXT_CHAPTER,
-        PREVIOUS_CHAPTER,
+    enum class HeadphoneAction(val analyticsValue: String) {
+        ADD_BOOKMARK("add_bookmark"),
+        SKIP_BACK("skip_back"),
+        SKIP_FORWARD("skip_forward"),
+        NEXT_CHAPTER("next_chapter"),
+        PREVIOUS_CHAPTER("previous_chapter"),
     }
 
     sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
@@ -301,8 +306,11 @@ interface Settings {
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>
 
+    fun getHeadphoneControlsNextAction(): HeadphoneAction
     fun setHeadphoneControlsNextAction(action: HeadphoneAction)
+    fun getHeadphoneControlsPreviousAction(): HeadphoneAction
     fun setHeadphoneControlsPreviousAction(action: HeadphoneAction)
+    fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean
     fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean)
 
     // Firebase remote config

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -31,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -103,10 +105,10 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     }
 
     private fun setupLogging() {
-        // TODO uncomment this after we have playback issues resolved
-        // if (BuildConfig.DEBUG) {
-        Timber.plant(TimberDebugTree())
-        // }
+        LogBuffer.setup(File(filesDir, "logs").absolutePath)
+        if (BuildConfig.DEBUG) {
+            Timber.plant(TimberDebugTree())
+        }
     }
 
     private fun setupAnalytics() {

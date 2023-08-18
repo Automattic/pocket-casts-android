@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
@@ -35,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
@@ -43,7 +45,9 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderB
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
@@ -130,6 +134,8 @@ class PodcastAdapter(
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
+    private val onHeadsetSettingsClicked: () -> Unit,
+    private val sourceView: SourceView,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -155,11 +161,15 @@ class PodcastAdapter(
         val isMultiSelecting: () -> Boolean,
         val isSelected: (Bookmark) -> Boolean,
     )
+    object BookmarkUpsell
+    object NoBookmarkMessage
 
     companion object {
         private const val VIEW_TYPE_TABS = 100
         private const val VIEW_TYPE_BOOKMARKS = 101
         private const val VIEW_TYPE_BOOKMARK_HEADER = 102
+        private const val VIEW_TYPE_BOOKMARK_UPSELL = 103
+        private const val VIEW_TYPE_NO_BOOKMARK = 104
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
@@ -172,7 +182,7 @@ class PodcastAdapter(
 
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
-    private var signedInAsPlusOrPatron: Boolean = false
+    private var signInState: SignInState = SignInState.SignedOut
     var castConnected: Boolean = false
         set(value) {
             field = value
@@ -194,6 +204,8 @@ class PodcastAdapter(
             VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), sourceView, theme)
+            VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
                 viewMode = EpisodeViewHolder.ViewMode.NoArtwork,
@@ -216,6 +228,8 @@ class PodcastAdapter(
             is DividerViewHolder -> bindDividerRow(holder, position)
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
+            is BookmarkUpsellViewHolder -> holder.bind()
+            is NoBookmarkViewHolder -> holder.bind()
         }
     }
 
@@ -229,7 +243,7 @@ class PodcastAdapter(
         holder.binding.expanded = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-        holder.binding.isPlusOrPatronUser = signedInAsPlusOrPatron
+        holder.binding.isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
@@ -355,8 +369,8 @@ class PodcastAdapter(
         this.tintColor = tintColor
     }
 
-    fun setSignedInAsPlusOrPatron(signedInAsPlusOrPatron: Boolean) {
-        this.signedInAsPlusOrPatron = signedInAsPlusOrPatron
+    fun setSignInState(signInState: SignInState) {
+        this.signInState = signInState
         notifyItemChanged(0)
     }
 
@@ -430,30 +444,37 @@ class PodcastAdapter(
             if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
                 add(Podcast())
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
-                add(
-                    BookmarkHeader(
-                        bookmarksCount = bookmarks.size,
-                        searchTerm = searchTerm,
-                        onSearchFocus = onSearchFocus,
-                        onSearchQueryChanged = onSearchQueryChanged,
-                        onOptionsClicked = onBookmarksOptionsClicked,
-                    )
-                )
-                addAll(
-                    bookmarks.map {
-                        BookmarkItemData(
-                            bookmark = it,
-                            onBookmarkPlayClicked = onBookmarkPlayClicked,
-                            onBookmarkRowLongPress = onBookmarkRowLongPress,
-                            onBookmarkRowClick = { bookmark, adapterPosition ->
-                                multiSelectBookmarksHelper.toggle(bookmark)
-                                notifyItemChanged(adapterPosition)
-                            },
-                            isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                            isSelected = { bookmark -> multiSelectBookmarksHelper.isSelected(bookmark) },
+
+                if (!signInState.isSignedInAsPatron) {
+                    add(BookmarkUpsell)
+                } else if (bookmarks.isEmpty()) {
+                    add(NoBookmarkMessage)
+                } else {
+                    add(
+                        BookmarkHeader(
+                            bookmarksCount = bookmarks.size,
+                            searchTerm = searchTerm,
+                            onSearchFocus = onSearchFocus,
+                            onSearchQueryChanged = onSearchQueryChanged,
+                            onOptionsClicked = onBookmarksOptionsClicked,
                         )
-                    }
-                )
+                    )
+                    addAll(
+                        bookmarks.map {
+                            BookmarkItemData(
+                                bookmark = it,
+                                onBookmarkPlayClicked = onBookmarkPlayClicked,
+                                onBookmarkRowLongPress = onBookmarkRowLongPress,
+                                onBookmarkRowClick = { bookmark, adapterPosition ->
+                                    multiSelectBookmarksHelper.toggle(bookmark)
+                                    notifyItemChanged(adapterPosition)
+                                },
+                                isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
+                                isSelected = { bookmark -> multiSelectBookmarksHelper.isSelected(bookmark) },
+                            )
+                        }
+                    )
+                }
             }
         }
         submitList(content)
@@ -474,6 +495,8 @@ class PodcastAdapter(
             is TabsHeader -> VIEW_TYPE_TABS
             is BookmarkItemData -> VIEW_TYPE_BOOKMARKS
             is BookmarkHeader -> VIEW_TYPE_BOOKMARK_HEADER
+            is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
+            is NoBookmarkMessage -> VIEW_TYPE_NO_BOOKMARK
             else -> R.layout.adapter_episode
         }
     }
@@ -487,6 +510,8 @@ class PodcastAdapter(
             is NoEpisodeMessage -> Long.MAX_VALUE - 3
             is TabsHeader -> Long.MAX_VALUE - 4
             is BookmarkHeader -> Long.MAX_VALUE - 5
+            is BookmarkUpsell -> Long.MAX_VALUE - 6
+            is NoBookmarkMessage -> Long.MAX_VALUE - 7
             is DividerRow -> item.groupIndex.toLong()
             is PodcastEpisode -> item.adapterId
             is BookmarkItemData -> item.bookmark.adapterId

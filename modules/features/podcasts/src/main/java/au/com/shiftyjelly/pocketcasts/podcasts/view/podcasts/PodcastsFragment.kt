@@ -188,7 +188,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FOLDERS))
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             true
         }
 

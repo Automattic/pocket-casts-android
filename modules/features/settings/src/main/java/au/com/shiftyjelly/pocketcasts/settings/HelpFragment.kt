@@ -98,7 +98,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
         webView = (view.findViewById<View>(VR.id.webview) as WebView).apply {
             webViewClient = SupportWebViewClient()
-            loadUrl(loadedUrl ?: "https://support.pocketcasts.com/android/?device=android")
+            loadUrl(loadedUrl ?: Settings.INFO_FAQ_URL)
             settings.javaScriptEnabled = true
             settings.textZoom = 100
         }

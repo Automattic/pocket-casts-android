@@ -66,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
@@ -135,6 +136,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -230,6 +232,12 @@ class MainActivity :
                 Timber.e("Unexpected null result from onboarding activity")
             }
         }
+    }
+
+    private val bookmarkActivityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        BookmarkActivityContract()
+    ) { result ->
+        showViewBookmarksSnackbar(result)
     }
 
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -1064,6 +1072,12 @@ class MainActivity :
             if (action == Settings.INTENT_OPEN_APP_DOWNLOADING) {
                 closeToRoot()
                 addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
+            } else if (action == Settings.INTENT_OPEN_APP_ADD_BOOKMARK) {
+                viewModel.buildBookmarkArguments { args ->
+                    bookmarkActivityLauncher.launch(args.getIntent(this))
+                }
+            } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {
+                showPlayerBookmarks()
             }
             // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
@@ -1397,5 +1411,35 @@ class MainActivity :
 
     override fun checkNotificationPermission(onPermissionGranted: () -> Unit) {
         checkForNotificationPermission(onPermissionGranted)
+    }
+
+    private fun showPlayerBookmarks() {
+        openPlayer()
+        launch {
+            delay(1000) // To let the player open and load tabs
+            withContext(Dispatchers.Main) {
+                val playerContainerFragment =
+                    supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
+                playerContainerFragment?.openBookmarks()
+            }
+        }
+    }
+
+    private fun showViewBookmarksSnackbar(
+        result: BookmarkActivityContract.BookmarkResult?,
+    ) {
+        val view = snackBarView()
+        if (result == null) return
+
+        val action = View.OnClickListener {
+            showPlayerBookmarks()
+        }
+
+        Snackbar.make(view, getString(LR.string.bookmark_added, result.title), Snackbar.LENGTH_LONG)
+            .setAction(LR.string.settings_view, action)
+            .setActionTextColor(result.tintColor)
+            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
+            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
+            .show()
     }
 }

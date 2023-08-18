@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -120,6 +121,7 @@ class EpisodeContainerFragment :
     private lateinit var adapter: ViewPagerAdapter
     @Inject
     lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val viewModel: EpisodeContainerFragmentViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (!forceDarkTheme || theme.isDarkTheme) {
@@ -198,6 +200,7 @@ class EpisodeContainerFragment :
                 super.onPageSelected(position)
                 btnFav.isVisible = adapter.isDetailsTab(position)
                 btnShare.isVisible = adapter.isDetailsTab(position)
+                viewModel.onPageSelected(position)
             }
         })
     }

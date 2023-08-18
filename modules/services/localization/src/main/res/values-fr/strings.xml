@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-04 08:10:07+0000
+Translation-Revision-Date: 2023-08-15 02:10:08+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="support">Assistance</string>
+    <string name="bookmark_notification_action_change_title">Modifier le titre</string>
+    <string name="bookmark_notification_content_tap_to_view">Touchez pour prévisualiser.</string>
+    <string name="bookmark_notification_title_added">Signet ajouté</string>
+    <string name="notification_channel_description_bookmark">S’affiche lorsque le signet est ajouté avec un casque</string>
+    <string name="notification_channel_description_sign_in_error">S’affiche lorsque la déconnexion a eu lieu en arrière-plan et qu’une reconnexion automatique n’a pas pu être faite</string>
+    <string name="notification_channel_description_podcast_import">Importez vos collections de podcasts.</string>
+    <string name="notification_channel_description_playback">S’affiche lorsque Pocket Casts diffuse de l’audio</string>
+    <string name="notification_channel_description_playback_error">Des erreurs ont survenues lors de la lecture</string>
+    <string name="notification_channel_description_episode">S’affiche lorsqu’un nouvel épisode est sorti</string>
+    <string name="notification_channel_description_download">S’affiche lorsque Pocket Casts télécharge des épisodes</string>
+    <string name="change_bookmark_title_hint">Modifier le titre qui identifie ce signet</string>
     <string name="bookmark">Signet</string>
     <string name="details">Détails</string>
     <string name="episode">Épisode</string>
@@ -42,6 +54,7 @@ Language: fr
     <string name="whats_new_autoplay_title">La lecture automatique est disponible !</string>
     <string name="filters_download_limit_3">3 épisodes</string>
     <string name="settings_title_headphone_controls">Commandes du casque</string>
+    <string name="settings_headphone_controls_summary">Personnalisez les actions effectuées par les principales commandes du casque.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Émettez un son de confirmation dans votre casque après la création d’un signet.</string>
     <string name="settings_headphone_controls_confirmation_sound">Son de confirmation lors de l’ajout d’un signet</string>
     <string name="settings_headphone_controls_choice_skip_forward">Avance rapide</string>
@@ -117,6 +130,7 @@ Language: fr
     <string name="log_in_with_email">Se connecter avec une adresse e-mail</string>
     <string name="log_in_on_phone">Se connecter avec un téléphone</string>
     <string name="log_in_with_google">Se connecter avec Google</string>
+    <string name="log_in_subtitle">Commencez à écouter vos podcasts préférés</string>
     <string name="onboarding_upgrade_no_subscriptions_found">Aucun abonnement trouvé.</string>
     <string name="trial_then_per_year">Essayer %1$s, puis %2$s par an</string>
     <string name="trial_then_per_month">Essayer %1$s, puis %2$s par mois</string>
@@ -174,8 +188,10 @@ Language: fr
     <string name="notifications_blocked_warning">Les notifications sont bloquées. Vous pouvez mettre à jour les droits depuis la section Réglages.</string>
     <string name="settings_media_actions_show_subtitle">Affichez les actions de médias personnalisées dans les notifications des médias et Android Auto.</string>
     <string name="settings_media_actions_show_title">Afficher les actions de médias personnalisées</string>
+    <string name="settings_media_actions_customise">Personnalisez les actions de médias</string>
     <string name="settings_media_actions_prioritize_subtitle">Vos principales actions seront disponibles.</string>
     <string name="settings_media_actions_prioritize_title">Prioriser vos actions de médias personnalisées</string>
+    <string name="plus_take_your_podcasting_to_next_level">Faites passer votre expérience d’écoute de podcasts au niveau supérieur avec un accès exclusif à des fonctionnalités et à des options de personnalisation.</string>
     <string name="onboarding_recommendations_more">Plus %s</string>
     <string name="filter_id_or_title">ID ou titre du filtre</string>
     <string name="filter_title">Titre du filtre</string>
@@ -420,6 +436,7 @@ Language: fr
     <string name="podcasts_empty_folder_summary">Ajoutez des podcasts à votre dossier et ils apparaîtront ici.</string>
     <string name="podcasts_empty_folder">Votre dossier est vide</string>
     <string name="add_podcasts">Ajouter des podcasts</string>
+    <string name="plus_folder_body">Créez des dossiers pour organiser votre collection de podcasts.</string>
     <string name="expand_details">Développer les détails</string>
     <string name="profile_help_support">Soutenez Pocket Casts en mettant à niveau votre compte</string>
     <string name="error_check_your_internet_connection">Vérifiez votre connexion Internet.</string>
@@ -1174,6 +1191,7 @@ Language: fr
     <string name="filters_create_filter_details">Détails du filtre</string>
     <string name="filters_create_filter_by">FILTRER PAR</string>
     <string name="filters_create_filter">Créer un filtre</string>
+    <string name="filters_create_colour_icon">COULEUR ET ICÔNE</string>
     <string name="filters_create_add_more">Ajoutez plus de critères pour finir d’affiner votre filtre.</string>
     <string name="filters_create">Créer</string>
     <string name="filters_chosen_singular">1 filtre choisi</string>

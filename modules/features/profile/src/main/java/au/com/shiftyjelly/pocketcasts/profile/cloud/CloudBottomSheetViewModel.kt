@@ -164,6 +164,7 @@ class CloudBottomSheetViewModel @Inject constructor(
         const val UPLOAD = "upload"
         const val DOWNLOAD = "download"
         const val UPLOAD_UPGRADE_REQUIRED = "upload_upgrade_required"
+        const val BOOKMARKS = "bookmarks"
     }
 }
 

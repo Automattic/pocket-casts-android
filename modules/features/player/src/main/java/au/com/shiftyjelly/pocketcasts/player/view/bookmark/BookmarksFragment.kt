@@ -24,10 +24,17 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -99,6 +106,7 @@ class BookmarksFragment : BaseFragment() {
                             textColor = requireNotNull(textColor(listData)),
                             sourceView = sourceView,
                             bookmarksViewModel = bookmarksViewModel,
+                            multiSelectHelper = multiSelectHelper,
                             onRowLongPressed = { bookmark ->
                                 multiSelectHelper.defaultLongPress(
                                     multiSelectable = bookmark,
@@ -106,7 +114,18 @@ class BookmarksFragment : BaseFragment() {
                                     forceDarkTheme = sourceView == SourceView.PLAYER,
                                 )
                             },
-                            showOptionsDialog = { showOptionsDialog(it) }
+                            onEditBookmarkClick = ::onEditBookmarkClick,
+                            onUpgradeClicked = ::onUpgradeClicked,
+                            showOptionsDialog = { showOptionsDialog(it) },
+                            openFragment = { fragment ->
+                                (parentFragment as? BottomSheetDialogFragment)?.dismiss()
+                                val fragmentHostListener = (activity as? FragmentHostListener)
+                                fragmentHostListener?.apply {
+                                    openTab(R.id.navigation_profile)
+                                    addFragment(SettingsFragment())
+                                    addFragment(fragment)
+                                }
+                            }
                         )
                     }
                 }
@@ -163,5 +182,17 @@ class BookmarksFragment : BaseFragment() {
                     }
                 ).show(it, "bookmarks_options_dialog")
         }
+    }
+
+    private fun onEditBookmarkClick() {
+        bookmarksViewModel.buildBookmarkArguments { arguments ->
+            startActivity(arguments.getIntent(requireContext()))
+        }
+    }
+
+    private fun onUpgradeClicked() {
+        val source = OnboardingUpgradeSource.BOOKMARKS
+        val onboardingFlow = OnboardingFlow.Upsell(source, true)
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }

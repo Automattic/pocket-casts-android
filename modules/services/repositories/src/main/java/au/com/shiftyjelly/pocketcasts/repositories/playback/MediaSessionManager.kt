@@ -26,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -63,9 +65,11 @@ class MediaSessionManager(
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
+    val bookmarkManager: BookmarkManager,
 ) : CoroutineScope {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
+        const val ACTION_NOT_SUPPORTED = "action_not_supported"
 
         // there's an issue on Samsung phones that if you don't say you support ACTION_SKIP_TO_PREVIOUS and
         // ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled. We work around this
@@ -92,6 +96,8 @@ class MediaSessionManager(
     val disposables = CompositeDisposable()
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
+    private var bookmarkHelper: BookmarkHelper
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -107,6 +113,12 @@ class MediaSessionManager(
         val extras = Bundle()
         extras.putBoolean("com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE", true)
         mediaSession.setExtras(extras)
+
+        bookmarkHelper = BookmarkHelper(
+            playbackManager,
+            bookmarkManager,
+            settings
+        )
 
         connect()
     }
@@ -451,15 +463,15 @@ class MediaSessionManager(
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
-                            handlePlayPauseEvent()
+                            handleMediaButtonSingleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                            onSkipToNext()
+                            handleMediaButtonDoubleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                            onSkipToPrevious()
+                            handleMediaButtonTripleTap()
                             return true
                         }
                     }
@@ -467,6 +479,11 @@ class MediaSessionManager(
             }
 
             return super.onMediaButtonEvent(mediaButtonEvent)
+        }
+
+        private fun onAddBookmark() {
+            logEvent("add bookmark")
+            bookmarkHelper.handleAddBookmarkAction(context)
         }
 
         private fun getCurrentControllerInfo(): String {
@@ -479,7 +496,7 @@ class MediaSessionManager(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${if (inSessionCallback) getCurrentControllerInfo() else ""}")
         }
 
-        private fun handlePlayPauseEvent() {
+        private fun handleMediaButtonSingleTap() {
             // this code allows the user to double tap their play pause button to skip ahead. Basically it allows them 600ms to press it again to cause a skip instead of a play/pause
             if (playPauseTimer == null) {
                 playPauseTimer = Timer().apply {
@@ -499,8 +516,25 @@ class MediaSessionManager(
                 playPauseTimer?.cancel()
                 playPauseTimer = null
 
-                logEvent("skip forwards from headset hook")
                 playbackManager.skipForward(sourceView = source)
+            }
+        }
+
+        private fun handleMediaButtonDoubleTap() {
+            handleMediaButtonAction(settings.headphoneNextActionFlow.value)
+        }
+
+        private fun handleMediaButtonTripleTap() {
+            handleMediaButtonAction(settings.headphonePreviousActionFlow.value)
+        }
+
+        private fun handleMediaButtonAction(action: Settings.HeadphoneAction) {
+            when (action) {
+                Settings.HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
+                Settings.HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
+                Settings.HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
+                Settings.HeadphoneAction.NEXT_CHAPTER,
+                Settings.HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 

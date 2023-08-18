@@ -46,11 +46,12 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             field = value
             _isMultiSelectingLive.value = value
             selectedList.clear()
+            _selectedListLive.value = emptyList()
         }
 
     var coordinatorLayout: View? = null
     var context: Context? = null
-    var source = SourceView.UNKNOWN
+    open var source = SourceView.UNKNOWN
 
     abstract val maxToolbarIcons: Int
     abstract val toolbarActions: LiveData<List<MultiSelectAction>>
@@ -60,6 +61,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         resources: Resources,
         fragmentManager: FragmentManager,
     ): Boolean
+    abstract fun deselect(multiSelectable: T)
 
     fun defaultLongPress(
         multiSelectable: T,
@@ -117,18 +119,6 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             selectedList.add(multiSelectable)
         }
         _selectedListLive.value = selectedList
-    }
-
-    fun deselect(multiSelectable: T) {
-        if (isSelected(multiSelectable)) {
-            selectedList.remove(multiSelectable)
-        }
-
-        _selectedListLive.value = selectedList
-
-        if (selectedList.isEmpty()) {
-            closeMultiSelect()
-        }
     }
 
     fun selectAll() {

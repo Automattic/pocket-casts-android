@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-04 08:10:07+0000
+Translation-Revision-Date: 2023-08-17 10:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="support">サポート</string>
+    <string name="bookmark_notification_action_change_title">タイトルを変更</string>
+    <string name="bookmark_notification_content_tap_to_view">タップして表示</string>
+    <string name="bookmark_notification_title_added">ブックマークを追加しました</string>
+    <string name="notification_channel_description_bookmark">ヘッドフォンを使用してブックマークを追加したときに表示されます</string>
+    <string name="notification_channel_description_sign_in_error">バックグラウンドでログアウトし、自動で再ログインできないときに表示されます</string>
+    <string name="notification_channel_description_podcast_import">ポッドキャストのコレクションをインポート</string>
+    <string name="notification_channel_description_playback">Pocket Casts の音声の再生中に表示されます</string>
+    <string name="notification_channel_description_playback_error">再生中のエラー</string>
+    <string name="notification_channel_description_episode">新しいエピソードが公開されると表示されます</string>
+    <string name="notification_channel_description_download">Pocket Casts のエピソードのダウンロード中に表示されます</string>
+    <string name="change_bookmark_title_hint">このブックマークを特定するタイトルを変更します</string>
     <string name="bookmark">ブックマーク</string>
     <string name="details">詳細</string>
     <string name="episode">エピソード</string>
@@ -42,6 +54,7 @@ Language: ja_JP
     <string name="whats_new_autoplay_title">自動再生機能が登場</string>
     <string name="filters_download_limit_3">3エピソード</string>
     <string name="settings_title_headphone_controls">ヘッドフォン操作</string>
+    <string name="settings_headphone_controls_summary">よく使用されるヘッドフォン操作で実行されるアクションをカスタマイズします。</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">ヘッドフォンでブックマークを作成したら、確認音声を再生します。</string>
     <string name="settings_headphone_controls_confirmation_sound">確認音声をブックマーク</string>
     <string name="settings_headphone_controls_choice_skip_forward">スキップ</string>
@@ -117,6 +130,7 @@ Language: ja_JP
     <string name="log_in_with_email">メールアドレスでログイン</string>
     <string name="log_in_on_phone">スマートフォンでログイン</string>
     <string name="log_in_with_google">Google でログイン</string>
+    <string name="log_in_subtitle">お気に入りのポッドキャストの視聴を開始</string>
     <string name="onboarding_upgrade_no_subscriptions_found">サブスクリプションが見つかりません。</string>
     <string name="trial_then_per_year">%1$sをお試し、その後は年間%2$s</string>
     <string name="trial_then_per_month">%1$sをお試し、その後は月間%2$s</string>
@@ -174,8 +188,10 @@ Language: ja_JP
     <string name="notifications_blocked_warning">通知がブロックされました。 「設定」で権限を更新できます。</string>
     <string name="settings_media_actions_show_subtitle">Android 13のメディア通知と Android Auto でカスタムメディアアクションを表示します。</string>
     <string name="settings_media_actions_show_title">カスタムメディアアクションを表示</string>
+    <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
     <string name="settings_media_actions_prioritize_subtitle">上位のアクションを利用できます。</string>
     <string name="settings_media_actions_prioritize_title">カスタムメディアアクションに優先順位を設定</string>
+    <string name="plus_take_your_podcasting_to_next_level">専用の機能やカスタマイズオプションを使用して、あなたのポッドキャスト体験をさらなるレベルに引き上げることができます。</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>
@@ -420,6 +436,7 @@ Language: ja_JP
     <string name="podcasts_empty_folder_summary">フォルダーにポッドキャストを追加するとここに表示されます。</string>
     <string name="podcasts_empty_folder">フォルダーは空です</string>
     <string name="add_podcasts">ポッドキャストを追加する</string>
+    <string name="plus_folder_body">フォルダーを作成してポッドキャストのコレクションを整理できます。</string>
     <string name="expand_details">詳細を展開</string>
     <string name="profile_help_support">アカウントをアップグレードして Pocket Casts のサポートにご協力ください</string>
     <string name="error_check_your_internet_connection">インターネット接続を確認してください。</string>
@@ -1174,6 +1191,7 @@ Language: ja_JP
     <string name="filters_create_filter_details">フィルターの詳細</string>
     <string name="filters_create_filter_by">絞り込み条件</string>
     <string name="filters_create_filter">フィルターを作成</string>
+    <string name="filters_create_colour_icon">カラーとアイコン</string>
     <string name="filters_create_add_more">条件をさらに追加してフィルターの絞り込みを完了します。</string>
     <string name="filters_create">作成</string>
     <string name="filters_chosen_singular">1件のフィルターを選択済み</string>

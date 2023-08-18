@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -80,7 +81,8 @@ class PodcastViewModel
     private val bookmarkSearchHandler: BookmarkSearchHandler,
     private val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
-    private val settings: Settings
+    private val settings: Settings,
+    private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -104,9 +106,14 @@ class PodcastViewModel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    init {
+        podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = {
+            multiSelectBookmarksHelper.source = SourceView.PODCAST_SCREEN
+        }
+    }
+
     fun loadPodcast(uuid: String, resources: Resources) {
         viewModelScope.launch {
-
             this@PodcastViewModel.podcastUuid = uuid
             val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
             val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
@@ -149,13 +156,15 @@ class PodcastViewModel
                     Observables.combineLatest(
                         Observable.just(it),
                         episodeSearchResults,
-                        bookmarkSearchResults
-                    ) { podcast, episodeSearchResults, bookmarkSearchResults ->
+                        bookmarkSearchResults,
+                        userManager.getSignInState().toObservable()
+                    ) { podcast, episodeSearchResults, bookmarkSearchResults, signInState ->
                         CombinedEpisodeAndBookmarkData(
                             podcast = podcast,
                             showingArchived = podcast.showArchived,
                             episodeSearchResult = episodeSearchResults,
                             bookmarkSearchResult = bookmarkSearchResults,
+                            signInState = signInState
                         )
                     }.toFlowable(BackpressureStrategy.LATEST)
                 }
@@ -184,6 +193,7 @@ class PodcastViewModel
     }
 
     fun onTabClicked(tab: PodcastTab) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_SCREEN_TAB_TAPPED, mapOf("value" to tab.analyticsValue))
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }
 
@@ -378,6 +388,25 @@ class PodcastViewModel
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
         settings.setBookmarksSortType(order)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
+            mapOf(
+                "sort_order" to order.key,
+                "source" to SourceView.PODCAST_SCREEN.analyticsValue,
+            ),
+        )
+    }
+
+    fun play(bookmark: Bookmark) {
+        val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+        bookmarkEpisode?.let {
+            val shouldPlayEpisode = !playbackManager.isPlaying() ||
+                playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+            if (shouldPlayEpisode) {
+                playbackManager.playNow(it, sourceView = SourceView.PODCAST_SCREEN)
+            }
+        }
+        playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
     }
 
     fun multiSelectSelectNone() {
@@ -505,9 +534,9 @@ class PodcastViewModel
     private fun getCurrentTab() =
         (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
-    enum class PodcastTab(@StringRes val labelResId: Int) {
-        EPISODES(LR.string.episodes),
-        BOOKMARKS(LR.string.bookmarks),
+    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
+        EPISODES(LR.string.episodes, "episodes"),
+        BOOKMARKS(LR.string.bookmarks, "bookmarks"),
     }
 
     sealed class UiState {
@@ -555,6 +584,7 @@ private data class CombinedEpisodeAndBookmarkData(
     val showingArchived: Boolean,
     val episodeSearchResult: SearchHandler.SearchResult,
     val bookmarkSearchResult: SearchHandler.SearchResult,
+    val signInState: SignInState
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -563,7 +593,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
     bookmarkManager: BookmarkManager,
     settings: Settings,
 ): Flowable<PodcastViewModel.UiState> {
-    return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
+    return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults, signInState) ->
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
             "Observing podcast ${podcast.uuid} episode changes"
@@ -621,6 +651,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
 
             val episodesWithBookmarkInfo = filteredList.map { episode ->
                 episode.hasBookmark = bookmarks.map { it.episodeUuid }.contains(episode.uuid) &&
+                    signInState.isSignedInAsPatron &&
                     FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 episode
             }
