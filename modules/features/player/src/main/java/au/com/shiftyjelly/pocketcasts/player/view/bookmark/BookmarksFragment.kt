@@ -22,13 +22,19 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.Companion.UNKNOWN_SOURCE_MESSAGE
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -74,9 +80,8 @@ class BookmarksFragment : BaseFragment() {
 
     private val overrideTheme: Theme.ThemeType
         get() = when (sourceView) {
-            SourceView.EPISODE_DETAILS -> if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
             SourceView.PLAYER -> if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
-            else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+            else -> if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
         }
 
     override fun onCreateView(
@@ -101,6 +106,7 @@ class BookmarksFragment : BaseFragment() {
                             textColor = requireNotNull(textColor(listData)),
                             sourceView = sourceView,
                             bookmarksViewModel = bookmarksViewModel,
+                            multiSelectHelper = multiSelectHelper,
                             onRowLongPressed = { bookmark ->
                                 multiSelectHelper.defaultLongPress(
                                     multiSelectable = bookmark,
@@ -108,7 +114,18 @@ class BookmarksFragment : BaseFragment() {
                                     forceDarkTheme = sourceView == SourceView.PLAYER,
                                 )
                             },
-                            showOptionsDialog = { showOptionsDialog(it) }
+                            onEditBookmarkClick = ::onEditBookmarkClick,
+                            onUpgradeClicked = ::onUpgradeClicked,
+                            showOptionsDialog = { showOptionsDialog(it) },
+                            openFragment = { fragment ->
+                                (parentFragment as? BottomSheetDialogFragment)?.dismiss()
+                                val fragmentHostListener = (activity as? FragmentHostListener)
+                                fragmentHostListener?.apply {
+                                    openTab(R.id.navigation_profile)
+                                    addFragment(SettingsFragment())
+                                    addFragment(fragment)
+                                }
+                            }
                         )
                     }
                 }
@@ -120,24 +137,21 @@ class BookmarksFragment : BaseFragment() {
     private fun episodeUuid(listData: State<PlayerViewModel.ListData?>) =
         when (sourceView) {
             SourceView.PLAYER -> listData.value?.podcastHeader?.episodeUuid
-            SourceView.EPISODE_DETAILS -> episodeUuid
-            else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+            else -> episodeUuid
         }
 
     @Composable
     private fun backgroundColor(listData: State<PlayerViewModel.ListData?>) =
         when (sourceView) {
             SourceView.PLAYER -> listData.value?.let { Color(it.podcastHeader.backgroundColor) }
-            SourceView.EPISODE_DETAILS -> MaterialTheme.theme.colors.primaryUi01
-            else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+            else -> MaterialTheme.theme.colors.primaryUi01
         }
 
     @Composable
     private fun textColor(listData: State<PlayerViewModel.ListData?>) =
         when (sourceView) {
             SourceView.PLAYER -> listData.value?.let { Color(it.podcastHeader.backgroundColor) }
-            SourceView.EPISODE_DETAILS -> MaterialTheme.theme.colors.primaryText02
-            else -> throw IllegalStateException("$UNKNOWN_SOURCE_MESSAGE: $sourceView")
+            else -> MaterialTheme.theme.colors.primaryText02
         }
 
     private val showOptionsDialog: (Int) -> Unit = { selectedValue ->
@@ -168,5 +182,17 @@ class BookmarksFragment : BaseFragment() {
                     }
                 ).show(it, "bookmarks_options_dialog")
         }
+    }
+
+    private fun onEditBookmarkClick() {
+        bookmarksViewModel.buildBookmarkArguments { arguments ->
+            startActivity(arguments.getIntent(requireContext()))
+        }
+    }
+
+    private fun onUpgradeClicked() {
+        val source = OnboardingUpgradeSource.BOOKMARKS
+        val onboardingFlow = OnboardingFlow.Upsell(source, true)
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }

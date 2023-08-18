@@ -223,6 +223,9 @@ dependencies {
     implementation libs.rxRelay
     implementation libs.retrofit
     implementation libs.retrofitMoshi
+    implementation(libs.retrofitProtobuf) {
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    }
     implementation libs.retrofitRxJava
     implementation libs.moshi
     implementation libs.moshiAdapters
@@ -252,6 +255,8 @@ dependencies {
         exclude group: 'org.hamcrest'
     }
     implementation libs.kotlinCoroutinesTest
+    implementation libs.protobufKotlinLite
+    implementation libs.protobufJavaLite
 
     ksp libs.moshiKotlinCompile
     ksp libs.glideCompile
@@ -276,6 +281,7 @@ dependencies {
     androidTestImplementation androidLibs.androidTestCore
     androidTestImplementation androidLibs.roomTest
     androidTestImplementation androidLibs.annotations
+    androidTestImplementation androidLibs.navigationTest
     androidTestImplementation androidLibs.testRunner
     androidTestImplementation androidLibs.testRules
     androidTestImplementation androidLibs.testEspressoCore

@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -18,17 +21,25 @@ import kotlin.coroutines.CoroutineContext
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : BookmarkManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    override var sourceView = SourceView.UNKNOWN
 
     private val bookmarkDao = appDatabase.bookmarkDao()
 
     /**
      * Add a bookmark for the given episode.
      */
-    override suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String): Bookmark {
+    override suspend fun add(
+        episode: BaseEpisode,
+        timeSecs: Int,
+        title: String,
+        creationSource: BookmarkManager.CreationSource
+    ): Bookmark {
         // Prevent adding more than one bookmark at the same place
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
@@ -48,6 +59,10 @@ class BookmarkManagerImpl @Inject constructor(
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARK_CREATED,
+            mapOf("source" to creationSource.analyticsValue)
+        )
         return bookmark
     }
 
@@ -57,6 +72,10 @@ class BookmarkManagerImpl @Inject constructor(
             title = title,
             titleModified = System.currentTimeMillis(),
             syncStatus = SyncStatus.NOT_SYNCED
+        )
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARK_UPDATE_TITLE,
+            mapOf("source" to sourceView.analyticsValue)
         )
     }
 
@@ -164,4 +183,7 @@ class BookmarkManagerImpl @Inject constructor(
         bookmarkDao.insert(bookmark)
         return bookmark
     }
+
+    override suspend fun findUserEpisodesBookmarksFlow() =
+        bookmarkDao.findUserEpisodesBookmarksFlow()
 }

@@ -11,6 +11,8 @@ import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -20,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
@@ -1082,7 +1085,21 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
-        return Settings.HeadphoneAction.values()[getInt("headphone_controls_next_action", Settings.HeadphoneAction.SKIP_FORWARD.ordinal)]
+        val isAddBookmarkEnabled =
+            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && (getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+
+        val defaultAction = Settings.HeadphoneAction.SKIP_FORWARD
+        val nextAction = Settings.HeadphoneAction.values()[
+            getInt(
+                "headphone_controls_next_action",
+                defaultAction.ordinal
+            )
+        ]
+        return if (nextAction == Settings.HeadphoneAction.ADD_BOOKMARK && !isAddBookmarkEnabled) {
+            defaultAction
+        } else {
+            nextAction
+        }
     }
 
     override fun setHeadphoneControlsNextAction(action: Settings.HeadphoneAction) {
@@ -1091,7 +1108,21 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
-        return Settings.HeadphoneAction.values()[getInt("headphone_controls_previous_action", Settings.HeadphoneAction.SKIP_BACK.ordinal)]
+        val isAddBookmarkEnabled =
+            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && (getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+
+        val defaultAction = Settings.HeadphoneAction.SKIP_BACK
+        val previousAction = Settings.HeadphoneAction.values()[
+            getInt(
+                "headphone_controls_previous_action",
+                defaultAction.ordinal
+            )
+        ]
+        return if (previousAction == Settings.HeadphoneAction.ADD_BOOKMARK && !isAddBookmarkEnabled) {
+            defaultAction
+        } else {
+            previousAction
+        }
     }
 
     override fun setHeadphoneControlsPreviousAction(action: Settings.HeadphoneAction) {

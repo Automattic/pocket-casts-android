@@ -306,7 +306,7 @@ class AddFileActivity :
     }
 
     private fun openOnboardingFlow() {
-        openOnboardingFlow(OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FILES))
+        openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES))
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {

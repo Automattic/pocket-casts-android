@@ -98,7 +98,7 @@ class UserManagerImpl @Inject constructor(
                             SignInState.SignedIn(syncManager.getEmail() ?: "", SubscriptionStatus.Free())
                         }
                 } else {
-                    Flowable.just(SignInState.SignedOut())
+                    Flowable.just(SignInState.SignedOut)
                 }
             }
     }

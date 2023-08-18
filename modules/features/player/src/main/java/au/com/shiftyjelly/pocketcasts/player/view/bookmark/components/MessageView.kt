@@ -6,11 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -27,15 +24,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun MessageView(
-    titleView: @Composable () -> Unit = {},
+    titleView: @Composable () -> Unit,
     @StringRes buttonTitleRes: Int,
-    buttonAction: () -> Unit = {},
-    style: MessageViewColors
+    buttonAction: () -> Unit,
+    style: MessageViewColors,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
+        modifier = modifier
     ) {
         Box(
             modifier = Modifier

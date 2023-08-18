@@ -71,10 +71,6 @@ The hierarchy of the modules in the project are reflected in [this diagram](docs
 
 Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, contributing code, and more ways to contribute.
 
-## Security
-
-If you happen to find a security vulnerability, please let us know at https://hackerone.com/automattic and allow us to respond before disclosing the issue publicly.
-
 ## Documentation
 
 - [Coding Style](docs/coding-style.md) - guidelines and validation and auto-formatting tools

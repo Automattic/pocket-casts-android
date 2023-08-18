@@ -372,20 +372,28 @@ class Support @Inject constructor(
                 output.append("Screen: ").append(width).append("x").append(height).append(", dpi: ").append(metrics.densityDpi).append(", density: ").append(metrics.density).append(eol)
             }
 
-            val storageFolder = fileStorage.storageDirectory.absolutePath
-            output.append("Storage: ").append(if (settings.usingCustomFolderStorage()) "Custom Folder" else settings.getStorageChoiceName()).append(", ").append(storageFolder).append(eol)
-            output.append("Storage options:").append(eol)
-            val storageOptions = StorageOptions()
-            for (folderLocation in storageOptions.getFolderLocations(context)) {
-                if (storageFolder == folderLocation.filePath) {
-                    continue
+            try {
+                val storageFolder = fileStorage.storageDirectory.absolutePath
+                output.append("Storage: ").append(if (settings.usingCustomFolderStorage()) "Custom Folder" else settings.getStorageChoiceName()).append(", ").append(storageFolder).append(eol)
+                output.append("Storage options:").append(eol)
+                val storageOptions = StorageOptions()
+                for (folderLocation in storageOptions.getFolderLocations(context)) {
+                    if (storageFolder == folderLocation.filePath) {
+                        continue
+                    }
+                    output.append(folderLocation.label).append(", ").append(folderLocation.filePath).append(eol)
                 }
-                output.append(folderLocation.label).append(", ").append(folderLocation.filePath).append(eol)
+            } catch (e: Exception) {
+                Timber.e(e)
             }
             output.append("Database: " + Util.formattedBytes(context.getDatabasePath("pocketcasts").length(), context = context)).append(eol)
-            output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.tempPodcastDirectory), context = context)).append(eol)
-            output.append("Podcast directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.podcastDirectory), context = context)).append(eol)
-            output.append("Network image directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.networkImageDirectory), context = context)).append(eol)
+            try {
+                output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.tempPodcastDirectory), context = context)).append(eol)
+                output.append("Podcast directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.podcastDirectory), context = context)).append(eol)
+                output.append("Network image directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.networkImageDirectory), context = context)).append(eol)
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
 
             if (!html) {
                 output.append(eol)
@@ -456,6 +464,7 @@ class Support @Inject constructor(
                 }
             }
         } catch (e: Exception) {
+            Timber.e(e)
             output.append("Unable to report all user debug info due to an exception. ").append(e.message)
         }
 
