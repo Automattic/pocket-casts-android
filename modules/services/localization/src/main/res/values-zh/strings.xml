@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-04 08:10:07+0000
+Translation-Revision-Date: 2023-08-15 14:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="support">支持</string>
+    <string name="bookmark_notification_action_change_title">更改标题</string>
+    <string name="bookmark_notification_content_tap_to_view">轻点以查看</string>
+    <string name="bookmark_notification_title_added">已添加书签</string>
+    <string name="notification_channel_description_bookmark">在使用耳机添加书签时显示</string>
+    <string name="notification_channel_description_sign_in_error">在已经后台注销且无法自动重新登录时显示</string>
+    <string name="notification_channel_description_podcast_import">导入播客集</string>
+    <string name="notification_channel_description_playback">在 Pocket Casts 播放音频时显示</string>
+    <string name="notification_channel_description_playback_error">播放时出现错误</string>
+    <string name="notification_channel_description_episode">在播放新一集时显示</string>
+    <string name="notification_channel_description_download">在 Pocket Casts 下载剧集时显示</string>
+    <string name="change_bookmark_title_hint">更改识别此书签的标题</string>
     <string name="bookmark">书签</string>
     <string name="details">详细信息</string>
     <string name="episode">剧集</string>
@@ -42,6 +54,7 @@ Language: zh_CN
     <string name="whats_new_autoplay_title">自动播放功能现已推出！</string>
     <string name="filters_download_limit_3"> 3 集</string>
     <string name="settings_title_headphone_controls">耳机控件</string>
+    <string name="settings_headphone_controls_summary">自定义由常见耳机控件完成的操作。</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">在使用耳机创建书签后播放确认声。</string>
     <string name="settings_headphone_controls_confirmation_sound">书签确认声</string>
     <string name="settings_headphone_controls_choice_skip_forward">前跳</string>
@@ -117,6 +130,7 @@ Language: zh_CN
     <string name="log_in_with_email">使用电子邮件登录</string>
     <string name="log_in_on_phone">在手机上登录</string>
     <string name="log_in_with_google">使用 Google 登录</string>
+    <string name="log_in_subtitle">开始收听您最喜欢的播客节目</string>
     <string name="onboarding_upgrade_no_subscriptions_found">未找到订阅。</string>
     <string name="trial_then_per_year">试用 %1$s，之后每年 %2$s</string>
     <string name="trial_then_per_month">试用 %1$s，之后每月 %2$s</string>
@@ -174,8 +188,10 @@ Language: zh_CN
     <string name="notifications_blocked_warning">通知已被阻止。 您可以通过“设置”更新权限。</string>
     <string name="settings_media_actions_show_subtitle">在 Android 13 媒体通知和 Android Auto 中显示自定义媒体操作。</string>
     <string name="settings_media_actions_show_title">显示自定义媒体操作</string>
+    <string name="settings_media_actions_customise">自定义媒体操作</string>
     <string name="settings_media_actions_prioritize_subtitle">您的顶部操作将可以使用。</string>
     <string name="settings_media_actions_prioritize_title">优先您的自定义媒体操作</string>
+    <string name="plus_take_your_podcasting_to_next_level">通过专享功能和自定义选项，将您的播客体验提升到新的水平。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">筛选 ID 或标题</string>
     <string name="filter_title">筛选标题</string>
@@ -420,6 +436,7 @@ Language: zh_CN
     <string name="podcasts_empty_folder_summary">播客添加到您的文件夹后，会显示在此处</string>
     <string name="podcasts_empty_folder">您的文件夹为空</string>
     <string name="add_podcasts">添加播客</string>
+    <string name="plus_folder_body">创建文件夹以整理您的播客集。</string>
     <string name="expand_details">展开详细信息</string>
     <string name="profile_help_support">通过升级您的账户，帮助支持 Pocket Casts</string>
     <string name="error_check_your_internet_connection">检查您的互联网连接。</string>
@@ -1174,6 +1191,7 @@ Language: zh_CN
     <string name="filters_create_filter_details">过滤器详情</string>
     <string name="filters_create_filter_by">过滤器</string>
     <string name="filters_create_filter">创建过滤器</string>
+    <string name="filters_create_colour_icon">颜色和图标</string>
     <string name="filters_create_add_more">添加更多条件以细化过滤器。</string>
     <string name="filters_create">创建</string>
     <string name="filters_chosen_singular">已选择 1 个过滤器</string>
