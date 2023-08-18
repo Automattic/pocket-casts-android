@@ -318,8 +318,7 @@ interface Settings {
     val cloudAutoUpload: UserSetting<Boolean>
     val cloudAutoDownload: UserSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
-    fun getCachedSubscription(): SubscriptionStatus?
-    fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
+    val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
 
     fun setUpgradeClosedProfile(value: Boolean)
     fun getUpgradeClosedProfile(): Boolean

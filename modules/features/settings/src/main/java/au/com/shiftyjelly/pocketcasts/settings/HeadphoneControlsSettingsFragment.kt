@@ -56,7 +56,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
 
     private val isAddBookmarkEnabled: Boolean
         get() = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-            (settings.getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+            (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
 
     override fun onCreateView(
         inflater: LayoutInflater,
