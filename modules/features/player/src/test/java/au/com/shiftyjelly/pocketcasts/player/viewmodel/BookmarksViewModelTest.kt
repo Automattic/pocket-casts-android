@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -64,6 +65,9 @@ class BookmarksViewModelTest {
     @Mock
     private lateinit var theme: Theme
 
+    @Mock
+    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     private lateinit var bookmarksViewModel: BookmarksViewModel
     private val episodeUuid = UUID.randomUUID().toString()
 
@@ -83,7 +87,8 @@ class BookmarksViewModelTest {
             settings = settings,
             playbackManager = playbackManager,
             theme = theme,
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            analyticsTracker = analyticsTracker,
         )
     }
 

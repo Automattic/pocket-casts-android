@@ -60,6 +60,7 @@ fun BookmarksPage(
 
     Content(
         state = state,
+        sourceView = sourceView,
         backgroundColor = backgroundColor,
         textColor = textColor,
         onRowLongPressed = onRowLongPressed,
@@ -97,6 +98,7 @@ fun BookmarksPage(
 @Composable
 private fun Content(
     state: UiState,
+    sourceView: SourceView,
     backgroundColor: Color,
     textColor: Color,
     onRowLongPressed: (Bookmark) -> Unit,
@@ -123,6 +125,7 @@ private fun Content(
             is UiState.Empty -> NoBookmarksView(
                 style = state.colors,
                 openFragment = openFragment,
+                sourceView = sourceView,
                 modifier = Modifier
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
@@ -130,6 +133,7 @@ private fun Content(
             is UiState.Upsell -> UpsellView(
                 style = state.colors,
                 onClick = onUpgradeClicked,
+                sourceView = sourceView,
                 modifier = Modifier
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
@@ -215,6 +219,7 @@ private fun BookmarksPreview(
                 onRowClick = {},
                 sourceView = SourceView.PLAYER
             ),
+            sourceView = SourceView.PLAYER,
             backgroundColor = Color.Black,
             textColor = Color.Black,
             onPlayClick = {},

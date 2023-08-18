@@ -214,6 +214,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
+                    viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)
                     BookmarksContainerFragment.newInstance(
                         episodeUuid = episodeUUID,
                         sourceView = SourceView.FILES

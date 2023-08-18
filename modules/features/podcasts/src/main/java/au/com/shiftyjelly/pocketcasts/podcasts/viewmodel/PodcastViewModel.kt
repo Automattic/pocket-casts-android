@@ -81,7 +81,8 @@ class PodcastViewModel
     private val bookmarkSearchHandler: BookmarkSearchHandler,
     private val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
-    private val settings: Settings
+    private val settings: Settings,
+    private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -105,9 +106,14 @@ class PodcastViewModel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    init {
+        podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = {
+            multiSelectBookmarksHelper.source = SourceView.PODCAST_SCREEN
+        }
+    }
+
     fun loadPodcast(uuid: String, resources: Resources) {
         viewModelScope.launch {
-
             this@PodcastViewModel.podcastUuid = uuid
             val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
             val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
@@ -187,6 +193,7 @@ class PodcastViewModel
     }
 
     fun onTabClicked(tab: PodcastTab) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_SCREEN_TAB_TAPPED, mapOf("value" to tab.analyticsValue))
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }
 
@@ -381,6 +388,13 @@ class PodcastViewModel
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
         settings.setBookmarksSortType(order)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
+            mapOf(
+                "sort_order" to order.key,
+                "source" to SourceView.PODCAST_SCREEN.analyticsValue,
+            ),
+        )
     }
 
     fun play(bookmark: Bookmark) {
@@ -389,7 +403,7 @@ class PodcastViewModel
             val shouldPlayEpisode = !playbackManager.isPlaying() ||
                 playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
             if (shouldPlayEpisode) {
-                playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+                playbackManager.playNow(it, sourceView = SourceView.PODCAST_SCREEN)
             }
         }
         playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
@@ -520,9 +534,9 @@ class PodcastViewModel
     private fun getCurrentTab() =
         (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
-    enum class PodcastTab(@StringRes val labelResId: Int) {
-        EPISODES(LR.string.episodes),
-        BOOKMARKS(LR.string.bookmarks),
+    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
+        EPISODES(LR.string.episodes, "episodes"),
+        BOOKMARKS(LR.string.bookmarks, "bookmarks"),
     }
 
     sealed class UiState {

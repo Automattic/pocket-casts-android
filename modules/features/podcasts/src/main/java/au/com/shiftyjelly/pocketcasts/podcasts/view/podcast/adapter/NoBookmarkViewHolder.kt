@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter
 
 import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
@@ -17,7 +18,8 @@ class NoBookmarkViewHolder(
             AppTheme(theme.activeTheme) {
                 NoBookmarksView(
                     style = NoBookmarksViewColors.Default,
-                    openFragment = { onHeadsetSettingsClicked() }
+                    sourceView = SourceView.PODCAST_SCREEN,
+                    openFragment = { onHeadsetSettingsClicked() },
                 )
             }
         }

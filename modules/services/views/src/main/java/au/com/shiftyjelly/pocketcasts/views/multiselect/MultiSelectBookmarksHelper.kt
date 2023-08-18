@@ -4,6 +4,8 @@ import android.content.res.Resources
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -22,11 +24,14 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @Singleton
 class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : MultiSelectHelper<Bookmark>() {
     override val maxToolbarIcons = 2
 
     private val _showEditBookmarkPage = MutableSharedFlow<Boolean>()
     val showEditBookmarkPage = _showEditBookmarkPage.asSharedFlow()
+
+    override var source by bookmarkManager::sourceView
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
@@ -118,6 +123,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
                 launch {
                     bookmarks.forEach {
                         bookmarkManager.deleteToSync(it.uuid)
+                        analyticsTracker.track(
+                            AnalyticsEvent.BOOKMARK_DELETED,
+                            mapOf("source" to source.analyticsValue)
+                        )
                     }
 
                     withContext(Dispatchers.Main) {

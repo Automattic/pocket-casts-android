@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -81,7 +82,7 @@ class PodcastSyncProcessTest {
             val folderManager: FolderManager = mock()
             whenever(folderManager.findFoldersToSync()).thenReturn(emptyList())
 
-            val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase)
+            val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase, mock())
             val bookmarkToUpdate = bookmarkManager.add(
                 episode = PodcastEpisode(
                     uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
@@ -89,7 +90,8 @@ class PodcastSyncProcessTest {
                     publishedDate = Date()
                 ),
                 timeSecs = 23,
-                title = "Bookmark"
+                title = "Bookmark",
+                creationSource = BookmarkManager.CreationSource.PLAYER,
             )
             val bookmarkToDelete = bookmarkManager.add(
                 episode = PodcastEpisode(
@@ -98,7 +100,8 @@ class PodcastSyncProcessTest {
                     publishedDate = Date()
                 ),
                 timeSecs = 875,
-                title = "Bookmark Deleted"
+                title = "Bookmark Deleted",
+                creationSource = BookmarkManager.CreationSource.PLAYER,
             )
             val bookmarkUuidToAdd = "d0f337c2-4d85-40b7-ae59-893a75fe42bc"
 

@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
@@ -43,6 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarksViewModel
 @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
@@ -61,6 +64,10 @@ class BookmarksViewModel
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
     private var sourceView: SourceView = SourceView.UNKNOWN
+        set(value) {
+            field = value
+            multiSelectHelper.source = value
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
@@ -189,6 +196,13 @@ class BookmarksViewModel
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPlayer) return
         settings.setBookmarksSortType(order)
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
+            mapOf(
+                "sort_order" to order.key,
+                "source" to sourceView.analyticsValue,
+            )
+        )
     }
 
     fun play(bookmark: Bookmark) {
@@ -198,10 +212,17 @@ class BookmarksViewModel
                 val shouldPlayEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
                 if (shouldPlayEpisode) {
-                    playbackManager.playNow(it, sourceView = SourceView.PODCAST_LIST)
+                    playbackManager.playNow(it, sourceView = sourceView)
                 }
             }
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
+            analyticsTracker.track(
+                AnalyticsEvent.BOOKMARK_PLAY_TAPPED,
+                mapOf(
+                    "source" to sourceView.analyticsValue,
+                    "episode_uuid" to bookmark.episodeUuid,
+                ),
+            )
         }
     }
 

@@ -614,6 +614,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                     swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
                 ),
                 onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
+                sourceView = SourceView.PODCAST_SCREEN,
             )
         }
 

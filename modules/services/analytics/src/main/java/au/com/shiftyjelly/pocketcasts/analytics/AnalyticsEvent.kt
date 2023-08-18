@@ -8,6 +8,15 @@ enum class AnalyticsEvent(val key: String) {
     APPLICATION_OPENED("application_opened"),
     APPLICATION_CLOSED("application_closed"),
 
+    /* Bookmarks */
+    BOOKMARK_CREATED("bookmark_created"),
+    BOOKMARK_UPDATE_TITLE("bookmark_update_title"),
+    BOOKMARKS_UPGRADE_BUTTON_TAPPED("bookmarks_upgrade_button_tapped"),
+    BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS("bookmarks_empty_go_to_headphone_settings"),
+    BOOKMARK_PLAY_TAPPED("bookmark_play_tapped"),
+    BOOKMARKS_SORT_BY_CHANGED("bookmarks_sort_by_changed"),
+    BOOKMARK_DELETED("bookmark_deleted"),
+
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
     USER_SIGNED_IN_WATCH_FROM_PHONE("user_signed_in_watch_from_phone"),
@@ -211,6 +220,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
     PODCASTS_SCREEN_SORT_ORDER_CHANGED("podcasts_screen_sort_order_changed"),
     PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
+    PODCASTS_SCREEN_TAB_TAPPED("podcasts_screen_tab_tapped"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -370,6 +380,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
     EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
     EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
+    EPISODE_DETAIL_TAB_CHANGED("episode_detail_tab_changed"),
 
     /* Recommendations */
     RECOMMENDATIONS_SHOWN("recommendations_shown"),
@@ -481,6 +492,12 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
     SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
+
+    /* Settings - Headphone controls */
+    SETTINGS_HEADPHONE_CONTROLS_SHOWN("settings_headphone_controls_shown"),
+    SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED("settings_headphone_controls_next_changed"),
+    SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED("settings_headphone_controls_previous_changed"),
+    SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_CONFIRMATION_SOUND("settings_headphone_controls_bookmark_confirmation_sound"),
 
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),

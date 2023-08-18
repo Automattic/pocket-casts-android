@@ -22,7 +22,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -69,17 +71,30 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                 val confirmationSound =
                     settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value
 
+                val viewModel = hiltViewModel<HeadphoneControlsSettingsPageViewModel>()
+
+                CallOnce {
+                    viewModel.onShown()
+                }
+
                 HeadphoneControlsSettingsPage(
                     previousAction = previousAction,
                     nextAction = nextAction,
-                    onNextActionSave = { settings.setHeadphoneControlsNextAction(it) },
-                    onPreviousActionSave = { settings.setHeadphoneControlsPreviousAction(it) },
+                    onNextActionSave = {
+                        settings.setHeadphoneControlsNextAction(it)
+                        viewModel.onNextActionChanged(it)
+                    },
+                    onPreviousActionSave = {
+                        settings.setHeadphoneControlsPreviousAction(it)
+                        viewModel.onPreviousActionChanged(it)
+                    },
                     confirmationSound = confirmationSound,
                     onConfirmationSoundSave = {
                         settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it)
                         if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
                             playbackManager.playTone()
                         }
+                        viewModel.onConfirmationSoundChanged(it)
                     },
                     onBackPressed = {
                         @Suppress("DEPRECATION")
