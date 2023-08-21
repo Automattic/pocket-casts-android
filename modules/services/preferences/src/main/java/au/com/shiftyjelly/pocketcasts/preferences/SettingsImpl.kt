@@ -8,8 +8,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -19,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
@@ -32,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehavi
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
@@ -84,9 +83,6 @@ class SettingsImpl @Inject constructor(
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
 
-    override val headphonePreviousActionFlow = MutableStateFlow(getHeadphoneControlsPreviousAction())
-    override val headphoneNextActionFlow = MutableStateFlow(getHeadphoneControlsNextAction())
-    override val headphonePlayBookmarkConfirmationSoundFlow = MutableStateFlow(getHeadphoneControlsPlayBookmarkConfirmationSound())
     override val bookmarkSortTypeForPlayerFlow = MutableStateFlow(getBookmarksSortTypeForPlayer())
     override val bookmarkSortTypeForPodcastFlow = MutableStateFlow(getBookmarksSortTypeForPodcast())
 
@@ -877,60 +873,50 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getHeadphoneControlsNextAction(): Settings.HeadphoneAction {
-        val isAddBookmarkEnabled =
-            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && (getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
-
-        val defaultAction = Settings.HeadphoneAction.SKIP_FORWARD
-        val nextAction = Settings.HeadphoneAction.values()[
-            getInt(
-                "headphone_controls_next_action",
-                defaultAction.ordinal
-            )
-        ]
-        return if (nextAction == Settings.HeadphoneAction.ADD_BOOKMARK && !isAddBookmarkEnabled) {
-            defaultAction
-        } else {
-            nextAction
+    override val cachedSubscriptionStatus = UserSetting.PrefFromString<SubscriptionStatus?>(
+        sharedPrefKey = "accountstatus",
+        defaultValue = null,
+        sharedPrefs = privatePreferences,
+        fromString = {
+            if (it.isEmpty()) {
+                return@PrefFromString null
+            }
+            val str = decrypt(it) ?: return@PrefFromString null
+            try {
+                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
+                adapter.fromJson(str)
+            } catch (e: Exception) {
+                null
+            }
+        },
+        toString = {
+            (it as? SubscriptionStatus.Paid)?.let { paidSubscriptionStatus ->
+                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
+                val str = adapter.toJson(paidSubscriptionStatus)
+                encrypt(str)
+            } ?: ""
         }
-    }
+    )
 
-    override fun setHeadphoneControlsNextAction(action: Settings.HeadphoneAction) {
-        setInt("headphone_controls_next_action", action.ordinal)
-        headphoneNextActionFlow.update { action }
-    }
+    override val headphoneControlsNextAction = HeadphoneActionUserSetting(
+        sharedPrefKey = "headphone_controls_next_action",
+        defaultAction = HeadphoneAction.SKIP_FORWARD,
+        sharedPrefs = sharedPreferences,
+        subscriptionStatusFlow = cachedSubscriptionStatus.flow,
+    )
 
-    override fun getHeadphoneControlsPreviousAction(): Settings.HeadphoneAction {
-        val isAddBookmarkEnabled =
-            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && (getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+    override val headphoneControlsPreviousAction = HeadphoneActionUserSetting(
+        sharedPrefKey = "headphone_controls_previous_action",
+        defaultAction = HeadphoneAction.SKIP_BACK,
+        sharedPrefs = sharedPreferences,
+        subscriptionStatusFlow = cachedSubscriptionStatus.flow,
+    )
 
-        val defaultAction = Settings.HeadphoneAction.SKIP_BACK
-        val previousAction = Settings.HeadphoneAction.values()[
-            getInt(
-                "headphone_controls_previous_action",
-                defaultAction.ordinal
-            )
-        ]
-        return if (previousAction == Settings.HeadphoneAction.ADD_BOOKMARK && !isAddBookmarkEnabled) {
-            defaultAction
-        } else {
-            previousAction
-        }
-    }
-
-    override fun setHeadphoneControlsPreviousAction(action: Settings.HeadphoneAction) {
-        setInt("headphone_controls_previous_action", action.ordinal)
-        headphonePreviousActionFlow.update { action }
-    }
-
-    override fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean {
-        return getBoolean("headphone_controls_play_bookmark_confirmation_sound", true)
-    }
-
-    override fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean) {
-        setBoolean("headphone_controls_play_bookmark_confirmation_sound", value)
-        headphonePlayBookmarkConfirmationSoundFlow.update { value }
-    }
+    override val headphoneControlsPlayBookmarkConfirmationSound = UserSetting.BoolPref(
+        sharedPrefKey = "headphone_controls_play_bookmark_confirmation_sound",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val showArchivedDefault = UserSetting.BoolPref(
         sharedPrefKey = "default_show_archived",
@@ -1044,26 +1030,6 @@ class SettingsImpl @Inject constructor(
 
     override fun setWhatsNewVersionCode(value: Int) {
         setInt("WhatsNewVersionCode", value)
-    }
-
-    override fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?) {
-        if (subscriptionStatus is SubscriptionStatus.Paid) {
-            val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
-            val str = adapter.toJson(subscriptionStatus)
-            privatePreferences.edit().putString("accountstatus", encrypt(str)).apply()
-        } else {
-            privatePreferences.edit().putString("accountstatus", null).apply()
-        }
-    }
-
-    override fun getCachedSubscription(): SubscriptionStatus? {
-        val str = decrypt(privatePreferences.getString("accountstatus", null)) ?: return null
-        try {
-            val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
-            return adapter.fromJson(str)
-        } catch (e: Exception) {
-            return null
-        }
     }
 
     private fun getShelfItems(): List<String> {

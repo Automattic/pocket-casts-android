@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehavi
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
@@ -143,14 +144,6 @@ interface Settings {
         LONG_SHORT
     }
 
-    enum class HeadphoneAction(val analyticsValue: String) {
-        ADD_BOOKMARK("add_bookmark"),
-        SKIP_BACK("skip_back"),
-        SKIP_FORWARD("skip_forward"),
-        NEXT_CHAPTER("next_chapter"),
-        PREVIOUS_CHAPTER("previous_chapter"),
-    }
-
     sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
 
         companion object {
@@ -187,9 +180,6 @@ interface Settings {
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
 
-    val headphonePreviousActionFlow: StateFlow<HeadphoneAction>
-    val headphoneNextActionFlow: StateFlow<HeadphoneAction>
-    val headphonePlayBookmarkConfirmationSoundFlow: StateFlow<Boolean>
     val bookmarkSortTypeForPlayerFlow: StateFlow<BookmarksSortTypeForPlayer>
     val bookmarkSortTypeForPodcastFlow: StateFlow<BookmarksSortTypeForPodcast>
 
@@ -306,12 +296,9 @@ interface Settings {
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>
 
-    fun getHeadphoneControlsNextAction(): HeadphoneAction
-    fun setHeadphoneControlsNextAction(action: HeadphoneAction)
-    fun getHeadphoneControlsPreviousAction(): HeadphoneAction
-    fun setHeadphoneControlsPreviousAction(action: HeadphoneAction)
-    fun getHeadphoneControlsPlayBookmarkConfirmationSound(): Boolean
-    fun setHeadphoneControlsPlayBookmarkConfirmationSound(value: Boolean)
+    val headphoneControlsNextAction: UserSetting<HeadphoneAction>
+    val headphoneControlsPreviousAction: UserSetting<HeadphoneAction>
+    val headphoneControlsPlayBookmarkConfirmationSound: UserSetting<Boolean>
 
     // Firebase remote config
     fun getPeriodicSaveTimeMs(): Long
@@ -331,8 +318,7 @@ interface Settings {
     val cloudAutoUpload: UserSetting<Boolean>
     val cloudAutoDownload: UserSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
-    fun getCachedSubscription(): SubscriptionStatus?
-    fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
+    val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
 
     fun setUpgradeClosedProfile(value: Boolean)
     fun getUpgradeClosedProfile(): Boolean

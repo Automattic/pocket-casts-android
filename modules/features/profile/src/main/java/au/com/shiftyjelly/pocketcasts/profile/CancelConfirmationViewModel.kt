@@ -17,7 +17,7 @@ class CancelConfirmationViewModel
 ) : ViewModel() {
     var expirationDate: String? = null
     private val paidSubscription: SubscriptionStatus.Paid?
-        get() = settings.getCachedSubscription() as? SubscriptionStatus.Paid
+        get() = settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid
 
     init {
         onViewShown()

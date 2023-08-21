@@ -30,7 +30,7 @@ abstract class UserSetting<T>(
     // These are lazy because (1) the class needs to initialize before calling get() and
     // (2) we don't want to get the current value from SharedPreferences for every
     // setting immediately on app startup.
-    private val _flow by lazy { MutableStateFlow(get()) }
+    protected val _flow by lazy { MutableStateFlow(get()) }
     val flow: StateFlow<T> by lazy { _flow }
 
     // External callers should use [value] to get the current value if they can't

@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -521,20 +522,20 @@ class MediaSessionManager(
         }
 
         private fun handleMediaButtonDoubleTap() {
-            handleMediaButtonAction(settings.headphoneNextActionFlow.value)
+            handleMediaButtonAction(settings.headphoneControlsNextAction.value)
         }
 
         private fun handleMediaButtonTripleTap() {
-            handleMediaButtonAction(settings.headphonePreviousActionFlow.value)
+            handleMediaButtonAction(settings.headphoneControlsPreviousAction.value)
         }
 
-        private fun handleMediaButtonAction(action: Settings.HeadphoneAction) {
+        private fun handleMediaButtonAction(action: HeadphoneAction) {
             when (action) {
-                Settings.HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
-                Settings.HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
-                Settings.HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
-                Settings.HeadphoneAction.NEXT_CHAPTER,
-                Settings.HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
+                HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
+                HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
+                HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
+                HeadphoneAction.NEXT_CHAPTER,
+                HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 

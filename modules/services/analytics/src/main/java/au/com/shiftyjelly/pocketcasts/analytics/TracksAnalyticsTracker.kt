@@ -24,7 +24,7 @@ class TracksAnalyticsTracker @Inject constructor(
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
     private val paidSubscription: SubscriptionStatus.Paid?
-        get() = settings.getCachedSubscription() as? SubscriptionStatus.Paid
+        get() = settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid
 
     private val predefinedEventProperties: Map<String, Any>
         get() {
