@@ -49,15 +49,13 @@ class CloudFilesViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 cloudFilesManager.cloudFilesList.asFlow(),
-                bookmarkManager.findUserEpisodesBookmarksFlow()
-            ) { cloudFiles, bookmarks ->
+                bookmarkManager.findUserEpisodesBookmarksFlow(),
+                signInState.asFlow(),
+            ) { cloudFiles, bookmarks, signInState ->
                 val cloudFilesWithBookmarkInfo = cloudFiles.map { file ->
-                    if (bookmarks.any { (it.episodeUuid == file.uuid) && it.deleted }) {
-                        file.hasBookmark = false
-                    } else {
-                        file.hasBookmark = bookmarks.any { it.episodeUuid == file.uuid } &&
+                    file.hasBookmark = bookmarks.map { it.episodeUuid }.contains(file.uuid) &&
+                            signInState.isSignedInAsPatron &&
                             FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
-                    }
                     file
                 }
                 _uiState.value = UiState(cloudFilesWithBookmarkInfo)
