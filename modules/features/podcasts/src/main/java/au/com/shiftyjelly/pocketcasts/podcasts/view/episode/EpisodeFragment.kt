@@ -137,13 +137,16 @@ class EpisodeFragment : BaseFragment() {
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEpisodeBinding.inflate(inflater, container, false)
-        showNotesFormatter = if (!forceDarkTheme || theme.isDarkTheme) {
-            createShowNotesFormatter(requireContext())
+        val themeResId = if (!forceDarkTheme || theme.isDarkTheme) {
+            activeTheme.resourceId
         } else {
-            val context = ContextThemeWrapper(requireContext(), R.style.ThemeDark)
-            createShowNotesFormatter(context)
+            R.style.ThemeDark
         }
+        val contextThemeWrapper = ContextThemeWrapper(requireContext(), themeResId)
+        val localInflater = inflater.cloneInContext(contextThemeWrapper)
+        binding = FragmentEpisodeBinding.inflate(localInflater, container, false)
+
+        showNotesFormatter = createShowNotesFormatter(contextThemeWrapper)
 
         statusBarColor = StatusBarColor.Custom(
             context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme
