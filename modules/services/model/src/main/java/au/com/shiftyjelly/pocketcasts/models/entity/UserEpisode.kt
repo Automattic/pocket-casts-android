@@ -52,6 +52,9 @@ data class UserEpisode(
     @Ignore
     override var playing: Boolean = false
 
+    @Ignore
+    var hasBookmark: Boolean = false
+
     override fun displaySubtitle(podcast: Podcast?): String {
         return UserEpisodePodcastSubstitute.substituteTitle
     }

@@ -1,5 +1,11 @@
 blank_issues_enabled: true
 contact_links:
-  - name: General help request
+  - name: Feature request
+    url: https://github.com/Automattic/pocket-casts-android/discussions
+    about: For feature requests, please use GitHub discussions.
+  - name: Help request
     url: https://support.pocketcasts.com/android/
     about: For general help requests, check the faq or get in touch with support.
+  - name: Pocket Casts Forums
+    url: https://forums.pocketcasts.com/
+    about: Get help with Pocket Casts at our public forum

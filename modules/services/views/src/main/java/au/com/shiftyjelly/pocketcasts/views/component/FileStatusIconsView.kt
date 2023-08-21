@@ -55,6 +55,7 @@ class FileStatusIconsView @JvmOverloads constructor(
     private val progressBar: ProgressBar
     private val imgUpNext: ImageView
     private val imgIcon: ImageView
+    private val imgBookmark: ImageView
     private val lblStatus: TextView
     private val imgCloud: GradientIcon
 
@@ -64,6 +65,7 @@ class FileStatusIconsView @JvmOverloads constructor(
         progressBar = findViewById(R.id.progressBar)
         imgUpNext = findViewById(R.id.imgUpNext)
         imgIcon = findViewById(R.id.imgIcon)
+        imgBookmark = findViewById(R.id.imgBookmark)
         lblStatus = findViewById(R.id.lblStatus)
         imgCloud = findViewById(R.id.imgCloud)
         ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {}
@@ -113,6 +115,7 @@ class FileStatusIconsView @JvmOverloads constructor(
             .doOnNext { (streamingProgress, playbackState, isInUpNext) ->
                 episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
                 imgUpNext.visibility = if (isInUpNext) View.VISIBLE else View.GONE
+                imgBookmark.visibility = if (episode.hasBookmark) View.VISIBLE else View.GONE
 
                 imgIcon.isVisible = false
                 if (playbackState.episodeUuid == episode.uuid && playbackState.isBuffering) {
