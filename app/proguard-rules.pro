@@ -164,6 +164,7 @@
 # > Task :modules:services:model:minifyReleaseWithR8 FAILED
 # ERROR: Missing classes detected while running R8. Please add the missing classes or apply additional keep rules that are generated in ~/pocket-casts-android/modules/services/model/build/outputs/mapping/release/missing_rules.txt.
 # ERROR: R8: Missing class au.com.shiftyjelly.pocketcasts.localization.R$string (referenced from: void au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency.<clinit>())
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$array
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$attr
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$color
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$drawable
