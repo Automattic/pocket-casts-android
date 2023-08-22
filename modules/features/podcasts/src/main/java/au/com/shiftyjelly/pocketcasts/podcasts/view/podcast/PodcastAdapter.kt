@@ -303,7 +303,17 @@ class PodcastAdapter(
 
     private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
         val episode = getItem(position) as? PodcastEpisode ?: return
-        holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectEpisodesHelper.isMultiSelecting, multiSelectEpisodesHelper.isSelected(episode), disposables)
+        holder.setup(
+            episode = episode,
+            fromListUuid = fromListUuid,
+            tintColor = ThemeColor.podcastIcon02(theme.activeTheme, tintColor),
+            playButtonListener = playButtonListener,
+            streamByDefault = settings.streamingMode.value || castConnected,
+            upNextAction = settings.upNextSwipe.value,
+            multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
+            isSelected = multiSelectEpisodesHelper.isSelected(episode),
+            disposables = disposables
+        )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectEpisodesHelper.toggle(episode)

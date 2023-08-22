@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -328,7 +329,7 @@ class RefreshPodcastsThread(
         // and run through them one by one sorted by their publish date. They are added to up next as if the action
         // was run right as they were published magically
         runBlocking {
-            val upNextLimit = settings.getAutoAddUpNextLimit()
+            val upNextLimit = settings.autoAddUpNextLimit.value
             episodesToAddToUpNext.sortBy { it.second.publishedDate }
             episodesToAddToUpNext.forEach {
                 if (playbackManager.upNextQueue.queueEpisodes.size < upNextLimit) {
@@ -337,7 +338,7 @@ class RefreshPodcastsThread(
                         AddToUpNext.Last -> playbackManager.playLast(it.second, source = SourceView.UNKNOWN, userInitiated = false)
                     }
                 } else if (playbackManager.upNextQueue.queueEpisodes.size >= upNextLimit &&
-                    settings.getAutoAddUpNextLimitBehaviour() == Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP &&
+                    settings.autoAddUpNextLimitBehaviour.value == AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP &&
                     it.first == AddToUpNext.Next
                 ) {
                     playbackManager.playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false)
@@ -536,11 +537,12 @@ class RefreshPodcastsThread(
 
             // Add sound and vibrations
             if (!isGroupNotification) {
-                val sound = settings.getNotificationSound()
+                val sound = settings.notificationSound.value.uri
                 if (sound != null) {
                     notification.sound = sound
                 }
-                if (settings.isNotificationVibrateOn()) {
+                val isVibrateOn = settings.notificationVibrate.value.isNotificationVibrateOn(context)
+                if (isVibrateOn) {
                     notification.defaults = notification.defaults or Notification.DEFAULT_VIBRATE
                 }
             }
@@ -625,11 +627,12 @@ class RefreshPodcastsThread(
             val summaryNotification = summaryBuilder.build()
 
             // Add sound and vibrations
-            val sound = settings.getNotificationSound()
+            val sound = settings.notificationSound.value.uri
             if (sound != null) {
                 summaryNotification.sound = sound
             }
-            if (settings.isNotificationVibrateOn()) {
+            val isVibrateOn = settings.notificationVibrate.value.isNotificationVibrateOn(context)
+            if (isVibrateOn) {
                 summaryNotification.defaults = summaryNotification.defaults or Notification.DEFAULT_VIBRATE
             }
 

@@ -5,19 +5,16 @@
         <SwitchPreference
             android:key="autoUpNextEmpty"
             android:title="@string/settings_auto_play"
-            app:defaultValue="true"
             android:summary="@string/settings_auto_play_summary" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_title_playback">
         <SwitchPreference
             android:key="autoSubscribeToPlayed"
             android:title="@string/settings_subscribe_to_played"
-            android:defaultValue="true"
             android:summary="@string/settings_subscribe_to_played_summary" />
         <SwitchPreference
             android:key="autoShowPlayed"
             android:title="@string/settings_show_played"
-            android:defaultValue="false"
             android:summary="@string/settings_show_played_summary" />
     </PreferenceCategory>
     <EditTextPreference

@@ -112,7 +112,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
-        updateMediaActionsVisibility(settings.areCustomMediaActionsVisible())
+        updateMediaActionsVisibility(settings.customMediaActionsVisibility.value)
 
         val callback = MediaActionTouchCallback(listener = this)
         itemTouchHelper = ItemTouchHelper(callback)
@@ -120,7 +120,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.defaultMediaNotificationControlsFlow.collect {
+                settings.mediaControlItems.flow.collect {
                     val itemsPlusTitles = mutableListOf<Any>()
                     itemsPlusTitles.addAll(it)
                     itemsPlusTitles.add(3, otherActionsTitle)
@@ -136,9 +136,9 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
             setContent {
                 AppThemeWithBackground(theme.activeTheme) {
                     ShowCustomMediaActionsSettingsRow(
-                        shouldShowCustomMediaActions = settings.customMediaActionsVisibilityFlow.collectAsState().value,
+                        shouldShowCustomMediaActions = settings.customMediaActionsVisibility.flow.collectAsState().value,
                         onShowCustomMediaActionsToggled = { showCustomActions ->
-                            settings.setCustomMediaActionsVisible(showCustomActions)
+                            settings.customMediaActionsVisibility.set(showCustomActions)
                             updateMediaActionsVisibility(showCustomActions)
                         }
                     )
@@ -282,7 +282,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         // Reset mediaActionMove now that we've tracked it
         mediaActionMove = null
 
-        settings.setMediaNotificationControlItems(items.filterIsInstance<Settings.MediaNotificationControls>().map { it.key })
+        settings.mediaControlItems.set(items.filterIsInstance<Settings.MediaNotificationControls>())
     }
 }
 

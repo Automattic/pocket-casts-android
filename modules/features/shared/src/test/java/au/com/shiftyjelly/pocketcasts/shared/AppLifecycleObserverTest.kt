@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatur
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -32,6 +33,7 @@ class AppLifecycleObserverTest {
 
     @Mock @ApplicationContext private lateinit var context: Context
     @Mock private lateinit var settings: Settings
+    @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
     @Mock private lateinit var packageUtil: PackageUtil
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
@@ -44,6 +46,8 @@ class AppLifecycleObserverTest {
 
     @Before
     fun setUp() {
+        whenever(settings.autoPlayNextEpisodeOnEmpty).thenReturn(autoPlayNextEpisodeSetting)
+
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
 
         appLifecycleObserver = AppLifecycleObserver(
@@ -70,7 +74,7 @@ class AppLifecycleObserverTest {
         appLifecycleObserver.setup()
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
-        verify(settings).setAutoPlayNextEpisodeOnEmpty(true)
+        verify(autoPlayNextEpisodeSetting).set(true)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -86,7 +90,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(settings, never()).setAutoPlayNextEpisodeOnEmpty(any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -101,7 +105,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(settings, never()).setAutoPlayNextEpisodeOnEmpty(any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -117,6 +121,6 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onApplicationUpgrade(VERSION_CODE_AFTER_FIRST_INSTALL)
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
-        verify(settings, never()).setAutoPlayNextEpisodeOnEmpty(any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
     }
 }

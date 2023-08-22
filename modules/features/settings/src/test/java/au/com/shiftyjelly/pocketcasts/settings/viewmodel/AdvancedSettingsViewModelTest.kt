@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import dagger.hilt.android.qualifiers.ApplicationContext
 import junit.framework.TestCase
@@ -13,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
@@ -35,6 +37,7 @@ class AdvancedSettingsViewModelTest {
     @Before
     fun setUp() {
         whenever(settings.syncOnMeteredNetwork()).thenReturn(false)
+        whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
         viewModel = AdvancedSettingsViewModel(
             settings,
             analyticsTracker,

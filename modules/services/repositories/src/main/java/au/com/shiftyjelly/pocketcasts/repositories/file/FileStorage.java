@@ -166,7 +166,7 @@ public class FileStorage {
 	}
 	
 	private final static void addNoMediaFile(File folder, Settings settings) {
-		if (folder == null || !folder.exists() || settings.allowOtherAppsAccessToEpisodes()) {
+		if (folder == null || !folder.exists()) {
 			return;
 		}
 		File file = new File(folder, ".nomedia");

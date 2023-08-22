@@ -34,8 +34,7 @@ class OnboardingWelcomeViewModel @Inject constructor(
             )
         )
 
-        settings.setMarketingOptIn(newsletter)
-        settings.setMarketingOptInNeedsSync(true)
+        settings.marketingOptIn.set(newsletter, needsSync = true)
     }
 
     fun onShown(flow: OnboardingFlow) {

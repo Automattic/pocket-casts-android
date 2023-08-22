@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -68,8 +67,7 @@ interface PodcastManager {
     fun updatePodcast(podcast: Podcast)
 
     fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
-    fun updateAllShowNotifications(showNotifications: Boolean)
-    fun updateAllShowNotificationsRx(showNotifications: Boolean): Completable
+    suspend fun updateAllShowNotifications(showNotifications: Boolean)
     fun updateAutoDownloadStatus(podcast: Podcast, autoDownloadStatus: Int)
     suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext)
     suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext)
