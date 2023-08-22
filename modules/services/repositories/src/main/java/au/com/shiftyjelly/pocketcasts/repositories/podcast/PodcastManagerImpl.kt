@@ -766,7 +766,7 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =
         podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 
-    override fun findRandomPodcasts(limit: Int): List<Podcast> {
+    override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
     }
 }
