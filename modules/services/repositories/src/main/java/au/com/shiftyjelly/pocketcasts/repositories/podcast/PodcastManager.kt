@@ -144,5 +144,5 @@ interface PodcastManager {
 
     suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 
-    fun findRandomPodcasts(limit: Int): List<Podcast>
+    suspend fun findRandomPodcasts(limit: Int): List<Podcast>
 }

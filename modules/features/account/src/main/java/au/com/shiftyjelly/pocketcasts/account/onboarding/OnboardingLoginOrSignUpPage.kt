@@ -23,6 +23,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,11 +37,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInButtonViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
@@ -86,11 +89,44 @@ internal fun OnboardingLoginOrSignUpPage(
         }
     }
 
-    BackHandler {
+    val onNavigationClick = {
         viewModel.onDismiss(flow)
         onDismiss()
     }
 
+    BackHandler {
+        onNavigationClick()
+    }
+
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Content(
+        state = state,
+        flow = flow,
+        showContinueWithGoogleButton = viewModel.showContinueWithGoogleButton,
+        onSignUpClicked = {
+            viewModel.onSignUpClicked(flow)
+            onSignUpClicked()
+        },
+        onLoginClicked = {
+            viewModel.onLoginClicked(flow)
+            onLoginClicked()
+        },
+        onContinueWithGoogleComplete = onContinueWithGoogleComplete,
+        onNavigationClick = onNavigationClick,
+    )
+}
+
+@Composable
+private fun Content(
+    state: UiState,
+    flow: OnboardingFlow,
+    showContinueWithGoogleButton: Boolean,
+    onNavigationClick: () -> Unit,
+    onSignUpClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
+) {
     Column(
         Modifier
             .fillMaxHeight()
@@ -108,10 +144,7 @@ internal fun OnboardingLoginOrSignUpPage(
                 NavigationIconButton(
                     iconColor = MaterialTheme.theme.colors.primaryText01,
                     navigationButton = NavigationButton.Close,
-                    onNavigationClick = {
-                        viewModel.onDismiss(flow)
-                        onDismiss()
-                    }
+                    onNavigationClick = onNavigationClick
                 )
             }
 
@@ -126,8 +159,13 @@ internal fun OnboardingLoginOrSignUpPage(
 
         Spacer(Modifier.height(32.dp))
 
-        val context = LocalContext.current
-        Artwork(GoogleSignInButtonViewModel.showContinueWithGoogleButton(context), viewModel.randomPodcasts)
+        if (state is UiState.Loaded) {
+            val context = LocalContext.current
+            Artwork(
+                googleSignInShown = GoogleSignInButtonViewModel.showContinueWithGoogleButton(context),
+                podcasts = state.randomPodcasts
+            )
+        }
 
         Spacer(Modifier.weight(1f))
 
@@ -151,7 +189,7 @@ internal fun OnboardingLoginOrSignUpPage(
 
         Spacer(Modifier.weight(1f))
 
-        if (viewModel.showContinueWithGoogleButton) {
+        if (showContinueWithGoogleButton) {
             Spacer(Modifier.height(8.dp))
             ContinueWithGoogleButton(
                 flow = flow,
@@ -161,16 +199,8 @@ internal fun OnboardingLoginOrSignUpPage(
             Spacer(Modifier.height(8.dp))
         }
 
-        SignUpButton(onClick = {
-            viewModel.onSignUpClicked(flow)
-            onSignUpClicked()
-        })
-
-        LogInButton(onClick = {
-            viewModel.onLoginClicked(flow)
-            onLoginClicked()
-        })
-
+        SignUpButton(onClick = onSignUpClicked)
+        LogInButton(onClick = onLoginClicked)
         Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }
@@ -278,7 +308,7 @@ private object Artwork {
 
 @Preview(showBackground = true)
 @Composable
-private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+private fun OnboardingLoginOrSignUpPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         OnboardingLoginOrSignUpPage(
             theme = themeType,
