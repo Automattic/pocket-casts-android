@@ -24,5 +24,5 @@ interface BookmarkManager {
     suspend fun upsertSynced(bookmark: Bookmark): Bookmark
     fun findBookmarksToSync(): List<Bookmark>
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
-    suspend fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
+    fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
 }

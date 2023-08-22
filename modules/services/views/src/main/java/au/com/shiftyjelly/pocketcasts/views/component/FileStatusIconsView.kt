@@ -15,6 +15,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -77,12 +78,9 @@ class FileStatusIconsView @JvmOverloads constructor(
         downloadProgressUpdates: Observable<DownloadProgressUpdate>,
         playbackStateUpdates: Observable<PlaybackState>,
         upNextChangesObservable: Observable<UpNextQueue.State>,
+        userBookmarksObservable: Observable<List<Bookmark>>,
         hideErrorDetails: Boolean = false,
-
     ) {
-        val bookmarkVisibilityObservable = BehaviorRelay.create<Boolean?>().apply {
-            accept(episode.hasBookmark)
-        }
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
@@ -108,7 +106,7 @@ class FileStatusIconsView @JvmOverloads constructor(
             val streamingProgress: EpisodeStreamProgress,
             val playbackState: PlaybackState,
             val isInUpNext: Boolean,
-            val hasBookmark: Boolean,
+            val userBookmarks: List<Bookmark>,
         )
 
         val playbackStateForThisEpisode = playbackStateUpdates
@@ -120,9 +118,9 @@ class FileStatusIconsView @JvmOverloads constructor(
             combinedProgress,
             playbackStateForThisEpisode,
             isInUpNextObservable,
-            bookmarkVisibilityObservable,
-        ) { streamProgress, playbackState, isInUpNext, hasBookmark ->
-            CombinedData(streamProgress, playbackState, isInUpNext, hasBookmark)
+            userBookmarksObservable,
+        ) { streamProgress, playbackState, isInUpNext, userBookmarks ->
+            CombinedData(streamProgress, playbackState, isInUpNext, userBookmarks)
         }
             .distinctUntilChanged()
             .toFlowable(BackpressureStrategy.LATEST)
@@ -131,7 +129,6 @@ class FileStatusIconsView @JvmOverloads constructor(
             .doOnTerminate { UploadProgressManager.stopObservingUpload(episode.uuid, uploadConsumer) }
             .doOnNext { combinedData ->
                 episode.playing = combinedData.playbackState.isPlaying && combinedData.playbackState.episodeUuid == episode.uuid
-                episode.hasBookmark = combinedData.playbackState.episodeUuid == episode.uuid
                 imgUpNext.visibility = if (combinedData.isInUpNext) View.VISIBLE else View.GONE
                 imgBookmark.visibility = if (episode.hasBookmark) View.VISIBLE else View.GONE
 

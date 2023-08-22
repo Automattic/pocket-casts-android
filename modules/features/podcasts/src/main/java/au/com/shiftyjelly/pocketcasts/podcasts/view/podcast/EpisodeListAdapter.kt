@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -24,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCallback<BaseEpisode>() {
@@ -38,6 +40,7 @@ val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCa
 }
 
 class EpisodeListAdapter(
+    val bookmarkManager: BookmarkManager,
     val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
     val upNextQueue: UpNextQueue,
@@ -82,7 +85,8 @@ class EpisodeListAdapter(
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 imageLoader = imageLoader,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                userBookmarksObservable = bookmarkManager.findUserEpisodesBookmarksFlow().asObservable(),
             )
             else -> throw IllegalStateException("Unknown playable type")
         }

@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Co
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD_UPGRADE_REQUIRED
 import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
@@ -51,6 +52,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.rx2.asObservable
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -81,6 +83,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var bookmarkManager: BookmarkManager
 
     var podcastImageLoader: PodcastImageLoader? = null
     private val viewModel: CloudBottomSheetViewModel by viewModels()
@@ -238,8 +241,15 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 } else {
                     errorLayout.visibility = View.GONE
                 }
-
-                binding.fileStatusIconsView.setup(episode, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable, true)
+                val userBookmarksObservable = bookmarkManager.findUserEpisodesBookmarksFlow().asObservable()
+                binding.fileStatusIconsView.setup(
+                    episode = episode,
+                    downloadProgressUpdates = downloadManager.progressUpdateRelay,
+                    playbackStateUpdates = playbackManager.playbackStateRelay,
+                    upNextChangesObservable = upNextQueue.changesObservable,
+                    userBookmarksObservable = userBookmarksObservable,
+                    hideErrorDetails = true
+                )
 
                 binding.lblCloud.text = when (episode.serverStatus) {
                     UserEpisodeServerStatus.LOCAL -> getString(LR.string.profile_cloud_upload)
