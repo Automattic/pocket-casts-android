@@ -4,6 +4,9 @@
 *   Updates:
     *   Enable copying logs from in-app logs viewer
         ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
+*   Bug Fixes:
+    *    Fixed the artwork not appearing on the onboarding page
+        ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
 
 7.46
 -----
