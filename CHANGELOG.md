@@ -1,6 +1,9 @@
 7.47
 -----
 
+*   Updates:
+    *   Enable copying logs from in-app logs viewer
+        ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
 
 7.46
 -----
