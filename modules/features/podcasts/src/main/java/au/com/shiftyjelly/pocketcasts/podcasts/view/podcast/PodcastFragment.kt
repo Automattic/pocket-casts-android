@@ -51,6 +51,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -81,6 +83,7 @@ import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, CoroutineScope {
@@ -468,6 +471,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         viewModel.play(bookmark)
     }
 
+    private fun onHeadsetSettingsClicked() {
+        val fragmentHostListener = (activity as? FragmentHostListener)
+        fragmentHostListener?.apply {
+            openTab(VR.id.navigation_profile)
+            addFragment(SettingsFragment())
+            addFragment(HeadphoneControlsSettingsFragment())
+        }
+    }
+
     val podcastUuid
         get() = arguments?.getString(ARG_PODCAST_UUID)!!
 
@@ -600,7 +612,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                     context = context,
                     fragmentManager = parentFragmentManager,
                     swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
-                )
+                ),
+                onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
+                sourceView = SourceView.PODCAST_SCREEN,
             )
         }
 
@@ -690,7 +704,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         viewModel.loadPodcast(podcastUuid, resources)
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-            adapter?.setSignedInAsPlusOrPatron(signInState.isSignedInAsPlusOrPatron)
+            adapter?.setSignInState(signInState)
         }
 
         viewModel.podcast.observe(

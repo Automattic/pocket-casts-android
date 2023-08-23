@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-02 12:21:30+0000
+Translation-Revision-Date: 2023-08-16 06:49:16+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: en_GB
 -->
 <resources>
+    <string name="go_to_bottom">Go to bottom</string>
+    <string name="go_to_top">Go to top</string>
+    <string name="support">Support</string>
+    <string name="bookmark_notification_action_change_title">Change title</string>
+    <string name="bookmark_notification_content_tap_to_view">Tap to view</string>
+    <string name="bookmark_notification_title_added">Bookmark added</string>
+    <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
+    <string name="notification_channel_description_sign_in_error">Shows when signed out in background and cannot auto re sign-in</string>
+    <string name="notification_channel_description_podcast_import">Import podcast collections</string>
+    <string name="notification_channel_description_playback">Shows while Pocket Casts is playing audio</string>
+    <string name="notification_channel_description_playback_error">Errors during playback</string>
+    <string name="notification_channel_description_episode">Shows when a new episode comes out</string>
+    <string name="notification_channel_description_download">Shows while Pocket Casts is downloading episodes</string>
+    <string name="change_bookmark_title_hint">Change the title that identifies this bookmark</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="details">Details</string>
     <string name="episode">Episode</string>
     <string name="bookmarks_search">Search bookmark</string>
     <string name="settings_storage_background_refresh_on_watch">Pocket Casts will periodically sync your account in the background.</string>

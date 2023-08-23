@@ -1,6 +1,24 @@
+7.47
+-----
+
+*   Updates:
+    *   Enable copying logs from in-app logs viewer
+        ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
+*   Bug Fixes:
+    *    Fixed the artwork not appearing on the onboarding page
+        ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+
 7.46
 -----
 
+*   New Feature:
+    *   Added a support section to the Automotive app
+        ([#1277](https://github.com/Automattic/pocket-casts-android/pull/1277))
+*   Bug Fixes:
+    *    Fixed episodes being removed from the Up Next when clearing downloads
+         ([#1280](https://github.com/Automattic/pocket-casts-android/pull/1280))
+    *    Improved upgrade flow when signing in with Google account
+         ([#1275](https://github.com/Automattic/pocket-casts-android/pull/1275))
 
 7.45
 -----

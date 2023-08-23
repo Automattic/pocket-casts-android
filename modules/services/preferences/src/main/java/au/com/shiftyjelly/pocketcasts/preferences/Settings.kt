@@ -44,6 +44,7 @@ interface Settings {
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
         const val INFO_CANCEL_URL = "https://support.pocketcasts.com/article/subscription-info/"
+        const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
 
         const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
 
@@ -197,12 +198,12 @@ interface Settings {
         ONLY_ADD_TO_TOP
     }
 
-    enum class HeadphoneAction {
-        ADD_BOOKMARK,
-        SKIP_BACK,
-        SKIP_FORWARD,
-        NEXT_CHAPTER,
-        PREVIOUS_CHAPTER,
+    enum class HeadphoneAction(val analyticsValue: String) {
+        ADD_BOOKMARK("add_bookmark"),
+        SKIP_BACK("skip_back"),
+        SKIP_FORWARD("skip_forward"),
+        NEXT_CHAPTER("next_chapter"),
+        PREVIOUS_CHAPTER("previous_chapter"),
     }
 
     sealed class AutoArchiveAfterPlaying(val timeSeconds: Int) {

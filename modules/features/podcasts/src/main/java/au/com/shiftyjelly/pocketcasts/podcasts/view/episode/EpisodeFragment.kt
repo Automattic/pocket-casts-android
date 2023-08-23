@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
@@ -103,6 +104,7 @@ class EpisodeFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -137,13 +139,16 @@ class EpisodeFragment : BaseFragment() {
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEpisodeBinding.inflate(inflater, container, false)
-        showNotesFormatter = if (!forceDarkTheme || theme.isDarkTheme) {
-            createShowNotesFormatter(requireContext())
+        val themeResId = if (!forceDarkTheme || theme.isDarkTheme) {
+            activeTheme.resourceId
         } else {
-            val context = ContextThemeWrapper(requireContext(), R.style.ThemeDark)
-            createShowNotesFormatter(context)
+            R.style.ThemeDark
         }
+        val contextThemeWrapper = ContextThemeWrapper(requireContext(), themeResId)
+        val localInflater = inflater.cloneInContext(contextThemeWrapper)
+        binding = FragmentEpisodeBinding.inflate(localInflater, container, false)
+
+        showNotesFormatter = createShowNotesFormatter(contextThemeWrapper)
 
         statusBarColor = StatusBarColor.Custom(
             context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme
@@ -185,6 +190,7 @@ class EpisodeFragment : BaseFragment() {
         super.onDestroyView()
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_DISMISSED, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
+            podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed()
         }
         webView.cleanup()
         webView = null

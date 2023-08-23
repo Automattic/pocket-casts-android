@@ -217,6 +217,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
+                    viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)
                     BookmarksContainerFragment.newInstance(
                         episodeUuid = episodeUUID,
                         sourceView = SourceView.FILES
@@ -279,7 +280,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
                     OnboardingLauncher.openOnboardingFlow(
                         activity,
-                        OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FILES)
+                        OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES)
                     )
                 }
 

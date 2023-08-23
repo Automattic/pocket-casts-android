@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-03 08:10:06+0000
+Translation-Revision-Date: 2023-08-16 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="support">지원</string>
+    <string name="bookmark_notification_action_change_title">제목 변경</string>
+    <string name="bookmark_notification_content_tap_to_view">눌러서 보기</string>
+    <string name="bookmark_notification_title_added">북마크 추가됨</string>
+    <string name="notification_channel_description_bookmark">헤드폰을 사용하여 북마크를 추가할 때 표시</string>
+    <string name="notification_channel_description_sign_in_error">백그라운드에서 로그아웃했는데 자동으로 다시 로그인할 수 없을 때 표시</string>
+    <string name="notification_channel_description_podcast_import">팟캐스트 컬렉션 가져오기</string>
+    <string name="notification_channel_description_playback">Pocket Casts를 통해 오디오를 재생하는 동안 표시</string>
+    <string name="notification_channel_description_playback_error">재생 중 오류</string>
+    <string name="notification_channel_description_episode">새 에피소드가 나올 때 표시</string>
+    <string name="notification_channel_description_download">Pocket Casts를 통해 에피소드를 다운로드하는 동안 표시</string>
+    <string name="change_bookmark_title_hint">이 북마크를 식별하는 제목 변경</string>
+    <string name="bookmark">북마크</string>
     <string name="details">세부사항</string>
     <string name="episode">에피소드</string>
     <string name="bookmarks_search">북마크 검색</string>
@@ -41,6 +54,7 @@ Language: ko_KR
     <string name="whats_new_autoplay_title">이제 자동 재생이 가능합니다!</string>
     <string name="filters_download_limit_3">에피소드 3개</string>
     <string name="settings_title_headphone_controls">헤드폰 제어 기능</string>
+    <string name="settings_headphone_controls_summary">가장 일반적인 헤드폰 제어 기능으로 수행한 작업을 사용자 정의하세요.</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">북마크 생성 후 헤드폰으로 확인 소리를 재생하세요.</string>
     <string name="settings_headphone_controls_confirmation_sound">북마크 확인 소리</string>
     <string name="settings_headphone_controls_choice_skip_forward">앞으로 건너뛰기</string>
@@ -116,6 +130,7 @@ Language: ko_KR
     <string name="log_in_with_email">이메일로 로그인</string>
     <string name="log_in_on_phone">스마트폰에서 로그인</string>
     <string name="log_in_with_google">Google로 로그인</string>
+    <string name="log_in_subtitle">즐겨 찾는 팟캐스트 청취 시작</string>
     <string name="onboarding_upgrade_no_subscriptions_found">구독을 찾을 수 없습니다.</string>
     <string name="trial_then_per_year">%1$s 평가 후 %2$s/년</string>
     <string name="trial_then_per_month">%1$s 평가 후 %2$s/월</string>
@@ -173,8 +188,10 @@ Language: ko_KR
     <string name="notifications_blocked_warning">알림이 차단되었습니다. 설정을 통해 권한을 업데이트할 수 있습니다.</string>
     <string name="settings_media_actions_show_subtitle">Android 13 미디어 알림과 Android Auto에 사용자 정의 미디어 작업을 표시합니다.</string>
     <string name="settings_media_actions_show_title">사용자 정의 미디어 작업 표시</string>
+    <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
     <string name="settings_media_actions_prioritize_subtitle">상위 작업이 제공됩니다.</string>
     <string name="settings_media_actions_prioritize_title">사용자 정의 미디어 작업 우선순위 지정</string>
+    <string name="plus_take_your_podcasting_to_next_level">기능과 사용자 정의 옵션에 접근하는 독점 권한으로 팟캐스팅 환경의 수준을 높이세요.</string>
     <string name="onboarding_recommendations_more">%s 추가</string>
     <string name="filter_id_or_title">필터 ID 또는 제목</string>
     <string name="filter_title">필터 제목</string>
@@ -419,6 +436,7 @@ Language: ko_KR
     <string name="podcasts_empty_folder_summary">팟캐스트를 폴더에 추가하면 여기에 나타납니다.</string>
     <string name="podcasts_empty_folder">폴더가 비어 있습니다.</string>
     <string name="add_podcasts">팟캐스트 추가</string>
+    <string name="plus_folder_body">폴더를 생성하여 팟캐스트 컬렉션을 정리하세요.</string>
     <string name="expand_details">상세 정보 확장</string>
     <string name="profile_help_support">계정을 업그레이드하여 Pocket Casts 후원 돕기</string>
     <string name="error_check_your_internet_connection">인터넷 연결을 확인하세요.</string>
@@ -1173,6 +1191,7 @@ Language: ko_KR
     <string name="filters_create_filter_details">필터 상세 정보</string>
     <string name="filters_create_filter_by">필터링 기준</string>
     <string name="filters_create_filter">필터 생성</string>
+    <string name="filters_create_colour_icon">색상 및 아이콘</string>
     <string name="filters_create_add_more">필터 세분화를 마치려면 기준을 더 추가하세요.</string>
     <string name="filters_create">생성</string>
     <string name="filters_chosen_singular">필터 1개 추가됨</string>
