@@ -54,8 +54,8 @@ class CloudFilesViewModel @Inject constructor(
             ) { cloudFiles, bookmarks, signInState ->
                 val cloudFilesWithBookmarkInfo = cloudFiles.map { file ->
                     file.hasBookmark = bookmarks.map { it.episodeUuid }.contains(file.uuid) &&
-                            signInState.isSignedInAsPatron &&
-                            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
+                        signInState.isSignedInAsPatron &&
+                        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                     file
                 }
                 _uiState.value = UiState(cloudFilesWithBookmarkInfo)
