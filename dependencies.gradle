@@ -297,8 +297,8 @@ project.ext {
             // Automattic Tracks
             automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
             // Sentry
-            sentryBom: 'io.sentry:sentry-bom:6.4.2',
-            sentry: 'io.sentry:sentry-android',
+            sentryBom: 'io.sentry:sentry-bom:6.28.0',
+            sentryAndroidCore: 'io.sentry:sentry-android-core',
             sentryFragment: 'io.sentry:sentry-android-fragment',
             sentryTimber: 'io.sentry:sentry-android-timber',
             // AboutLibraries - https://github.com/mikepenz/AboutLibraries
