@@ -76,7 +76,11 @@ class EpisodeListAdapter(
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 imageLoader = imageLoader,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                userBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
+                    podcastUuid = fromListUuid ?: "",
+                    sortType = settings.getBookmarksSortTypeForPodcast()
+                ).asObservable()
             )
             R.layout.adapter_user_episode -> UserEpisodeViewHolder(
                 binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),

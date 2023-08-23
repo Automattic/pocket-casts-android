@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -58,6 +59,7 @@ class EpisodeViewHolder constructor(
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
     val imageLoader: PodcastImageLoader? = null,
+    private val userBookmarksObservable: Observable<List<Bookmark>>,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
@@ -166,6 +168,13 @@ class EpisodeViewHolder constructor(
             .startWith(emptyState) // Pre load with a blank state so it doesn't wait for the first update
             .map { if (it.episodeUuid == episode.uuid) it else emptyState } // When another episode is playing return an empty state to clear fields like the buffering status
 
+        data class CombinedData(
+            val downloadProgress: Int,
+            val playbackState: PlaybackState,
+            val isInUpNext: Boolean,
+            val userBookmarks: List<Bookmark>,
+        )
+
         val imgIcon = binding.imgIcon
         val progressBar = binding.progressBar
         val progressCircle = binding.progressCircle
@@ -176,23 +185,30 @@ class EpisodeViewHolder constructor(
         val date = binding.date
 
         disposable?.dispose()
-        disposable = Observables.combineLatest(downloadUpdates, playbackStateForThisEpisode, isInUpNextObservable)
+        disposable = Observables.combineLatest(
+            downloadUpdates,
+            playbackStateForThisEpisode,
+            isInUpNextObservable,
+            userBookmarksObservable
+        ) { downloadProgress, playbackState, isInUpNext, userBookmarks ->
+            CombinedData(downloadProgress, playbackState, isInUpNext, userBookmarks)
+        }
             .distinctUntilChanged()
             .toFlowable(BackpressureStrategy.LATEST)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { (downloadProgress, playbackState, isInUpNext) ->
-                episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
+            .doOnNext { combinedData ->
+                episode.playing = combinedData.playbackState.isPlaying && combinedData.playbackState.episodeUuid == episode.uuid
                 val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
-                binding.inUpNext = isInUpNext
+                binding.inUpNext = combinedData.isInUpNext
                 binding.hasBookmarks = episode.hasBookmark
 
                 imgIcon.isVisible = false
                 progressCircle.isVisible = false
                 progressBar.isVisible = false
                 imgIcon.alpha = 1.0f
-                if (playbackState.episodeUuid == episode.uuid && playbackState.isBuffering) {
+                if (combinedData.playbackState.episodeUuid == episode.uuid && combinedData.playbackState.isBuffering) {
                     progressBar.isVisible = true
                     lblStatus.text = context.getString(LR.string.episode_row_buffering)
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED) {
@@ -202,8 +218,8 @@ class EpisodeViewHolder constructor(
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(context.getThemeColor(UR.attr.support_02)))
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADING) {
                     progressCircle.isVisible = true
-                    lblStatus.text = context.getString(LR.string.episode_row_downloading, downloadProgress)
-                    progressCircle.setPercent(downloadProgress / 100.0f)
+                    lblStatus.text = context.getString(LR.string.episode_row_downloading, combinedData.downloadProgress)
+                    progressCircle.setPercent(combinedData.downloadProgress / 100.0f)
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
                     imgIcon.isVisible = true
                     imgIcon.setImageResource(IR.drawable.ic_download_failed_row)
@@ -240,7 +256,7 @@ class EpisodeViewHolder constructor(
                 } else {
                     updateTimeLeft(textView = lblStatus, episode = episode)
                 }
-                updateRowText(episode, captionColor, tintColor, date, title, lblStatus, isInUpNext)
+                updateRowText(episode, captionColor, tintColor, date, title, lblStatus, combinedData.isInUpNext)
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
                 imgArtwork.alpha = if (episodeGreyedOut) 0.5f else 1f
