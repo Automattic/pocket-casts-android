@@ -14,6 +14,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
@@ -56,6 +57,7 @@ class UserEpisodeViewHolder(
     val upNextChangesObservable: Observable<UpNextQueue.State>,
     val imageLoader: PodcastImageLoader? = null,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
+    private val userBookmarksObservable: Observable<List<Bookmark>>,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
@@ -137,7 +139,13 @@ class UserEpisodeViewHolder(
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
 
-        binding.fileStatusIconsView.setup(episode, downloadProgressUpdates, playbackStateUpdates, upNextChangesObservable)
+        binding.fileStatusIconsView.setup(
+            episode = episode,
+            downloadProgressUpdates = downloadProgressUpdates,
+            playbackStateUpdates = playbackStateUpdates,
+            upNextChangesObservable = upNextChangesObservable,
+            userBookmarksObservable = userBookmarksObservable,
+        )
 
         val downloadUpdates = downloadProgressUpdates
             .filter { it.episodeUuid == episode.uuid }
