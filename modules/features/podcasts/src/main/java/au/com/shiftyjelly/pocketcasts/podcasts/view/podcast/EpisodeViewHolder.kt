@@ -59,7 +59,7 @@ class EpisodeViewHolder constructor(
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
     val imageLoader: PodcastImageLoader? = null,
-    private val userBookmarksObservable: Observable<List<Bookmark>>,
+    private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
@@ -172,7 +172,7 @@ class EpisodeViewHolder constructor(
             val downloadProgress: Int,
             val playbackState: PlaybackState,
             val isInUpNext: Boolean,
-            val userBookmarks: List<Bookmark>,
+            val podcastBookmarks: List<Bookmark>,
         )
 
         val imgIcon = binding.imgIcon
@@ -189,9 +189,9 @@ class EpisodeViewHolder constructor(
             downloadUpdates,
             playbackStateForThisEpisode,
             isInUpNextObservable,
-            userBookmarksObservable
-        ) { downloadProgress, playbackState, isInUpNext, userBookmarks ->
-            CombinedData(downloadProgress, playbackState, isInUpNext, userBookmarks)
+            podcastBookmarksObservable
+        ) { downloadProgress, playbackState, isInUpNext, podcastBookmarks ->
+            CombinedData(downloadProgress, playbackState, isInUpNext, podcastBookmarks)
         }
             .distinctUntilChanged()
             .toFlowable(BackpressureStrategy.LATEST)

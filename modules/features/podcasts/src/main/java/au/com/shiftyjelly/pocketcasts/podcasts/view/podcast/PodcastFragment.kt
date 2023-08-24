@@ -618,7 +618,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 ),
                 onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
                 sourceView = SourceView.PODCAST_SCREEN,
-                userBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
+                podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                     podcastUuid = podcastUuid,
                     sortType = settings.getBookmarksSortTypeForPodcast()
                 ).asObservable()

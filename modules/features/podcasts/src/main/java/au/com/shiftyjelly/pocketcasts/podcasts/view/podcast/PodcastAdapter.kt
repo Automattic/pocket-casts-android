@@ -113,7 +113,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
-    private val userBookmarksObservable: Observable<List<Bookmark>>,
+    private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
@@ -215,7 +215,7 @@ class PodcastAdapter(
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                userBookmarksObservable = userBookmarksObservable
+                podcastBookmarksObservable = podcastBookmarksObservable
             )
         }
     }
