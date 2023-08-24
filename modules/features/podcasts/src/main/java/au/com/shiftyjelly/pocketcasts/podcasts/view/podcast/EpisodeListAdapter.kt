@@ -54,6 +54,8 @@ class EpisodeListAdapter(
     val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
+    private lateinit var podcastEpisode: PodcastEpisode
+
     val disposables = CompositeDisposable()
 
     init {
@@ -77,8 +79,8 @@ class EpisodeListAdapter(
                 upNextChangesObservable = upNextQueue.changesObservable,
                 imageLoader = imageLoader,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                userBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
-                    podcastUuid = fromListUuid ?: "",
+                podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
+                    podcastUuid = podcastEpisode.podcastUuid,
                     sortType = settings.getBookmarksSortTypeForPodcast()
                 ).asObservable()
             )
