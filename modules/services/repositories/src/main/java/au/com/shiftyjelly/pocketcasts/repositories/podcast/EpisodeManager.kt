@@ -148,4 +148,5 @@ interface EpisodeManager {
     suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
     suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode?
     suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
+    suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double
 }

@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -60,6 +61,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.Date
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -1114,4 +1116,19 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int =
         episodeDao.findEpisodesCountInListeningHistory(fromEpochMs, toEpochMs)
+
+    override suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double {
+        val query =
+            "last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000"
+        val last1000EpisodesPlayed = findEpisodesWhere(query)
+        var totalPlaytime = 0.0
+        last1000EpisodesPlayed.forEach { episode ->
+            episode.lastPlaybackInteractionDate?.let {
+                if (TimeUnit.MILLISECONDS.toDays(it.timeIntervalSinceNow()) < days) {
+                    totalPlaytime += episode.playedUpTo
+                }
+            }
+        }
+        return totalPlaytime
+    }
 }
