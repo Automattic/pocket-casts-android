@@ -1,27 +1,40 @@
 package au.com.shiftyjelly.pocketcasts.settings.stats
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
+import au.com.shiftyjelly.pocketcasts.ui.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
+import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
     val statsManager: StatsManager,
+    val episodeManager: EpisodeManager,
     val settings: Settings,
     val syncManager: SyncManager,
-    val application: Application
+    val application: Application,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val inAppReviewHelper: InAppReviewHelper,
 ) : ViewModel() {
 
     sealed class State {
@@ -35,7 +48,8 @@ class StatsViewModel @Inject constructor(
             val autoSkipping: Long,
             val totalSaved: Long,
             val funnyText: String,
-            val startedAt: Date?
+            val startedAt: Date?,
+            val showAppReviewDialog: Boolean = false,
         ) : State()
     }
 
@@ -74,10 +88,44 @@ class StatsViewModel @Inject constructor(
                     funnyText = funnyText,
                     startedAt = serverStats?.startedAt
                 )
+                withContext(ioDispatcher) {
+                    serverStats?.startedAt?.let { showAppReviewDialogIfPossible(it) }
+                }
             } catch (e: Exception) {
                 Timber.e(e)
                 mutableState.value = State.Error
             }
         }
+    }
+
+    private suspend fun showAppReviewDialogIfPossible(statsStartedAt: Date) {
+        /* If the user has listened to more than 2.5 hours the past 7 days
+         and has been using the app for more than a week
+         we request them to review the app */
+        val currentState = mutableState.value as? State.Loaded ?: return
+        val playedUptoSumInSecs =
+            episodeManager.calculatePlayedUptoSumInSecsWithinDays(DAYS_LIMIT_FOR_PLAYED_UPTO)
+
+        val showAppReviewDialog =
+            TimeUnit.SECONDS.toHours(playedUptoSumInSecs.toLong()) > SUM_PLAYED_UPTO_MIN_HOURS &&
+                TimeUnit.MILLISECONDS.toDays(statsStartedAt.timeIntervalSinceNow()) > MIN_DAYS_STATS_STARTED
+        mutableState.update { currentState.copy(showAppReviewDialog = showAppReviewDialog) }
+    }
+
+    fun launchAppReviewDialog(activity: AppCompatActivity) {
+        viewModelScope.launch {
+            inAppReviewHelper.launchReviewDialog(
+                activity = activity,
+                delayInMs = IN_APP_REVIEW_LAUNCH_DELAY_IN_MS,
+                sourceView = SourceView.STATS
+            )
+        }
+    }
+
+    companion object {
+        private const val SUM_PLAYED_UPTO_MIN_HOURS = 2.5
+        private const val DAYS_LIMIT_FOR_PLAYED_UPTO = 7
+        private const val MIN_DAYS_STATS_STARTED = 7
+        private const val IN_APP_REVIEW_LAUNCH_DELAY_IN_MS = 1000L
     }
 }
