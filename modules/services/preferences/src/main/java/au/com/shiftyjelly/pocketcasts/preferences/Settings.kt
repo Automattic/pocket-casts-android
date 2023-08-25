@@ -84,6 +84,7 @@ interface Settings {
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
+        const val PREFERENCE_EXISTING_BOOKMARK_UUID = "existingBookmarkUuid"
 
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
@@ -211,6 +212,7 @@ interface Settings {
     fun getStorageChoiceName(): String?
     fun setStorageChoice(choice: String?, name: String?)
     fun getStorageCustomFolder(): String
+    fun getExistingBookmarkUuid(): String
     fun setStorageCustomFolder(folder: String)
 
     fun getLastRefreshTime(): Long
@@ -272,7 +274,7 @@ interface Settings {
     fun setClearHistoryTime(timeMs: Long)
     fun setClearHistoryTimeNow()
     fun getClearHistoryTime(): Long
-
+    fun setExistingBookmarkUuid(uuid: String?)
     fun setSleepTimerCustomMins(minutes: Int)
     fun getSleepTimerCustomMins(): Int
 

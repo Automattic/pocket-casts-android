@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PREFERENCE_EXISTING_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
@@ -255,6 +256,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getStorageCustomFolder(): String {
         return sharedPreferences.getString(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER, "") ?: ""
+    }
+
+    override fun getExistingBookmarkUuid(): String {
+        return sharedPreferences.getString(Settings.PREFERENCE_EXISTING_BOOKMARK_UUID, "") ?: ""
     }
 
     override fun setStorageCustomFolder(folder: String) {
@@ -632,6 +637,12 @@ class SettingsImpl @Inject constructor(
 
     override fun getClearHistoryTime(): Long {
         return getLong("clearHistoryTime", 0)
+    }
+
+    override fun setExistingBookmarkUuid(uuid: String?) {
+        val editor = sharedPreferences.edit()
+        editor?.putString(PREFERENCE_EXISTING_BOOKMARK_UUID, uuid)
+        editor?.apply()
     }
 
     override fun setSleepTimerCustomMins(minutes: Int) {
