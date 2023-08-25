@@ -302,7 +302,7 @@
     <string name="player_star" translatable="false">@string/star</string>
     <string name="player_tab_bookmarks" translatable="false">@string/bookmarks</string>
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
-    <string name="player_tab_notes">Notes</string>
+    <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
