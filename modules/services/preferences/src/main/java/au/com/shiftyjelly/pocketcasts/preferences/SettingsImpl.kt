@@ -258,8 +258,8 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getString(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER, "") ?: ""
     }
 
-    override fun getExistingBookmarkUuid(): String {
-        return sharedPreferences.getString(Settings.PREFERENCE_EXISTING_BOOKMARK_UUID, "") ?: ""
+    override fun getExistingBookmarkUuid(uuid:String): String {
+        return sharedPreferences.getString(PREFERENCE_EXISTING_BOOKMARK_UUID, uuid) ?: ""
     }
 
     override fun setStorageCustomFolder(folder: String) {

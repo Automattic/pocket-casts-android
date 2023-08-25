@@ -212,7 +212,7 @@ interface Settings {
     fun getStorageChoiceName(): String?
     fun setStorageChoice(choice: String?, name: String?)
     fun getStorageCustomFolder(): String
-    fun getExistingBookmarkUuid(): String
+    fun getExistingBookmarkUuid(uuid:String): String?
     fun setStorageCustomFolder(folder: String)
 
     fun getLastRefreshTime(): Long
