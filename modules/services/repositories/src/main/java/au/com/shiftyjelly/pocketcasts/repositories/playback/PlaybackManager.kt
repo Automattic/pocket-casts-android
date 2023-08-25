@@ -1310,13 +1310,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         val playerDurationSecs = durationMs.toDouble() / 1000.0
-
-        val currentDurationMs = episode.durationMs
-        if (currentDurationMs < 10000) {
-            episodeManager.updateDuration(episode, playerDurationSecs, true)
-        } else {
-            episodeManager.updateDuration(episode, playerDurationSecs, true)
-        }
+        episodeManager.updateDuration(episode, playerDurationSecs, true)
     }
 
     suspend fun onSeekComplete(positionMs: Int) {
