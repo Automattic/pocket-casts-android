@@ -447,7 +447,7 @@ class PodcastAdapter(
 
                 if (!signInState.isSignedInAsPatron) {
                     add(BookmarkUpsell)
-                } else if (bookmarks.isEmpty()) {
+                } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
                     add(NoBookmarkMessage)
                 } else {
                     add(
