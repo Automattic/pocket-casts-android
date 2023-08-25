@@ -95,6 +95,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -1288,6 +1289,15 @@ open class PlaybackManager @Inject constructor(
         val durationMs = player?.durationMs() ?: 0
         if (durationMs <= 0) {
             return
+        }
+
+        val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
+        if (abs(durationDiffSeconds) > 30) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed significantly ($durationDiffSeconds seconds)")
+            launch(Dispatchers.Main) {
+                val message = application.getString(LR.string.episode_duration_change, durationDiffSeconds)
+                Toast.makeText(application, message, Toast.LENGTH_LONG).show()
+            }
         }
 
         withContext(Dispatchers.Main) {
