@@ -602,6 +602,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun isExist(bookmarkUuid: String): Boolean {
-        return bookmarkUuid == settings.getExistingBookmarkUuid()
+        val existingBookmarkUuid = settings.getExistingBookmarkUuid(bookmarkUuid)
+        return existingBookmarkUuid != null && bookmarkUuid == existingBookmarkUuid
     }
 }
