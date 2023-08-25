@@ -59,7 +59,6 @@ class EpisodeViewHolder constructor(
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
     val imageLoader: PodcastImageLoader? = null,
-    private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
@@ -134,7 +133,7 @@ class EpisodeViewHolder constructor(
             return listOf(archiveItem, shareItem)
         }
 
-    fun setup(episode: PodcastEpisode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable) {
+    fun setup(episode: PodcastEpisode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable, podcastBookmarksObservable: Observable<List<Bookmark>>) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 

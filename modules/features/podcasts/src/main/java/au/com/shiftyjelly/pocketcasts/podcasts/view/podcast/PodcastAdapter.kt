@@ -215,7 +215,6 @@ class PodcastAdapter(
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                podcastBookmarksObservable = podcastBookmarksObservable
             )
         }
     }
@@ -315,7 +314,8 @@ class PodcastAdapter(
             upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
-            disposables = disposables
+            disposables = disposables,
+            podcastBookmarksObservable = podcastBookmarksObservable
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {

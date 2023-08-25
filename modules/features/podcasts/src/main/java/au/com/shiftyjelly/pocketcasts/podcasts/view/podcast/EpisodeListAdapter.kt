@@ -54,8 +54,6 @@ class EpisodeListAdapter(
     val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
-    private lateinit var podcastEpisode: PodcastEpisode
-
     val disposables = CompositeDisposable()
 
     init {
@@ -78,11 +76,7 @@ class EpisodeListAdapter(
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 imageLoader = imageLoader,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
-                    podcastUuid = podcastEpisode.podcastUuid,
-                    sortType = settings.getBookmarksSortTypeForPodcast()
-                ).asObservable()
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory
             )
             R.layout.adapter_user_episode -> UserEpisodeViewHolder(
                 binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),
@@ -118,7 +112,11 @@ class EpisodeListAdapter(
             upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
-            disposables = disposables
+            disposables = disposables,
+            podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
+                podcastUuid = episode.podcastUuid,
+                sortType = settings.getBookmarksSortTypeForPodcast()
+            ).asObservable()
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
