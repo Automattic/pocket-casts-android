@@ -26,7 +26,22 @@ fun NoBookmarksView(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<NoBookmarksViewModel>()
+    Content(
+        style = style,
+        onClick = {
+            viewModel.onGoToHeadphoneSettingsClicked(sourceView)
+            openFragment(HeadphoneControlsSettingsFragment())
+        },
+        modifier = modifier,
+    )
+}
 
+@Composable
+private fun Content(
+    style: NoBookmarksViewColors,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     MessageView(
         titleView = {
             TextH20(
@@ -35,10 +50,7 @@ fun NoBookmarksView(
             )
         },
         buttonTitleRes = LR.string.bookmarks_headphone_settings,
-        buttonAction = {
-            viewModel.onGoToHeadphoneSettingsClicked(sourceView)
-            openFragment(HeadphoneControlsSettingsFragment())
-        },
+        buttonAction = onClick,
         style = style.toMessageViewColors(),
         modifier = modifier,
     )
@@ -50,7 +62,7 @@ sealed class NoBookmarksViewColors {
 
     object Default : NoBookmarksViewColors() {
         @Composable
-        override fun textColor(): Color = MaterialTheme.theme.colors.primaryText02
+        override fun textColor(): Color = MaterialTheme.theme.colors.primaryText01
     }
 
     object Player : NoBookmarksViewColors() {
@@ -70,10 +82,9 @@ private fun NoBookmarksPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        NoBookmarksView(
+        Content(
             style = NoBookmarksViewColors.Default,
-            sourceView = SourceView.UNKNOWN,
-            openFragment = {},
+            onClick = {},
         )
     }
 }
