@@ -470,9 +470,11 @@
     <string name="podcast_next_episode_today">Next episode today</string>
     <string name="podcast_next_episode_tomorrow">Next episode tomorrow</string>
     <string name="podcast_next_episode_value">Next episode %s</string>
-    <string name="podcast_no_episodes_found">No Episodes Found</string>
+    <string name="podcast_no_bookmarks_found">No bookmarks found</string>
+    <string name="podcast_no_episodes_found">No episodes found</string>
     <string name="podcast_no_episodes">There are no episodes in this podcast</string>
     <string name="podcast_no_episodes_all_archived">All %d episodes of this podcast have been archived</string>
+    <string name="podcast_no_bookmarks_matching">This podcast has no bookmarks matching your search criteria.</string>
     <string name="podcast_no_episodes_matching">This podcast has no episodes matching your search criteria.</string>
     <string name="podcast_notification_new_episode" translatable="false"><![CDATA[<i>%1$s</i> %2$s]]></string>
     <string name="podcast_notifications">Notifications</string>
