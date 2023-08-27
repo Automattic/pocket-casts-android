@@ -579,9 +579,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             return
         }
 
-        val isExistingBookmark = isExist(result.bookmarkUuid)
-
-        val snackbarMessage = if (isExistingBookmark) {
+        val snackbarMessage = if (result.isExistingBookmark) {
             getString(LR.string.bookmark_exists, result.title)
         } else {
             getString(LR.string.bookmark_added, result.title)
@@ -590,19 +588,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             (parentFragment as? PlayerContainerFragment)?.openBookmarks()
         }
 
-        val existingBookmarkUuid = result.bookmarkUuid
-        settings.setExistingBookmarkUuid(existingBookmarkUuid)
-
         Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(LR.string.settings_view, viewBookmarksAction)
             .setActionTextColor(result.tintColor)
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
-    }
-
-    private fun isExist(bookmarkUuid: String): Boolean {
-        val existingBookmarkUuid = settings.getExistingBookmarkUuid(bookmarkUuid)
-        return existingBookmarkUuid != null && bookmarkUuid == existingBookmarkUuid
     }
 }

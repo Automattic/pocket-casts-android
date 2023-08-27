@@ -1431,11 +1431,17 @@ class MainActivity :
         val view = snackBarView()
         if (result == null) return
 
+        val snackbarMessage = if (result.isExistingBookmark) {
+            getString(LR.string.bookmark_exists, result.title)
+        } else {
+            getString(LR.string.bookmark_added, result.title)
+        }
+
         val action = View.OnClickListener {
             showPlayerBookmarks()
         }
 
-        Snackbar.make(view, getString(LR.string.bookmark_added, result.title), Snackbar.LENGTH_LONG)
+        Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(LR.string.settings_view, action)
             .setActionTextColor(result.tintColor)
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
