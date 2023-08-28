@@ -135,13 +135,13 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.padding(16.dp)
                 )
-                NextActionRow(
-                    saved = nextAction,
-                    onSave = onNextActionSave
-                )
                 PreviousActionRow(
                     saved = previousAction,
                     onSave = onPreviousActionSave
+                )
+                NextActionRow(
+                    saved = nextAction,
+                    onSave = onNextActionSave
                 )
                 if (previousAction == HeadphoneAction.ADD_BOOKMARK || nextAction == HeadphoneAction.ADD_BOOKMARK) {
                     ConfirmationSoundRow(
