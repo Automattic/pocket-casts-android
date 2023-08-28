@@ -33,14 +33,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val WARNING_LIMIT = 3
-@Singleton
 class MultiSelectEpisodesHelper @Inject constructor(
     val episodeManager: EpisodeManager,
     val userEpisodeManager: UserEpisodeManager,
