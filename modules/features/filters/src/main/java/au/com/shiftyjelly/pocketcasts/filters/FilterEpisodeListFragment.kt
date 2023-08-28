@@ -463,7 +463,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             override fun multiSelectSelectNone() {
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
-                    episodes.forEach { multiSelectHelper.deselect(it) }
+                    multiSelectHelper.deselectAllInList(episodes)
                     adapter.notifyDataSetChanged()
                 }
             }
@@ -488,7 +488,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         val episodesBelow = episodes.subList(startIndex, episodes.size)
-                        episodesBelow.forEach { multiSelectHelper.deselect(it) }
+                        multiSelectHelper.deselectAllInList(episodesBelow)
                         adapter.notifyDataSetChanged()
                     }
                 }
@@ -501,7 +501,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
                         val episodesAbove = episodes.subList(0, startIndex + 1)
-                        episodesAbove.forEach { multiSelectHelper.deselect(it) }
+                        multiSelectHelper.deselectAllInList(episodesAbove)
                         adapter.notifyDataSetChanged()
                     }
                 }

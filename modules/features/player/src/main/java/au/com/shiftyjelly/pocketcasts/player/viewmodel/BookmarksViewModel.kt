@@ -110,7 +110,7 @@ class BookmarksViewModel
 
             override fun multiSelectSelectNone() {
                 (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    bookmarks.forEach { multiSelectHelper.deselect(it) }
+                    multiSelectHelper.deselectAllInList(bookmarks)
                 }
             }
 
@@ -128,8 +128,8 @@ class BookmarksViewModel
                 (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
                     val startIndex = bookmarks.indexOf(multiSelectable)
                     if (startIndex > -1) {
-                        bookmarks.subList(startIndex, bookmarks.size)
-                            .forEach { multiSelectHelper.deselect(it) }
+                        val bookmarksBelow = bookmarks.subList(startIndex, bookmarks.size)
+                        multiSelectHelper.deselectAllInList(bookmarksBelow)
                     }
                 }
             }
