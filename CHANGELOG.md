@@ -13,6 +13,8 @@
         ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
     *    Fixed the artwork not appearing on the onboarding page
         ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+    *    Fixed issue where multiselect on one screen could affect multiselect on other screens
+         ([#1316](https://github.com/Automattic/pocket-casts-android/pull/1316))
 
 7.46
 -----
