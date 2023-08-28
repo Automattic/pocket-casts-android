@@ -579,10 +579,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             return
         }
 
+        val snackbarMessage = if (result.isExistingBookmark) {
+            getString(LR.string.bookmark_updated, result.title)
+        } else {
+            getString(LR.string.bookmark_added, result.title)
+        }
         val viewBookmarksAction = View.OnClickListener {
             (parentFragment as? PlayerContainerFragment)?.openBookmarks()
         }
-        Snackbar.make(view, getString(LR.string.bookmark_added, result.title), Snackbar.LENGTH_LONG)
+
+        Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(LR.string.settings_view, viewBookmarksAction)
             .setActionTextColor(result.tintColor)
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
