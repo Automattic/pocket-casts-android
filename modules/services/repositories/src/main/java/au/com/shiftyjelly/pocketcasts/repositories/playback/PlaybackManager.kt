@@ -95,6 +95,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -1290,6 +1291,30 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
+        if (abs(durationDiffSeconds) > 0) {
+            val notifyUser = abs(durationDiffSeconds) > 30
+            if (notifyUser) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed significantly ($durationDiffSeconds seconds)")
+                launch(Dispatchers.Main) {
+                    val message = application.getString(LR.string.episode_duration_change, durationDiffSeconds)
+                    Toast.makeText(application, message, Toast.LENGTH_LONG).show()
+                }
+            }
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYBACK_EPISODE_DURATION_CHANGED,
+                mapOf(
+                    "duration_change" to durationDiffSeconds,
+                    "duration" to durationMs / 1000,
+                    "notified_user" to notifyUser,
+                    "is_user_file" to (episode is UserEpisode),
+                    "is_downloaded" to episode.isDownloaded,
+                    "episode_uuid" to episode.uuid,
+                    "podcast_uuid" to episode.podcastOrSubstituteUuid,
+                )
+            )
+        }
+
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 if (playbackState.durationMs == durationMs) {
@@ -1300,13 +1325,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         val playerDurationSecs = durationMs.toDouble() / 1000.0
-
-        val currentDurationMs = episode.durationMs
-        if (currentDurationMs < 10000) {
-            episodeManager.updateDuration(episode, playerDurationSecs, true)
-        } else {
-            episodeManager.updateDuration(episode, playerDurationSecs, true)
-        }
+        episodeManager.updateDuration(episode, playerDurationSecs, true)
     }
 
     suspend fun onSeekComplete(positionMs: Int) {
