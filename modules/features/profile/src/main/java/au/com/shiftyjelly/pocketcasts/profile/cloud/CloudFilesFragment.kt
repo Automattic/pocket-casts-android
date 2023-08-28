@@ -254,7 +254,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             override fun multiSelectSelectNone() {
                 val episodes = viewModel.cloudFilesList.value
                 if (episodes != null) {
-                    episodes.forEach { multiSelectHelper.deselect(it) }
+                    multiSelectHelper.deselectAllInList(episodes)
                     adapter.notifyDataSetChanged()
                     analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
                 }
