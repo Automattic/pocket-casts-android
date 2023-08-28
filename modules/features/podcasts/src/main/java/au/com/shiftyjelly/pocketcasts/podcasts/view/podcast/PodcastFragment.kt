@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
@@ -77,6 +78,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -123,6 +125,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
+    @Inject lateinit var bookmarkManager: BookmarkManager
     @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
     @Inject lateinit var multiSelectBookmarksHelper: MultiSelectBookmarksHelper
     @Inject lateinit var coilManager: CoilManager
@@ -615,6 +618,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 ),
                 onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
                 sourceView = SourceView.PODCAST_SCREEN,
+                podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
+                    podcastUuid = podcastUuid,
+                    sortType = settings.getBookmarksSortTypeForPodcast()
+                ).asObservable()
             )
         }
 

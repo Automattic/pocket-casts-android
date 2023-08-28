@@ -66,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -112,6 +113,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
+    private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
@@ -312,7 +314,8 @@ class PodcastAdapter(
             upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
-            disposables = disposables
+            disposables = disposables,
+            podcastBookmarksObservable = podcastBookmarksObservable
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {
