@@ -14,8 +14,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -38,6 +40,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -45,6 +50,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class HeadphoneControlsSettingsFragment : BaseFragment() {
@@ -152,14 +158,16 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         saved: HeadphoneAction,
         onSave: (HeadphoneAction) -> Unit,
     ) {
+        val iconColor = colorResource(UR.color.patron_purple).toArgb()
         SettingRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_next),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
             icon = painterResource(IR.drawable.ic_skip_forward),
             modifier = Modifier
                 .clickable {
-                    var optionsDialog = OptionsDialog()
+                    val optionsDialog = OptionsDialog()
                         .setTitle(getString(LR.string.settings_headphone_controls_action_next))
+                        .setIconColor(iconColor)
                         .addCheckedOption(
                             titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_FORWARD),
                             checked = saved == HeadphoneAction.SKIP_FORWARD
@@ -172,15 +180,17 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                         ) {
                             onSave(HeadphoneAction.SKIP_BACK)
                         }
-
-                    if (isAddBookmarkEnabled) {
-                        optionsDialog = optionsDialog.addCheckedOption(
+                        .addCheckedOption(
+                            imageId = IR.drawable.ic_patron,
                             titleId = headphoneActionToStringRes(HeadphoneAction.ADD_BOOKMARK),
-                            checked = saved == HeadphoneAction.ADD_BOOKMARK,
+                            checked = saved == HeadphoneAction.ADD_BOOKMARK
                         ) {
-                            onSave(HeadphoneAction.ADD_BOOKMARK)
+                            if (isAddBookmarkEnabled) {
+                                onSave(HeadphoneAction.ADD_BOOKMARK)
+                            } else {
+                                startUpsellFlow()
+                            }
                         }
-                    }
 
                     optionsDialog.show(childFragmentManager, "action_next_options")
                 }
@@ -192,14 +202,16 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         saved: HeadphoneAction,
         onSave: (HeadphoneAction) -> Unit,
     ) {
+        val iconColor = colorResource(UR.color.patron_purple).toArgb()
         SettingRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_previous),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
             icon = painterResource(IR.drawable.ic_skip_back),
             modifier = Modifier
                 .clickable {
-                    var optionsDialog = OptionsDialog()
+                    val optionsDialog = OptionsDialog()
                         .setTitle(getString(LR.string.settings_headphone_controls_action_previous))
+                        .setIconColor(iconColor)
                         .addCheckedOption(
                             titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_BACK),
                             checked = saved == HeadphoneAction.SKIP_BACK
@@ -212,15 +224,17 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                         ) {
                             onSave(HeadphoneAction.SKIP_FORWARD)
                         }
-
-                    if (isAddBookmarkEnabled) {
-                        optionsDialog = optionsDialog.addCheckedOption(
+                        .addCheckedOption(
+                            imageId = IR.drawable.ic_patron,
                             titleId = headphoneActionToStringRes(HeadphoneAction.ADD_BOOKMARK),
-                            checked = saved == HeadphoneAction.ADD_BOOKMARK,
+                            checked = saved == HeadphoneAction.ADD_BOOKMARK
                         ) {
-                            onSave(HeadphoneAction.ADD_BOOKMARK)
+                            if (isAddBookmarkEnabled) {
+                                onSave(HeadphoneAction.ADD_BOOKMARK)
+                            } else {
+                                startUpsellFlow()
+                            }
                         }
-                    }
                     optionsDialog.show(childFragmentManager, "action_previous_options")
                 }
                 .padding(vertical = 6.dp)
@@ -238,6 +252,12 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
+    }
+
+    private fun startUpsellFlow() {
+        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
+        val onboardingFlow = OnboardingFlow.Upsell(source, true)
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
     @StringRes
