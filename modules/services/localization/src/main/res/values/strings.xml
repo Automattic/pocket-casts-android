@@ -12,7 +12,7 @@
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
-    <string name="bookmark_exists">Bookmark \"%s\" exists</string>
+    <string name="bookmark_updated">Bookmark \"%s\" updated</string>
     <string name="change_title">Change title</string>
     <string name="add_bookmark_title_hint">Add an optional title to identify this bookmark</string>
     <string name="change_bookmark_title_hint">Change the title that identifies this bookmark</string>

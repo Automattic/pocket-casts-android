@@ -580,7 +580,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
 
         val snackbarMessage = if (result.isExistingBookmark) {
-            getString(LR.string.bookmark_exists, result.title)
+            getString(LR.string.bookmark_updaed, result.title)
         } else {
             getString(LR.string.bookmark_added, result.title)
         }
