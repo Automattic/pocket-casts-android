@@ -1,6 +1,11 @@
 7.46
 -----
 
+7.45.1
+-----
+*   Bug Fixes:
+    *   Fixed issue where that could cause app freeze when using multiselect
+        ([#1315](https://github.com/Automattic/pocket-casts-android/pull/1315))
 
 7.45
 -----
