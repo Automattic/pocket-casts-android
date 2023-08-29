@@ -245,20 +245,21 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
-                upNextEpisodes.forEach { multiSelectHelper.select(it) }
+                multiSelectHelper.selectAllInList(upNextEpisodes)
                 adapter.notifyDataSetChanged()
             }
 
             override fun multiSelectSelectNone() {
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
-                upNextEpisodes.forEach { multiSelectHelper.deselect(it) }
+                multiSelectHelper.deselectAllInList(upNextEpisodes)
                 adapter.notifyDataSetChanged()
             }
 
             override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
                 val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
-                    upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.select(it) }
+                    val episodesAbove = upNextEpisodes.subList(0, startIndex + 1)
+                    multiSelectHelper.selectAllInList(episodesAbove)
                 }
 
                 adapter.notifyDataSetChanged()
@@ -267,7 +268,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
                 val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
-                    upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.select(it) }
+                    val episodesBelow = upNextEpisodes.subList(startIndex, upNextEpisodes.size)
+                    multiSelectHelper.selectAllInList(episodesBelow)
                 }
 
                 adapter.notifyDataSetChanged()
@@ -276,7 +278,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
                 val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
-                    upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.deselect(it) }
+                    val episodesBelow = upNextEpisodes.subList(startIndex, upNextEpisodes.size)
+                    multiSelectHelper.deselectAllInList(episodesBelow)
                 }
                 adapter.notifyDataSetChanged()
             }
@@ -284,7 +287,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
                 val startIndex = upNextEpisodes.indexOf(multiSelectable)
                 if (startIndex > -1) {
-                    upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                    val episdesAbove = upNextEpisodes.subList(0, startIndex + 1)
+                    multiSelectHelper.deselectAllInList(episdesAbove)
                 }
                 adapter.notifyDataSetChanged()
             }
