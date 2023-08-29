@@ -6,6 +6,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
@@ -16,6 +18,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.Date
 import java.util.UUID
@@ -32,7 +35,10 @@ class UpNextQueueTest {
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         downloadManager = mock {}
         val episodeManager = mock<EpisodeManager> {}
-        val settings = mock<Settings> {}
+        val settings = mock<Settings> {
+            on { autoDownloadUpNext } doReturn UserSetting.Mock(true, mock())
+            on { lastLoadedFromPodcastOrFilterUuid } doReturn UserSetting.Mock(LastPlayedList.None, mock())
+        }
         val syncManager = mock<SyncManager> {}
 
         upNextQueue = UpNextQueueImpl(appDatabase, settings, episodeManager, syncManager, context)

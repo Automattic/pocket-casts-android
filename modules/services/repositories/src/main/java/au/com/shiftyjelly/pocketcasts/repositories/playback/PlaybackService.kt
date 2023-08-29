@@ -268,7 +268,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_STOPPED,
                 PlaybackStateCompat.STATE_PAUSED,
                 PlaybackStateCompat.STATE_ERROR -> {
-                    val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause()
+                    val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause.value
                     // We have to be careful here to only call notify when moving from PLAY to PAUSE once
                     // or else the notification will come back after being swiped away
                     if (removeNotification || isForegroundService) {
@@ -521,7 +521,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
 
-                val showPlayed = settings.getAutoShowPlayed()
+                val showPlayed = settings.autoShowPlayed.value
                 val episodes = episodeManager
                     .findEpisodesByPodcastOrdered(podcast)
                     .filterNot { !showPlayed && (it.isFinished || it.isArchived) }

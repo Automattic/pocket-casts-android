@@ -8,7 +8,7 @@
             android:key="autoDownloadUpNext"
             android:title="@string/settings_auto_download_up_next"
             android:defaultValue="false"
-            android:persistent="true" />
+            android:persistent="false" />
 
     </PreferenceCategory>
 
@@ -44,15 +44,14 @@
             android:key="autoDownloadOnlyDownloadOnWifi"
             android:title="@string/settings_auto_download_unmetered"
             android:summary="@string/settings_auto_download_unmetered_summary"
-            android:persistent="true"
-
-             />
+            android:persistent="false"
+            />
 
         <SwitchPreference
             android:defaultValue="false"
             android:key="autoDownloadOnlyDownloadWhenCharging"
             android:title="@string/settings_auto_download_charging"
-            android:persistent="true" />
+            android:persistent="false" />
 
     </PreferenceCategory>
 

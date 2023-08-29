@@ -51,14 +51,17 @@ class BookmarkFragment : Fragment() {
     }
 
     private fun saveBookmark() {
-        viewModel.saveBookmark(onSaved = { bookmark -> bookmarkSaved(bookmark) })
+        viewModel.saveBookmark(onSaved = { bookmark, isExisting ->
+            bookmarkSaved(bookmark, isExisting)
+        })
     }
 
-    private fun bookmarkSaved(bookmark: Bookmark) {
+    private fun bookmarkSaved(bookmark: Bookmark, isExistingBookmark: Boolean) {
         val intent = BookmarkActivityContract.createIntent(
             bookmarkUuid = bookmark.uuid,
             title = bookmark.title,
-            tintColor = viewModel.uiState.value.tintColor
+            tintColor = viewModel.uiState.value.tintColor,
+            isExistingBookmark = isExistingBookmark
         )
         requireActivity().run {
             setResult(Activity.RESULT_OK, intent)

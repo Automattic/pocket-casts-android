@@ -19,20 +19,23 @@ class BookmarkActivityContract : ActivityResultContract<Intent, BookmarkActivity
         const val RESULT_BOOKMARK_UUID = "RESULT_BOOKMARK_UUID"
         const val RESULT_TITLE = "RESULT_TITLE"
         const val RESULT_TINT_COLOR = "RESULT_TINT_COLOR"
+        const val RESULT_EXISTING_BOOKMARK = "RESULT_EXISTING_BOOKMARK"
 
-        fun createIntent(bookmarkUuid: String, title: String, tintColor: Color): Intent {
+        fun createIntent(bookmarkUuid: String, title: String, tintColor: Color, isExistingBookmark: Boolean): Intent {
             return Intent().apply {
                 putExtra(RESULT_BOOKMARK_UUID, bookmarkUuid)
                 putExtra(RESULT_TITLE, title)
                 putExtra(RESULT_TINT_COLOR, tintColor.toArgb())
+                putExtra(RESULT_EXISTING_BOOKMARK, isExistingBookmark)
             }
         }
     }
 
     data class BookmarkResult(
-        val bookmarkUuid: String,
+        val bookmarkUuid: String? = null,
         val title: String,
-        val tintColor: Int
+        val tintColor: Int,
+        val isExistingBookmark: Boolean
     )
 
     override fun createIntent(context: Context, input: Intent): Intent = input
@@ -42,8 +45,9 @@ class BookmarkActivityContract : ActivityResultContract<Intent, BookmarkActivity
             val bookmarkUuid = intent.getStringExtra(RESULT_BOOKMARK_UUID)
             val title = intent.getStringExtra(RESULT_TITLE)
             val tintColor = intent.getIntExtra(RESULT_TINT_COLOR, Color.White.toArgb())
+            val existingBookmark = intent.getBooleanExtra(RESULT_EXISTING_BOOKMARK, false)
             if (bookmarkUuid != null) {
-                return BookmarkResult(bookmarkUuid = bookmarkUuid, title = title ?: "", tintColor = tintColor)
+                return BookmarkResult(bookmarkUuid = bookmarkUuid, title = title ?: "", tintColor = tintColor, isExistingBookmark = existingBookmark)
             }
         }
         return null

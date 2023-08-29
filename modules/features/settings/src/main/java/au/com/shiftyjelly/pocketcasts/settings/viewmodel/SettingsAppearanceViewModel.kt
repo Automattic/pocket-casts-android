@@ -30,8 +30,8 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
-    val showArtworkOnLockScreen = MutableLiveData(settings.showArtworkOnLockScreen())
-    val useEmbeddedArtwork = MutableLiveData(settings.getUseEmbeddedArtwork())
+    val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow
+    val useEmbeddedArtwork = settings.useEmbeddedArtwork.flow
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)
@@ -118,8 +118,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
-        settings.setShowArtworkOnLockScreen(value)
-        showArtworkOnLockScreen.value = value
+        settings.showArtworkOnLockScreen.set(value)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
             mapOf("enabled" to value)
@@ -127,8 +126,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEmbeddedArtwork(value: Boolean) {
-        settings.setUseEmbeddedArtwork(value)
-        useEmbeddedArtwork.value = value
+        settings.useEmbeddedArtwork.set(value)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
             mapOf("enabled" to value)

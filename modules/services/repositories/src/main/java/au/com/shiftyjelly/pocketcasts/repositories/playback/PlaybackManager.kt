@@ -32,8 +32,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
-import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -95,6 +95,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -241,7 +242,7 @@ open class PlaybackManager @Inject constructor(
             return nextEpisode
         }
 
-        if (!settings.getAutoPlayNextEpisodeOnEmpty()) {
+        if (!settings.autoPlayNextEpisodeOnEmpty.value) {
             return null
         }
 
@@ -363,7 +364,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
-        return settings.warnOnMeteredNetwork() && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
+        return settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
     }
 
     fun getPlaybackSpeed(): Double {
@@ -725,7 +726,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipForward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipForwardInSecs()) {
+    fun skipForward(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
+    ) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 
@@ -749,7 +753,7 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, sourceView)
     }
 
-    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipBackwardInSecs()) {
+    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 
@@ -1160,7 +1164,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
-        val lastPodcastOrFilterUuid = settings.getlastLoadedFromPodcastOrFilterUuid()
+        val lastPodcastOrFilterUuid = settings.lastLoadedFromPodcastOrFilterUuid.value.uuid
         val lastEpisodeUuid = lastPlayedEpisodeUuid
         if (lastEpisodeUuid == null || lastPodcastOrFilterUuid == null) {
             return null
@@ -1287,6 +1291,30 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
+        if (abs(durationDiffSeconds) > 0) {
+            val notifyUser = abs(durationDiffSeconds) > 30
+            if (notifyUser) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed significantly ($durationDiffSeconds seconds)")
+                launch(Dispatchers.Main) {
+                    val message = application.getString(LR.string.episode_duration_change, durationDiffSeconds)
+                    Toast.makeText(application, message, Toast.LENGTH_LONG).show()
+                }
+            }
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYBACK_EPISODE_DURATION_CHANGED,
+                mapOf(
+                    "duration_change" to durationDiffSeconds,
+                    "duration" to durationMs / 1000,
+                    "notified_user" to notifyUser,
+                    "is_user_file" to (episode is UserEpisode),
+                    "is_downloaded" to episode.isDownloaded,
+                    "episode_uuid" to episode.uuid,
+                    "podcast_uuid" to episode.podcastOrSubstituteUuid,
+                )
+            )
+        }
+
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 if (playbackState.durationMs == durationMs) {
@@ -1297,13 +1325,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         val playerDurationSecs = durationMs.toDouble() / 1000.0
-
-        val currentDurationMs = episode.durationMs
-        if (currentDurationMs < 10000) {
-            episodeManager.updateDuration(episode, playerDurationSecs, true)
-        } else {
-            episodeManager.updateDuration(episode, playerDurationSecs, true)
-        }
+        episodeManager.updateDuration(episode, playerDurationSecs, true)
     }
 
     suspend fun onSeekComplete(positionMs: Int) {
@@ -1504,7 +1526,7 @@ open class PlaybackManager @Inject constructor(
         if (!episode.isDownloaded) {
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) && // The watch handles these warnings before this is called
-                settings.warnOnMeteredNetwork() &&
+                settings.warnOnMeteredNetwork.value &&
                 !Network.isUnmeteredConnection(application) &&
                 !forceStream &&
                 play
@@ -1573,7 +1595,7 @@ open class PlaybackManager @Inject constructor(
         // podcast start from
         if (episode is PodcastEpisode) {
             // Auto subscribe to played podcasts (used in Automotive)
-            if (podcast != null && settings.getAutoSubscribeToPlayed() && !podcast.isSubscribed && episode.episodeType !is PodcastEpisode.EpisodeType.Trailer) {
+            if (podcast != null && settings.autoSubscribeToPlayed.value && !podcast.isSubscribed && episode.episodeType !is PodcastEpisode.EpisodeType.Trailer) {
                 podcastManager.subscribeToPodcast(podcast.uuid, sync = true)
             }
         }
@@ -1595,7 +1617,11 @@ open class PlaybackManager @Inject constructor(
         player?.setPodcast(podcast)
         player?.setEpisode(episode)
 
-        val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) podcast.playbackEffects else settings.getGlobalPlaybackEffects()
+        val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
+            podcast.playbackEffects
+        } else {
+            settings.globalPlaybackEffects.value
+        }
 
         val previousPlaybackState = playbackStateRelay.blockingFirst()
         val playbackState = PlaybackState(
@@ -1714,7 +1740,7 @@ open class PlaybackManager @Inject constructor(
         val notification = builder.build()
 
         // Add sound and vibrations
-        val sound = settings.getNotificationSound()
+        val sound = settings.notificationSound.value.uri
         if (sound != null) {
             notification.sound = sound
         }

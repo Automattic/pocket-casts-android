@@ -36,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.HeadphoneAction
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -56,7 +56,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
 
     private val isAddBookmarkEnabled: Boolean
         get() = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-            (settings.getCachedSubscription() as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+            (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,10 +66,9 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                val previousAction = settings.headphonePreviousActionFlow.collectAsState().value
-                val nextAction = settings.headphoneNextActionFlow.collectAsState().value
-                val confirmationSound =
-                    settings.headphonePlayBookmarkConfirmationSoundFlow.collectAsState().value
+                val previousAction = settings.headphoneControlsPreviousAction.flow.collectAsState().value
+                val nextAction = settings.headphoneControlsNextAction.flow.collectAsState().value
+                val confirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.flow.collectAsState().value
 
                 val viewModel = hiltViewModel<HeadphoneControlsSettingsPageViewModel>()
 
@@ -81,20 +80,20 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                     previousAction = previousAction,
                     nextAction = nextAction,
                     onNextActionSave = {
-                        settings.setHeadphoneControlsNextAction(it)
+                        settings.headphoneControlsNextAction.set(it)
                         viewModel.onNextActionChanged(it)
                     },
                     onPreviousActionSave = {
-                        settings.setHeadphoneControlsPreviousAction(it)
+                        settings.headphoneControlsPreviousAction.set(it)
                         viewModel.onPreviousActionChanged(it)
                     },
                     confirmationSound = confirmationSound,
-                    onConfirmationSoundSave = {
-                        settings.setHeadphoneControlsPlayBookmarkConfirmationSound(it)
-                        if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
+                    onConfirmationSoundSave = { newValue ->
+                        settings.headphoneControlsPlayBookmarkConfirmationSound.set(newValue)
+                        if (newValue) {
                             playbackManager.playTone()
                         }
-                        viewModel.onConfirmationSoundChanged(it)
+                        viewModel.onConfirmationSoundChanged(newValue)
                     },
                     onBackPressed = {
                         @Suppress("DEPRECATION")

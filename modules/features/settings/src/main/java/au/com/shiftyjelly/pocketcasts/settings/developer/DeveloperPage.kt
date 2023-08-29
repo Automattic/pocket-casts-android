@@ -3,9 +3,11 @@ package au.com.shiftyjelly.pocketcasts.settings.developer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.Notifications
@@ -19,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import io.sentry.Sentry
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -38,6 +41,7 @@ fun DeveloperPage(
         )
         ShowkaseSetting(onClick = onShowkaseClick)
         ForceRefreshSetting(onClick = onForceRefreshClick)
+        SendCrashSetting()
         TriggerNotificationSetting(onClick = onTriggerNotificationClick)
         DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
     }
@@ -66,6 +70,20 @@ private fun ForceRefreshSetting(
         secondaryText = "Refresh podcasts and sync data",
         icon = rememberVectorPainter(Icons.Default.Refresh),
         modifier = modifier.clickable { onClick() }
+    )
+}
+
+@Composable
+private fun SendCrashSetting(
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Report a crash",
+        secondaryText = "Send an exception to Sentry",
+        icon = rememberVectorPainter(Icons.Outlined.BugReport),
+        modifier = modifier.clickable {
+            Sentry.captureException(Exception("Test crash"))
+        }
     )
 }
 
