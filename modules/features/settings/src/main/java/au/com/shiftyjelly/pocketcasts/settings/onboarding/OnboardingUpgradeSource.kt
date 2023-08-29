@@ -11,4 +11,5 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     RECOMMENDATIONS("recommendations"),
     SETTINGS("settings"),
     BOOKMARKS("bookmarks"),
+    HEADPHONE_CONTROLS_SETTINGS("headphone_controls_settings"),
 }
