@@ -5,5 +5,5 @@ import javax.inject.Singleton
 
 @Singleton
 class PodcastAndEpisodeDetailsCoordinator @Inject constructor() {
-    lateinit var onEpisodeDetailsDismissed: () -> Unit
+    var onEpisodeDetailsDismissed: (() -> Unit)? = null
 }

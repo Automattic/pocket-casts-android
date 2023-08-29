@@ -255,7 +255,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             override fun multiSelectSelectNone() {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
-                    episodes.forEach { multiSelectHelper.deselect(it) }
+                    multiSelectHelper.deselectAllInList(episodes)
                     adapter.notifyDataSetChanged()
                     trackSelectAll(false)
                 }
@@ -292,7 +292,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
-                        episodes.subList(startIndex, episodes.size).forEach { multiSelectHelper.deselect(it) }
+                        val episodesBelow = episodes.subList(startIndex, episodes.size)
+                        multiSelectHelper.deselectAllInList(episodesBelow)
                         adapter.notifyDataSetChanged()
                     }
                 }
@@ -303,7 +304,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
-                        episodes.subList(0, startIndex + 1).forEach { multiSelectHelper.deselect(it) }
+                        val episodesAbove = episodes.subList(0, startIndex + 1)
+                        multiSelectHelper.deselectAllInList(episodesAbove)
                         adapter.notifyDataSetChanged()
                     }
                 }
