@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -29,6 +27,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehavi
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
@@ -44,8 +44,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.Date
@@ -82,9 +80,6 @@ class SettingsImpl @Inject constructor(
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
-
-    override val bookmarkSortTypeForPlayerFlow = MutableStateFlow(getBookmarksSortTypeForPlayer())
-    override val bookmarkSortTypeForPodcastFlow = MutableStateFlow(getBookmarksSortTypeForPodcast())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1267,32 +1262,21 @@ class SettingsImpl @Inject constructor(
         toString = { it.id }
     )
 
-    override fun <T> setBookmarksSortType(sortType: T) {
-        when (sortType) {
-            is BookmarksSortTypeForPlayer -> {
-                setString(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER, sortType.key)
-                bookmarkSortTypeForPlayerFlow.update { sortType }
-            }
-            is BookmarksSortTypeForPodcast -> {
-                setString(Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST, sortType.key)
-                bookmarkSortTypeForPodcastFlow.update { sortType }
-            }
-        }
-    }
+    override val episodeBookmarksSortType = BookmarksSortTypeDefault.UserSettingPref(
+        sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_EPISODE,
+        defaultValue = BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getBookmarksSortTypeForPlayer() =
-        BookmarksSortTypeForPlayer.fromString(
-            getString(
-                Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER,
-                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
-            )
-        ) ?: BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST
+    override val playerBookmarksSortType = BookmarksSortTypeDefault.UserSettingPref(
+        sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER,
+        defaultValue = BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST,
+        sharedPrefs = sharedPreferences,
+    )
 
-    override fun getBookmarksSortTypeForPodcast() =
-        BookmarksSortTypeForPodcast.fromString(
-            getString(
-                Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
-                BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
-            )
-        ) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST
+    override val podcastBookmarksSortType = BookmarksSortTypeForPodcast.UserSettingPref(
+        sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
+        defaultValue = BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST,
+        sharedPrefs = sharedPreferences,
+    )
 }
