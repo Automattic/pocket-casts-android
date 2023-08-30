@@ -198,7 +198,8 @@ private fun Content(
                 OnboardingUpgradeSource.PROFILE,
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.SETTINGS,
-                OnboardingUpgradeSource.BOOKMARKS -> false
+                OnboardingUpgradeSource.BOOKMARKS,
+                OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }

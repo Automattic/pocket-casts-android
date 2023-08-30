@@ -777,6 +777,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
                                 searchTerm = state.searchBookmarkTerm,
+                                context = requireContext()
                             )
 
                             adapter?.notifyDataSetChanged()
