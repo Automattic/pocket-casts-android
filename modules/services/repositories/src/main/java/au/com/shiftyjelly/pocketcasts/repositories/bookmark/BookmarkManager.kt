@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import kotlinx.coroutines.flow.Flow
 
 interface BookmarkManager {
@@ -14,7 +14,7 @@ interface BookmarkManager {
     suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark?
     suspend fun findEpisodeBookmarksFlow(
         episode: BaseEpisode,
-        sortType: BookmarksSortTypeForPlayer,
+        sortType: BookmarksSortTypeDefault,
     ): Flow<List<Bookmark>>
     fun findPodcastBookmarksFlow(
         podcastUuid: String,

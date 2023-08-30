@@ -115,7 +115,7 @@ class EpisodeListAdapter(
             disposables = disposables,
             podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                 podcastUuid = episode.podcastUuid,
-                sortType = settings.getBookmarksSortTypeForPodcast()
+                sortType = settings.podcastBookmarksSortType.flow.value
             ).asObservable()
         )
         holder.episodeRow.setOnClickListener {

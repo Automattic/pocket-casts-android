@@ -620,7 +620,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 sourceView = SourceView.PODCAST_SCREEN,
                 podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                     podcastUuid = podcastUuid,
-                    sortType = settings.getBookmarksSortTypeForPodcast()
+                    sortType = settings.podcastBookmarksSortType.flow.value
                 ).asObservable()
             )
         }
