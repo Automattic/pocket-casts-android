@@ -79,8 +79,6 @@ class PodcastViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
-    private val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
-    private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
 ) : ViewModel(), CoroutineScope {
@@ -105,6 +103,9 @@ class PodcastViewModel
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
+    lateinit var multiSelectBookmarksHelper: MultiSelectBookmarksHelper
 
     init {
         podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = {

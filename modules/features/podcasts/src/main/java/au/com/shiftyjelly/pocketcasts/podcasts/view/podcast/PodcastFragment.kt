@@ -651,6 +651,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     fun <T> MultiSelectHelper<T>.setUp() {
+        viewModel.multiSelectEpisodesHelper = multiSelectEpisodesHelper
+        viewModel.multiSelectBookmarksHelper = multiSelectBookmarksHelper
+
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
             if (episodeContainerFragment != null) return@observe
