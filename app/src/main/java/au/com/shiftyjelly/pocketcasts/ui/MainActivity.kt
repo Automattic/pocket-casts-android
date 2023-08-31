@@ -509,6 +509,14 @@ class MainActivity :
 
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
+        if (isUpNextShowing()) {
+            val fragment = supportFragmentManager.findFragmentByTag(UpNextFragment::class.java.name)
+            if ((fragment as UpNextFragment).multiSelectHelper.isMultiSelecting) {
+                fragment.multiSelectHelper.isMultiSelecting = false
+                return
+            }
+        }
+
         if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
             frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             return

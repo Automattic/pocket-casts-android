@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -71,6 +72,19 @@ class BookmarksContainerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bottomSheetDialog = dialog as? BottomSheetDialog
+        bottomSheetDialog?.onBackPressedDispatcher?.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (multiSelectHelper.isMultiSelecting) {
+                        multiSelectHelper.isMultiSelecting = false
+                        return
+                    }
+                    dismiss()
+                }
+            }
+        )
+
         bottomSheetDialog?.behavior?.apply {
             isFitToContents = false
             state = BottomSheetBehavior.STATE_EXPANDED
