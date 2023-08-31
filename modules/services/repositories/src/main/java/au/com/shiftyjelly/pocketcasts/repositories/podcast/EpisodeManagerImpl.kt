@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.paging.PagedList
+import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.work.Constraints
 import androidx.work.Data
@@ -954,12 +955,19 @@ class EpisodeManagerImpl @Inject constructor(
 
     // Playback manager is only optional for UI tests. Should never be optional in the app but can't work out
     // another way without mocking a lot of stuff.
-    override fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?) {
-        episodes.filter { !it.isArchived }.chunked(500).forEach { chunked ->
-            episodeDao.archiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
-            playbackManager?.let { playbackManager ->
-                chunked.forEach {
-                    cleanUpEpisode(it, playbackManager)
+    override fun archiveAllInList(
+        episodes: List<PodcastEpisode>,
+        playbackManager: PlaybackManager?
+    ) {
+        launch(Dispatchers.IO) {
+            appDatabase.withTransaction {
+                episodes.filter { !it.isArchived }.chunked(500).forEach { chunked ->
+                    episodeDao.archiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
+                    playbackManager?.let { playbackManager ->
+                        chunked.forEach {
+                            cleanUpEpisode(it, playbackManager)
+                        }
+                    }
                 }
             }
         }
