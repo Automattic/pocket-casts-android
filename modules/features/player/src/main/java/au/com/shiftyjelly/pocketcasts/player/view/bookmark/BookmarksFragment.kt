@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -62,9 +61,7 @@ class BookmarksFragment : BaseFragment() {
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
-
-    @Inject
-    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val sharedBookmarksViewModel: SharedBookmarksViewModel by viewModels({ requireParentFragment() })
 
     @Inject
     lateinit var settings: Settings
@@ -97,6 +94,7 @@ class BookmarksFragment : BaseFragment() {
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     val listData = playerViewModel.listDataLive.asFlow()
                         .collectAsState(initial = null)
+                    bookmarksViewModel.multiSelectHelper = requireNotNull(sharedBookmarksViewModel.multiSelectHelper)
 
                     val episodeUuid = episodeUuid(listData)
                     if (episodeUuid != null) {
@@ -106,9 +104,9 @@ class BookmarksFragment : BaseFragment() {
                             textColor = requireNotNull(textColor(listData)),
                             sourceView = sourceView,
                             bookmarksViewModel = bookmarksViewModel,
-                            multiSelectHelper = multiSelectHelper,
+                            multiSelectHelper = requireNotNull(sharedBookmarksViewModel.multiSelectHelper),
                             onRowLongPressed = { bookmark ->
-                                multiSelectHelper.defaultLongPress(
+                                sharedBookmarksViewModel.multiSelectHelper?.defaultLongPress(
                                     multiSelectable = bookmark,
                                     fragmentManager = childFragmentManager,
                                     forceDarkTheme = sourceView == SourceView.PLAYER,
@@ -162,7 +160,7 @@ class BookmarksFragment : BaseFragment() {
                     titleId = LR.string.bookmarks_select_option,
                     imageId = IR.drawable.ic_multiselect,
                     click = {
-                        multiSelectHelper.isMultiSelecting = true
+                        sharedBookmarksViewModel.multiSelectHelper?.isMultiSelecting = true
                     }
                 )
                 .addTextOption(

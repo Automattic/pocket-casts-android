@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.SharedBookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastBinding
@@ -132,6 +133,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: PodcastViewModel by viewModels()
+    private val sharedBookmarksViewModel: SharedBookmarksViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var adapter: PodcastAdapter? = null
@@ -653,7 +655,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     fun <T> MultiSelectHelper<T>.setUp() {
         viewModel.multiSelectEpisodesHelper = multiSelectEpisodesHelper
         viewModel.multiSelectBookmarksHelper = multiSelectBookmarksHelper
-
+        sharedBookmarksViewModel.multiSelectHelper = multiSelectBookmarksHelper
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
             if (episodeContainerFragment != null) return@observe

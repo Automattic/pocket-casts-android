@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.SharedBookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -122,6 +123,7 @@ class EpisodeContainerFragment :
     @Inject
     lateinit var multiSelectHelper: MultiSelectBookmarksHelper
     private val viewModel: EpisodeContainerFragmentViewModel by viewModels()
+    private val sharedBookmarksViewModel: SharedBookmarksViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (!forceDarkTheme || theme.isDarkTheme) {
@@ -206,6 +208,7 @@ class EpisodeContainerFragment :
     }
 
     private fun FragmentEpisodeContainerBinding.setupMultiSelectHelper() {
+        sharedBookmarksViewModel.multiSelectHelper = multiSelectHelper
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             multiSelectToolbar.isVisible = isMultiSelecting
             multiSelectToolbar.setNavigationIcon(R.drawable.ic_arrow_back)

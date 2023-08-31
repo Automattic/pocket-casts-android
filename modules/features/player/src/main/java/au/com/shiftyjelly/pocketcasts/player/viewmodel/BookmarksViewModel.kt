@@ -50,7 +50,6 @@ class BookmarksViewModel
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val userManager: UserManager,
-    private val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
@@ -62,6 +61,8 @@ class BookmarksViewModel
 
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
+
+    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     private var sourceView: SourceView = SourceView.UNKNOWN
         set(value) {

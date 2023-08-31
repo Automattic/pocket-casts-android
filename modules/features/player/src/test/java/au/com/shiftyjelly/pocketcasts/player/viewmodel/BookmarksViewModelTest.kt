@@ -83,13 +83,13 @@ class BookmarksViewModelTest {
             episodeManager = episodeManager,
             podcastManager = podcastManager,
             userManager = userManager,
-            multiSelectHelper = multiSelectHelper,
             settings = settings,
             playbackManager = playbackManager,
             theme = theme,
             ioDispatcher = UnconfinedTestDispatcher(),
             analyticsTracker = analyticsTracker,
         )
+        bookmarksViewModel.multiSelectHelper = multiSelectHelper
     }
 
     /*@Test

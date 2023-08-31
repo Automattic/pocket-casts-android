@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -27,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.SharedBookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -58,6 +60,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val sharedBookmarksViewModel: SharedBookmarksViewModel by viewModels()
     private var binding: FragmentPlayerContainerBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -192,6 +195,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             }
         }
 
+        sharedBookmarksViewModel.multiSelectHelper = multiSelectHelper
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             binding.multiSelectToolbar.isVisible = isMultiSelecting
             binding.multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)

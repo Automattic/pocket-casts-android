@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentBookmarksContainerBinding
@@ -56,6 +57,7 @@ class BookmarksContainerFragment :
 
     @Inject
     lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val sharedBookmarksViewModel: SharedBookmarksViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -102,6 +104,7 @@ class BookmarksContainerFragment :
     }
 
     private fun FragmentBookmarksContainerBinding.setupMultiSelectHelper() {
+        sharedBookmarksViewModel.multiSelectHelper = multiSelectHelper
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             multiSelectToolbar.isVisible = isMultiSelecting
             multiSelectToolbar.setNavigationIcon(R.drawable.ic_arrow_back)
