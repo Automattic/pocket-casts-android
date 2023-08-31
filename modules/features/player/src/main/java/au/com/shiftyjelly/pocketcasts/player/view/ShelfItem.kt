@@ -23,7 +23,7 @@ object ShelfItems {
         add(ShelfItem.Cast)
         add(ShelfItem.Played)
         if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            add(ShelfItem.Bookmark)
+            add(ShelfItem.Bookmark())
         }
         add(ShelfItem.Archive)
     }
@@ -40,6 +40,7 @@ sealed class ShelfItem(
     var iconRes: (BaseEpisode?) -> Int,
     val shownWhen: Shown,
     val tier: SubscriptionTier = SubscriptionTier.NONE,
+    open val isUnlocked: Boolean = true,
     val analyticsValue: String,
     @StringRes val subtitle: Int? = null
 ) {
@@ -107,7 +108,9 @@ sealed class ShelfItem(
         analyticsValue = "mark_as_played"
     )
 
-    object Bookmark : ShelfItem(
+    data class Bookmark(
+        override val isUnlocked: Boolean = false
+    ) : ShelfItem(
         id = "bookmark",
         title = { LR.string.add_bookmark },
         iconRes = { IR.drawable.ic_bookmark },

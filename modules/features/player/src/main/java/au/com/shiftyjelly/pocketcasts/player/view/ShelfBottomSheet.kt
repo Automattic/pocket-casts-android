@@ -110,7 +110,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
             }
             is ShelfItem.Bookmark -> {
-                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick()
+                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick(item)
             }
             ShelfItem.Download -> {
                 Timber.e("Unexpected click on ShelfItem.Download")

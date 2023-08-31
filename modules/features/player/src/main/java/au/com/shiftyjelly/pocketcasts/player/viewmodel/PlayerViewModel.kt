@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfItem
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfItems
@@ -209,12 +208,12 @@ class PlayerViewModel @Inject constructor(
     }
         .toFlowable(BackpressureStrategy.LATEST)
         .combineLatest(userManager.getSignInState()).map { (shelfItems, signInState) ->
-            shelfItems.filter { item ->
-                when (item.tier) {
-                    SubscriptionTier.NONE -> true
-                    SubscriptionTier.PLUS -> signInState.isSignedInAsPlusOrPatron
-                    SubscriptionTier.PATRON -> signInState.isSignedInAsPatron
+            shelfItems.map { item ->
+                var updatedItem = item
+                if (item is ShelfItem.Bookmark) {
+                    updatedItem = item.copy(isUnlocked = signInState.isSignedInAsPatron)
                 }
+                updatedItem
             }
         }
 

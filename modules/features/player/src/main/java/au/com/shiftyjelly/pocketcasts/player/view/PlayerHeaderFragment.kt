@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
@@ -33,6 +34,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -138,18 +142,22 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
-        val shelfViews = mapOf(
-            ShelfItem.Effects.id to binding.effects,
-            ShelfItem.Sleep.id to binding.sleep,
-            ShelfItem.Star.id to binding.star,
-            ShelfItem.Share.id to binding.share,
-            ShelfItem.Podcast.id to binding.podcast,
-            ShelfItem.Cast.id to binding.cast,
-            ShelfItem.Played.id to binding.played,
-            ShelfItem.Archive.id to binding.archive,
-            ShelfItem.Download.id to binding.download,
-            ShelfItem.Bookmark.id to binding.bookmark,
-        )
+        val shelfViews = ShelfItems.itemsList.associate { item ->
+            val shelfItemView = when (item) {
+                ShelfItem.Archive -> binding.archive
+                is ShelfItem.Bookmark -> binding.bookmark
+                ShelfItem.Cast -> binding.cast
+                ShelfItem.Download -> binding.download
+                ShelfItem.Effects -> binding.effects
+                ShelfItem.Played -> binding.played
+                ShelfItem.Podcast -> binding.podcast
+                ShelfItem.Share -> binding.share
+                ShelfItem.Sleep -> binding.sleep
+                ShelfItem.Star -> binding.star
+            }
+            item.id to shelfItemView
+        }
+
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
             val visibleItems = it.first.subList(0, 4).map { it.id }
             binding.shelf.removeAllViews()
@@ -181,8 +189,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             viewModel.downloadCurrentlyPlaying()
         }
         binding.bookmark.setOnClickListener {
-            trackShelfAction(ShelfItem.Bookmark.analyticsValue)
-            onAddBookmarkClick()
+            val bookmarkShelfItem = ShelfItems.itemsList.first { it is ShelfItem.Bookmark } as ShelfItem.Bookmark
+            trackShelfAction(bookmarkShelfItem.analyticsValue)
+            onAddBookmarkClick(bookmarkShelfItem)
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
@@ -472,10 +481,20 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.starToggle()
     }
 
-    fun onAddBookmarkClick() {
-        viewModel.buildBookmarkArguments { arguments ->
-            activityLauncher.launch(arguments.getIntent(requireContext()))
+    fun onAddBookmarkClick(item: ShelfItem.Bookmark) {
+        if (item.isUnlocked) {
+            viewModel.buildBookmarkArguments { arguments ->
+                activityLauncher.launch(arguments.getIntent(requireContext()))
+            }
+        } else {
+            starUpsellFlow(item.tier)
         }
+    }
+
+    private fun starUpsellFlow(tier: SubscriptionTier) {
+        val source = OnboardingUpgradeSource.BOOKMARKS
+        val onboardingFlow = OnboardingFlow.Upsell(source, tier == SubscriptionTier.PATRON)
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
     override fun onShareClick() {
