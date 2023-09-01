@@ -1726,7 +1726,9 @@ open class PlaybackManager @Inject constructor(
                     manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
                 }
             } ?: run {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "notificationPermissionChecker was null (this should never happen)")
+                val message = "notificationPermissionChecker was null (this should never happen)"
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
+                Sentry.addBreadcrumb(message)
                 manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
             }
         } catch (e: Exception) {
