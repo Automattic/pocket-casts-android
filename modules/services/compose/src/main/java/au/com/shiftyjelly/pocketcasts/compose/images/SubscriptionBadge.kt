@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -22,8 +23,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private val pillCornerRadiusInDp = 800.dp
 
@@ -71,12 +75,89 @@ fun SubscriptionBadge(
     }
 }
 
-@Preview
 @Composable
-private fun SubscriptionBadgePreview() {
-    SubscriptionBadge(
-        iconRes = R.drawable.ic_patron,
-        shortNameRes = LR.string.pocket_casts_patron_short,
-        backgroundColor = Color.Black,
+fun SubscriptionBadgeForTier(
+    tier: SubscriptionTier,
+    displayMode: DisplayMode,
+) {
+    when (tier) {
+        SubscriptionTier.PLUS -> SubscriptionBadge(
+            iconRes = IR.drawable.ic_plus,
+            shortNameRes = LR.string.pocket_casts_plus_short,
+            iconColor = when (displayMode) {
+                DisplayMode.Black -> colorResource(UR.color.plus_gold)
+                DisplayMode.Colored -> Color.White
+            },
+            backgroundColor = when (displayMode) {
+                DisplayMode.Black -> Color.Black
+                DisplayMode.Colored -> colorResource(UR.color.plus_gold)
+            },
+            textColor = when (displayMode) {
+                DisplayMode.Black -> colorResource(UR.color.plus_gold)
+                DisplayMode.Colored -> Color.White
+            },
+        )
+        SubscriptionTier.PATRON -> SubscriptionBadge(
+            iconRes = IR.drawable.ic_patron,
+            shortNameRes = LR.string.pocket_casts_patron_short,
+            iconColor = when (displayMode) {
+                DisplayMode.Black -> colorResource(UR.color.patron_purple_light)
+                DisplayMode.Colored -> Color.White
+            },
+            backgroundColor = when (displayMode) {
+                DisplayMode.Black -> Color.Black
+                DisplayMode.Colored -> colorResource(UR.color.patron_purple)
+            },
+            textColor = when (displayMode) {
+                DisplayMode.Black -> Color.White
+                DisplayMode.Colored -> Color.White
+            },
+        )
+        SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+    }
+}
+
+enum class DisplayMode {
+    Black,
+    Colored,
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored", defaultStyle = true)
+@Preview(name = "Colored")
+@Composable
+fun SubscriptionBadgePlusColoredPreview() {
+    SubscriptionBadgeForTier(
+        tier = SubscriptionTier.PLUS,
+        displayMode = DisplayMode.Colored
+    )
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Black")
+@Preview(name = "Black")
+@Composable
+fun SubscriptionBadgePlusBlackPreview() {
+    SubscriptionBadgeForTier(
+        tier = SubscriptionTier.PLUS,
+        displayMode = DisplayMode.Black
+    )
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored")
+@Preview(name = "Colored")
+@Composable
+fun SubscriptionBadgePatronColoredPreview() {
+    SubscriptionBadgeForTier(
+        tier = SubscriptionTier.PATRON,
+        displayMode = DisplayMode.Colored
+    )
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Black")
+@Preview(name = "Black")
+@Composable
+fun SubscriptionBadgePatronBlackPreview() {
+    SubscriptionBadgeForTier(
+        tier = SubscriptionTier.PATRON,
+        displayMode = DisplayMode.Black
     )
 }
