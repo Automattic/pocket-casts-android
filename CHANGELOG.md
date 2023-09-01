@@ -13,8 +13,6 @@
          ([#1280](https://github.com/Automattic/pocket-casts-android/pull/1280))
     *    Improved upgrade flow when signing in with Google account
          ([#1275](https://github.com/Automattic/pocket-casts-android/pull/1275))
-    *    Improved performance when archiving multiple episodes
-         ([1327](https://github.com/Automattic/pocket-casts-android/pull/1327))
 
 7.45.1
 -----

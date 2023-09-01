@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.paging.PagedList
-import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.work.Constraints
 import androidx.work.Data
@@ -28,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
@@ -47,7 +45,6 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +72,6 @@ class EpisodeManagerImpl @Inject constructor(
     private val appDatabase: AppDatabase,
     private val podcastCacheServerManager: PodcastCacheServerManager,
     private val userEpisodeManager: UserEpisodeManager,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : EpisodeManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -958,19 +954,12 @@ class EpisodeManagerImpl @Inject constructor(
 
     // Playback manager is only optional for UI tests. Should never be optional in the app but can't work out
     // another way without mocking a lot of stuff.
-    override fun archiveAllInList(
-        episodes: List<PodcastEpisode>,
-        playbackManager: PlaybackManager?
-    ) {
-        launch(ioDispatcher) {
-            appDatabase.withTransaction {
-                episodes.filter { !it.isArchived }.chunked(500).forEach { chunked ->
-                    episodeDao.archiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
-                    playbackManager?.let { playbackManager ->
-                        chunked.forEach {
-                            cleanUpEpisode(it, playbackManager)
-                        }
-                    }
+    override fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?) {
+        episodes.filter { !it.isArchived }.chunked(500).forEach { chunked ->
+            episodeDao.archiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
+            playbackManager?.let { playbackManager ->
+                chunked.forEach {
+                    cleanUpEpisode(it, playbackManager)
                 }
             }
         }
