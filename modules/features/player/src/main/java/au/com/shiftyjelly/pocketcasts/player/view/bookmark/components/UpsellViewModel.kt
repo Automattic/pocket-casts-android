@@ -20,7 +20,7 @@ import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class PlusUpsellViewModel @Inject constructor(
+class UpsellViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {

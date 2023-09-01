@@ -35,7 +35,7 @@ fun UpsellView(
     sourceView: SourceView,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = hiltViewModel<PlusUpsellViewModel>()
+    val viewModel = hiltViewModel<UpsellViewModel>()
     Content(
         style = style,
         activeTheme = activeTheme,
