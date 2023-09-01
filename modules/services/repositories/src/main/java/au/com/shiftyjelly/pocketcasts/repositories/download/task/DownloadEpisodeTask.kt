@@ -140,7 +140,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 setForegroundAsync(createForegroundInfo())
             }
 
-            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADING)
+            runBlocking {
+                episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADING)
+            }
 
             download()
                 .doOnNext { updateProgress(it) }
@@ -150,7 +152,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
             if (!isStopped) {
                 pathToSaveTo?.let {
                     episodeManager.updateDownloadFilePath(episode, it, false)
-                    episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                    runBlocking {
+                        episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                    }
                 }
 
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Downloaded episode ${episode.title} ${episode.uuid}")
@@ -201,7 +205,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
             .putString(OUTPUT_EPISODE_UUID, episode.uuid)
             .build()
 
-        episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
+        runBlocking {
+            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
+        }
         val message = if (downloadMessage.isNullOrBlank()) "Download Failed" else downloadMessage
         episodeManager.updateDownloadErrorDetails(episode, message)
 

@@ -71,8 +71,8 @@ interface EpisodeManager {
     fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDuration(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
     fun updatePlayingStatus(episode: BaseEpisode?, status: EpisodePlayingStatus)
-    fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
-    fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
+    suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
+    suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
     fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileType(episode: BaseEpisode?, fileType: String)
     fun updateSizeInBytes(episode: BaseEpisode?, sizeInBytes: Long)
@@ -101,7 +101,7 @@ interface EpisodeManager {
     fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
     fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
     fun unarchive(episode: BaseEpisode)
-    fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
+    suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
     fun checkForEpisodesToAutoArchive(playbackManager: PlaybackManager?, podcastManager: PodcastManager)
     fun userHasInteractedWithEpisode(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun clearEpisodePlaybackInteractionDatesBefore(lastCleared: Date)
@@ -115,7 +115,7 @@ interface EpisodeManager {
     fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
-    fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
+    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
     fun deleteCustomFolderEpisode(episode: PodcastEpisode?, playbackManager: PlaybackManager)
     fun deleteFinishedEpisodes(playbackManager: PlaybackManager)
     fun deleteDownloadedEpisodeFiles()
