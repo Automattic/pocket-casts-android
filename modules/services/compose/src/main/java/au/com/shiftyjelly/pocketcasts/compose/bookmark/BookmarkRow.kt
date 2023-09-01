@@ -107,7 +107,6 @@ fun BookmarkRow(
     colors: BookmarkRowColors,
     timePlayButtonStyle: TimePlayButtonStyle,
     timePlayButtonColors: TimePlayButtonColors,
-    preTitle: String? = null,
     showIcon: Boolean,
 ) {
     Column(
@@ -157,20 +156,20 @@ fun BookmarkRow(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                if (preTitle != null) {
+                if (bookmark.episodeTitle.isNotEmpty()) {
                     TextH70(
-                        text = preTitle,
+                        text = bookmark.episodeTitle,
                         color = colors.secondaryTextColor(),
-                        maxLines = 1,
+                        maxLines = 2,
                         modifier = Modifier.padding(top = 8.dp),
                     )
                 }
 
                 Spacer(
                     modifier = Modifier.padding(
-                        top = if (preTitle != null) 4.dp else 16.dp
+                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp
                     )
                 )
 
@@ -189,7 +188,7 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        bottom = if (preTitle != null) 8.dp else 16.dp
+                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp
                     )
                 )
             }

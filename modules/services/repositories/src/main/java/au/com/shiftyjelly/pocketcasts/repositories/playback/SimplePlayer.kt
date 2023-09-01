@@ -191,8 +191,8 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         val player = ExoPlayer.Builder(context, renderer)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
-            .setSeekForwardIncrementMs(settings.getSkipForwardInMs())
-            .setSeekBackIncrementMs(settings.getSkipBackwardInMs())
+            .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
+            .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .build()
 
         renderer.onAudioSessionId(player.audioSessionId)

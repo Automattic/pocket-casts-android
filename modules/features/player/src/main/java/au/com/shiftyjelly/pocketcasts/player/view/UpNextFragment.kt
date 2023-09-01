@@ -143,7 +143,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = this::clearViewAtPosition,
-                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
                 context = context,
                 fragmentManager = parentFragmentManager,
                 swipeSource = SwipeSource.UP_NEXT,
@@ -352,7 +352,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
-        if (settings.getTapOnUpNextShouldPlay()) {
+        if (settings.tapOnUpNextShouldPlay.value) {
             playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
         } else {
             (activity as? FragmentHostListener)?.openEpisodeDialog(
@@ -365,7 +365,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onEpisodeActionsLongPress(episodeUuid: String, podcastUuid: String?) {
-        if (settings.getTapOnUpNextShouldPlay()) {
+        if (settings.tapOnUpNextShouldPlay.value) {
             (activity as? FragmentHostListener)?.openEpisodeDialog(
                 episodeUuid = episodeUuid,
                 source = EpisodeViewSource.UP_NEXT,

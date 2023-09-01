@@ -263,7 +263,7 @@ class Support @Inject constructor(
             output.append("Android version: ").append(Build.VERSION.RELEASE).append(" SDK ").append(Build.VERSION.SDK_INT).append(eol)
             output.append(eol)
 
-            output.append("Background refresh: ").append(settings.refreshPodcastsAutomatically()).append(eol)
+            output.append("Background refresh: ").append(settings.backgroundRefreshPodcasts.value).append(eol)
             output.append("Battery restriction: ${systemBatteryRestrictions.status}")
             output.append(eol)
 
@@ -313,20 +313,18 @@ class Support @Inject constructor(
                 Timber.e(e)
             }
 
-            val afterPlaying = context.resources.getStringArray(R.array.settings_auto_archive_played_values)
-            val inactive = context.resources.getStringArray(R.array.settings_auto_archive_inactive_values)
             output.append(eol)
             output.append("Auto archive settings").append(eol)
-            output.append("Auto archive played episodes after: " + afterPlaying[settings.getAutoArchiveAfterPlaying().toIndex()]).append(eol)
-            output.append("Auto archive inactive episodes after: " + inactive[settings.getAutoArchiveInactive().toIndex()]).append(eol)
-            output.append("Auto archive starred episodes: " + settings.getAutoArchiveIncludeStarred().toString()).append(eol)
+            output.append("Auto archive played episodes after: ${settings.autoArchiveAfterPlaying.value.analyticsValue}").append(eol)
+            output.append("Auto archive inactive episodes after: ${settings.autoArchiveInactive.value.analyticsValue}").append(eol)
+            output.append("Auto archive starred episodes: ${settings.autoArchiveIncludeStarred.value}").append(eol)
 
             output.append(eol)
             output.append("Auto downloads").append(eol)
             output.append("  Any podcast? ").append(yesNoString(autoDownloadOn[0])).append(eol)
-            output.append("  Up Next? ").append(yesNoString(settings.isUpNextAutoDownloaded())).append(eol)
-            output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.isPodcastAutoDownloadUnmeteredOnly())).append(eol)
-            output.append("  Only when charging? ").append(yesNoString(settings.isPodcastAutoDownloadPowerOnly())).append(eol)
+            output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.value)).append(eol)
+            output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.autoDownloadUnmeteredOnly.value)).append(eol)
+            output.append("  Only when charging? ").append(yesNoString(settings.autoDownloadOnlyWhenCharging.value)).append(eol)
             output.append(eol)
 
             output.append("Current connection").append(eol)
@@ -335,7 +333,7 @@ class Support @Inject constructor(
             output.append("  Restrict Background Status: ").append(Network.getRestrictBackgroundStatusString(context)).append(eol)
             output.append(eol)
 
-            output.append("Warning when not on Wifi? ").append(yesNoString(settings.warnOnMeteredNetwork())).append(eol)
+            output.append("Warning when not on Wifi? ").append(yesNoString(settings.warnOnMeteredNetwork.value)).append(eol)
             output.append(eol)
 
             output.append("Work Manager Tasks").append(eol)
@@ -414,11 +412,11 @@ class Support @Inject constructor(
                 output.append(eol)
 
                 output.append("Notifications").append(eol)
-                output.append("Play over notifications? ").append(settings.getPlayOverNotification().analyticsString).append(eol)
-                output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause()) "yes" else "no").append(eol)
+                output.append("Play over notifications? ").append(settings.playOverNotification.value.analyticsString).append(eol)
+                output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause.value) "yes" else "no").append(eol)
                 output.append(eol)
 
-                val effects = settings.getGlobalPlaybackEffects()
+                val effects = settings.globalPlaybackEffects.value
                 output.append("Effects").append(eol)
                 output.append("Global Audio effects: ")
                     .append(" Playback speed: ").append(effects.playbackSpeed).append(eol)

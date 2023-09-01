@@ -63,7 +63,7 @@ class BookmarkHelper @Inject constructor(
                     )
                 }
 
-                if (settings.getHeadphoneControlsPlayBookmarkConfirmationSound()) {
+                if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
                     playbackManager.playTone()
                 }
 
@@ -73,7 +73,7 @@ class BookmarkHelper @Inject constructor(
     }
 
     private fun shouldAllowAddBookmark(): Boolean {
-        return settings.getCachedSubscription()?.let { subscriptionStatus ->
+        return settings.cachedSubscriptionStatus.value?.let { subscriptionStatus ->
             (subscriptionStatus as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
         } ?: false
     }

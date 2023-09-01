@@ -5,7 +5,9 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -42,7 +44,12 @@ class PodcastManagerTest {
 
         val episodeManager = mock<EpisodeManager>()
         val playlistManager = mock<PlaylistManager>()
-        val settings = mock<Settings>()
+
+        val settings = mock<Settings> {
+            on { podcastGroupingDefault } doReturn UserSetting.Mock(PodcastGrouping.None, mock())
+            on { showArchivedDefault } doReturn UserSetting.Mock(false, mock())
+        }
+
         val syncManagerSignedOut = mock<SyncManager> {
             on { isLoggedIn() } doReturn false
         }

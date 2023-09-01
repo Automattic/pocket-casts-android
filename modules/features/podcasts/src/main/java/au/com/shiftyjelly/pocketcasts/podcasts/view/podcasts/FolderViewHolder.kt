@@ -16,7 +16,8 @@ import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.min
 
@@ -24,11 +25,11 @@ class FolderViewHolder(
     val composeView: ComposeView,
     val theme: Theme,
     val gridWidthDp: Int,
-    val podcastsLayout: Int,
+    val podcastsLayout: PodcastGridLayoutType,
     val onFolderClick: (Folder) -> Unit
 ) : RecyclerView.ViewHolder(composeView) {
 
-    fun bind(folder: Folder, podcasts: List<Podcast>, badgeType: Settings.BadgeType, podcastUuidToBadge: Map<String, Int>) {
+    fun bind(folder: Folder, podcasts: List<Podcast>, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>) {
         val badgeCount = calculateFolderBadge(podcasts, badgeType, podcastUuidToBadge)
 
         composeView.setContent {
@@ -36,7 +37,7 @@ class FolderViewHolder(
                 val color = MaterialTheme.theme.colors.getFolderColor(folder.color)
                 val podcastUuids = podcasts.map { it.uuid }
                 when (podcastsLayout) {
-                    Settings.PodcastGridLayoutType.LIST_VIEW.id -> {
+                    PodcastGridLayoutType.LIST_VIEW -> {
                         FolderListAdapter(
                             color = color,
                             name = folder.name,
@@ -62,21 +63,21 @@ class FolderViewHolder(
         }
     }
 
-    private fun calculateFolderBadge(podcasts: List<Podcast>, badgeType: Settings.BadgeType, podcastUuidToBadge: Map<String, Int>): Int {
-        if (badgeType == Settings.BadgeType.OFF) {
+    private fun calculateFolderBadge(podcasts: List<Podcast>, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>): Int {
+        if (badgeType == BadgeType.OFF) {
             return 0
         }
         val episodeCount = podcasts.sumOf { podcast -> podcastUuidToBadge[podcast.uuid] ?: 0 }
         return when (badgeType) {
-            Settings.BadgeType.OFF -> 0
-            Settings.BadgeType.ALL_UNFINISHED -> min(99, episodeCount)
-            Settings.BadgeType.LATEST_EPISODE -> min(1, episodeCount)
+            BadgeType.OFF -> 0
+            BadgeType.ALL_UNFINISHED -> min(99, episodeCount)
+            BadgeType.LATEST_EPISODE -> min(1, episodeCount)
         }
     }
 }
 
 @Composable
-private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: Settings.BadgeType, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: BadgeType, modifier: Modifier = Modifier, onClick: () -> Unit) {
     FolderImage(
         name = name,
         color = color,
@@ -88,7 +89,7 @@ private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<Str
 }
 
 @Composable
-private fun FolderListAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: Settings.BadgeType, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FolderListAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: BadgeType, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Column {
         FolderListRow(
             color = color,

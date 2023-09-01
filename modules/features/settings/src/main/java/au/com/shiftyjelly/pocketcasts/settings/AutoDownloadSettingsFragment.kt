@@ -19,8 +19,6 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
@@ -64,7 +62,6 @@ class AutoDownloadSettingsFragment :
 
     companion object {
         const val PREFERENCE_PODCASTS_CATEGORY = "podcasts_category"
-        const val PREFERENCE_UP_NEXT = "autoDownloadUpNext"
         const val PREFERENCE_NEW_EPISODES = "autoDownloadNewEpisodes"
         const val PREFERENCE_CHOOSE_PODCASTS = "autoDownloadPodcastsPreference"
         const val PREFERENCE_CHOOSE_FILTERS = "autoDownloadPlaylists"
@@ -92,10 +89,12 @@ class AutoDownloadSettingsFragment :
     private val viewModel: AutoDownloadSettingsViewModel by viewModels()
 
     private var podcastsCategory: PreferenceCategory? = null
-    private var upNextPreference: SwitchPreference? = null
+    private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
     private var podcastsPreference: Preference? = null
     private var filtersPreference: Preference? = null
+    private lateinit var autoDownloadOnlyDownloadOnWifi: SwitchPreference
+    private lateinit var autoDownloadOnlyWhenCharging: SwitchPreference
 
     private val showToolbar: Boolean
         get() = arguments?.getBoolean(ARG_SHOW_TOOLBAR) ?: true
@@ -124,8 +123,8 @@ class AutoDownloadSettingsFragment :
         setPreferencesFromResource(R.xml.preferences_auto_download, rootKey)
 
         podcastsCategory = preferenceManager.findPreference(PREFERENCE_PODCASTS_CATEGORY)
-        upNextPreference = preferenceManager.findPreference<SwitchPreference>(PREFERENCE_UP_NEXT)
-            ?.apply {
+        upNextPreference = preferenceManager.findPreference<SwitchPreference>("autoDownloadUpNext")!!
+            .apply {
                 setOnPreferenceChangeListener { _, newValue ->
                     viewModel.onUpNextChange(newValue as Boolean)
                     true
@@ -156,8 +155,6 @@ class AutoDownloadSettingsFragment :
                 }
             }
 
-        updateView()
-
         preferenceManager.findPreference<Preference>(PREFERENCE_CANCEL_ALL)
             ?.setOnPreferenceClickListener {
                 context?.let {
@@ -175,21 +172,26 @@ class AutoDownloadSettingsFragment :
                 true
             }
 
-        preferenceManager.findPreference<SwitchPreference>(PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED)
-            ?.setOnPreferenceChangeListener { _, newValue ->
-                (newValue as? Boolean)?.let {
-                    viewModel.onDownloadOnlyOnUnmeteredChange(it)
+        autoDownloadOnlyDownloadOnWifi =
+            preferenceManager.findPreference<SwitchPreference>("autoDownloadOnlyDownloadOnWifi")!!
+                .apply {
+                    setOnPreferenceChangeListener { _, newValue ->
+                        viewModel.onDownloadOnlyOnUnmeteredChange(newValue as Boolean)
+                        true
+                    }
                 }
-                true
+
+        autoDownloadOnlyWhenCharging = preferenceManager.findPreference<SwitchPreference>("autoDownloadOnlyDownloadWhenCharging")!!
+            .apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    (newValue as? Boolean)?.let {
+                        viewModel.onDownloadOnlyWhenChargingChange(it)
+                    }
+                    true
+                }
             }
 
-        preferenceManager.findPreference<SwitchPreference>(PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING)
-            ?.setOnPreferenceChangeListener { _, newValue ->
-                (newValue as? Boolean)?.let {
-                    viewModel.onDownloadOnlyWhenChargingChange(it)
-                }
-                true
-            }
+        updateView()
     }
 
     override fun onResume() {
@@ -299,6 +301,10 @@ class AutoDownloadSettingsFragment :
         updatePodcastsSummary()
         updateFiltersSelectedSummary()
         updateNewEpisodesSwitch()
+
+        upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
+        autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
+        autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {

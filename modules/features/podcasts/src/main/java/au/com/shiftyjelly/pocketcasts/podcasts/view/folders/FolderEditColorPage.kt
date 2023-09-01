@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.FolderListRow
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -121,10 +121,10 @@ private fun FolderEditColorForm(
 }
 
 @Composable
-private fun FolderPreview(layout: Int, name: String, colorId: Int, gridImageWidthDp: Int, podcastUuids: List<String>, modifier: Modifier = Modifier) {
+private fun FolderPreview(layout: PodcastGridLayoutType, name: String, colorId: Int, gridImageWidthDp: Int, podcastUuids: List<String>, modifier: Modifier = Modifier) {
     val backgroundColor = MaterialTheme.theme.colors.getFolderColor(colorId)
     when (layout) {
-        Settings.PodcastGridLayoutType.LIST_VIEW.id -> {
+        PodcastGridLayoutType.LIST_VIEW -> {
             FolderListRow(
                 color = backgroundColor,
                 name = name,

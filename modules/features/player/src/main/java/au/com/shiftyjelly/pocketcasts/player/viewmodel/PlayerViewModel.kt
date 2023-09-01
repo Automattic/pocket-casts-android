@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
@@ -65,6 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -180,11 +180,11 @@ class PlayerViewModel @Inject constructor(
     val listDataRx = Observables.combineLatest(
         upNextStateObservable,
         playbackStateObservable,
-        settings.skipBackwardInSecsObservable,
-        settings.skipForwardInSecsObservable,
+        settings.skipBackInSecs.flow.asObservable(coroutineContext),
+        settings.skipForwardInSecs.flow.asObservable(coroutineContext),
         upNextExpandedObservable,
         chaptersExpandedObservable,
-        settings.playbackEffectsObservable,
+        settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
         this::mergeListData
     )
         .distinctUntilChanged()
@@ -278,7 +278,7 @@ class PlayerViewModel @Inject constructor(
                 Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
             }
         }
-        .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.getGlobalPlaybackEffects()) }
+        .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.globalPlaybackEffects.value) }
         .doOnNext { Timber.i("Effects: Podcast: ${it.podcast.overrideGlobalEffects} ${it.effects}") }
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()
@@ -585,7 +585,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                effects.saveToGlobalSettings(settings)
+                settings.globalPlaybackEffects.set(effects)
             }
             playbackManager.updatePlayerEffects(effects)
         }
@@ -594,7 +594,7 @@ class PlayerViewModel @Inject constructor(
     fun clearPodcastEffects(podcast: Podcast) {
         launch {
             podcastManager.updateOverrideGlobalEffects(podcast, false)
-            playbackManager.updatePlayerEffects(settings.getGlobalPlaybackEffects())
+            playbackManager.updatePlayerEffects(settings.globalPlaybackEffects.value)
         }
     }
 

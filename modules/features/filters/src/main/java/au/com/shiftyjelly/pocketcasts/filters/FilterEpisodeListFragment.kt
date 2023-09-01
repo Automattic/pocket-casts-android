@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
@@ -92,11 +93,12 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-
+    @Inject lateinit var bookmarkManager: BookmarkManager
     private lateinit var imageLoader: PodcastImageLoader
 
     private val adapter: EpisodeListAdapter by lazy {
         EpisodeListAdapter(
+            bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
             upNextQueue = upNextQueue,
@@ -109,7 +111,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = this::lazyNotifyAdapterChanged,
-                defaultUpNextSwipeAction = { settings.getUpNextSwipeAction() },
+                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,

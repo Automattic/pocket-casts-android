@@ -25,9 +25,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
+import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -142,7 +143,7 @@ class MediaSessionManager(
 
     private fun observeCustomMediaActionsVisibility() {
         launch {
-            settings.customMediaActionsVisibilityFlow.collect {
+            settings.customMediaActionsVisibility.flow.collect {
                 withContext(Dispatchers.Main) {
                     val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
                     // Called to update playback state with updated custom media actions visibility
@@ -154,7 +155,7 @@ class MediaSessionManager(
 
     private fun observeMediaNotificationControls() {
         launch {
-            settings.defaultMediaNotificationControlsFlow.collect {
+            settings.mediaControlItems.flow.collect {
                 withContext(Dispatchers.Main) {
                     val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
                     updatePlaybackState(playbackStateCompat)
@@ -365,7 +366,7 @@ class MediaSessionManager(
         Timber.i("MediaSession metadata. Episode: ${episode.uuid} ${episode.title} Duration: ${episode.durationMs.toLong()}")
         mediaSession.setMetadata(nowPlaying)
 
-        if (settings.showArtworkOnLockScreen()) {
+        if (settings.showArtworkOnLockScreen.value) {
             if (Util.isAutomotive(context)) {
                 val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
@@ -387,8 +388,8 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        val visibleCount = if (settings.areCustomMediaActionsVisible()) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
-        settings.getMediaNotificationControlItems().take(visibleCount).forEach { mediaControl ->
+        val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
+        settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
@@ -521,20 +522,20 @@ class MediaSessionManager(
         }
 
         private fun handleMediaButtonDoubleTap() {
-            handleMediaButtonAction(settings.headphoneNextActionFlow.value)
+            handleMediaButtonAction(settings.headphoneControlsNextAction.value)
         }
 
         private fun handleMediaButtonTripleTap() {
-            handleMediaButtonAction(settings.headphonePreviousActionFlow.value)
+            handleMediaButtonAction(settings.headphoneControlsPreviousAction.value)
         }
 
-        private fun handleMediaButtonAction(action: Settings.HeadphoneAction) {
+        private fun handleMediaButtonAction(action: HeadphoneAction) {
             when (action) {
-                Settings.HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
-                Settings.HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
-                Settings.HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
-                Settings.HeadphoneAction.NEXT_CHAPTER,
-                Settings.HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
+                HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
+                HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
+                HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
+                HeadphoneAction.NEXT_CHAPTER,
+                HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 
@@ -605,7 +606,9 @@ class MediaSessionManager(
                 val episodeId = autoMediaId.episodeId
                 episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
                     playbackManager.playNow(episode, sourceView = source)
-                    settings.setlastLoadedFromPodcastOrFilterUuid(autoMediaId.sourceId)
+                    LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
+                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
+                    }
                 }
             }
         }
@@ -702,9 +705,9 @@ class MediaSessionManager(
                 }
             }
             // update global playback speed
-            val effects = settings.getGlobalPlaybackEffects()
+            val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            effects.saveToGlobalSettings(settings)
+            settings.globalPlaybackEffects.set(effects)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

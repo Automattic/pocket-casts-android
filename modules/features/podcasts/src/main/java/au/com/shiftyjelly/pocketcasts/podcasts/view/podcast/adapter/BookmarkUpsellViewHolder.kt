@@ -24,6 +24,7 @@ class BookmarkUpsellViewHolder(
                 val context = LocalContext.current
                 UpsellView(
                     style = MessageViewColors.Default,
+                    activeTheme = theme.activeTheme,
                     sourceView = sourceView,
                     onClick = {
                         val source = OnboardingUpgradeSource.BOOKMARKS

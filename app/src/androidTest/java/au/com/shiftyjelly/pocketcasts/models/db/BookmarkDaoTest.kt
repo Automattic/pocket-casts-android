@@ -280,9 +280,9 @@ class BookmarkDaoTest {
                 podcastUuid = defaultPodcastUuid,
             ).first()
             with(result) {
-                assert(get(0).bookmark.uuid == bookmark1.uuid)
-                assert(get(1).bookmark.uuid == bookmark3.uuid)
-                assert(get(2).bookmark.uuid == bookmark2.uuid)
+                assert(get(0).bookmark.uuid == bookmark2.uuid)
+                assert(get(1).bookmark.uuid == bookmark1.uuid)
+                assert(get(2).bookmark.uuid == bookmark3.uuid)
             }
         }
 
