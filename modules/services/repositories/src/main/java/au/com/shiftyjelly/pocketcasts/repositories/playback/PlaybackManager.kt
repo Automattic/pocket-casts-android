@@ -1720,9 +1720,15 @@ open class PlaybackManager @Inject constructor(
         }
 
         try {
-            notificationPermissionChecker?.checkNotificationPermission {
+            notificationPermissionChecker?.let {
+                Timber.i("Checking notification permission")
+                it.checkNotificationPermission {
+                    manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+                }
+            } ?: run {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "notificationPermissionChecker was null (this should never happen)")
                 manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
-            } ?: manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
         } catch (e: Exception) {
             val message = "Could not post notification ${e.message}"
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
