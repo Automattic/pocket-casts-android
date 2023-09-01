@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -54,7 +56,7 @@ class UpsellViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val subscriptionTier = SubscriptionTier.PATRON
+        val subscriptionTier = Feature.BOOKMARKS_ENABLED.tier.toSubscriptionTier()
         val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
         // Check the server subscriptions to see if the Patron tier has a free trial
@@ -76,6 +78,12 @@ class UpsellViewModel @Inject constructor(
             AnalyticsEvent.BOOKMARKS_UPGRADE_BUTTON_TAPPED,
             mapOf("source" to sourceView.analyticsValue)
         )
+    }
+
+    private fun FeatureTier.toSubscriptionTier() = when (this) {
+        FeatureTier.Patron -> SubscriptionTier.PATRON
+        is FeatureTier.Plus -> SubscriptionTier.PLUS
+        FeatureTier.Free -> SubscriptionTier.UNKNOWN
     }
 
     sealed class UiState {
