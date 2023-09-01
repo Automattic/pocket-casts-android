@@ -21,6 +21,8 @@ import androidx.lifecycle.asFlow
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -192,7 +194,10 @@ class BookmarksFragment : BaseFragment() {
 
     private fun onUpgradeClicked() {
         val source = OnboardingUpgradeSource.BOOKMARKS
-        val onboardingFlow = OnboardingFlow.Upsell(source, true)
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = source,
+            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron,
+        )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }

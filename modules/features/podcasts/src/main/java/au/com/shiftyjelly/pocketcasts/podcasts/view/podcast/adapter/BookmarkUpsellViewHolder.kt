@@ -5,6 +5,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -27,7 +29,10 @@ class BookmarkUpsellViewHolder(
                     sourceView = sourceView,
                     onClick = {
                         val source = OnboardingUpgradeSource.BOOKMARKS
-                        val onboardingFlow = OnboardingFlow.Upsell(source, true)
+                        val onboardingFlow = OnboardingFlow.Upsell(
+                            source = source,
+                            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron,
+                        )
                         OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
                     }
                 )
