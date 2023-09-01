@@ -727,9 +727,12 @@ class EpisodeManagerImpl @Inject constructor(
     private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?) {
         val playbackManager = playbackManager ?: return
         if (episode.isDownloaded || episode.isDownloading || episode.downloadTaskId != null) {
+            // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
             downloadManager.removeEpisodeFromQueue(episode, "episode manager")
         }
         deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true)
+
+        // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
     }
 
