@@ -21,8 +21,13 @@ import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
@@ -33,6 +38,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -473,9 +481,24 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     fun onAddBookmarkClick() {
-        viewModel.buildBookmarkArguments { arguments ->
-            activityLauncher.launch(arguments.getIntent(requireContext()))
+        val userTier = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+        if (Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)) {
+            viewModel.buildBookmarkArguments { arguments ->
+                activityLauncher.launch(arguments.getIntent(requireContext()))
+            }
+        } else {
+            startUpsellFlow()
         }
+    }
+
+    private fun startUpsellFlow() {
+        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = source,
+            showPatronOnly = SubscriptionMapper
+                .mapFeatureTierToSubscriptionTier(Feature.BOOKMARKS_ENABLED.tier) == Subscription.SubscriptionTier.PATRON
+        )
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
     override fun onShareClick() {

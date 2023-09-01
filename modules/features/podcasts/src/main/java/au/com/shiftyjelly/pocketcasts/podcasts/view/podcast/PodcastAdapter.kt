@@ -32,11 +32,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
@@ -468,7 +470,8 @@ class PodcastAdapter(
                 add(Podcast())
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
 
-                if (!signInState.isSignedInAsPatron) {
+                val userTier = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+                if (!Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)) {
                     add(BookmarkUpsell)
                 } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
                     add(NoBookmarkMessage)

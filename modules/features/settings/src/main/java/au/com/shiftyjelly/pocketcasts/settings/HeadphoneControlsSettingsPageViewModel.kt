@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -34,8 +36,9 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
             userManager.getSignInState().asFlow()
                 .stateIn(viewModelScope)
                 .collect {
-                    val isAddBookmarkEnabled =
-                        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && it.isSignedInAsPatron
+                    val userTier = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+                    val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
 
                     _state.update { state -> state.copy(isAddBookmarkEnabled = isAddBookmarkEnabled) }
 
