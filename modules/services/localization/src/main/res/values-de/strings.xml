@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 09:54:24+0000
+Translation-Revision-Date: 2023-08-22 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="go_to_bottom">Zum Ende</string>
+    <string name="go_to_top">Zum Anfang</string>
     <string name="support">Support</string>
     <string name="bookmark_notification_action_change_title">Titel ändern</string>
     <string name="bookmark_notification_content_tap_to_view">Zum Anzeigen tippen</string>
@@ -1410,7 +1412,6 @@ Language: de
     <string name="player_time_saved_detail">Insgesamt hast du mit dieser Funktion %s gespart.</string>
     <string name="player_tab_playing_wide">Aktuelle Wiedergabe</string>
     <string name="player_tab_playing">Wiedergabe</string>
-    <string name="player_tab_notes">Beschreibung</string>
     <string name="player_sleep_when_episode_ends">Schlummern, wenn Folge endet</string>
     <string name="player_sleep_timer">Schlummerfunktion</string>
     <string name="player_sleep_timer_title">Schlummerfunktion</string>
