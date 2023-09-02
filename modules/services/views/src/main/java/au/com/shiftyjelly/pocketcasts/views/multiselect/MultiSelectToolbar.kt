@@ -42,6 +42,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
         if (menuRes != null) {
             inflateMenu(menuRes)
         } else {
+            multiSelectHelper.toolbarActions.removeObservers(lifecycleOwner)
             multiSelectHelper.toolbarActions.observe(lifecycleOwner) {
                 menu.clear()
 
