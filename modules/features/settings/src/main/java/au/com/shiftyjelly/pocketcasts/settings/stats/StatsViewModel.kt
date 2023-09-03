@@ -98,17 +98,27 @@ class StatsViewModel @Inject constructor(
         }
     }
 
+    /*
+     * If the user has listened to more than 2.5 hours the past 7 days
+     * and has been using the app for more than a week
+     * we request them to review the app
+     */
     private suspend fun showAppReviewDialogIfPossible(statsStartedAt: Date) {
-        /* If the user has listened to more than 2.5 hours the past 7 days
-         and has been using the app for more than a week
-         we request them to review the app */
         val currentState = mutableState.value as? State.Loaded ?: return
         val playedUptoSumInSecs =
             episodeManager.calculatePlayedUptoSumInSecsWithinDays(DAYS_LIMIT_FOR_PLAYED_UPTO)
-
+        val daysSinceStarted =
+            if (statsStartedAt.time == 0L) {
+                val message = "statsStartedAt is Unix epoch, which the server returns until the user has " +
+                    "listening history synced. Treating that as if the user has used the app for 0 days"
+                Timber.i(message)
+                0
+            } else {
+                TimeUnit.MILLISECONDS.toDays(statsStartedAt.timeIntervalSinceNow())
+            }
         val showAppReviewDialog =
             TimeUnit.SECONDS.toHours(playedUptoSumInSecs.toLong()) > SUM_PLAYED_UPTO_MIN_HOURS &&
-                TimeUnit.MILLISECONDS.toDays(statsStartedAt.timeIntervalSinceNow()) > MIN_DAYS_STATS_STARTED
+                daysSinceStarted > MIN_DAYS_STATS_STARTED
         mutableState.update { currentState.copy(showAppReviewDialog = showAppReviewDialog) }
     }
 

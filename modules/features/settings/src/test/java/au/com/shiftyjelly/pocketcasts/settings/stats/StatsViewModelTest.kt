@@ -23,6 +23,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
@@ -106,6 +107,16 @@ class StatsViewModelTest {
     fun `given stats started equal to 7 days, when stats are loaded, then app review dialog is not shown`() =
         runTest {
             initViewModel(statsStartedAt = LocalDateTime.now().minusDays(7.toLong()))
+
+            viewModel.loadStats()
+
+            assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+        }
+
+    @Test
+    fun `given stats started at unix epoch, when stats are loaded, then app review dialog is not shown`() =
+        runTest {
+            initViewModel(statsStartedAt = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()))
 
             viewModel.loadStats()
 
