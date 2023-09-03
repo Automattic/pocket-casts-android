@@ -2,9 +2,13 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -26,6 +30,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import java.util.UUID
 
@@ -66,6 +72,12 @@ class BookmarksViewModelTest {
     private lateinit var theme: Theme
 
     @Mock
+    private lateinit var feature: FeatureWrapper
+
+    @Mock
+    private lateinit var userSetting: UserSetting<SubscriptionStatus?>
+
+    @Mock
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
@@ -73,10 +85,10 @@ class BookmarksViewModelTest {
 
     @Before
     fun setUp() = runTest {
-        whenever(signInState.isSignedInAsPatron).thenReturn(true)
         whenever(userManager.getSignInState()).thenReturn(flowOf(signInState).asFlowable())
-
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
+        whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
+        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         bookmarksViewModel = BookmarksViewModel(
             bookmarkManager = bookmarkManager,
@@ -87,6 +99,7 @@ class BookmarksViewModelTest {
             settings = settings,
             playbackManager = playbackManager,
             theme = theme,
+            feature = feature,
             ioDispatcher = UnconfinedTestDispatcher(),
             analyticsTracker = analyticsTracker,
         )
@@ -111,8 +124,8 @@ class BookmarksViewModelTest {
     }*/
 
     @Test
-    fun `given free account, when bookmarks loaded, then Upsell state shown`() = runTest {
-        whenever(signInState.isSignedInAsPatron).thenReturn(false)
+    fun `given feature not available, when bookmarks loaded, then Upsell state shown`() = runTest {
+        whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(false)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
@@ -120,8 +133,8 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun `given patron account, when bookmarks loaded, then Upsell state not shown`() = runTest {
-        whenever(signInState.isSignedInAsPatron).thenReturn(true)
+    fun `given feature available, when bookmarks loaded, then Upsell state not shown`() = runTest {
+        whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 

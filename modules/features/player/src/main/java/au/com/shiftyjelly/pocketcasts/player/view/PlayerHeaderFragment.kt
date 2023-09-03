@@ -22,12 +22,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
@@ -495,8 +494,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
-            showPatronOnly = SubscriptionMapper
-                .mapFeatureTierToSubscriptionTier(Feature.BOOKMARKS_ENABLED.tier) == Subscription.SubscriptionTier.PATRON
+            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
