@@ -184,6 +184,6 @@ class BookmarkManagerImpl @Inject constructor(
         return bookmark
     }
 
-    override suspend fun findUserEpisodesBookmarksFlow() =
+    override fun findUserEpisodesBookmarksFlow() =
         bookmarkDao.findUserEpisodesBookmarksFlow()
 }

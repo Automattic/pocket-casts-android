@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -27,6 +28,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -73,6 +75,8 @@ class StorageSettingsViewModelTest {
         whenever(context.getString(any())).thenReturn("")
         whenever(context.getString(any(), any())).thenReturn("")
         whenever(settings.getStorageChoiceName()).thenReturn("")
+        whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
+        whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.empty())
         viewModel = StorageSettingsViewModel(
             podcastManager,

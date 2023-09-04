@@ -8,6 +8,7 @@ import androidx.lifecycle.toLiveData
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
@@ -30,6 +31,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
 
+    private lateinit var preferenceAutoPlay: SwitchPreference
+    private lateinit var preferenceAutoSubscribeToPlayed: SwitchPreference
+    private lateinit var preferenceAutoShowPlayed: SwitchPreference
     private var preferenceRefreshNow: Preference? = null
     private var preferenceSkipForward: EditTextPreference? = null
     private var preferenceSkipBackward: EditTextPreference? = null
@@ -37,6 +41,10 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_auto)
+
+        preferenceAutoPlay = preferenceManager.findPreference("autoUpNextEmpty")!!
+        preferenceAutoSubscribeToPlayed = preferenceManager.findPreference("autoSubscribeToPlayed")!!
+        preferenceAutoShowPlayed = preferenceManager.findPreference("autoShowPlayed")!!
 
         preferenceSkipForward = preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_FORWARD)?.apply {
             setInputAsSeconds()
@@ -48,6 +56,33 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         changeSkipTitles()
         setupRefreshNow()
         setupAbout()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        preferenceAutoPlay.apply {
+            isChecked = settings.autoPlayNextEpisodeOnEmpty.value
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean)
+                true
+            }
+        }
+
+        preferenceAutoSubscribeToPlayed.apply {
+            isChecked = settings.autoSubscribeToPlayed.value
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoSubscribeToPlayed.set(newValue as Boolean)
+                true
+            }
+        }
+
+        preferenceAutoShowPlayed.apply {
+            isChecked = settings.autoShowPlayed.value
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoShowPlayed.set(newValue as Boolean)
+                true
+            }
+        }
     }
 
     private fun setupAbout() {
@@ -84,8 +119,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceSkipForward?.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
-                settings.setSkipForwardInSec(value)
-                settings.setSkipForwardNeedsSync(true)
+                settings.skipForwardInSecs.set(value, needsSync = true)
                 changeSkipTitles()
                 true
             } else {
@@ -96,8 +130,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceSkipBackward?.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
-                settings.setSkipBackwardInSec(value)
-                settings.setSkipBackNeedsSync(true)
+                settings.skipBackInSecs.set(value, needsSync = true)
                 changeSkipTitles()
                 true
             } else {
@@ -132,9 +165,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
     }
 
     private fun changeSkipTitles() {
-        val skipForwardSummary = resources.getStringPluralSeconds(settings.getSkipForwardInSecs())
+        val skipForwardSummary = resources.getStringPluralSeconds(settings.skipForwardInSecs.value)
         preferenceSkipForward?.summary = skipForwardSummary
-        val skipBackwardSummary = resources.getStringPluralSeconds(settings.getSkipBackwardInSecs())
+        val skipBackwardSummary = resources.getStringPluralSeconds(settings.skipBackInSecs.value)
         preferenceSkipBackward?.summary = skipBackwardSummary
     }
 }

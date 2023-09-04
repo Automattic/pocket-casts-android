@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -597,7 +598,6 @@ class PodcastSyncProcess(
     private fun updateSettings(response: SyncUpdateResponse): Completable {
         return Completable.fromAction {
             settings.setLastModified(response.lastModified)
-            settings.setLastSyncTime(System.currentTimeMillis())
         }
     }
 
@@ -856,7 +856,7 @@ class PodcastSyncProcess(
         if (bookmark.deleted) {
             bookmarkManager.deleteSynced(bookmark.uuid)
         } else {
-            bookmarkManager.upsertSynced(bookmark)
+            bookmarkManager.upsertSynced(bookmark.copy(syncStatus = SyncStatus.SYNCED))
         }
     }
 }

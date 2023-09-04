@@ -171,7 +171,7 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override suspend fun getHomeFolder(): List<FolderItem> {
-        val sortType = settings.getPodcastsSortType()
+        val sortType = settings.podcastsSortType.value
 
         val podcasts = if (sortType == EPISODE_DATE_NEWEST_TO_OLDEST) {
             podcastManager.findPodcastsOrderByLatestEpisode(orderAsc = false)

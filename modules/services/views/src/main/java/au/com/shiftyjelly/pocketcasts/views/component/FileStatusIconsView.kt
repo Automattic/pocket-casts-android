@@ -15,6 +15,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -77,9 +78,9 @@ class FileStatusIconsView @JvmOverloads constructor(
         downloadProgressUpdates: Observable<DownloadProgressUpdate>,
         playbackStateUpdates: Observable<PlaybackState>,
         upNextChangesObservable: Observable<UpNextQueue.State>,
-        hideErrorDetails: Boolean = false
+        userBookmarksObservable: Observable<List<Bookmark>>,
+        hideErrorDetails: Boolean = false,
     ) {
-
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
@@ -101,24 +102,38 @@ class FileStatusIconsView @JvmOverloads constructor(
 
         val isInUpNextObservable = upNextChangesObservable.containsUuid(episode.uuid)
 
+        data class CombinedData(
+            val streamingProgress: EpisodeStreamProgress,
+            val playbackState: PlaybackState,
+            val isInUpNext: Boolean,
+            val userBookmarks: List<Bookmark>,
+        )
+
         val playbackStateForThisEpisode = playbackStateUpdates
             .startWith(PlaybackState(episodeUuid = episode.uuid)) // Pre load with a blank state so it doesn't wait for the first update
             .filter { it.episodeUuid == episode.uuid } // We only care about playback for this row
 
         disposables.clear()
-        Observables.combineLatest(combinedProgress, playbackStateForThisEpisode, isInUpNextObservable)
+        Observables.combineLatest(
+            combinedProgress,
+            playbackStateForThisEpisode,
+            isInUpNextObservable,
+            userBookmarksObservable,
+        ) { streamProgress, playbackState, isInUpNext, userBookmarks ->
+            CombinedData(streamProgress, playbackState, isInUpNext, userBookmarks)
+        }
             .distinctUntilChanged()
             .toFlowable(BackpressureStrategy.LATEST)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnTerminate { UploadProgressManager.stopObservingUpload(episode.uuid, uploadConsumer) }
-            .doOnNext { (streamingProgress, playbackState, isInUpNext) ->
-                episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
-                imgUpNext.visibility = if (isInUpNext) View.VISIBLE else View.GONE
+            .doOnNext { combinedData ->
+                episode.playing = combinedData.playbackState.isPlaying && combinedData.playbackState.episodeUuid == episode.uuid
+                imgUpNext.visibility = if (combinedData.isInUpNext) View.VISIBLE else View.GONE
                 imgBookmark.visibility = if (episode.hasBookmark) View.VISIBLE else View.GONE
 
                 imgIcon.isVisible = false
-                if (playbackState.episodeUuid == episode.uuid && playbackState.isBuffering) {
+                if (combinedData.playbackState.episodeUuid == episode.uuid && combinedData.playbackState.isBuffering) {
                     imgIcon.isVisible = false
                     progressBar.isVisible = true
                     progressCircle.isVisible = false
@@ -141,8 +156,8 @@ class FileStatusIconsView @JvmOverloads constructor(
                     imgIcon.isVisible = false
                     progressBar.isVisible = false
                     progressCircle.isVisible = true
-                    lblStatus.text = context.getString(LR.string.episode_row_downloading, (streamingProgress.downloadProgress * 100f).roundToInt())
-                    progressCircle.setPercent(streamingProgress.downloadProgress)
+                    lblStatus.text = context.getString(LR.string.episode_row_downloading, (combinedData.streamingProgress.downloadProgress * 100f).roundToInt())
+                    progressCircle.setPercent(combinedData.streamingProgress.downloadProgress)
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false
@@ -186,8 +201,8 @@ class FileStatusIconsView @JvmOverloads constructor(
                     imgIcon.isVisible = false
                     imgCloud.isVisible = false
                     progressCircle.isVisible = true
-                    lblStatus.text = context.getString(LR.string.episode_row_uploading, (streamingProgress.uploadProgress * 100f).roundToInt())
-                    progressCircle.setPercent(streamingProgress.uploadProgress)
+                    lblStatus.text = context.getString(LR.string.episode_row_uploading, (combinedData.streamingProgress.uploadProgress * 100f).roundToInt())
+                    progressCircle.setPercent(combinedData.streamingProgress.uploadProgress)
                 } else if (episode.serverStatus == UserEpisodeServerStatus.WAITING_FOR_WIFI) {
                     imgIcon.isVisible = true
                     progressBar.isVisible = false

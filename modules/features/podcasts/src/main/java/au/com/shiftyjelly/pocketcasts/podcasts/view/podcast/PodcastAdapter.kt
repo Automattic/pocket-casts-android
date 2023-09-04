@@ -66,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -112,6 +113,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
+    private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
@@ -140,7 +142,7 @@ class PodcastAdapter(
 
     data class EpisodeLimitRow(val episodeLimit: Int)
     class DividerRow(val grouping: PodcastGrouping, val groupIndex: Int)
-    data class NoEpisodeMessage(val bodyText: String, val showButton: Boolean)
+    data class NoResultsMessage(val title: String, val bodyText: String, val showButton: Boolean)
     data class EpisodeHeader(val showingArchived: Boolean, val episodeCount: Int, val archivedCount: Int, val searchTerm: String, val episodeLimit: Int?)
     data class TabsHeader(
         val selectedTab: PodcastTab,
@@ -173,7 +175,7 @@ class PodcastAdapter(
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
-        val VIEW_TYPE_NO_EPISODE = R.layout.adapter_no_episodes
+        val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
         val VIEW_TYPE_DIVIDER = R.layout.adapter_divider_row
     }
 
@@ -200,7 +202,7 @@ class PodcastAdapter(
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
-            VIEW_TYPE_NO_EPISODE -> NoEpisodesViewHolder(inflater.inflate(R.layout.adapter_no_episodes, parent, false))
+            VIEW_TYPE_NO_RESULTS -> NoResultsViewHolder(inflater.inflate(R.layout.adapter_no_results, parent, false))
             VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
@@ -224,7 +226,7 @@ class PodcastAdapter(
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
-            is NoEpisodesViewHolder -> bindNoEpisodesMessage(holder, position)
+            is NoResultsViewHolder -> bindNoResultsMessage(holder, position)
             is DividerViewHolder -> bindDividerRow(holder, position)
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
@@ -303,7 +305,18 @@ class PodcastAdapter(
 
     private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
         val episode = getItem(position) as? PodcastEpisode ?: return
-        holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectEpisodesHelper.isMultiSelecting, multiSelectEpisodesHelper.isSelected(episode), disposables)
+        holder.setup(
+            episode = episode,
+            fromListUuid = fromListUuid,
+            tintColor = ThemeColor.podcastIcon02(theme.activeTheme, tintColor),
+            playButtonListener = playButtonListener,
+            streamByDefault = settings.streamingMode.value || castConnected,
+            upNextAction = settings.upNextSwipe.value,
+            multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
+            isSelected = multiSelectEpisodesHelper.isSelected(episode),
+            disposables = disposables,
+            podcastBookmarksObservable = podcastBookmarksObservable
+        )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectEpisodesHelper.toggle(episode)
@@ -323,11 +336,12 @@ class PodcastAdapter(
         holder.lblTitle.text = holder.itemView.resources.getString(LR.string.podcast_episodes_limited, limit)
     }
 
-    private fun bindNoEpisodesMessage(holder: NoEpisodesViewHolder, position: Int) {
-        val noEpisodeMessage = getItem(position) as? NoEpisodeMessage ?: return
-        holder.lblBody.text = noEpisodeMessage.bodyText
+    private fun bindNoResultsMessage(holder: NoResultsViewHolder, position: Int) {
+        val noResultsMessage = getItem(position) as? NoResultsMessage ?: return
+        holder.lblTitle.text = noResultsMessage.title
+        holder.lblBody.text = noResultsMessage.bodyText
         holder.btnShowArchived.setOnClickListener { onShowArchivedClicked() }
-        holder.btnShowArchived.isVisible = noEpisodeMessage.showButton
+        holder.btnShowArchived.isVisible = noResultsMessage.showButton
     }
 
     private fun bindDividerRow(holder: DividerViewHolder, position: Int) {
@@ -414,12 +428,30 @@ class PodcastAdapter(
         if (episodes.isEmpty()) {
             if (searchTerm.isEmpty()) {
                 if (archivedCount == 0) {
-                    content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes), false))
+                    content.add(
+                        NoResultsMessage(
+                            title = context.getString(LR.string.podcast_no_episodes_found),
+                            bodyText = context.getString(LR.string.podcast_no_episodes),
+                            showButton = false
+                        )
+                    )
                 } else {
-                    content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount), true))
+                    content.add(
+                        NoResultsMessage(
+                            title = context.getString(LR.string.podcast_no_episodes_found),
+                            bodyText = context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount),
+                            showButton = true
+                        )
+                    )
                 }
             } else {
-                content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_matching), false))
+                content.add(
+                    NoResultsMessage(
+                        title = context.getString(LR.string.podcast_no_episodes_found),
+                        bodyText = context.getString(LR.string.podcast_no_episodes_matching),
+                        showButton = false
+                    )
+                )
             }
         }
 
@@ -429,6 +461,7 @@ class PodcastAdapter(
     fun setBookmarks(
         bookmarks: List<Bookmark>,
         searchTerm: String,
+        context: Context,
     ) {
         val content = mutableListOf<Any>().apply {
             if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
@@ -437,7 +470,7 @@ class PodcastAdapter(
 
                 if (!signInState.isSignedInAsPatron) {
                     add(BookmarkUpsell)
-                } else if (bookmarks.isEmpty()) {
+                } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
                     add(NoBookmarkMessage)
                 } else {
                     add(
@@ -449,21 +482,35 @@ class PodcastAdapter(
                             onOptionsClicked = onBookmarksOptionsClicked,
                         )
                     )
-                    addAll(
-                        bookmarks.map {
-                            BookmarkItemData(
-                                bookmark = it,
-                                onBookmarkPlayClicked = onBookmarkPlayClicked,
-                                onBookmarkRowLongPress = onBookmarkRowLongPress,
-                                onBookmarkRowClick = { bookmark, adapterPosition ->
-                                    multiSelectBookmarksHelper.toggle(bookmark)
-                                    notifyItemChanged(adapterPosition)
-                                },
-                                isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                                isSelected = { bookmark -> multiSelectBookmarksHelper.isSelected(bookmark) },
+                    if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
+                        add(
+                            NoResultsMessage(
+                                title = context.getString(LR.string.podcast_no_bookmarks_found),
+                                bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
+                                showButton = false
                             )
-                        }
-                    )
+                        )
+                    } else {
+                        addAll(
+                            bookmarks.map {
+                                BookmarkItemData(
+                                    bookmark = it,
+                                    onBookmarkPlayClicked = onBookmarkPlayClicked,
+                                    onBookmarkRowLongPress = onBookmarkRowLongPress,
+                                    onBookmarkRowClick = { bookmark, adapterPosition ->
+                                        multiSelectBookmarksHelper.toggle(bookmark)
+                                        notifyItemChanged(adapterPosition)
+                                    },
+                                    isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
+                                    isSelected = { bookmark ->
+                                        multiSelectBookmarksHelper.isSelected(
+                                            bookmark
+                                        )
+                                    },
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -480,7 +527,7 @@ class PodcastAdapter(
             is Podcast -> R.layout.adapter_podcast_header
             is EpisodeHeader -> R.layout.adapter_episode_header
             is EpisodeLimitRow -> R.layout.adapter_episode_limit
-            is NoEpisodeMessage -> R.layout.adapter_no_episodes
+            is NoResultsMessage -> R.layout.adapter_no_results
             is DividerRow -> R.layout.adapter_divider_row
             is TabsHeader -> VIEW_TYPE_TABS
             is BookmarkItemData -> VIEW_TYPE_BOOKMARKS
@@ -497,7 +544,7 @@ class PodcastAdapter(
             is Podcast -> Long.MAX_VALUE
             is EpisodeHeader -> Long.MAX_VALUE - 1
             is EpisodeLimitRow -> Long.MAX_VALUE - 2
-            is NoEpisodeMessage -> Long.MAX_VALUE - 3
+            is NoResultsMessage -> Long.MAX_VALUE - 3
             is TabsHeader -> Long.MAX_VALUE - 4
             is BookmarkHeader -> Long.MAX_VALUE - 5
             is BookmarkUpsell -> Long.MAX_VALUE - 6
@@ -572,7 +619,8 @@ class PodcastAdapter(
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
-    internal class NoEpisodesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class NoResultsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
         val lblBody = itemView.findViewById<TextView>(R.id.lblBody)
         val btnShowArchived = itemView.findViewById<View>(R.id.btnShowArchived)
     }
