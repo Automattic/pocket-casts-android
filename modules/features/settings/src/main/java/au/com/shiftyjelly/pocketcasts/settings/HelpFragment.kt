@@ -101,6 +101,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             loadUrl(loadedUrl ?: Settings.INFO_FAQ_URL)
             settings.javaScriptEnabled = true
             settings.textZoom = 100
+            settings.domStorageEnabled = true
         }
         loadingView = view.findViewById(VR.id.progress_circle)
         layoutError = view.findViewById(VR.id.layoutLoadingError)
