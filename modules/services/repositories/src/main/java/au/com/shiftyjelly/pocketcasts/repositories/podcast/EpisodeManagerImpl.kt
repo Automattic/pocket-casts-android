@@ -190,8 +190,13 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findEpisodesWhere(queryAfterWhere: String): List<PodcastEpisode> {
-        return episodeDao.findEpisodes(SimpleSQLiteQuery("SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere"))
+    override fun findEpisodesWhere(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean): List<PodcastEpisode> {
+        var query = "SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE "
+        if (forSubscribedPodcastsOnly) {
+            query += "podcasts.subscribed = 1 AND "
+        }
+        query += queryAfterWhere
+        return episodeDao.findEpisodes(SimpleSQLiteQuery(query))
     }
 
     override fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int> {
@@ -1120,7 +1125,7 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double {
         val query =
             "last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000"
-        val last1000EpisodesPlayed = findEpisodesWhere(query)
+        val last1000EpisodesPlayed = findEpisodesWhere(query, forSubscribedPodcastsOnly = false)
         var totalPlaytime = 0.0
         last1000EpisodesPlayed.forEach { episode ->
             episode.lastPlaybackInteractionDate?.let {
