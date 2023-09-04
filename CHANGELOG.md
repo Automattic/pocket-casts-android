@@ -6,6 +6,8 @@
         ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
     *   Present toast notification when duration of an in-progress episode changes
         ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
+    *   Present app review prompt 
+        ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
 *   Bug Fixes:
     *   Fixed auto archive settings getting lost when switching languages
         ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
