@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 11:54:03+0000
+Translation-Revision-Date: 2023-08-22 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="go_to_bottom">Naar beneden</string>
+    <string name="go_to_top">Naar boven</string>
     <string name="support">Ondersteuning</string>
     <string name="bookmark_notification_action_change_title">Titel wijzigen</string>
     <string name="bookmark_notification_content_tap_to_view">Tik om te bekijken</string>
@@ -1410,7 +1412,6 @@ Language: nl
     <string name="player_time_saved_detail">In totaal heb je %s bespaard met deze functie.</string>
     <string name="player_tab_playing_wide">Bezig met afspelen</string>
     <string name="player_tab_playing">Wordt afgespeeld</string>
-    <string name="player_tab_notes">Notities</string>
     <string name="player_sleep_when_episode_ends">In slaapstand als de aflevering stopt</string>
     <string name="player_sleep_timer">Slaaptimer</string>
     <string name="player_sleep_timer_title">Slaaptimer</string>

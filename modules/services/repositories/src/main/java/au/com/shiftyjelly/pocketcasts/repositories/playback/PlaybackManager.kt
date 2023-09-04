@@ -136,7 +136,7 @@ open class PlaybackManager @Inject constructor(
         const val ENABLED_KEY = "enabled"
     }
 
-    private lateinit var notificationPermissionChecker: NotificationPermissionChecker
+    private var notificationPermissionChecker: NotificationPermissionChecker? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -457,6 +457,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
+            SourceView.STATS,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -1745,12 +1746,22 @@ open class PlaybackManager @Inject constructor(
             notification.sound = sound
         }
 
-        notificationPermissionChecker.checkNotificationPermission {
-            manager.notify(
-                notificationTag,
-                NotificationBroadcastReceiver.NOTIFICATION_ID,
-                notification
-            )
+        try {
+            notificationPermissionChecker?.let {
+                Timber.i("Checking notification permission")
+                it.checkNotificationPermission {
+                    manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+                }
+            } ?: run {
+                val message = "notificationPermissionChecker was null (this should never happen)"
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
+                Sentry.addBreadcrumb(message)
+                manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
+        } catch (e: Exception) {
+            val message = "Could not post notification ${e.message}"
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
+            SentryHelper.recordException(message, e)
         }
     }
 

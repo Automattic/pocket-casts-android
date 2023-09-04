@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-16 09:54:04+0000
+Translation-Revision-Date: 2023-08-22 14:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="go_to_bottom">맨 아래로 가기</string>
+    <string name="go_to_top">맨 위로 가기</string>
     <string name="support">지원</string>
     <string name="bookmark_notification_action_change_title">제목 변경</string>
     <string name="bookmark_notification_content_tap_to_view">눌러서 보기</string>
@@ -1410,7 +1412,6 @@ Language: ko_KR
     <string name="player_time_saved_detail">이 기능을 사용하여 절약한 합계는 %s입니다.</string>
     <string name="player_tab_playing_wide">지금 재생 중</string>
     <string name="player_tab_playing">재생 중</string>
-    <string name="player_tab_notes">참고 사항</string>
     <string name="player_sleep_when_episode_ends">에피소드 종료 시 절전 유지</string>
     <string name="player_sleep_timer">절전 타이머</string>
     <string name="player_sleep_timer_title">절전 타이머</string>

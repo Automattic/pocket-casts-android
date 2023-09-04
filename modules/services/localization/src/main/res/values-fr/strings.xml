@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 02:10:08+0000
+Translation-Revision-Date: 2023-08-22 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="go_to_bottom">Vers le bas</string>
+    <string name="go_to_top">Vers le haut</string>
     <string name="support">Assistance</string>
     <string name="bookmark_notification_action_change_title">Modifier le titre</string>
     <string name="bookmark_notification_content_tap_to_view">Touchez pour prévisualiser.</string>
@@ -1410,7 +1412,6 @@ Language: fr
     <string name="player_time_saved_detail">Au total, vous avez économisé %s en utilisant cette fonctionnalité.</string>
     <string name="player_tab_playing_wide">En cours de lecture</string>
     <string name="player_tab_playing">En lecture</string>
-    <string name="player_tab_notes">Commentaires</string>
     <string name="player_sleep_when_episode_ends">Mise en veille à la fin de l’épisode</string>
     <string name="player_sleep_timer">Mise en veille</string>
     <string name="player_sleep_timer_title">Mise en veille</string>
