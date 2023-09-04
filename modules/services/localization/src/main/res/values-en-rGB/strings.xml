@@ -1412,7 +1412,6 @@ Language: en_GB
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_tab_playing">Playing</string>
-    <string name="player_tab_notes">Notes</string>
     <string name="player_sleep_when_episode_ends">Sleeping when episode ends</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>

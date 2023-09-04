@@ -22,7 +22,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -45,6 +48,9 @@ class AutoArchiveTest {
     val podcastCacheServerManager = mock<PodcastCacheServerManager> {}
     val userEpisodeManager = mock<UserEpisodeManager> {}
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testDispatcher = UnconfinedTestDispatcher()
+
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -62,13 +68,14 @@ class AutoArchiveTest {
         played: AutoArchiveAfterPlayingSetting,
         inactive: AutoArchiveInactiveSetting,
         includeStarred: Boolean = false,
+        testDispatcher: CoroutineDispatcher,
     ): EpisodeManager {
         val settings = mock<Settings> {
             on { autoArchiveInactive } doReturn UserSetting.Mock(inactive, mock())
             on { autoArchiveAfterPlaying } doReturn UserSetting.Mock(played, mock())
             on { autoArchiveIncludeStarred } doReturn UserSetting.Mock(includeStarred, mock())
         }
-        return EpisodeManagerImpl(settings, fileStorage, downloadManager, context, db, podcastCacheServerManager, userEpisodeManager)
+        return EpisodeManagerImpl(settings, fileStorage, downloadManager, context, db, podcastCacheServerManager, userEpisodeManager, testDispatcher)
     }
 
     private fun podcastManagerThatReturns(podcast: Podcast): PodcastManager {
@@ -90,7 +97,7 @@ class AutoArchiveTest {
     @Test
     fun testNever() {
         val uuid = UUID.randomUUID().toString()
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString())
         val podcastManager = podcastManagerThatReturns(podcast)
         val episode = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date())
@@ -104,7 +111,7 @@ class AutoArchiveTest {
 
     @Test
     fun testInactive30Days() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true)
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -130,7 +137,7 @@ class AutoArchiveTest {
 
     @Test
     fun testPlayedRecently() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true)
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -151,7 +158,7 @@ class AutoArchiveTest {
 
     @Test
     fun testDownloadedRecently() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true)
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -172,7 +179,7 @@ class AutoArchiveTest {
 
     @Test
     fun testPlayed24Hours() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Hours24, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Hours24, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString())
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -197,7 +204,7 @@ class AutoArchiveTest {
 
     @Test
     fun testPlayedNotIncludeStarred() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Hours24, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Hours24, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString())
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -222,7 +229,7 @@ class AutoArchiveTest {
 
     @Test
     fun testPlayedIncludeStarred() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Hours24, AutoArchiveInactiveSetting.Never, includeStarred = true)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Hours24, AutoArchiveInactiveSetting.Never, includeStarred = true, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString())
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -247,7 +254,7 @@ class AutoArchiveTest {
 
     @Test
     fun inactiveNotIncludeStarred() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true)
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -273,7 +280,7 @@ class AutoArchiveTest {
 
     @Test
     fun inactiveIncludeStarred() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30, includeStarred = true)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Days30, includeStarred = true, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
 
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true)
@@ -300,7 +307,7 @@ class AutoArchiveTest {
 
     @Test
     fun inactiveArchiveModified() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Weeks1, includeStarred = true)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Weeks1, includeStarred = true, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
 
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true)
@@ -337,7 +344,7 @@ class AutoArchiveTest {
 
     @Test
     fun testPlayed24HoursPodcastOverride() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString(), overrideGlobalArchive = true, autoArchiveAfterPlaying = AutoArchiveAfterPlayingSetting.Hours24.toIndex())
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -362,7 +369,7 @@ class AutoArchiveTest {
 
     @Test
     fun testInactive30DaysPodcastOverride() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true, overrideGlobalArchive = true, autoArchiveInactive = AutoArchiveInactiveSetting.Days30.toIndex())
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -388,7 +395,7 @@ class AutoArchiveTest {
 
     @Test
     fun testInactive24HoursAddedRecentlyPodcastOverride() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true, overrideGlobalArchive = true, autoArchiveInactive = AutoArchiveInactiveSetting.Hours24.toIndex())
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -414,7 +421,7 @@ class AutoArchiveTest {
 
     @Test
     fun testInactive2DaysAndAfterPlayingPodcastOverride() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.AfterPlaying, AutoArchiveInactiveSetting.Weeks2)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.AfterPlaying, AutoArchiveInactiveSetting.Weeks2, testDispatcher = testDispatcher)
         val podcastUUID = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = podcastUUID, isSubscribed = true, overrideGlobalArchive = true, autoArchiveInactive = AutoArchiveInactiveSetting.Days2.toIndex(), autoArchiveAfterPlaying = AutoArchiveAfterPlayingSetting.AfterPlaying.toIndex())
         val podcastManager = podcastManagerThatReturns(podcast)
@@ -440,7 +447,7 @@ class AutoArchiveTest {
 
     @Test
     fun testEpisodeLimit() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString(), autoArchiveEpisodeLimit = 1, overrideGlobalArchive = true)
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -465,7 +472,7 @@ class AutoArchiveTest {
 
     @Test
     fun testEpisodeLimitIgnoresManualUnarchiveInCount() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString(), autoArchiveEpisodeLimit = 0, overrideGlobalArchive = true)
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -490,7 +497,7 @@ class AutoArchiveTest {
 
     @Test
     fun testEpisodeLimitRespectsIgnoreGlobal() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Never, testDispatcher = testDispatcher)
         val podcast = Podcast(UUID.randomUUID().toString(), autoArchiveEpisodeLimit = 0, overrideGlobalArchive = false)
         val podcastManager = podcastManagerThatReturns(podcast)
         val calendar = Calendar.getInstance()
@@ -510,7 +517,7 @@ class AutoArchiveTest {
 
     @Test
     fun testAddingInactiveEpisodeToUpNext() {
-        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Weeks1, includeStarred = true)
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlayingSetting.Never, AutoArchiveInactiveSetting.Weeks1, includeStarred = true, testDispatcher = testDispatcher)
         val upNext = upNextQueueFor(testDb, episodeManager)
 
         val podcastUUID = UUID.randomUUID().toString()

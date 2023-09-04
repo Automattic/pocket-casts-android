@@ -149,7 +149,7 @@ project.ext {
             browserHelper: 'com.google.androidbrowserhelper:androidbrowserhelper:2.3.0',
             flexbox: 'com.google.android.flexbox:flexbox:3.0.0',
             androidTestCore: "androidx.test:core:$versionTest",
-            room: "androidx.room:room-runtime:$versionRoom",
+            room: "androidx.room:room-ktx:$versionRoom",
             roomRx: "androidx.room:room-rxjava2:$versionRoom",
             roomKtx: "androidx.room:room-ktx:$versionRoom",
             roomCompile: "androidx.room:room-compiler:$versionRoom",
