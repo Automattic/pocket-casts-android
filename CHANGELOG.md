@@ -13,8 +13,10 @@
         ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
     *   Improved handling of enabling/disabling new episode notifications
         ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
-    *    Fixed the artwork not appearing on the onboarding page
+    *   Fixed the artwork not appearing on the onboarding page
         ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+    *   Improved multi-select toolbars setup 
+        ([#1338](https://github.com/Automattic/pocket-casts-android/pull/1338))
 
 7.46
 -----
