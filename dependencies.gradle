@@ -214,7 +214,9 @@ project.ext {
             media3DatasourceOkhttp: "androidx.media3:media3-datasource-okhttp:$versionMedia3",
 
             // Fixes instrumentation tests, see: https://github.com/android/android-test/issues/861#issuecomment-1180219978
-            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework"
+            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework",
+            // In-app reviews
+            playReview: 'com.google.android.play:review-ktx:2.0.1',
     ]
 
     libs = [
