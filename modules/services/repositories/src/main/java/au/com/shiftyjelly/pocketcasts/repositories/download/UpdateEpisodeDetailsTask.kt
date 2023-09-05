@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -45,7 +46,9 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
             Timber.i("Downloading Meta Data for ${episodeUuids.size} episodes")
 
             for (episodeUuid in episodeUuids) {
-                val episode = episodeManager.findByUuid(episodeUuid) ?: continue
+                val episode = runBlocking {
+                    episodeManager.findByUuid(episodeUuid)
+                } ?: continue
                 val downloadUrl = episode.downloadUrl?.toHttpUrlOrNull() ?: continue
 
                 val client = OkHttpClient()

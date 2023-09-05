@@ -89,7 +89,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val userEpisodeDao = appDatabase.userEpisodeDao()
 
     override suspend fun findEpisodeByUuid(uuid: String): BaseEpisode? {
-        val episode = findByUuidSuspend(uuid)
+        val episode = findByUuid(uuid)
         if (episode != null) {
             return episode
         }
@@ -97,23 +97,23 @@ class EpisodeManagerImpl @Inject constructor(
         return userEpisodeManager.findEpisodeByUuid(uuid)
     }
 
-    override fun findByUuid(uuid: String): PodcastEpisode? {
-        return episodeDao.findByUuid(uuid)
-    }
+    override suspend fun findByUuid(uuid: String): PodcastEpisode? =
+        episodeDao.findByUuid(uuid)
 
-    override suspend fun findByUuidSuspend(uuid: String): PodcastEpisode? {
-        return episodeDao.findByUuidSuspend(uuid)
-    }
+    @Deprecated("Use findByUuid suspended method instead")
+    override fun findByUuidSync(uuid: String): PodcastEpisode? =
+        episodeDao.findByUuidSync(uuid)
 
-    override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> {
-        return episodeDao.findByUuidRx(uuid)
-    }
+    @Deprecated("Use findByUuid suspended method instead")
+    override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =
+        episodeDao.findByUuidRx(uuid)
 
     override fun observeByUuid(uuid: String): Flow<PodcastEpisode> {
         return episodeDao.observeByUuid(uuid)
     }
 
     override fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode> {
+        @Suppress("DEPRECATION")
         return findByUuidRx(uuid)
             .flatMapPublisher<BaseEpisode> { episodeDao.observeByUuid(uuid).asFlowable() }
             .switchIfEmpty(userEpisodeManager.observeEpisodeRx(uuid))
@@ -246,20 +246,18 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observeDownloadingEpisodesRx().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
     }
 
-    override fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode> {
+    override fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode> =
         if (uuids.isEmpty()) {
-            return ArrayList()
-        }
-        if (ordered) {
-            val episodes = ArrayList<PodcastEpisode>()
-            for (uuid in uuids) {
-                findByUuid(uuid)?.let { episodes.add(it) }
+            emptyList()
+        } else if (ordered) {
+            uuids.mapNotNull {
+                runBlocking {
+                    findByUuid(it)
+                }
             }
-            return episodes
         } else {
-            return findEpisodesWhere("uuid IN " + QueryHelper.convertStringArrayToInStatement(uuids))
+            findEpisodesWhere("uuid IN " + QueryHelper.convertStringArrayToInStatement(uuids))
         }
-    }
 
     override fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
         if (playedUpTo < 0 || episode == null) {
@@ -939,7 +937,9 @@ class EpisodeManagerImpl @Inject constructor(
         while (episodesItr.hasNext()) {
             val episode = episodesItr.next()
             // check if the episode already exists
-            val existingEpisode = findByUuid(episode.uuid)
+            val existingEpisode = runBlocking {
+                findByUuid(episode.uuid)
+            }
             if (existingEpisode == null) {
                 episode.podcastUuid = podcastUuid
                 addedEpisodes.add(episode)
@@ -1129,6 +1129,8 @@ class EpisodeManagerImpl @Inject constructor(
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
+
+                        @Suppress("DEPRECATION")
                         podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRx(episodeUuid))
                     }.flatMap { (podcast, episode) ->
                         if (podcast.isAutoDownloadNewEpisodes) {

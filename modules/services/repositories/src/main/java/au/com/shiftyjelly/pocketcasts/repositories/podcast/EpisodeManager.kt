@@ -24,9 +24,15 @@ interface EpisodeManager {
     fun getPodcastUuidToBadgeLatest(): Flowable<Map<String, Int>>
 
     /** Find methods  */
-    fun findByUuid(uuid: String): PodcastEpisode?
-    suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
+
+    suspend fun findByUuid(uuid: String): PodcastEpisode?
+
+    @Deprecated("Use findByUuid suspended function instead")
+    fun findByUuidSync(uuid: String): PodcastEpisode?
+
+    @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
+
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
     fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode>
     fun observeEpisodeByUuid(uuid: String): Flow<BaseEpisode>

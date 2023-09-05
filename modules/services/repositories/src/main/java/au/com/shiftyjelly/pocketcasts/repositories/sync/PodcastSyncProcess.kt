@@ -45,6 +45,7 @@ import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
 import org.json.JSONArray
 import org.json.JSONException
@@ -771,7 +772,9 @@ class PodcastSyncProcess(
         val uuid = episodeSync.uuid ?: return Maybe.empty()
 
         // check if the episode already exists
-        val episode = episodeManager.findByUuid(uuid)
+        val episode = runBlocking {
+            episodeManager.findByUuid(uuid)
+        }
         return if (episode == null) {
             Maybe.empty()
         } else {

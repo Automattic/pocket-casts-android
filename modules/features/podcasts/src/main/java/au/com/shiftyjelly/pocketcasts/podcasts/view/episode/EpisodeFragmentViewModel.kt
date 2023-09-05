@@ -100,7 +100,10 @@ class EpisodeFragmentViewModel @Inject constructor(
             Maybe.empty()
         }
 
-        val stateObservable: Flowable<EpisodeFragmentState> = episodeManager.findByUuidRx(episodeUuid)
+        @Suppress("DEPRECATION")
+        val maybeEpisode = episodeManager.findByUuidRx(episodeUuid)
+
+        val stateObservable: Flowable<EpisodeFragmentState> = maybeEpisode
             .switchIfEmpty(onEmptyHandler)
             .flatMapPublisher { episode ->
                 val zipper: Function4<PodcastEpisode, Podcast, ShowNotesState, Float, EpisodeFragmentState> = Function4 { episodeLoaded: PodcastEpisode, podcast: Podcast, showNotesState: ShowNotesState, downloadProgress: Float ->

@@ -41,7 +41,7 @@ class UpdateEpisodeTask(val context: Context, val params: WorkerParameters) : Wo
             val appDatabase = AppDatabase.getInstance(context)
             val episodeDao = appDatabase.episodeDao()
 
-            val episode = episodeDao.findByUuid(episodeUUID)
+            val episode = episodeDao.findByUuidSync(episodeUUID)
             val serverEpisodeUrl = serverPodcast.episodes.firstOrNull()?.downloadUrl
             if (episode != null &&
                 serverEpisodeUrl != null &&
