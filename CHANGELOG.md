@@ -12,6 +12,8 @@
         ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
     *   Present app review prompt 
         ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
+    *   Updated storage limit title
+        ([#1342](https://github.com/Automattic/pocket-casts-android/pull/1342))
 *   Bug Fixes:
     *   Fixed auto archive settings getting lost when switching languages
         ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
