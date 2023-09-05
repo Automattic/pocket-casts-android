@@ -55,7 +55,9 @@ class UpdateEpisodeDetailsTest {
         server.enqueue(finalResponse)
 
         val episode = PodcastEpisode(uuid = UUID.randomUUID().toString(), publishedDate = Date(), downloadUrl = firstUrl.toString())
-        val episodeManager = mock<EpisodeManager> { on { findByUuid(episode.uuid) }.doReturn(episode) }
+        val episodeManager = mock<EpisodeManager> {
+            onBlocking { findByUuid(episode.uuid) }.doReturn(episode)
+        }
 
         val episodeUuids = listOf(episode.uuid).toTypedArray()
         val data = Data.Builder().putStringArray(UpdateEpisodeDetailsTask.INPUT_EPISODE_UUIDS, episodeUuids).build()
