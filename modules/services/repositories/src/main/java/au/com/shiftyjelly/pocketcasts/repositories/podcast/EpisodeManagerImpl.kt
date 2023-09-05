@@ -447,7 +447,6 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView) {
-        episode.isStarred = starred
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
         val event =
             if (starred) AnalyticsEvent.EPISODE_UNSTARRED
