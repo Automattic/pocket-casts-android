@@ -126,10 +126,11 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
         }
 
         Spacer(Modifier.weight(1f))
-
+        val isTitleEnable = title.text.isBlank()
         RowButton(
             text = stringResource(if (isNewBookmark) R.string.save_bookmark else R.string.change_title),
             colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
+            enabled = !isTitleEnable,
             // if the tint color is too light use the background color for the text
             textColor = if (buttonColor.luminance() > 0.5) backgroundColor else Color.White,
             includePadding = false,
