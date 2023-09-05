@@ -262,7 +262,7 @@ abstract class EpisodeDao {
     abstract fun findLatestEpisodeToPlay(): PodcastEpisode?
 
     @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid = :uuid")
-    abstract fun updateStarred(starred: Boolean, modified: Long, uuid: String)
+    abstract suspend fun updateStarred(starred: Boolean, modified: Long, uuid: String)
 
     @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun updateAllStarred(episodesUUIDs: List<String>, starred: Boolean, modified: Long)

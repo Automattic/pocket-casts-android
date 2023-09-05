@@ -12,6 +12,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
@@ -52,9 +54,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.merge
@@ -80,6 +80,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val podcastCacheServerManager: PodcastCacheServerManager,
     private val userEpisodeManager: UserEpisodeManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : EpisodeManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -445,9 +446,13 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun starEpisode(episode: PodcastEpisode, starred: Boolean) {
+    override suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView) {
         episode.isStarred = starred
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
+        val event =
+            if (starred) AnalyticsEvent.EPISODE_UNSTARRED
+            else AnalyticsEvent.EPISODE_STARRED
+        episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
     }
 
     override suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean) {
@@ -456,12 +461,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    override fun toggleStarEpisodeAsync(episode: PodcastEpisode) {
-        GlobalScope.launch {
-            findByUuid(episode.uuid)?.let {
-                starEpisode(episode, !it.isStarred)
-            }
+    override suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView) {
+        // Retrieve the episode to make sure we have the latest starred status
+        findByUuid(episode.uuid)?.let {
+            starEpisode(episode, !it.isStarred, sourceView)
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -277,9 +278,9 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun starClicked() {
         episode?.let { episode ->
-            episodeManager.toggleStarEpisodeAsync(episode)
-            val event = if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
-            episodeAnalytics.trackEvent(event, source, episode.uuid)
+            viewModelScope.launch {
+                episodeManager.toggleStarEpisode(episode, source)
+            }
         }
     }
 
