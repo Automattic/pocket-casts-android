@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -44,6 +45,9 @@ class MultiSelectToolbar @JvmOverloads constructor(
         } else {
             multiSelectHelper.toolbarActions.removeObservers(lifecycleOwner)
             multiSelectHelper.toolbarActions.observe(lifecycleOwner) {
+
+                Sentry.addBreadcrumb("MultiSelectToolbar setup observed toolbarActionChange,$it from ${multiSelectHelper.source}")
+
                 menu.clear()
 
                 val maxIcons = multiSelectHelper.maxToolbarIcons
