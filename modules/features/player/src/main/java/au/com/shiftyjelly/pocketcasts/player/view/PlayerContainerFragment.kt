@@ -328,7 +328,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     }
 
     override fun createFragment(position: Int): Fragment {
-        Timber.d("PHILIP Creating fragment for position $position ${sections[position]}")
         return when (sections[position]) {
             is Section.Player -> PlayerHeaderFragment()
             is Section.Notes -> NotesFragment()

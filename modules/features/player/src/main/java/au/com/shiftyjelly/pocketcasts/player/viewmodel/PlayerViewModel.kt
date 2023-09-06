@@ -626,7 +626,7 @@ class PlayerViewModel @Inject constructor(
             field = value
         }
 
-    var cacheScrollToChapter: Chapter? = null
+    private var cacheScrollToChapter: Chapter? = null
 
     fun scrollToChapter(chapter: Chapter) {
         if (scrollToChapterListener == null) {
