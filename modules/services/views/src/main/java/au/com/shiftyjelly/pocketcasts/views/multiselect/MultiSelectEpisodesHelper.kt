@@ -190,7 +190,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
             episodeManager.markAsUnplayed(list)
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_MARKED_AS_UNPLAYED, source, list.size)
-            launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_unplayed_singular, LR.string.marked_as_unplayed_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
