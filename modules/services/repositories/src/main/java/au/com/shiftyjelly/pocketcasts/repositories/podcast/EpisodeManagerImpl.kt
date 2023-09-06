@@ -698,9 +698,9 @@ class EpisodeManagerImpl @Inject constructor(
 
     private fun shouldArchiveBasedOnSettings(podcastOverrideSettings: Boolean, podcastArchiveAfterPlaying: AutoArchiveAfterPlayingSetting) =
         (
-            (!podcastOverrideSettings && settings.autoArchiveAfterPlaying.value == AutoArchiveAfterPlayingSetting.AfterPlaying) ||
-                (podcastArchiveAfterPlaying == AutoArchiveAfterPlayingSetting.AfterPlaying)
-            )
+                (!podcastOverrideSettings && settings.autoArchiveAfterPlaying.value == AutoArchiveAfterPlayingSetting.AfterPlaying) ||
+                        (podcastArchiveAfterPlaying == AutoArchiveAfterPlayingSetting.AfterPlaying)
+                )
 
     @Suppress("NAME_SHADOWING")
     private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
@@ -1092,12 +1092,12 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun userHasInteractedWithEpisode(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean {
         return episode.isStarred ||
-            episode.isArchived ||
-            episode.isDownloaded ||
-            episode.isFinished ||
-            episode.isInProgress ||
-            playbackManager.upNextQueue.contains(episode.uuid) ||
-            episode.lastPlaybackInteraction != null
+                episode.isArchived ||
+                episode.isDownloaded ||
+                episode.isFinished ||
+                episode.isInProgress ||
+                playbackManager.upNextQueue.contains(episode.uuid) ||
+                episode.lastPlaybackInteraction != null
     }
 
     override fun episodeCanBeCleanedUp(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean {
