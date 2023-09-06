@@ -54,6 +54,7 @@ fun ChapterRow(
     val textColor = if (state.isPlayed) MaterialTheme.theme.colors.playerContrast04 else MaterialTheme.theme.colors.playerContrast01
     Box(
         modifier = modifier
+            // use intrinsic height so the progress bar fills the height of the row
             .height(IntrinsicSize.Max)
             .padding(horizontal = 8.dp)
             .clip(RoundedCornerShape(8.dp))
@@ -142,7 +143,7 @@ fun ChapterRowPreview() {
         title = "Chapter Title",
         startTime = 0,
         endTime = 62,
-        url = "https://twitter.com/search?q=cute%20%23puppies&f=images".toHttpUrlOrNull(),
+        url = "https://pocketcasts.com".toHttpUrlOrNull(),
         imagePath = null,
         mimeType = null,
         index = 1
