@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -569,9 +570,9 @@ class PlayerViewModel @Inject constructor(
     fun starToggle() {
         playbackManager.upNextQueue.currentEpisode?.let {
             if (it is PodcastEpisode) {
-                episodeManager.toggleStarEpisodeAsync(episode = it)
-                val event = if (it.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
-                episodeAnalytics.trackEvent(event, source, it.uuid)
+                viewModelScope.launch {
+                    episodeManager.toggleStarEpisode(episode = it, source)
+                }
             }
         }
     }

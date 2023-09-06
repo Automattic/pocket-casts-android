@@ -1462,20 +1462,22 @@ open class PlaybackManager @Inject constructor(
     private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         // make sure we have the most recent copy from the database
         val currentUpNextEpisode = upNextQueue.currentEpisode
-        val episode: BaseEpisode? = if (currentUpNextEpisode is PodcastEpisode) {
-            episodeManager.findByUuid(currentUpNextEpisode.uuid)
-        } else if (currentUpNextEpisode is UserEpisode) {
-            userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
-                .flatMap {
-                    if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                        userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
-                    } else {
-                        Maybe.just(it)
+        val episode: BaseEpisode? = when (currentUpNextEpisode) {
+            is PodcastEpisode -> episodeManager.findByUuid(currentUpNextEpisode.uuid)
+
+            is UserEpisode -> {
+                userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
+                    .flatMap {
+                        if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
+                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
+                        } else {
+                            Maybe.just(it)
+                        }
                     }
-                }
-                .awaitSingleOrNull()
-        } else {
-            null
+                    .awaitSingleOrNull()
+            }
+
+            else -> null
         }
 
         if (episode == null) {

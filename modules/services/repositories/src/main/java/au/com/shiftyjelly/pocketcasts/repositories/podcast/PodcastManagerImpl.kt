@@ -41,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
@@ -681,7 +682,9 @@ class PodcastManagerImpl @Inject constructor(
 
         val uuidToAdded = HashMap<String, Boolean>()
         for (episodeUuid in episodeUuidsAdded) {
-            val episode = episodeManager.findByUuid(episodeUuid) ?: continue
+            val episode = runBlocking {
+                episodeManager.findByUuid(episodeUuid)
+            } ?: continue
             val autoDownload = podcastUuidToAutoDownload[episode.podcastUuid]
             Timber.i(
                 "Auto download " + episode.title +
