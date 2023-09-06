@@ -23,6 +23,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -135,8 +136,9 @@ class PodcastListViewModel @Inject constructor(
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
         podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
             .flatMapMaybe {
-                @Suppress("DEPRECATION")
-                episodeManager.findByUuidRx(discoverEpisode.uuid)
+                rxMaybe {
+                    episodeManager.findByUuid(discoverEpisode.uuid)
+                }
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
