@@ -30,7 +30,7 @@ interface EpisodeManager {
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
     fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode>
     fun observeEpisodeByUuid(uuid: String): Flow<BaseEpisode>
-    fun findFirstBySearchQuery(query: String): PodcastEpisode?
+    suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     fun findAll(rowParser: (PodcastEpisode) -> Boolean)
     fun findEpisodesWhere(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>

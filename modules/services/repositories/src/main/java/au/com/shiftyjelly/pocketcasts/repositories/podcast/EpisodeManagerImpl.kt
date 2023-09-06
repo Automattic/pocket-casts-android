@@ -125,9 +125,8 @@ class EpisodeManagerImpl @Inject constructor(
             userEpisodeManager.observeEpisode(uuid) // if it is a UserEpisode
         ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
 
-    override fun findFirstBySearchQuery(query: String): PodcastEpisode? {
-        return episodeDao.findFirstBySearchQuery(query)
-    }
+    override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? =
+        episodeDao.findFirstBySearchQuery(query)
 
     @Suppress("DEPRECATION")
     override fun findAll(rowParser: (PodcastEpisode) -> Boolean) {
