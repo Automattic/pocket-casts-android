@@ -93,8 +93,12 @@ interface EpisodeManager {
     fun markAsNotPlayed(episode: BaseEpisode?)
     fun markAsNotPlayedRx(episode: PodcastEpisode): Single<PodcastEpisode>
     suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    suspend fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    suspend fun markAsPlayed(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
+    suspend fun markAsPlayed(
+        episode: BaseEpisode,
+        playbackManager: PlaybackManager,
+        podcastManager: PodcastManager,
+        fromExternalSource: Boolean = false,
+    )
     fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
     suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)

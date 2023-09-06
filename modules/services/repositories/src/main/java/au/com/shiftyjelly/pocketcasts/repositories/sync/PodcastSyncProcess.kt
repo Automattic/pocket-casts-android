@@ -829,7 +829,7 @@ class PodcastSyncProcess(
                     episode.playingStatus = newPlayingStatus
                     if (episode.isFinished) {
                         runBlocking {
-                            episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
+                            episodeManager.markAsPlayed(episode, playbackManager, podcastManager, fromExternalSource = true)
                         }
                     }
                 }

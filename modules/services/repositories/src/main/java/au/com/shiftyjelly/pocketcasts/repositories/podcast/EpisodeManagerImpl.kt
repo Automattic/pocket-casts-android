@@ -509,28 +509,23 @@ class EpisodeManagerImpl @Inject constructor(
         userEpisodeManager.markAllAsUnplayed(justUserEpisodes)
     }
 
-    override suspend fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    override suspend fun markAsPlayed(
+        episode: BaseEpisode,
+        playbackManager: PlaybackManager,
+        podcastManager: PodcastManager,
+        fromExternalSource: Boolean,
+    ) {
         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+
+        if (!fromExternalSource) {
+            episode.playingStatus = EpisodePlayingStatus.COMPLETED
+            updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
+        }
 
         // Auto archive after playing if the episode isn't already archived
         if (!episode.isArchived) {
             archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
         }
-    }
-
-    override suspend fun markAsPlayed(
-        episode: BaseEpisode,
-        playbackManager: PlaybackManager,
-        podcastManager: PodcastManager,
-    ) {
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
-
-        episode.playingStatus = EpisodePlayingStatus.COMPLETED
-
-        updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
-
-        // Auto archive after playing
-        archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
     }
 
     override fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
