@@ -499,17 +499,15 @@ class EpisodeManagerImpl @Inject constructor(
         userEpisodeManager.markAllAsPlayed(episodes.filterIsInstance<UserEpisode>(), playbackManager)
     }
 
-    override fun markAsUnplayed(episodes: List<BaseEpisode>) {
-        launch {
-            val justEpisodes = episodes.filterIsInstance<PodcastEpisode>()
-            justEpisodes.chunked(500).forEach {
-                episodeDao.markAllUnplayed(it.map { it.uuid }, System.currentTimeMillis())
-            }
-            unarchiveAllInList(justEpisodes)
-
-            val justUserEpisodes = episodes.filterIsInstance<UserEpisode>()
-            userEpisodeManager.markAllAsUnplayed(justUserEpisodes)
+    override suspend fun markAsUnplayed(episodes: List<BaseEpisode>) {
+        val justEpisodes = episodes.filterIsInstance<PodcastEpisode>()
+        justEpisodes.chunked(500).forEach {
+            episodeDao.markAllUnplayed(it.map { it.uuid }, System.currentTimeMillis())
         }
+        unarchiveAllInList(justEpisodes)
+
+        val justUserEpisodes = episodes.filterIsInstance<UserEpisode>()
+        userEpisodeManager.markAllAsUnplayed(justUserEpisodes)
     }
 
     override fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
