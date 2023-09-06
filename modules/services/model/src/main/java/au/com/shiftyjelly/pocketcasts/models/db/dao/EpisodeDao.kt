@@ -60,7 +60,7 @@ abstract class EpisodeDao {
     abstract fun findByUuids(uuids: List<String>): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
-    abstract fun findFirstBySearchQuery(query: String): PodcastEpisode?
+    abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_sync_status <> 1 AND last_playback_interaction_date IS NOT NULL ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun findEpisodesForHistorySync(): List<PodcastEpisode>
