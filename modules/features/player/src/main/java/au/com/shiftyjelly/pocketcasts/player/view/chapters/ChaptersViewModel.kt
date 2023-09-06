@@ -17,6 +17,8 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -42,6 +44,13 @@ class ChaptersViewModel
         class Played(chapter: Chapter) : ChapterState(chapter)
         class Playing(val progress: Float, chapter: Chapter) : ChapterState(chapter)
         class NotPlayed(chapter: Chapter) : ChapterState(chapter)
+    }
+
+    private val _scrollToChapterState = MutableStateFlow<Chapter?>(null)
+    val scrollToChapterState = _scrollToChapterState.asStateFlow()
+
+    fun setScrollToChapter(chapter: Chapter?) {
+        _scrollToChapterState.value = chapter
     }
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
