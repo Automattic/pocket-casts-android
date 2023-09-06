@@ -2,6 +2,12 @@
 -----
 
 
+7.46.1
+------
+*   Bug Fixes:
+    *   Improved multi-select toolbars setup
+        ([#1338](https://github.com/Automattic/pocket-casts-android/pull/1338))
+
 7.46
 -----
 
