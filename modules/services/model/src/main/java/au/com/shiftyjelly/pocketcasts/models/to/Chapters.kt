@@ -87,27 +87,27 @@ data class Chapters(private val items: List<Chapter> = emptyList()) {
         return getChapterIndex(time) == items.size - 1
     }
 
-    fun getListWithState(timeMs: Int): List<Chapter> {
-        val currentChapter: Chapter? = getChapter(timeMs)
-        var foundChapter = false
-        items.forEach { chapter ->
-            if (currentChapter == null) {
-                chapter.played = false
-            } else {
-                if (currentChapter == chapter) {
-                    foundChapter = true
-                    val chapterLength = chapter.endTime - chapter.startTime
-                    if (chapterLength > 0) {
-                        chapter.progress = (timeMs - chapter.startTime).toFloat() / chapterLength
-                    }
-                } else {
-                    chapter.progress = 0.0f
-                }
-
-                chapter.played = !foundChapter
-            }
-        }
-
-        return items
-    }
+//    fun getListWithState(timeMs: Int): List<Chapter> {
+//        val currentChapter: Chapter? = getChapter(timeMs)
+//        var foundChapter = false
+//        items.forEach { chapter ->
+//            if (currentChapter == null) {
+//                chapter.played = false
+//            } else {
+//                if (currentChapter == chapter) {
+//                    foundChapter = true
+//                    val chapterLength = chapter.endTime - chapter.startTime
+//                    if (chapterLength > 0) {
+//                        chapter.progress = (timeMs - chapter.startTime).toFloat() / chapterLength
+//                    }
+//                } else {
+//                    chapter.progress = 0.0f
+//                }
+//
+//                chapter.played = !foundChapter
+//            }
+//        }
+//
+//        return items
+//    }
 }
