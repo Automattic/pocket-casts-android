@@ -828,7 +828,9 @@ class PodcastSyncProcess(
                     episode.playingStatusModified = null
                     episode.playingStatus = newPlayingStatus
                     if (episode.isFinished) {
-                        episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
+                        runBlocking {
+                            episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
+                        }
                     }
                 }
             }

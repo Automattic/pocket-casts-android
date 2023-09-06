@@ -12,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -26,6 +29,7 @@ class MiniPlayerDialog(
     private val fragmentManager: FragmentManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
+    private val coroutineScope: CoroutineScope,
 ) {
     private var isOptionClicked = false
     fun show(context: Context) {
@@ -38,7 +42,9 @@ class MiniPlayerDialog(
                 click = {
                     isOptionClicked = true
                     analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to MARK_PLAYED))
-                    markAsPlayed()
+                    coroutineScope.launch(Dispatchers.IO) {
+                        markAsPlayed()
+                    }
                 }
             )
             .addTextOption(
@@ -71,9 +77,9 @@ class MiniPlayerDialog(
         dialog.showOrClear(fragmentManager)
     }
 
-    private fun markAsPlayed() {
+    private suspend fun markAsPlayed() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
-        episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager)
+        episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
         episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, SourceView.MINIPLAYER, episode.uuid)
     }
 

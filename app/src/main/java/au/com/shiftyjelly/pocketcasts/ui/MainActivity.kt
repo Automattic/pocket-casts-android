@@ -614,7 +614,8 @@ class MainActivity :
             episodeManager = episodeManager,
             fragmentManager = supportFragmentManager,
             analyticsTracker = analyticsTracker,
-            episodeAnalytics = episodeAnalytics
+            episodeAnalytics = episodeAnalytics,
+            coroutineScope = this,
         ).show(this)
     }
 

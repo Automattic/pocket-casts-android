@@ -648,11 +648,10 @@ class MediaSessionManager(
     }
 
     private fun markAsPlayed() {
-        launch {
-            val episode = playbackManager.getCurrentEpisode()
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
-            episode?.let {
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, it.uuid)
+        playbackManager.getCurrentEpisode()?.let { episode ->
+            launch {
+                episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
             }
         }
     }

@@ -47,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -510,7 +509,7 @@ class EpisodeManagerImpl @Inject constructor(
         userEpisodeManager.markAllAsUnplayed(justUserEpisodes)
     }
 
-    override fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    override suspend fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
 
         // Auto archive after playing if the episode isn't already archived
@@ -519,17 +518,11 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
-        launch {
-            markAsPlayed(episode, playbackManager, podcastManager)
-        }
-    }
-
-    override fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
-        if (episode == null) {
-            return
-        }
-
+    override suspend fun markAsPlayed(
+        episode: BaseEpisode,
+        playbackManager: PlaybackManager,
+        podcastManager: PodcastManager,
+    ) {
         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
 
         episode.playingStatus = EpisodePlayingStatus.COMPLETED
@@ -669,27 +662,25 @@ class EpisodeManagerImpl @Inject constructor(
         episode.downloadErrorDetails = null
     }
 
-    override fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean) {
-        launch {
-            if (episode !is PodcastEpisode) return@launch
-            // check if we are meant to archive after episode is played
-            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
-            val podcastOverrideSettings = podcast.overrideGlobalArchive
-            val podcastArchiveAfterPlaying = AutoArchiveAfterPlayingSetting.fromIndex(podcast.autoArchiveAfterPlaying)
+    override suspend fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean) {
+        if (episode !is PodcastEpisode) return
+        // check if we are meant to archive after episode is played
+        val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return
+        val podcastOverrideSettings = podcast.overrideGlobalArchive
+        val podcastArchiveAfterPlaying = AutoArchiveAfterPlayingSetting.fromIndex(podcast.autoArchiveAfterPlaying)
 
-            val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
+        val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
 
-            if (shouldArchiveBasedOnSettings &&
-                (settings.autoArchiveIncludeStarred.value || !episode.isStarred)
-            ) {
-                if (sync) {
-                    episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
-                } else {
-                    episodeDao.updateArchivedNoSync(true, System.currentTimeMillis(), episode.uuid)
-                }
-                episode.isArchived = true
-                cleanUpEpisode(episode, playbackManager)
+        if (shouldArchiveBasedOnSettings &&
+            (settings.autoArchiveIncludeStarred.value || !episode.isStarred)
+        ) {
+            if (sync) {
+                episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
+            } else {
+                episodeDao.updateArchivedNoSync(true, System.currentTimeMillis(), episode.uuid)
             }
+            episode.isArchived = true
+            cleanUpEpisode(episode, playbackManager)
         }
     }
 
@@ -895,10 +886,6 @@ class EpisodeManagerImpl @Inject constructor(
             markAsNotPlayed(episode)
             episode
         }
-    }
-
-    override fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable {
-        return Completable.fromAction { markAsPlayed(episode, playbackManager, podcastManager) }
     }
 
     override fun findEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): List<PodcastEpisode> {
