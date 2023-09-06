@@ -44,6 +44,12 @@
     *    Avoided adding multiple toolbar observers, which was causing the app to lag and freeze
          ([#1333](https://github.com/Automattic/pocket-casts-android/pull/1333))
 
+7.45.1
+-----
+*   Bug Fixes:
+    *   Fixed issue that could cause app freeze when using multiselect
+        ([#1315](https://github.com/Automattic/pocket-casts-android/pull/1315))
+
 7.45
 -----
 *   Bug Fixes:
