@@ -1,6 +1,9 @@
 7.48
 -----
 
+*   Updates:
+    *   Removed login by email and password on WearOS app
+        ([#1356](https://github.com/Automattic/pocket-casts-android/pull/1356))
 
 7.47
 -----
