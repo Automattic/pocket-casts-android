@@ -1294,20 +1294,12 @@ open class PlaybackManager @Inject constructor(
 
         val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
         if (abs(durationDiffSeconds) > 0) {
-            val notifyUser = abs(durationDiffSeconds) > 30
-            if (notifyUser) {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed significantly ($durationDiffSeconds seconds)")
-                launch(Dispatchers.Main) {
-                    val message = application.getString(LR.string.episode_duration_change, durationDiffSeconds)
-                    Toast.makeText(application, message, Toast.LENGTH_LONG).show()
-                }
-            }
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed by $durationDiffSeconds seconds")
             analyticsTracker.track(
                 AnalyticsEvent.PLAYBACK_EPISODE_DURATION_CHANGED,
                 mapOf(
                     "duration_change" to durationDiffSeconds,
                     "duration" to durationMs / 1000,
-                    "notified_user" to notifyUser,
                     "is_user_file" to (episode is UserEpisode),
                     "is_downloaded" to episode.isDownloaded,
                     "episode_uuid" to episode.uuid,
