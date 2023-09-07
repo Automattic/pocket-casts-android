@@ -12,6 +12,8 @@
         ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
     *   Present app review prompt 
         ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
+    *   Updated storage limit title
+        ([#1342](https://github.com/Automattic/pocket-casts-android/pull/1342))
 *   Bug Fixes:
     *   Fixed auto archive settings getting lost when switching languages
         ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
@@ -19,7 +21,11 @@
         ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
     *   Fixed the artwork not appearing on the onboarding page
         ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
-    *   Improved multi-select toolbars setup 
+    
+7.46.1
+------
+*   Bug Fixes:
+    *   Improved multi-select toolbars setup
         ([#1338](https://github.com/Automattic/pocket-casts-android/pull/1338))
 
 7.46
@@ -41,7 +47,7 @@
 7.45.1
 -----
 *   Bug Fixes:
-    *   Fixed issue where that could cause app freeze when using multiselect
+    *   Fixed issue that could cause app freeze when using multiselect
         ([#1315](https://github.com/Automattic/pocket-casts-android/pull/1315))
 
 7.45

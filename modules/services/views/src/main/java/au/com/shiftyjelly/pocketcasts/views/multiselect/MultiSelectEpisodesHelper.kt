@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import io.reactivex.BackpressureStrategy
+import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,6 +60,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         .toLiveData()
         .combineLatest(_selectedListLive)
         .map { (actions, selectedEpisodes) ->
+            Sentry.addBreadcrumb("MultiSelectEpisodesHelper toolbarActions updated (${actions.size}): ${actions.map { it::class.java.simpleName }}, ${selectedEpisodes.size} selectedEpisodes from $source")
             actions.mapNotNull {
                 MultiSelectEpisodeAction.actionForGroup(it.groupId, selectedEpisodes)
             }
