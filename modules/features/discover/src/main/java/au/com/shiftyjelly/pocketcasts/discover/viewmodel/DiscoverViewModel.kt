@@ -49,7 +49,7 @@ class DiscoverViewModel @Inject constructor(
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
-    var currentRegionCode: String? = settings.getDiscoveryCountryCode()
+    var currentRegionCode: String? = settings.discoverCountryCode.value
     var replacements = emptyMap<String, String>()
     private var isFragmentChangingConfigurations: Boolean = false
 
@@ -100,7 +100,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
-        settings.setDiscoveryCountryCode(region.code)
+        settings.discoverCountryCode.set(region.code)
         currentRegionCode = region.code
         loadData(resources)
     }
@@ -214,7 +214,10 @@ class DiscoverViewModel @Inject constructor(
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
         podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
-            .flatMapMaybe { episodeManager.findByUuidRx(discoverEpisode.uuid) }
+            .flatMapMaybe {
+                @Suppress("DEPRECATION")
+                episodeManager.findByUuidRx(discoverEpisode.uuid)
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -44,6 +45,7 @@ import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
 import org.json.JSONArray
 import org.json.JSONException
@@ -597,7 +599,6 @@ class PodcastSyncProcess(
     private fun updateSettings(response: SyncUpdateResponse): Completable {
         return Completable.fromAction {
             settings.setLastModified(response.lastModified)
-            settings.setLastSyncTime(System.currentTimeMillis())
         }
     }
 
@@ -771,7 +772,9 @@ class PodcastSyncProcess(
         val uuid = episodeSync.uuid ?: return Maybe.empty()
 
         // check if the episode already exists
-        val episode = episodeManager.findByUuid(uuid)
+        val episode = runBlocking {
+            episodeManager.findByUuid(uuid)
+        }
         return if (episode == null) {
             Maybe.empty()
         } else {
@@ -856,7 +859,7 @@ class PodcastSyncProcess(
         if (bookmark.deleted) {
             bookmarkManager.deleteSynced(bookmark.uuid)
         } else {
-            bookmarkManager.upsertSynced(bookmark)
+            bookmarkManager.upsertSynced(bookmark.copy(syncStatus = SyncStatus.SYNCED))
         }
     }
 }

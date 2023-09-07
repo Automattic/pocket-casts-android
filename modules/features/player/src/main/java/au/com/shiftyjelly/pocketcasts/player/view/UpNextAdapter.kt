@@ -106,7 +106,7 @@ class UpNextAdapter(
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
             } else {
                 val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
-                val playOnTap = settings.getTapOnUpNextShouldPlay()
+                val playOnTap = settings.tapOnUpNextShouldPlay.value
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
                 listener.onEpisodeActionsClick(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
             }
@@ -116,7 +116,7 @@ class UpNextAdapter(
                 multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
             } else {
                 val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
-                val playOnLongPress = !settings.getTapOnUpNextShouldPlay()
+                val playOnLongPress = !settings.tapOnUpNextShouldPlay.value
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
                 listener.onEpisodeActionsLongPress(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
             }

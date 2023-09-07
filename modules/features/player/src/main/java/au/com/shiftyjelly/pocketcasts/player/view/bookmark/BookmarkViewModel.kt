@@ -85,14 +85,15 @@ class BookmarkViewModel
         mutableUiState.value = mutableUiState.value.copy(title = titleLimited)
     }
 
-    fun saveBookmark(onSaved: (Bookmark) -> Unit) {
+    fun saveBookmark(onSaved: (Bookmark, isExistingBookmark: Boolean) -> Unit) {
         launch {
             try {
                 val state = uiState.value
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
+                val isExistingBookmark = bookmarkUuid != null
                 val bookmark = if (bookmarkUuid == null) {
-                    val episode = episodeManager.findByUuidSuspend(episodeUuid)
+                    val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
                         ?: return@launch
                     bookmarkManager.add(
@@ -106,7 +107,7 @@ class BookmarkViewModel
                     bookmarkManager.findBookmark(bookmarkUuid)
                 }
                 if (bookmark != null) {
-                    onSaved(bookmark)
+                    onSaved(bookmark, isExistingBookmark)
                 }
             } catch (e: Exception) {
                 Timber.e(e)

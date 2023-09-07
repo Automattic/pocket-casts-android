@@ -1,6 +1,27 @@
+7.48
+-----
+
+
 7.47
 -----
 
+*   Updates:
+    *   Enable copying logs from in-app logs viewer
+        ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
+    *   Present toast notification when duration of an in-progress episode changes
+        ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
+    *   Present app review prompt 
+        ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
+    *   Updated storage limit title
+        ([#1342](https://github.com/Automattic/pocket-casts-android/pull/1342))
+*   Bug Fixes:
+    *   Fixed auto archive settings getting lost when switching languages
+        ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
+    *   Improved handling of enabling/disabling new episode notifications
+        ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
+    *   Fixed the artwork not appearing on the onboarding page
+        ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+    
 7.46.2
 ------
 *   Updates:
@@ -32,7 +53,7 @@
 7.45.1
 -----
 *   Bug Fixes:
-    *   Fixed issue where that could cause app freeze when using multiselect
+    *   Fixed issue that could cause app freeze when using multiselect
         ([#1315](https://github.com/Automattic/pocket-casts-android/pull/1315))
 
 7.45

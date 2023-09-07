@@ -214,7 +214,9 @@ project.ext {
             media3DatasourceOkhttp: "androidx.media3:media3-datasource-okhttp:$versionMedia3",
 
             // Fixes instrumentation tests, see: https://github.com/android/android-test/issues/861#issuecomment-1180219978
-            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework"
+            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework",
+            // In-app reviews
+            playReview: 'com.google.android.play:review-ktx:2.0.1',
     ]
 
     libs = [
@@ -297,8 +299,8 @@ project.ext {
             // Automattic Tracks
             automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
             // Sentry
-            sentryBom: 'io.sentry:sentry-bom:6.4.2',
-            sentry: 'io.sentry:sentry-android',
+            sentryBom: 'io.sentry:sentry-bom:6.28.0',
+            sentryAndroidCore: 'io.sentry:sentry-android-core',
             sentryFragment: 'io.sentry:sentry-android-fragment',
             sentryTimber: 'io.sentry:sentry-android-timber',
             // AboutLibraries - https://github.com/mikepenz/AboutLibraries

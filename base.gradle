@@ -180,6 +180,7 @@ dependencies {
     implementation androidLibs.lifecycleProcess
     implementation androidLibs.paging
     implementation androidLibs.pagingRx
+    implementation androidLibs.playReview
     implementation androidLibs.workManager
     implementation androidLibs.workManagerRx
     implementation androidLibs.navigationFragment
@@ -241,7 +242,7 @@ dependencies {
     implementation libs.accompanistFlowLayout
     implementation libs.accompanistSystemUiController
     implementation platform(libs.sentryBom)
-    implementation libs.sentry
+    implementation libs.sentryAndroidCore
     implementation libs.sentryFragment
     implementation libs.sentryTimber
     implementation libs.media3Cast
@@ -308,4 +309,9 @@ dependencies {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
     }
+}
+
+// Exclude the NDK from the Sentry Android SDK as we don't use it and Tracks includes it.
+configurations.configureEach {
+    exclude group: "io.sentry", module: "sentry-android-ndk"
 }

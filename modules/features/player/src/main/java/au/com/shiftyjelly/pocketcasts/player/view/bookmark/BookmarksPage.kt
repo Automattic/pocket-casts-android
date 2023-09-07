@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun BookmarksPage(
     episodeUuid: String,
+    activeTheme: Theme.ThemeType,
     backgroundColor: Color,
     textColor: Color,
     sourceView: SourceView,
@@ -61,6 +62,7 @@ fun BookmarksPage(
     Content(
         state = state,
         sourceView = sourceView,
+        activeTheme = activeTheme,
         backgroundColor = backgroundColor,
         textColor = textColor,
         onRowLongPressed = onRowLongPressed,
@@ -99,6 +101,7 @@ fun BookmarksPage(
 private fun Content(
     state: UiState,
     sourceView: SourceView,
+    activeTheme: Theme.ThemeType,
     backgroundColor: Color,
     textColor: Color,
     onRowLongPressed: (Bookmark) -> Unit,
@@ -132,6 +135,7 @@ private fun Content(
             )
             is UiState.Upsell -> UpsellView(
                 style = state.colors,
+                activeTheme = activeTheme,
                 onClick = onUpgradeClicked,
                 sourceView = sourceView,
                 modifier = Modifier
@@ -177,7 +181,7 @@ private fun BookmarksView(
                 isSelected = state.isSelected,
                 onPlayClick = onPlayClick,
                 modifier = Modifier
-                    .pointerInput(state.isSelected(bookmark)) {
+                    .pointerInput(bookmark.adapterId) {
                         detectTapGestures(
                             onLongPress = { onRowLongPressed(bookmark) },
                             onTap = { state.onRowClick(bookmark) }
@@ -220,6 +224,7 @@ private fun BookmarksPreview(
                 sourceView = SourceView.PLAYER
             ),
             sourceView = SourceView.PLAYER,
+            activeTheme = theme,
             backgroundColor = Color.Black,
             textColor = Color.Black,
             onPlayClick = {},

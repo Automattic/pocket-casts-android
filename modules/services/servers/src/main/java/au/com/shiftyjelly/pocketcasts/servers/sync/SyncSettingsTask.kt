@@ -14,11 +14,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             try {
                 val request = NamedSettingsRequest(
                     settings = NamedSettingsSettings(
-                        skipForward = if (settings.getSkipForwardNeedsSync()) settings.getSkipForwardInSecs() else null,
-                        skipBack = if (settings.getSkipBackNeedsSync()) settings.getSkipBackwardInSecs() else null,
-                        marketingOptIn = if (settings.getMarketingOptInNeedsSync()) settings.getMarketingOptIn() else null,
-                        freeGiftAcknowledged = if (settings.getFreeGiftAcknowledgedNeedsSync()) settings.getFreeGiftAcknowledged() else null,
-                        gridOrder = if (settings.getPodcastsSortTypeNeedsSync()) settings.getPodcastsSortType().serverId else null,
+                        skipForward = settings.skipForwardInSecs.getSyncValue(),
+                        skipBack = settings.skipBackInSecs.getSyncValue(),
+                        marketingOptIn = settings.marketingOptIn.getSyncValue(),
+                        freeGiftAcknowledged = settings.freeGiftAcknowledged.getSyncValue(),
+                        gridOrder = settings.podcastsSortType.getSyncValue()?.serverId,
                     )
                 )
 
@@ -29,14 +29,17 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
                         if (value.value is Number) { // Probably will have to change this when we do other settings, but for now just Number is fine
                             when (key) {
-                                "skipForward" -> settings.setSkipForwardInSec(value.value.toInt())
-                                "skipBack" -> settings.setSkipBackwardInSec(value.value.toInt())
-                                "gridOrder" -> settings.setPodcastsSortType(sortType = PodcastsSortType.fromServerId(value.value.toInt()), sync = false)
+                                "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt())
+                                "skipBack" -> settings.skipBackInSecs.set(value.value.toInt())
+                                "gridOrder" -> {
+                                    val sortType = PodcastsSortType.fromServerId(value.value.toInt())
+                                    settings.podcastsSortType.set(sortType)
+                                }
                             }
                         } else if (value.value is Boolean) {
                             when (key) {
-                                "marketingOptIn" -> settings.setMarketingOptIn(value.value)
-                                "freeGiftAcknowledgement" -> settings.setFreeGiftAcknowledged(value.value)
+                                "marketingOptIn" -> settings.marketingOptIn.set(value.value)
+                                "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value)
                             }
                         }
                     } else {
@@ -48,12 +51,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return Result.failure()
             }
 
-            settings.setSkipBackNeedsSync(false)
-            settings.setSkipForwardNeedsSync(false)
-            settings.setMarketingOptInNeedsSync(false)
-            settings.setFreeGiftAcknowledgedNeedsSync(false)
-            settings.setPodcastsSortTypeNeedsSync(false)
-
+            listOf(
+                settings.freeGiftAcknowledged,
+                settings.marketingOptIn,
+                settings.podcastsSortType,
+                settings.skipBackInSecs,
+                settings.skipForwardInSecs,
+            ).forEach {
+                it.needsSync = false
+            }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 
             return Result.success()

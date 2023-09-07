@@ -57,7 +57,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         setupSentry()
         setupLogging()
         setupAnalytics()
-        setupAutomotiveDefaults()
         setupApp()
     }
 
@@ -96,14 +95,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onTerminate() {
         super.onTerminate()
         Log.d(Settings.LOG_TAG_AUTO, "Terminate")
-    }
-
-    private fun setupAutomotiveDefaults() {
-        // We don't want these to default to true in the main app so we set them up here.
-
-        if (!settings.contains(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY)) {
-            settings.setBooleanForKey(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
-        }
     }
 
     private fun setupSentry() {

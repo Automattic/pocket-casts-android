@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -100,7 +101,10 @@ class EpisodeFragmentViewModel @Inject constructor(
             Maybe.empty()
         }
 
-        val stateObservable: Flowable<EpisodeFragmentState> = episodeManager.findByUuidRx(episodeUuid)
+        @Suppress("DEPRECATION")
+        val maybeEpisode = episodeManager.findByUuidRx(episodeUuid)
+
+        val stateObservable: Flowable<EpisodeFragmentState> = maybeEpisode
             .switchIfEmpty(onEmptyHandler)
             .flatMapPublisher { episode ->
                 val zipper: Function4<PodcastEpisode, Podcast, ShowNotesState, Float, EpisodeFragmentState> = Function4 { episodeLoaded: PodcastEpisode, podcast: Podcast, showNotesState: ShowNotesState, downloadProgress: Float ->
@@ -246,7 +250,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     }
 
     fun shouldShowStreamingWarning(context: Context): Boolean {
-        return isPlaying.value == false && episode?.isDownloaded == false && settings.warnOnMeteredNetwork() && !Network.isUnmeteredConnection(context)
+        return isPlaying.value == false && episode?.isDownloaded == false && settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context)
     }
 
     fun playClickedGetShouldClose(
@@ -274,9 +278,9 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun starClicked() {
         episode?.let { episode ->
-            episodeManager.toggleStarEpisodeAsync(episode)
-            val event = if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
-            episodeAnalytics.trackEvent(event, source, episode.uuid)
+            viewModelScope.launch {
+                episodeManager.toggleStarEpisode(episode, source)
+            }
         }
     }
 

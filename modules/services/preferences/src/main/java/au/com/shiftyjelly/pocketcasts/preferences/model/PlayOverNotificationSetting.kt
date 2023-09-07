@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.preferences
+package au.com.shiftyjelly.pocketcasts.preferences.model
 
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR

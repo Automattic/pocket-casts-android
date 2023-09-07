@@ -687,7 +687,13 @@ class MainActivity :
                 updateNavAndStatusColors(true, state.podcast)
             }
 
-            if (viewModel.lastPlaybackState != null && (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) && settings.openPlayerAutomatically()) {
+            if (viewModel.lastPlaybackState != null &&
+                (
+                    viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid ||
+                        (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)
+                    ) &&
+                settings.openPlayerAutomatically.value
+            ) {
                 binding.playerBottomSheet.openPlayer()
             }
 
@@ -800,7 +806,7 @@ class MainActivity :
     private fun updatePlaybackState(state: PlaybackState) {
         binding.playerBottomSheet.setPlaybackState(state)
 
-        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake()) {
+        if ((state.isPlaying || state.isBuffering) && settings.keepScreenAwake.value) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -1425,11 +1431,17 @@ class MainActivity :
         val view = snackBarView()
         if (result == null) return
 
+        val snackbarMessage = if (result.isExistingBookmark) {
+            getString(LR.string.bookmark_updated, result.title)
+        } else {
+            getString(LR.string.bookmark_added, result.title)
+        }
+
         val action = View.OnClickListener {
             showPlayerBookmarks()
         }
 
-        Snackbar.make(view, getString(LR.string.bookmark_added, result.title), Snackbar.LENGTH_LONG)
+        Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(LR.string.settings_view, action)
             .setActionTextColor(result.tintColor)
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))

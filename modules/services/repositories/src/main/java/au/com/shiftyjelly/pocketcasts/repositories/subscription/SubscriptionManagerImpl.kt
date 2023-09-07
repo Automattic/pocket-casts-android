@@ -63,8 +63,8 @@ class SubscriptionManagerImpl @Inject constructor(
     AcknowledgePurchaseResponseListener {
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
-        get() = settings.getCachedSubscription()
-        set(value) = settings.setCachedSubscription(value)
+        get() = settings.cachedSubscriptionStatus.value
+        set(value) = settings.cachedSubscriptionStatus.set(value)
 
     private var subscriptionStatus = BehaviorRelay.create<Optional<SubscriptionStatus>>().apply {
         val cachedStatus = cachedSubscriptionStatus
@@ -349,7 +349,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 BillingFlowParams.newBuilder()
                     .setProductDetailsParamsList(productDetailsParamsList)
 
-            settings.getCachedSubscription()?.let { subscriptionStatus ->
+            settings.cachedSubscriptionStatus.value?.let { subscriptionStatus ->
                 if (
                     shouldAllowUpgradePlan(
                         subscribedPlanStatus = subscriptionStatus,

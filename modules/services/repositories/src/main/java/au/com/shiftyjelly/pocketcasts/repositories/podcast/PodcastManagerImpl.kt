@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -42,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
@@ -396,7 +396,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun findSubscribedSorted(): List<Podcast> {
-        val sortType = settings.getPodcastsSortType()
+        val sortType = settings.podcastsSortType.value
         // use a query to get the podcasts ordered by episode release date
         if (sortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
             return findPodcastsOrderByLatestEpisode(orderAsc = false)
@@ -560,12 +560,8 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateAllAutoDownloadStatus(autoDownloadStatus)
     }
 
-    override fun updateAllShowNotifications(showNotifications: Boolean) {
+    override suspend fun updateAllShowNotifications(showNotifications: Boolean) {
         podcastDao.updateAllShowNotifications(showNotifications)
-    }
-
-    override fun updateAllShowNotificationsRx(showNotifications: Boolean): Completable {
-        return Completable.fromAction { updateAllShowNotifications(showNotifications) }
     }
 
     override fun updateAutoDownloadStatus(podcast: Podcast, autoDownloadStatus: Int) {
@@ -627,6 +623,9 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
+        if (show) {
+            settings.notifyRefreshPodcast.set(true)
+        }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }
 
@@ -683,7 +682,9 @@ class PodcastManagerImpl @Inject constructor(
 
         val uuidToAdded = HashMap<String, Boolean>()
         for (episodeUuid in episodeUuidsAdded) {
-            val episode = episodeManager.findByUuid(episodeUuid) ?: continue
+            val episode = runBlocking {
+                episodeManager.findByUuid(episodeUuid)
+            } ?: continue
             val autoDownload = podcastUuidToAutoDownload[episode.podcastUuid]
             Timber.i(
                 "Auto download " + episode.title +
@@ -768,7 +769,7 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =
         podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 
-    override fun findRandomPodcasts(limit: Int): List<Podcast> {
+    override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
     }
 }

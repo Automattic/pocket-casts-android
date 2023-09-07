@@ -251,6 +251,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_STOP("playback_stop"),
     PLAYBACK_SEEK("playback_seek"),
     PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
+    PLAYBACK_EPISODE_DURATION_CHANGED("playback_episode_duration_changed"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
@@ -588,4 +589,7 @@ enum class AnalyticsEvent(val key: String) {
     WHATSNEW_SHOWN("whatsnew_shown"),
     WHATSNEW_DISMISSED("whatsnew_dismissed"),
     WHATSNEW_CONFIRM_BUTTON_TAPPED("whatsnew_confirm_button_tapped"),
+
+    /* App Store Review */
+    APP_STORE_REVIEW_REQUESTED("app_store_review_requested"),
 }

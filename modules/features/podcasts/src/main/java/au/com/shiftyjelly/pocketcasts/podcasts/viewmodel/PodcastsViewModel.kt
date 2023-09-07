@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -22,10 +22,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Flowable.combineLatest
-import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import java.util.Collections
 import java.util.Optional
@@ -84,7 +86,7 @@ class PodcastsViewModel
         // monitor the folder uuid
         folderUuidObservable.toFlowable(BackpressureStrategy.LATEST),
         // monitor the home folder sort order
-        settings.podcastSortTypeObservable.toFlowable(BackpressureStrategy.LATEST),
+        settings.podcastsSortType.flow.asObservable(coroutineContext).toFlowable(BackpressureStrategy.LATEST),
         // show folders for Plus users
         userManager.getSignInState()
     ) { podcasts, folders, folderUuidOptional, podcastSortOrder, signInState ->
@@ -166,18 +168,21 @@ class PodcastsViewModel
     }
 
     val podcastUuidToBadge: LiveData<Map<String, Int>> =
-        settings.podcastBadgeTypeObservable
+        settings.podcastBadgeType.flow
+            .asObservable(coroutineContext)
             .toFlowable(BackpressureStrategy.LATEST)
             .switchMap { badgeType ->
                 return@switchMap when (badgeType) {
-                    Settings.BadgeType.ALL_UNFINISHED -> episodeManager.getPodcastUuidToBadgeUnfinished()
-                    Settings.BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatest()
+                    BadgeType.ALL_UNFINISHED -> episodeManager.getPodcastUuidToBadgeUnfinished()
+                    BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatest()
                     else -> Flowable.just(emptyMap())
                 }
             }.toLiveData()
 
     // We only want the current badge type when loading for this observable or else it will rebind the adapter every time the badge changes. We use take(1) for this.
-    val layoutChangedLiveData = Observables.combineLatest(settings.podcastLayoutObservable, settings.podcastBadgeTypeObservable.take(1))
+    val layoutChangedLiveData = settings.podcastGridLayout.flow
+        .combine(settings.podcastBadgeType.flow.take(1), ::Pair)
+        .asObservable(coroutineContext)
         .toFlowable(BackpressureStrategy.LATEST)
         .toLiveData()
 
@@ -239,7 +244,7 @@ class PodcastsViewModel
 
         val folder = folder
         if (folder == null) {
-            settings.setPodcastsSortType(sortType = PodcastsSortType.DRAG_DROP, sync = true)
+            settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, needsSync = true)
         } else {
             folderManager.updateSortType(folderUuid = folder.uuid, podcastsSortType = PodcastsSortType.DRAG_DROP)
         }
@@ -260,9 +265,9 @@ class PodcastsViewModel
             val properties = HashMap<String, Any>()
             properties[NUMBER_OF_FOLDERS_KEY] = folderManager.countFolders()
             properties[NUMBER_OF_PODCASTS_KEY] = podcastManager.countSubscribed()
-            properties[BADGE_TYPE_KEY] = settings.getPodcastBadgeType().analyticsValue
-            properties[LAYOUT_KEY] = PodcastGridLayoutType.fromLayoutId(settings.getPodcastsLayout()).analyticsValue
-            properties[SORT_ORDER_KEY] = settings.getPodcastsSortType().analyticsValue
+            properties[BADGE_TYPE_KEY] = settings.podcastBadgeType.value.analyticsValue
+            properties[LAYOUT_KEY] = settings.podcastGridLayout.value.analyticsValue
+            properties[SORT_ORDER_KEY] = settings.podcastsSortType.value.analyticsValue
             analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
         }
     }

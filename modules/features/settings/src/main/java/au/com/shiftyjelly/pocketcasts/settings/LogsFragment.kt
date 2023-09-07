@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -51,6 +54,7 @@ class LogsFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         ComposeView(requireContext()).apply {
             setContent {
+                UiUtil.hideKeyboard(LocalView.current)
                 AppThemeWithBackground(theme.activeTheme) {
                     LogsPage(
                         onBackPressed = ::closeFragment
@@ -60,7 +64,12 @@ class LogsFragment : BaseFragment() {
         }
 
     private fun closeFragment() {
-        (activity as? FragmentHostListener)?.closeModal(this)
+        activity?.let {
+            when (it) {
+                is HelpActivity -> it.closeFragment(this)
+                is FragmentHostListener -> it.closeModal(this)
+            }
+        }
     }
 }
 
@@ -121,7 +130,9 @@ private fun LogsContent(
             if (logs == null) {
                 LoadingView()
             } else {
-                TextP60(logs)
+                SelectionContainer {
+                    TextP60(logs)
+                }
             }
         }
     }
