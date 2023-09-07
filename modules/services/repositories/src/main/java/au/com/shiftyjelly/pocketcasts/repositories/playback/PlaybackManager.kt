@@ -1823,7 +1823,7 @@ open class PlaybackManager @Inject constructor(
             episode.isAudio,
             episode.downloadUrl ?: "_",
             episode.uuid,
-            (episode as? PodcastEpisode)?.podcastUuid ?: "_",
+            (episode as? PodcastEpisode)?.podcastUuid ?: "User File",
         )
 
         player?.play(currentTimeMs)
