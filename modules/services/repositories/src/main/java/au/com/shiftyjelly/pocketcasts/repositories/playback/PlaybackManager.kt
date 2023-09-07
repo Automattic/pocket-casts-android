@@ -1454,20 +1454,22 @@ open class PlaybackManager @Inject constructor(
     private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         // make sure we have the most recent copy from the database
         val currentUpNextEpisode = upNextQueue.currentEpisode
-        val episode: BaseEpisode? = if (currentUpNextEpisode is PodcastEpisode) {
-            episodeManager.findByUuid(currentUpNextEpisode.uuid)
-        } else if (currentUpNextEpisode is UserEpisode) {
-            userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
-                .flatMap {
-                    if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                        userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
-                    } else {
-                        Maybe.just(it)
+        val episode: BaseEpisode? = when (currentUpNextEpisode) {
+            is PodcastEpisode -> episodeManager.findByUuid(currentUpNextEpisode.uuid)
+
+            is UserEpisode -> {
+                userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
+                    .flatMap {
+                        if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
+                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
+                        } else {
+                            Maybe.just(it)
+                        }
                     }
-                }
-                .awaitSingleOrNull()
-        } else {
-            null
+                    .awaitSingleOrNull()
+            }
+
+            else -> null
         }
 
         if (episode == null) {
@@ -1804,10 +1806,16 @@ open class PlaybackManager @Inject constructor(
 
         val currentTimeMs = resumptionHelper.adjustedStartTimeMsFor(episode)
         LogBuffer.i(
-            LogBuffer.TAG_PLAYBACK, "Play %.3f %s Player. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", currentTimeMs / 1000f,
-            player?.name
-                ?: "",
-            episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid
+            LogBuffer.TAG_PLAYBACK, "Play %.3f %s Player. %s Downloaded: %b, Downloading: %b, Audio: %b, File: %s, EpisodeUuid: %s, PodcastUuid: %s",
+            currentTimeMs / 1000f,
+            player?.name ?: "_",
+            episode.title,
+            episode.isDownloaded,
+            episode.isDownloading,
+            episode.isAudio,
+            episode.downloadUrl ?: "_",
+            episode.uuid,
+            (episode as? PodcastEpisode)?.podcastUuid ?: "User File",
         )
 
         player?.play(currentTimeMs)

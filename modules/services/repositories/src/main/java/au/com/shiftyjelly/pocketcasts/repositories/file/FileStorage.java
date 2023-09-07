@@ -322,7 +322,8 @@ public class FileStorage {
 							if (fileName.length() < 36) {
 								continue;
 							}
-							PodcastEpisode episode = episodeManager.findByUuid(fileName);
+							//noinspection deprecation
+							PodcastEpisode episode = episodeManager.findByUuidSync(fileName);
 							if (episode != null) {
 								// Delete the original file if it is already there
 								if (!StringUtil.isBlank(episode.getDownloadedFilePath())) {
@@ -438,7 +439,8 @@ public class FileStorage {
 					if (uuid.length() != 36) {
 						continue;
 					}
-					PodcastEpisode episode = episodeManager.findByUuid(uuid);
+					//noinspection deprecation
+					PodcastEpisode episode = episodeManager.findByUuidSync(uuid);
 					if (episode != null) {
 						if (episode.getDownloadedFilePath() != null && new File(episode.getDownloadedFilePath()).exists() && episode.isDownloaded()) {
 							// skip as the episode download already exists
