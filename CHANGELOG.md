@@ -13,8 +13,6 @@
 *   Updates:
     *   Enable copying logs from in-app logs viewer
         ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
-    *   Present toast notification when duration of an in-progress episode changes
-        ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
     *   Present app review prompt 
         ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
     *   Updated storage limit title
