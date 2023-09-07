@@ -1814,10 +1814,16 @@ open class PlaybackManager @Inject constructor(
 
         val currentTimeMs = resumptionHelper.adjustedStartTimeMsFor(episode)
         LogBuffer.i(
-            LogBuffer.TAG_PLAYBACK, "Play %.3f %s Player. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", currentTimeMs / 1000f,
-            player?.name
-                ?: "",
-            episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid
+            LogBuffer.TAG_PLAYBACK, "Play %.3f %s Player. %s Downloaded: %b, Downloading: %b, Audio: %b, File: %s, EpisodeUuid: %s, PodcastUuid: %s",
+            currentTimeMs / 1000f,
+            player?.name ?: "_",
+            episode.title,
+            episode.isDownloaded,
+            episode.isDownloading,
+            episode.isAudio,
+            episode.downloadUrl ?: "_",
+            episode.uuid,
+            (episode as? PodcastEpisode)?.podcastUuid ?: "User File",
         )
 
         player?.play(currentTimeMs)
