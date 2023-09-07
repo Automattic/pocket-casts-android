@@ -1112,7 +1112,12 @@ open class PlaybackManager @Inject constructor(
 
             // auto archive after playing
             if (episode is PodcastEpisode) {
-                episodeManager.archivePlayedEpisode(episode, this, podcastManager, sync = true)
+                episodeManager.archivePlayedEpisode(
+                    episode = episode,
+                    playbackManager = this,
+                    podcastManager = podcastManager,
+                    sync = true,
+                )
             } else if (episode is UserEpisode) {
                 userEpisodeManager.deletePlayedEpisodeIfReq(episode, this)
             }
