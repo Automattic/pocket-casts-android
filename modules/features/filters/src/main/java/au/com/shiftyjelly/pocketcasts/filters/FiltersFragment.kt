@@ -135,7 +135,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             runBlocking {
                 val playlistUUID = settings.selectedFilter() ?: return@runBlocking
                 lastFilterUuidShown = playlistUUID
-                val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) } ?: return@runBlocking
+                val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuidSync(playlistUUID) } ?: return@runBlocking
                 openPlaylist(playlist, isNewFilter = false)
             }
         } else if (!viewModel.isFragmentChangingConfigurations) {

@@ -93,7 +93,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     fun deletePlaylist() {
         launch {
-            withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) }?.let { playlist ->
+            withContext(Dispatchers.Default) { playlistManager.findByUuidSync(playlistUUID) }?.let { playlist ->
                 playlistManager.delete(playlist)
                 analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }

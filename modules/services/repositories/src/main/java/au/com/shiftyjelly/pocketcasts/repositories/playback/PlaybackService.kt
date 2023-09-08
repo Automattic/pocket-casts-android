@@ -506,7 +506,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         // user tapped on a playlist or podcast, show the episodes
         val episodeItems = ArrayList<MediaBrowserCompat.MediaItem>()
 
-        val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuid(parentId)
+        val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidSync(parentId)
         if (playlist != null) {
             val episodeList = if (DOWNLOADS_ROOT == parentId) episodeManager.observeDownloadedEpisodes().blockingFirst() else playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
             val topEpisodes = episodeList.take(EPISODE_LIMIT)

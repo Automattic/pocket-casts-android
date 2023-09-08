@@ -123,7 +123,7 @@ class PlaylistManagerImpl @Inject constructor(
         return playlistDao.observeAll()
     }
 
-    override fun findByUuid(playlistUuid: String): Playlist? {
+    override fun findByUuidSync(playlistUuid: String): Playlist? {
         return playlistDao.findByUUID(playlistUuid)
     }
 

@@ -175,7 +175,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         val recyclerView = binding.recyclerView
 
         launch {
-            val playlist = async(Dispatchers.Default) { playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) }.await()!!
+            val playlist = async(Dispatchers.Default) { playlistManager.findByUuidSync(requireArguments().getString(ARG_PLAYLIST_UUID)!!) }.await()!!
             this@TimeOptionsFragment.playlist = playlist
 
             selectedPosition = when (optionType) {
