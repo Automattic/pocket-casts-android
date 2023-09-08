@@ -1,6 +1,10 @@
 7.48
 -----
 
+*   New Feature:
+    *   Suggest episodes to play in Automotive
+        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
+
 7.47
 -----
 
