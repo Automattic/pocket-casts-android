@@ -51,7 +51,9 @@ fun ChapterRow(
     modifier: Modifier = Modifier,
 ) {
     val chapter = state.chapter
-    val textColor = if (state.isPlayed) MaterialTheme.theme.colors.playerContrast04 else MaterialTheme.theme.colors.playerContrast01
+    val textColor =
+        if (state is ChaptersViewModel.ChapterState.Played) MaterialTheme.theme.colors.playerContrast04
+        else MaterialTheme.theme.colors.playerContrast01
     Box(
         modifier = modifier
             // use intrinsic height so the progress bar fills the height of the row
@@ -59,7 +61,7 @@ fun ChapterRow(
             .padding(horizontal = 8.dp)
             .clip(RoundedCornerShape(8.dp))
     ) {
-        if (state.isPlaying) {
+        if (state is ChaptersViewModel.ChapterState.Playing) {
             ChapterProgressBar(progress = state.progress)
         }
         Row(
@@ -151,17 +153,17 @@ fun ChapterRowPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         Column {
             ChapterRow(
-                state = ChaptersViewModel.ChapterState(chapter = chapter, isPlayed = true, isPlaying = false),
+                state = ChaptersViewModel.ChapterState.Played(chapter = chapter),
                 onClick = {},
                 onUrlClick = {}
             )
             ChapterRow(
-                state = ChaptersViewModel.ChapterState(chapter = chapter, isPlayed = false, isPlaying = true, progress = 0.5f),
+                state = ChaptersViewModel.ChapterState.Playing(chapter = chapter, progress = 0.5f),
                 onClick = {},
                 onUrlClick = {}
             )
             ChapterRow(
-                state = ChaptersViewModel.ChapterState(chapter = chapter, isPlayed = false, isPlaying = false),
+                state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter),
                 onClick = {},
                 onUrlClick = {}
             )

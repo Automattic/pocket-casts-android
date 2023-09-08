@@ -35,7 +35,7 @@ fun ChaptersPage(
         itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->
             ChapterRow(
                 state = state,
-                onClick = { onChapterClick(state.chapter, state.isPlaying) },
+                onClick = { onChapterClick(state.chapter, state is ChaptersViewModel.ChapterState.Playing) },
                 onUrlClick = { onUrlClick(state.chapter.url.toString()) },
             )
             if (index <= itemsList.lastIndex) {

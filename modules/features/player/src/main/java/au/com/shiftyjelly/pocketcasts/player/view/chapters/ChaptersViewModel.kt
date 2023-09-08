@@ -17,6 +17,8 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -38,12 +40,18 @@ class ChaptersViewModel
         val backgroundColor: Color
     )
 
-    data class ChapterState(
-        val chapter: Chapter,
-        val isPlayed: Boolean,
-        val isPlaying: Boolean,
-        val progress: Float = 0f
-    )
+    sealed class ChapterState(val chapter: Chapter) {
+        class Played(chapter: Chapter) : ChapterState(chapter)
+        class Playing(val progress: Float, chapter: Chapter) : ChapterState(chapter)
+        class NotPlayed(chapter: Chapter) : ChapterState(chapter)
+    }
+
+    private val _scrollToChapterState = MutableStateFlow<Chapter?>(null)
+    val scrollToChapterState = _scrollToChapterState.asStateFlow()
+
+    fun setScrollToChapter(chapter: Chapter?) {
+        _scrollToChapterState.value = chapter
+    }
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
@@ -92,15 +100,15 @@ class ChaptersViewModel
         for (chapter in chapterList) {
             val chapterState = if (currentChapter != null) {
                 // a chapter that hasn't been played
-                ChapterState(chapter = chapter, isPlayed = false, isPlaying = false)
+                ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
                 // the chapter currently playing
                 currentChapter = chapter
                 val progress = if (chapter.duration <= 0) 0f else ((playbackPositionMs - chapter.startTime) / chapter.duration.toFloat())
-                ChapterState(chapter = chapter, isPlayed = false, isPlaying = true, progress = progress)
+                ChapterState.Playing(chapter = chapter, progress = progress)
             } else {
                 // a chapter that has been played
-                ChapterState(chapter = chapter, isPlayed = true, isPlaying = false)
+                ChapterState.Played(chapter)
             }
             chapters.add(chapterState)
         }

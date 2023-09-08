@@ -24,10 +24,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -59,6 +61,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val chaptersViewModel: ChaptersViewModel by activityViewModels()
     private var binding: FragmentPlayerContainerBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -228,8 +231,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         if (index == -1) {
             return
         }
-        viewModel.scrollToChapter(chapter)
         binding?.viewPager?.currentItem = index
+
+        // tapping on the chapter title on the now playing screen should scroll to that chapter when the fragment is available
+        chaptersViewModel.setScrollToChapter(chapter)
     }
 
     fun updateUpNextVisibility(show: Boolean) {

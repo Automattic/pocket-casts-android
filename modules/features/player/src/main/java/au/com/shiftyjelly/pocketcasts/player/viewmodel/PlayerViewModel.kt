@@ -614,25 +614,4 @@ class PlayerViewModel @Inject constructor(
     fun previousChapter() {
         playbackManager.skipToPreviousChapter()
     }
-
-    // taping on the chapter title on the now playing screen should scroll to that chapter when the fragment is available
-    var scrollToChapterListener: ((Chapter) -> Unit)? = null
-        set(value) {
-            val chapter = cacheScrollToChapter
-            if (chapter != null) {
-                value?.invoke(chapter)
-                cacheScrollToChapter = null
-            }
-            field = value
-        }
-
-    private var cacheScrollToChapter: Chapter? = null
-
-    fun scrollToChapter(chapter: Chapter) {
-        if (scrollToChapterListener == null) {
-            cacheScrollToChapter = chapter
-        } else {
-            scrollToChapterListener?.invoke(chapter)
-        }
-    }
 }
