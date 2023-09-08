@@ -8,13 +8,23 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
+import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerNotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +36,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
+import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeoutException
 
@@ -34,13 +45,11 @@ class PlaybackServiceTest {
     @get:Rule
     val serviceRule = ServiceTestRule()
 
-    @Test
-    @Throws(TimeoutException::class)
-    fun testPlaybackServiceEntersAndExitsForeground() {
-        val application = ApplicationProvider.getApplicationContext<PocketCastsApplication>()
-        val testScheduler = SchedulerProvider.testScheduler
+    private lateinit var service: PlaybackService
 
-        // Create the service Intent.
+    @Before
+    fun setup() {
+        val application = ApplicationProvider.getApplicationContext<PocketCastsApplication>()
         val serviceIntent = Intent(
             application,
             PlaybackService::class.java
@@ -48,10 +57,75 @@ class PlaybackServiceTest {
 
         // Bind the service and grab a reference to the binder.
         val binder: IBinder = serviceRule.bindService(serviceIntent)
-
         // Get the reference to the service, or you can call
         // public methods on the binder directly.
-        val service: PlaybackService = (binder as PlaybackService.LocalBinder).service
+        service = (binder as PlaybackService.LocalBinder).service
+    }
+
+    @Test
+    fun testLoadSuggestedAndRecent() {
+        val podcastOne = Podcast(
+            uuid = UUID.randomUUID().toString(),
+        )
+        val podcastTwo = Podcast(
+            uuid = UUID.randomUUID().toString(),
+        )
+        val upNextCurrentEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 1")
+        val upNextEpisodes = listOf(
+            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 2"),
+            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3")
+        )
+        val filter = Playlist(uuid = UUID.randomUUID().toString(), title = "New Releases")
+        val filters = listOf(filter)
+        val filterEpisodes = listOf(
+            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4"),
+            // use the same episode in the filter so we can test duplicates aren't used
+            upNextEpisodes.last()
+        )
+        val latestEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 5")
+
+        val upNextQueue = mock<UpNextQueue> {
+            on { currentEpisode }.doReturn(upNextCurrentEpisode)
+            on { queueEpisodes }.doReturn(upNextEpisodes)
+        }
+        service.upNextQueue = upNextQueue
+        val podcastManager = mock<PodcastManager> {
+            onBlocking { findPodcastByUuidSuspend(podcastOne.uuid) }.doReturn(podcastOne)
+            onBlocking { findPodcastByUuidSuspend(podcastTwo.uuid) }.doReturn(podcastTwo)
+        }
+        service.podcastManager = podcastManager
+        val episodeManager = mock<EpisodeManager> {
+            on { findEpisodesWhere(any(), any()) }.doReturn(filterEpisodes)
+            onBlocking { findLatestEpisodeToPlay() }.doReturn(latestEpisode)
+        }
+        service.episodeManager = episodeManager
+        val playlistManager = mock<PlaylistManager> {
+            onBlocking { findAllSuspend() }.doReturn(filters)
+            onBlocking { findByUuid(filter.uuid) }.doReturn(filter)
+            on { findEpisodes(playlist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
+        }
+        service.playlistManager = playlistManager
+
+        runTest {
+            val mediaItems = service.loadSuggestedChildren()
+            assertEquals(5, mediaItems.size)
+            assertEquals("${podcastOne.uuid}#${upNextCurrentEpisode.uuid}", mediaItems[0].mediaId)
+            assertEquals("${podcastTwo.uuid}#${upNextEpisodes[0].uuid}", mediaItems[1].mediaId)
+            assertEquals("${podcastOne.uuid}#${upNextEpisodes[1].uuid}", mediaItems[2].mediaId)
+            assertEquals("${podcastOne.uuid}#${filterEpisodes[0].uuid}", mediaItems[3].mediaId)
+            assertEquals("${podcastTwo.uuid}#${latestEpisode.uuid}", mediaItems[4].mediaId)
+
+            val recentMediaItems = service.loadRecentChildren()
+            assertEquals(1, recentMediaItems.size)
+            assertEquals("${podcastOne.uuid}#${upNextCurrentEpisode.uuid}", recentMediaItems[0].mediaId)
+        }
+    }
+
+    @Test
+    @Throws(TimeoutException::class)
+    fun testPlaybackServiceEntersAndExitsForeground() {
+        val testScheduler = SchedulerProvider.testScheduler
+
         val testNotificationManager = mock<PlayerNotificationManager> { }
         val testNotificationHelper = mock<NotificationHelper> {
             on { isShowing(any()) }.doReturn(true)
