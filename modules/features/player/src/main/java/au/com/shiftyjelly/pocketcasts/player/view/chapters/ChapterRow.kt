@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -90,13 +92,15 @@ fun ChapterRow(
                     textColor = textColor,
                     onClick = onUrlClick
                 )
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(8.dp))
             }
             val context = LocalContext.current
             val duration = remember(chapter.duration) { TimeHelper.getTimeDurationMediumString(chapter.duration, context, "") }
             TextH50(
                 text = duration,
-                color = textColor
+                color = textColor,
+                textAlign = TextAlign.End,
+                modifier = Modifier.widthIn(min = 60.dp)
             )
         }
     }
