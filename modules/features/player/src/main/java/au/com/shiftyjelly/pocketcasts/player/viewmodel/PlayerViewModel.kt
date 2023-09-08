@@ -153,14 +153,12 @@ class PlayerViewModel @Inject constructor(
     data class ListData(
         var podcastHeader: PlayerHeader,
         var chaptersExpanded: Boolean,
-        var chapters: List<Chapter>,
+        var chapters: Chapters,
         var currentChapter: Chapter?,
         var upNextExpanded: Boolean,
         var upNextEpisodes: List<BaseEpisode>,
         var upNextSummary: UpNextSummary,
-    ) {
-        fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
-    }
+    )
     private val source = SourceView.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
@@ -375,8 +373,7 @@ class PlayerViewModel @Inject constructor(
                 theme = theme.activeTheme
             )
         }
-        // copy the chapter so the diff can see the differences
-        val chapters = playbackState.chapters.getListWithState(playbackState.positionMs).map { it.copy() }
+        val chapters = playbackState.chapters
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs)
 
         var episodeCount = 0
@@ -617,16 +614,5 @@ class PlayerViewModel @Inject constructor(
 
     fun previousChapter() {
         playbackManager.skipToPreviousChapter()
-    }
-
-    fun onChapterClick(chapter: Chapter) {
-        launch {
-            val listData = listDataLive.value
-            if (listData?.isSameChapter(chapter) == true) {
-                _showPlayerFlow.emit(Unit)
-            } else {
-                playbackManager.skipToChapter(chapter)
-            }
-        }
     }
 }
