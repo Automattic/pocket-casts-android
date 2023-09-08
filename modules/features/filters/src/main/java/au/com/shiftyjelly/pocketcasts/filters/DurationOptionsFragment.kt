@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -102,7 +101,7 @@ class DurationOptionsFragment : BaseFragment() {
         val btnClose = binding.btnClose
 
         launch {
-            val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) } ?: return@launch
+            val playlist = playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
             this@DurationOptionsFragment.playlist = playlist
 
             enableDurations(playlist.filterDuration)

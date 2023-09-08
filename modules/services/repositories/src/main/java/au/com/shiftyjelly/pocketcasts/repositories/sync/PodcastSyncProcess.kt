@@ -670,7 +670,7 @@ class PodcastSyncProcess(
                 return@fromCallable null
             }
 
-            var playlist = playlistManager.findByUuid(uuid)
+            var playlist = playlistManager.findByUuidSync(uuid)
             if (sync.deleted) {
                 playlist?.let { playlistManager.deleteSynced(it) }
                 return@fromCallable null
