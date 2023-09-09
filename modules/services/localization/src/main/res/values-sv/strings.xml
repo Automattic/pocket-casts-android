@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 14:54:03+0000
+Translation-Revision-Date: 2023-08-22 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="go_to_bottom">Gå till botten</string>
+    <string name="go_to_top">Gå till toppen</string>
     <string name="support">Support</string>
     <string name="bookmark_notification_action_change_title">Ändra rubrik</string>
     <string name="bookmark_notification_content_tap_to_view">Tryck för att visa</string>
@@ -1410,7 +1412,6 @@ Language: sv_SE
     <string name="player_time_saved_detail">Sammanlagt har du sparat %s genom att använda den här funktionen.</string>
     <string name="player_tab_playing_wide">Spelar nu upp</string>
     <string name="player_tab_playing">Spelar</string>
-    <string name="player_tab_notes">Noteringar</string>
     <string name="player_sleep_when_episode_ends">Sova när avsnittet slutar</string>
     <string name="player_sleep_timer">Sömntimer</string>
     <string name="player_sleep_timer_title">Sömntimer</string>

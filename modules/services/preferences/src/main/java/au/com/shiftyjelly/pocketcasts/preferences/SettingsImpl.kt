@@ -967,7 +967,7 @@ class SettingsImpl @Inject constructor(
         sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
         sharedPrefs = sharedPreferences,
 
-    )
+        )
 
     override val cloudAutoUpload = UserSetting.BoolPref(
         sharedPrefKey = "cloudAutoUpload",
@@ -1279,4 +1279,13 @@ class SettingsImpl @Inject constructor(
         defaultValue = BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST,
         sharedPrefs = sharedPreferences,
     )
+
+    override fun addReviewRequestedDate() {
+        val dates = getReviewRequestedDates().toMutableList()
+        dates.add(Date().toString())
+        sharedPreferences.edit().putStringSet(Settings.APP_REVIEW_REQUESTED_DATES, dates.toSet()).apply()
+    }
+    override fun getReviewRequestedDates(): List<String> {
+        return sharedPreferences.getStringSet(Settings.APP_REVIEW_REQUESTED_DATES, emptySet())?.toList() ?: emptyList()
+    }
 }

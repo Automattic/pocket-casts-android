@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -99,7 +100,12 @@ fun SettingsFragmentPage(
             if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
                 HeadphoneControlsRow(onClick = { openFragment(HeadphoneControlsSettingsFragment()) })
             }
-            HelpAndFeedbackRow(onClick = { openFragment(HelpFragment()) })
+            HelpAndFeedbackRow(
+                onClick = {
+                    val intent = Intent(context, HelpActivity::class.java)
+                    context.startActivity(intent)
+                }
+            )
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
             AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
             PrivacyRow(onClick = { openFragment(PrivacyFragment()) })

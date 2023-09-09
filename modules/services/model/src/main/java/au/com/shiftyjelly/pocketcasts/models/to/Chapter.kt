@@ -8,8 +8,6 @@ data class Chapter(
     val url: HttpUrl?,
     var startTime: Int,
     var endTime: Int,
-    val startOffset: Long,
-    val endOffset: Long,
     val imagePath: String?,
     val mimeType: String?,
     var played: Boolean = false,
@@ -23,7 +21,7 @@ data class Chapter(
     val isValid: Boolean
         get() = startTime >= 0 && endTime > 0
 
-    val lengthTime: Int
+    val duration: Int
         get() = endTime - startTime
 
     fun containsTime(time: Int): Boolean {

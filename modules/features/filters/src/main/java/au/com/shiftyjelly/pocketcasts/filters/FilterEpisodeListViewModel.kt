@@ -28,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -93,7 +92,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     fun deletePlaylist() {
         launch {
-            withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) }?.let { playlist ->
+            playlistManager.findByUuid(playlistUUID)?.let { playlist ->
                 playlistManager.delete(playlist)
                 analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }

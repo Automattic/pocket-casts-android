@@ -589,4 +589,7 @@ enum class AnalyticsEvent(val key: String) {
     WHATSNEW_SHOWN("whatsnew_shown"),
     WHATSNEW_DISMISSED("whatsnew_dismissed"),
     WHATSNEW_CONFIRM_BUTTON_TAPPED("whatsnew_confirm_button_tapped"),
+
+    /* App Store Review */
+    APP_STORE_REVIEW_REQUESTED("app_store_review_requested"),
 }

@@ -214,7 +214,10 @@ class DiscoverViewModel @Inject constructor(
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
         podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
-            .flatMapMaybe { episodeManager.findByUuidRx(discoverEpisode.uuid) }
+            .flatMapMaybe {
+                @Suppress("DEPRECATION")
+                episodeManager.findByUuidRx(discoverEpisode.uuid)
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

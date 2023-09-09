@@ -39,10 +39,10 @@ abstract class EpisodeDao {
     abstract fun observeCount(query: SupportSQLiteQuery): Flowable<Int>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuid(uuid: String): PodcastEpisode?
+    abstract fun findByUuidSync(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
+    abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
@@ -60,7 +60,7 @@ abstract class EpisodeDao {
     abstract fun findByUuids(uuids: List<String>): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
-    abstract fun findFirstBySearchQuery(query: String): PodcastEpisode?
+    abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_sync_status <> 1 AND last_playback_interaction_date IS NOT NULL ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun findEpisodesForHistorySync(): List<PodcastEpisode>
@@ -201,7 +201,7 @@ abstract class EpisodeDao {
     abstract fun updateDownloadedFilePath(downloadedFilePath: String, uuid: String)
 
     @Query("UPDATE podcast_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
-    abstract fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
+    abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
 
     @Query("UPDATE podcast_episodes SET thumbnail_status = :thumbnailStatus WHERE uuid = :uuid")
     abstract fun updateThumbnailStatus(thumbnailStatus: Int, uuid: String)
@@ -213,7 +213,7 @@ abstract class EpisodeDao {
     abstract fun updateDownloadErrorDetails(downloadErrorDetails: String?, uuid: String)
 
     @Query("UPDATE podcast_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract fun updateEpisodeStatus(episodeStatus: EpisodeStatusEnum, uuid: String)
+    abstract suspend fun updateEpisodeStatus(episodeStatus: EpisodeStatusEnum, uuid: String)
 
     @Query("UPDATE podcast_episodes SET episode_status = :episodeStatus")
     abstract fun updateAllEpisodeStatus(episodeStatus: EpisodeStatusEnum)
@@ -262,7 +262,7 @@ abstract class EpisodeDao {
     abstract fun findLatestEpisodeToPlay(): PodcastEpisode?
 
     @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid = :uuid")
-    abstract fun updateStarred(starred: Boolean, modified: Long, uuid: String)
+    abstract suspend fun updateStarred(starred: Boolean, modified: Long, uuid: String)
 
     @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun updateAllStarred(episodesUUIDs: List<String>, starred: Boolean, modified: Long)
@@ -304,7 +304,7 @@ abstract class EpisodeDao {
     abstract fun findInactiveEpisodes(podcastUuid: String, inactiveDate: Date, inactiveTime: Long = inactiveDate.time): List<PodcastEpisode>
 
     @Query("UPDATE podcast_episodes SET archived = 1, archived_modified = :modified, last_archive_interaction_date = :modified WHERE uuid IN (:episodesUUIDs)")
-    abstract fun archiveAllInList(episodesUUIDs: List<String>, modified: Long)
+    abstract suspend fun archiveAllInList(episodesUUIDs: List<String>, modified: Long)
 
     @Query("UPDATE podcast_episodes SET archived = 0, archived_modified = :modified, last_archive_interaction_date = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract fun unarchiveAllInList(episodesUUIDs: List<String>, modified: Long)

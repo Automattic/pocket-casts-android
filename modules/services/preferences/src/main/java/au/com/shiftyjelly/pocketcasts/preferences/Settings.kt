@@ -110,6 +110,8 @@ interface Settings {
         const val LOG_TAG_AUTO = "PocketCastsAuto"
 
         const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
+
+        const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -410,4 +412,7 @@ interface Settings {
     val episodeBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val playerBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val podcastBookmarksSortType: UserSetting<BookmarksSortTypeForPodcast>
+
+    fun addReviewRequestedDate()
+    fun getReviewRequestedDates(): List<String>
 }

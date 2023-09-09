@@ -136,7 +136,7 @@ open class PlaybackManager @Inject constructor(
         const val ENABLED_KEY = "enabled"
     }
 
-    private lateinit var notificationPermissionChecker: NotificationPermissionChecker
+    private var notificationPermissionChecker: NotificationPermissionChecker? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -457,6 +457,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
+            SourceView.STATS,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -1293,20 +1294,12 @@ open class PlaybackManager @Inject constructor(
 
         val durationDiffSeconds = (durationMs - episode.durationMs) / 1000
         if (abs(durationDiffSeconds) > 0) {
-            val notifyUser = abs(durationDiffSeconds) > 30
-            if (notifyUser) {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed significantly ($durationDiffSeconds seconds)")
-                launch(Dispatchers.Main) {
-                    val message = application.getString(LR.string.episode_duration_change, durationDiffSeconds)
-                    Toast.makeText(application, message, Toast.LENGTH_LONG).show()
-                }
-            }
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "The total episode duration has changed by $durationDiffSeconds seconds")
             analyticsTracker.track(
                 AnalyticsEvent.PLAYBACK_EPISODE_DURATION_CHANGED,
                 mapOf(
                     "duration_change" to durationDiffSeconds,
                     "duration" to durationMs / 1000,
-                    "notified_user" to notifyUser,
                     "is_user_file" to (episode is UserEpisode),
                     "is_downloaded" to episode.isDownloaded,
                     "episode_uuid" to episode.uuid,
@@ -1461,20 +1454,22 @@ open class PlaybackManager @Inject constructor(
     private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         // make sure we have the most recent copy from the database
         val currentUpNextEpisode = upNextQueue.currentEpisode
-        val episode: BaseEpisode? = if (currentUpNextEpisode is PodcastEpisode) {
-            episodeManager.findByUuid(currentUpNextEpisode.uuid)
-        } else if (currentUpNextEpisode is UserEpisode) {
-            userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
-                .flatMap {
-                    if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                        userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
-                    } else {
-                        Maybe.just(it)
+        val episode: BaseEpisode? = when (currentUpNextEpisode) {
+            is PodcastEpisode -> episodeManager.findByUuid(currentUpNextEpisode.uuid)
+
+            is UserEpisode -> {
+                userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
+                    .flatMap {
+                        if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
+                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
+                        } else {
+                            Maybe.just(it)
+                        }
                     }
-                }
-                .awaitSingleOrNull()
-        } else {
-            null
+                    .awaitSingleOrNull()
+            }
+
+            else -> null
         }
 
         if (episode == null) {
@@ -1745,12 +1740,22 @@ open class PlaybackManager @Inject constructor(
             notification.sound = sound
         }
 
-        notificationPermissionChecker.checkNotificationPermission {
-            manager.notify(
-                notificationTag,
-                NotificationBroadcastReceiver.NOTIFICATION_ID,
-                notification
-            )
+        try {
+            notificationPermissionChecker?.let {
+                Timber.i("Checking notification permission")
+                it.checkNotificationPermission {
+                    manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+                }
+            } ?: run {
+                val message = "notificationPermissionChecker was null (this should never happen)"
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
+                Sentry.addBreadcrumb(message)
+                manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
+        } catch (e: Exception) {
+            val message = "Could not post notification ${e.message}"
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
+            SentryHelper.recordException(message, e)
         }
     }
 
@@ -1801,10 +1806,16 @@ open class PlaybackManager @Inject constructor(
 
         val currentTimeMs = resumptionHelper.adjustedStartTimeMsFor(episode)
         LogBuffer.i(
-            LogBuffer.TAG_PLAYBACK, "Play %.3f %s Player. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", currentTimeMs / 1000f,
-            player?.name
-                ?: "",
-            episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid
+            LogBuffer.TAG_PLAYBACK, "Play %.3f %s Player. %s Downloaded: %b, Downloading: %b, Audio: %b, File: %s, EpisodeUuid: %s, PodcastUuid: %s",
+            currentTimeMs / 1000f,
+            player?.name ?: "_",
+            episode.title,
+            episode.isDownloaded,
+            episode.isDownloading,
+            episode.isAudio,
+            episode.downloadUrl ?: "_",
+            episode.uuid,
+            (episode as? PodcastEpisode)?.podcastUuid ?: "User File",
         )
 
         player?.play(currentTimeMs)
