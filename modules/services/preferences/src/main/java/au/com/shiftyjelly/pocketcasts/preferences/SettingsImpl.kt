@@ -967,7 +967,7 @@ class SettingsImpl @Inject constructor(
         sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
         sharedPrefs = sharedPreferences,
 
-        )
+    )
 
     override val cloudAutoUpload = UserSetting.BoolPref(
         sharedPrefKey = "cloudAutoUpload",
