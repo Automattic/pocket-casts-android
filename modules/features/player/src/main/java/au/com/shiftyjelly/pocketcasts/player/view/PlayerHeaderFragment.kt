@@ -23,9 +23,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
@@ -480,8 +478,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     fun onAddBookmarkClick() {
-        val userTier = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-        if (Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)) {
+        if (Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
             viewModel.buildBookmarkArguments { arguments ->
                 activityLauncher.launch(arguments.getIntent(requireContext()))
             }

@@ -10,9 +10,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureWrapper
-import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -83,8 +81,7 @@ class BookmarksViewModel
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
             userManager.getSignInState().asFlow().collectLatest {
-                val userTier = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                if (!feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)) {
+                if (!feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
                     _uiState.value = UiState.Upsell(sourceView)
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
