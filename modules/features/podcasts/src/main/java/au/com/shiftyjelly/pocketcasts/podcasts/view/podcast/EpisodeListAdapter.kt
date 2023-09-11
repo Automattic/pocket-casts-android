@@ -113,10 +113,7 @@ class EpisodeListAdapter(
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
             disposables = disposables,
-            podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
-                podcastUuid = episode.podcastUuid,
-                sortType = settings.getBookmarksSortTypeForPodcast()
-            ).asObservable()
+            bookmarksObservable = bookmarkManager.findBookmarksFlow().asObservable()
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
