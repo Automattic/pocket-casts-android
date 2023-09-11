@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
@@ -115,7 +118,18 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     data class UiState(
         val isAddBookmarkEnabled: Boolean = false,
         val startUpsellFromSource: UpsellSourceAction? = null,
-    )
+    ) {
+        val addBookmarkIconId = when (Feature.BOOKMARKS_ENABLED.tier) {
+            FeatureTier.Patron -> R.drawable.ic_patron
+            is FeatureTier.Plus -> R.drawable.ic_plus
+            FeatureTier.Free -> null
+        }
+        val addBookmarkIconColor = when (Feature.BOOKMARKS_ENABLED.tier) {
+            FeatureTier.Patron -> UR.color.patron_purple
+            is FeatureTier.Plus -> UR.color.plus_gold
+            FeatureTier.Free -> UR.color.black
+        }
+    }
 
     enum class UpsellSourceAction {
         PREVIOUS,
