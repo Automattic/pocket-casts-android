@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -1124,7 +1123,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
+                if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
                     observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->

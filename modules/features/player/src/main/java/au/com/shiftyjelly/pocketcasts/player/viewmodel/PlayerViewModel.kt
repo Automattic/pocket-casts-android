@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -274,7 +273,7 @@ class PlayerViewModel @Inject constructor(
             if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
             } else {
-                Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
+                Flowable.just(Podcast.userPodcast.copy(overrideGlobalEffects = false))
             }
         }
         .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.globalPlaybackEffects.value) }
