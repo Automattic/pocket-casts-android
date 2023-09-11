@@ -46,18 +46,34 @@ class FeatureTest {
 
     @Test
     fun `patron can use features that default to true`() {
-        val feature = mock<Feature> {
-            on { defaultValue } doReturn true
+        listOf(
+            FeatureTier.Free,
+            FeatureTier.Plus(null),
+            FeatureTier.Patron,
+        ).forEach { featureTier ->
+
+            val feature = mock<Feature> {
+                on { defaultValue } doReturn true
+                on { tier } doReturn featureTier
+            }
+            assertTrue("$featureTier", Feature.isAvailable(feature, UserTier.Patron))
         }
-        assertTrue(Feature.isAvailable(feature, UserTier.Patron))
     }
 
     @Test
     fun `patron cannot use features that default to false`() {
-        val feature = mock<Feature> {
-            on { defaultValue } doReturn false
+        listOf(
+            FeatureTier.Free,
+            FeatureTier.Plus(null),
+            FeatureTier.Patron,
+        ).forEach { featureTier ->
+
+            val feature = mock<Feature> {
+                on { defaultValue } doReturn false
+                on { tier } doReturn featureTier
+            }
+            assertFalse("$featureTier", Feature.isAvailable(feature, UserTier.Patron))
         }
-        assertFalse(Feature.isAvailable(feature, UserTier.Patron))
     }
 
     /*
