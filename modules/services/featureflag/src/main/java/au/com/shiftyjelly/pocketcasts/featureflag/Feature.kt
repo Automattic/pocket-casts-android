@@ -50,8 +50,10 @@ enum class Feature(
         fun isAvailable(feature: Feature, userTier: UserTier) = when (userTier) {
 
             // Patron users can use all features
-            UserTier.Patron -> {
-                feature.defaultValue
+            UserTier.Patron -> when (feature.tier) {
+                FeatureTier.Patron,
+                is FeatureTier.Plus,
+                FeatureTier.Free -> FeatureFlag.isEnabled(feature)
             }
 
             UserTier.Plus -> {
@@ -63,10 +65,10 @@ enum class Feature(
 
                     // Plus users cannot use Plus features during early access for patrons
                     is FeatureTier.Plus ->
-                        feature.defaultValue &&
+                        FeatureFlag.isEnabled(feature) &&
                             !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()
 
-                    FeatureTier.Free -> feature.defaultValue
+                    FeatureTier.Free -> FeatureFlag.isEnabled(feature)
                 }
             }
 
@@ -74,7 +76,7 @@ enum class Feature(
             UserTier.Free -> when (feature.tier) {
                 FeatureTier.Patron -> false
                 is FeatureTier.Plus -> false
-                FeatureTier.Free -> feature.defaultValue
+                FeatureTier.Free -> FeatureFlag.isEnabled(feature)
             }
         }
     }
