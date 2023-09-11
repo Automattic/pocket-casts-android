@@ -1,6 +1,12 @@
 7.47
 -----
 
+7.46.3
+------
+*   Updates:
+    *   Added scrollbar to Watch app's Up Next screen
+        ([#1365](https://github.com/Automattic/pocket-casts-android/pull/1365))
+
 7.46.2
 ------
 *   Updates:
