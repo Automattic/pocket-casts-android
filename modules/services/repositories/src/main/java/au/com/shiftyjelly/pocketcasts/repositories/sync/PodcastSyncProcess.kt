@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -67,7 +67,8 @@ class PodcastSyncProcess(
     var userEpisodeManager: UserEpisodeManager,
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
-    var syncManager: SyncManager
+    var syncManager: SyncManager,
+    var featureFlagWrapper: FeatureFlagWrapper
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -218,7 +219,7 @@ class PodcastSyncProcess(
     }
 
     private suspend fun downloadAndImportBookmarks() {
-        if (!FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
             return
         }
         val bookmarks = syncManager.getBookmarks()
@@ -510,7 +511,7 @@ class PodcastSyncProcess(
     }
 
     private fun uploadBookmarksChanges(records: JSONArray) {
-        if (!FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
             return
         }
         try {
@@ -640,7 +641,7 @@ class PodcastSyncProcess(
     }
 
     private suspend fun importBookmarks(bookmarks: List<Bookmark>) {
-        if (!FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
             return
         }
         for (bookmark in bookmarks) {

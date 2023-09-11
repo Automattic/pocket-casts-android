@@ -6,9 +6,7 @@ import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -75,9 +73,6 @@ class BookmarksViewModelTest {
     private lateinit var feature: FeatureWrapper
 
     @Mock
-    private lateinit var userSetting: UserSetting<SubscriptionStatus?>
-
-    @Mock
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
@@ -88,7 +83,6 @@ class BookmarksViewModelTest {
         whenever(userManager.getSignInState()).thenReturn(flowOf(signInState).asFlowable())
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
         whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
-        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         bookmarksViewModel = BookmarksViewModel(
             bookmarkManager = bookmarkManager,
