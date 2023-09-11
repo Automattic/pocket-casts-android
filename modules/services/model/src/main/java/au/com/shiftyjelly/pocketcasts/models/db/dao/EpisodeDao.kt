@@ -39,10 +39,10 @@ abstract class EpisodeDao {
     abstract fun observeCount(query: SupportSQLiteQuery): Flowable<Int>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuid(uuid: String): PodcastEpisode?
+    abstract fun findByUuidSync(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
+    abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
@@ -60,7 +60,7 @@ abstract class EpisodeDao {
     abstract fun findByUuids(uuids: List<String>): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
-    abstract fun findFirstBySearchQuery(query: String): PodcastEpisode?
+    abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_sync_status <> 1 AND last_playback_interaction_date IS NOT NULL ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun findEpisodesForHistorySync(): List<PodcastEpisode>
@@ -262,7 +262,7 @@ abstract class EpisodeDao {
     abstract fun findLatestEpisodeToPlay(): PodcastEpisode?
 
     @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid = :uuid")
-    abstract fun updateStarred(starred: Boolean, modified: Long, uuid: String)
+    abstract suspend fun updateStarred(starred: Boolean, modified: Long, uuid: String)
 
     @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun updateAllStarred(episodesUUIDs: List<String>, starred: Boolean, modified: Long)

@@ -1,18 +1,39 @@
+7.48
+-----
+
+*   New Feature:
+    *   Suggest episodes to play in Automotive
+        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
+
 7.47
 -----
 
 *   Updates:
     *   Enable copying logs from in-app logs viewer
         ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
-    *   Present toast notification when duration of an in-progress episode changes
-        ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
+    *   Present app review prompt 
+        ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
+    *   Updated storage limit title
+        ([#1342](https://github.com/Automattic/pocket-casts-android/pull/1342))
 *   Bug Fixes:
     *   Fixed auto archive settings getting lost when switching languages
         ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
     *   Improved handling of enabling/disabling new episode notifications
         ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
-    *    Fixed the artwork not appearing on the onboarding page
+    *   Fixed the artwork not appearing on the onboarding page
         ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+
+7.46.2
+------
+*   Updates:
+    *   Removed login with email and password on WearOS app
+        ([#1356](https://github.com/Automattic/pocket-casts-android/pull/1356))
+    
+7.46.1
+------
+*   Bug Fixes:
+    *   Improved multi-select toolbars setup
+        ([#1338](https://github.com/Automattic/pocket-casts-android/pull/1338))
 
 7.46
 -----
@@ -33,7 +54,7 @@
 7.45.1
 -----
 *   Bug Fixes:
-    *   Fixed issue where that could cause app freeze when using multiselect
+    *   Fixed issue that could cause app freeze when using multiselect
         ([#1315](https://github.com/Automattic/pocket-casts-android/pull/1315))
 
 7.45

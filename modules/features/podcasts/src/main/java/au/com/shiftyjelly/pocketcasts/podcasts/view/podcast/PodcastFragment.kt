@@ -21,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -74,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -644,17 +647,32 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         binding.episodesRecyclerView.requestFocus()
 
-        multiSelectEpisodesHelper.setUp()
-        multiSelectBookmarksHelper.setUp()
-
         return binding.root
     }
 
-    fun <T> MultiSelectHelper<T>.setUp() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.setupMultiSelect()
+    }
+
+    private fun FragmentPodcastBinding.setupMultiSelect() {
+        multiSelectEpisodesHelper.setUp(multiSelectEpisodesToolbar)
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
+        }
+    }
+
+    fun <T> MultiSelectHelper<T>.setUp(multiSelectToolbar: MultiSelectToolbar) {
+        multiSelectToolbar.setup(
+            lifecycleOwner = viewLifecycleOwner,
+            multiSelectHelper = this,
+            menuRes = null,
+            fragmentManager = parentFragmentManager,
+        )
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
             if (episodeContainerFragment != null) return@observe
-            binding?.multiSelectToolbar?.isVisible = it
+            multiSelectToolbar.isVisible = it
             binding?.toolbar?.isVisible = !it
             adapter?.notifyDataSetChanged()
         }
@@ -747,13 +765,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                     addPaddingForEpisodeSearch(state.episodes)
                     when (state.showTab) {
                         PodcastTab.EPISODES -> {
-                            binding?.multiSelectToolbar?.setup(
-                                lifecycleOwner = viewLifecycleOwner,
-                                multiSelectHelper = multiSelectEpisodesHelper,
-                                menuRes = null,
-                                fragmentManager = parentFragmentManager,
-                            )
-
                             adapter?.setEpisodes(
                                 episodes = state.episodes,
                                 showingArchived = state.showingArchived,
@@ -767,13 +778,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                             )
                         }
                         PodcastTab.BOOKMARKS -> {
-                            binding?.multiSelectToolbar?.setup(
-                                lifecycleOwner = viewLifecycleOwner,
-                                multiSelectHelper = multiSelectBookmarksHelper,
-                                menuRes = null,
-                                fragmentManager = parentFragmentManager,
-                            )
-
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
                                 searchTerm = state.searchBookmarkTerm,

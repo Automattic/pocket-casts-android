@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -24,13 +25,19 @@ interface EpisodeManager {
     fun getPodcastUuidToBadgeLatest(): Flowable<Map<String, Int>>
 
     /** Find methods  */
-    fun findByUuid(uuid: String): PodcastEpisode?
-    suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
+
+    suspend fun findByUuid(uuid: String): PodcastEpisode?
+
+    @Deprecated("Use findByUuid suspended function instead")
+    fun findByUuidSync(uuid: String): PodcastEpisode?
+
+    @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
+
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
     fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode>
     fun observeEpisodeByUuid(uuid: String): Flow<BaseEpisode>
-    fun findFirstBySearchQuery(query: String): PodcastEpisode?
+    suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     fun findAll(rowParser: (PodcastEpisode) -> Boolean)
     fun findEpisodesWhere(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>
@@ -93,9 +100,9 @@ interface EpisodeManager {
     fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable
     fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
-    fun starEpisode(episode: PodcastEpisode, starred: Boolean)
+    suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
     suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean)
-    fun toggleStarEpisodeAsync(episode: PodcastEpisode)
+    suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackError(episode: BaseEpisode?)
     fun clearDownloadError(episode: PodcastEpisode?)
     fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
