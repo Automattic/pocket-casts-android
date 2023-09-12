@@ -18,13 +18,14 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -39,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
@@ -105,6 +108,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     @Inject lateinit var serverManager: ServerManager
     @Inject lateinit var notificationHelper: NotificationHelper
     @Inject lateinit var subscriptionManager: SubscriptionManager
+    @Inject lateinit var listServerManager: ListServerManager
+    @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManager
 
     var mediaController: MediaControllerCompat? = null
         set(value) {
@@ -396,44 +401,53 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     private val NUM_SUGGESTED_ITEMS = 8
-    private suspend fun loadSuggestedChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
-        Timber.d("Loading sugggested children")
-        val upNext = listOfNotNull(playbackManager.getCurrentEpisode()) + playbackManager.upNextQueue.queueEpisodes
-        val mediaUpNext = upNext.take(NUM_SUGGESTED_ITEMS).mapNotNull { playable ->
-            val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
-            val parentPodcast = (if (playable is PodcastEpisode) podcastManager.findPodcastByUuid(playable.podcastUuid) else filesPodcast) ?: return@mapNotNull null
-            AutoConverter.convertEpisodeToMediaItem(this, playable, parentPodcast)
+    suspend fun loadSuggestedChildren(): List<MediaBrowserCompat.MediaItem> {
+        Timber.d("Loading suggested children")
+        val episodes = mutableListOf<BaseEpisode>()
+        // add episodes from the Up Next
+        val currentEpisode = upNextQueue.currentEpisode
+        if (currentEpisode != null) {
+            episodes.add(currentEpisode)
         }
-
-        if (mediaUpNext.size == NUM_SUGGESTED_ITEMS) {
-            return ArrayList(mediaUpNext)
+        episodes.addAll(upNextQueue.queueEpisodes.take(NUM_SUGGESTED_ITEMS - 1))
+        // add episodes from the top filter
+        if (episodes.size < NUM_SUGGESTED_ITEMS) {
+            val topFilter = playlistManager.findAllSuspend().firstOrNull()
+            if (topFilter != null) {
+                val filterEpisodes = playlistManager.findEpisodes(topFilter, episodeManager, playbackManager)
+                for (filterEpisode in filterEpisodes) {
+                    if (episodes.size >= NUM_SUGGESTED_ITEMS) {
+                        break
+                    }
+                    if (episodes.none { it.uuid == filterEpisode.uuid }) {
+                        episodes.add(filterEpisode)
+                    }
+                }
+            }
         }
-
-        Timber.d("Up next length was ${mediaUpNext.size}. Trying top filter.")
-        // If we don't have enough items in up next, try the top filter
-        val topPlaylist = playlistManager.findAll().firstOrNull()
-        if (topPlaylist == null) {
-            Timber.d("Could not find top filter.")
-            return ArrayList(mediaUpNext)
+        // add the latest episode
+        if (episodes.size < NUM_SUGGESTED_ITEMS) {
+            val latestEpisode = episodeManager.findLatestEpisodeToPlay()
+            if (latestEpisode != null && episodes.none { it.uuid == latestEpisode.uuid }) {
+                episodes.add(latestEpisode)
+            }
         }
-
-        Timber.d("Loading suggestions from ${topPlaylist.title}")
-        val playlistItems = loadEpisodeChildren(topPlaylist.uuid).take(NUM_SUGGESTED_ITEMS - mediaUpNext.size)
-        Timber.d("Got ${playlistItems.size} from playlist.")
-
-        val retList = mediaUpNext + playlistItems
-        Timber.d("Returning ${retList.size} suggestions. $retList")
-        return ArrayList(retList)
+        return convertEpisodesToMediaItems(episodes)
     }
 
-    private fun loadRecentChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
+    suspend fun loadRecentChildren(): List<MediaBrowserCompat.MediaItem> {
         Timber.d("Loading recent children")
-        val upNext = playbackManager.getCurrentEpisode() ?: return arrayListOf()
-        val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
-        val parentPodcast = (if (upNext is PodcastEpisode) podcastManager.findPodcastByUuid(upNext.podcastUuid) else filesPodcast) ?: return arrayListOf()
+        val episodes = listOfNotNull(upNextQueue.currentEpisode)
+        return convertEpisodesToMediaItems(episodes)
+    }
 
-        Timber.d("Recent item ${upNext.title}")
-        return arrayListOf(AutoConverter.convertEpisodeToMediaItem(this, upNext, parentPodcast))
+    private suspend fun convertEpisodesToMediaItems(episodes: List<BaseEpisode>): List<MediaBrowserCompat.MediaItem> {
+        return episodes.mapNotNull { episode ->
+            // find the podcast
+            val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) else Podcast.userPodcast
+            // convert to a media item
+            if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+        }
     }
 
     open suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
@@ -504,7 +518,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     suspend fun loadEpisodeChildren(parentId: String): List<MediaBrowserCompat.MediaItem> {
         // user tapped on a playlist or podcast, show the episodes
-        val episodeItems = ArrayList<MediaBrowserCompat.MediaItem>()
+        val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
 
         val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuid(parentId)
         if (playlist != null) {
@@ -512,7 +526,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {
                 for (episode in topEpisodes) {
-                    podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { parentPodcast ->
+                    podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)?.let { parentPodcast ->
                         episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid))
                     }
                 }
@@ -541,8 +555,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
         return userEpisodeManager.findUserEpisodes().map {
-            val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, thumbnailUrl = it.artworkUrl)
-            AutoConverter.convertEpisodeToMediaItem(this, it, podcast)
+            AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast)
         }
     }
 

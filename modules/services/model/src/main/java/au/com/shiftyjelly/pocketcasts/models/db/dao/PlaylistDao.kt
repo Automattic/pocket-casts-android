@@ -31,7 +31,10 @@ abstract class PlaylistDao {
     abstract fun observeAll(): Flowable<List<Playlist>>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun findByUUID(uuid: String): Playlist?
+    abstract fun findByUuidSync(uuid: String): Playlist?
+
+    @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
+    abstract suspend fun findByUuid(uuid: String): Playlist?
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
     abstract fun findByUUIDRx(uuid: String): Maybe<Playlist>

@@ -77,12 +77,19 @@ abstract class BookmarkDao {
             FROM bookmarks
             JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
             WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
-            ORDER BY publishedDate, time ASC"""
+            ORDER BY publishedDate DESC, time ASC"""
     )
     abstract fun findByPodcastOrderEpisodeAndTimeFlow(
         podcastUuid: String,
         deleted: Boolean = false,
     ): Flow<List<PodcastBookmark>>
+
+    @Query(
+        """SELECT *
+            FROM bookmarks
+            WHERE deleted = :deleted"""
+    )
+    abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 
     @Query(
         """SELECT bookmarks.*

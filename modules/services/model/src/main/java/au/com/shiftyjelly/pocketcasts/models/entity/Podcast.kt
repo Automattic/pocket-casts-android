@@ -94,6 +94,11 @@ data class Podcast(
     }
 
     companion object {
+        // A holder of podcast substitutes when needed for UserEpisodes
+        val userPodcast = Podcast(
+            uuid = "da7aba5e-f11e-f11e-f11e-da7aba5ef11e",
+            title = "Custom Episode"
+        )
 
         const val SYNC_STATUS_NOT_SYNCED = 0
         const val SYNC_STATUS_SYNCED = 1

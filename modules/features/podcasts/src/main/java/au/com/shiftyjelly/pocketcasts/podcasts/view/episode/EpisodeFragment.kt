@@ -190,7 +190,7 @@ class EpisodeFragment : BaseFragment() {
         super.onDestroyView()
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_DISMISSED, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
-            podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed()
+            podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed?.invoke()
         }
         webView.cleanup()
         webView = null

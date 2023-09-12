@@ -1,10 +1,15 @@
 
-*   New Feature:
-    *   Added a support section to the Automotive app
-        ([#1277](https://github.com/Automattic/pocket-casts-android/pull/1277))
+*   Updates:
+    *   Enable copying logs from in-app logs viewer
+        ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
+    *   Present toast notification when duration of an in-progress episode changes
+        ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
+    *   Present app review prompt
+        ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
 *   Bug Fixes:
-    *    Fixed episodes being removed from the Up Next when clearing downloads
-         ([#1280](https://github.com/Automattic/pocket-casts-android/pull/1280))
-    *    Improved upgrade flow when signing in with Google account
-         ([#1275](https://github.com/Automattic/pocket-casts-android/pull/1275))
-
+    *   Fixed auto archive settings getting lost when switching languages
+        ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
+    *   Improved handling of enabling/disabling new episode notifications
+        ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
+    *   Fixed the artwork not appearing on the onboarding page
+        ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))

@@ -152,7 +152,6 @@
     <string name="support">Support</string>
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
-    <string name="episode_duration_change">"This episode's duration has changed by %d seconds"</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -304,7 +303,7 @@
     <string name="player_star" translatable="false">@string/star</string>
     <string name="player_tab_bookmarks" translatable="false">@string/bookmarks</string>
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
-    <string name="player_tab_notes">Notes</string>
+    <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
@@ -472,9 +471,11 @@
     <string name="podcast_next_episode_today">Next episode today</string>
     <string name="podcast_next_episode_tomorrow">Next episode tomorrow</string>
     <string name="podcast_next_episode_value">Next episode %s</string>
-    <string name="podcast_no_episodes_found">No Episodes Found</string>
+    <string name="podcast_no_bookmarks_found">No bookmarks found</string>
+    <string name="podcast_no_episodes_found">No episodes found</string>
     <string name="podcast_no_episodes">There are no episodes in this podcast</string>
     <string name="podcast_no_episodes_all_archived">All %d episodes of this podcast have been archived</string>
+    <string name="podcast_no_bookmarks_matching">This podcast has no bookmarks matching your search criteria.</string>
     <string name="podcast_no_episodes_matching">This podcast has no episodes matching your search criteria.</string>
     <string name="podcast_notification_new_episode" translatable="false"><![CDATA[<i>%1$s</i> %2$s]]></string>
     <string name="podcast_notifications">Notifications</string>
@@ -1653,7 +1654,7 @@
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_title">Folders</string>
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10GB Cloud Storage</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20GB Cloud Storage</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
     <string name="onboarding_plus_feature_watch_playback">Watch Playback</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra Themes &amp; App Icons</string>

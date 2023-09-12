@@ -194,6 +194,10 @@ class PodcastViewModel
     }
 
     fun onTabClicked(tab: PodcastTab) {
+        when (tab) {
+            PodcastTab.EPISODES -> multiSelectBookmarksHelper.closeMultiSelect()
+            PodcastTab.BOOKMARKS -> multiSelectEpisodesHelper.closeMultiSelect()
+        }
         analyticsTracker.track(AnalyticsEvent.PODCASTS_SCREEN_TAB_TAPPED, mapOf("value" to tab.analyticsValue))
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }

@@ -662,8 +662,7 @@ class MediaSessionManager(
             playbackManager.getCurrentEpisode()?.let {
                 if (it is PodcastEpisode) {
                     it.isStarred = true
-                    episodeManager.starEpisode(it, true)
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_STARRED, source, it.uuid)
+                    episodeManager.starEpisode(episode = it, starred = true, sourceView = source)
                 }
             }
         }
@@ -674,8 +673,7 @@ class MediaSessionManager(
             playbackManager.getCurrentEpisode()?.let {
                 if (it is PodcastEpisode) {
                     it.isStarred = false
-                    episodeManager.starEpisode(it, false)
-                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNSTARRED, source, it.uuid)
+                    episodeManager.starEpisode(episode = it, starred = false, sourceView = source)
                 }
             }
         }

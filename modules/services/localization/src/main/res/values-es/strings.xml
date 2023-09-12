@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-16 09:54:04+0000
+Translation-Revision-Date: 2023-08-22 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="go_to_bottom">Ir abajo</string>
+    <string name="go_to_top">Ir arriba</string>
     <string name="support">Ayuda</string>
     <string name="bookmark_notification_action_change_title">Cambiar título</string>
     <string name="bookmark_notification_content_tap_to_view">Toca para ver</string>
@@ -1410,7 +1412,6 @@ Language: es
     <string name="player_time_saved_detail">En total, has ahorrado %s con esta función.</string>
     <string name="player_tab_playing_wide">Reproduciendo</string>
     <string name="player_tab_playing">En reproducción</string>
-    <string name="player_tab_notes">Notas</string>
     <string name="player_sleep_when_episode_ends">Poner en reposo cuando se termine el episodio</string>
     <string name="player_sleep_timer">Temporizador</string>
     <string name="player_sleep_timer_title">Temporizador</string>

@@ -334,9 +334,6 @@ fun WearApp(
 
         authenticationNavGraph(
             navController = navController,
-            onEmailSignInSuccess = {
-                navController.navigate(LoggingInScreen.route)
-            },
             googleSignInSuccessScreen = { googleSignInAccount ->
                 LoggingInScreen(
                     avatarUrl = googleSignInAccount?.photoUrl?.toString(),

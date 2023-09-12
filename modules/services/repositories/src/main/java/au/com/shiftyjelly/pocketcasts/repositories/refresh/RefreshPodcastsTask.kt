@@ -66,10 +66,10 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 .setRequiresBatteryNotLow(true)
                 .build()
 
-            val request = PeriodicWorkRequestBuilder<RefreshPodcastsTask>(20, TimeUnit.SECONDS)
+            val request = PeriodicWorkRequestBuilder<RefreshPodcastsTask>(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
                 .addTag(TAG_REFRESH_TASK)
                 .setConstraints(constraints)
-                .setInitialDelay(20, TimeUnit.SECONDS)
+                .setInitialDelay(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
                 .build()
 
             workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, request)
