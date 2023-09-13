@@ -48,7 +48,7 @@ body:
           label: Device, Operating system, and Pocket Casts app version
           placeholder: |
               Google Pixel 6 wAndroid 12, Pocket Casts 7.19.0
-          description: Pocket Casts app version can be found from the settings screen under App info
+          description: Pocket Casts app version can be found from the settings screen then scroll down to About
       validations:
           required: false
 
