@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -35,6 +37,7 @@ class StatsViewModel @Inject constructor(
     val application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val inAppReviewHelper: InAppReviewHelper,
+    private val featureFlag: FeatureFlagWrapper,
 ) : ViewModel() {
 
     sealed class State {
@@ -88,8 +91,10 @@ class StatsViewModel @Inject constructor(
                     funnyText = funnyText,
                     startedAt = serverStats?.startedAt
                 )
-                withContext(ioDispatcher) {
-                    serverStats?.startedAt?.let { showAppReviewDialogIfPossible(it) }
+                if (featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)) {
+                    withContext(ioDispatcher) {
+                        serverStats?.startedAt?.let { showAppReviewDialogIfPossible(it) }
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e)

@@ -25,4 +25,9 @@ enum class Feature(
         title = "Bookmarks",
         defaultValue = BuildConfig.DEBUG
     ),
+    IN_APP_REVIEW_ENABLED(
+        key = "in_app_review_enabled",
+        title = "In App Review",
+        defaultValue = BuildConfig.DEBUG
+    ),
 }
