@@ -57,6 +57,16 @@ open class PodcastImageLoader(
         }
     }
 
+    suspend fun getBitmapSuspend(podcast: Podcast, size: Int): Bitmap? {
+        return try {
+            val request = load(podcast).size(size, size).build()
+            context.imageLoader.execute(request).drawable!!.toBitmap()
+        } catch (e: Exception) {
+            val request = loadNoPodcastCoil().size(size, size).build()
+            context.imageLoader.execute(request).drawable?.toBitmap()
+        }
+    }
+
     fun loadForTarget(podcast: Podcast, size: Int, bitmapListener: coil.target.Target) {
         val request = load(podcast).size(size, size).target(bitmapListener).build()
         context.imageLoader.enqueue(request)
