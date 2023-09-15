@@ -18,7 +18,7 @@ enum class Feature(
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",
         title = "Patron",
-        defaultValue = false
+        defaultValue = true
     ),
     BOOKMARKS_ENABLED(
         key = "bookmarks_enabled",
