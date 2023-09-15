@@ -23,40 +23,8 @@ class TracksAnalyticsTracker @Inject constructor(
 ) : IdentifyingTracker(preferences) {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
-    private val paidSubscription: SubscriptionStatus.Paid?
-        get() = settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid
 
-    private val predefinedEventProperties: Map<String, Any>
-        get() {
-            val isLoggedIn = accountStatusInfo.isLoggedIn()
-            val hasSubscription = paidSubscription != null
-            val hasLifetime = paidSubscription?.isLifetimePlus
-                ?: false
-            val subscriptionType = paidSubscription?.type?.toString()
-                ?: INVALID_OR_NULL_VALUE
-            val subscriptionTier = paidSubscription?.tier?.toString()
-                ?: INVALID_OR_NULL_VALUE
-            val subscriptionPlatform = paidSubscription?.platform?.toString()
-                ?: INVALID_OR_NULL_VALUE
-            val subscriptionFrequency = paidSubscription?.frequency?.toString()
-                ?: INVALID_OR_NULL_VALUE
-
-            return mapOf(
-                PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),
-                PredefinedEventProperty.USER_IS_LOGGED_IN to isLoggedIn,
-                PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION to hasSubscription,
-                PredefinedEventProperty.PLUS_HAS_LIFETIME to hasLifetime,
-                PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
-                PredefinedEventProperty.PLUS_SUBSCRIPTION_TIER to subscriptionTier,
-                PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
-                PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
-                PredefinedEventProperty.PLATFORM to when (Util.getAppPlatform(appContext)) {
-                    AppPlatform.Automotive -> "automotive"
-                    AppPlatform.Phone -> "phone"
-                    AppPlatform.WearOs -> "watch"
-                },
-            ).mapKeys { it.key.analyticsKey }
-        }
+    private var predefinedEventProperties = emptyMap<String, Any>()
 
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
         if (tracksClient == null) return
@@ -70,12 +38,12 @@ class TracksAnalyticsTracker @Inject constructor(
         /* Create the merged JSON Object of properties.
         Properties defined by the user have precedence over the default ones pre-defined at "event level" */
         val propertiesToJSON = JSONObject(properties)
-        predefinedEventProperties.keys.forEach { key ->
+        predefinedEventProperties.forEach { (key, value) ->
             if (propertiesToJSON.has(key)) {
                 Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
-                Timber.w("User value: " + propertiesToJSON.get(key).toString() + " - pre-defined value: " + predefinedEventProperties[key].toString())
+                Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
             } else {
-                propertiesToJSON.put(key, predefinedEventProperties[key])
+                propertiesToJSON.put(key, value)
             }
         }
 
@@ -85,6 +53,38 @@ class TracksAnalyticsTracker @Inject constructor(
         } else {
             Timber.i("\uD83D\uDD35 Tracked: $eventKey")
         }
+    }
+
+    private fun updatePredefinedEventProperties() {
+        val paidSubscription = settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid
+        val isLoggedIn = accountStatusInfo.isLoggedIn()
+        val hasSubscription = paidSubscription != null
+        val hasLifetime = paidSubscription?.isLifetimePlus
+            ?: false
+        val subscriptionType = paidSubscription?.type?.toString()
+            ?: INVALID_OR_NULL_VALUE
+        val subscriptionTier = paidSubscription?.tier?.toString()
+            ?: INVALID_OR_NULL_VALUE
+        val subscriptionPlatform = paidSubscription?.platform?.toString()
+            ?: INVALID_OR_NULL_VALUE
+        val subscriptionFrequency = paidSubscription?.frequency?.toString()
+            ?: INVALID_OR_NULL_VALUE
+
+        predefinedEventProperties = mapOf(
+            PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),
+            PredefinedEventProperty.USER_IS_LOGGED_IN to isLoggedIn,
+            PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION to hasSubscription,
+            PredefinedEventProperty.PLUS_HAS_LIFETIME to hasLifetime,
+            PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
+            PredefinedEventProperty.PLUS_SUBSCRIPTION_TIER to subscriptionTier,
+            PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
+            PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
+            PredefinedEventProperty.PLATFORM to when (Util.getAppPlatform(appContext)) {
+                AppPlatform.Automotive -> "automotive"
+                AppPlatform.Phone -> "phone"
+                AppPlatform.WearOs -> "watch"
+            },
+        ).mapKeys { it.key.analyticsKey }
     }
 
     override fun refreshMetadata() {
@@ -102,6 +102,8 @@ class TracksAnalyticsTracker @Inject constructor(
                 generateNewAnonID()
             }
         }
+
+        updatePredefinedEventProperties()
     }
 
     override fun flush() {
