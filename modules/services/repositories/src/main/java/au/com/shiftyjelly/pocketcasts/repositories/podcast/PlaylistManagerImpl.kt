@@ -54,7 +54,7 @@ class PlaylistManagerImpl @Inject constructor(
         get() = Dispatchers.Default
 
     private fun setupDefaultPlaylists() {
-        val existingNewRelease = playlistDao.findByUUID(NEWRELEASE_UUID)
+        val existingNewRelease = playlistDao.findByUuidSync(NEWRELEASE_UUID)
         if (existingNewRelease == null) {
             val newRelease = Playlist()
             newRelease.apply {
@@ -77,7 +77,7 @@ class PlaylistManagerImpl @Inject constructor(
             playlistDao.update(existingNewRelease)
         }
 
-        val existingInProgress = playlistDao.findByUUID(INPROGRESS_UUID)
+        val existingInProgress = playlistDao.findByUuidSync(INPROGRESS_UUID)
         if (existingInProgress == null) {
             val inProgress = Playlist()
             inProgress.apply {
@@ -124,7 +124,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override fun findByUuidSync(playlistUuid: String): Playlist? {
-        return playlistDao.findByUUID(playlistUuid)
+        return playlistDao.findByUuidSync(playlistUuid)
     }
 
     override fun findByUuidRx(playlistUuid: String): Maybe<Playlist> {
