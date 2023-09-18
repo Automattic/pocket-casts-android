@@ -45,6 +45,9 @@ android {
 
         debugProd {
             initWith debug
+            manifestPlaceholders += [
+                    appIcon: "@mipmap/ic_launcher_3",
+            ]
         }
 
         release {

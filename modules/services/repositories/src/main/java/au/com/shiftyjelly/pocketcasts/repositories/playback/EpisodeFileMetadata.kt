@@ -117,8 +117,6 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             url = url?.toHttpUrlOrNull(),
             startTime = frame.startTimeMs,
             endTime = frame.endTimeMs,
-            startOffset = frame.startOffset,
-            endOffset = frame.endOffset,
             imagePath = imagePath,
             mimeType = mimeType
         )

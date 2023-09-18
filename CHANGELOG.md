@@ -1,11 +1,9 @@
 7.48
 -----
 
-7.46.2
-------
-*   Updates:
-    *   Removed login with email and password on WearOS app
-        ([#1356](https://github.com/Automattic/pocket-casts-android/pull/1356))
+*   New Feature:
+    *   Suggest episodes to play in Automotive
+        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
 
 7.47
 -----
@@ -22,6 +20,12 @@
         ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
     *   Fixed the artwork not appearing on the onboarding page
         ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+
+7.46.2
+------
+*   Updates:
+    *   Removed login with email and password on WearOS app
+        ([#1356](https://github.com/Automattic/pocket-casts-android/pull/1356))
     
 7.46.1
 ------
@@ -44,6 +48,12 @@
          ([1327](https://github.com/Automattic/pocket-casts-android/pull/1327))
     *    Avoided adding multiple toolbar observers, which was causing the app to lag and freeze
          ([#1333](https://github.com/Automattic/pocket-casts-android/pull/1333))
+
+7.45.1
+-----
+*   Bug Fixes:
+    *   Fixed issue that could cause app freeze when using multiselect
+        ([#1315](https://github.com/Automattic/pocket-casts-android/pull/1315))
 
 7.45
 -----
