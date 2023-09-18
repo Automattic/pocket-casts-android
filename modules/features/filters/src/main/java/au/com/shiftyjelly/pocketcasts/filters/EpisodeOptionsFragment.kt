@@ -75,7 +75,7 @@ class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
             val playlist = withContext(Dispatchers.Default) {
                 val uuid = requireArguments().getString(ARG_PLAYLIST_UUID)!!
                 Timber.d("Loading playlist $uuid")
-                playlistManager.findByUuid(uuid)
+                playlistManager.findByUuidSync(uuid)
             } ?: return@launch
             this@EpisodeOptionsFragment.playlist = playlist
 

@@ -102,7 +102,7 @@ class DurationOptionsFragment : BaseFragment() {
         val btnClose = binding.btnClose
 
         launch {
-            val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) } ?: return@launch
+            val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuidSync(requireArguments().getString(ARG_PLAYLIST_UUID)!!) } ?: return@launch
             this@DurationOptionsFragment.playlist = playlist
 
             enableDurations(playlist.filterDuration)

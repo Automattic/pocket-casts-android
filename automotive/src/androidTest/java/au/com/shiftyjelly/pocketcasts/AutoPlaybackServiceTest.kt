@@ -102,7 +102,7 @@ class AutoPlaybackServiceTest {
             val podcast = Podcast(UUID.randomUUID().toString(), title = "Test podcast")
             val episode = PodcastEpisode(UUID.randomUUID().toString(), title = "Test episode", publishedDate = Date())
 
-            service.playlistManager = mock { on { findByUuid(any()) }.doReturn(null) }
+            service.playlistManager = mock { on { findByUuidSync(any()) }.doReturn(null) }
             service.podcastManager = mock { on { runBlocking { findPodcastByUuidSuspend(any()) } }.doReturn(podcast) }
             service.episodeManager = mock { on { findEpisodesByPodcastOrdered(any()) }.doReturn(listOf(episode)) }
 

@@ -1185,7 +1185,7 @@ open class PlaybackManager @Inject constructor(
             // First check if it is a podcast uuid, then check if it is from a filter
             else -> podcastManager.findPodcastByUuid(lastPodcastOrFilterUuid)?.let { podcast ->
                 autoPlayOrderForPodcastEpisodes(podcast)
-            } ?: playlistManager.findByUuid(lastPodcastOrFilterUuid)?.let { playlist ->
+            } ?: playlistManager.findByUuidSync(lastPodcastOrFilterUuid)?.let { playlist ->
                 playlistManager.findEpisodes(playlist, episodeManager, this)
             }
         } ?: emptyList()
