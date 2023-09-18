@@ -10,9 +10,13 @@ import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class TracksAnalyticsTracker @Inject constructor(
     @ApplicationContext private val appContext: Context,
@@ -20,38 +24,41 @@ class TracksAnalyticsTracker @Inject constructor(
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
     private val accountStatusInfo: AccountStatusInfo,
-) : IdentifyingTracker(preferences) {
+) : IdentifyingTracker(preferences), CoroutineScope {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
 
     private var predefinedEventProperties = emptyMap<String, Any>()
 
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
         if (tracksClient == null) return
 
-        val eventKey = event.key
-        val user = userId ?: anonID ?: generateNewAnonID()
-        val userType = userId?.let {
-            TracksClient.NosaraUserType.POCKETCASTS
-        } ?: TracksClient.NosaraUserType.ANON
+        launch {
+            val eventKey = event.key
+            val user = userId ?: anonID ?: generateNewAnonID()
+            val userType = userId?.let {
+                TracksClient.NosaraUserType.POCKETCASTS
+            } ?: TracksClient.NosaraUserType.ANON
 
-        /* Create the merged JSON Object of properties.
-        Properties defined by the user have precedence over the default ones pre-defined at "event level" */
-        val propertiesToJSON = JSONObject(properties)
-        predefinedEventProperties.forEach { (key, value) ->
-            if (propertiesToJSON.has(key)) {
-                Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
-                Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
-            } else {
-                propertiesToJSON.put(key, value)
+            /* Create the merged JSON Object of properties.
+            Properties defined by the user have precedence over the default ones pre-defined at "event level" */
+            val propertiesToJSON = JSONObject(properties)
+            predefinedEventProperties.forEach { (key, value) ->
+                if (propertiesToJSON.has(key)) {
+                    Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
+                    Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
+                } else {
+                    propertiesToJSON.put(key, value)
+                }
             }
-        }
 
-        tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
-        if (propertiesToJSON.length() > 0) {
-            Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
-        } else {
-            Timber.i("\uD83D\uDD35 Tracked: $eventKey")
+            tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
+            if (propertiesToJSON.length() > 0) {
+                Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
+            } else {
+                Timber.i("\uD83D\uDD35 Tracked: $eventKey")
+            }
         }
     }
 
