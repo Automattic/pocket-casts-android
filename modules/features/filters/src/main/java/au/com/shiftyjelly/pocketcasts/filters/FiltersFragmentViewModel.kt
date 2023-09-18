@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.filters
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -12,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.Collections
 import javax.inject.Inject
@@ -78,5 +80,12 @@ class FiltersFragmentViewModel @Inject constructor(
     fun trackFilterListShown(filterCount: Int) {
         val properties = mapOf(FILTER_COUNT_KEY to filterCount)
         analyticsTracker.track(AnalyticsEvent.FILTER_LIST_SHOWN, properties)
+    }
+
+    fun findPlaylistByUuid(playlistUuid: String, onSuccess: (Playlist) -> Unit) {
+        viewModelScope.launch {
+            val playlist = playlistManager.findByUuid(playlistUuid) ?: return@launch
+            onSuccess(playlist)
+        }
     }
 }
