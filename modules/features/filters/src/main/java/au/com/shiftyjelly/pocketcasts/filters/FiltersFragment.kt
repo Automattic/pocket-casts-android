@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -132,10 +130,9 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     private fun checkForSavedFilter() {
         val shouldOpenSavedFilter = settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()
         if (shouldOpenSavedFilter) {
-            runBlocking {
-                val playlistUUID = settings.selectedFilter() ?: return@runBlocking
-                lastFilterUuidShown = playlistUUID
-                val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) } ?: return@runBlocking
+            val playlistUuid = settings.selectedFilter() ?: return
+            lastFilterUuidShown = playlistUuid
+            viewModel.findPlaylistByUuid(playlistUuid) { playlist ->
                 openPlaylist(playlist, isNewFilter = false)
             }
         } else if (!viewModel.isFragmentChangingConfigurations) {
