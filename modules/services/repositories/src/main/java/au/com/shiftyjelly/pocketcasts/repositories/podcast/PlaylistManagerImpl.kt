@@ -127,6 +127,10 @@ class PlaylistManagerImpl @Inject constructor(
         return playlistDao.findByUuidSync(playlistUuid)
     }
 
+    override suspend fun findByUuid(playlistUuid: String): Playlist? {
+        return playlistDao.findByUuid(playlistUuid)
+    }
+
     override fun findByUuidRx(playlistUuid: String): Maybe<Playlist> {
         return playlistDao.findByUUIDRx(playlistUuid)
     }

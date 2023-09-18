@@ -15,6 +15,7 @@ interface PlaylistManager {
     fun observeAll(): Flowable<List<Playlist>>
 
     fun findById(id: Long): Playlist?
+    suspend fun findByUuid(playlistUuid: String): Playlist?
     fun findByUuidSync(playlistUuid: String): Playlist?
     fun findByUuidRx(playlistUuid: String): Maybe<Playlist>
     fun observeByUuid(playlistUuid: String): Flowable<Playlist>

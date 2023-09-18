@@ -34,6 +34,9 @@ abstract class PlaylistDao {
     abstract fun findByUuidSync(uuid: String): Playlist?
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
+    abstract suspend fun findByUuid(uuid: String): Playlist?
+
+    @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
     abstract fun findByUUIDRx(uuid: String): Maybe<Playlist>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
