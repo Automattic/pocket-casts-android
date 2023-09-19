@@ -153,7 +153,8 @@ android {
 
 dependencies {
     // Uncomment if you want to run with leak canary
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+//    debugImplementation androidLibs.leakCanary
+//    debugProdImplementation androidLibs.leakCanary
 
     implementation androidLibs.appCompat
     implementation androidLibs.auth

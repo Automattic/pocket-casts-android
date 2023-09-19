@@ -217,6 +217,8 @@ project.ext {
             accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework",
             // In-app reviews
             playReview: 'com.google.android.play:review-ktx:2.0.1',
+
+            leakCanary: 'com.squareup.leakcanary:leakcanary-android:2.10',
     ]
 
     libs = [
