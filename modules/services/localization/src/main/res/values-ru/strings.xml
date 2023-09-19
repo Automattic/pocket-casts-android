@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-21 13:54:03+0000
+Translation-Revision-Date: 2023-09-12 13:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">В этом подкасте нет закладок, соответствующих вашим условиям поиска.</string>
+    <string name="podcast_no_bookmarks_found">Закладки не найдены</string>
+    <string name="player_tab_notes">Сведения</string>
+    <string name="bookmark_updated">Закладка «%s» обновлена</string>
     <string name="go_to_bottom">Перейти вниз</string>
     <string name="go_to_top">Перейти наверх</string>
     <string name="support">Поддержка</string>
@@ -284,7 +288,7 @@ Language: ru
     <string name="onboarding_plus_feature_themes_icons_text">Покажите себя во всей красе. Эксклюзивные темы и значки только для членов клуба Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Темы и значки</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Загрузите файлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">Облачное хранилище 10 ГБ</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">Облачное хранилище объемом 20 ГБ</string>
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
     <string name="onboarding_plus_feature_folders_title">Папки</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Слушайте подкасты везде: в приложениях для Windows, macOS и веб-приложении.</string>
