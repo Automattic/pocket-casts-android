@@ -60,9 +60,12 @@ enum class PodcastsSortType(
         val default = DATE_ADDED_OLDEST_TO_NEWEST
 
         fun fromServerId(serverId: Int?): PodcastsSortType {
+            if (serverId == null) {
+                return default
+            }
             val sortType = values().firstOrNull { it.serverId == serverId }
             if (sortType == null) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid server ${PodcastsSortType::class.java.simpleName}: $serverId")
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid server value for PodcastsSortType: $serverId")
                 return default
             }
             return sortType
@@ -89,7 +92,9 @@ enum class PodcastsSortType(
 }
 
 class PodcastsSortTypeMoshiAdapter : JsonAdapter<PodcastsSortType>() {
-    override fun toJson(writer: JsonWriter, value: PodcastsSortType?) {}
+    override fun toJson(writer: JsonWriter, value: PodcastsSortType?) {
+        writer.value(value?.serverId)
+    }
 
     override fun fromJson(reader: JsonReader): PodcastsSortType {
         return PodcastsSortType.fromServerId(reader.nextInt())
