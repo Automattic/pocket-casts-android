@@ -77,14 +77,26 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
     abstract fun findByPodcastOrderTitleAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    abstract suspend fun findByPodcastOrderTitleAscSuspend(podcastUuid: String): List<PodcastEpisode>
+
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
     abstract fun findByPodcastOrderTitleDesc(podcastUuid: String): List<PodcastEpisode>
+
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    abstract suspend fun findByPodcastOrderTitleDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract fun findByPodcastOrderPublishedDateAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
+    abstract suspend fun findByPodcastOrderPublishedDateAscSuspend(podcastUuid: String): List<PodcastEpisode>
+
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract fun findByPodcastOrderPublishedDateDesc(podcastUuid: String): List<PodcastEpisode>
+
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
+    abstract suspend fun findByPodcastOrderPublishedDateDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid AND playing_status != 2 AND archived = 0 ORDER BY published_date DESC LIMIT 1")
     abstract fun findLatestUnfinishedEpisodeByPodcast(podcastUuid: String): PodcastEpisode?
@@ -92,8 +104,14 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract fun findByPodcastOrderDurationAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
+    abstract suspend fun findByPodcastOrderDurationAscSuspend(podcastUuid: String): List<PodcastEpisode>
+
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun findByPodcastOrderDurationDesc(podcastUuid: String): List<PodcastEpisode>
+
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
+    abstract suspend fun findByPodcastOrderDurationDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
     // Find new episodes to display in notifications.
     @Query(
