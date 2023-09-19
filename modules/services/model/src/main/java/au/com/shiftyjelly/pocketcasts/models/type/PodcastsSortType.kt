@@ -65,7 +65,7 @@ enum class PodcastsSortType(
             }
             val sortType = values().firstOrNull { it.serverId == serverId }
             if (sortType == null) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid server value for PodcastsSortType: $serverId")
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid server ID for PodcastsSortType: $serverId")
                 return default
             }
             return sortType
@@ -75,7 +75,7 @@ enum class PodcastsSortType(
             val clientId = clientIdString.toIntOrNull()
             val sortType = PodcastsSortType.values().firstOrNull { it.clientId == clientId }
             if (sortType == null) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid client ${PodcastsSortType::class.java.simpleName}: $clientIdString")
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid client ID for PodcastsSortType: $clientIdString")
                 return default
             }
             return sortType
