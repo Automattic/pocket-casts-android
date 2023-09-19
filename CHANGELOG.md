@@ -4,8 +4,6 @@
 *   New Feature:
     *   Suggest episodes to play in Automotive
         ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
-    *   Internal: Adds Patron Tier
-        ([#1379](https://github.com/Automattic/pocket-casts-android/pull/1379))
 
 7.47
 -----
