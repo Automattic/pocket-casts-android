@@ -252,10 +252,10 @@ dependencies {
     implementation libs.media3Extractor
     implementation libs.media3Ui
     implementation libs.showkase
-    implementation (libs.junit) {
+    testImplementation (libs.junit) {
         exclude group: 'org.hamcrest'
     }
-    implementation libs.kotlinCoroutinesTest
+    testImplementation libs.kotlinCoroutinesTest
     implementation libs.protobufKotlinLite
     implementation libs.protobufJavaLite
 
