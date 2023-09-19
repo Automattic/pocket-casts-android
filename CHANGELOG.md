@@ -4,6 +4,8 @@
 *   New Feature:
     *   Suggest episodes to play in Automotive
         ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
+    *   Internal: Adds Patron Tier
+        ([#1379](https://github.com/Automattic/pocket-casts-android/pull/1379))
 
 7.47
 -----
@@ -11,8 +13,6 @@
 *   Updates:
     *   Enable copying logs from in-app logs viewer
         ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
-    *   Present app review prompt 
-        ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
     *   Updated storage limit title
         ([#1342](https://github.com/Automattic/pocket-casts-android/pull/1342))
 *   Bug Fixes:
