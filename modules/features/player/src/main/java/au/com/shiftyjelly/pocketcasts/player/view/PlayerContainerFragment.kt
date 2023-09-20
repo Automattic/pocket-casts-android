@@ -210,8 +210,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun openUpNext() {
-        val upNextFragment = UpNextFragment.newInstance(source = UpNextSource.PLAYER)
-        (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
+        binding?.let {
+            BottomSheetBehavior.from(it.upNextFrameBottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     fun openPlayer() {
