@@ -32,7 +32,8 @@ class DeveloperFragment : BaseFragment() {
                         onShowkaseClick = ::onShowkaseClick,
                         onForceRefreshClick = viewModel::forceRefresh,
                         onTriggerNotificationClick = viewModel::triggerNotification,
-                        onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode
+                        onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
+                        onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails
                     )
                 }
             }
