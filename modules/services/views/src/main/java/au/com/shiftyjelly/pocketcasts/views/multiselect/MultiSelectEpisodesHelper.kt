@@ -66,7 +66,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
         }
 
-    override lateinit var listener: Listener<BaseEpisode>
+    override var listener: Listener<BaseEpisode>? = null
 
     override fun isSelected(multiSelectable: BaseEpisode) =
         selectedList.count { it.uuid == multiSelectable.uuid } > 0

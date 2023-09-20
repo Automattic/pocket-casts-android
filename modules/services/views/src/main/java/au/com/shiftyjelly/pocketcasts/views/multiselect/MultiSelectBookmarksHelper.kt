@@ -44,7 +44,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
             )
         }
 
-    override lateinit var listener: Listener<Bookmark>
+    override var listener: Listener<Bookmark>? = null
 
     override fun isSelected(multiSelectable: Bookmark) =
         selectedList.count { it.uuid == multiSelectable.uuid } > 0
