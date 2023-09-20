@@ -7,15 +7,21 @@ Layout/LineLength:
   Max: 180
   Exclude:
     - fastlane/Fastfile
+    - scripts/themes/download_themes.rb
     - scripts/themes/generate_themes.rb
+    - scripts/themes/generate_kotlin.rb
 
 Metrics/BlockLength:
   Exclude:
     - fastlane/Fastfile
+    - scripts/themes/download_themes.rb
     - scripts/themes/generate_themes.rb
+    - scripts/themes/generate_kotlin.rb
     
 Metrics/MethodLength:
   Max: 30
   Exclude:
     - fastlane/Fastfile
+    - scripts/themes/download_themes.rb
     - scripts/themes/generate_themes.rb
+    - scripts/themes/generate_kotlin.rb

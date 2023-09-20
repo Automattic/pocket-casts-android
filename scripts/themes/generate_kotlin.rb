@@ -5,8 +5,8 @@
 require 'csv'
 require './download_themes'
 
-filePathColors = '../../modules/services/ui/src/main/java/au/com/shiftyjelly/pocketcasts/ui/theme/ThemeColor.kt'
-filePathStyles = '../../modules/services/ui/src/main/java/au/com/shiftyjelly/pocketcasts/ui/theme/ThemeStyle.kt'
+FILE_PATH_COLORS = '../../modules/services/ui/src/main/java/au/com/shiftyjelly/pocketcasts/ui/theme/ThemeColor.kt'
+FILE_PATH_STYLES = '../../modules/services/ui/src/main/java/au/com/shiftyjelly/pocketcasts/ui/theme/ThemeStyle.kt'
 
 class String
   def uncapitalize
@@ -14,14 +14,14 @@ class String
   end
 end
 
-def writeThemeValue(hex_val, opacity, tokenName, filePath, themeName)
-  if tokenName.start_with?('filterU') || tokenName.start_with?('filterI') || tokenName.start_with?('filterT')
+def write_theme_value(hex_val, opacity, token_name, file_path, theme_name)
+  if token_name.start_with?('filterU') || token_name.start_with?('filterI') || token_name.start_with?('filterT')
     str = ''
     # deal with special filter overlay colours
     if ['filter', '$filter', '#filter'].include?(hex_val)
       # the ones without any custom opacity are easy
       if opacity == '100%' || opacity.nil? || opacity.empty?
-        str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt filterColor: Int): Int {
+        str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt filterColor: Int): Int {
                               return filterColor
                            }\n\n"
       else
@@ -30,39 +30,39 @@ def writeThemeValue(hex_val, opacity, tokenName, filePath, themeName)
         words = opacity.split
 
         actual_opacity = words[1].gsub('%', '')
-        originalColor = if words[3] == 'white'
-                          'Color.WHITE'
-                        elsif words[3].start_with?('#')
-                          "Color.parseColor(\"#{words[3]}\")"
-                        else
-                          'Color.BLACK'
-                        end
+        original_color = if words[3] == 'white'
+                           'Color.WHITE'
+                         elsif words[3].start_with?('#')
+                           "Color.parseColor(\"#{words[3]}\")"
+                         else
+                           'Color.BLACK'
+                         end
 
-        overlayColor = "ColorUtils.colorWithAlpha(filterColor, #{(actual_opacity.to_f / 100.0 * 255.0).round})"
+        overlay_color = "ColorUtils.colorWithAlpha(filterColor, #{(actual_opacity.to_f / 100.0 * 255.0).round})"
 
-        str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt filterColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(#{originalColor}, #{overlayColor})
+        str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt filterColor: Int): Int {
+        return ColorUtils.calculateCombinedColor(#{original_color}, #{overlay_color})
     }\n\n"
       end
 
     else
-      str = "@ColorInt fun #{tokenName}#{themeName}(@ColorInt filterColor: Int): Int { return Color.parseColor(\"#{hex_val}\") }\n\n"
+      str = "@ColorInt fun #{token_name}#{theme_name}(@ColorInt filterColor: Int): Int { return Color.parseColor(\"#{hex_val}\") }\n\n"
     end
 
-    File.write(filePath, str, mode: 'a')
+    File.write(file_path, str, mode: 'a')
     return
-  elsif tokenName.start_with?('podcast') || tokenName.start_with?('playerBackground') || tokenName.start_with?('playerHighlight')
+  elsif token_name.start_with?('podcast') || token_name.start_with?('playerBackground') || token_name.start_with?('playerHighlight')
     str = ''
     # deal with special podcast overlay colours
     if ['podcast', '$podcast', '#podcast'].include?(hex_val)
       # the ones without any custom opacity are easy
       if opacity == '100%' || opacity.nil? || opacity.empty?
-        str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt podcastColor: Int): Int {
+        str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int {
         return podcastColor
     }\n\n"
       elsif opacity.split.size == 1
         opacity = opacity.gsub('%', '')
-        str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt podcastColor: Int): Int {
+        str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int {
         return ColorUtils.colorWithAlpha(podcastColor, #{(opacity.to_f / 100.0 * 255.0).round})
     }\n\n"
       else
@@ -71,48 +71,48 @@ def writeThemeValue(hex_val, opacity, tokenName, filePath, themeName)
         words = opacity.split
 
         actual_opacity = words[1].gsub('%', '')
-        originalColor = "Color.parseColor(\"#{words[3]}\")"
-        overlayColor = "ColorUtils.colorWithAlpha(podcastColor, #{(actual_opacity.to_f / 100.0 * 255.0).round})"
+        original_color = "Color.parseColor(\"#{words[3]}\")"
+        overlay_color = "ColorUtils.colorWithAlpha(podcastColor, #{(actual_opacity.to_f / 100.0 * 255.0).round})"
 
-        str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(#{originalColor}, #{overlayColor})
+        str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int {
+        return ColorUtils.calculateCombinedColor(#{original_color}, #{overlay_color})
     }\n\n"
       end
     elsif opacity == '100%' || opacity.nil? || opacity.empty?
-      str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt podcastColor: Int): Int { return Color.parseColor(\"#{hex_val}\") }\n\n"
+      str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int { return Color.parseColor(\"#{hex_val}\") }\n\n"
     elsif opacity.split.size == 1
       opacity = opacity.gsub('%', '')
-      originalColor = "Color.parseColor(\"#{hex_val}\")"
-      str = "    @ColorInt fun #{tokenName}#{themeName}(@ColorInt podcastColor: Int): Int {
-       return ColorUtils.colorWithAlpha(#{originalColor}, #{(opacity.to_f / 100.0 * 255.0).round})
+      original_color = "Color.parseColor(\"#{hex_val}\")"
+      str = "    @ColorInt fun #{token_name}#{theme_name}(@ColorInt podcastColor: Int): Int {
+       return ColorUtils.colorWithAlpha(#{original_color}, #{(opacity.to_f / 100.0 * 255.0).round})
     }\n\n"
     end
 
-    File.write(filePath, str, mode: 'a')
+    File.write(file_path, str, mode: 'a')
     return
   end
 
   unless hex_val.start_with?('#')
-    puts "Invalid hex value found #{hex_val}, found in #{tokenName} ignoring"
+    puts "Invalid hex value found #{hex_val}, found in #{token_name} ignoring"
     return
   end
 
-  variable_str = "    val #{tokenName}#{themeName} = Color.parseColor(\"#{hex_val}\")"
+  variable_str = "    val #{token_name}#{theme_name} = Color.parseColor(\"#{hex_val}\")"
   if opacity == '100%' || opacity.nil? || opacity.empty?
-    File.write(filePath, "#{variable_str}\n", mode: 'a')
+    File.write(file_path, "#{variable_str}\n", mode: 'a')
   else
     opacity = opacity.gsub('%', '')
-    File.write(filePath, "#{variable_str}.colorIntWithAlpha(#{(opacity.to_f / 100.0 * 255.0).round})\n", mode: 'a')
+    File.write(file_path, "#{variable_str}.colorIntWithAlpha(#{(opacity.to_f / 100.0 * 255.0).round})\n", mode: 'a')
   end
 end
 
 tokens = download_themes
 exit if tokens.nil?
 
-File.truncate(filePathColors, 0) if File.exist?(filePathColors)
-File.truncate(filePathStyles, 0) if File.exist?(filePathStyles)
+File.truncate(FILE_PATH_COLORS, 0) if File.exist?(FILE_PATH_COLORS)
+File.truncate(FILE_PATH_STYLES, 0) if File.exist?(FILE_PATH_STYLES)
 
-File.write(filePathColors, "// ************ WARNING AUTO GENERATED, DO NOT EDIT ************
+File.write(FILE_PATH_COLORS, "// ************ WARNING AUTO GENERATED, DO NOT EDIT ************
 @file:Suppress(\"unused\", \"MemberVisibilityCanBePrivate\", \"UNUSED_PARAMETER\")
 
 package au.com.shiftyjelly.pocketcasts.ui.theme
@@ -123,11 +123,10 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.colorIntWithAlpha
 
 object ThemeColor {\n", mode: 'a')
-File.write(filePathStyles, "package au.com.shiftyjelly.pocketcasts.ui.theme
+File.write(FILE_PATH_STYLES, "package au.com.shiftyjelly.pocketcasts.ui.theme
 
 // ************ WARNING AUTO GENERATED, DO NOT EDIT ************\nenum class ThemeStyle {\n", mode: 'a')
 
-index = 0
 all_token_names = []
 
 tokens.each do |token_attrs|
@@ -147,8 +146,9 @@ tokens.each do |token_attrs|
   classic_light_hex_value = themes[:classic_light][:hex]
   classic_light_opacity = themes[:classic_light][:opacity]
 
-  classic_dark_hex_value = themes[:classic_dark][:hex]
-  classic_dark_opacity = themes[:classic_dark][:opacity]
+  # unused
+  # classic_dark_hex_value = themes[:classic_dark][:hex]
+  # classic_dark_opacity = themes[:classic_dark][:opacity]
 
   electric_hex_value = themes[:electricity][:hex]
   electric_opacity = themes[:electricity][:opacity]
@@ -173,23 +173,21 @@ tokens.each do |token_attrs|
   token_name = token_name.gsub('$', '').split('-').collect(&:capitalize).join.uncapitalize
   all_token_names << token_name
 
-  File.write(filePathStyles, "    #{token_name},\n", mode: 'a')
+  File.write(FILE_PATH_STYLES, "    #{token_name},\n", mode: 'a')
 
-  writeThemeValue(light_hex_value, light_opacity, token_name, filePathColors, 'Light')
-  writeThemeValue(dark_hex_value, dark_opacity, token_name, filePathColors, 'Dark')
-  writeThemeValue(extra_dark_hex_value, extra_dark_opacity, token_name, filePathColors, 'ExtraDark')
-  writeThemeValue(classic_light_hex_value, classic_light_opacity, token_name, filePathColors, 'ClassicLight')
-  writeThemeValue(electric_hex_value, electric_opacity, token_name, filePathColors, 'Electric')
-  writeThemeValue(indigo_hex_value, indigo_opacity, token_name, filePathColors, 'Indigo')
-  writeThemeValue(radioactive_hex_value, radioactive_opacity, token_name, filePathColors, 'Radioactive')
-  writeThemeValue(rose_hex_value, rose_opacity, token_name, filePathColors, 'Rose')
-  writeThemeValue(light_contrast_hex_value, light_contrast_opacity, token_name, filePathColors, 'LightContrast')
-  writeThemeValue(dark_contrast_hex_value, dark_contrast_opacity, token_name, filePathColors, 'DarkContrast')
-
-  index += 1
+  write_theme_value(light_hex_value, light_opacity, token_name, FILE_PATH_COLORS, 'Light')
+  write_theme_value(dark_hex_value, dark_opacity, token_name, FILE_PATH_COLORS, 'Dark')
+  write_theme_value(extra_dark_hex_value, extra_dark_opacity, token_name, FILE_PATH_COLORS, 'ExtraDark')
+  write_theme_value(classic_light_hex_value, classic_light_opacity, token_name, FILE_PATH_COLORS, 'ClassicLight')
+  write_theme_value(electric_hex_value, electric_opacity, token_name, FILE_PATH_COLORS, 'Electric')
+  write_theme_value(indigo_hex_value, indigo_opacity, token_name, FILE_PATH_COLORS, 'Indigo')
+  write_theme_value(radioactive_hex_value, radioactive_opacity, token_name, FILE_PATH_COLORS, 'Radioactive')
+  write_theme_value(rose_hex_value, rose_opacity, token_name, FILE_PATH_COLORS, 'Rose')
+  write_theme_value(light_contrast_hex_value, light_contrast_opacity, token_name, FILE_PATH_COLORS, 'LightContrast')
+  write_theme_value(dark_contrast_hex_value, dark_contrast_opacity, token_name, FILE_PATH_COLORS, 'DarkContrast')
 end
 
-File.write(filePathColors, "\n", mode: 'a')
+File.write(FILE_PATH_COLORS, "\n", mode: 'a')
 all_token_names.each_with_index do |token, index|
   token_str = if token.start_with?('podcast') || token.start_with?('playerBackground') || token.start_with?('playerHighlight')
                 "    @ColorInt fun #{token}(activeTheme: Theme.ThemeType, @ColorInt podcastColor: Int): Int {
@@ -267,12 +265,12 @@ all_token_names.each_with_index do |token, index|
         }
     }\n"
               end
-  File.write(filePathColors, token_str, mode: 'a')
+  File.write(FILE_PATH_COLORS, token_str, mode: 'a')
 
-  File.write(filePathColors, "\n", mode: 'a') if index != all_token_names.length - 1
+  File.write(FILE_PATH_COLORS, "\n", mode: 'a') if index != all_token_names.length - 1
 end
 
-File.write(filePathColors, "}\n", mode: 'a')
+File.write(FILE_PATH_COLORS, "}\n", mode: 'a')
 
-File.truncate(filePathStyles, File.size(filePathStyles) - 2) # remove the trailing comma
-File.write(filePathStyles, "\n}\n", mode: 'a')
+File.truncate(FILE_PATH_STYLES, File.size(FILE_PATH_STYLES) - 2) # remove the trailing comma
+File.write(FILE_PATH_STYLES, "\n}\n", mode: 'a')

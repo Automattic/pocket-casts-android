@@ -5,7 +5,7 @@
 require 'csv'
 require './download_themes'
 
-filePath = '../../modules/services/compose/src/main/java/au/com/shiftyjelly/pocketcasts/compose/Colors.kt'
+COLORS_FILE_PATH = '../../modules/services/compose/src/main/java/au/com/shiftyjelly/pocketcasts/compose/Colors.kt'
 
 class String
   def uncapitalize
@@ -20,7 +20,7 @@ end
 tokens = download_themes
 exit if tokens.nil?
 
-themeToCodeLines = {}
+theme_to_code_lines = {}
 
 tokens.each do |token_attrs|
   key = token_attrs[:key]
@@ -42,8 +42,8 @@ tokens.each do |token_attrs|
   token_attrs[:themes].each do |name, attrs|
     next if name.to_s == 'classic_dark'
 
-    cleanThemeName = name.to_s.split('_').collect(&:capitalize).join
-    lines = themeToCodeLines[cleanThemeName] || []
+    clean_theme_name = name.to_s.split('_').collect(&:capitalize).join
+    lines = theme_to_code_lines[clean_theme_name] || []
     hex = attrs[:hex].gsub('#', '')
     next if hex.include?('$')
 
@@ -51,20 +51,20 @@ tokens.each do |token_attrs|
     next if opacity.to_i.zero?
 
     lines << "#{kotlin_name} = Color(0x#{int_to_hex(opacity)}#{hex})"
-    themeToCodeLines[cleanThemeName] = lines
+    theme_to_code_lines[clean_theme_name] = lines
   end
 end
 
-File.truncate(filePath, 0) if File.exist?(filePath)
+File.truncate(COLORS_FILE_PATH, 0) if File.exist?(COLORS_FILE_PATH)
 
-File.write(filePath, "// ************ WARNING AUTO GENERATED, DO NOT EDIT ************
+File.write(COLORS_FILE_PATH, "// ************ WARNING AUTO GENERATED, DO NOT EDIT ************
 package au.com.shiftyjelly.pocketcasts.compose
 
 import androidx.compose.ui.graphics.Color
 ", mode: 'a')
 
-themeToCodeLines.each do |theme, lines|
-  File.write(filePath, "
+theme_to_code_lines.each do |theme, lines|
+  File.write(COLORS_FILE_PATH, "
 val Theme#{theme}Colors = ThemeColors(
     #{lines.join(",\n    ")}
 )

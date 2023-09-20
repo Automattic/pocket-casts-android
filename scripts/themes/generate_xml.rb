@@ -42,8 +42,8 @@ def write_theme_colors(tokens, theme_name, file_marker)
     opacity = theme[:opacity]
     alpha = (opacity[0...-1].to_f / 100.0 * 255.0).to_i.to_s(16)
     alpha = "0#{alpha}" if alpha.size == 1
-    colorWithAlpha = opacity == '100%' ? color : "##{alpha}#{color[1..]}"
-    output += %(        <item name="#{key}">#{colorWithAlpha}</item>\n)
+    color_with_alpha = opacity == '100%' ? color : "##{alpha}#{color[1..]}"
+    output += %(        <item name="#{key}">#{color_with_alpha}</item>\n)
   end
   write_to_theme_file(output, file_marker)
 end
