@@ -338,24 +338,13 @@ class DownloadManagerImpl @Inject constructor(
                 .addTag(episode.uuid)
                 .build()
 
-            val tasks = mutableListOf(downloadTask)
-            if (episode is PodcastEpisode) {
-                val cacheShowNotesData = Data.Builder()
-                    .putString(UpdateShowNotesTask.INPUT_PODCAST_UUID, episode.podcastUuid)
-                    .putString(UpdateShowNotesTask.INPUT_EPISODE_UUID, episode.uuid)
-                    .build()
-                val cacheShowNotesTask = OneTimeWorkRequestBuilder<UpdateShowNotesTask>()
-                    .setInputData(cacheShowNotesData)
-                    .addTag(episode.uuid)
-                    .build()
-                tasks.add(cacheShowNotesTask)
-            }
+            UpdateShowNotesTask.enqueue(episode, constraints, context)
 
             episodeManager.updateDownloadTaskId(episode, downloadTask.id.toString())
             WorkManager
                 .getInstance(context)
                 .beginWith(updateTask)
-                .then(tasks)
+                .then(downloadTask)
                 .enqueue()
         } catch (storageException: StorageException) {
             launch(downloadsCoroutineContext) {
