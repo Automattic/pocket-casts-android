@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require './download_themes'
 
 THEME_FILE = '../../modules/services/ui/src/main/res/values/themes.xml'
 
 def write_to_theme_file(output, file_marker)
-  contents = IO.read(THEME_FILE)
+  contents = File.read(THEME_FILE)
   new_contents = ''
   reading = true
   contents.lines.each do |line|
@@ -39,8 +41,8 @@ def write_theme_colors(tokens, theme_name, file_marker)
     color = theme[:hex]
     opacity = theme[:opacity]
     alpha = (opacity[0...-1].to_f / 100.0 * 255.0).to_i.to_s(16)
-    alpha = '0' + alpha if alpha.size == 1
-    colorWithAlpha = opacity == '100%' ? color : "##{alpha}#{color[1..-1]}"
+    alpha = "0#{alpha}" if alpha.size == 1
+    colorWithAlpha = opacity == '100%' ? color : "##{alpha}#{color[1..]}"
     output += %(        <item name="#{key}">#{colorWithAlpha}</item>\n)
   end
   write_to_theme_file(output, file_marker)

@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 require 'google/apis/sheets_v4'
 require 'googleauth'
 require 'fileutils'
 
-APPLICATION_NAME = 'Google Sheets API Pocket Casts Themes'.freeze
-CREDENTIALS_PATH = 'google_credentials.json'.freeze
+APPLICATION_NAME = 'Google Sheets API Pocket Casts Themes'
+CREDENTIALS_PATH = 'google_credentials.json'
 SCOPE = Google::Apis::SheetsV4::AUTH_SPREADSHEETS_READONLY
 
 class String
   def uncapitalize
-    self[0, 1].downcase + self[1..-1]
+    self[0, 1].downcase + self[1..]
   end
 end
 
 def response_to_tokens_map(response)
   tokens = []
-  response.values.each do |row|
+  response.each_value do |row|
     key = row[0]
-    next if key.nil? || key.length == 0
+    next if key.nil? || key.empty?
 
     tokens << {
       key: key.gsub('$', '').gsub('-', '_'),
@@ -71,7 +73,7 @@ def response_to_tokens_map(response)
     }
   end
   tokens.each do |token_attrs|
-    token_attrs[:user_input] = !token_attrs[:themes].none? { |_key, value| value[:hex] == '$podcast' || value[:hex] == '$filter' }
+    token_attrs[:user_input] = token_attrs[:themes].any? { |_key, value| value[:hex] == '$podcast' || value[:hex] == '$filter' }
   end
   tokens
 end

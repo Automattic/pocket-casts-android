@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Generate android theme colours from exported CSV from Google Sheet
 # To use: ruby generate_themes2.rb themes.csv
 require 'csv'
@@ -8,7 +10,7 @@ filePathStyles = '../../modules/services/ui/src/main/java/au/com/shiftyjelly/poc
 
 class String
   def uncapitalize
-    self[0, 1].downcase + self[1..-1]
+    self[0, 1].downcase + self[1..]
   end
 end
 
@@ -189,8 +191,8 @@ end
 
 File.write(filePathColors, "\n", mode: 'a')
 all_token_names.each_with_index do |token, index|
-  if token.start_with?('podcast') || token.start_with?('playerBackground') || token.start_with?('playerHighlight')
-    token_str = "    @ColorInt fun #{token}(activeTheme: Theme.ThemeType, @ColorInt podcastColor: Int): Int {
+  token_str = if token.start_with?('podcast') || token.start_with?('playerBackground') || token.start_with?('playerHighlight')
+                "    @ColorInt fun #{token}(activeTheme: Theme.ThemeType, @ColorInt podcastColor: Int): Int {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 #{token}Light(podcastColor)
@@ -214,9 +216,8 @@ all_token_names.each_with_index do |token, index|
                 #{token}DarkContrast(podcastColor)
         }
     }\n"
-    File.write(filePathColors, token_str, mode: 'a')
-  elsif token.start_with?('filterU') || token.start_with?('filterI') || token.start_with?('filterT')
-    token_str = "    @ColorInt fun #{token}(activeTheme: Theme.ThemeType, @ColorInt filterColor: Int): Int {
+              elsif token.start_with?('filterU') || token.start_with?('filterI') || token.start_with?('filterT')
+                "    @ColorInt fun #{token}(activeTheme: Theme.ThemeType, @ColorInt filterColor: Int): Int {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 #{token}Light(filterColor)
@@ -240,9 +241,8 @@ all_token_names.each_with_index do |token, index|
                 #{token}DarkContrast(filterColor)
             }
         }\n"
-    File.write(filePathColors, token_str, mode: 'a')
-  else
-    token_str = "    @ColorInt fun #{token}(theme: Theme.ThemeType): Int {
+              else
+                "    @ColorInt fun #{token}(theme: Theme.ThemeType): Int {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 #{token}Light
@@ -266,8 +266,8 @@ all_token_names.each_with_index do |token, index|
                 #{token}DarkContrast
         }
     }\n"
-    File.write(filePathColors, token_str, mode: 'a')
-  end
+              end
+  File.write(filePathColors, token_str, mode: 'a')
 
   File.write(filePathColors, "\n", mode: 'a') if index != all_token_names.length - 1
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 default_platform(:android)
 fastlane_require 'dotenv'
 
@@ -60,7 +62,7 @@ GH_REPOSITORY = 'automattic/pocket-casts-android'
 APPS_APP = 'app'
 APPS_AUTOMOTIVE = 'automotive'
 APPS_WEAR = 'wear'
-APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR]
+APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR].freeze
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 

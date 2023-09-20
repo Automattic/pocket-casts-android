@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Generate android theme colours from exported CSV from Google Sheet
 # To use: ruby generate_themes2.rb themes.csv
 require 'csv'
@@ -7,7 +9,7 @@ filePath = '../../modules/services/compose/src/main/java/au/com/shiftyjelly/pock
 
 class String
   def uncapitalize
-    self[0, 1].downcase + self[1..-1]
+    self[0, 1].downcase + self[1..]
   end
 end
 
@@ -46,7 +48,7 @@ tokens.each do |token_attrs|
     next if hex.include?('$')
 
     opacity = attrs[:opacity]
-    next if opacity.to_i == 0
+    next if opacity.to_i.zero?
 
     lines << "#{kotlin_name} = Color(0x#{int_to_hex(opacity)}#{hex})"
     themeToCodeLines[cleanThemeName] = lines
