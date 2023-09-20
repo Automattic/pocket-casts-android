@@ -32,7 +32,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TASK_NAME = "UpdateEpisodeDetailsTask"
-        private const val INPUT_EPISODE_UUIDS = "episode_uuids"
+        const val INPUT_EPISODE_UUIDS = "episode_uuids"
         private const val REQUEST_TIMEOUT_SECS = 20L
 
         fun enqueue(episodes: List<PodcastEpisode>, context: Context) {
@@ -76,6 +76,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 val request = Request.Builder()
                     .url(downloadUrl)
                     .addHeader("User-Agent", "Pocket Casts")
+                    .head()
                     .build()
 
                 if (isStopped) {
