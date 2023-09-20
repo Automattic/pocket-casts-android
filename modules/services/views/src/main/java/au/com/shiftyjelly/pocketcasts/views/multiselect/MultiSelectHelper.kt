@@ -31,7 +31,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fun multiDeselectAllAbove(multiSelectable: T)
     }
 
-    open var listener: Listener<T>? = null
+    var listener: Listener<T>? = null
 
     private val _isMultiSelectingLive = MutableLiveData<Boolean>().apply { value = false }
     val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
