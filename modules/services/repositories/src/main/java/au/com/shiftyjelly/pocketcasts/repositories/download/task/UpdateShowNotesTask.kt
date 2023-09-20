@@ -44,11 +44,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
             val workRequest = OneTimeWorkRequestBuilder<UpdateShowNotesTask>()
                 .setInputData(cacheShowNotesData)
                 .addTag(episode.uuid)
-                .apply {
-                    if (constraints != Constraints.NONE) {
-                        setConstraints(constraints)
-                    }
-                }
+                .setConstraints(constraints)
                 .build()
             WorkManager.getInstance(context).beginUniqueWork(TASK_NAME, ExistingWorkPolicy.APPEND, workRequest).enqueue()
         }
