@@ -142,7 +142,6 @@ class DiscoverViewModel @Inject constructor(
             .map { sponsoredPodcast ->
                 loadPodcastList(sponsoredPodcast.source as String)
                     .filter {
-                        Timber.e("Invalid sponsored podcast list found.")
                         it.podcasts.isNotEmpty() && it.listId != null
                     }
                     .map {

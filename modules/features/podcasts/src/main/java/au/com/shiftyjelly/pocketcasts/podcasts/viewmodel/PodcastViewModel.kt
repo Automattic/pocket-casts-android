@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -49,13 +48,14 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import javax.inject.Inject
@@ -114,83 +114,85 @@ class PodcastViewModel
     }
 
     fun loadPodcast(uuid: String, resources: Resources) {
-        viewModelScope.launch {
-            this@PodcastViewModel.podcastUuid = uuid
-            val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
-            val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
+        this@PodcastViewModel.podcastUuid = uuid
+        val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
+        val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
 
-            val podcastStateFlowable = podcastManager.findPodcastByUuidRx(uuid)
-                .subscribeOn(Schedulers.io())
-                .flatMap {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
-                    if (it.isSubscribed) {
-                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid is subscribed")
+        disposables.clear()
+        podcastManager.findPodcastByUuidRx(uuid)
+            .subscribeOn(Schedulers.io())
+            .flatMap {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
+                if (it.isSubscribed) {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid is subscribed")
+                    updatePodcast(it)
+                    return@flatMap Maybe.just(it)
+                } else {
+                    val wasDeleted = podcastManager.deletePodcastIfUnused(it, playbackManager)
+                    if (wasDeleted) {
+                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid was old and deleted")
+                        return@flatMap Maybe.empty<Podcast>()
+                    } else {
                         updatePodcast(it)
                         return@flatMap Maybe.just(it)
-                    } else {
-                        val wasDeleted = podcastManager.deletePodcastIfUnused(it, playbackManager)
-                        if (wasDeleted) {
-                            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid was old and deleted")
-                            return@flatMap Maybe.empty<Podcast>()
-                        } else {
-                            updatePodcast(it)
-                            return@flatMap Maybe.just(it)
-                        }
                     }
-                }
-                .filterKeepSubscribed()
-                .downloadMissingPodcast(uuid, podcastManager)
-                .toFlowable()
-                .switchMap {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Creating observer for podcast $uuid changes")
-                    // We have already loaded the podcast so fire that first and then observe changes from then on
-                    Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext { newPodcast ->
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
-                    tintColor.value = theme.getPodcastTintColor(newPodcast)
-                    observableHeaderExpanded.value = !newPodcast.isSubscribed
-                    podcast.postValue(newPodcast)
-                }
-                .switchMap {
-                    Observables.combineLatest(
-                        Observable.just(it),
-                        episodeSearchResults,
-                        bookmarkSearchResults,
-                        userManager.getSignInState().toObservable()
-                    ) { podcast, episodeSearchResults, bookmarkSearchResults, signInState ->
-                        CombinedEpisodeAndBookmarkData(
-                            podcast = podcast,
-                            showingArchived = podcast.showArchived,
-                            episodeSearchResult = episodeSearchResults,
-                            bookmarkSearchResult = bookmarkSearchResults,
-                            signInState = signInState
-                        )
-                    }.toFlowable(BackpressureStrategy.LATEST)
-                }
-                .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
-                .doOnNext {
-                    if (it is UiState.Loaded) {
-                        val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
-                        groupedEpisodes.postValue(groups)
-                    } else {
-                        groupedEpisodes.postValue(emptyList())
-                    }
-                }
-                .onErrorReturn {
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not load podcast page")
-                    UiState.Error(it.message ?: "Unknown error")
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-
-            podcastStateFlowable.asFlow().collect {
-                _uiState.value = when (it) {
-                    is UiState.Loaded -> it.copy(showTab = getCurrentTab())
-                    else -> it
                 }
             }
-        }
+            .filterKeepSubscribed()
+            .downloadMissingPodcast(uuid, podcastManager)
+            .toFlowable()
+            .switchMap {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Creating observer for podcast $uuid changes")
+                // We have already loaded the podcast so fire that first and then observe changes from then on
+                Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { newPodcast ->
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
+                tintColor.value = theme.getPodcastTintColor(newPodcast)
+                observableHeaderExpanded.value = !newPodcast.isSubscribed
+                podcast.postValue(newPodcast)
+            }
+            .switchMap {
+                Observables.combineLatest(
+                    Observable.just(it),
+                    episodeSearchResults,
+                    bookmarkSearchResults,
+                    userManager.getSignInState().toObservable()
+                ) { podcast, episodeSearchResults, bookmarkSearchResults, signInState ->
+                    CombinedEpisodeAndBookmarkData(
+                        podcast = podcast,
+                        showingArchived = podcast.showArchived,
+                        episodeSearchResult = episodeSearchResults,
+                        bookmarkSearchResult = bookmarkSearchResults,
+                        signInState = signInState
+                    )
+                }.toFlowable(BackpressureStrategy.LATEST)
+            }
+            .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
+            .doOnNext {
+                if (it is UiState.Loaded) {
+                    val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
+                    groupedEpisodes.postValue(groups)
+                } else {
+                    groupedEpisodes.postValue(emptyList())
+                }
+            }
+            .onErrorReturn {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not load podcast page")
+                UiState.Error(it.message ?: "Unknown error")
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    _uiState.value = when (it) {
+                        is UiState.Loaded -> it.copy(showTab = getCurrentTab())
+                        else -> it
+                    }
+                },
+                onError = { Timber.e(it) }
+            )
+            .addTo(disposables)
     }
 
     fun onTabClicked(tab: PodcastTab) {

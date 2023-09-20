@@ -44,6 +44,7 @@ interface EpisodeManager {
     fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode>
     fun findEpisodesByPodcast(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodes(date: Date): List<PodcastEpisode>

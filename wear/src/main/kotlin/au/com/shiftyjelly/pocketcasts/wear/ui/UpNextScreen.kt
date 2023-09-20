@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.PositionIndicator
+import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
@@ -50,21 +52,25 @@ fun UpNextScreen(
             if (list.isEmpty()) {
                 EmptyQueueState()
             } else {
-                ScalingLazyColumn(
-                    columnState = columnState,
-                    modifier = modifier.fillMaxWidth(),
+                Scaffold(
+                    positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) }
                 ) {
+                    ScalingLazyColumn(
+                        columnState = columnState,
+                        modifier = modifier.fillMaxWidth(),
+                    ) {
 
-                    item { ScreenHeaderChip(LR.string.up_next) }
+                        item { ScreenHeaderChip(LR.string.up_next) }
 
-                    items(list) { episode ->
-                        EpisodeChip(
-                            episode = episode,
-                            useUpNextIcon = false,
-                            onClick = {
-                                navigateToEpisode(episode.uuid)
-                            },
-                        )
+                        items(list) { episode ->
+                            EpisodeChip(
+                                episode = episode,
+                                useUpNextIcon = false,
+                                onClick = {
+                                    navigateToEpisode(episode.uuid)
+                                },
+                            )
+                        }
                     }
                 }
             }
