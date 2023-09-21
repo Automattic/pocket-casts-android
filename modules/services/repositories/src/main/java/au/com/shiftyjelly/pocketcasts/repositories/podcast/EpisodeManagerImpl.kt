@@ -6,19 +6,14 @@ import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.paging.PagedList
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -52,9 +47,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.merge
@@ -80,6 +73,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val podcastCacheServerManager: PodcastCacheServerManager,
     private val userEpisodeManager: UserEpisodeManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : EpisodeManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -89,7 +83,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val userEpisodeDao = appDatabase.userEpisodeDao()
 
     override suspend fun findEpisodeByUuid(uuid: String): BaseEpisode? {
-        val episode = findByUuidSuspend(uuid)
+        val episode = findByUuid(uuid)
         if (episode != null) {
             return episode
         }
@@ -97,23 +91,23 @@ class EpisodeManagerImpl @Inject constructor(
         return userEpisodeManager.findEpisodeByUuid(uuid)
     }
 
-    override fun findByUuid(uuid: String): PodcastEpisode? {
-        return episodeDao.findByUuid(uuid)
-    }
+    override suspend fun findByUuid(uuid: String): PodcastEpisode? =
+        episodeDao.findByUuid(uuid)
 
-    override suspend fun findByUuidSuspend(uuid: String): PodcastEpisode? {
-        return episodeDao.findByUuidSuspend(uuid)
-    }
+    @Deprecated("Use findByUuid suspended method instead")
+    override fun findByUuidSync(uuid: String): PodcastEpisode? =
+        episodeDao.findByUuidSync(uuid)
 
-    override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> {
-        return episodeDao.findByUuidRx(uuid)
-    }
+    @Deprecated("Use findByUuid suspended method instead")
+    override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =
+        episodeDao.findByUuidRx(uuid)
 
     override fun observeByUuid(uuid: String): Flow<PodcastEpisode> {
         return episodeDao.observeByUuid(uuid)
     }
 
     override fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode> {
+        @Suppress("DEPRECATION")
         return findByUuidRx(uuid)
             .flatMapPublisher<BaseEpisode> { episodeDao.observeByUuid(uuid).asFlowable() }
             .switchIfEmpty(userEpisodeManager.observeEpisodeRx(uuid))
@@ -125,9 +119,8 @@ class EpisodeManagerImpl @Inject constructor(
             userEpisodeManager.observeEpisode(uuid) // if it is a UserEpisode
         ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
 
-    override fun findFirstBySearchQuery(query: String): PodcastEpisode? {
-        return episodeDao.findFirstBySearchQuery(query)
-    }
+    override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? =
+        episodeDao.findFirstBySearchQuery(query)
 
     @Suppress("DEPRECATION")
     override fun findAll(rowParser: (PodcastEpisode) -> Boolean) {
@@ -178,6 +171,17 @@ class EpisodeManagerImpl @Inject constructor(
             EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAsc(podcastUuid = podcast.uuid)
             EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDesc(podcastUuid = podcast.uuid)
             else -> episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid)
+        }
+    }
+
+    override suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode> {
+        return when (podcast.episodesSortType) {
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescSuspend(podcastUuid = podcast.uuid)
+            else -> episodeDao.findByPodcastOrderPublishedDateDescSuspend(podcastUuid = podcast.uuid)
         }
     }
 
@@ -246,20 +250,18 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observeDownloadingEpisodesRx().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
     }
 
-    override fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode> {
+    override fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode> =
         if (uuids.isEmpty()) {
-            return ArrayList()
-        }
-        if (ordered) {
-            val episodes = ArrayList<PodcastEpisode>()
-            for (uuid in uuids) {
-                findByUuid(uuid)?.let { episodes.add(it) }
+            emptyList()
+        } else if (ordered) {
+            uuids.mapNotNull {
+                runBlocking {
+                    findByUuid(it)
+                }
             }
-            return episodes
         } else {
-            return findEpisodesWhere("uuid IN " + QueryHelper.convertStringArrayToInStatement(uuids))
+            findEpisodesWhere("uuid IN " + QueryHelper.convertStringArrayToInStatement(uuids))
         }
-    }
 
     override fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
         if (playedUpTo < 0 || episode == null) {
@@ -447,9 +449,12 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun starEpisode(episode: PodcastEpisode, starred: Boolean) {
-        episode.isStarred = starred
+    override suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView) {
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
+        val event =
+            if (starred) AnalyticsEvent.EPISODE_UNSTARRED
+            else AnalyticsEvent.EPISODE_STARRED
+        episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
     }
 
     override suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean) {
@@ -458,12 +463,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    override fun toggleStarEpisodeAsync(episode: PodcastEpisode) {
-        GlobalScope.launch {
-            findByUuid(episode.uuid)?.let {
-                starEpisode(episode, !it.isStarred)
-            }
+    override suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView) {
+        // Retrieve the episode to make sure we have the latest starred status
+        findByUuid(episode.uuid)?.let {
+            starEpisode(episode, !it.isStarred, sourceView)
         }
     }
 
@@ -474,20 +477,8 @@ class EpisodeManagerImpl @Inject constructor(
         unarchive(episode)
     }
 
-    private fun downloadEpisodesFileDetails(episodes: List<PodcastEpisode>?) {
-        if (episodes == null || episodes.isEmpty()) {
-            return
-        }
-
-        val episodeUuids = episodes.map { it.uuid }.toTypedArray()
-        val workData = Data.Builder()
-            .putStringArray(UpdateEpisodeDetailsTask.INPUT_EPISODE_UUIDS, episodeUuids)
-            .build()
-        val workRequest = OneTimeWorkRequestBuilder<UpdateEpisodeDetailsTask>()
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setInputData(workData)
-            .build()
-        WorkManager.getInstance(context).beginUniqueWork(UpdateEpisodeDetailsTask.TASK_NAME, ExistingWorkPolicy.APPEND, workRequest).enqueue()
+    private fun downloadEpisodesFileDetails(episodes: List<PodcastEpisode>) {
+        UpdateEpisodeDetailsTask.enqueue(episodes, context)
     }
 
     override suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
@@ -939,7 +930,9 @@ class EpisodeManagerImpl @Inject constructor(
         while (episodesItr.hasNext()) {
             val episode = episodesItr.next()
             // check if the episode already exists
-            val existingEpisode = findByUuid(episode.uuid)
+            val existingEpisode = runBlocking {
+                findByUuid(episode.uuid)
+            }
             if (existingEpisode == null) {
                 episode.podcastUuid = podcastUuid
                 addedEpisodes.add(episode)
@@ -1123,12 +1116,14 @@ class EpisodeManagerImpl @Inject constructor(
     override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
+                if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
                     observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
+
+                        @Suppress("DEPRECATION")
                         podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRx(episodeUuid))
                     }.flatMap { (podcast, episode) ->
                         if (podcast.isAutoDownloadNewEpisodes) {

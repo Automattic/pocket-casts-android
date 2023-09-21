@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import java.util.Date
@@ -145,6 +146,10 @@ class BookmarkManagerImpl @Inject constructor(
             bookmarkDao.findByPodcastOrderEpisodeAndTimeFlow(
                 podcastUuid = podcastUuid,
             ).flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
+    }
+
+    override fun findBookmarksFlow(): Flow<List<Bookmark>> {
+        return bookmarkDao.findBookmarksFlow()
     }
 
     override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
