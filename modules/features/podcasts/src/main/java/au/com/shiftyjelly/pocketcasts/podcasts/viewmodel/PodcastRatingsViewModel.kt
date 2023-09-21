@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -62,7 +63,13 @@ class PodcastRatingsViewModel
             try {
                 ratingsManager.refreshPodcastRatings(uuid)
             } catch (e: Exception) {
-                Timber.e(e, "Failed to refresh podcast ratings")
+                val message = "Failed to refresh podcast ratings"
+                // don't report missing rating or network errors to Sentry
+                if (e is HttpException || e is IOException) {
+                    Timber.i(e, message)
+                } else {
+                    Timber.e(e, message)
+                }
             }
         }
     }
