@@ -316,15 +316,15 @@ class DownloadManagerImpl @Inject constructor(
                 .setRequiredNetworkType(networkRequirements.toWorkManagerEnum())
                 .setRequiresCharging(networkRequirements.requiresPower)
                 .build()
-            val updateData = Data.Builder()
-                .putString(UpdateEpisodeTask.INPUT_EPISODE_UUID, episode.uuid)
-                .putString(UpdateEpisodeTask.INPUT_PODCAST_UUID, (episode as? PodcastEpisode)?.podcastUuid)
-                .build()
-            val updateTask = OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
-                .setInputData(updateData)
-                .setConstraints(constraints)
-                .addTag(episode.uuid)
-                .build()
+
+            // only update the episode download URL for feed podcasts, not user podcasts
+            val updateEpisodeTask = (episode as? PodcastEpisode)?.let {
+                OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
+                    .setInputData(UpdateEpisodeTask.buildInputData(episode))
+                    .setConstraints(constraints)
+                    .addTag(episode.uuid)
+                    .build()
+            }
 
             val downloadData = Data.Builder()
                 .putString(DownloadEpisodeTask.INPUT_EPISODE_UUID, episode.uuid)
@@ -341,11 +341,15 @@ class DownloadManagerImpl @Inject constructor(
             UpdateShowNotesTask.enqueue(episode, constraints, context)
 
             episodeManager.updateDownloadTaskId(episode, downloadTask.id.toString())
-            WorkManager
-                .getInstance(context)
-                .beginWith(updateTask)
-                .then(downloadTask)
-                .enqueue()
+            val workManager = WorkManager.getInstance(context)
+            if (updateEpisodeTask == null) {
+                workManager.enqueue(downloadTask)
+            } else {
+                workManager
+                    .beginWith(updateEpisodeTask)
+                    .then(downloadTask)
+                    .enqueue()
+            }
         } catch (storageException: StorageException) {
             launch(downloadsCoroutineContext) {
                 episodeDidDownload(DownloadResult.failedResult(null, "Insufficient storage space", episode.uuid))

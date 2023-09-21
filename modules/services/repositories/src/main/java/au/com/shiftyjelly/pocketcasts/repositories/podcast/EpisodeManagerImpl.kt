@@ -428,16 +428,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateDownloadUrl(episode: BaseEpisode?, url: String) {
-        episode ?: return
-        if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadUrl(url, episode.uuid)
-        } else if (episode is UserEpisode) {
-            episode.downloadUrl = url
-            // We shouldn't hold on to these urls in the database
-        }
-    }
-
     override fun updateLastDownloadAttemptDate(episode: BaseEpisode?) {
         episode ?: return
         val now = Date()
@@ -1119,7 +1109,7 @@ class EpisodeManagerImpl @Inject constructor(
                 if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
                     observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
-                    podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
+                    podcastCacheServerManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
 

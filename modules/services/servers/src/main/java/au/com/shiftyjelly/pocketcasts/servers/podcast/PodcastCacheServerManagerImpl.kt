@@ -23,8 +23,12 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
             .map(PodcastResponse::toPodcast)
     }
 
-    override fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Single<Podcast> {
-        return server.getPodcastAndEpisode(podcastUuid, episodeUuid).map(PodcastResponse::toPodcast)
+    override fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast> {
+        return server.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).map(PodcastResponse::toPodcast)
+    }
+
+    override suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast {
+        return server.getPodcastAndEpisode(podcastUuid, episodeUuid).toPodcast()
     }
 
     override fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>> {
