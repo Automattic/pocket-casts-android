@@ -332,9 +332,8 @@ class DownloadManagerImpl @Inject constructor(
                     .build()
             }
 
-            UpdateShowNotesTask.enqueue(episode, constraints, context)
-
             episodeManager.updateDownloadTaskId(episode, downloadTask.id.toString())
+
             val workManager = WorkManager.getInstance(context)
 
             when (episode) {
@@ -344,6 +343,9 @@ class DownloadManagerImpl @Inject constructor(
                 }
 
                 is PodcastEpisode -> {
+
+                    UpdateShowNotesTask.enqueue(episode, constraints, context)
+
                     val updateEpisodeTask = OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
                         .setInputData(UpdateEpisodeTask.buildInputData(episode))
                         .setConstraints(constraints)
