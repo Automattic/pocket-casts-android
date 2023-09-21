@@ -43,8 +43,6 @@ class RefreshPodcastsTask @AssistedInject constructor(
         super.onStopped()
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - onStopped")
         this.refreshRunnable?.cancelExecution()
-
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - onStopped")
     }
 
     companion object {

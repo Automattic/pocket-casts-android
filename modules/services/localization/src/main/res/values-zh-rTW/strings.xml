@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-22 09:54:04+0000
+Translation-Revision-Date: 2023-09-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">此 Podcast 沒有符合您搜尋條件的書籤。</string>
+    <string name="podcast_no_bookmarks_found">找不到書籤</string>
+    <string name="player_tab_notes">詳細資料</string>
+    <string name="bookmark_updated">已更新書籤「%s」</string>
     <string name="go_to_bottom">前往底部</string>
     <string name="go_to_top">前往頂端</string>
     <string name="support">支援</string>
@@ -284,7 +288,7 @@ Language: zh_TW
     <string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的專屬圖示和主題。</string>
     <string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10 GB 雲端儲存空間</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20 GB 雲端儲存空間</string>
     <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並同步到所有裝置。</string>
     <string name="onboarding_plus_feature_folders_title">資料夾</string>
     <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，享受更多元的收聽方式。</string>

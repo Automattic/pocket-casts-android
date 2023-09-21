@@ -12,6 +12,7 @@
     *   Improved the downloading of episode show notes
         ([#1390](https://github.com/Automattic/pocket-casts-android/pull/1390))
 
+        
 7.47
 -----
 
@@ -33,7 +34,7 @@
 *   Updates:
     *   Removed login with email and password on WearOS app
         ([#1356](https://github.com/Automattic/pocket-casts-android/pull/1356))
-    
+
 7.46.1
 ------
 *   Bug Fixes:
