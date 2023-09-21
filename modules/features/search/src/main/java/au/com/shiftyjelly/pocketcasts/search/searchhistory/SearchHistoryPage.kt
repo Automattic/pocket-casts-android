@@ -14,6 +14,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -71,7 +72,9 @@ internal fun SearchHistoryPage(
         onRowClick = onClick,
         onScroll = onScroll,
     )
-    viewModel.start()
+    LaunchedEffect(Unit) {
+        viewModel.start()
+    }
 }
 
 @Composable
