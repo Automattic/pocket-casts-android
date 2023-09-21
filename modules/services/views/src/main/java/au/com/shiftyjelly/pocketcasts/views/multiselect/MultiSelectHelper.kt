@@ -31,7 +31,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         fun multiDeselectAllAbove(multiSelectable: T)
     }
 
-    open lateinit var listener: Listener<T>
+    var listener: Listener<T>? = null
 
     private val _isMultiSelectingLive = MutableLiveData<Boolean>().apply { value = false }
     val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
@@ -122,19 +122,19 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     }
 
     fun selectAll() {
-        listener.multiSelectSelectAll()
+        listener?.multiSelectSelectAll()
     }
 
     fun unselectAll() {
-        listener.multiSelectSelectNone()
+        listener?.multiSelectSelectNone()
     }
 
     private fun selectAllAbove(multiSelectable: T) {
-        listener.multiSelectSelectAllUp(multiSelectable)
+        listener?.multiSelectSelectAllUp(multiSelectable)
     }
 
     private fun selectAllBelow(multiSelectable: T) {
-        listener.multiSelectSelectAllDown(multiSelectable)
+        listener?.multiSelectSelectAllDown(multiSelectable)
     }
 
     fun selectAllInList(multiSelectables: List<T>) {
@@ -181,15 +181,15 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     }
 
     private fun deselectAll() {
-        listener.multiSelectSelectNone()
+        listener?.multiSelectSelectNone()
     }
 
     private fun deselectAllAbove(deselectAllBelow: T) {
-        listener.multiDeselectAllAbove(deselectAllBelow)
+        listener?.multiDeselectAllAbove(deselectAllBelow)
     }
 
     private fun deselectAllBelow(deselectAllBelow: T) {
-        listener.multiDeselectAllBelow(deselectAllBelow)
+        listener?.multiDeselectAllBelow(deselectAllBelow)
     }
 
     fun closeMultiSelect() {

@@ -6,3 +6,13 @@ android {
         buildConfig true
     }
 }
+
+dependencies {
+    // These dependencies have to be redeclared here event though they are already in
+    // base.gradle because here they need to not be test dependencies like they are in
+    // the main app.
+    implementation libs.kotlinCoroutinesTest
+    implementation (libs.junit) {
+        exclude group: 'org.hamcrest'
+    }
+}
