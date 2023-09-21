@@ -278,7 +278,6 @@ Language: nb_NO
     <string name="onboarding_plus_feature_desktop_apps_text">Lytt på flere steder med appene våre for Windows, macOS og nett.</string>
     <string name="onboarding_plus_feature_folders_title">Mapper</string>
     <string name="onboarding_plus_feature_folders_text">Ordne podcastene i mapper og synkroniser dem mellom alle enhetene dine.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10 GB lagringsplass i skyen</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Last opp filene til skylageret, slik at du har dem tilgjengelig overalt.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temaer og ikoner</string>
     <string name="onboarding_plus_feature_themes_icons_text">Vis ditt sanne jeg. Eksklusive ikoner og temaer bare for Plus-klubben.</string>
