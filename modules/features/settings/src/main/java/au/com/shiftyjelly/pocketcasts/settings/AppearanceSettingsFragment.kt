@@ -122,6 +122,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                             viewModel.updateChangeThemeType(Pair(null, null))
                         }
                     } else {
+                        viewModel.updateChangeThemeType(Pair(null, null))
                         (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updateTheme(beforeThemeType)
                         scrollToCurrentTheme()
                     }
