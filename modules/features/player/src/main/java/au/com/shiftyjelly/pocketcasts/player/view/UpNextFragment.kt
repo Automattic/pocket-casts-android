@@ -123,6 +123,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         binding.recyclerView.adapter = null
         super.onDestroyView()
         multiSelectHelper.context = null
+        multiSelectHelper.listener = null
         realBinding = null
     }
 
