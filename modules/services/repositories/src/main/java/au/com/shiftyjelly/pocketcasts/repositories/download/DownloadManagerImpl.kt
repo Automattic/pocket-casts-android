@@ -317,7 +317,7 @@ class DownloadManagerImpl @Inject constructor(
                 .setRequiresCharging(networkRequirements.requiresPower)
                 .build()
 
-            // only update the episode download URL for feed podcasts, not user podcasts
+            // only update the episode download URL for feed podcasts, not user files
             val updateEpisodeTask = (episode as? PodcastEpisode)?.let {
                 OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
                     .setInputData(UpdateEpisodeTask.buildInputData(episode))
