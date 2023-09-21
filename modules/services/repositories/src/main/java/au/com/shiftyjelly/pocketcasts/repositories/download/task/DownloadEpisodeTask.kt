@@ -126,7 +126,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             this.episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUUID!!) } ?: return Result.failure()
 
             if (this.episode.downloadTaskId != id.toString()) {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling.")
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling. downloadTaskId: ${this.episode.downloadTaskId} id: $id.")
                 return Result.failure()
             }
 
@@ -513,7 +513,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         if (exception != null) {
             // don't report issues such as timeouts to Sentry
             val logPriority = if (exception is IOException) Log.INFO else Log.ERROR
-            LogBuffer.log(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
+            LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
         }
 
         if (!emitter.isDisposed) {

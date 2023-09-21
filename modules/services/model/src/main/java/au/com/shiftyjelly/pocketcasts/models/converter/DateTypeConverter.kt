@@ -6,8 +6,8 @@ import java.util.Date
 class DateTypeConverter {
 
     @TypeConverter
-    fun toDate(value: Long?): Date {
-        return if (value == null) Date() else Date(value)
+    fun toDate(value: Long?): Date? {
+        return if (value == null) null else Date(value)
     }
 
     @TypeConverter

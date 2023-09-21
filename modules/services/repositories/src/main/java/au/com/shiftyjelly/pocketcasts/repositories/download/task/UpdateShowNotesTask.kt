@@ -46,7 +46,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
                 .addTag(episode.uuid)
                 .setConstraints(constraints)
                 .build()
-            WorkManager.getInstance(context).beginUniqueWork(TASK_NAME, ExistingWorkPolicy.APPEND, workRequest).enqueue()
+            WorkManager.getInstance(context).beginUniqueWork(TASK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest).enqueue()
         }
     }
 
@@ -62,7 +62,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
         } catch (e: Exception) {
             info("Worker failed - took ${SystemClock.elapsedRealtime() - startTime} ms")
             val logPriority = if (e is HttpException) Log.INFO else Log.ERROR
-            LogBuffer.log(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to update show notes")
+            LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to update show notes")
             // Don't keep retrying if the download fails. The user can download the show notes when viewing them.
             Result.success()
         }
