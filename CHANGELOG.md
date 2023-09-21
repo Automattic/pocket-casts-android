@@ -11,6 +11,8 @@
         ([#1395](https://github.com/Automattic/pocket-casts-android/pull/1392))
     *   Improved the downloading of episode show notes
         ([#1390](https://github.com/Automattic/pocket-casts-android/pull/1390))
+    *   Fixed bug where theme selection UI was not functioning as intended
+        ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
 
 7.47
 -----
