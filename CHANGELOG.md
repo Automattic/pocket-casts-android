@@ -3,7 +3,14 @@
 
 *   New Feature:
     *   Suggest episodes to play in Automotive
-        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
+        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362))
+*   Bug Fixes:
+    *   Avoid memory leak when opening Up Next queue
+        ([#1397](https://github.com/Automattic/pocket-casts-android/pull/1397))
+    *   Improved multiselect handling in Up Next queue
+        ([#1395](https://github.com/Automattic/pocket-casts-android/pull/1392))
+    *   Improved the downloading of episode show notes
+        ([#1390](https://github.com/Automattic/pocket-casts-android/pull/1390))
 
 7.47
 -----
