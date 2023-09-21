@@ -310,7 +310,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun addWorkManagerTask(episode: BaseEpisode, networkRequirements: NetworkRequirements) {
+    private suspend fun addWorkManagerTask(episode: BaseEpisode, networkRequirements: NetworkRequirements) {
         try {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(networkRequirements.toWorkManagerEnum())

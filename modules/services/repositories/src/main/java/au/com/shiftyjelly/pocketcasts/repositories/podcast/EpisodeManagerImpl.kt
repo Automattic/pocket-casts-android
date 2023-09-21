@@ -335,11 +335,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateDownloadTaskId(episode: BaseEpisode, id: String?) {
-        if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadTaskId(episode.uuid, id)
-        } else if (episode is UserEpisode) {
-            runBlocking { userEpisodeManager.updateDownloadTaskId(episode, id) }
+    override suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?) {
+        when (episode) {
+            is PodcastEpisode -> episodeDao.updateDownloadTaskId(episode.uuid, id)
+            is UserEpisode -> userEpisodeManager.updateDownloadTaskId(episode, id)
         }
     }
 
