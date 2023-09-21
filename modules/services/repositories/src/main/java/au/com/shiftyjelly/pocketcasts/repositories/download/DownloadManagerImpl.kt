@@ -317,38 +317,44 @@ class DownloadManagerImpl @Inject constructor(
                 .setRequiresCharging(networkRequirements.requiresPower)
                 .build()
 
-            // only update the episode download URL for feed podcasts, not user files
-            val updateEpisodeTask = (episode as? PodcastEpisode)?.let {
-                OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
-                    .setInputData(UpdateEpisodeTask.buildInputData(episode))
+            val downloadTask = run {
+                val downloadData = Data.Builder()
+                    .putString(DownloadEpisodeTask.INPUT_EPISODE_UUID, episode.uuid)
+                    .putString(DownloadEpisodeTask.INPUT_PATH_TO_SAVE_TO, DownloadHelper.pathForEpisode(episode, fileStorage))
+                    .putString(DownloadEpisodeTask.INPUT_TEMP_PATH, DownloadHelper.tempPathForEpisode(episode, fileStorage))
+                    .build()
+
+                OneTimeWorkRequestBuilder<DownloadEpisodeTask>()
+                    .setInputData(downloadData)
                     .setConstraints(constraints)
+                    .addTag(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
                     .addTag(episode.uuid)
                     .build()
             }
-
-            val downloadData = Data.Builder()
-                .putString(DownloadEpisodeTask.INPUT_EPISODE_UUID, episode.uuid)
-                .putString(DownloadEpisodeTask.INPUT_PATH_TO_SAVE_TO, DownloadHelper.pathForEpisode(episode, fileStorage))
-                .putString(DownloadEpisodeTask.INPUT_TEMP_PATH, DownloadHelper.tempPathForEpisode(episode, fileStorage))
-                .build()
-            val downloadTask = OneTimeWorkRequestBuilder<DownloadEpisodeTask>()
-                .setInputData(downloadData)
-                .setConstraints(constraints)
-                .addTag(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
-                .addTag(episode.uuid)
-                .build()
 
             UpdateShowNotesTask.enqueue(episode, constraints, context)
 
             episodeManager.updateDownloadTaskId(episode, downloadTask.id.toString())
             val workManager = WorkManager.getInstance(context)
-            if (updateEpisodeTask == null) {
-                workManager.enqueue(downloadTask)
-            } else {
-                workManager
-                    .beginWith(updateEpisodeTask)
-                    .then(downloadTask)
-                    .enqueue()
+
+            when (episode) {
+
+                is UserEpisode -> {
+                    workManager.enqueue(downloadTask)
+                }
+
+                is PodcastEpisode -> {
+                    val updateEpisodeTask = OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
+                        .setInputData(UpdateEpisodeTask.buildInputData(episode))
+                        .setConstraints(constraints)
+                        .addTag(episode.uuid)
+                        .build()
+
+                    workManager
+                        .beginWith(updateEpisodeTask)
+                        .then(downloadTask)
+                        .enqueue()
+                }
             }
         } catch (storageException: StorageException) {
             launch(downloadsCoroutineContext) {
