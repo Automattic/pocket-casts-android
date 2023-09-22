@@ -832,6 +832,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     override fun onDestroyView() {
         binding?.episodesRecyclerView?.adapter = null
+
+        multiSelectEpisodesHelper.cleanup()
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            multiSelectBookmarksHelper.cleanup()
+        }
+
         super.onDestroyView()
 
         binding?.episodesRecyclerView?.removeOnScrollListener(onScrollListener)
