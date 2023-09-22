@@ -78,20 +78,18 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, CoroutineScope {
+class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     companion object {
         const val ARG_PODCAST_UUID = "ARG_PODCAST_UUID"
@@ -144,9 +142,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private var fromListUuid: String? = null
     private var listState: Parcelable? = null
 
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
-
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
 
@@ -189,7 +184,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit = { successCallback ->
-        launch {
+        lifecycleScope.launch {
             val downloaded = withContext(Dispatchers.Default) { podcastManager.countEpisodesInPodcastWithStatus(podcastUuid, EpisodeStatusEnum.DOWNLOADED) }
             val title = when (downloaded) {
                 0 -> getString(LR.string.are_you_sure)
@@ -490,7 +485,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         get() = arguments?.getString(ARG_PODCAST_UUID)!!
 
     private var lastSearchTerm: String? = null
-    private var shouldCloseOnReturn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -532,14 +526,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     override fun onStart() {
         super.onStart()
-
-        if (shouldCloseOnReturn) {
-            launch(Dispatchers.Main) {
-                // You can't call back during onresume
-                @Suppress("DEPRECATION")
-                (activity as? AppCompatActivity)?.onBackPressed()
-            }
-        }
 
         updateStatusBar()
 

@@ -118,8 +118,9 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
     }
 
     override fun onDestroyView() {
-        toolbar = null
         super.onDestroyView()
+        toolbar = null
+        (activity as AppCompatActivity).setSupportActionBar(null)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -137,7 +138,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
         preferenceAddToUpNextOrder?.isVisible = false
 
         viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
-            val context = toolbar.context
+            val context = context ?: return@observe
 
             val colors = ToolbarColors.Podcast(podcast = podcast, theme = theme)
 
@@ -155,7 +156,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
             theme.updateWindowStatusBar(
                 window = requireActivity().window,
                 statusBarColor = StatusBarColor.Custom(colors.backgroundColor, isWhiteIcons = theme.activeTheme.defaultLightIcons),
-                context = requireContext()
+                context = context
             )
 
             preferenceNotifications?.isChecked = podcast.isShowNotifications
