@@ -11,7 +11,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -32,11 +31,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
         private const val TASK_NAME = "UpdateShowNotesTask"
         const val INPUT_PODCAST_UUID = "podcast_uuid"
 
-        fun enqueue(episode: BaseEpisode, constraints: Constraints = Constraints.NONE, context: Context) {
-            if (episode !is PodcastEpisode) {
-                return
-            }
-
+        fun enqueue(episode: PodcastEpisode, constraints: Constraints = Constraints.NONE, context: Context) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$TASK_NAME - enqueued ${episode.uuid}")
             val cacheShowNotesData = Data.Builder()
                 .putString(INPUT_PODCAST_UUID, episode.podcastUuid)
