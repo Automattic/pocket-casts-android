@@ -116,7 +116,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
     }
 
-    private lateinit var itemTouchHelper: EpisodeItemTouchHelper
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var episodeManager: EpisodeManager
@@ -137,6 +136,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var adapter: PodcastAdapter? = null
     private var binding: FragmentPodcastBinding? = null
+    private var itemTouchHelper: EpisodeItemTouchHelper? = null
 
     private var featuredPodcast = false
     private var fromListUuid: String? = null
@@ -623,7 +623,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             it.addOnScrollListener(onScrollListener)
         }
 
-        itemTouchHelper.attachToRecyclerView(binding.episodesRecyclerView)
+        itemTouchHelper?.attachToRecyclerView(binding.episodesRecyclerView)
 
         binding.btnRetry.setOnClickListener {
             loadData()
@@ -703,7 +703,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     ) {
         binding?.episodesRecyclerView?.let { recyclerView ->
             recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper.clearView(recyclerView, it)
+                itemTouchHelper?.clearView(recyclerView, it)
             }
         }
 
@@ -818,6 +818,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onDestroyView() {
         binding?.episodesRecyclerView?.adapter = null
+        itemTouchHelper = null
 
         multiSelectEpisodesHelper.cleanup()
         if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
