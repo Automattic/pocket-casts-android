@@ -208,4 +208,10 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
             }
         }
     }
+
+    fun cleanup() {
+        listener = null
+        coordinatorLayout = null
+        context = null
+    }
 }

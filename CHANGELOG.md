@@ -1,6 +1,9 @@
 7.49
 -----
 
+*   Bug Fixes:
+    *   Improve multiselect handling in Up Next queue
+        ([#1398](https://github.com/Automattic/pocket-casts-android/pull/1390))
 
 7.48
 -----
