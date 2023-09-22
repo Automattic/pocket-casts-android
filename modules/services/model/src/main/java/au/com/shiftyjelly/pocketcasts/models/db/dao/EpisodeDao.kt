@@ -207,7 +207,7 @@ abstract class EpisodeDao {
     abstract suspend fun updateDownloadUrl(url: String, uuid: String)
 
     @Query("UPDATE podcast_episodes SET download_task_id = :taskId WHERE uuid = :uuid")
-    abstract fun updateDownloadTaskId(uuid: String, taskId: String?)
+    abstract suspend fun updateDownloadTaskId(uuid: String, taskId: String?)
 
     @Query("UPDATE podcast_episodes SET last_download_attempt_date = :lastDownloadAttemptDate WHERE uuid = :uuid")
     abstract fun updateLastDownloadAttemptDate(lastDownloadAttemptDate: Date, uuid: String)

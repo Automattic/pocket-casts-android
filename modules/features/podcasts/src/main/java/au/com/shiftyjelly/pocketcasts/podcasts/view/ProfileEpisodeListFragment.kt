@@ -189,6 +189,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     override fun onDestroyView() {
         binding?.recyclerView?.adapter = null
+        multiSelectHelper.cleanup()
         super.onDestroyView()
         binding = null
     }

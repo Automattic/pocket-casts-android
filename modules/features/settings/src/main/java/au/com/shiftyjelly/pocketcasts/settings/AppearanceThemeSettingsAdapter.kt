@@ -111,7 +111,11 @@ class AppearanceThemeSettingsAdapter(
             val afterTheme = list[bindingAdapterPosition]
             val validTheme = !afterTheme.isPlus || isPlusOrPatronSignedIn
 
-            selectedTheme = afterTheme
+            selectedTheme = if (validTheme) {
+                afterTheme
+            } else {
+                beforeTheme
+            }
             clickListener(beforeTheme, afterTheme, validTheme)
             notifyDataSetChanged()
         }
