@@ -81,6 +81,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                         } else {
                             viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
                             openOnboardingFlow()
+                            scrollToCurrentTheme()
                         }
                     }
                     binding.themeRecyclerView.setHasFixedSize(true)
@@ -121,6 +122,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                             viewModel.updateChangeThemeType(Pair(null, null))
                         }
                     } else {
+                        viewModel.updateChangeThemeType(Pair(null, null))
                         (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updateTheme(beforeThemeType)
                         scrollToCurrentTheme()
                     }
