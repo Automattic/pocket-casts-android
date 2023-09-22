@@ -4,6 +4,8 @@
 *   Bug Fixes:
     *   Improve multiselect handling in Up Next queue
         ([#1398](https://github.com/Automattic/pocket-casts-android/pull/1390))
+    *   Fixed bug where theme selection UI was not functioning as intended
+        ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
 
 7.48
 -----
@@ -16,8 +18,6 @@
         ([#1397](https://github.com/Automattic/pocket-casts-android/pull/1397))
     *   Improved the downloading of episode show notes
         ([#1390](https://github.com/Automattic/pocket-casts-android/pull/1390))
-    *   Fixed bug where theme selection UI was not functioning as intended
-        ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
 
         
 7.47
