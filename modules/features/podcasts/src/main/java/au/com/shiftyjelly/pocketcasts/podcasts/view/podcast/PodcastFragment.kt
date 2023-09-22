@@ -543,8 +543,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
-        itemTouchHelper = EpisodeItemTouchHelper()
-
         loadData()
 
         binding.toolbar.let {
@@ -623,7 +621,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             it.addOnScrollListener(onScrollListener)
         }
 
-        itemTouchHelper?.attachToRecyclerView(binding.episodesRecyclerView)
+        itemTouchHelper = EpisodeItemTouchHelper().apply {
+            attachToRecyclerView(binding.episodesRecyclerView)
+        }
 
         binding.btnRetry.setOnClickListener {
             loadData()
