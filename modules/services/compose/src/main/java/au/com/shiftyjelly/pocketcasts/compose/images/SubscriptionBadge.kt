@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -27,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private val pillCornerRadiusInDp = 800.dp
 
@@ -85,15 +83,15 @@ fun SubscriptionBadgeForTier(
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> colorResource(UR.color.plus_gold)
+                SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
                 SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
-                SubscriptionBadgeDisplayMode.Colored -> colorResource(UR.color.plus_gold)
+                SubscriptionBadgeDisplayMode.Colored -> SubscriptionTierColor.plusGold
             },
             textColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> colorResource(UR.color.plus_gold)
+                SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
                 SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
         )
@@ -101,12 +99,12 @@ fun SubscriptionBadgeForTier(
             iconRes = IR.drawable.ic_patron,
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> colorResource(UR.color.patron_purple_light)
+                SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.patronPurpleLight
                 SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
-                SubscriptionBadgeDisplayMode.Colored -> colorResource(UR.color.patron_purple)
+                SubscriptionBadgeDisplayMode.Colored -> SubscriptionTierColor.patronPurple
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
@@ -120,6 +118,12 @@ fun SubscriptionBadgeForTier(
 enum class SubscriptionBadgeDisplayMode {
     Black,
     Colored,
+}
+
+object SubscriptionTierColor {
+    val plusGold = Color(0xFFFFD846)
+    val patronPurple = Color(0xFF6046F5)
+    val patronPurpleLight = Color(0xFFAFA2FA)
 }
 
 @ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored", defaultStyle = true)
