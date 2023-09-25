@@ -74,7 +74,6 @@ class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
             val uuid = requireArguments().getString(ARG_PLAYLIST_UUID)!!
             Timber.d("Loading playlist $uuid")
             val playlist = playlistManager.findByUuid(uuid) ?: return@launch
-
             this@EpisodeOptionsFragment.playlist = playlist
 
             val unplayedOption = FilterOption(LR.string.unplayed, playlist.unplayed, { v, _ ->

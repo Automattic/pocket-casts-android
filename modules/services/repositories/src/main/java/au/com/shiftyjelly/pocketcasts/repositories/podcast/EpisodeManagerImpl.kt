@@ -6,12 +6,6 @@ import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.paging.PagedList
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -20,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -181,6 +174,17 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode> {
+        return when (podcast.episodesSortType) {
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescSuspend(podcastUuid = podcast.uuid)
+            else -> episodeDao.findByPodcastOrderPublishedDateDescSuspend(podcastUuid = podcast.uuid)
+        }
+    }
+
     override fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>> {
         return Single.fromCallable { findEpisodesByPodcastOrdered(podcast) }
     }
@@ -331,11 +335,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateDownloadTaskId(episode: BaseEpisode, id: String?) {
-        if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadTaskId(episode.uuid, id)
-        } else if (episode is UserEpisode) {
-            runBlocking { userEpisodeManager.updateDownloadTaskId(episode, id) }
+    override suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?) {
+        when (episode) {
+            is PodcastEpisode -> episodeDao.updateDownloadTaskId(episode.uuid, id)
+            is UserEpisode -> userEpisodeManager.updateDownloadTaskId(episode, id)
         }
     }
 
@@ -424,16 +427,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateDownloadUrl(episode: BaseEpisode?, url: String) {
-        episode ?: return
-        if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadUrl(url, episode.uuid)
-        } else if (episode is UserEpisode) {
-            episode.downloadUrl = url
-            // We shouldn't hold on to these urls in the database
-        }
-    }
-
     override fun updateLastDownloadAttemptDate(episode: BaseEpisode?) {
         episode ?: return
         val now = Date()
@@ -473,20 +466,8 @@ class EpisodeManagerImpl @Inject constructor(
         unarchive(episode)
     }
 
-    private fun downloadEpisodesFileDetails(episodes: List<PodcastEpisode>?) {
-        if (episodes == null || episodes.isEmpty()) {
-            return
-        }
-
-        val episodeUuids = episodes.map { it.uuid }.toTypedArray()
-        val workData = Data.Builder()
-            .putStringArray(UpdateEpisodeDetailsTask.INPUT_EPISODE_UUIDS, episodeUuids)
-            .build()
-        val workRequest = OneTimeWorkRequestBuilder<UpdateEpisodeDetailsTask>()
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setInputData(workData)
-            .build()
-        WorkManager.getInstance(context).beginUniqueWork(UpdateEpisodeDetailsTask.TASK_NAME, ExistingWorkPolicy.APPEND, workRequest).enqueue()
+    private fun downloadEpisodesFileDetails(episodes: List<PodcastEpisode>) {
+        UpdateEpisodeDetailsTask.enqueue(episodes, context)
     }
 
     override suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
@@ -1124,10 +1105,10 @@ class EpisodeManagerImpl @Inject constructor(
     override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
+                if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
                     observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
-                    podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
+                    podcastCacheServerManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
 

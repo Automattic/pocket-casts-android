@@ -26,6 +26,7 @@ interface BookmarkManager {
     fun findBookmarksToSync(): List<Bookmark>
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
+    fun findBookmarksFlow(): Flow<List<Bookmark>>
 
     var sourceView: SourceView
 

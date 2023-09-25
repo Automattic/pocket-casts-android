@@ -18,7 +18,6 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -445,11 +444,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     private suspend fun convertEpisodesToMediaItems(episodes: List<BaseEpisode>): List<MediaBrowserCompat.MediaItem> {
         return episodes.mapNotNull { episode ->
             // find the podcast
-            val podcast = if (episode is PodcastEpisode) {
-                podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)
-            } else {
-                Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
-            }
+            val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) else Podcast.userPodcast
             // convert to a media item
             if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
         }
@@ -525,7 +520,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         // user tapped on a playlist or podcast, show the episodes
         val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
 
-        val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuid(parentId)
+        val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidSync(parentId)
         if (playlist != null) {
             val episodeList = if (DOWNLOADS_ROOT == parentId) episodeManager.observeDownloadedEpisodes().blockingFirst() else playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
@@ -560,8 +555,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
         return userEpisodeManager.findUserEpisodes().map {
-            val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, thumbnailUrl = it.artworkUrl)
-            AutoConverter.convertEpisodeToMediaItem(this, it, podcast)
+            AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast)
         }
     }
 

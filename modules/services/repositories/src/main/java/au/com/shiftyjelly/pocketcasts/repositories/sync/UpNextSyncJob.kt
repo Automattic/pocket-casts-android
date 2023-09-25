@@ -10,8 +10,8 @@ import android.content.Context
 import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -143,7 +143,7 @@ class UpNextSyncJob : JobService() {
             val uuids = change.uuids?.splitIgnoreEmpty(",") ?: listOf()
             val episodes = uuids.map { uuid ->
                 val episode = runBlocking { episodeManager.findEpisodeByUuid(uuid) }
-                val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
+                val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else Podcast.userPodcast.uuid
                 UpNextSyncRequest.ChangeEpisode(
                     uuid,
                     episode?.title,
@@ -163,7 +163,7 @@ class UpNextSyncJob : JobService() {
             val uuid = change.uuid
             val episode = if (uuid == null) null else runBlocking { episodeManager.findEpisodeByUuid(uuid) }
             val publishedDate = episode?.publishedDate?.switchInvalidForNow()?.toIsoString()
-            val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
+            val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else Podcast.userPodcast.uuid
             return UpNextSyncRequest.Change(
                 action = change.type,
                 modified = change.modified,
@@ -188,7 +188,7 @@ class UpNextSyncJob : JobService() {
         }
 
         // import missing podcasts
-        val podcastUuids: List<String> = response.episodes?.mapNotNull { it.podcast }?.filter { it != UserEpisodePodcastSubstitute.substituteUuid } ?: emptyList()
+        val podcastUuids: List<String> = response.episodes?.mapNotNull { it.podcast }?.filter { it != Podcast.userPodcast.uuid } ?: emptyList()
         val addMissingPodcast: Completable = Observable.fromIterable(podcastUuids).flatMapCompletable { podcastUuid ->
             podcastManager.findOrDownloadPodcastRx(podcastUuid = podcastUuid).ignoreElement()
         }
@@ -200,7 +200,7 @@ class UpNextSyncJob : JobService() {
             if (podcastUuid == null) {
                 Observable.empty()
             } else {
-                if (podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
+                if (podcastUuid == Podcast.userPodcast.uuid) {
                     userEpisodeManager.downloadMissingUserEpisode(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate()).toObservable()
                 } else {
                     val skeletonEpisode = responseEpisode.toSkeletonEpisode(podcastUuid)

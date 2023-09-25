@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Refresh
@@ -31,7 +32,8 @@ fun DeveloperPage(
     onShowkaseClick: () -> Unit,
     onForceRefreshClick: () -> Unit,
     onTriggerNotificationClick: () -> Unit,
-    onDeleteFirstEpisodeClick: () -> Unit
+    onDeleteFirstEpisodeClick: () -> Unit,
+    onTriggerUpdateEpisodeDetails: () -> Unit
 ) {
 
     Column(modifier = modifier) {
@@ -44,6 +46,7 @@ fun DeveloperPage(
         SendCrashSetting()
         TriggerNotificationSetting(onClick = onTriggerNotificationClick)
         DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
+        TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
     }
 }
 
@@ -113,6 +116,19 @@ private fun DeleteFirstEpisodeSetting(
     )
 }
 
+@Composable
+private fun TriggerUpdateEpisodeDetails(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger update episode details",
+        secondaryText = "Test the update episode details task with 5 random episodes",
+        icon = rememberVectorPainter(Icons.Outlined.Downloading),
+        modifier = modifier.clickable { onClick() }
+    )
+}
+
 @Preview(name = "Light")
 @Composable
 private fun DeveloperPageLightPreview() {
@@ -136,6 +152,7 @@ private fun DeveloperPagePreview() {
         onShowkaseClick = {},
         onForceRefreshClick = {},
         onTriggerNotificationClick = {},
-        onDeleteFirstEpisodeClick = {}
+        onDeleteFirstEpisodeClick = {},
+        onTriggerUpdateEpisodeDetails = {}
     )
 }

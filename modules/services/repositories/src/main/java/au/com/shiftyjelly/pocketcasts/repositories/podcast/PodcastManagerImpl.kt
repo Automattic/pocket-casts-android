@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -747,11 +746,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun buildUserEpisodePodcast(episode: UserEpisode): Podcast {
-        return Podcast(
-            uuid = UserEpisodePodcastSubstitute.substituteUuid,
-            title = UserEpisodePodcastSubstitute.substituteTitle,
-            thumbnailUrl = episode.getUrlForArtwork()
-        )
+        return Podcast.userPodcast.copy(thumbnailUrl = episode.getUrlForArtwork())
     }
 
     override fun observeAutoAddToUpNextPodcasts(): Flowable<List<Podcast>> {

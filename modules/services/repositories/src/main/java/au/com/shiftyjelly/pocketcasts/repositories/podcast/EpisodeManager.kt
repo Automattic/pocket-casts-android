@@ -44,6 +44,7 @@ interface EpisodeManager {
     fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode>
     fun findEpisodesByPodcast(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodes(date: Date): List<PodcastEpisode>
@@ -83,8 +84,7 @@ interface EpisodeManager {
     fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileType(episode: BaseEpisode?, fileType: String)
     fun updateSizeInBytes(episode: BaseEpisode?, sizeInBytes: Long)
-    fun updateDownloadUrl(episode: BaseEpisode?, url: String)
-    fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
+    suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
     fun updateLastDownloadAttemptDate(episode: BaseEpisode?)
     fun updateDownloadErrorDetails(episode: BaseEpisode?, message: String?)
     fun setEpisodeThumbnailStatus(episode: PodcastEpisode?, thumbnailStatus: Int)

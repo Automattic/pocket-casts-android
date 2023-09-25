@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.core.ui.widget.PodcastWidget
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -147,7 +146,7 @@ class WidgetManagerImpl @Inject constructor(
             return
         }
 
-        val podcastTitle = podcast?.title ?: UserEpisodePodcastSubstitute.substituteTitle
+        val podcastTitle = podcast?.title ?: Podcast.userPodcast.title
         views.setContentDescription(R.id.widget_artwork, "$podcastTitle. Open Pocket Casts")
         views.setImageViewResource(R.id.widget_artwork, IR.drawable.defaultartwork_small_dark)
 

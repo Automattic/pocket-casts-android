@@ -85,6 +85,13 @@ abstract class BookmarkDao {
     ): Flow<List<PodcastBookmark>>
 
     @Query(
+        """SELECT *
+            FROM bookmarks
+            WHERE deleted = :deleted"""
+    )
+    abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
+
+    @Query(
         """SELECT bookmarks.*
             FROM bookmarks
             LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
