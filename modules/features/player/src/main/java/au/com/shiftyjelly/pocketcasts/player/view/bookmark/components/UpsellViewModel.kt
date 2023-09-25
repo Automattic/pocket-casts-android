@@ -57,6 +57,7 @@ class UpsellViewModel @Inject constructor(
         val subscriptionTier = SubscriptionTier.PATRON
         val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
+        // Check the server subscriptions to see if the Patron tier has a free trial
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             tier = subscriptionTier,
             subscriptions = updatedSubscriptions,
