@@ -32,8 +32,8 @@ fun UpsellView(
     onClick: () -> Unit,
     sourceView: SourceView,
     modifier: Modifier = Modifier,
+    viewModel: UpsellViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<UpsellViewModel>()
     val state by viewModel.state.collectAsState()
     when (state) {
         UiState.Loading -> Unit
