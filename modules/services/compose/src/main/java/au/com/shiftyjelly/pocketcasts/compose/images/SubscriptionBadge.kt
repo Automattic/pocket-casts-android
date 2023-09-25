@@ -78,46 +78,46 @@ fun SubscriptionBadge(
 @Composable
 fun SubscriptionBadgeForTier(
     tier: SubscriptionTier,
-    displayMode: DisplayMode,
+    displayMode: SubscriptionBadgeDisplayMode,
 ) {
     when (tier) {
         SubscriptionTier.PLUS -> SubscriptionBadge(
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
-                DisplayMode.Black -> colorResource(UR.color.plus_gold)
-                DisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.Black -> colorResource(UR.color.plus_gold)
+                SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
             backgroundColor = when (displayMode) {
-                DisplayMode.Black -> Color.Black
-                DisplayMode.Colored -> colorResource(UR.color.plus_gold)
+                SubscriptionBadgeDisplayMode.Black -> Color.Black
+                SubscriptionBadgeDisplayMode.Colored -> colorResource(UR.color.plus_gold)
             },
             textColor = when (displayMode) {
-                DisplayMode.Black -> colorResource(UR.color.plus_gold)
-                DisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.Black -> colorResource(UR.color.plus_gold)
+                SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
         )
         SubscriptionTier.PATRON -> SubscriptionBadge(
             iconRes = IR.drawable.ic_patron,
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {
-                DisplayMode.Black -> colorResource(UR.color.patron_purple_light)
-                DisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.Black -> colorResource(UR.color.patron_purple_light)
+                SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
             backgroundColor = when (displayMode) {
-                DisplayMode.Black -> Color.Black
-                DisplayMode.Colored -> colorResource(UR.color.patron_purple)
+                SubscriptionBadgeDisplayMode.Black -> Color.Black
+                SubscriptionBadgeDisplayMode.Colored -> colorResource(UR.color.patron_purple)
             },
             textColor = when (displayMode) {
-                DisplayMode.Black -> Color.White
-                DisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.Black -> Color.White
+                SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
         )
         SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
     }
 }
 
-enum class DisplayMode {
+enum class SubscriptionBadgeDisplayMode {
     Black,
     Colored,
 }
@@ -128,7 +128,7 @@ enum class DisplayMode {
 fun SubscriptionBadgePlusColoredPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
-        displayMode = DisplayMode.Colored
+        displayMode = SubscriptionBadgeDisplayMode.Colored
     )
 }
 
@@ -138,7 +138,7 @@ fun SubscriptionBadgePlusColoredPreview() {
 fun SubscriptionBadgePlusBlackPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
-        displayMode = DisplayMode.Black
+        displayMode = SubscriptionBadgeDisplayMode.Black
     )
 }
 
@@ -148,7 +148,7 @@ fun SubscriptionBadgePlusBlackPreview() {
 fun SubscriptionBadgePatronColoredPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
-        displayMode = DisplayMode.Colored
+        displayMode = SubscriptionBadgeDisplayMode.Colored
     )
 }
 
@@ -158,6 +158,6 @@ fun SubscriptionBadgePatronColoredPreview() {
 fun SubscriptionBadgePatronBlackPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
-        displayMode = DisplayMode.Black
+        displayMode = SubscriptionBadgeDisplayMode.Black
     )
 }
