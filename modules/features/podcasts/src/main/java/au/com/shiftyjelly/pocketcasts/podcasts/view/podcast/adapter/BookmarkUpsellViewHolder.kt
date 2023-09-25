@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter
 
+import androidx.compose.foundation.background
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -29,7 +33,9 @@ class BookmarkUpsellViewHolder(
                         val source = OnboardingUpgradeSource.BOOKMARKS
                         val onboardingFlow = OnboardingFlow.Upsell(source, true)
                         OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
-                    }
+                    },
+                    modifier = Modifier
+                        .background(color = MaterialTheme.theme.colors.primaryUi02),
                 )
             }
         }
