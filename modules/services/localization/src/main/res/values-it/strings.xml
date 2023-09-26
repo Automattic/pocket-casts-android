@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 09:54:24+0000
+Translation-Revision-Date: 2023-09-12 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">In questo podcast non ci sono segnalibri che corrispondono ai tuoi criteri di ricerca.</string>
+    <string name="podcast_no_bookmarks_found">Nessun segnalibro trovato</string>
+    <string name="player_tab_notes">Dettagli</string>
+    <string name="bookmark_updated">Segnalibro \"%s\" aggiornato</string>
+    <string name="go_to_bottom">Vai in fondo alla pagina</string>
+    <string name="go_to_top">Torna a inizio pagina</string>
     <string name="support">Supporto</string>
     <string name="bookmark_notification_action_change_title">Modifica il titolo</string>
     <string name="bookmark_notification_content_tap_to_view">Tocca per visualizzare</string>
@@ -282,7 +288,7 @@ Language: it
     <string name="onboarding_plus_feature_themes_icons_text">Mostra i tuoi reali colori. Icone e temi esclusivi solo per chi fa parte del club Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temi e icone</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carica i tuoi file sull\'archiviazione su cloud e rendili disponibili per qualsiasi postazione.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10 GB di archiviazione su cloud</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20 GB di archiviazione su cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organizza i tuoi podcast in cartelle e sincronizzali su tutti i dispositivi.</string>
     <string name="onboarding_plus_feature_folders_title">Cartelle</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ascolta da più postazioni con le app per Windows, macOS e web.</string>
@@ -1410,7 +1416,6 @@ Language: it
     <string name="player_time_saved_detail">In totale hai risparmiato %s utilizzando questa funzionalità.</string>
     <string name="player_tab_playing_wide">Riproduzione in corso</string>
     <string name="player_tab_playing">Riproduzione</string>
-    <string name="player_tab_notes">Note</string>
     <string name="player_sleep_when_episode_ends">In sospensione fino alla fine dell\'episodio</string>
     <string name="player_sleep_timer">Autospegnimento</string>
     <string name="player_sleep_timer_title">Autospegnimento</string>

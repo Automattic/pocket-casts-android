@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 11:54:03+0000
+Translation-Revision-Date: 2023-09-12 13:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">Deze podcast heeft geen bladwijzers die overeenkomen met je zoekcriteria.</string>
+    <string name="podcast_no_bookmarks_found">Geen bladwijzers gevonden</string>
+    <string name="player_tab_notes">Details</string>
+    <string name="bookmark_updated">Bladwijzer \'%s\' bijgewerkt</string>
+    <string name="go_to_bottom">Naar beneden</string>
+    <string name="go_to_top">Naar boven</string>
     <string name="support">Ondersteuning</string>
     <string name="bookmark_notification_action_change_title">Titel wijzigen</string>
     <string name="bookmark_notification_content_tap_to_view">Tik om te bekijken</string>
@@ -282,7 +288,7 @@ Language: nl
     <string name="onboarding_plus_feature_themes_icons_text">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor Plus-abonnees.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thema\'s en pictogrammen</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10 GB cloudopslag</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20 GB cloudopslag</string>
     <string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
     <string name="onboarding_plus_feature_folders_title">Mappen</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
@@ -1410,7 +1416,6 @@ Language: nl
     <string name="player_time_saved_detail">In totaal heb je %s bespaard met deze functie.</string>
     <string name="player_tab_playing_wide">Bezig met afspelen</string>
     <string name="player_tab_playing">Wordt afgespeeld</string>
-    <string name="player_tab_notes">Notities</string>
     <string name="player_sleep_when_episode_ends">In slaapstand als de aflevering stopt</string>
     <string name="player_sleep_timer">Slaaptimer</string>
     <string name="player_sleep_timer_title">Slaaptimer</string>

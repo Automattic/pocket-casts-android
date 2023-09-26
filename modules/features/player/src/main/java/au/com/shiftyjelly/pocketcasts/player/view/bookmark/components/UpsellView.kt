@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.images.DisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoText
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
@@ -32,8 +32,8 @@ fun UpsellView(
     onClick: () -> Unit,
     sourceView: SourceView,
     modifier: Modifier = Modifier,
+    viewModel: UpsellViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<UpsellViewModel>()
     val state by viewModel.state.collectAsState()
     when (state) {
         UiState.Loading -> Unit
@@ -70,7 +70,7 @@ private fun UpsellViewContent(
                 Spacer(modifier = Modifier.width(8.dp))
                 SubscriptionBadgeForTier(
                     tier = state.tier,
-                    displayMode = DisplayMode.Colored
+                    displayMode = SubscriptionBadgeDisplayMode.Colored
                 )
             }
         },

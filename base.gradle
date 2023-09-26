@@ -153,7 +153,8 @@ android {
 
 dependencies {
     // Uncomment if you want to run with leak canary
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+//    debugImplementation androidLibs.leakCanary
+//    debugProdImplementation androidLibs.leakCanary
 
     implementation androidLibs.appCompat
     implementation androidLibs.auth
@@ -180,6 +181,7 @@ dependencies {
     implementation androidLibs.lifecycleProcess
     implementation androidLibs.paging
     implementation androidLibs.pagingRx
+    implementation androidLibs.playReview
     implementation androidLibs.workManager
     implementation androidLibs.workManagerRx
     implementation androidLibs.navigationFragment
@@ -251,10 +253,10 @@ dependencies {
     implementation libs.media3Extractor
     implementation libs.media3Ui
     implementation libs.showkase
-    implementation (libs.junit) {
+    testImplementation (libs.junit) {
         exclude group: 'org.hamcrest'
     }
-    implementation libs.kotlinCoroutinesTest
+    testImplementation libs.kotlinCoroutinesTest
     implementation libs.protobufKotlinLite
     implementation libs.protobufJavaLite
 

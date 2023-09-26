@@ -35,7 +35,15 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-            android:id="@+id/multiSelectToolbar"
+            android:id="@+id/multiSelectEpisodesToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/actionBarSize"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            android:visibility="gone"/>
+
+        <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+            android:id="@+id/multiSelectBookmarksToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"

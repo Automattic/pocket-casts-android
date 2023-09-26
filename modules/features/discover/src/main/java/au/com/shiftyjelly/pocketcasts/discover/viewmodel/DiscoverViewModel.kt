@@ -142,7 +142,6 @@ class DiscoverViewModel @Inject constructor(
             .map { sponsoredPodcast ->
                 loadPodcastList(sponsoredPodcast.source as String)
                     .filter {
-                        Timber.e("Invalid sponsored podcast list found.")
                         it.podcasts.isNotEmpty() && it.listId != null
                     }
                     .map {
@@ -214,7 +213,10 @@ class DiscoverViewModel @Inject constructor(
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
         podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
-            .flatMapMaybe { episodeManager.findByUuidRx(discoverEpisode.uuid) }
+            .flatMapMaybe {
+                @Suppress("DEPRECATION")
+                episodeManager.findByUuidRx(discoverEpisode.uuid)
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

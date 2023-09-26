@@ -433,10 +433,9 @@ class EpisodeViewModel @Inject constructor(
                 return
             }
 
-            episodeManager.toggleStarEpisodeAsync(episode)
-            val event =
-                if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
-            episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
+            viewModelScope.launch {
+                episodeManager.toggleStarEpisode(episode, sourceView)
+            }
         }
     }
 

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 14:54:03+0000
+Translation-Revision-Date: 2023-09-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">此播客没有符合您搜索条件的书签。</string>
+    <string name="podcast_no_bookmarks_found">未找到书签</string>
+    <string name="player_tab_notes">详细信息</string>
+    <string name="bookmark_updated">已更新书签“%s”</string>
+    <string name="go_to_bottom">转到底部</string>
+    <string name="go_to_top">回到顶部</string>
     <string name="support">支持</string>
     <string name="bookmark_notification_action_change_title">更改标题</string>
     <string name="bookmark_notification_content_tap_to_view">轻点以查看</string>
@@ -282,7 +288,7 @@ Language: zh_CN
     <string name="onboarding_plus_feature_themes_icons_text">选择您的真实颜色。 仅面向 Plus 俱乐部的专属图标和主题。</string>
     <string name="onboarding_plus_feature_themes_icons_title">主题和图标</string>
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10GB 云存储空间</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20GB 云存储空间</string>
     <string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
     <string name="onboarding_plus_feature_folders_title">文件夹</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
@@ -1410,7 +1416,6 @@ Language: zh_CN
     <string name="player_time_saved_detail">您总共使用此功能节省了 %s。</string>
     <string name="player_tab_playing_wide">正在播放</string>
     <string name="player_tab_playing">正在播放</string>
-    <string name="player_tab_notes">备注</string>
     <string name="player_sleep_when_episode_ends">在剧集结束时进入睡眠状态</string>
     <string name="player_sleep_timer">睡眠计时器</string>
     <string name="player_sleep_timer_title">睡眠计时器</string>

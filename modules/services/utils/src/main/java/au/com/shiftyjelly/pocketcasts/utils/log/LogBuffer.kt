@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.utils.log
 import android.util.Log
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import timber.log.Timber
+import timber.log.Timber.Forest.tag
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -110,6 +111,10 @@ object LogBuffer {
         addLog(Log.INFO, tag, null, message, *args)
     }
 
+    fun i(tag: String, throwable: Throwable, message: String, vararg args: Any) {
+        addLog(Log.INFO, tag, throwable, message, *args)
+    }
+
     fun w(tag: String, message: String, vararg args: Any) {
         addLog(Log.WARN, tag, null, message, *args)
     }
@@ -127,7 +132,7 @@ object LogBuffer {
     }
 
     @Suppress("NAME_SHADOWING")
-    private fun addLog(priority: Int, tag: String, throwable: Throwable?, message: String?, vararg args: Any) {
+    fun addLog(priority: Int, tag: String, throwable: Throwable?, message: String?, vararg args: Any) {
         var message = message
         if (message != null && message.isEmpty()) {
             message = null

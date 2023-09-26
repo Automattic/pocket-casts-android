@@ -76,7 +76,10 @@ interface PodcastCacheServer {
     suspend fun getShowNotesCache(@Path("podcastUuid") podcastUuid: String): ShowNotesResponse
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
-    fun getPodcastAndEpisode(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
+    fun getPodcastAndEpisodeSingle(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
+
+    @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
+    suspend fun getPodcastAndEpisode(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): PodcastResponse
 
     @POST("/mobile/podcast/episode/search")
     fun searchPodcastForEpisodes(@Body searchBody: SearchBody): Single<SearchResultBody>

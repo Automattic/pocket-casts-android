@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -24,19 +25,26 @@ interface EpisodeManager {
     fun getPodcastUuidToBadgeLatest(): Flowable<Map<String, Int>>
 
     /** Find methods  */
-    fun findByUuid(uuid: String): PodcastEpisode?
-    suspend fun findByUuidSuspend(uuid: String): PodcastEpisode?
+
+    suspend fun findByUuid(uuid: String): PodcastEpisode?
+
+    @Deprecated("Use findByUuid suspended function instead")
+    fun findByUuidSync(uuid: String): PodcastEpisode?
+
+    @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
+
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
     fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode>
     fun observeEpisodeByUuid(uuid: String): Flow<BaseEpisode>
-    fun findFirstBySearchQuery(query: String): PodcastEpisode?
+    suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     fun findAll(rowParser: (PodcastEpisode) -> Boolean)
-    fun findEpisodesWhere(queryAfterWhere: String): List<PodcastEpisode>
+    fun findEpisodesWhere(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>
     fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode>
     fun findEpisodesByPodcast(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodes(date: Date): List<PodcastEpisode>
@@ -71,13 +79,12 @@ interface EpisodeManager {
     fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDuration(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
     fun updatePlayingStatus(episode: BaseEpisode?, status: EpisodePlayingStatus)
-    fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
-    fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
+    suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
+    suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
     fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileType(episode: BaseEpisode?, fileType: String)
     fun updateSizeInBytes(episode: BaseEpisode?, sizeInBytes: Long)
-    fun updateDownloadUrl(episode: BaseEpisode?, url: String)
-    fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
+    suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
     fun updateLastDownloadAttemptDate(episode: BaseEpisode?)
     fun updateDownloadErrorDetails(episode: BaseEpisode?, message: String?)
     fun setEpisodeThumbnailStatus(episode: PodcastEpisode?, thumbnailStatus: Int)
@@ -93,15 +100,15 @@ interface EpisodeManager {
     fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable
     fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
-    fun starEpisode(episode: PodcastEpisode, starred: Boolean)
+    suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
     suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean)
-    fun toggleStarEpisodeAsync(episode: PodcastEpisode)
+    suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackError(episode: BaseEpisode?)
     fun clearDownloadError(episode: PodcastEpisode?)
     fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
     fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
     fun unarchive(episode: BaseEpisode)
-    fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
+    suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
     fun checkForEpisodesToAutoArchive(playbackManager: PlaybackManager?, podcastManager: PodcastManager)
     fun userHasInteractedWithEpisode(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun clearEpisodePlaybackInteractionDatesBefore(lastCleared: Date)
@@ -115,7 +122,7 @@ interface EpisodeManager {
     fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
-    fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
+    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
     fun deleteCustomFolderEpisode(episode: PodcastEpisode?, playbackManager: PlaybackManager)
     fun deleteFinishedEpisodes(playbackManager: PlaybackManager)
     fun deleteDownloadedEpisodeFiles()
@@ -148,4 +155,5 @@ interface EpisodeManager {
     suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
     suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode?
     suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
+    suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double
 }

@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -175,7 +174,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         val recyclerView = binding.recyclerView
 
         launch {
-            val playlist = async(Dispatchers.Default) { playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) }.await()!!
+            val playlist = playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
             this@TimeOptionsFragment.playlist = playlist
 
             selectedPosition = when (optionType) {

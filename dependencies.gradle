@@ -149,7 +149,7 @@ project.ext {
             browserHelper: 'com.google.androidbrowserhelper:androidbrowserhelper:2.3.0',
             flexbox: 'com.google.android.flexbox:flexbox:3.0.0',
             androidTestCore: "androidx.test:core:$versionTest",
-            room: "androidx.room:room-runtime:$versionRoom",
+            room: "androidx.room:room-ktx:$versionRoom",
             roomRx: "androidx.room:room-rxjava2:$versionRoom",
             roomKtx: "androidx.room:room-ktx:$versionRoom",
             roomCompile: "androidx.room:room-compiler:$versionRoom",
@@ -214,7 +214,11 @@ project.ext {
             media3DatasourceOkhttp: "androidx.media3:media3-datasource-okhttp:$versionMedia3",
 
             // Fixes instrumentation tests, see: https://github.com/android/android-test/issues/861#issuecomment-1180219978
-            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework"
+            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework",
+            // In-app reviews
+            playReview: 'com.google.android.play:review-ktx:2.0.1',
+
+            leakCanary: 'com.squareup.leakcanary:leakcanary-android:2.10',
     ]
 
     libs = [

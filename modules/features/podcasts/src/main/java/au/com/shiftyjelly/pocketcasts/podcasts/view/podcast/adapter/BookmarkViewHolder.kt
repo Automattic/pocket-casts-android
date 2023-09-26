@@ -27,7 +27,7 @@ class BookmarkViewHolder(
                     isSelected = data.isSelected,
                     onPlayClick = { data.onBookmarkPlayClicked(it) },
                     modifier = Modifier
-                        .pointerInput(data.isSelected(data.bookmark)) {
+                        .pointerInput(data.bookmark.adapterId) {
                             detectTapGestures(
                                 onLongPress = { data.onBookmarkRowLongPress(data.bookmark) },
                                 onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) }

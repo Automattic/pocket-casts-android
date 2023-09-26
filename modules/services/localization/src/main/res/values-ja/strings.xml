@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-17 10:54:03+0000
+Translation-Revision-Date: 2023-09-12 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">このポッドキャストには検索条件に一致するブックマークがありません。</string>
+    <string name="podcast_no_bookmarks_found">ブックマークが見つかりません</string>
+    <string name="player_tab_notes">詳細</string>
+    <string name="bookmark_updated">ブックマーク「%s」を更新しました</string>
+    <string name="go_to_bottom">一番下へ移動</string>
+    <string name="go_to_top">一番上へ移動</string>
     <string name="support">サポート</string>
     <string name="bookmark_notification_action_change_title">タイトルを変更</string>
     <string name="bookmark_notification_content_tap_to_view">タップして表示</string>
@@ -282,7 +288,7 @@ Language: ja_JP
     <string name="onboarding_plus_feature_themes_icons_text">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
     <string name="onboarding_plus_feature_themes_icons_title">テーマとアイコン</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10GB のクラウドストレージ</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20GB のクラウドストレージ</string>
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
     <string name="onboarding_plus_feature_folders_title">フォルダー</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
@@ -1410,7 +1416,6 @@ Language: ja_JP
     <string name="player_time_saved_detail">この機能を使用して合計%s 節約しました。</string>
     <string name="player_tab_playing_wide">再生中</string>
     <string name="player_tab_playing">再生中</string>
-    <string name="player_tab_notes">メモ</string>
     <string name="player_sleep_when_episode_ends">エピソード終了時は就寝中</string>
     <string name="player_sleep_timer">スリープタイマー</string>
     <string name="player_sleep_timer_title">スリープタイマー</string>

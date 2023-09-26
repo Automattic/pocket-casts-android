@@ -21,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -74,21 +76,20 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, CoroutineScope {
+class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     companion object {
         const val ARG_PODCAST_UUID = "ARG_PODCAST_UUID"
@@ -115,7 +116,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
     }
 
-    private lateinit var itemTouchHelper: EpisodeItemTouchHelper
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var episodeManager: EpisodeManager
@@ -136,13 +136,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var adapter: PodcastAdapter? = null
     private var binding: FragmentPodcastBinding? = null
+    private var itemTouchHelper: EpisodeItemTouchHelper? = null
 
     private var featuredPodcast = false
     private var fromListUuid: String? = null
     private var listState: Parcelable? = null
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
@@ -186,7 +184,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit = { successCallback ->
-        launch {
+        lifecycleScope.launch {
             val downloaded = withContext(Dispatchers.Default) { podcastManager.countEpisodesInPodcastWithStatus(podcastUuid, EpisodeStatusEnum.DOWNLOADED) }
             val title = when (downloaded) {
                 0 -> getString(LR.string.are_you_sure)
@@ -487,7 +485,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         get() = arguments?.getString(ARG_PODCAST_UUID)!!
 
     private var lastSearchTerm: String? = null
-    private var shouldCloseOnReturn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -530,14 +527,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     override fun onStart() {
         super.onStart()
 
-        if (shouldCloseOnReturn) {
-            launch(Dispatchers.Main) {
-                // You can't call back during onresume
-                @Suppress("DEPRECATION")
-                (activity as? AppCompatActivity)?.onBackPressed()
-            }
-        }
-
         updateStatusBar()
 
         binding?.episodesRecyclerView?.adapter = adapter
@@ -553,8 +542,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding.headerColor = headerColor
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
-
-        itemTouchHelper = EpisodeItemTouchHelper()
 
         loadData()
 
@@ -634,7 +621,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             it.addOnScrollListener(onScrollListener)
         }
 
-        itemTouchHelper.attachToRecyclerView(binding.episodesRecyclerView)
+        itemTouchHelper = EpisodeItemTouchHelper().apply {
+            attachToRecyclerView(binding.episodesRecyclerView)
+        }
 
         binding.btnRetry.setOnClickListener {
             loadData()
@@ -644,17 +633,32 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         binding.episodesRecyclerView.requestFocus()
 
-        multiSelectEpisodesHelper.setUp()
-        multiSelectBookmarksHelper.setUp()
-
         return binding.root
     }
 
-    fun <T> MultiSelectHelper<T>.setUp() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.setupMultiSelect()
+    }
+
+    private fun FragmentPodcastBinding.setupMultiSelect() {
+        multiSelectEpisodesHelper.setUp(multiSelectEpisodesToolbar)
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
+        }
+    }
+
+    fun <T> MultiSelectHelper<T>.setUp(multiSelectToolbar: MultiSelectToolbar) {
+        multiSelectToolbar.setup(
+            lifecycleOwner = viewLifecycleOwner,
+            multiSelectHelper = this,
+            menuRes = null,
+            fragmentManager = parentFragmentManager,
+        )
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
             if (episodeContainerFragment != null) return@observe
-            binding?.multiSelectToolbar?.isVisible = it
+            multiSelectToolbar.isVisible = it
             binding?.toolbar?.isVisible = !it
             adapter?.notifyDataSetChanged()
         }
@@ -699,7 +703,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     ) {
         binding?.episodesRecyclerView?.let { recyclerView ->
             recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper.clearView(recyclerView, it)
+                itemTouchHelper?.clearView(recyclerView, it)
             }
         }
 
@@ -747,13 +751,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                     addPaddingForEpisodeSearch(state.episodes)
                     when (state.showTab) {
                         PodcastTab.EPISODES -> {
-                            binding?.multiSelectToolbar?.setup(
-                                lifecycleOwner = viewLifecycleOwner,
-                                multiSelectHelper = multiSelectEpisodesHelper,
-                                menuRes = null,
-                                fragmentManager = parentFragmentManager,
-                            )
-
                             adapter?.setEpisodes(
                                 episodes = state.episodes,
                                 showingArchived = state.showingArchived,
@@ -767,13 +764,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                             )
                         }
                         PodcastTab.BOOKMARKS -> {
-                            binding?.multiSelectToolbar?.setup(
-                                lifecycleOwner = viewLifecycleOwner,
-                                multiSelectHelper = multiSelectBookmarksHelper,
-                                menuRes = null,
-                                fragmentManager = parentFragmentManager,
-                            )
-
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
                                 searchTerm = state.searchBookmarkTerm,
@@ -828,6 +818,13 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     override fun onDestroyView() {
         binding?.episodesRecyclerView?.adapter = null
+        itemTouchHelper = null
+
+        multiSelectEpisodesHelper.cleanup()
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            multiSelectBookmarksHelper.cleanup()
+        }
+
         super.onDestroyView()
 
         binding?.episodesRecyclerView?.removeOnScrollListener(onScrollListener)

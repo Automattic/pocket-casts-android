@@ -36,6 +36,13 @@ enum class Feature(
         defaultValue = false,
         tier = FeatureTier.Plus(null),
         hasDevToggle = true,
+    ),
+    IN_APP_REVIEW_ENABLED(
+        key = "in_app_review_enabled",
+        title = "In App Review",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasDevToggle = true,
     );
 
     companion object {

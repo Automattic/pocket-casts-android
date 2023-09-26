@@ -177,7 +177,7 @@ private fun BookmarksView(
                 isSelected = state.isSelected,
                 onPlayClick = onPlayClick,
                 modifier = Modifier
-                    .pointerInput(state.isSelected(bookmark)) {
+                    .pointerInput(bookmark.adapterId) {
                         detectTapGestures(
                             onLongPress = { onRowLongPressed(bookmark) },
                             onTap = { state.onRowClick(bookmark) }

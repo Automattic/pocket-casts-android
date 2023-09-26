@@ -315,7 +315,7 @@ class PodcastAdapter(
             multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             disposables = disposables,
-            podcastBookmarksObservable = podcastBookmarksObservable
+            bookmarksObservable = podcastBookmarksObservable
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {

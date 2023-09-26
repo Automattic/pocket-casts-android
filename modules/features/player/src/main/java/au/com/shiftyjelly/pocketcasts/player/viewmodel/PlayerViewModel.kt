@@ -6,11 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -149,14 +149,12 @@ class PlayerViewModel @Inject constructor(
     data class ListData(
         var podcastHeader: PlayerHeader,
         var chaptersExpanded: Boolean,
-        var chapters: List<Chapter>,
+        var chapters: Chapters,
         var currentChapter: Chapter?,
         var upNextExpanded: Boolean,
         var upNextEpisodes: List<BaseEpisode>,
         var upNextSummary: UpNextSummary,
-    ) {
-        fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
-    }
+    )
     private val source = SourceView.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
@@ -263,7 +261,7 @@ class PlayerViewModel @Inject constructor(
             if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
             } else {
-                Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
+                Flowable.just(Podcast.userPodcast.copy(overrideGlobalEffects = false))
             }
         }
         .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.globalPlaybackEffects.value) }
@@ -362,8 +360,7 @@ class PlayerViewModel @Inject constructor(
                 theme = theme.activeTheme
             )
         }
-        // copy the chapter so the diff can see the differences
-        val chapters = playbackState.chapters.getListWithState(playbackState.positionMs).map { it.copy() }
+        val chapters = playbackState.chapters
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs)
 
         var episodeCount = 0
@@ -557,9 +554,9 @@ class PlayerViewModel @Inject constructor(
     fun starToggle() {
         playbackManager.upNextQueue.currentEpisode?.let {
             if (it is PodcastEpisode) {
-                episodeManager.toggleStarEpisodeAsync(episode = it)
-                val event = if (it.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
-                episodeAnalytics.trackEvent(event, source, it.uuid)
+                viewModelScope.launch {
+                    episodeManager.toggleStarEpisode(episode = it, source)
+                }
             }
         }
     }
@@ -604,16 +601,5 @@ class PlayerViewModel @Inject constructor(
 
     fun previousChapter() {
         playbackManager.skipToPreviousChapter()
-    }
-
-    fun onChapterClick(chapter: Chapter) {
-        launch {
-            val listData = listDataLive.value
-            if (listData?.isSameChapter(chapter) == true) {
-                _showPlayerFlow.emit(Unit)
-            } else {
-                playbackManager.skipToChapter(chapter)
-            }
-        }
     }
 }

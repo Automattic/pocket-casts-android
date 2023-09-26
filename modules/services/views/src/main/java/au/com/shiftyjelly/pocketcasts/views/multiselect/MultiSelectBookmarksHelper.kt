@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -35,14 +36,13 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
+            Sentry.addBreadcrumb("MultiSelectBookmarksHelper toolbarActions updated, ${it.size} bookmarks from $source")
             listOf(
                 MultiSelectBookmarkAction.EditBookmark(isVisible = it.count() == 1),
                 MultiSelectBookmarkAction.DeleteBookmark,
                 MultiSelectAction.SelectAll,
             )
         }
-
-    override lateinit var listener: Listener<Bookmark>
 
     override fun isSelected(multiSelectable: Bookmark) =
         selectedList.count { it.uuid == multiSelectable.uuid } > 0

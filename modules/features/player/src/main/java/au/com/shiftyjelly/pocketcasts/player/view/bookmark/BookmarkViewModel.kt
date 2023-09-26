@@ -93,7 +93,7 @@ class BookmarkViewModel
                 val episodeUuid = arguments.episodeUuid
                 val isExistingBookmark = bookmarkUuid != null
                 val bookmark = if (bookmarkUuid == null) {
-                    val episode = episodeManager.findByUuidSuspend(episodeUuid)
+                    val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
                         ?: return@launch
                     bookmarkManager.add(

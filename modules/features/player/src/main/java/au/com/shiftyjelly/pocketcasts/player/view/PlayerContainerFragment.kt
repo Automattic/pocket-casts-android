@@ -24,9 +24,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -58,6 +61,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val chaptersViewModel: ChaptersViewModel by activityViewModels()
     private var binding: FragmentPlayerContainerBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -97,7 +101,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                         theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.primaryUi01(Theme.ThemeType.DARK), true), it)
                     }
 
-                    upNextFragment.startTour()
+                    upNextFragment.onExpanded()
 
                     FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -105,6 +109,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     updateUpNextVisibility(false)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
+                    upNextFragment.onCollapsed()
                 }
             }
         })
@@ -155,7 +160,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         })
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
-            val hasChapters = it.chapters.isNotEmpty()
+            val hasChapters = !it.chapters.isEmpty
             val hasNotes = !it.podcastHeader.isUserEpisode
 
             val updated = adapter.update(hasNotes, hasChapters)
@@ -228,8 +233,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             return
         }
         binding?.viewPager?.currentItem = index
-        // HACK: View pager 2 has no way to get the actual fragments
-        childFragmentManager.fragments.filterIsInstance<ChaptersFragment>().firstOrNull()?.scrollToChapter(chapter)
+
+        // tapping on the chapter title on the now playing screen should scroll to that chapter when the fragment is available
+        chaptersViewModel.setScrollToChapter(chapter)
     }
 
     fun updateUpNextVisibility(show: Boolean) {
@@ -328,7 +334,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     }
 
     override fun createFragment(position: Int): Fragment {
-        Timber.d("Creating fragment for position $position ${sections[position]}")
         return when (sections[position]) {
             is Section.Player -> PlayerHeaderFragment()
             is Section.Notes -> NotesFragment()

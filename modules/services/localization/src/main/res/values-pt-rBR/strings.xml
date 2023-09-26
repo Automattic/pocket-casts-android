@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-15 02:10:08+0000
+Translation-Revision-Date: 2023-09-11 22:54:26+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">Este podcast não tem favoritos correspondentes aos seus critérios de pesquisa.</string>
+    <string name="podcast_no_bookmarks_found">Nenhum favorito encontrado</string>
+    <string name="player_tab_notes">Detalhes</string>
+    <string name="bookmark_updated">Favorito \"%s\" atualizado</string>
+    <string name="go_to_bottom">Ir para o final</string>
+    <string name="go_to_top">Voltar ao início</string>
     <string name="support">Suporte</string>
     <string name="bookmark_notification_action_change_title">Alterar título</string>
     <string name="bookmark_notification_content_tap_to_view">Toque para visualizar</string>
@@ -282,7 +288,7 @@ Language: pt_BR
     <string name="onboarding_plus_feature_themes_icons_text">Expresse sua individualidade. Temas e ícones exclusivos para o Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temas e ícones</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Faça upload dos seus arquivos na nuvem para acessá-los em qualquer lugar.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10 GB de armazenamento na nuvem</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20 GB de armazenamento na nuvem</string>
     <string name="onboarding_plus_feature_folders_text">Organize seus podcasts em pastas e mantenha a sincronização em todos os seus dispositivos.</string>
     <string name="onboarding_plus_feature_folders_title">Pastas</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ouça seus podcasts em mais lugares com os apps para Windows, macOS e Web.</string>
@@ -1410,7 +1416,6 @@ Language: pt_BR
     <string name="player_time_saved_detail">Você economizou %s usando essa funcionalidade.</string>
     <string name="player_tab_playing_wide">Reproduzindo agora</string>
     <string name="player_tab_playing">Reproduzindo</string>
-    <string name="player_tab_notes">Notas</string>
     <string name="player_sleep_when_episode_ends">Suspender quando o episódio terminar</string>
     <string name="player_sleep_timer">Temporizador</string>
     <string name="player_sleep_timer_title">Temporizador</string>

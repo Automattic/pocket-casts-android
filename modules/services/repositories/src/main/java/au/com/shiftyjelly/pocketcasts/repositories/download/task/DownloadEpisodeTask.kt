@@ -5,6 +5,7 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.system.ErrnoException
 import android.system.OsConstants
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
@@ -125,13 +126,13 @@ class DownloadEpisodeTask @AssistedInject constructor(
             this.episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUUID!!) } ?: return Result.failure()
 
             if (this.episode.downloadTaskId != id.toString()) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling.")
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling. downloadTaskId: ${this.episode.downloadTaskId} id: $id.")
                 return Result.failure()
             }
 
             if (this.episode.isArchived) {
                 // In case the episode was archived again but the cancellation event hasn't come through yet
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode ${episode.title} is archived in download task. Cancelling.")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Episode ${episode.title} is archived in download task. Cancelling.")
                 return Result.success(Data.Builder().putBoolean(OUTPUT_CANCELLED, true).build())
             }
 
@@ -140,7 +141,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 setForegroundAsync(createForegroundInfo())
             }
 
-            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADING)
+            runBlocking {
+                episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADING)
+            }
 
             download()
                 .doOnNext { updateProgress(it) }
@@ -150,7 +153,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
             if (!isStopped) {
                 pathToSaveTo?.let {
                     episodeManager.updateDownloadFilePath(episode, it, false)
-                    episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                    runBlocking {
+                        episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                    }
                 }
 
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Downloaded episode ${episode.title} ${episode.uuid}")
@@ -189,7 +194,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         runBlocking {
             val requirements = downloadManager.getRequirementsAndSetStatusAsync(episode)
             val message = e?.toString() ?: "No exception"
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Download stopped, will retry with $requirements ${episode.title} ${episode.uuid} - $message")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Download stopped, will retry with $requirements ${episode.title} ${episode.uuid} - $message")
         }
     }
 
@@ -201,11 +206,13 @@ class DownloadEpisodeTask @AssistedInject constructor(
             .putString(OUTPUT_EPISODE_UUID, episode.uuid)
             .build()
 
-        episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
+        runBlocking {
+            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
+        }
         val message = if (downloadMessage.isNullOrBlank()) "Download Failed" else downloadMessage
         episodeManager.updateDownloadErrorDetails(episode, message)
 
-        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Download failed ${episode.title} ${episode.uuid} - $message")
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, e, "Download failed ${episode.title} ${episode.uuid} - $message")
 
         return outputData
     }
@@ -504,7 +511,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
             call?.cancel()
         }
         if (exception != null) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
+            // don't report issues such as timeouts to Sentry
+            val logPriority = if (exception is IOException) Log.INFO else Log.ERROR
+            LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
         }
 
         if (!emitter.isDisposed) {
@@ -569,13 +578,13 @@ class DownloadEpisodeTask @AssistedInject constructor(
             val message = if (statusCode == 404) ERROR_FILE_NOT_FOUND else String.format(
                 ERROR_DOWNLOAD_MESSAGE, if (responseReason.isBlank()) "" else "(error $statusCode $responseReason)"
             )
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Invalid response returned for episode download. ${response.code} $responseReason ${response.request.url}")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Invalid response returned for episode download. ${response.code} $responseReason ${response.request.url}")
             return ResponseValidationResult(isValid = false, errorMessage = message)
         }
         // check the content type is valid
         response.header("Content-Type")?.let { contentType ->
             if (INVALID_CONTENT_TYPES.any { it == contentType }) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Invalid content type returned for episode download. $contentType ${response.request.url}")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Invalid content type returned for episode download. $contentType ${response.request.url}")
                 return ResponseValidationResult(isValid = false, errorMessage = ERROR_FAILED_EPISODE)
             }
         }

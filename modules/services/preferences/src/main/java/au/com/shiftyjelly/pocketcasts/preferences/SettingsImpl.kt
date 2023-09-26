@@ -1300,4 +1300,13 @@ class SettingsImpl @Inject constructor(
                 BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST.key
             )
         ) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST
+
+    override fun addReviewRequestedDate() {
+        val dates = getReviewRequestedDates().toMutableList()
+        dates.add(Date().toString())
+        sharedPreferences.edit().putStringSet(Settings.APP_REVIEW_REQUESTED_DATES, dates.toSet()).apply()
+    }
+    override fun getReviewRequestedDates(): List<String> {
+        return sharedPreferences.getStringSet(Settings.APP_REVIEW_REQUESTED_DATES, emptySet())?.toList() ?: emptyList()
+    }
 }
