@@ -122,7 +122,16 @@ class UserEpisodeViewHolder(
             )
         )
 
-    fun setup(episode: UserEpisode, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false) {
+    fun setup(
+        episode: UserEpisode,
+        tintColor: Int,
+        playButtonListener: PlayButton.OnClickListener,
+        streamByDefault: Boolean,
+        upNextAction: Settings.UpNextAction,
+        multiSelectEnabled: Boolean = false,
+        isSelected: Boolean = false,
+        bookmarksAvailable: Boolean = false,
+    ) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
@@ -145,6 +154,7 @@ class UserEpisodeViewHolder(
             playbackStateUpdates = playbackStateUpdates,
             upNextChangesObservable = upNextChangesObservable,
             userBookmarksObservable = userBookmarksObservable,
+            bookmarksAvailable = bookmarksAvailable,
         )
 
         val downloadUpdates = downloadProgressUpdates
