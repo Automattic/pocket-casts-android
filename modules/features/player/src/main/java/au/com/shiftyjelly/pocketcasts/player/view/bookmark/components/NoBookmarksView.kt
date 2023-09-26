@@ -49,7 +49,8 @@ private fun Content(
                 color = style.textColor(),
             )
         },
-        buttonTitleRes = LR.string.bookmarks_headphone_settings,
+        message = stringResource(LR.string.bookmarks_create_instructions),
+        buttonTitle = stringResource(LR.string.bookmarks_headphone_settings),
         buttonAction = onClick,
         style = style.toMessageViewColors(),
         modifier = modifier,

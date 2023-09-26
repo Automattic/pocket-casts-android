@@ -102,7 +102,6 @@ class BookmarksFragment : BaseFragment() {
                     if (episodeUuid != null) {
                         BookmarksPage(
                             episodeUuid = episodeUuid,
-                            activeTheme = overrideTheme,
                             backgroundColor = requireNotNull(backgroundColor(listData)),
                             textColor = requireNotNull(textColor(listData)),
                             sourceView = sourceView,

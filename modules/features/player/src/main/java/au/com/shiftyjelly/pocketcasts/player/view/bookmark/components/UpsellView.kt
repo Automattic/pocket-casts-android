@@ -1,16 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -20,42 +17,48 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoText
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun UpsellView(
     style: MessageViewColors,
-    activeTheme: Theme.ThemeType,
     onClick: () -> Unit,
     sourceView: SourceView,
     modifier: Modifier = Modifier,
+    viewModel: UpsellViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<PlusUpsellViewModel>()
-    Content(
-        style = style,
-        activeTheme = activeTheme,
-        onClick = {
-            viewModel.onClick(sourceView)
-            onClick()
-        },
-        modifier = modifier,
-    )
+    val state by viewModel.state.collectAsState()
+    when (state) {
+        UiState.Loading -> Unit
+        is UiState.Loaded -> {
+            UpsellViewContent(
+                style = style,
+                state = state as UiState.Loaded,
+                onClick = {
+                    viewModel.onClick(sourceView)
+                    onClick()
+                },
+                modifier = modifier,
+            )
+        }
+    }
 }
 
 @Composable
-private fun Content(
+private fun UpsellViewContent(
     style: MessageViewColors,
-    activeTheme: Theme.ThemeType,
+    state: UiState.Loaded,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val logoColor = if (activeTheme.darkTheme) Color.White else Color.Black
-    val description = stringResource(LR.string.pocket_casts_patron)
+    val description = stringResource(state.tier.getContentDescription())
     MessageView(
         titleView = {
             Row(
@@ -63,25 +66,42 @@ private fun Content(
                 modifier = Modifier
                     .clearAndSetSemantics { contentDescription = description }
             ) {
-                Image(
-                    painter = painterResource(IR.drawable.logo_pocket_casts),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(logoColor),
-                )
+                HorizontalLogoText()
                 Spacer(modifier = Modifier.width(8.dp))
-                SubscriptionBadge(
-                    iconRes = IR.drawable.ic_patron,
-                    shortNameRes = LR.string.pocket_casts_patron_short,
-                    iconColor = Color.White,
-                    textColor = Color.White,
-                    backgroundColor = colorResource(UR.color.patron_purple),
+                SubscriptionBadgeForTier(
+                    tier = state.tier,
+                    displayMode = SubscriptionBadgeDisplayMode.Colored
                 )
             }
         },
-        buttonTitleRes = LR.string.subscribe, // TODO: Bookmarks update upsell button title based on subscription status
+        message = stringResource(LR.string.bookmarks_create_instructions),
+        buttonTitle = getButtonTitle(state.tier, state.hasFreeTrial),
         buttonAction = onClick,
         style = style,
         modifier = modifier,
+    )
+}
+
+private fun SubscriptionTier.getContentDescription() = when (this) {
+    SubscriptionTier.PATRON -> LR.string.pocket_casts_patron
+    SubscriptionTier.PLUS -> LR.string.pocket_casts_plus
+    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+}
+
+@Composable
+private fun getButtonTitle(
+    tier: SubscriptionTier,
+    hasFreeTrial: Boolean
+) = if (hasFreeTrial) {
+    stringResource(LR.string.profile_start_free_trial)
+} else {
+    stringResource(
+        LR.string.upgrade_to,
+        when (tier) {
+            SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
+            SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
+            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+        }
     )
 }
 
@@ -91,9 +111,9 @@ private fun UpsellPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        Content(
+        UpsellViewContent(
             style = MessageViewColors.Default,
-            activeTheme = themeType,
+            state = UiState.Loaded(tier = SubscriptionTier.PATRON, hasFreeTrial = false),
             onClick = {},
         )
     }
