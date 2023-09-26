@@ -24,7 +24,7 @@
         android:orientation="vertical"
         android:padding="64dp"
         android:layout_gravity="center"
-        android:visibility="gone">
+        android:visibility="visible">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,12 +42,15 @@
             android:layout_gravity="center"
             android:text="@string/settings_help_contact_support" />
     </LinearLayout>
+
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="?android:attr/actionBarSize"
         android:background="#FFFFFF"
-        android:layout_marginTop="?android:attr/actionBarSize"/>
+        android:padding="10dp" />
     <ProgressBar
         android:id="@+id/progress_circle"
         style="?android:attr/progressBarStyle"
