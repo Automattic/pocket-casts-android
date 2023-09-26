@@ -8,7 +8,6 @@ import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -49,11 +48,9 @@ class CloudFilesViewModel @Inject constructor(
             combine(
                 cloudFilesManager.cloudFilesList.asFlow(),
                 bookmarkManager.findUserEpisodesBookmarksFlow(),
-                settings.cachedSubscriptionStatus.flow,
-            ) { cloudFiles, bookmarks, _ ->
+            ) { cloudFiles, bookmarks ->
                 val cloudFilesWithBookmarkInfo = cloudFiles.map { file ->
-                    file.hasBookmark = bookmarks.map { it.episodeUuid }.contains(file.uuid) &&
-                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)
+                    file.hasBookmark = bookmarks.map { it.episodeUuid }.contains(file.uuid)
                     file
                 }
                 _uiState.value = UiState(cloudFilesWithBookmarkInfo)

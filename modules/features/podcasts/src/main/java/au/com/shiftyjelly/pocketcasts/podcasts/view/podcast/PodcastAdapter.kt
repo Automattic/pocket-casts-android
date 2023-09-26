@@ -185,6 +185,9 @@ class PodcastAdapter(
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
     private var signInState: SignInState = SignInState.SignedOut
+
+    private var bookmarksAvailable: Boolean = false
+
     var castConnected: Boolean = false
         set(value) {
             field = value
@@ -315,7 +318,8 @@ class PodcastAdapter(
             multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             disposables = disposables,
-            bookmarksObservable = podcastBookmarksObservable
+            bookmarksObservable = podcastBookmarksObservable,
+            bookmarksAvailable = bookmarksAvailable,
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {
@@ -468,7 +472,7 @@ class PodcastAdapter(
                 add(Podcast())
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
 
-                if (!Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
+                if (!bookmarksAvailable) {
                     add(BookmarkUpsell)
                 } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
                     add(NoBookmarkMessage)
@@ -515,6 +519,10 @@ class PodcastAdapter(
             }
         }
         submitList(content)
+    }
+
+    fun setBookmarksAvailable(bookmarksAvailable: Boolean) {
+        this.bookmarksAvailable = bookmarksAvailable
     }
 
     fun setError() {

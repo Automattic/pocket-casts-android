@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -655,16 +653,9 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 episodeLimitIndex = null
             }
 
-            val episodesWithBookmarkInfo = filteredList.map { episode ->
-                episode.hasBookmark = bookmarks.map { it.episodeUuid }.contains(episode.uuid) &&
-                    Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier) &&
-                    FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
-                episode
-            }
-
             val state: PodcastViewModel.UiState = PodcastViewModel.UiState.Loaded(
                 podcast = podcast,
-                episodes = episodesWithBookmarkInfo,
+                episodes = filteredList,
                 bookmarks = bookmarks,
                 showingArchived = showArchivedWithSearch,
                 episodeCount = episodeCount,
