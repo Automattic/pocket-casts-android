@@ -19,10 +19,10 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:indeterminate="true"
-        android:layout_marginTop="19dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="19dp"
         android:layout_marginEnd="16dp"
+        android:indeterminate="true"
         app:mpb_progressStyle="horizontal" />
 
     <TextView
