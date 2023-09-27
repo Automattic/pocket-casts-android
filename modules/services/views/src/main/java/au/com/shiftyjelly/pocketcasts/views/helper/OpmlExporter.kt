@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -80,7 +81,7 @@ class OpmlExporter(
                 }
             }
         } catch (e: Exception) {
-            Timber.e(e, "OPML export failed.")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, e, "OPML export failed.")
             UiUtil.hideProgressDialog(progressDialog)
             UiUtil.displayAlertError(
                 context = context, title = context.getString(LR.string.settings_opml_export_failed_title),
@@ -131,7 +132,7 @@ class OpmlExporter(
                         } catch (e: Exception) {
                             trackFailure(reason = "unknown")
                             UiUtil.hideProgressDialog(progressDialog)
-                            Timber.e(e)
+                            LogBuffer.logException(LogBuffer.TAG_CRASH, e, "OPML export failed.")
                         }
                     }
                 }
@@ -155,11 +156,11 @@ class OpmlExporter(
             try {
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                Timber.e(e)
+                Timber.w(e)
                 UiUtil.displayAlertError(context, context.getString(LR.string.settings_no_file_browser_title), context.getString(LR.string.settings_no_file_browser), null)
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.w(e)
         }
     }
 
@@ -181,11 +182,11 @@ class OpmlExporter(
                 context.startActivity(intent)
                 // fragment.startActivityForResult(intent, EXPORT_PICKER_REQUEST_CODE);
             } catch (e: ActivityNotFoundException) {
-                Timber.e(e)
+                Timber.w(e)
                 UiUtil.displayAlertError(context, context.getString(LR.string.settings_no_email_app_title), context.getString(LR.string.settings_no_email_app), null)
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.w(e)
         }
     }
 

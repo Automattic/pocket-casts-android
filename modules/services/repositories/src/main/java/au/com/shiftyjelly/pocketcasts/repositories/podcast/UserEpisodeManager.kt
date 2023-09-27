@@ -271,7 +271,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             try {
                 syncFiles(playbackManager)
             } catch (e: Exception) {
-                Timber.e("Could not sync cloud files: ${e.message}")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not sync cloud files.")
             }
         }
     }
@@ -460,8 +460,8 @@ class UserEpisodeManagerImpl @Inject constructor(
             // the api server will call S3 to check the file exists if it doesn't know
             .andThen(
                 syncManager.getFileUploadStatus(userEpisode.uuid)
-                    .onErrorReturn {
-                        Timber.e(it)
+                    .onErrorReturn { exception ->
+                        LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Failed to get file upload status")
                         false
                     }
                     .flatMapCompletable { success ->
@@ -476,7 +476,9 @@ class UserEpisodeManagerImpl @Inject constructor(
             )
             .andThen(
                 rxCompletable { syncFiles(playbackManager) }
-                    .doOnError { Timber.e(it) }
+                    .doOnError { exception ->
+                        LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Failed to sync files")
+                    }
                     .onErrorComplete()
             )
     }

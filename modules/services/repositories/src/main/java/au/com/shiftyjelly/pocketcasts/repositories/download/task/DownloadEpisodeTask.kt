@@ -125,7 +125,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             this.episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUUID!!) } ?: return Result.failure()
 
             if (this.episode.downloadTaskId != id.toString()) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling. downloadTaskId: ${this.episode.downloadTaskId} id: $id.")
+                LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling. downloadTaskId: ${this.episode.downloadTaskId} id: $id.")
                 return Result.failure()
             }
 
@@ -235,7 +235,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 }
             } catch (interrupt: InterruptedIOException) {
             } catch (e: Exception) {
-                Timber.e(e)
+                Timber.w(e)
                 if (!emitter.isDisposed) {
                     emitter.onError(e)
                 }
@@ -404,7 +404,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                                 try {
                                     fireProgressUpdate(emitter)
                                 } catch (e: Exception) {
-                                    Timber.e(e)
+                                    Timber.w(e)
                                 }
 
                                 lastReportedProgressTime = System.currentTimeMillis()
@@ -430,7 +430,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     try {
                         FileUtil.copyFile(tempDownloadFile, fullDownloadFile)
                     } catch (exception: IOException) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
+                        LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
 
                         // the move failed, so delete the temp file
                         if (tempDownloadFile.exists()) {
@@ -555,7 +555,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 return
             }
         } catch (e: Exception) {
-            Timber.e(e, "Failed to fix missing duration.")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to fix missing duration.")
         }
     }
 
@@ -640,7 +640,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 writer.write(data)
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.w(e)
         }
     }
 

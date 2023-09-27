@@ -29,7 +29,7 @@ class AudioOutputSelectorHelper @Inject constructor(
             if (canPlayWithNewOutput) {
                 play()
             } else {
-                Timber.e("Cannot play audio on output $newAudioOutput")
+                Timber.w("Cannot play audio on output $newAudioOutput")
             }
         }
     }

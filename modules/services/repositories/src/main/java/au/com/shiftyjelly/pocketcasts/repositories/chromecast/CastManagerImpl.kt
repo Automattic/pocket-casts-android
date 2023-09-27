@@ -32,10 +32,10 @@ class CastManagerImpl @Inject constructor(
         try {
             val executor = ContextCompat.getMainExecutor(context)
             CastContext.getSharedInstance(context, executor)
-                .addOnFailureListener { e -> LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to init CastContext shared instance ${e.message}") }
+                .addOnFailureListener { e -> LogBuffer.logException(LogBuffer.TAG_PLAYBACK, e, "Failed to init CastContext shared instance") }
                 .addOnSuccessListener { castContext -> castContext.sessionManager.addSessionManagerListener(sessionManagerListener) }
         } catch (e: Exception) {
-            Timber.e(e, "Failed to setup Chromecast.")
+            Timber.w(e, "Failed to setup Chromecast.")
         }
     }
 

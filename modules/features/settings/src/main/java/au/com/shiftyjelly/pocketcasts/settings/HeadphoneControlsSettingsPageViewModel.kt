@@ -107,7 +107,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         HeadphoneAction.ADD_BOOKMARK -> state.value.isAddBookmarkEnabled
         HeadphoneAction.NEXT_CHAPTER,
         HeadphoneAction.PREVIOUS_CHAPTER -> {
-            Timber.e("Headphone action not supported")
+            Timber.w("Headphone action not supported")
             false
         }
     }

@@ -25,7 +25,7 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
                 firebaseRemoteConfig.activate()
                 Timber.i("Firebase feature flag refreshed")
             } else {
-                Timber.e("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
+                Timber.w("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
             }
         }
     }

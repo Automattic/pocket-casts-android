@@ -147,7 +147,7 @@ class SyncManagerImpl @Inject constructor(
             syncAccountManager.setAccessToken(tokenResponse.accessToken)
             tokenResponse.accessToken
         } catch (ex: Exception) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
             if (isHttpClientError(ex)) {
                 throw RefreshTokenExpiredException()
             } else {
@@ -196,7 +196,7 @@ class SyncManagerImpl @Inject constructor(
             val result = handleTokenResponse(loginIdentity = loginIdentity, response = response)
             LoginResult.Success(result)
         } catch (ex: Exception) {
-            Timber.e(ex, "Failed to sign in with Pocket Casts")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, ex, "Failed to sign in with Pocket Casts")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
 
@@ -211,7 +211,7 @@ class SyncManagerImpl @Inject constructor(
             val result = handleTokenResponse(loginIdentity = LoginIdentity.PocketCasts, response = response)
             LoginResult.Success(result)
         } catch (ex: Exception) {
-            Timber.e(ex, "Failed to create a Pocket Casts account")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, ex, "Failed to create a Pocket Casts account")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.server_login_unable_to_create_account)
         }
         trackRegister(loginResult)
@@ -228,7 +228,7 @@ class SyncManagerImpl @Inject constructor(
                 onError(response.message)
             }
         } catch (ex: Exception) {
-            Timber.e(ex, "Failed to reset password.")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, ex, "Failed to reset password.")
             onError(context.resources.getString(LR.string.profile_reset_password_failed))
         }
     }

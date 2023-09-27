@@ -9,7 +9,7 @@ fun GoogleApiAvailability.isGooglePlayServicesAvailableSuccess(context: Context,
     return try {
         isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
     } catch (ex: Exception) {
-        Timber.e("Unable to check if Google Play Services is installed.", ex)
+        Timber.w("Unable to check if Google Play Services is installed.", ex)
         exceptionDefault
     }
 }

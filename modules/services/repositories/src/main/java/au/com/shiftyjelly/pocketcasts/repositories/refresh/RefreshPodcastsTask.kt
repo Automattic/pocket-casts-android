@@ -105,7 +105,7 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 val result = refreshJob?.await()
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - runNow - Finished $result")
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "RefreshPodcastsTask - runNow - Exception")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "RefreshPodcastsTask - runNow - Exception")
             } finally {
                 refreshJob = null
             }

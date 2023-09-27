@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.servers
 
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,7 +38,7 @@ class ServerShowNotesManager @Inject constructor(
                     emit(ShowNotesState.NotFound)
                 }
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed load show notes")
                 // only emit error if we haven't already loaded something
                 if (!loaded) {
                     emit(ShowNotesState.Error(e))
@@ -58,7 +58,7 @@ class ServerShowNotesManager @Inject constructor(
                 return ShowNotesState.Loaded(showNotesDownloaded)
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed load show notes")
             downloadException = e
         }
 
@@ -68,7 +68,7 @@ class ServerShowNotesManager @Inject constructor(
                 return ShowNotesState.Loaded(showNotesCached)
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed load show notes from cache")
         }
 
         return if (downloadException != null) ShowNotesState.Error(downloadException) else ShowNotesState.NotFound

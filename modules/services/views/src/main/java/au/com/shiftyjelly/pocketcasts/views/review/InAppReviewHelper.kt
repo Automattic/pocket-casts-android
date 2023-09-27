@@ -7,10 +7,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.play.core.review.ReviewManager
 import kotlinx.coroutines.delay
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,8 +44,7 @@ class InAppReviewHelper @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Timber.e("Could not launch review dialog.")
-            SentryHelper.recordException(e)
+            LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Could not launch review dialog.")
         }
     }
 

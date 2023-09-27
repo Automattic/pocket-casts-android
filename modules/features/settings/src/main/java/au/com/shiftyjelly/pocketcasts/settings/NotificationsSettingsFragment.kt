@@ -220,7 +220,7 @@ class NotificationsSettingsFragment :
                 settings.notificationSound.set(NotificationSound(value, it))
                 ringtonePreference?.summary = getRingtoneValue(value)
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
-            } ?: Timber.e("Context was null when trying to set notification sound")
+            } ?: Timber.w("Context was null when trying to set notification sound")
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }

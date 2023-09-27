@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
@@ -145,7 +146,7 @@ class DeveloperViewModel
                     Toast.makeText(context, "Running update episode details", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to run update episode details")
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Failed to run update episode details", Toast.LENGTH_LONG).show()
                 }

@@ -84,7 +84,7 @@ open class SyncAccountManagerImpl @Inject constructor(
                     AccessToken(token)
                 }
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
                 throw e // Rethrow the exception so it carries on
             }
         }

@@ -69,7 +69,7 @@ class SystemBatteryRestrictions @Inject constructor(@ApplicationContext private 
         // granting this request will only ignore battery optimizations, it will not remove the
         // app's background restrictions.
         if (status == Status.Restricted) {
-            Timber.e(
+            Timber.w(
                 "Improperly requesting that the user turn off battery optimization when their current " +
                     "setting is $status. Use SystemBatteryOptimization::goToAppSettings prompt instead"
             )

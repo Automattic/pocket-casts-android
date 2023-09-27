@@ -291,7 +291,7 @@ open class PlaybackManager @Inject constructor(
                     Observable.empty<EpisodeSyncResponse>()
                 }
             }
-            .doOnError { LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not sync episode progress. ${it.javaClass.name} ${it.message ?: ""}") }
+            .doOnError { exception -> LogBuffer.logException(LogBuffer.TAG_PLAYBACK, exception, "Could not sync episode progress.") }
             .onErrorReturnItem(EpisodeSyncResponse())
             .subscribeBy(
                 onNext = {
@@ -958,7 +958,7 @@ open class PlaybackManager @Inject constructor(
             Timber.e(e, "Problems logging error.")
         }
 
-        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player error %s", event.message)
+        LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Player error %s", event.message)
 
         val currentEpisode = getCurrentEpisode()
         if (currentEpisode is BaseEpisode) {
@@ -1753,9 +1753,7 @@ open class PlaybackManager @Inject constructor(
                 manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
             }
         } catch (e: Exception) {
-            val message = "Could not post notification ${e.message}"
-            LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
-            SentryHelper.recordException(message, e)
+            LogBuffer.logException(LogBuffer.TAG_PLAYBACK, e, "Could not post notification")
         }
     }
 

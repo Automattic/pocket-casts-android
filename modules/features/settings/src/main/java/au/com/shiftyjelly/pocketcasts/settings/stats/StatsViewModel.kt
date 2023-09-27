@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,7 +98,7 @@ class StatsViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Loading stats failed")
                 mutableState.value = State.Error
             }
         }

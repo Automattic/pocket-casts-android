@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.utils.log
 
 import android.util.Log
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
-import retrofit2.HttpException
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import timber.log.Timber
 import timber.log.Timber.Forest.tag
 import java.io.File
@@ -137,10 +137,7 @@ object LogBuffer {
      * Exceptions such as network timeouts are logged at the info level as they can't be fixed.
      */
     fun logException(tag: String, throwable: Throwable, message: String, vararg args: Any) {
-        val priority = when (throwable) {
-            is IOException, is HttpException -> Log.INFO
-            else -> Log.ERROR
-        }
+        val priority = if (SentryHelper.shouldIgnoreExceptions(throwable)) Log.INFO else Log.ERROR
         addLog(priority, tag, throwable, message, *args)
     }
 

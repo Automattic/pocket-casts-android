@@ -515,7 +515,7 @@ class AddFileActivity :
             }
         } catch (e: Exception) {
             binding.layoutLoading.isVisible = false
-            Timber.e(e, "Could not load file")
+            Timber.w(e, "Could not load file")
             AlertDialog.Builder(this)
                 .setTitle(LR.string.error)
                 .setMessage(getString(LR.string.profile_cloud_add_file_error, e.message))
@@ -594,7 +594,7 @@ class AddFileActivity :
                 return outImageFile
             }
         } catch (t: Throwable) {
-            Timber.e(t, "Could not save bitmap to file")
+            Timber.w(t, "Could not save bitmap to file")
         }
         return null
     }
@@ -627,7 +627,7 @@ class AddFileActivity :
                 }
             }
         } catch (t: Throwable) {
-            Timber.e(t, "Failed to get file name.")
+            Timber.w(t, "Failed to get file name.")
         }
         return null
     }
@@ -645,7 +645,7 @@ class AddFileActivity :
                 }
             }
         } catch (t: Throwable) {
-            Timber.e(t, "Failed to get file mime type.")
+            Timber.w(t, "Failed to get file mime type.")
         }
         return null
     }
@@ -665,7 +665,7 @@ class AddFileActivity :
                 return cursor.getLong(columnIndex)
             }
         } catch (e: Exception) {
-            Timber.e(e, "Failed to get file size.")
+            Timber.w(e, "Failed to get file size.")
         }
         return null
     }

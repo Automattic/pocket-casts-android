@@ -342,7 +342,7 @@ class AutoDownloadSettingsFragment :
         countPodcastsAutoDownloading()
             .map { it > 0 }
             .subscribeBy(
-                onError = { Timber.e(it) },
+                onError = { Timber.w(it) },
                 onSuccess = { on ->
                     updateNewEpisodesSwitch(on)
                     newEpisodesPreference?.isChecked = on

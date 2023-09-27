@@ -121,7 +121,7 @@ class Support @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Failed to share logs")
 
                 val debugStr = StringBuilder()
                 debugStr.append(intro)
@@ -161,7 +161,7 @@ class Support @Inject constructor(
                     FileUtil.createUriWithReadPermissions(debugFile, intent, context)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Failed to share wear logs")
                 intent.putExtra(Intent.EXTRA_TEXT, String(logBytes))
             }
             intent

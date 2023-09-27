@@ -292,8 +292,7 @@ open class ServerManager @Inject constructor(
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                Timber.e(e, "Post response failed.")
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Response failed from ${call.request().url}.")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Response failed from ${call.request().url}.")
                 if (callbackOnUiThread) {
                     Handler(Looper.getMainLooper()).post {
                         callback.onFailed(
@@ -329,7 +328,7 @@ open class ServerManager @Inject constructor(
                     requestCallback.onFailure(call, IOException("Unexpected code $response"))
                 }
             } catch (e: IOException) {
-                Timber.e(e)
+                Timber.w(e)
                 requestCallback.onFailure(call, e)
                 return null
             }

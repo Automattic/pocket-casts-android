@@ -9,6 +9,6 @@ fun Fragment.openUrl(url: String) {
     try {
         this.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     } catch (e: Exception) {
-        Timber.e(e)
+        Timber.w(e)
     }
 }

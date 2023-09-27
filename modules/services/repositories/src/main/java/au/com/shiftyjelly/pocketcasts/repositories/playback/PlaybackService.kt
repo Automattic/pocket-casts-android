@@ -191,8 +191,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                         onPlaybackStateChangedWithNotification(state, notification)
                     },
                     onError = { throwable ->
-                        Timber.e(throwable)
-                        LogBuffer.e(LogBuffer.TAG_PLAYBACK, throwable, "Playback service error")
+                        LogBuffer.logException(LogBuffer.TAG_CRASH, throwable, "Playback service error")
                     }
                 )
                 .addTo(disposables)
@@ -295,7 +294,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                     }
 
                     if (state == PlaybackStateCompat.STATE_ERROR) {
-                        LogBuffer.e(
+                        LogBuffer.w(
                             LogBuffer.TAG_PLAYBACK,
                             "Playback state error: ${playbackStatusRelay.value?.errorCode
                                 ?: -1} ${playbackStatusRelay.value?.errorMessage
@@ -602,7 +601,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 serverManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
             }
         } catch (ex: Exception) {
-            Timber.e(ex)
+            LogBuffer.logException(LogBuffer.TAG_CRASH, ex, "Podcast search failed")
             // display the error message when the server call fails only if there is no local podcasts to display
             if (localPodcasts.isEmpty()) {
                 return null

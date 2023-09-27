@@ -353,7 +353,7 @@ class EpisodeViewModel @Inject constructor(
 
     fun onPauseClicked() {
         if ((stateFlow.value as? State.Loaded)?.isPlayingEpisode != true) {
-            Timber.e("Attempted to pause when not playing")
+            Timber.w("Attempted to pause when not playing")
             return
         }
         playAttempt?.cancel()

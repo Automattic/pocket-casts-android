@@ -26,7 +26,7 @@ object UiUtil {
                 progressDialog.dismiss()
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.w(e)
         }
     }
 
@@ -50,7 +50,7 @@ object UiUtil {
                 .show()
         } catch (e: Exception) {
             // you can get exceptions sometimes, like if you try to launch a message from an invalid activity
-            Timber.e(e)
+            Timber.w(e)
         }
     }
 

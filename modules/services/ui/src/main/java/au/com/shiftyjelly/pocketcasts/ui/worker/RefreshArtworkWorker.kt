@@ -48,7 +48,7 @@ class RefreshArtworkWorker @AssistedInject constructor(
                 try {
                     imageLoader.cacheSubscribedArtworkSuspend(podcast)
                 } catch (e: Exception) {
-                    Timber.e(e)
+                    Timber.w(e)
                 }
             }
         }

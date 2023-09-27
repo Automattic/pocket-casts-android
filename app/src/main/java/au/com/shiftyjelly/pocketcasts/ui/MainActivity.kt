@@ -110,7 +110,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -474,7 +473,7 @@ class MainActivity :
                     .doOnNext {
                         podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
                     }
-                    .subscribeBy(onError = { Timber.e(it) })
+                    .subscribeBy(onError = { LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Starting refresh failed") })
                     .addTo(disposables)
             }
         }
@@ -1194,8 +1193,7 @@ class MainActivity :
                 playbackManager.playQueue()
             }
         } catch (e: Exception) {
-            Timber.e(e)
-            SentryHelper.recordException(e)
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Handle intent failed")
         }
     }
 
@@ -1333,7 +1331,7 @@ class MainActivity :
                     throwable: Throwable?
                 ) {
                     UiUtil.hideProgressDialog(dialog)
-                    Timber.e(serverMessage)
+                    Timber.w(serverMessage)
                     UiUtil.displayAlertError(
                         this@MainActivity,
                         getString(LR.string.podcast_share_open_fail_title),

@@ -31,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -93,8 +92,8 @@ class UserManagerImpl @Inject constructor(
                             analyticsTracker.refreshMetadata()
                             SignInState.SignedIn(email = syncManager.getEmail() ?: "", subscriptionStatus = it)
                         }
-                        .onErrorReturn {
-                            Timber.e(it, "Error getting subscription state")
+                        .onErrorReturn { exception ->
+                            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Error getting subscription state")
                             SignInState.SignedIn(syncManager.getEmail() ?: "", SubscriptionStatus.Free())
                         }
                 } else {

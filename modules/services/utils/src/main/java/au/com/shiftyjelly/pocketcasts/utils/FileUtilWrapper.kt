@@ -31,7 +31,7 @@ class FileUtilWrapper @Inject constructor() {
                 stream.flush()
             }
         } catch (e: IOException) {
-            Timber.e("Error while saving image to file " + e.message)
+            Timber.w("Error while saving image to file " + e.message)
         }
         file
     }

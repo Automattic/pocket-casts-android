@@ -103,7 +103,7 @@ class UpNextSyncJob : JobService() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { throwable ->
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "UpNextSyncJob - failed - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+                    LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "UpNextSyncJob - failed - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
                     jobFinished(jobParameters, false)
                 },
                 onComplete = {

@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxSingle
-import timber.log.Timber
 import javax.inject.Inject
 
 class StatsManagerImpl @Inject constructor(
@@ -225,7 +225,7 @@ class StatsManagerImpl @Inject constructor(
             cachedMergedStats = mergeStats(stats.values, localStatsInServerFormat)
             persistTimes()
         } catch (ex: Exception) {
-            Timber.e("Could not load server stats for cache ${ex.message}")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Could not load server stats for cache")
         }
     }
 

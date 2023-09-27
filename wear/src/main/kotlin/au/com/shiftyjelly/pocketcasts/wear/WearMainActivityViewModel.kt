@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -124,7 +124,7 @@ class WearMainActivityViewModel @Inject constructor(
             try {
                 podcastManager.refreshPodcastsIfRequired(fromLog = "watch - open app")
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to start refresh")
             }
         }
         // Schedule next refresh in the background

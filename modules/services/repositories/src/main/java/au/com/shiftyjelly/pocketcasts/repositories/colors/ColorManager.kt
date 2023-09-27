@@ -64,7 +64,7 @@ class ColorManager @Inject constructor(
             )
             Timber.i("ColorManager successfully updated colors for podcast ${podcast.uuid}")
         } catch (e: Exception) {
-            Timber.e(e, "ColorManager could not update colors for podcast ${podcast.uuid}")
+            Timber.w(e, "ColorManager could not update colors for podcast ${podcast.uuid}")
         }
     }
 }

@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest
@@ -33,7 +34,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Retrofit
-import timber.log.Timber
 import java.net.HttpURLConnection
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -210,8 +210,8 @@ class PodcastSyncProcessTest {
             val lastModified = System.currentTimeMillis().toString()
 
             syncProcess.performIncrementalSync(lastModified)
-                .doOnError {
-                    Timber.e(it)
+                .doOnError { exception ->
+                    LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Incremental sync failed")
                 }
                 .test()
                 .awaitDone(5, TimeUnit.SECONDS)

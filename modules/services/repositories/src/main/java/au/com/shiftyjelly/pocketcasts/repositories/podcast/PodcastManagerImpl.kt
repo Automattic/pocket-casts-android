@@ -660,7 +660,7 @@ class PodcastManagerImpl @Inject constructor(
         try {
             podcastDao.updateColors(background, tintForLightBg, tintForDarkBg, fabForLightBg, fabForDarkBg, linkForLightBg, linkForDarkBg, colorLastDownloaded, podcastUuid)
         } catch (e: Exception) {
-            Timber.e(e, "Podcast colors update failed.")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Podcast colors update failed.")
         }
     }
 

@@ -9,8 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import okhttp3.Call
-import timber.log.Timber
 import java.io.File
 import kotlin.math.round
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -64,7 +64,7 @@ data class SharePodcastHelper(
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             this.context.startActivity(Intent.createChooser(intent, context.getString(LR.string.podcasts_share_via)))
         } catch (e: Exception) {
-            Timber.e(e)
+            LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Failed to send file")
         }
     }
 

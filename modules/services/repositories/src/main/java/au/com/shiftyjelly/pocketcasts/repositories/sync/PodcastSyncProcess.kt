@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FolderResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
@@ -42,7 +41,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
-import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -110,7 +108,6 @@ class PodcastSyncProcess(
             )
         return syncUpNextObservable
             .doOnError { throwable ->
-                SentryHelper.recordException("Sync failed", throwable)
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
             }
             .doOnComplete {
@@ -548,7 +545,6 @@ class PodcastSyncProcess(
             }
             records.put(record)
         } catch (e: JSONException) {
-            Sentry.captureException(e)
             Timber.e(e, "Unable to save bookmark")
         }
     }

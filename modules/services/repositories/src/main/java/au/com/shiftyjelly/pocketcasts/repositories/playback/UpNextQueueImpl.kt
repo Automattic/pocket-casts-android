@@ -27,7 +27,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -85,7 +84,7 @@ class UpNextQueueImpl @Inject constructor(
             // send server changes in bulk
             .debounce(5, TimeUnit.SECONDS)
             .doOnNext { sendToServer() }
-            .subscribeBy(onError = { Timber.e(it) })
+            .subscribeBy(onError = { exception -> LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Failed to send Up Next changes to server") })
             .addTo(disposables)
     }
 

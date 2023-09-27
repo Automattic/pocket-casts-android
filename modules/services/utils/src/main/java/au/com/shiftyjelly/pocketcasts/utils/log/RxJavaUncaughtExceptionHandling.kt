@@ -11,7 +11,7 @@ object RxJavaUncaughtExceptionHandling {
 
                 is UndeliverableException -> {
                     // Merely log undeliverable exceptions
-                    Timber.e(exception)
+                    Timber.w(exception)
                     LogBuffer.i(LogBuffer.TAG_RX_JAVA_DEFAULT_ERROR_HANDLER, "Caught undeliverable exception: ${exception.cause}")
                 }
 

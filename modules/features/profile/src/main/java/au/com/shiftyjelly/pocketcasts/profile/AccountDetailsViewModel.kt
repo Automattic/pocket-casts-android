@@ -20,15 +20,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
@@ -94,8 +93,7 @@ class AccountDetailsViewModel
 
     private fun deleteAccountError(throwable: Throwable) {
         deleteAccountState.postValue(DeleteAccountState.Failure(message = null))
-        Timber.e(throwable)
-        SentryHelper.recordException("Delete account failed", throwable)
+        LogBuffer.logException(LogBuffer.TAG_CRASH, throwable, "Delete account failed")
     }
 
     fun clearDeleteAccountState() {

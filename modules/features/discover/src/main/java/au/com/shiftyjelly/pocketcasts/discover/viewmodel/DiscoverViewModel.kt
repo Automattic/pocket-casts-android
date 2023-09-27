@@ -134,7 +134,7 @@ class DiscoverViewModel @Inject constructor(
                 val isInvalidSponsoredSource = it.source == null || it.position == null
                 if (isInvalidSponsoredSource) {
                     val message = "Invalid sponsored source found."
-                    Timber.e(message)
+                    Timber.w(message)
                     SentryHelper.recordException(InvalidObjectException(message))
                 }
                 !isInvalidSponsoredSource

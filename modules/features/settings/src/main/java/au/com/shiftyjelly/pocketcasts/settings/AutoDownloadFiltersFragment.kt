@@ -66,7 +66,7 @@ class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAuto
                 }
 
                 override fun onError(throwable: Throwable) {
-                    Timber.e(throwable)
+                    Timber.w(throwable)
                 }
             }).addTo(disposables)
     }
@@ -81,7 +81,7 @@ class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAuto
                 }
 
                 override fun onError(throwable: Throwable) {
-                    Timber.e(throwable)
+                    Timber.w(throwable)
                 }
             })
             .addTo(disposables)

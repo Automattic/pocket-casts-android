@@ -53,7 +53,7 @@ class WidgetManagerImpl @Inject constructor(
                     updateOnClicks(views, context)
                     appWidgetManager.updateAppWidget(widgetName, views)
                 } catch (e: Exception) {
-                    Timber.e(e)
+                    Timber.w(e)
                 }
             }
         }
@@ -95,7 +95,7 @@ class WidgetManagerImpl @Inject constructor(
                 manager.updateAppWidget(widgetId, views)
             } catch (e: Exception) {
                 // sometimes widgets are not able to be updated, ignore this one and move on to the next one
-                Timber.e(e)
+                Timber.w(e)
             }
         }
     }

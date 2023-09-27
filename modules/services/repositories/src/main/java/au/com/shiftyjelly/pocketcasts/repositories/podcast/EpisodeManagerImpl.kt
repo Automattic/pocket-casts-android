@@ -837,7 +837,7 @@ class EpisodeManagerImpl @Inject constructor(
             fileStorage.removeDirectoryFiles(fileStorage.podcastDirectory)
             fileStorage.removeDirectoryFiles(fileStorage.tempPodcastDirectory)
         } catch (e: Exception) {
-            Timber.e(e)
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to delete downloaded episodes")
         }
 
         val episodes = findEpisodesWhere("episode_status = " + EpisodeStatusEnum.DOWNLOADED.ordinal)

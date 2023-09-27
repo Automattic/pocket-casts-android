@@ -31,7 +31,7 @@ fun String.parseIsoDate(): Date? {
             // try next format
         }
     }
-    Timber.e("Parsing ISO date failed [${toString()}]")
+    Timber.w("Parsing ISO date failed [${toString()}]")
     return null
 }
 
@@ -51,7 +51,7 @@ fun String.toSecondsFromColonFormattedString(): Int? {
 
         return time.toInt()
     } catch (e: NumberFormatException) {
-        Timber.e(e)
+        Timber.w(e)
     }
 
     return null
