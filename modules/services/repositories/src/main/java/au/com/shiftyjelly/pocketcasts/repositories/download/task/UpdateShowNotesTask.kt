@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.download.task
 
 import android.content.Context
 import android.os.SystemClock
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -17,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import retrofit2.HttpException
 
 /**
  * Try to cache the show notes so they can be viewed offline. This task happens when the user downloads an episode.
@@ -61,8 +59,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
             Result.success()
         } catch (e: Exception) {
             info("Worker failed - took ${SystemClock.elapsedRealtime() - startTime} ms")
-            val logPriority = if (e is HttpException) Log.INFO else Log.ERROR
-            LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to update show notes")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to update show notes")
             // Don't keep retrying if the download fails. The user can download the show notes when viewing them.
             Result.success()
         }

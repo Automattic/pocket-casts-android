@@ -139,7 +139,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     Timber.d("Connected to google play")
                     loadProducts()
                 } else {
-                    Timber.e("Couldn't set up billing connection: ${billingResult.debugMessage}")
+                    Timber.w("Couldn't set up billing connection: ${billingResult.debugMessage}")
                     loadProducts()
                 }
             }

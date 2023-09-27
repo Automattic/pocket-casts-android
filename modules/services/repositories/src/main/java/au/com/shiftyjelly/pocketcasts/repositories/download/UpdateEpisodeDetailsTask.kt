@@ -118,7 +118,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         } catch (t: Throwable) {
             info("Worker failed - took ${SystemClock.elapsedRealtime() - startTime} ms")
             // report the error to Sentry and to the log buffer for support
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "Unable to check episode file details with a head request.")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, t, "Unable to check episode file details with a head request.")
             // mark the worker as a success or it will won't process all the chain tasks
             return Result.success()
         }

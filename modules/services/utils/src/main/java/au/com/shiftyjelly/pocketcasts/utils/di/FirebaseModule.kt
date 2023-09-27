@@ -26,7 +26,7 @@ class FirebaseModule {
                 if (it.isSuccessful) {
                     activate()
                 } else {
-                    Timber.e("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
+                    Timber.w("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
                 }
             }
         }

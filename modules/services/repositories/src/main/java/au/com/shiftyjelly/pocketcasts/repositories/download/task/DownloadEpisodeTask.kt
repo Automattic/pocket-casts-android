@@ -5,7 +5,6 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.system.ErrnoException
 import android.system.OsConstants
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
@@ -511,9 +510,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             call?.cancel()
         }
         if (exception != null) {
-            // don't report issues such as timeouts to Sentry
-            val logPriority = if (exception is IOException) Log.INFO else Log.ERROR
-            LogBuffer.addLog(logPriority, LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Download failed %s", this.episode.downloadUrl ?: "")
         }
 
         if (!emitter.isDisposed) {

@@ -131,16 +131,15 @@ class RefreshPodcastsThread(
 
             return ListenableWorker.Result.success()
         } catch (e: Exception) {
-            Timber.e(e)
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh failed")
-
             if (e is RefreshTokenExpiredException) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signed out user because the refresh token has expired.")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed out user because the refresh token has expired.")
 
                 val userManager = entryPoint.userManager()
                 val playbackManager = entryPoint.playbackManager()
                 userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh failed")
+
                 refreshFailedOrCancelled(e.message ?: "Unknown error")
             }
 

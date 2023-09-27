@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.utils.log
 
 import android.util.Log
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import retrofit2.HttpException
 import timber.log.Timber
 import timber.log.Timber.Forest.tag
 import java.io.File
@@ -129,6 +130,18 @@ object LogBuffer {
 
     fun e(tag: String, throwable: Throwable, message: String, vararg args: Any) {
         addLog(Log.ERROR, tag, throwable, message, *args)
+    }
+
+    /**
+     * Log the exception with the appropriate priority based on the exception type.
+     * Exceptions such as network timeouts are logged at the info level as they can't be fixed.
+     */
+    fun logException(tag: String, throwable: Throwable, message: String, vararg args: Any) {
+        val priority = when (throwable) {
+            is IOException, is HttpException -> Log.INFO
+            else -> Log.ERROR
+        }
+        addLog(priority, tag, throwable, message, *args)
     }
 
     @Suppress("NAME_SHADOWING")
