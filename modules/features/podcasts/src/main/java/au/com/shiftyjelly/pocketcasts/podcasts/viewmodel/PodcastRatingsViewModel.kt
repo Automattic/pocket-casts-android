@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -63,13 +63,7 @@ class PodcastRatingsViewModel
             try {
                 ratingsManager.refreshPodcastRatings(uuid)
             } catch (e: Exception) {
-                val message = "Failed to refresh podcast ratings"
-                // don't report missing rating or network errors to Sentry
-                if (e is HttpException || e is IOException) {
-                    Timber.i(e, message)
-                } else {
-                    Timber.e(e, message)
-                }
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Failed to refresh podcast ratings")
             }
         }
     }

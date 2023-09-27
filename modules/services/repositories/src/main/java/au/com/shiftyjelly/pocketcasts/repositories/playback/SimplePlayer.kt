@@ -224,7 +224,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
+                LogBuffer.w(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
                 val event = PlayerEvent.PlayerError(error.message ?: "", error)
                 this@SimplePlayer.onError(event)
             }

@@ -57,7 +57,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -953,12 +952,10 @@ open class PlaybackManager @Inject constructor(
                         .append(if (descriptor.valid()) "File descriptor is valid. " else "File descriptor is invalid! ")
                 }
             }
-            Timber.e(output.toString())
+            LogBuffer.w(LogBuffer.TAG_PLAYBACK, output.toString())
         } catch (e: Exception) {
-            Timber.e(e, "Problems logging error.")
+            Timber.w(e, "Problems logging error.")
         }
-
-        LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Player error %s", event.message)
 
         val currentEpisode = getCurrentEpisode()
         if (currentEpisode is BaseEpisode) {
@@ -975,13 +972,8 @@ open class PlaybackManager @Inject constructor(
                 } else {
                     event.message
                 }
-                Sentry.withScope { scope ->
-                    episode?.uuid?.let { scope.setTag("episodeUuid", it) }
-                    SentryHelper.recordException(
-                        message = "Illegal playback state encountered",
-                        throwable = event.error ?: IllegalStateException(event.message)
-                    )
-                }
+                LogBuffer.w(LogBuffer.TAG_PLAYBACK, event.error ?: IllegalStateException(event.message), "Illegal playback state encountered. Episode: ${episode?.uuid}")
+
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = "onPlayerError"))
             }
         }
@@ -1096,7 +1088,7 @@ open class PlaybackManager @Inject constructor(
         if (episode != null) {
             if (episode.uuid != episodeUUID) {
                 // We have already completed this episode, don't do it again or we may skip the next one
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.")
+                LogBuffer.w(LogBuffer.TAG_PLAYBACK, "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.")
                 return
             }
 
@@ -1132,7 +1124,7 @@ open class PlaybackManager @Inject constructor(
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete { Timber.d("Synced episode completion") }
-                        .doOnError { Timber.e("Could not sync episode completion ${it.message}") }
+                        .doOnError { Timber.w("Could not sync episode completion ${it.message}") }
                         .onErrorComplete()
                         .subscribe()
                 } else if (episode is UserEpisode) {
@@ -1142,7 +1134,7 @@ open class PlaybackManager @Inject constructor(
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .doOnComplete { Timber.d("Synced user episode completion") }
-                            .doOnError { Timber.e("Could not sync user episode completion ${it.message}") }
+                            .doOnError { Timber.w("Could not sync user episode completion ${it.message}") }
                             .onErrorComplete()
                             .subscribe()
                     }
@@ -1395,7 +1387,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     override fun onFocusRequestFailed() {
-        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not get audio focus, stopping")
+        LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Could not get audio focus, stopping")
         stopAsync(isAudioFocusFailed = true)
     }
 
@@ -1748,7 +1740,7 @@ open class PlaybackManager @Inject constructor(
                 }
             } ?: run {
                 val message = "notificationPermissionChecker was null (this should never happen)"
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
+                LogBuffer.w(LogBuffer.TAG_PLAYBACK, message)
                 Sentry.addBreadcrumb(message)
                 manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
             }
@@ -1792,7 +1784,7 @@ open class PlaybackManager @Inject constructor(
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, lastChangeFrom = "play"))
 
                 if (player?.episodeUuid != playbackState.episodeUuid) {
-                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player playing episode that is not the same as playback state. Player: ${player?.episodeUuid} State: ${playbackState.episodeUuid}")
+                    LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Player playing episode that is not the same as playback state. Player: ${player?.episodeUuid} State: ${playbackState.episodeUuid}")
                 }
 
                 // Handle skip first

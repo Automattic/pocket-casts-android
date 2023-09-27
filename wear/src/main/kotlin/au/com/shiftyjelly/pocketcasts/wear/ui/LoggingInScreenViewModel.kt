@@ -56,7 +56,7 @@ class LoggingInScreenViewModel @Inject constructor(
         val stateValue = state.value
 
         if (stateValue is State.None) {
-            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Immediately closing LoggingInScreen because refresh is not in progress")
+            LogBuffer.w(LogBuffer.TAG_INVALID_STATE, "Immediately closing LoggingInScreen because refresh is not in progress")
             return true
         }
 

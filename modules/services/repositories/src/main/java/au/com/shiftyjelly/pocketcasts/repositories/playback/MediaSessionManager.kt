@@ -328,13 +328,13 @@ class MediaSessionManager(
             .switchMap { (state, episode) -> getPlaybackStateRx(state, episode).toObservable().onErrorResumeNext(Observable.empty()) }
             .switchMap {
                 Observable.fromCallable { updatePlaybackState(it) }
-                    .doOnError { LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Error updating playback state in media session: ${it.message}") }.retry(3)
+                    .doOnError { LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Error updating playback state in media session: ${it.message}") }.retry(3)
             }
             .ignoreElements()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { throwable ->
-                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
+                    LogBuffer.w(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
                 }
             ).addTo(disposables)
     }

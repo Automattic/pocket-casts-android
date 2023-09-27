@@ -53,7 +53,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             sleepTimeMs = timeMs
             true
         } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
+            LogBuffer.w(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
             if (Build.VERSION.SDK_INT >= 31 && !alarmManager.canScheduleExactAlarms()) {
                 Toast.makeText(context, LR.string.player_sleep_timer_start_failed, Toast.LENGTH_LONG).show()
             }

@@ -147,10 +147,10 @@ class SyncManagerImpl @Inject constructor(
             syncAccountManager.setAccessToken(tokenResponse.accessToken)
             tokenResponse.accessToken
         } catch (ex: Exception) {
-            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
             if (isHttpClientError(ex)) {
                 throw RefreshTokenExpiredException()
             } else {
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
                 throw ex
             }
         }
@@ -557,7 +557,7 @@ class SyncManagerImpl @Inject constructor(
         return rxSingle {
             syncAccountManager.getAccessToken() ?: throw RuntimeException("Failed to get token")
         }.doOnError {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Refresh token threw an error.")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Refresh token threw an error.")
         }
     }
 

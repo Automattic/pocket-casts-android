@@ -58,7 +58,7 @@ class SubscribeManager @Inject constructor(
             .observeOn(Schedulers.io())
             .doOnNext { info -> Timber.i("Adding podcast to addPodcast queue ${info.podcastUuid}") }
             .flatMap({ info -> addPodcast(info.podcastUuid, sync = info.sync, subscribed = true).toObservable() }, true, 5)
-            .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
+            .doOnError { throwable -> LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
             .subscribeBy(
                 onNext = { podcast ->
                     uuidsInQueue.remove(podcast.uuid)

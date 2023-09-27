@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.utils.log
 
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import timber.log.Timber
 
 object RxJavaUncaughtExceptionHandling {
     fun setUp() {
@@ -11,8 +10,7 @@ object RxJavaUncaughtExceptionHandling {
 
                 is UndeliverableException -> {
                     // Merely log undeliverable exceptions
-                    Timber.w(exception)
-                    LogBuffer.i(LogBuffer.TAG_RX_JAVA_DEFAULT_ERROR_HANDLER, "Caught undeliverable exception: ${exception.cause}")
+                    LogBuffer.w(LogBuffer.TAG_RX_JAVA_DEFAULT_ERROR_HANDLER, exception, "Caught undeliverable exception.")
                 }
 
                 else -> {

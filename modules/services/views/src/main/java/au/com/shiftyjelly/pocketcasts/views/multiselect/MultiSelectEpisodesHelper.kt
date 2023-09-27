@@ -408,7 +408,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
         val episode = selectedList.let { list ->
             if (list.size != 1) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share one episode, but trying to share ${selectedList.size} episodes when multi selecting")
+                LogBuffer.w(LogBuffer.TAG_INVALID_STATE, "Can only share one episode, but trying to share ${selectedList.size} episodes when multi selecting")
                 return
             } else {
                 list.first()
@@ -416,14 +416,14 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
 
         if (episode !is PodcastEpisode) {
-            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share a ${PodcastEpisode::class.java.simpleName}")
+            LogBuffer.w(LogBuffer.TAG_INVALID_STATE, "Can only share a ${PodcastEpisode::class.java.simpleName}")
             Toast.makeText(context, LR.string.podcasts_share_failed, Toast.LENGTH_SHORT).show()
             return
         }
 
         launch {
             val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: run {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Share failed because unable to find podcast from uuid")
+                LogBuffer.w(LogBuffer.TAG_INVALID_STATE, "Share failed because unable to find podcast from uuid")
                 return@launch
             }
 

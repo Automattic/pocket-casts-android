@@ -78,6 +78,6 @@ private fun String.hashString(algorithm: String) =
             .digest(toByteArray())
             .joinToString("") { "%02x".format(it) }
     } catch (e: Exception) {
-        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error applying $algorithm to $this: ${e.message}")
+        LogBuffer.w(LogBuffer.TAG_INVALID_STATE, "Error applying $algorithm to $this: ${e.message}")
         null
     }

@@ -230,13 +230,13 @@ class DownloadManagerImpl @Inject constructor(
                 val state = workManager.getWorkInfoById(uuid).get()
                 if (state == null) {
                     episodeManager.updateDownloadTaskId(episode, null)
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
                 } else {
                     // This should not happen
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Workmanager knows about ${episode.uuid} but it is marked as not downloaded.")
+                    LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Workmanager knows about ${episode.uuid} but it is marked as not downloaded.")
                 }
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clean up stale download ${episode.uuid}.", e)
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not clean up stale download ${episode.uuid}.")
             }
         }
     }

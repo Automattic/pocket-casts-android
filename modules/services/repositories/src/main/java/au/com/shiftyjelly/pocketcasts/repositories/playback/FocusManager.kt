@@ -98,7 +98,7 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
                 audioFocus = AUDIO_NO_FOCUS_NO_DUCK
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Giving up audio focus. Request granted")
             } else {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Giving up audio focus request failed")
+                LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Giving up audio focus request failed")
             }
         }
     }

@@ -178,7 +178,7 @@ class PodcastViewModel
                 }
             }
             .onErrorReturn {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not load podcast page")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not load podcast page")
                 UiState.Error(it.message ?: "Unknown error")
             }
             .observeOn(AndroidSchedulers.mainThread())

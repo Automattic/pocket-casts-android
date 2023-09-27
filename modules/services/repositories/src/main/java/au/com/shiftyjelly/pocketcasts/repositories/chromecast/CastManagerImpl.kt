@@ -100,7 +100,7 @@ class CastManagerImpl @Inject constructor(
         return try {
             CastContext.getSharedInstance()?.sessionManager
         } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Couldn't load cast despite it reporting it is available")
+            LogBuffer.w(LogBuffer.TAG_PLAYBACK, "Couldn't load cast despite it reporting it is available")
             null
         }
     }

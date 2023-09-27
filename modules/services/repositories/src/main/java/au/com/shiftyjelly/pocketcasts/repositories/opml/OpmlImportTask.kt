@@ -165,7 +165,7 @@ class OpmlImportTask @AssistedInject constructor(
             trackProcessed(numberProcessed)
             return Result.success()
         } catch (t: Throwable) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             trackFailure(reason = "unknown")
             return Result.failure()
         }

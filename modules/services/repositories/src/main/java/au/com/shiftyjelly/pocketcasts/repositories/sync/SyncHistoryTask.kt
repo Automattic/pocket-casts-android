@@ -114,7 +114,7 @@ class SyncHistoryTask @AssistedInject constructor(
 
             LogBuffer.i(TAG, "Sync history completed successfully")
         } catch (e: Exception) {
-            LogBuffer.e(TAG, "Sync history failed: ${e.message}")
+            LogBuffer.logException(TAG, e, "Sync history failed")
             return Result.failure()
         }
 

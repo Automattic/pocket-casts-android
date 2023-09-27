@@ -293,7 +293,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Synced cloud files successfully")
                 userEpisodeDao.markAllSynced()
             } else {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Couldn't sync cloud files")
+                LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Couldn't sync cloud files")
                 throw HttpException(response)
             }
         }
@@ -500,7 +500,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = {
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not upload file ${userEpisode.uuid} - ${userEpisode.title}")
+                    LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not upload file ${userEpisode.uuid} - ${userEpisode.title}")
                 }
             )
     }

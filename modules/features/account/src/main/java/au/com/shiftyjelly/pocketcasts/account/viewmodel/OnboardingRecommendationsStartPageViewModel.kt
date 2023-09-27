@@ -131,7 +131,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             val feed = try {
                 repository.getDiscoverFeed().await()
             } catch (e: Exception) {
-                Timber.e("Exception retrieving Discover feed: $e")
+                Timber.w("Exception retrieving Discover feed: $e")
                 return@launch
             }
 
@@ -139,7 +139,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             val region = feed.regions[regionCode]
                 ?: feed.regions[feed.defaultRegionCode]
                     .let {
-                        Timber.e("Could not get region for $regionCode")
+                        Timber.w("Could not get region for $regionCode")
                         return@launch
                     }
 
@@ -246,7 +246,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     ) {
         val listItem = updatedList.find { it.id == id }
         if (listItem == null) {
-            Timber.e("Could not find section with id $id")
+            Timber.w("Could not find section with id $id")
             return
         }
 
@@ -255,7 +255,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 .await()
                 ?: return
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.w(e)
             return
         }
 
@@ -292,7 +292,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                             )
                         }
                 } catch (e: Exception) {
-                    Timber.e(e)
+                    Timber.w(e)
                     null
                 }
             } ?: emptyList()

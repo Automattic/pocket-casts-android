@@ -43,7 +43,7 @@ class UploadEpisodeTask @AssistedInject constructor(
             }
             .andThen(Single.just(Result.success(outputData.build())))
             .onErrorReturn {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not upload file")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not upload file")
                 var errorMessage: String?
                 val retry: Boolean
 

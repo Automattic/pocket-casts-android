@@ -109,7 +109,7 @@ private fun buildAndShowNotification(
         NotificationManagerCompat.from(context)
             .notify(Settings.NotificationId.BOOKMARK.value, notification)
     } else {
-        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Post notification permission not granted.")
+        LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Post notification permission not granted.")
     }
 }
 

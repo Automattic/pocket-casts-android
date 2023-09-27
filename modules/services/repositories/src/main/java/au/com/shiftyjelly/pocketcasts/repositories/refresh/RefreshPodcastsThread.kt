@@ -176,7 +176,7 @@ class RefreshPodcastsThread(
                 ) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
                     if (throwable != null) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
+                        LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
                     }
                     refreshFailedOrCancelled("Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
                 }
@@ -257,12 +257,11 @@ class RefreshPodcastsThread(
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync complete - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         val throwable = syncCompletable.blockingGet()
         if (throwable != null) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
-
             if (throwable is RefreshTokenExpiredException) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
+                LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
                 userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
                 return RefreshState.Failed("Sync threw an error: ${throwable.message}")
             }
         }

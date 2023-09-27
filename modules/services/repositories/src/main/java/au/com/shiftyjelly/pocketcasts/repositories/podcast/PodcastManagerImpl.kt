@@ -97,7 +97,7 @@ class PodcastManagerImpl @Inject constructor(
                 unsubscribeRelay.accept(podcastUuid)
             }
         } catch (t: Throwable) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "Could not unsubscribe from $podcastUuid")
+            LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, t, "Could not unsubscribe from $podcastUuid")
         }
     }
 

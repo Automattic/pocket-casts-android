@@ -81,7 +81,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             }
             chapters = Chapters(newChapters)
         } catch (e: Exception) {
-            Timber.e(e, "Unable to read chapters from ID3 tags.")
+            Timber.w(e, "Unable to read chapters from ID3 tags.")
         }
     }
 

@@ -83,7 +83,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                 val intentRequest = IntentSenderRequest.Builder(result.pendingIntent).build()
                 onSuccess(intentRequest)
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
                 onError()
             }
         }
@@ -115,7 +115,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     )
                 }
             } catch (ex: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, ex, "Unable to sign in with legacy Google Sign-In")
+                LogBuffer.logException(LogBuffer.TAG_CRASH, ex, "Unable to sign in with legacy Google Sign-In")
                 onError()
             }
         }
@@ -143,7 +143,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     // user declined to sign in
                     return@launch
                 }
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from Google One Tap result.")
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from Google One Tap result.")
                 onError()
             }
         }
@@ -161,11 +161,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     onError = onError
                 )
             } catch (e: Exception) {
-                LogBuffer.e(
-                    LogBuffer.TAG_CRASH,
-                    e,
-                    "Unable to get sign in credentials from legacy Google Sign-In result."
-                )
+                LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from legacy Google Sign-In result.")
                 onError()
             }
         }

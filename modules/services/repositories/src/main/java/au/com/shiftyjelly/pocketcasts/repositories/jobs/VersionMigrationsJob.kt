@@ -104,7 +104,7 @@ class VersionMigrationsJob : JobService() {
                 }
             } catch (t: Throwable) {
                 Timber.e(t)
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "VersionMigrationsTask jobFinished failed.")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, t, "VersionMigrationsTask jobFinished failed.")
             } finally {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsTask jobFinished shouldReschedule? $shouldReschedule")
                 jobFinished(jobParameters, shouldReschedule)
@@ -160,7 +160,7 @@ class VersionMigrationsJob : JobService() {
             val oldTempDirectory = fileStorage.oldTempPodcastDirectory
             FileUtil.deleteDirectoryContents(oldTempDirectory.absolutePath)
         } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clear old podcast temp directory")
+            LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clear old podcast temp directory")
         }
     }
 

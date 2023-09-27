@@ -130,7 +130,7 @@ class NotesFragment : BaseFragment() {
                     }
 
                     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
-                        LogBuffer.e(LogBuffer.TAG_CRASH, "Show notes fragment webview gone for episode ${viewModel.episode.value?.title}")
+                        LogBuffer.w(LogBuffer.TAG_CRASH, "Show notes fragment webview gone for episode ${viewModel.episode.value?.title}")
                         view.cleanup()
                         webView = null
                         return true

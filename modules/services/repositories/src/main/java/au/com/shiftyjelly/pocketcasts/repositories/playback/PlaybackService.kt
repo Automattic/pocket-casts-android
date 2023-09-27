@@ -255,7 +255,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             notificationManager.enteredForeground(notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
-                            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
+                            LogBuffer.w(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                                 e is ForegroundServiceStartNotAllowedException
                             ) {

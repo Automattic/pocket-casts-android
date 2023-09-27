@@ -115,7 +115,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
             setResult(SONOS_APP_ACTIVITY_RESULT, result)
             finish()
         } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_CRASH, e, "Failed to link Sonos")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, e, "Failed to link Sonos")
 
             binding.connectBtn.setText(LR.string.profile_sonos_retry)
             UiUtil.displayAlert(this, getString(LR.string.profile_sonos_linking_failed), getString(LR.string.profile_sonos_linking_failed_summary), null)

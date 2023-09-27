@@ -108,7 +108,7 @@ class PodcastSyncProcess(
             )
         return syncUpNextObservable
             .doOnError { throwable ->
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
             }
             .doOnComplete {
                 Timber.i("SyncProcess: Sync success")
@@ -228,7 +228,7 @@ class PodcastSyncProcess(
         return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
             .toMaybe()
-            .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not import server podcast $podcastResponse.uuid", it) }
+            .doOnError { LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast $podcastResponse.uuid", it) }
             .onErrorComplete()
     }
 
@@ -738,7 +738,7 @@ class PodcastSyncProcess(
                     podcastManager.updatePodcast(podcast)
                 }
                 .toMaybe()
-                .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not import server podcast $podcastUuid", it) }
+                .doOnError { LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast $podcastUuid") }
                 .onErrorComplete()
         } else {
             return Maybe.empty<Podcast>()

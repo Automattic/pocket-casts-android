@@ -120,6 +120,10 @@ object LogBuffer {
         addLog(Log.WARN, tag, null, message, *args)
     }
 
+    fun w(tag: String, throwable: Throwable, message: String, vararg args: Any) {
+        addLog(Log.WARN, tag, throwable, message, *args)
+    }
+
     fun e(tag: String, message: String, vararg args: Any) {
         addLog(Log.ERROR, tag, null, message, *args)
     }

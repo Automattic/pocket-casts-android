@@ -84,7 +84,12 @@ open class SyncAccountManagerImpl @Inject constructor(
                     AccessToken(token)
                 }
             } catch (e: Exception) {
-                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
+                if (e is RefreshTokenExpiredException) {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh token expired")
+                } else {
+                    LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
+                }
+
                 throw e // Rethrow the exception so it carries on
             }
         }

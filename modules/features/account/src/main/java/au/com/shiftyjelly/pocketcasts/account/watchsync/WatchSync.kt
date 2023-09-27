@@ -49,10 +49,7 @@ class WatchSync @OptIn(ExperimentalHorologistApi::class)
                 // Don't catch CancellationException since this represents the normal cancellation of a coroutine
                 throw cancellationException
             } catch (exception: Exception) {
-                LogBuffer.e(
-                    LogBuffer.TAG_BACKGROUND_TASKS,
-                    "Saving refresh token to data layer failed: $exception"
-                )
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Saving refresh token to data layer failed")
             }
         }
     }

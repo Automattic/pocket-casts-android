@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -100,7 +100,7 @@ class ChangePwdViewModel
                 )
                 changePasswordState.postValue(ChangePasswordState.Success("OK"))
             } catch (ex: Exception) {
-                Timber.e(ex, "Failed update password")
+                LogBuffer.logException(LogBuffer.TAG_CRASH, ex, "Update password failed")
                 changePasswordState.postValue(ChangePasswordState.Failure(errors = setOf(ChangePasswordError.SERVER), message = null))
             }
         }

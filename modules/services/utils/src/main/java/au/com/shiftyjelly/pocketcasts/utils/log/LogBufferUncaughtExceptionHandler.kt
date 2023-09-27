@@ -6,7 +6,7 @@ class LogBufferUncaughtExceptionHandler(private val defaultHandler: Thread.Uncau
 
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
         try {
-            LogBuffer.e(LogBuffer.TAG_CRASH, throwable, "Fatal crash.")
+            LogBuffer.logException(LogBuffer.TAG_CRASH, throwable, "Fatal crash.")
         } catch (throwable: Throwable) {
             Log.e("POCKETCASTS", "Logging crash", throwable)
         }

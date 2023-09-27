@@ -2,12 +2,12 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -80,7 +80,7 @@ class ChangeEmailViewModel
                     changeEmailState.postValue(ChangeEmailState.Failure(errors, response.message))
                 }
             }
-            .subscribeBy(onError = { Timber.e(it) })
+            .subscribeBy(onError = { LogBuffer.logException(LogBuffer.TAG_CRASH, it, "Change email failed") })
             .addTo(disposables)
     }
 

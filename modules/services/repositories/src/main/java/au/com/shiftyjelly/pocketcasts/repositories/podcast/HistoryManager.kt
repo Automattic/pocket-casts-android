@@ -59,7 +59,7 @@ class HistoryManager @Inject constructor(
             .flatMap(
                 { podcastUuid ->
                     podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false)
-                        .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
+                        .doOnError { throwable -> LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
                         .onErrorReturn { Podcast(uuid = podcastUuid) }
                         .toObservable()
                 }, true, ADD_PODCAST_CONCURRENCY

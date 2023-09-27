@@ -47,7 +47,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     }
                 }
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Sync settings failed")
+                LogBuffer.logException(LogBuffer.TAG_BACKGROUND_TASKS, e, "Sync settings failed")
                 return Result.failure()
             }
 
