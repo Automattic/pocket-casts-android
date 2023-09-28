@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.accounts.AccountManager
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -119,10 +120,10 @@ class ServersModule {
                 .build()
         }
 
-        fun provideMoshiBuilder(): Moshi.Builder {
+        fun provideMoshiBuilder(featureFlagWrapper: FeatureFlagWrapper = FeatureFlagWrapper()): Moshi.Builder {
             return Moshi.Builder()
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
+                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser(featureFlagWrapper))
                 .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
                 .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
                 .add(AccessToken::class.java, AccessToken.Adapter)
