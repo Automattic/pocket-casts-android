@@ -37,8 +37,8 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
             userManager.getSignInState().asFlow()
                 .stateIn(viewModelScope)
                 .collect {
-                    val isAddBookmarkEnabled =
-                        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && it.isSignedInAsPatron
+                    val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)
 
                     _state.update { state -> state.copy(isAddBookmarkEnabled = isAddBookmarkEnabled) }
 
