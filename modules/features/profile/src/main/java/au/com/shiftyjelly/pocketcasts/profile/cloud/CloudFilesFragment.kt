@@ -121,6 +121,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onDestroyView() {
         binding?.recyclerView?.adapter = null
+        multiSelectHelper.cleanup()
         super.onDestroyView()
         binding = null
     }

@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,18 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun MessageView(
     titleView: @Composable () -> Unit,
-    @StringRes buttonTitleRes: Int,
+    message: String,
+    buttonTitle: String,
     buttonAction: () -> Unit,
     style: MessageViewColors,
     modifier: Modifier = Modifier
@@ -49,13 +47,13 @@ fun MessageView(
             ) {
                 titleView()
                 TextP40(
-                    text = stringResource(LR.string.bookmarks_create_instructions),
+                    text = message,
                     color = style.textColor(),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 12.dp)
                 )
                 TextButton(
-                    buttonTitleRes = buttonTitleRes,
+                    buttonTitle = buttonTitle,
                     buttonAction = buttonAction,
                     modifier = Modifier.padding(top = 4.dp),
                     style = style
@@ -67,7 +65,7 @@ fun MessageView(
 
 @Composable
 private fun TextButton(
-    @StringRes buttonTitleRes: Int,
+    buttonTitle: String,
     buttonAction: () -> Unit = {},
     modifier: Modifier,
     style: MessageViewColors
@@ -79,7 +77,7 @@ private fun TextButton(
             .clickable { buttonAction() }
     ) {
         TextH40(
-            text = stringResource(buttonTitleRes),
+            text = buttonTitle,
             color = style.buttonTextColor(),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp)

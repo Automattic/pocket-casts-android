@@ -1,6 +1,13 @@
 7.49
 -----
 
+*   Bug Fixes:
+    *   Improve multiselect handling in Up Next queue
+        ([#1398](https://github.com/Automattic/pocket-casts-android/pull/1390))
+    *   Fixed bug where theme selection UI was not functioning as intended
+        ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
+    *   Improve RTL handling in episode search box
+        ([#1405](https://github.com/Automattic/pocket-casts-android/pull/1405))
 
 7.48
 -----
