@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -82,6 +83,7 @@ class RefreshPodcastsThread(
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
+        fun featureFlagWrapper(): FeatureFlagWrapper
     }
 
     @Volatile
@@ -252,6 +254,7 @@ class RefreshPodcastsThread(
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
+            featureFlagWrapper = entryPoint.featureFlagWrapper()
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()
