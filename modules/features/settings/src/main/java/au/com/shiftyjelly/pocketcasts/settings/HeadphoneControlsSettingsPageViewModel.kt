@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionTierColor
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
@@ -20,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
@@ -120,14 +121,14 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         val startUpsellFromSource: UpsellSourceAction? = null,
     ) {
         val addBookmarkIconId = when (Feature.BOOKMARKS_ENABLED.tier) {
-            FeatureTier.Patron -> R.drawable.ic_patron
+            is FeatureTier.Patron -> R.drawable.ic_patron
             is FeatureTier.Plus -> R.drawable.ic_plus
-            FeatureTier.Free -> null
+            is FeatureTier.Free -> null
         }
         val addBookmarkIconColor = when (Feature.BOOKMARKS_ENABLED.tier) {
-            FeatureTier.Patron -> UR.color.patron_purple
-            is FeatureTier.Plus -> UR.color.plus_gold
-            FeatureTier.Free -> UR.color.black
+            is FeatureTier.Patron -> SubscriptionTierColor.patronPurple
+            is FeatureTier.Plus -> SubscriptionTierColor.plusGold
+            is FeatureTier.Free -> Color.Black // This should never happen. Icon should be removed for free tier.
         }
     }
 

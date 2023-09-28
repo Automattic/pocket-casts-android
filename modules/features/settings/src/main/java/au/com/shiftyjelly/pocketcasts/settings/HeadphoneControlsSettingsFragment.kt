@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -177,7 +176,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         onSave: (HeadphoneAction) -> Unit,
         onOptionsDialogShown: () -> Unit,
     ) {
-        val iconColor = colorResource(state.addBookmarkIconColor).toArgb()
+        val iconColor = state.addBookmarkIconColor.toArgb()
         SettingRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_next),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
@@ -219,7 +218,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         onSave: (HeadphoneAction) -> Unit,
         onOptionsDialogShown: () -> Unit,
     ) {
-        val iconColor = colorResource(state.addBookmarkIconColor).toArgb()
+        val iconColor = state.addBookmarkIconColor.toArgb()
         SettingRow(
             primaryText = stringResource(LR.string.settings_headphone_controls_action_previous),
             secondaryText = stringResource(headphoneActionToStringRes(saved)),
