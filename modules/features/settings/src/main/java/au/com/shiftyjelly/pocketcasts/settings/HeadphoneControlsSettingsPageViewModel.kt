@@ -41,7 +41,15 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                     val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
                         Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)
 
-                    _state.update { state -> state.copy(isAddBookmarkEnabled = isAddBookmarkEnabled) }
+                    _state.update { state ->
+                        state.copy(
+                            isAddBookmarkEnabled = isAddBookmarkEnabled,
+                            addBookmarkIconId = addBookmarkIconId
+                                .takeIf { !isAddBookmarkEnabled },
+                            addBookmarkIconColor = addBookmarkIconColor
+                                .takeIf { !isAddBookmarkEnabled } ?: SubscriptionTierColor.plusGold,
+                        )
+                    }
 
                     _state.value.startUpsellFromSource?.let { upsellFrom ->
                         onUpsellComplete(upsellFrom)
@@ -119,18 +127,23 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     data class UiState(
         val isAddBookmarkEnabled: Boolean = false,
         val startUpsellFromSource: UpsellSourceAction? = null,
-    ) {
-        val addBookmarkIconId = when (Feature.BOOKMARKS_ENABLED.tier) {
+        val addBookmarkIconId: Int? = null,
+        val addBookmarkIconColor: Color = SubscriptionTierColor.plusGold,
+    )
+
+    private val addBookmarkIconId
+        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
             is FeatureTier.Patron -> R.drawable.ic_patron
             is FeatureTier.Plus -> R.drawable.ic_plus
             is FeatureTier.Free -> null
         }
-        val addBookmarkIconColor = when (Feature.BOOKMARKS_ENABLED.tier) {
+
+    private val addBookmarkIconColor
+        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
             is FeatureTier.Patron -> SubscriptionTierColor.patronPurple
             is FeatureTier.Plus -> SubscriptionTierColor.plusGold
-            is FeatureTier.Free -> Color.Black // This should never happen. Icon should be removed for free tier.
+            is FeatureTier.Free -> null
         }
-    }
 
     enum class UpsellSourceAction {
         PREVIOUS,
