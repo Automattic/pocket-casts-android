@@ -9,24 +9,23 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionTierColor
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val userManager: UserManager,
     private val settings: Settings,
 ) : ViewModel() {
 
@@ -35,11 +34,12 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userManager.getSignInState().asFlow()
+            settings.cachedSubscriptionStatus.flow
                 .stateIn(viewModelScope)
                 .collect {
+                    val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                     val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)
+                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
 
                     _state.update { state ->
                         state.copy(
