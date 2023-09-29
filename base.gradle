@@ -312,7 +312,9 @@ dependencies {
     }
 }
 
+// Exclude the Timber integration from the Sentry Android SDK temporarily.
 // Exclude the NDK from the Sentry Android SDK as we don't use it and Tracks includes it.
 configurations.configureEach {
+    exclude group: "io.sentry", module: "sentry-android-timber"
     exclude group: "io.sentry", module: "sentry-android-ndk"
 }
