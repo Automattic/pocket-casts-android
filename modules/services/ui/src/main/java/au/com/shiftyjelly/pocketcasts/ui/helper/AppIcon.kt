@@ -218,7 +218,7 @@ class AppIcon @Inject constructor(
     val allAppIconTypes = AppIconType.values()
 
     fun enableSelectedAlias(selectedIconType: AppIconType) {
-        // Ensure the new icon is enabled before the old one in removed to
+        // Ensure the new icon is enabled before the old one is removed to
         // prevent entering a state where there's no launcher activity
         setIconEnabledFlag(selectedIconType, true)
 
