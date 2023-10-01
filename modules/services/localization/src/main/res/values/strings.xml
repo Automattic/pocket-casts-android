@@ -1020,7 +1020,7 @@
     <string name="settings_app_icon_ok" translatable="false">@string/ok</string>
     <string name="settings_app_icon_title">Title</string>
     <string name="settings_app_icon_updated">Icon updated</string>
-    <string name="settings_app_icon_updated_message">This new icon may take a few minutes to appear and you will see two icons in your all apps screen. This is normal. Drag the new one onto your home screen and you should be good to go!</string>
+    <string name="settings_app_icon_updated_message">This new icon may take a few minutes to appear. Drag the new one onto your home screen and you should be good to go!</string>
     <string name="settings_apply_archived_hide">Would you like to change all your existing podcasts to hide archived?</string>
     <string name="settings_apply_archived_show">Would you like to change all your existing podcasts to show archived?</string>
     <string name="settings_apply_group_by">Would you like to change all your existing podcasts to be grouped by %s?</string>

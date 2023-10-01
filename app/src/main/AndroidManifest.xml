@@ -269,19 +269,6 @@
                     android:name="android.app.shortcuts"
                     android:resource="@xml/shortcuts"/>
         </activity>
-
-        <activity-alias
-            android:name=".ui.MainActivity_0"
-            android:label="@string/app_name"
-            android:targetActivity=".ui.MainActivity"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
         <activity-alias
             android:name=".ui.MainActivity_1"
             android:label="@string/app_name"

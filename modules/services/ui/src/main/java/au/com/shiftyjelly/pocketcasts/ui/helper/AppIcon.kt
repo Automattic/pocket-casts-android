@@ -37,7 +37,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon0,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher,
-            aliasName = ".ui.MainActivity_0"
+            aliasName = ".ui.MainActivity"
         ),
         DARK(
             setting = AppIconSetting.DARK,
@@ -218,19 +218,30 @@ class AppIcon @Inject constructor(
     val allAppIconTypes = AppIconType.values()
 
     fun enableSelectedAlias(selectedIconType: AppIconType) {
-        val componentPackage =
-            if (BuildConfig.DEBUG) "au.com.shiftyjelly.pocketcasts.debug" else "au.com.shiftyjelly.pocketcasts"
+        // Ensure the new icon is enabled before the old one in removed to
+        // prevent entering a state where there's no launcher activity
+        setIconEnabledFlag(selectedIconType, true)
+
+        AppIconType.values()
+            .filter { icon -> icon != selectedIconType }
+            // On debug builds always keep the default activity so it can be launched from Android Studio
+            .forEach { icon -> setIconEnabledFlag(icon, BuildConfig.DEBUG && icon == AppIconType.DEFAULT) }
+    }
+
+    private fun setIconEnabledFlag(iconType: AppIconType, isEnabled: Boolean) {
+        val componentPackage = if (BuildConfig.DEBUG) "au.com.shiftyjelly.pocketcasts.debug" else "au.com.shiftyjelly.pocketcasts"
         val classPath = "au.com.shiftyjelly.pocketcasts"
-        AppIconType.values().forEach { iconType ->
-            val componentName = ComponentName(componentPackage, "$classPath${iconType.aliasName}")
-            // If we are using the default icon we just switch every alias off
-            val enabledFlag =
-                if (selectedIconType == iconType && selectedIconType != AppIconType.DEFAULT) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            context.packageManager.setComponentEnabledSetting(
-                componentName,
-                enabledFlag,
-                PackageManager.DONT_KILL_APP
-            )
+        val componentName = ComponentName(componentPackage, "$classPath${iconType.aliasName}")
+        val enabledFlag = if (isEnabled) {
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+        } else {
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         }
+
+        context.packageManager.setComponentEnabledSetting(
+            componentName,
+            enabledFlag,
+            PackageManager.DONT_KILL_APP
+        )
     }
 }
