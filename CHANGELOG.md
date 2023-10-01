@@ -10,6 +10,8 @@
         ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
     *   Improve RTL handling in episode search box
         ([#1405](https://github.com/Automattic/pocket-casts-android/pull/1405))
+    *   Fixed bug where multiple app icons appear in the launcher
+        ([#1252](https://github.com/Automattic/pocket-casts-android/pull/1426))
 
 7.48
 -----
