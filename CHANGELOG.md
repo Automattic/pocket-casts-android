@@ -1,12 +1,33 @@
+7.50
+-----
+
+
+7.49
+-----
+
+*   Bug Fixes:
+    *   Improve multiselect handling in Up Next queue
+        ([#1398](https://github.com/Automattic/pocket-casts-android/pull/1390))
+    *   Improve the next episode action to remove the playing episode from the Up Next
+        ([#1422](https://github.com/Automattic/pocket-casts-android/pull/1422))
+    *   Fixed bug where theme selection UI was not functioning as intended
+        ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
+    *   Improve RTL handling in episode search box
+        ([#1405](https://github.com/Automattic/pocket-casts-android/pull/1405))
+
 7.48
 -----
 
 *   New Feature:
     *   Suggest episodes to play in Automotive
-        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362)).
-    *   Internal: Adds Patron Tier
-        ([#1379](https://github.com/Automattic/pocket-casts-android/pull/1379))
+        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362))
+*   Bug Fixes:
+    *   Avoid memory leak when opening Up Next queue
+        ([#1397](https://github.com/Automattic/pocket-casts-android/pull/1397))
+    *   Improved the downloading of episode show notes
+        ([#1390](https://github.com/Automattic/pocket-casts-android/pull/1390))
 
+        
 7.47
 -----
 
@@ -28,7 +49,7 @@
 *   Updates:
     *   Removed login with email and password on WearOS app
         ([#1356](https://github.com/Automattic/pocket-casts-android/pull/1356))
-    
+
 7.46.1
 ------
 *   Bug Fixes:

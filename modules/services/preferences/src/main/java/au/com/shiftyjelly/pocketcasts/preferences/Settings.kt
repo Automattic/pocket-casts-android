@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -321,6 +322,7 @@ interface Settings {
     val cloudAutoDownload: UserSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
     val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
+    val userTier: UserTier
 
     fun setUpgradeClosedProfile(value: Boolean)
     fun getUpgradeClosedProfile(): Boolean

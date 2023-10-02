@@ -279,7 +279,6 @@ Language: ar
     <string name="onboarding_plus_feature_desktop_apps_text">يمكنك الاستماع في مزيد من الأماكن من خلال تطبيقاتنا التي تعمل بنظامَي التشغيل Windows وmacOS وتطبيقات الويب.</string>
     <string name="onboarding_plus_feature_folders_title">المجلدات</string>
     <string name="onboarding_plus_feature_folders_text">يمكنك تنظيم حلقات البودكاست الخاصة بك في المجلدات وحافظ عليها قيد المزامنة عبر كل أجهزتك.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">مساحة تخزين على السحابة قدرها 10 جيجابايت</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ارفع ملفاتك إلى مساحة التخزين على السحابة واجعلها متوافرة في كل مكان.</string>
     <string name="onboarding_plus_feature_themes_icons_title">القوالب والأيقونات</string>
     <string name="onboarding_plus_feature_themes_icons_text">حلِّق بألوانك الحقيقية. أيقونات وقوالب استثنائية لنادي Plus فقط.</string>

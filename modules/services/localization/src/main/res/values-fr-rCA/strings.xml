@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-22 09:54:03+0000
+Translation-Revision-Date: 2023-09-12 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="podcast_no_bookmarks_matching">Ce podcast n’a aucun signet correspondant à vos critères de recherche.</string>
+    <string name="podcast_no_bookmarks_found">Aucun signet trouvé</string>
+    <string name="player_tab_notes">Détails</string>
+    <string name="bookmark_updated">Signet « %s » mis à jour</string>
     <string name="go_to_bottom">Vers le bas</string>
     <string name="go_to_top">Vers le haut</string>
     <string name="support">Assistance</string>
@@ -284,7 +288,7 @@ Language: fr
     <string name="onboarding_plus_feature_themes_icons_text">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thèmes et icônes</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>
-    <string name="onboarding_plus_feature_cloud_storage_title">10 Go de stockage Cloud</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">20 Go de stockage Cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organisez vos podcasts dans des dossiers et synchronisez-les sur tous vos appareils.</string>
     <string name="onboarding_plus_feature_folders_title">Dossiers</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Écoutez vos podcasts partout grâce à nos applications Windows, macOS et Web.</string>

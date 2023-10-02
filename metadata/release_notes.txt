@@ -1,15 +1,11 @@
 
-*   Updates:
-    *   Enable copying logs from in-app logs viewer
-        ([#1298](https://github.com/Automattic/pocket-casts-android/pull/1298))
-    *   Present toast notification when duration of an in-progress episode changes
-        ([#1312](https://github.com/Automattic/pocket-casts-android/pull/1312))
-    *   Present app review prompt
-        ([#1305](https://github.com/Automattic/pocket-casts-android/pull/1305))
 *   Bug Fixes:
-    *   Fixed auto archive settings getting lost when switching languages
-        ([#1234](https://github.com/Automattic/pocket-casts-android/pull/1234))
-    *   Improved handling of enabling/disabling new episode notifications
-        ([#1264](https://github.com/Automattic/pocket-casts-android/pull/1264))
-    *   Fixed the artwork not appearing on the onboarding page
-        ([#1299](https://github.com/Automattic/pocket-casts-android/pull/1299))
+    *   Improve multiselect handling in Up Next queue
+        ([#1398](https://github.com/Automattic/pocket-casts-android/pull/1390))
+    *   Improve the next episode action to remove the playing episode from the Up Next
+        ([#1422](https://github.com/Automattic/pocket-casts-android/pull/1422))
+    *   Fixed bug where theme selection UI was not functioning as intended
+        ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
+    *   Improve RTL handling in episode search box
+        ([#1405](https://github.com/Automattic/pocket-casts-android/pull/1405))
+

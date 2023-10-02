@@ -12,7 +12,10 @@ import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -28,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -57,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -83,6 +88,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     private val viewModel by viewModels<FilterEpisodeListViewModel>()
+    private val episodeListBookmarkViewModel by viewModels<EpisodeListBookmarkViewModel>()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
 
     @Inject lateinit var downloadManager: DownloadManager
@@ -181,6 +187,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     override fun onDestroyView() {
         binding?.recyclerView?.adapter = null
+        multiSelectHelper.cleanup()
         super.onDestroyView()
 
         binding = null
@@ -271,6 +278,15 @@ class FilterEpisodeListFragment : BaseFragment() {
                 clearSelectedFilter()
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                episodeListBookmarkViewModel.stateFlow.collect {
+                    adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
+                    adapter.notifyDataSetChanged()
+                }
             }
         }
 

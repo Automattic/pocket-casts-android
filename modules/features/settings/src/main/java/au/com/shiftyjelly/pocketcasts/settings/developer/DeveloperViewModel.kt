@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -12,9 +13,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.stream.Collectors.toList
 import javax.inject.Inject
 
 @HiltViewModel
@@ -113,5 +120,36 @@ class DeveloperViewModel
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+    }
+
+    @OptIn(FlowPreview::class)
+    fun triggerUpdateEpisodeDetails() {
+        viewModelScope.launch {
+            try {
+                val episodes = podcastManager.findSubscribedNoOrder()
+                    .shuffled()
+                    .asFlow()
+                    .flatMapConcat {
+                        episodeManager.findEpisodesByPodcastOrderedSuspend(it).asFlow()
+                    }
+                    .take(5)
+                    .toList()
+                if (episodes.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "No episodes found, subscribe to some podcasts", Toast.LENGTH_LONG).show()
+                    }
+                    return@launch
+                }
+                UpdateEpisodeDetailsTask.enqueue(episodes, context.applicationContext)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Running update episode details", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Failed to run update episode details", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 }

@@ -86,4 +86,11 @@ class ServerShowNotesManager @Inject constructor(
         val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
         return response.findEpisode(episodeUuid)?.showNotes
     }
+
+    suspend fun downloadToCacheShowNotes(podcastUuid: String) {
+        if (podcastUuid.isBlank()) {
+            return
+        }
+        podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
+    }
 }
