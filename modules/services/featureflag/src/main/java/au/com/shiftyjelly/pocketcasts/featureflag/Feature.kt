@@ -33,7 +33,7 @@ enum class Feature(
     BOOKMARKS_ENABLED(
         key = "bookmarks_enabled",
         title = "Bookmarks",
-        defaultValue = false,
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
         hasDevToggle = true,
     ),
