@@ -33,7 +33,7 @@ enum class Feature(
     BOOKMARKS_ENABLED(
         key = "bookmarks_enabled",
         title = "Bookmarks",
-        defaultValue = false,
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
         hasDevToggle = true,
     ),
@@ -66,7 +66,7 @@ enum class Feature(
                     // Plus users cannot use Plus features during early access for patrons
                     is FeatureTier.Plus ->
                         FeatureFlag.isEnabled(feature) &&
-                            !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()
+                                !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()
 
                     FeatureTier.Free -> FeatureFlag.isEnabled(feature)
                 }

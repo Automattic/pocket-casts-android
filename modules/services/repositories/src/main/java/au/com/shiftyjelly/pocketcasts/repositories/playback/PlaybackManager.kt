@@ -490,6 +490,9 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    /**
+     * Add the episode to the Up Next queue so it will play after the current episode.
+     */
     suspend fun playNext(
         episode: BaseEpisode,
         source: SourceView,
@@ -719,12 +722,15 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    /**
+     * Remove the currently playing episode from the Up Next and load the next episode in the queue.
+     */
     fun playNextInQueue(sourceView: SourceView = SourceView.UNKNOWN) {
-        launch {
-            upNextQueue.queueEpisodes.getOrNull(0)?.let {
-                playNowSync(episode = it, sourceView = sourceView)
-            }
+        val currentEpisode = upNextQueue.currentEpisode
+        if (currentEpisode == null || upNextQueue.queueEpisodes.isEmpty()) {
+            return
         }
+        removeEpisode(currentEpisode, sourceView)
     }
 
     fun skipForward(
