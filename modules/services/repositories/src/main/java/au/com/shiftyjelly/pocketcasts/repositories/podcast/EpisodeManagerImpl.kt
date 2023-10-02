@@ -335,11 +335,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateDownloadTaskId(episode: BaseEpisode, id: String?) {
-        if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadTaskId(episode.uuid, id)
-        } else if (episode is UserEpisode) {
-            runBlocking { userEpisodeManager.updateDownloadTaskId(episode, id) }
+    override suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?) {
+        when (episode) {
+            is PodcastEpisode -> episodeDao.updateDownloadTaskId(episode.uuid, id)
+            is UserEpisode -> userEpisodeManager.updateDownloadTaskId(episode, id)
         }
     }
 
@@ -425,16 +424,6 @@ class EpisodeManagerImpl @Inject constructor(
         } else if (episode is UserEpisode) {
             episode.sizeInBytes = sizeInBytes
             runBlocking { userEpisodeManager.updateSizeInBytes(episode, sizeInBytes) }
-        }
-    }
-
-    override fun updateDownloadUrl(episode: BaseEpisode?, url: String) {
-        episode ?: return
-        if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadUrl(url, episode.uuid)
-        } else if (episode is UserEpisode) {
-            episode.downloadUrl = url
-            // We shouldn't hold on to these urls in the database
         }
     }
 
@@ -1119,7 +1108,7 @@ class EpisodeManagerImpl @Inject constructor(
                 if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
                     observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
-                    podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
+                    podcastCacheServerManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
 
