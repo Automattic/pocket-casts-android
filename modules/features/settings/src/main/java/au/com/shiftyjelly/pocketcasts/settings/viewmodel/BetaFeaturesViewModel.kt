@@ -21,12 +21,14 @@ class BetaFeaturesViewModel @Inject constructor() : ViewModel() {
     val state: StateFlow<State> = _state
 
     private val featureFlags: List<FeatureFlagWrapper>
-        get() = Feature.values().map {
-            FeatureFlagWrapper(
-                featureFlag = it,
-                isEnabled = FeatureFlag.isEnabled(it)
-            )
-        }
+        get() = Feature.values()
+            .filter { it.hasDevToggle }
+            .map {
+                FeatureFlagWrapper(
+                    featureFlag = it,
+                    isEnabled = FeatureFlag.isEnabled(it)
+                )
+            }
 
     fun setFeatureEnabled(feature: Feature, enabled: Boolean) {
         FeatureFlag.setEnabled(feature, enabled)
