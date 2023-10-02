@@ -48,6 +48,8 @@ data class SharePodcastHelper(
         } ?: run {
             url = "$host/podcast/${podcast.uuid}"
         }
+        
+        // Android 10+ supports rich content previews: https://developer.android.com/training/sharing/send#adding-rich-content-previews
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             cachePodcastImage { sendText(url, it) }
         } else {
