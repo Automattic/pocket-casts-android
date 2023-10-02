@@ -1467,7 +1467,7 @@ open class PlaybackManager @Inject constructor(
                 userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
                     .flatMap {
                         if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
+                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
                         } else {
                             Maybe.just(it)
                         }
