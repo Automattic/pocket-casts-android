@@ -85,7 +85,7 @@ project.ext {
 
     // Library versions
     versionAccessibilityTestFramework = '4.0.0'
-    versionBillingClient = '5.0.0'
+    versionBillingClient = '5.2.1'
     versionCompose = '1.4.2' // When updating this, also check if versionComposeAccompanist should be updated as well: https://github.com/google/accompanist#compose-versions
     versionComposeAccompanist = '0.30.1'
     versionComposeCompiler = '1.3.0'
