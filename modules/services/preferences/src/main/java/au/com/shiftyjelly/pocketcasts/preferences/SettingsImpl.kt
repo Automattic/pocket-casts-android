@@ -8,6 +8,7 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -892,6 +893,10 @@ class SettingsImpl @Inject constructor(
             } ?: ""
         }
     )
+
+    // This is passed to the feature module which cannot access subscription tier to determine feature availability
+    override val userTier: UserTier
+        get() = (cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
 
     override val headphoneControlsNextAction = HeadphoneActionUserSetting(
         sharedPrefKey = "headphone_controls_next_action",

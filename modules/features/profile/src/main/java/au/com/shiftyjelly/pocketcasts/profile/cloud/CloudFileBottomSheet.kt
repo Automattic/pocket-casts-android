@@ -311,23 +311,19 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val binding = binding ?: return@Observer
                 val layoutCloud = binding.layoutCloud
                 val layoutLockedCloud = binding.layoutLockedCloud
-                val layoutBookmark = binding.layoutBookmark
                 when (signInState) {
                     is SignInState.SignedIn -> {
                         if (signInState.subscriptionStatus is SubscriptionStatus.Paid) {
                             layoutCloud.isVisible = true
                             layoutLockedCloud.isVisible = false
-                            layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                         } else {
                             layoutCloud.isVisible = false
                             layoutLockedCloud.isVisible = true
-                            layoutBookmark.isVisible = false
                         }
                     }
                     else -> {
                         layoutCloud.isVisible = false
                         layoutLockedCloud.isVisible = true
-                        layoutBookmark.isVisible = false
                     }
                 }
             }

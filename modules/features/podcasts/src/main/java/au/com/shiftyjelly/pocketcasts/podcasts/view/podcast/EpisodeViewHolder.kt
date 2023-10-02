@@ -133,7 +133,19 @@ class EpisodeViewHolder constructor(
             return listOf(archiveItem, shareItem)
         }
 
-    fun setup(episode: PodcastEpisode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable, bookmarksObservable: Observable<List<Bookmark>>) {
+    fun setup(
+        episode: PodcastEpisode,
+        fromListUuid: String?,
+        tintColor: Int,
+        playButtonListener: PlayButton.OnClickListener,
+        streamByDefault: Boolean,
+        upNextAction: Settings.UpNextAction,
+        multiSelectEnabled: Boolean = false,
+        isSelected: Boolean = false,
+        disposables: CompositeDisposable,
+        bookmarksObservable: Observable<List<Bookmark>>,
+        bookmarksAvailable: Boolean,
+    ) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
@@ -201,7 +213,7 @@ class EpisodeViewHolder constructor(
                 val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
                 binding.inUpNext = combinedData.isInUpNext
-                binding.hasBookmarks = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid)
+                binding.hasBookmarks = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid) && bookmarksAvailable
 
                 imgIcon.isVisible = false
                 progressCircle.isVisible = false

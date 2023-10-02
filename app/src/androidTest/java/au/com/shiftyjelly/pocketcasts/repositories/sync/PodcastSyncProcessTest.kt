@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
@@ -46,6 +48,7 @@ class PodcastSyncProcessTest {
     private lateinit var retrofit: Retrofit
     private lateinit var okhttpCache: Cache
     private lateinit var appDatabase: AppDatabase
+    private val featureFlagWrapper: FeatureFlagWrapper = mock()
 
     @Before
     fun setUp() {
@@ -56,7 +59,8 @@ class PodcastSyncProcessTest {
 
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
-        val moshi = ServersModule.provideMoshiBuilder().build()
+        whenever(featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) doReturn true
+        val moshi = ServersModule.provideMoshiBuilder(featureFlagWrapper).build()
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
         okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context)
@@ -146,7 +150,8 @@ class PodcastSyncProcessTest {
                 userEpisodeManager = mock(),
                 subscriptionManager = mock(),
                 folderManager = folderManager,
-                syncManager = syncManager
+                syncManager = syncManager,
+                featureFlagWrapper = featureFlagWrapper,
             )
 
             val response = MockResponse()
