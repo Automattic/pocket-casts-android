@@ -84,8 +84,8 @@ end
 platform :android do
   lane :code_freeze do | options |
     ensure_git_status_clean
-
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+    ensure_git_branch(branch: DEFAULT_BRANCH)
 
     confirmation_message = <<-MESSAGE
 
@@ -103,13 +103,12 @@ platform :android do
 
     # Create the release branch
     UI.message 'Creating release branch...'
-    ensure_git_branch(branch: DEFAULT_BRANCH)
     Fastlane::Helper::GitHelper.create_branch("release/#{next_release_version}", from: DEFAULT_BRANCH)
+    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     UI.message "Done! New release branch is: #{git_branch}"
 
     # Bump the version and build code
     UI.message 'Bumping beta version and build code...'
-    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     VERSION_FILE.write_version(
       version_name: first_beta_version,
       version_code: next_build_code
@@ -152,11 +151,8 @@ platform :android do
   end
 
   lane :new_beta_release do | options |
-    # Checkout default branch and update
-    Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
-
-    # Check local repo status
     ensure_git_status_clean
+    Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
 
     # Check versions
     message = <<-MESSAGE
