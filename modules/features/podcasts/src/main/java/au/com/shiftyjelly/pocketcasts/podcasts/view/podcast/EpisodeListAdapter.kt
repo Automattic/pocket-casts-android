@@ -56,6 +56,8 @@ class EpisodeListAdapter(
 
     val disposables = CompositeDisposable()
 
+    private var bookmarksAvailable: Boolean = false
+
     init {
         setHasStableIds(true)
     }
@@ -113,7 +115,8 @@ class EpisodeListAdapter(
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
             disposables = disposables,
-            bookmarksObservable = bookmarkManager.findBookmarksFlow().asObservable()
+            bookmarksObservable = bookmarkManager.findBookmarksFlow().asObservable(),
+            bookmarksAvailable = bookmarksAvailable,
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
@@ -139,7 +142,8 @@ class EpisodeListAdapter(
             streamByDefault = settings.streamingMode.value,
             upNextAction = settings.upNextSwipe.value,
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
-            isSelected = multiSelectHelper.isSelected(userEpisode)
+            isSelected = multiSelectHelper.isSelected(userEpisode),
+            bookmarksAvailable = bookmarksAvailable,
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
@@ -182,5 +186,9 @@ class EpisodeListAdapter(
             is UserEpisode -> R.layout.adapter_user_episode
             else -> throw IllegalStateException("Unknown playable type")
         }
+    }
+
+    fun setBookmarksAvailable(bookmarksAvailable: Boolean) {
+        this.bookmarksAvailable = bookmarksAvailable
     }
 }
