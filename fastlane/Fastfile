@@ -135,8 +135,8 @@ platform :android do
   end
 
   lane :complete_code_freeze do | options |
-    # Verify that the current branch is a release branch
-    UI.user_error!("Current branch - '#{git_branch}' - is not a release branch. Abort.") unless git_branch.start_with?('release/')
+    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
+    ensure_git_status_clean
 
     new_version = current_release_version
 
@@ -255,7 +255,7 @@ platform :android do
   end
 
   lane :finalize_hotfix_release do
-    UI.user_error!("Current branch - '#{git_branch}' - is not a release branch. Abort.") unless git_branch.start_with?('release/')
+    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
     UI.message = "Triggering hotfix build for version: #{current_release_version}"
@@ -284,6 +284,7 @@ platform :android do
   desc "Builds and uploads a new build to Google Play (without releasing it)"
   lane :build_and_upload_to_play_store do | options |
     version = current_version_name
+    build_code = current_build_code
     is_beta = is_beta_version(version)
     unless (options[:skip_prechecks])
       # Match branch names that begin with `release/`
@@ -306,7 +307,7 @@ platform :android do
     release_assets = []
 
     APPS.each do |app|
-        build_bundle(app: app, version: version)
+        build_bundle(app: app, version: version, build_code: build_code)
 
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
@@ -340,11 +341,7 @@ platform :android do
 
   lane :finalize_release do | options |
     UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if android_current_branch_is_hotfix
-
-    unless git_branch.start_with?('release/')
-      UI.user_error!("Current branch - '#{git_branch}' - is not a release branch. Abort.")
-    end
-
+    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
     message = "Finalizing release: #{current_release_version}\n"
@@ -356,9 +353,17 @@ platform :android do
 
     configure_apply(force: is_ci)
 
-    android_bump_version_final_release()
+    # Bump the release version and build code
+    UI.message 'Bumping final release version and build code...'
+    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
+    VERSION_FILE.write_version(
+      version_name: current_release_version,
+      version_code: next_build_code
+    )
+    commit_version_bump
+    UI.message "Done! New Release Version: #{current_release_version}. New Build Code: #{current_build_code}"
 
-    version = android_get_release_version()
+    version = current_release_version
 
     # Download Localizations
     android_download_translations(
@@ -368,21 +373,25 @@ platform :android do
       lint_task: 'lintRelease'
     )
 
+    version = current_release_version
+
     # Wrap up
-    removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version["name"]}")
-    setfrozentag(repository:GH_REPOSITORY, milestone: version["name"], freeze: false)
+    removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: version, freeze: false)
     create_new_milestone(repository:GH_REPOSITORY, need_appstore_submission: true)
-    close_milestone(repository:GH_REPOSITORY, milestone: version["name"])
+    close_milestone(repository:GH_REPOSITORY, milestone: version)
 
     push_to_git_remote(tags: false)
-    trigger_release_build(branch_to_build: "release/#{version["name"]}")
+    trigger_release_build(branch_to_build: "release/#{version}")
   end
 
-  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
+  # @param [String] version The version to create
+  # @param [String] build_code The build code to create
   # @param [String] app The Android app to build (i.e 'app', 'automotive', or 'wear')
   desc "Builds and bundles the given app"
   lane :build_bundle do | options |
     version = options[:version]
+    build_code = options[:build_code]
     app = options[:app]
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = "artifacts/"
@@ -390,7 +399,7 @@ platform :android do
     gradle(task: "clean")
     UI.message("Running lint...")
     gradle(task: ":#{app}:lintRelease")
-    UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
+    UI.message("Building #{version} / #{build_code} - #{aab_artifact_path}...")
     gradle(
         task: ":#{app}:bundle",
         build_type: "Release",
@@ -445,7 +454,7 @@ platform :android do
 
     create_release(
       repository: GH_REPOSITORY,
-      version: version["name"],
+      version: version,
       release_notes_file_path: nil,
       prerelease: prerelease,
       release_assets: release_assets.join(',')
@@ -456,7 +465,7 @@ platform :android do
   # Utils
   #####################################################################################
   def aab_artifact_path(app, version)
-    File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version["name"]}.aab")
+    File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version}.aab")
   end
 
   def bundle_output_path(app)
