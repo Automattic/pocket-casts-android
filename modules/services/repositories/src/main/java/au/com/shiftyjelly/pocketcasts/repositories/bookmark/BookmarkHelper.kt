@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +37,10 @@ class BookmarkHelper @Inject constructor(
         context: Context,
     ) {
         if (!shouldAllowAddBookmark()) return
-        if (context.isAppForeground()) {
+        if (context.isAppForeground() &&
+            Util.getAppPlatform(context) == AppPlatform.Phone &&
+            !Util.isCarUiMode(context)
+        ) {
             val bookmarkIntent =
                 context.packageManager.getLaunchIntentForPackage(context.packageName)
                     ?.apply { action = INTENT_OPEN_APP_ADD_BOOKMARK }
