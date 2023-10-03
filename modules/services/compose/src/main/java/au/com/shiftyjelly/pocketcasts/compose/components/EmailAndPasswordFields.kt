@@ -55,6 +55,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun EmailAndPasswordFields(
     email: String,
     password: String,
+    emailPlaceholder: String = stringResource(LR.string.profile_email_address),
+    passwordPlaceholder: String = stringResource(LR.string.profile_password),
     showEmailError: Boolean,
     showPasswordError: Boolean,
     showPasswordErrorMessage: Boolean = showPasswordError,
@@ -81,6 +83,7 @@ fun EmailAndPasswordFields(
         EmailField(
             email = email,
             isError = showEmailError,
+            placeholder = emailPlaceholder,
             enabled = enabled,
             onUpdateEmail = onUpdateEmail,
             imeAction = ImeAction.Next,
@@ -98,6 +101,7 @@ fun EmailAndPasswordFields(
         PasswordField(
             password = password,
             isError = showPasswordError,
+            placeholder = passwordPlaceholder,
             enabled = enabled,
             imeAction = ImeAction.Done,
             onImeAction = onDone,
@@ -128,6 +132,7 @@ fun EmailField(
     email: String,
     enabled: Boolean,
     isError: Boolean,
+    placeholder: String = stringResource(LR.string.profile_email_address),
     onUpdateEmail: (String) -> Unit,
     imeAction: ImeAction = ImeAction.Next,
     onImeAction: () -> Unit,
@@ -143,7 +148,7 @@ fun EmailField(
 
     FormField(
         value = email,
-        placeholder = stringResource(LR.string.profile_email_address),
+        placeholder = placeholder,
         onValueChange = onUpdateEmail,
         enabled = enabled,
         isError = isError,
@@ -168,6 +173,7 @@ fun PasswordField(
     password: String,
     enabled: Boolean,
     isError: Boolean,
+    placeholder: String = stringResource(LR.string.profile_password),
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
@@ -185,7 +191,7 @@ fun PasswordField(
 
     FormField(
         value = password,
-        placeholder = stringResource(LR.string.profile_password),
+        placeholder = placeholder,
         onValueChange = onUpdatePassword,
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
