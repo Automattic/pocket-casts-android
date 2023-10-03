@@ -17,13 +17,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -388,7 +388,7 @@ class PodcastViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
-        settings.setBookmarksSortType(order)
+        settings.podcastBookmarksSortType.set(order)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
@@ -612,7 +612,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     searchResults = episodeSearchResults,
                 ),
 
-            settings.bookmarkSortTypeForPodcastFlow.flatMapLatest { sortType ->
+            settings.podcastBookmarksSortType.flow.flatMapLatest { sortType ->
                 bookmarkManager.findPodcastBookmarksFlow(podcast.uuid, sortType)
             }.asFlowable()
                 .withSearchResult(

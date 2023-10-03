@@ -6,9 +6,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -99,23 +99,23 @@ class BookmarkManagerImpl @Inject constructor(
      */
     override suspend fun findEpisodeBookmarksFlow(
         episode: BaseEpisode,
-        sortType: BookmarksSortTypeForPlayer,
+        sortType: BookmarksSortTypeDefault,
     ) = when (sortType) {
-        BookmarksSortTypeForPlayer.DATE_ADDED_NEWEST_TO_OLDEST ->
+        BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST ->
             bookmarkDao.findByEpisodeOrderCreatedAtFlow(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
                 isAsc = false,
             )
 
-        BookmarksSortTypeForPlayer.DATE_ADDED_OLDEST_TO_NEWEST ->
+        BookmarksSortTypeDefault.DATE_ADDED_OLDEST_TO_NEWEST ->
             bookmarkDao.findByEpisodeOrderCreatedAtFlow(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
                 isAsc = true,
             )
 
-        BookmarksSortTypeForPlayer.TIMESTAMP ->
+        BookmarksSortTypeDefault.TIMESTAMP ->
             bookmarkDao.findByEpisodeOrderTimeFlow(
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 episodeUuid = episode.uuid,
