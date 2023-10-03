@@ -81,12 +81,14 @@ class FileStatusIconsView @JvmOverloads constructor(
         userBookmarksObservable: Observable<List<Bookmark>>,
         hideErrorDetails: Boolean = false,
         bookmarksAvailable: Boolean = false,
+        tintColor: Int,
     ) {
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
         progressCircle.setColor(captionColor)
         progressBar.indeterminateTintList = ColorStateList.valueOf(captionColor)
+        imgBookmark.imageTintList = ColorStateList.valueOf(tintColor)
 
         val downloadUpdates = downloadProgressUpdates
             .filter { it.episodeUuid == episode.uuid }

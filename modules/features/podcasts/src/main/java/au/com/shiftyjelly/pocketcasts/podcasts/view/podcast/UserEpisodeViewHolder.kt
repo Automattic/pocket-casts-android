@@ -155,6 +155,7 @@ class UserEpisodeViewHolder(
             upNextChangesObservable = upNextChangesObservable,
             userBookmarksObservable = userBookmarksObservable,
             bookmarksAvailable = bookmarksAvailable,
+            tintColor = tintColor,
         )
 
         val downloadUpdates = downloadProgressUpdates

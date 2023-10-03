@@ -146,7 +146,8 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.lblTitle.text = episode.title
                 val btnPlay = binding.btnPlay
-                btnPlay.setCircleTintColor(btnPlay.context.getThemeColor(UR.attr.primary_interactive_01))
+                val tintColor = view.context.getThemeColor(UR.attr.primary_icon_01)
+                btnPlay.setCircleTintColor(tintColor)
                 btnPlay.setPlaying(isPlaying, false)
                 btnPlay.setOnPlayClicked {
                     if (!isPlaying) {
@@ -249,7 +250,8 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     playbackStateUpdates = playbackManager.playbackStateRelay,
                     upNextChangesObservable = upNextQueue.changesObservable,
                     userBookmarksObservable = userBookmarksObservable,
-                    hideErrorDetails = true
+                    hideErrorDetails = true,
+                    tintColor = tintColor,
                 )
 
                 binding.lblCloud.text = when (episode.serverStatus) {

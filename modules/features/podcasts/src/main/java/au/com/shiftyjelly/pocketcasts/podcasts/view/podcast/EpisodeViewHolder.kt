@@ -166,6 +166,7 @@ class EpisodeViewHolder constructor(
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
         binding.progressCircle.setColor(captionColor)
         binding.progressBar.indeterminateTintList = ColorStateList.valueOf(captionColor)
+        binding.imgBookmark.imageTintList = ColorStateList.valueOf(tintColor)
 
         val downloadUpdates = downloadProgressUpdates
             .filter { it.episodeUuid == episode.uuid }
