@@ -14,7 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ChangeEmailFragmentPage(
     email: String,
@@ -47,13 +50,18 @@ fun ChangeEmailFragmentPage(
     onBackPressed: () -> Unit,
     changeEmailState: ChangeEmailState,
 ) {
-    val onFormSubmit = {
-        changeEmail()
-    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     var isEmailInvalid by remember { mutableStateOf(false) }
     var isPasswordInvalid by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    val onFormSubmit = {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+        changeEmail()
+    }
 
     LaunchedEffect(changeEmailState) {
         when (changeEmailState) {
