@@ -1,6 +1,8 @@
 7.50
 -----
-
+*   Bug Fixes:
+    *   Fixed show notes loading issues
+        ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
 
 7.49
 -----
