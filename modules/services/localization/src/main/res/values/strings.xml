@@ -1725,7 +1725,8 @@
     <string name="bookmark_notification_title_added">Bookmark added</string>
     <string name="bookmark_notification_content_tap_to_view">Tap to view</string>
     <string name="bookmark_notification_action_change_title">Change title</string>
-
+    <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
+    <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers on %s.</string>
 
     <!--    Tasker Plugin-->
 

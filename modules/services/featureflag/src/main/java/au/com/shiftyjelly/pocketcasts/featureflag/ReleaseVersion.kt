@@ -23,7 +23,7 @@ data class ReleaseVersion(
 
     companion object {
 
-        private val currentReleaseVersion by lazy {
+        val currentReleaseVersion by lazy {
             fromString(BuildConfig.VERSION_NAME) ?: error("Invalid version name: ${BuildConfig.VERSION_NAME}")
         }
 

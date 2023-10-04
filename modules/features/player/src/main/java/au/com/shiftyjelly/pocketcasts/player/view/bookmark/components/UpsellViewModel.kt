@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -19,6 +20,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,6 +33,9 @@ class UpsellViewModel @Inject constructor(
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
+
+    private val earlyAccessEndDate = LocalDate.of(2023, 10, 30).atStartOfDay().atZone(ZoneId.systemDefault())
+    private val formattedEarlyAccessEndDate = earlyAccessEndDate.format(DateTimeFormatter.ofPattern("MMMM d"))
 
     init {
         viewModelScope.launch {
@@ -56,7 +63,13 @@ class UpsellViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val subscriptionTier = Feature.BOOKMARKS_ENABLED.tier.toSubscriptionTier()
+        val patronExclusiveAccessRelease = (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
+
+        val subscriptionTier = if (patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion) {
+            FeatureTier.Patron.toSubscriptionTier()
+        } else {
+            Feature.BOOKMARKS_ENABLED.tier.toSubscriptionTier()
+        }
         val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
         // Check the server subscriptions to see if the Patron tier has a free trial
@@ -69,6 +82,8 @@ class UpsellViewModel @Inject constructor(
             UiState.Loaded(
                 tier = subscriptionTier,
                 hasFreeTrial = selectedSubscription?.trialPricingPhase != null,
+                showEarlyAccessMessage = patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion,
+                formattedEarlyAccessEndDate = formattedEarlyAccessEndDate,
             )
         }
     }
@@ -91,6 +106,8 @@ class UpsellViewModel @Inject constructor(
         data class Loaded(
             val tier: SubscriptionTier,
             val hasFreeTrial: Boolean,
+            val showEarlyAccessMessage: Boolean,
+            val formattedEarlyAccessEndDate: String,
         ) : UiState()
     }
 }

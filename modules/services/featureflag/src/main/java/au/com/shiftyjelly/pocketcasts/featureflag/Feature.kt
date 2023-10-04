@@ -63,10 +63,11 @@ enum class Feature(
                     // Patron features can only be used by Patrons
                     FeatureTier.Patron -> false
 
-                    // Plus users cannot use Plus features during early access for patrons
+                    // Plus users cannot use Plus features during early access for patrons except when the app is in beta
                     is FeatureTier.Plus ->
                         FeatureFlag.isEnabled(feature) &&
-                            !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()
+                            (ReleaseVersion.currentReleaseVersion.releaseCandidate != null && feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()) ||
+                            (ReleaseVersion.currentReleaseVersion.releaseCandidate == null && !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess())
 
                     FeatureTier.Free -> FeatureFlag.isEnabled(feature)
                 }
