@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,13 +79,14 @@ fun ChangeEmailFragmentPage(
             }
 
             is ChangeEmailState.Loading -> {
+                errorMessage = ""
             }
 
             is ChangeEmailState.Success -> {
                 onSuccess()
             }
 
-            else -> {
+            is ChangeEmailState.Empty -> {
                 isEmailInvalid = false
                 isPasswordInvalid = false
             }
@@ -93,7 +96,6 @@ fun ChangeEmailFragmentPage(
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_change_email_address_title),
@@ -101,57 +103,65 @@ fun ChangeEmailFragmentPage(
             onNavigationClick = onBackPressed
         )
 
-        Row(
+        Column(
             modifier = Modifier
-                .padding(
-                    horizontal = 16.dp
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .weight(1f, false)
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TextH50(
+            Row(
                 modifier = Modifier
-                    .padding(end = 8.dp),
-                text = stringResource(LR.string.profile_current_email),
-                color = MaterialTheme.theme.colors.primaryText02,
-            )
-            TextH50(
-                modifier = Modifier
-                    .weight(1f)
-                    .basicMarquee(),
-                text = existingEmail,
-                color = MaterialTheme.theme.colors.primaryText01,
-                textAlign = TextAlign.End
-            )
-        }
+                    .padding(
+                        horizontal = 16.dp
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                TextH50(
+                    modifier = Modifier
+                        .padding(end = 8.dp),
+                    text = stringResource(LR.string.profile_current_email),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+                TextH50(
+                    modifier = Modifier
+                        .weight(1f)
+                        .basicMarquee(),
+                    text = existingEmail,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    textAlign = TextAlign.End
+                )
+            }
 
-        Column {
-            EmailAndPasswordFields(
-                modifier = Modifier
-                    .padding(
-                        horizontal = 16.dp
-                    ),
-                email = email,
-                emailPlaceholder = stringResource(LR.string.profile_new_email_address),
-                password = password,
-                passwordPlaceholder = stringResource(LR.string.profile_confirm_password),
-                showEmailError = false,
-                showPasswordError = false,
-                enabled = true,
-                focusEnabled = false,
-                onDone = onFormSubmit,
-                onUpdateEmail = updateEmail,
-                onUpdatePassword = updatePassword,
-                showPasswordErrorMessage = false,
-                isCreatingAccount = false,
-            )
-            TextH40(
-                modifier = Modifier
-                    .padding(
-                        horizontal = 16.dp
-                    ),
-                text = errorMessage,
-                color = MaterialTheme.theme.colors.support05
-            )
+            Column {
+                EmailAndPasswordFields(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 16.dp
+                        ),
+                    email = email,
+                    emailPlaceholder = stringResource(LR.string.profile_new_email_address),
+                    password = password,
+                    passwordPlaceholder = stringResource(LR.string.profile_confirm_password),
+                    showEmailError = false,
+                    showPasswordError = false,
+                    enabled = true,
+                    focusEnabled = false,
+                    onDone = onFormSubmit,
+                    onUpdateEmail = updateEmail,
+                    onUpdatePassword = updatePassword,
+                    showPasswordErrorMessage = false,
+                    isCreatingAccount = false,
+                )
+                TextH40(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 16.dp
+                        ),
+                    text = errorMessage,
+                    color = MaterialTheme.theme.colors.support05
+                )
+            }
         }
 
         RowLoadingButton(
