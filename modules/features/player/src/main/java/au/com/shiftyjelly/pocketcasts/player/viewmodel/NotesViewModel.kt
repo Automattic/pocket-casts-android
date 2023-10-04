@@ -73,10 +73,10 @@ class NotesViewModel
             showNotesFormatter.linkColor = ColorUtils.colorIntToHexString(linkColor)
             // load the show notes
             val state = serverShowNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episode.uuid)
-            // theme the show notes
+            // show an error message if the show notes couldn't be loaded
             val text = if (state is ShowNotesState.Loaded) state.showNotes else errorLoadingString
+            // theme the show notes
             val formattedText = showNotesFormatter.format(text) ?: ""
-            // post
             showNotes.postValue(ShowNotesState.Loaded(formattedText))
         } catch (e: Exception) {
             Timber.e(e)
