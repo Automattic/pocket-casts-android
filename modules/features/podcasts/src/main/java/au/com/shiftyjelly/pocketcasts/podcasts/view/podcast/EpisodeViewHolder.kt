@@ -271,7 +271,10 @@ class EpisodeViewHolder constructor(
                 updateRowText(episode, captionColor, tintColor, date, title, lblStatus, combinedData.isInUpNext)
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
-                imgArtwork.alpha = if (episodeGreyedOut) 0.5f else 1f
+                val imageAlpha = if (episodeGreyedOut) 0.5f else 1f
+                imgArtwork.alpha = imageAlpha
+                binding.imgBookmark.alpha = imageAlpha
+
                 binding.executePendingBindings()
             }
             .subscribe()

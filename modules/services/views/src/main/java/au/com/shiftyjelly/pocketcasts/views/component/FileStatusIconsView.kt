@@ -231,7 +231,10 @@ class FileStatusIconsView @JvmOverloads constructor(
                 lblStatus.contentDescription = lblStatus.text.toString()
                 statusText = lblStatus.text.toString()
 
-                imgCloud.alpha = if (episodeGreyedOut) 0.5f else 1f
+                val imageAlpha = if (episodeGreyedOut) 0.5f else 1f
+                imgCloud.alpha = imageAlpha
+                imgBookmark.alpha = imageAlpha
+                imgIcon.alpha = imageAlpha
             }
             .subscribe()
             .addTo(disposables)
