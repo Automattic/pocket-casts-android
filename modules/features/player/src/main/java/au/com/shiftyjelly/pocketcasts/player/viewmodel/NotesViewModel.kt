@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
@@ -23,12 +24,14 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.rxCompletable
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class NotesViewModel
 @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
+    private val episodeManager: EpisodeManager,
     private val serverShowNotesManager: ServerShowNotesManager,
     @ApplicationContext context: Context
 ) : ViewModel() {
@@ -40,8 +43,9 @@ class NotesViewModel
         linkColor = "#FFFFFF"
         setConvertTimesToLinks(true)
     }
+    private val errorLoadingString = context.getString(LR.string.error_loading_show_notes)
 
-    val showNotes = MutableLiveData<Pair<String, Boolean>>().apply { postValue(Pair("", false)) }
+    val showNotes = MutableLiveData<ShowNotesState>().apply { postValue(ShowNotesState.Loaded("")) }
     val episode = MutableLiveData<PodcastEpisode>()
 
     fun loadEpisode(episode: BaseEpisode, color: Int) {
@@ -68,17 +72,12 @@ class NotesViewModel
 
     private fun loadShowNotes(podcastUuid: String, episodeUuid: String): Completable {
         // Clear previous show notes while loading new notes
-        updateShowNotes("", inProgress = true)
+        showNotes.postValue(ShowNotesState.Loading)
         return rxCompletable {
             val state = serverShowNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
-            val showNotes = if (state is ShowNotesState.Loaded) state.showNotes else ""
-            updateShowNotes(showNotes, inProgress = false)
-        }
-    }
-
-    private fun updateShowNotes(notes: String, inProgress: Boolean) {
-        showNotesFormatter.format(notes)?.let { formatted ->
-            showNotes.postValue(Pair(formatted, inProgress))
+            val text = if (state is ShowNotesState.Loaded) state.showNotes else errorLoadingString
+            val formattedText = showNotesFormatter.format(text) ?: ""
+            showNotes.postValue(ShowNotesState.Loaded(formattedText))
         }
     }
 

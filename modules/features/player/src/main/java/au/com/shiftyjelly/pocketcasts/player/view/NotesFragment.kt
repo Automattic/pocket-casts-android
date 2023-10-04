@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.NotesViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -78,13 +79,14 @@ class NotesFragment : BaseFragment() {
 
         setupShowNotes()
 
-        viewModel.showNotes.observe(viewLifecycleOwner) { (notes, inProgress) ->
+        viewModel.showNotes.observe(viewLifecycleOwner) { state ->
             if (webView == null) {
                 // If the webview has crashed we need to reinitialise it or
                 // else it won't show any notes until the app is restarted
                 setupShowNotes()
             }
-            binding?.progressBar?.showIf(inProgress)
+            binding?.progressBar?.showIf(state is ShowNotesState.Loading)
+            val notes = if (state is ShowNotesState.Loaded) state.showNotes else ""
             loadShowNotes(notes)
         }
 
