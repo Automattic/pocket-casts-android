@@ -15,8 +15,12 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
     override fun isEnabled(feature: Feature): Boolean =
         firebaseRemoteConfig.getBoolean(feature.key)
 
-    override fun hasFeature(feature: Feature): Boolean {
-        return false
+    override fun hasFeature(feature: Feature) = when (feature) {
+        Feature.IN_APP_REVIEW_ENABLED -> true
+        Feature.END_OF_YEAR_ENABLED,
+        Feature.SHOW_RATINGS_ENABLED,
+        Feature.ADD_PATRON_ENABLED,
+        Feature.BOOKMARKS_ENABLED -> false
     }
 
     override fun refresh() {
