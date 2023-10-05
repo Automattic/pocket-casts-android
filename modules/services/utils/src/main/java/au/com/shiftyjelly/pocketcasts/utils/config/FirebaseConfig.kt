@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils.config
 
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+
 object FirebaseConfig {
     const val PERIODIC_SAVE_TIME_MS = "periodic_playback_save_ms"
     const val PODCAST_SEARCH_DEBOUNCE_MS = "podcast_search_debounce_ms"
@@ -12,5 +14,7 @@ object FirebaseConfig {
         EPISODE_SEARCH_DEBOUNCE_MS to 2000L,
         CLOUD_STORAGE_LIMIT to 10L,
         FEATURE_FLAG_SEARCH_IMPROVEMENTS to false
-    )
+    ) + Feature.values()
+        .filter { it.hasFirebaseRemoteFlag }
+        .associate { it.key to it.defaultValue }
 }

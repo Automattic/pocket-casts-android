@@ -8,6 +8,7 @@ enum class Feature(
     val title: String,
     val defaultValue: Boolean,
     val tier: FeatureTier,
+    val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
 ) {
     END_OF_YEAR_ENABLED(
@@ -15,6 +16,7 @@ enum class Feature(
         title = "End of Year",
         defaultValue = false,
         tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
     SHOW_RATINGS_ENABLED(
@@ -22,6 +24,7 @@ enum class Feature(
         title = "Show Ratings",
         defaultValue = true,
         tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
     ADD_PATRON_ENABLED(
@@ -29,6 +32,7 @@ enum class Feature(
         title = "Patron",
         defaultValue = false,
         tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     BOOKMARKS_ENABLED(
@@ -36,6 +40,7 @@ enum class Feature(
         title = "Bookmarks",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     IN_APP_REVIEW_ENABLED(
@@ -43,6 +48,7 @@ enum class Feature(
         title = "In App Review",
         defaultValue = true,
         tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     );
 
