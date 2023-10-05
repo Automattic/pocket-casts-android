@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionTierColor
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -132,17 +133,21 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     )
 
     private val addBookmarkIconId
-        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
-            is FeatureTier.Patron -> R.drawable.ic_patron
-            is FeatureTier.Plus -> R.drawable.ic_plus
-            is FeatureTier.Free -> null
+        get() = when {
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
+                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> R.drawable.ic_patron
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> R.drawable.ic_plus
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
+            else -> null
         }
 
     private val addBookmarkIconColor
-        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
-            is FeatureTier.Patron -> SubscriptionTierColor.patronPurple
-            is FeatureTier.Plus -> SubscriptionTierColor.plusGold
-            is FeatureTier.Free -> null
+        get() = when {
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
+                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> SubscriptionTierColor.patronPurple
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> SubscriptionTierColor.plusGold
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
+            else -> null
         }
 
     enum class UpsellSourceAction {
