@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -29,6 +29,8 @@ import javax.inject.Inject
 class UpsellViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
+    private val feature: FeatureWrapper,
+    private val releaseVersion: ReleaseVersionWrapper,
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
@@ -63,12 +65,13 @@ class UpsellViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val patronExclusiveAccessRelease = (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
+        val bookmarksFeature = feature.bookmarksFeature
+        val patronExclusiveAccessRelease = (bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
 
-        val subscriptionTier = if (patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion) {
+        val subscriptionTier = if (patronExclusiveAccessRelease == releaseVersion.currentReleaseVersion) {
             FeatureTier.Patron.toSubscriptionTier()
         } else {
-            Feature.BOOKMARKS_ENABLED.tier.toSubscriptionTier()
+            bookmarksFeature.tier.toSubscriptionTier()
         }
         val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
@@ -82,7 +85,7 @@ class UpsellViewModel @Inject constructor(
             UiState.Loaded(
                 tier = subscriptionTier,
                 hasFreeTrial = selectedSubscription?.trialPricingPhase != null,
-                showEarlyAccessMessage = patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion,
+                showEarlyAccessMessage = patronExclusiveAccessRelease == releaseVersion.currentReleaseVersion,
                 formattedEarlyAccessEndDate = formattedEarlyAccessEndDate,
             )
         }

@@ -4,4 +4,5 @@ import javax.inject.Inject
 
 class FeatureWrapper @Inject constructor() {
     fun isAvailable(feature: Feature, userTier: UserTier) = Feature.isAvailable(feature, userTier)
+    val bookmarksFeature = Feature.BOOKMARKS_ENABLED
 }
