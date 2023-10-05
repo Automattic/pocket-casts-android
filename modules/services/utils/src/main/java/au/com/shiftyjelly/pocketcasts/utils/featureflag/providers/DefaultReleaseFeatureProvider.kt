@@ -1,8 +1,8 @@
-package au.com.shiftyjelly.pocketcasts.featureflag.providers
+package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.MIN_PRIORITY
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.MIN_PRIORITY
 import javax.inject.Inject
 import javax.inject.Singleton
 

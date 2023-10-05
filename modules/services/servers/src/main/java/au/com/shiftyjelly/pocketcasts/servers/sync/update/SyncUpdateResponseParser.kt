@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync.update
 
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -15,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrDefault
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextStringOrNull
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader

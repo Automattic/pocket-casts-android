@@ -1,6 +1,7 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
 
 enum class Feature(
     val key: String,

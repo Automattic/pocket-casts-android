@@ -1,8 +1,8 @@
-package au.com.shiftyjelly.pocketcasts.featureflag.providers
+package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.MAX_PRIORITY
-import au.com.shiftyjelly.pocketcasts.featureflag.RemoteFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.MAX_PRIORITY
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.RemoteFeatureProvider
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import timber.log.Timber
 import javax.inject.Inject

@@ -6,14 +6,14 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

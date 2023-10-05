@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
@@ -23,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener

@@ -9,8 +9,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeButton.P
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -19,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

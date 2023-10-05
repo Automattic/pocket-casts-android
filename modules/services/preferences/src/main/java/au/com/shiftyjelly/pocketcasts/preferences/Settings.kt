@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
-import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -25,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetti
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
