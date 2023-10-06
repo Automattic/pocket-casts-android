@@ -72,6 +72,12 @@ android {
         freeCompilerArgs += "-opt-in=com.google.android.horologist.annotations.ExperimentalHorologistApi"
         freeCompilerArgs += "-opt-in=com.google.android.horologist.media.ui.ExperimentalHorologistMediaUiApi"
     }
+    variantFilter { variant ->
+        if (variant.flavors*.name.contains("free")) {
+            // Android Wear apps must include proprietary libs
+            setIgnore(true)
+        }
+    }
 }
 
 sentry {
