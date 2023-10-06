@@ -40,7 +40,7 @@ enum class Feature(
     IN_APP_REVIEW_ENABLED(
         key = "in_app_review_enabled",
         title = "In App Review",
-        defaultValue = false,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasDevToggle = true,
     );
