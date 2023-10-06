@@ -33,27 +33,27 @@ open class PodcastImageLoader(
     var radiusPx: Int = 0
     var shouldScale: Boolean = true
 
-    fun getBitmap(userEpisode: UserEpisode, size: Int): Bitmap? {
-        return runBlocking {
-            try {
-                val request = load(userEpisode).size(size, size).build()
-                return@runBlocking context.imageLoader.execute(request).drawable!!.toBitmap()
-            } catch (e: Exception) {
-                val request = loadNoPodcastCoil().size(size, size).build()
-                return@runBlocking context.imageLoader.execute(request).drawable?.toBitmap()
-            }
-        }
+    fun getBitmap(userEpisode: UserEpisode, size: Int): Bitmap? = runBlocking {
+        val request = load(userEpisode).size(size, size).build()
+        executeImageRequest(request, size)
     }
 
-    fun getBitmap(podcast: Podcast, size: Int): Bitmap? {
-        return runBlocking {
-            try {
-                val request = load(podcast).size(size, size).build()
-                return@runBlocking context.imageLoader.execute(request).drawable!!.toBitmap()
-            } catch (e: Exception) {
-                val request = loadNoPodcastCoil().size(size, size).build()
-                return@runBlocking context.imageLoader.execute(request).drawable?.toBitmap()
-            }
+    fun getBitmap(podcast: Podcast, size: Int): Bitmap? = runBlocking {
+        getBitmapSuspend(podcast, size)
+    }
+
+    suspend fun getBitmapSuspend(podcast: Podcast, size: Int): Bitmap? {
+        val request = load(podcast).size(size, size).build()
+        return executeImageRequest(request, size)
+    }
+
+    private suspend fun executeImageRequest(request: ImageRequest, size: Int): Bitmap? {
+        val drawable = context.imageLoader.execute(request).drawable
+        return if (drawable != null) {
+            drawable.toBitmap()
+        } else {
+            val fallbackRequest = loadNoPodcastCoil().size(size, size).build()
+            context.imageLoader.execute(fallbackRequest).drawable?.toBitmap()
         }
     }
 
