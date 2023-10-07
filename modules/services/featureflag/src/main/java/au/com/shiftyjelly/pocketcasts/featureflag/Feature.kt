@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 
 enum class Feature(
     val key: String,
@@ -47,7 +47,11 @@ enum class Feature(
 
     companion object {
 
-        fun isAvailable(feature: Feature, userTier: UserTier) = when (userTier) {
+        fun isAvailable(
+            feature: Feature,
+            userTier: UserTier,
+            releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
+        ) = when (userTier) {
 
             // Patron users can use all features
             UserTier.Patron -> when (feature.tier) {
@@ -64,10 +68,19 @@ enum class Feature(
                     FeatureTier.Patron -> false
 
                     // Plus users cannot use Plus features during early access for patrons except when the app is in beta
-                    is FeatureTier.Plus ->
+                    is FeatureTier.Plus -> {
+                        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+                        val relativeToEarlyAccess = feature.tier.patronExclusiveAccessRelease?.let {
+                            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+                        }
                         FeatureFlag.isEnabled(feature) &&
-                            (ReleaseVersion.currentReleaseVersion.releaseCandidate != null && feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()) ||
-                            (ReleaseVersion.currentReleaseVersion.releaseCandidate == null && !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess())
+                            when (relativeToEarlyAccess) {
+                                null -> true // no early access release
+                                EarlyAccessState.Before,
+                                EarlyAccessState.During -> isReleaseCandidate
+                                EarlyAccessState.After -> true
+                            }
+                    }
 
                     FeatureTier.Free -> FeatureFlag.isEnabled(feature)
                 }

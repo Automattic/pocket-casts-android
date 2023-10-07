@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.featureflag.EarlyAccessState
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
@@ -68,11 +70,17 @@ class UpsellViewModel @Inject constructor(
         val bookmarksFeature = feature.bookmarksFeature
         val patronExclusiveAccessRelease = (bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
 
-        val subscriptionTier = if (patronExclusiveAccessRelease == releaseVersion.currentReleaseVersion) {
-            FeatureTier.Patron.toSubscriptionTier()
-        } else {
-            bookmarksFeature.tier.toSubscriptionTier()
+        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
+            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
         }
+        val availableForFeatureTier = when (relativeToEarlyPatronAccess) {
+            null -> bookmarksFeature.tier
+            EarlyAccessState.Before,
+            EarlyAccessState.During -> if (isReleaseCandidate) bookmarksFeature.tier else FeatureTier.Patron
+            EarlyAccessState.After -> bookmarksFeature.tier
+        }
+        val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
         val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
         // Check the server subscriptions to see if the Patron tier has a free trial
