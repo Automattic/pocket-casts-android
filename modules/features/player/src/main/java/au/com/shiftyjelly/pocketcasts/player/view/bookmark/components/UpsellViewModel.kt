@@ -22,9 +22,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,9 +34,6 @@ class UpsellViewModel @Inject constructor(
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
-
-    private val earlyAccessEndDate = LocalDate.of(2023, 10, 30).atStartOfDay().atZone(ZoneId.systemDefault())
-    private val formattedEarlyAccessEndDate = earlyAccessEndDate.format(DateTimeFormatter.ofPattern("MMMM d"))
 
     init {
         viewModelScope.launch {
@@ -94,7 +88,6 @@ class UpsellViewModel @Inject constructor(
                 tier = subscriptionTier,
                 hasFreeTrial = selectedSubscription?.trialPricingPhase != null,
                 showEarlyAccessMessage = patronExclusiveAccessRelease == releaseVersion.currentReleaseVersion,
-                formattedEarlyAccessEndDate = formattedEarlyAccessEndDate,
             )
         }
     }
@@ -118,7 +111,6 @@ class UpsellViewModel @Inject constructor(
             val tier: SubscriptionTier,
             val hasFreeTrial: Boolean,
             val showEarlyAccessMessage: Boolean,
-            val formattedEarlyAccessEndDate: String,
         ) : UiState()
     }
 }

@@ -76,7 +76,6 @@ private fun UpsellViewContent(
         },
         message = getMessage(
             state.showEarlyAccessMessage,
-            state.formattedEarlyAccessEndDate
         ),
         buttonTitle = getButtonTitle(state.tier, state.hasFreeTrial),
         buttonAction = onClick,
@@ -111,16 +110,10 @@ private fun getButtonTitle(
 @Composable
 private fun getMessage(
     showEarlyAccessMessage: Boolean,
-    formattedEarlyAccessEndDate: String,
 ) = if (showEarlyAccessMessage) {
-    stringResource(
-        LR.string.bookmarks_upsell_instructions_early_access,
-        formattedEarlyAccessEndDate
-    )
+    stringResource(LR.string.bookmarks_upsell_instructions_early_access,)
 } else {
-    stringResource(
-        LR.string.bookmarks_upsell_instructions
-    )
+    stringResource(LR.string.bookmarks_upsell_instructions)
 }
 
 @Preview
@@ -135,7 +128,6 @@ private fun UpsellPreview(
                 tier = SubscriptionTier.PATRON,
                 hasFreeTrial = false,
                 showEarlyAccessMessage = false,
-                formattedEarlyAccessEndDate = "",
             ),
             onClick = {},
         )
