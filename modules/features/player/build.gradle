@@ -25,5 +25,6 @@ dependencies {
     implementation project(':modules:services:utils')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:views')
+    implementation project(path: ':modules:services:protobuf')
     testImplementation project(':modules:services:sharedtest')
 }

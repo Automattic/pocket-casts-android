@@ -1,11 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.doOnLayout
@@ -47,15 +50,20 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
+import org.checkerframework.checker.units.qual.Length
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
-    @Inject lateinit var settings: Settings
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    @Inject lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    @Inject
+    lateinit var settings: Settings
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject
+    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -64,7 +72,11 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     private val chaptersViewModel: ChaptersViewModel by activityViewModels()
     private var binding: FragmentPlayerContainerBinding? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentPlayerContainerBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -80,25 +92,42 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
-        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
-        childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
+        val upNextFragment =
+            UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
+        childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment)
+            .commitAllowingStateLoss()
 
         val binding = binding ?: return
 
         upNextBottomSheetBehavior = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
-        upNextBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        upNextBottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
+                    analyticsTracker.track(
+                        AnalyticsEvent.UP_NEXT_SHOWN,
+                        mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue)
+                    )
                     upNextBottomSheetBehavior.setPeekHeight(0, false)
                     updateUpNextVisibility(true)
 
                     activity?.let {
-                        theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(Theme.ThemeType.DARK))
-                        theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.primaryUi01(Theme.ThemeType.DARK), true), it)
+                        theme.setNavigationBarColor(
+                            it.window,
+                            true,
+                            ThemeColor.primaryUi03(Theme.ThemeType.DARK)
+                        )
+                        theme.updateWindowStatusBar(
+                            it.window,
+                            StatusBarColor.Custom(
+                                ThemeColor.primaryUi01(Theme.ThemeType.DARK),
+                                true
+                            ),
+                            it
+                        )
                     }
 
                     upNextFragment.onExpanded()
@@ -116,7 +145,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         val viewPager = binding.viewPager
         viewPager.adapter = adapter
-        viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
+        viewPager.getChildAt(0).isNestedScrollingEnabled =
+            false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
 
         TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
             tab.setText(adapter.pageTitle(position))
@@ -137,20 +167,36 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 when {
                     adapter.isPlayerTab(position) -> {
                         if (previousPosition == INVALID_TAB_POSITION) return
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "now_playing"))
+                        analyticsTracker.track(
+                            AnalyticsEvent.PLAYER_TAB_SELECTED,
+                            mapOf(TAB_KEY to "now_playing")
+                        )
                         FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
+
                     adapter.isNotesTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "show_notes"))
+                        analyticsTracker.track(
+                            AnalyticsEvent.PLAYER_TAB_SELECTED,
+                            mapOf(TAB_KEY to "show_notes")
+                        )
                         FirebaseAnalyticsTracker.openedPlayerNotes()
                     }
+
                     adapter.isBookmarksTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "bookmarks"))
+                        analyticsTracker.track(
+                            AnalyticsEvent.PLAYER_TAB_SELECTED,
+                            mapOf(TAB_KEY to "bookmarks")
+                        )
                     }
+
                     adapter.isChaptersTab(position) -> {
-                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "chapters"))
+                        analyticsTracker.track(
+                            AnalyticsEvent.PLAYER_TAB_SELECTED,
+                            mapOf(TAB_KEY to "chapters")
+                        )
                         FirebaseAnalyticsTracker.openedPlayerChapters()
                     }
+
                     else -> {
                         Timber.e("Invalid tab selected")
                     }
@@ -174,12 +220,16 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 upNextCount < 10 -> R.drawable.mini_player_upnext_badge
                 else -> R.drawable.mini_player_upnext_badge_large
             }
-            val upNextDrawable: Drawable? = AppCompatResources.getDrawable(binding.upNextButton.context, drawableId)
+            val upNextDrawable: Drawable? =
+                AppCompatResources.getDrawable(binding.upNextButton.context, drawableId)
             binding.upNextButton.setImageDrawable(upNextDrawable)
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.toString()
 
             binding.upNextButton.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
+                analyticsTracker.track(
+                    AnalyticsEvent.UP_NEXT_SHOWN,
+                    mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue)
+                )
                 openUpNext()
             }
 
@@ -208,6 +258,35 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             menuRes = null,
             fragmentManager = parentFragmentManager,
         )
+
+
+        viewModel.networkType.observe(viewLifecycleOwner) { type ->
+            when (type) {
+
+                ConnectivityManager.TYPE_WIFI -> {
+                    Timber.tag("Check Data Connectivity").d("Connect to wifi 😊")
+                    println("Connect to wifi ")
+
+                }
+
+                ConnectivityManager.TYPE_MOBILE -> {
+                    //Log Purposes
+                    Timber.tag("Check Data Connectivity").d("Connect to Mobile Internet 😊")
+                    println("Connect to Mobile Internet ")
+                    //Toast when user is using Mobile Internet
+                    Toast.makeText(context, "Using Mobile Data", Toast.LENGTH_SHORT).show()
+
+                }
+
+                else -> {
+                    Timber.tag("Check Data Connectivity").d("Neither Connected to Wifi nor Mobile" +
+                            " Internet")
+
+
+                }
+            }
+        }
+        viewModel.checkNetworkType(requireContext())
     }
 
     fun openUpNext() {
@@ -258,14 +337,27 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 true
             }
+
             multiSelectHelper.isMultiSelecting -> {
                 multiSelectHelper.closeMultiSelect()
                 binding?.viewPager?.isUserInputEnabled = true
                 true
             }
+
             else -> false
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.registerNetworkCallback(requireContext())
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.unregisterNetworkCallback(requireContext())
+    }
+
 
     companion object {
         private const val INVALID_TAB_POSITION = -1
@@ -382,3 +474,6 @@ private val step4 = TourStep(
     Gravity.TOP
 )
 private val tour = listOf(step1, step2, step3, step4)
+
+
+

@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
+import android.net.NetworkRequest
 import android.content.res.Resources
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -55,7 +59,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +73,7 @@ import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@Suppress("DEPRECATION")
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
@@ -401,6 +405,59 @@ class PlayerViewModel @Inject constructor(
             val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
             playbackManager.playNow(episode = episode, sourceView = sourceView)
         }
+    }
+
+    private val _networkType = MutableLiveData<Int>()
+    val networkType: LiveData<Int> get() = _networkType
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        // Called when a network becomes available after a request was made
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            // Update the LiveData with the current network type
+            _networkType.postValue(getNetworkType(context))
+        }
+        // Called when a previously available network is lost
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            // Update the LiveData with the current network type
+            _networkType.postValue(getNetworkType(context))
+        }
+    }
+
+    // Function to check the current network type and update the LiveData with this information.
+    fun checkNetworkType(context: Context){
+        val type = getNetworkType(context)
+        // Post the network type to the LiveData so that observers can be notified
+        _networkType.postValue(type)
+    }
+
+
+
+
+    //This will be called when the fragment is resume
+    fun registerNetworkCallback(context: Context) {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        connectivityManager.registerNetworkCallback(request, networkCallback)
+    }
+
+    //This will be called when the fragment is paused to avoid memory leaks, resource
+    // deallocation thus increase performance
+    fun unregisterNetworkCallback(context: Context) {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    // Function to determine the current active network type.
+    // Returns the network type as an integer (e.g., ConnectivityManager.TYPE_WIFI)
+    // or -1 if there's no active network or an issue arises.
+     fun getNetworkType(context: Context): Int {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        return activeNetwork?.type ?: -1
     }
 
     fun skipBackward() {
