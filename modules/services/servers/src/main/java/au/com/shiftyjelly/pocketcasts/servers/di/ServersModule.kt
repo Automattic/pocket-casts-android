@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.accounts.AccountManager
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -21,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module

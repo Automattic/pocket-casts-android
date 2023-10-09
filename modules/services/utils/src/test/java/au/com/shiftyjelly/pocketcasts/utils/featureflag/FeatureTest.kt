@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue

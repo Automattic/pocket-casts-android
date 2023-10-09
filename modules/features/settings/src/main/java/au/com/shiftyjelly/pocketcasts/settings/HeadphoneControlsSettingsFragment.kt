@@ -34,8 +34,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -43,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint

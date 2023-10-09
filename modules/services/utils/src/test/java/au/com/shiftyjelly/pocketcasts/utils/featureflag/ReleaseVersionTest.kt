@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 import junit.framework.TestCase.assertEquals

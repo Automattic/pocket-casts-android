@@ -166,6 +166,7 @@ class EpisodeViewHolder constructor(
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
         binding.progressCircle.setColor(captionColor)
         binding.progressBar.indeterminateTintList = ColorStateList.valueOf(captionColor)
+        binding.imgBookmark.imageTintList = ColorStateList.valueOf(tintColor)
 
         val downloadUpdates = downloadProgressUpdates
             .filter { it.episodeUuid == episode.uuid }
@@ -270,7 +271,10 @@ class EpisodeViewHolder constructor(
                 updateRowText(episode, captionColor, tintColor, date, title, lblStatus, combinedData.isInUpNext)
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
-                imgArtwork.alpha = if (episodeGreyedOut) 0.5f else 1f
+                val imageAlpha = if (episodeGreyedOut) 0.5f else 1f
+                imgArtwork.alpha = imageAlpha
+                binding.imgBookmark.alpha = imageAlpha
+
                 binding.executePendingBindings()
             }
             .subscribe()

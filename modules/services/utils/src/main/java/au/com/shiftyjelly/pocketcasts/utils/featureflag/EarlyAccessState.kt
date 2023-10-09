@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 enum class EarlyAccessState {
     Before,

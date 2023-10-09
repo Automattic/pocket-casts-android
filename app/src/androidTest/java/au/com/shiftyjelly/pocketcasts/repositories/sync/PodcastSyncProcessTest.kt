@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
@@ -20,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest

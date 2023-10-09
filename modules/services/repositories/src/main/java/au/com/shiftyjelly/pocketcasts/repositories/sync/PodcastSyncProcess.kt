@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -35,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Maybe

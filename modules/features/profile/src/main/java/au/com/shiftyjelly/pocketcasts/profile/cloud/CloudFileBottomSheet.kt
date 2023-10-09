@@ -17,8 +17,6 @@ import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -45,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
@@ -146,7 +146,8 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.lblTitle.text = episode.title
                 val btnPlay = binding.btnPlay
-                btnPlay.setCircleTintColor(btnPlay.context.getThemeColor(UR.attr.primary_interactive_01))
+                val tintColor = view.context.getThemeColor(UR.attr.primary_icon_01)
+                btnPlay.setCircleTintColor(tintColor)
                 btnPlay.setPlaying(isPlaying, false)
                 btnPlay.setOnPlayClicked {
                     if (!isPlaying) {
@@ -249,7 +250,8 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     playbackStateUpdates = playbackManager.playbackStateRelay,
                     upNextChangesObservable = upNextQueue.changesObservable,
                     userBookmarksObservable = userBookmarksObservable,
-                    hideErrorDetails = true
+                    hideErrorDetails = true,
+                    tintColor = tintColor,
                 )
 
                 binding.lblCloud.text = when (episode.serverStatus) {

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 /**
  * Every provider has an explicit priority so they can override each other (e.g. "Firebase Remote" > "Default Release").
