@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -135,7 +134,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val addBookmarkIconId
         get() = when {
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
-                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> R.drawable.ic_patron
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> R.drawable.ic_patron
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> R.drawable.ic_plus
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
             else -> null
@@ -144,7 +143,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val addBookmarkIconColor
         get() = when {
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
-                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> SubscriptionTierColor.patronPurple
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> SubscriptionTierColor.patronPurple
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> SubscriptionTierColor.plusGold
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
             else -> null
