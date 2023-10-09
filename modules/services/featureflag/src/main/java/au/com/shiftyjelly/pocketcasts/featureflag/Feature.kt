@@ -45,6 +45,19 @@ enum class Feature(
         hasDevToggle = true,
     );
 
+    fun isCurrentlyExclusiveToPatron(): Boolean {
+        val isReleaseCandidate = ReleaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
+            ReleaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+        }
+        return when (relativeToEarlyAccessState) {
+            null -> false
+            EarlyAccessState.Before,
+            EarlyAccessState.During -> !isReleaseCandidate
+            EarlyAccessState.After -> false
+        }
+    }
+
     companion object {
 
         fun isAvailable(

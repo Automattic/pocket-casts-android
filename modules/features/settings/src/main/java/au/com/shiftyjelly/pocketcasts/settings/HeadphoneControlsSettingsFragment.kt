@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -273,7 +272,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
             showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion,
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }

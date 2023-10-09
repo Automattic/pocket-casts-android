@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -493,7 +492,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
             showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion,
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }

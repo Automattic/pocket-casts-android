@@ -77,7 +77,7 @@ class UpsellViewModel @Inject constructor(
         val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
         val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
-        // Check the server subscriptions to see if the Patron tier has a free trial
+        // Check if subscription has a free trial
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             tier = subscriptionTier,
             subscriptions = updatedSubscriptions,
@@ -87,7 +87,7 @@ class UpsellViewModel @Inject constructor(
             UiState.Loaded(
                 tier = subscriptionTier,
                 hasFreeTrial = selectedSubscription?.trialPricingPhase != null,
-                showEarlyAccessMessage = patronExclusiveAccessRelease == releaseVersion.currentReleaseVersion,
+                showEarlyAccessMessage = bookmarksFeature.isCurrentlyExclusiveToPatron(),
             )
         }
     }
