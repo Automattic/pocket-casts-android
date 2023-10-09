@@ -1,8 +1,8 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import android.content.Context
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Assert.assertFalse

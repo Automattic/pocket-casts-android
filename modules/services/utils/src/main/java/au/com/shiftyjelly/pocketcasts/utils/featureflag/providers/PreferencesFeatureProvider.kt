@@ -1,9 +1,9 @@
-package au.com.shiftyjelly.pocketcasts.featureflag.providers
+package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.MIN_PRIORITY
-import au.com.shiftyjelly.pocketcasts.featureflag.ModifiableFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.MIN_PRIORITY
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ModifiableFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -16,7 +16,6 @@ android {
 
 dependencies {
     implementation project(':modules:services:localization')
-    implementation project(':modules:services:featureflag')
     implementation project(':modules:services:utils')
 
     api androidLibs.room
