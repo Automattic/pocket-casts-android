@@ -15,7 +15,7 @@ class GiveRatingFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            GiveRatingNavGraph()
+            GiveRatingListenMore()
         }
     }
 }
