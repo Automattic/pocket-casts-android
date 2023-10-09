@@ -32,7 +32,7 @@ enum class Feature(
         title = "Patron",
         defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     BOOKMARKS_ENABLED(
