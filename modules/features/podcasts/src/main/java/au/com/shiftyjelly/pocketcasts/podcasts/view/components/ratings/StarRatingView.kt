@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.podcasts.view.components
+package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,12 +26,14 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import java.util.UUID
 
 @Composable
 fun StarRatingView(
+    fragmentHostListener: FragmentHostListener,
     viewModel: PodcastRatingsViewModel,
 ) {
     val state by viewModel.stateFlow.collectAsState()
@@ -41,7 +43,12 @@ fun StarRatingView(
             val loadedState = state as RatingState.Loaded
             Content(
                 state = loadedState,
-                onClick = { viewModel.onRatingStarsTapped(loadedState.podcastUuid) },
+                onClick = {
+                    viewModel.onRatingStarsTapped(
+                        podcastUuid = loadedState.podcastUuid,
+                        fragmentHostListener = fragmentHostListener
+                    )
+                },
             )
         }
         is RatingState.Loading,

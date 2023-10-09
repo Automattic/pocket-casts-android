@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,11 +86,17 @@ class PodcastRatingsViewModel
         return stars
     }
 
-    fun onRatingStarsTapped(podcastUuid: String) {
+    fun onRatingStarsTapped(
+        podcastUuid: String,
+        fragmentHostListener: FragmentHostListener,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.RATING_STARS_TAPPED,
             AnalyticsProp.ratingStarsTapped(podcastUuid)
         )
+        if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
+            fragmentHostListener.addFragment(GiveRatingFragment())
+        }
     }
 
     private fun getStarFor(index: Int, rating: Int, half: Double) = when {
