@@ -42,8 +42,9 @@ class UpsellViewModelTest {
 
     private lateinit var upsellViewModel: UpsellViewModel
 
-    private val betaRelease = ReleaseVersion(7, 50, 1)
+    private val betaEarlyAccessRelease = ReleaseVersion(7, 50, null, 1)
     private val productionEarlyAccessRelease = ReleaseVersion(7, 50)
+    private val betaFullAccessRelease = ReleaseVersion(7, 51, null, 1)
     private val productionFullAccessRelease = ReleaseVersion(7, 51)
 
     @Before
@@ -56,13 +57,14 @@ class UpsellViewModelTest {
     /* Early Access Availability */
     // Current Release                   | Beta         | Production
     // ----------------------------------|--------------|--------------
-    // Beta Release                      | Plus Users   | N/A
+    // Beta Early Access Release         | Plus Users   | N/A
     // Production Early Access Release   | Plus Users   | Patron Users
+    // Beta Full Access Release          | Plus Users   | Plus Users
     // Production Full Access Release    | Plus Users   | Plus Users
     @Test
     fun `given patron exclusive feature, when beta release, feature available to Plus`() {
         initViewModel(
-            currentRelease = betaRelease,
+            currentRelease = betaEarlyAccessRelease,
             patronExclusiveAccessRelease = productionEarlyAccessRelease,
         )
 
@@ -82,7 +84,29 @@ class UpsellViewModelTest {
     }
 
     @Test
-    fun `given patron exclusive feature, when production full access release, feature available to Plus`() {
+    fun `given not a patron exclusive feature, when production release, feature available to Plus`() {
+        initViewModel(
+            currentRelease = productionEarlyAccessRelease,
+            patronExclusiveAccessRelease = null,
+        )
+
+        val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
+        assertTrue(state.tier == Subscription.SubscriptionTier.PLUS)
+    }
+
+    @Test
+    fun `given not a patron exclusive feature, when beta full access release, feature available to Plus`() {
+        initViewModel(
+            currentRelease = betaFullAccessRelease,
+            patronExclusiveAccessRelease = productionEarlyAccessRelease,
+        )
+
+        val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
+        assertTrue(state.tier == Subscription.SubscriptionTier.PLUS)
+    }
+
+    @Test
+    fun `given not a patron exclusive feature, when production full access release, feature available to Plus`() {
         initViewModel(
             currentRelease = productionFullAccessRelease,
             patronExclusiveAccessRelease = productionEarlyAccessRelease,
@@ -94,9 +118,9 @@ class UpsellViewModelTest {
 
     /* Early Access Message */
     @Test
-    fun `given patron exclusive feature, when beta release, early access message not shown`() {
+    fun `given not a patron exclusive feature, when beta release, early access message not shown`() {
         initViewModel(
-            currentRelease = betaRelease,
+            currentRelease = betaEarlyAccessRelease,
             patronExclusiveAccessRelease = productionEarlyAccessRelease,
         )
 
@@ -105,7 +129,7 @@ class UpsellViewModelTest {
     }
 
     @Test
-    fun `given patron exclusive feature, when production early access release, early access message shown`() {
+    fun `given not a patron exclusive feature, when production early access release, early access message shown`() {
         initViewModel(
             currentRelease = productionEarlyAccessRelease,
             patronExclusiveAccessRelease = productionEarlyAccessRelease,
@@ -116,7 +140,18 @@ class UpsellViewModelTest {
     }
 
     @Test
-    fun `given patron exclusive feature, when production full access release, early access message not shown`() {
+    fun `given not a patron exclusive feature, when beta full access release, early access message not shown`() {
+        initViewModel(
+            currentRelease = betaFullAccessRelease,
+            patronExclusiveAccessRelease = productionEarlyAccessRelease,
+        )
+
+        val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
+        assertFalse(state.showEarlyAccessMessage)
+    }
+
+    @Test
+    fun `given not a patron exclusive feature, when production full access release, early access message not shown`() {
         initViewModel(
             currentRelease = productionFullAccessRelease,
             patronExclusiveAccessRelease = productionEarlyAccessRelease,

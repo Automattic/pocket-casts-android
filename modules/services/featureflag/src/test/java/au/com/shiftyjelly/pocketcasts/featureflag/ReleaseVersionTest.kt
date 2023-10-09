@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert
 import org.junit.Test
@@ -100,42 +99,45 @@ class ReleaseVersionTest {
      */
 
     @Test
-    fun `returns false when called on null`() {
-        assertFalse(null.matchesCurrentReleaseForEarlyPatronAccess(ReleaseVersion(1, 1)))
-    }
-
-    @Test
-    fun `returns false when major version does not match`() {
+    fun `returns before when major version less than early access major version`() {
         val version = ReleaseVersion(major = 1, minor = 1)
-        assertFalse(version.matchesCurrentReleaseForEarlyPatronAccess(ReleaseVersion(2, 1)))
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(2, 1)) == EarlyAccessState.Before)
     }
 
     @Test
-    fun `returns false when minor version does not match`() {
+    fun `returns before when major version same abd minor version less than early access minor version`() {
         val version = ReleaseVersion(major = 1, minor = 1)
-        assertFalse(version.matchesCurrentReleaseForEarlyPatronAccess(ReleaseVersion(1, 2)))
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(1, 2)) == EarlyAccessState.Before)
     }
 
     @Test
-    fun `returns false for release candidates`() {
+    fun `returns during when major and minor versions match, and it's a release candidate`() {
         val version = ReleaseVersion(major = 2, minor = 3, releaseCandidate = 1)
-        assertFalse(version.matchesCurrentReleaseForEarlyPatronAccess(ReleaseVersion(2, 3, 4)))
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(2, 3, 4)) == EarlyAccessState.During)
     }
 
     @Test
-    fun `returns true when major and minor versions match, and it's not a release candidate`() {
+    fun `returns during when major and minor versions match, and it's not a release candidate`() {
         val version = ReleaseVersion(major = 2, minor = 3)
-        assertTrue(version.matchesCurrentReleaseForEarlyPatronAccess(ReleaseVersion(2, 3, 4)))
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(2, 3, 4)) == EarlyAccessState.During)
     }
 
     @Test
-    fun `returns true when major and minor versions match, even if current release is a patch`() {
+    fun `returns during when major and minor versions match, even if current release is a patch`() {
         val version = ReleaseVersion(major = 1, minor = 1)
-        assertTrue(
-            version.matchesCurrentReleaseForEarlyPatronAccess(
-                currentReleaseVersion = ReleaseVersion(1, 1, 1)
-            )
-        )
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(1, 1, 1)) == EarlyAccessState.During)
+    }
+
+    @Test
+    fun `returns after when major version more than early access major version`() {
+        val version = ReleaseVersion(major = 2, minor = 1)
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(1, 1)) == EarlyAccessState.After)
+    }
+
+    @Test
+    fun `returns after when major version same abd minor version more than early access minor version`() {
+        val version = ReleaseVersion(major = 1, minor = 2)
+        assertTrue(version.comparedToEarlyPatronAccess(ReleaseVersion(1, 1)) == EarlyAccessState.After)
     }
 
     private fun assertFirstLessThanSecond(first: String, second: String) {
