@@ -1,14 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureWrapper
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import com.android.billingclient.api.ProductDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf

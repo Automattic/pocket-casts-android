@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionTierColor
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion
-import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +40,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                 .collect {
                     val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                     val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                            Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
+                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
 
                     _state.update { state ->
                         state.copy(
@@ -136,7 +135,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val addBookmarkIconId
         get() = when {
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
-                    (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> R.drawable.ic_patron
+                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> R.drawable.ic_patron
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> R.drawable.ic_plus
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
             else -> null
@@ -145,7 +144,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val addBookmarkIconColor
         get() = when {
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
-                    (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> SubscriptionTierColor.patronPurple
+                (Feature.BOOKMARKS_ENABLED.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease == ReleaseVersion.currentReleaseVersion -> SubscriptionTierColor.patronPurple
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> SubscriptionTierColor.plusGold
             Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
             else -> null

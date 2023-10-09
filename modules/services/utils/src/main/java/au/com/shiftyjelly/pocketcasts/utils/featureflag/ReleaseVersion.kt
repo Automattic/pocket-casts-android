@@ -29,11 +29,11 @@ data class ReleaseVersion(
         fun ReleaseVersion.comparedToEarlyPatronAccess(patronExclusiveAccessRelease: ReleaseVersion): EarlyAccessState =
             when {
                 this.major < patronExclusiveAccessRelease.major ||
-                        (this.major == patronExclusiveAccessRelease.major && this.minor < patronExclusiveAccessRelease.minor)
+                    (this.major == patronExclusiveAccessRelease.major && this.minor < patronExclusiveAccessRelease.minor)
                 -> EarlyAccessState.Before
 
                 this.major > patronExclusiveAccessRelease.major ||
-                        (this.major == patronExclusiveAccessRelease.major && this.minor > patronExclusiveAccessRelease.minor)
+                    (this.major == patronExclusiveAccessRelease.major && this.minor > patronExclusiveAccessRelease.minor)
                 -> EarlyAccessState.After
 
                 else -> EarlyAccessState.During

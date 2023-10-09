@@ -94,12 +94,12 @@ enum class Feature(
                             releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
                         }
                         FeatureFlag.isEnabled(feature) &&
-                                when (relativeToEarlyAccess) {
-                                    null -> true // no early access release
-                                    EarlyAccessState.Before,
-                                    EarlyAccessState.During -> isReleaseCandidate
-                                    EarlyAccessState.After -> true
-                                }
+                            when (relativeToEarlyAccess) {
+                                null -> true // no early access release
+                                EarlyAccessState.Before,
+                                EarlyAccessState.During -> isReleaseCandidate
+                                EarlyAccessState.After -> true
+                            }
                     }
 
                     FeatureTier.Free -> FeatureFlag.isEnabled(feature)
