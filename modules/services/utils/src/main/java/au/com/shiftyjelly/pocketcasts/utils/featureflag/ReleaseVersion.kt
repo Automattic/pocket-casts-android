@@ -1,6 +1,7 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import androidx.annotation.VisibleForTesting
+import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
 import timber.log.Timber
 
 data class ReleaseVersion(

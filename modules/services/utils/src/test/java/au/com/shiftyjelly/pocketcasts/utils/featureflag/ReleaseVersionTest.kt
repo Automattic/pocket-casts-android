@@ -1,6 +1,6 @@
-package au.com.shiftyjelly.pocketcasts.featureflag
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
-import au.com.shiftyjelly.pocketcasts.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
