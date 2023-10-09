@@ -30,9 +30,9 @@ enum class Feature(
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",
         title = "Patron",
-        defaultValue = false,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     BOOKMARKS_ENABLED(

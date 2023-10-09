@@ -14,6 +14,9 @@
         ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
     *   Improve RTL handling in episode search box
         ([#1405](https://github.com/Automattic/pocket-casts-android/pull/1405))
+*   New Feature:
+    *   Enables Patron (Internal)
+        ([#1442](https://github.com/Automattic/pocket-casts-android/pull/1442))
 
 7.48
 -----
