@@ -14,9 +14,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingFragmentViewModel.State
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 
 private const val ARG_PODCAST_UUID = "podcastUuid"
 
@@ -71,7 +71,7 @@ class GiveRatingFragment : BaseFragment() {
 
     @Suppress("Deprecation")
     private fun exitWithError(message: String) {
-        Timber.e(message)
+        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, message)
         activity?.onBackPressed()
     }
 }
