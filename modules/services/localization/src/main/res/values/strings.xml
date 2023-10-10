@@ -1412,7 +1412,7 @@
     <!-- Errors -->
 
     <string name="error_webview_not_installed">Unable to load show notes due to no system WebView installed.</string>
-    <string name="error_loading_show_notes">Unable to load show notes.</string>
+    <string name="error_loading_show_notes">Unable to find show notes for this episode.</string>
     <string name="error_chartable">The producer is using Chartable analytics which is being blocked, if you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_chartable_streaming">Streaming failed. The producer is using Chartable analytics which is being blocked, if you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_streaming_internet">Streaming failed check your internet connection.</string>
