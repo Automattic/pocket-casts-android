@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.min
 
 @HiltViewModel
 class GiveRatingFragmentViewModel @Inject constructor(
@@ -64,18 +65,12 @@ class GiveRatingFragmentViewModel @Inject constructor(
             }
 
             val episodes = episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
+
             val numCompleted = episodes.count {
                 it.playingStatus == EpisodePlayingStatus.COMPLETED
             }
-
-            val userCanRatePodcast = run {
-                val numEpisodes = episodes.size
-                if (numEpisodes > 1) {
-                    numCompleted > 1
-                } else {
-                    numCompleted == numEpisodes
-                }
-            }
+            val haveToListenTo = min(2, episodes.size)
+            val userCanRatePodcast = numCompleted >= haveToListenTo
 
             _state.value = if (userCanRatePodcast) {
                 State.CanRate
