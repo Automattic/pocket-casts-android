@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.parallaxview.ParallaxView
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
@@ -68,10 +69,16 @@ private fun BackgroundImage() {
 
 @Composable
 private fun TitleView() {
-    Image(
-        painter = painterResource(R.drawable.eoy_review),
-        contentDescription = stringResource(LR.string.end_of_year_review),
-        contentScale = ContentScale.FillBounds
+    ParallaxView(
+        content = { modifier, biasAlignment ->
+            Image(
+                painter = painterResource(R.drawable.eoy_review),
+                contentDescription = stringResource(LR.string.end_of_year_review),
+                contentScale = ContentScale.FillBounds,
+                modifier = modifier,
+                alignment = biasAlignment,
+            )
+        }
     )
 }
 
