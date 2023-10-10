@@ -14,7 +14,7 @@ enum class Feature(
     END_OF_YEAR_ENABLED(
         key = "end_of_year_enabled",
         title = "End of Year",
-        defaultValue = false,
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,

@@ -37,7 +37,7 @@ class EndOfYearManagerImpl @Inject constructor(
 ) : EndOfYearManager, CoroutineScope {
 
     companion object {
-        private const val YEAR = 2022
+        private const val YEAR = 2023
         private const val EPISODE_MINIMUM_PLAYED_TIME_IN_MIN = 5L
     }
 
