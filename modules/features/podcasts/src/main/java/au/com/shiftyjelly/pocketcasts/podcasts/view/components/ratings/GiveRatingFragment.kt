@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -47,8 +48,10 @@ class GiveRatingFragment : BaseFragment() {
 
                 val viewModel = hiltViewModel<GiveRatingFragmentViewModel>()
 
+                val context = LocalContext.current
                 LaunchedEffect(podcastUuid) {
                     viewModel.checkIfUserCanRatePodcast(
+                        context = context,
                         podcastUuid = podcastUuid,
                         onFailure = ::exitWithError
                     )
@@ -59,6 +62,7 @@ class GiveRatingFragment : BaseFragment() {
                     State.Loading -> GiveRatingLoadingScreen()
                     State.CanRate -> GiveRatingScreen("Ratings Screen")
                     State.MustListenMore -> GiveRatingListenMoreScreen()
+                    State.NoNetwork -> GiveRatingScreen("Please connect to the internet to leave a rating")
                     State.NotSignedIn -> GiveRatingScreen("Please sign in to rate")
                 }
             }

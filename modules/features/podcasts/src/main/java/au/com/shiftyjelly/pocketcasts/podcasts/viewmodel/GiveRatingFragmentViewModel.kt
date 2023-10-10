@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -7,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +27,7 @@ class GiveRatingFragmentViewModel @Inject constructor(
         CanRate,
         Loading,
         MustListenMore,
+        NoNetwork,
         NotSignedIn,
     }
 
@@ -32,6 +35,7 @@ class GiveRatingFragmentViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     fun checkIfUserCanRatePodcast(
+        context: Context,
         podcastUuid: String,
         onFailure: (String) -> Unit
     ) {
@@ -45,6 +49,13 @@ class GiveRatingFragmentViewModel @Inject constructor(
                     _state.value = State.NotSignedIn
                     return@launch
                 }
+            }
+
+            // Check network after checking if user is signed in because the user will
+            // have to connect to the network to sign in
+            if (!Network.isConnected(context)) {
+                _state.value = State.NoNetwork
+                return@launch
             }
 
             val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: run {
