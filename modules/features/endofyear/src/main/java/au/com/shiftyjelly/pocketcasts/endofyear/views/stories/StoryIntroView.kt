@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,11 +14,12 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -25,57 +27,102 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
-import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
-import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun StoryIntroView(
-    story: StoryIntro,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Spacer(modifier = modifier.weight(1f))
+    Box {
+        BackgroundImage()
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Spacer(modifier = modifier.weight(1f))
 
-        Image(
-            painter = painterResource(R.drawable.img_2022_big),
-            contentDescription = null,
-            modifier = modifier.fillMaxWidth(),
-            contentScale = ContentScale.FillBounds
-        )
+            TitleView()
 
-        Spacer(modifier = modifier.weight(0.4f))
+            Spacer(modifier = modifier.weight(1f))
 
-        PrimaryText(story = story, modifier = modifier)
+            PodcastLogoWhite()
 
-        Spacer(modifier = modifier.weight(1f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
+            Spacer(modifier = modifier.height(30.dp))
+        }
     }
 }
 
 @Composable
-private fun PrimaryText(
-    story: StoryIntro,
-    modifier: Modifier,
-) {
-    val language = Locale.current.language
-    val textResId = if (language == "en") {
-        LR.string.end_of_year_story_intro_title_english_only
-    } else {
-        LR.string.end_of_year_story_intro_title
+private fun BackgroundImage() {
+    Box(
+        contentAlignment = Alignment.Center,
+    ) {
+        ImageTwenty()
+        ImageTwentyThree()
     }
-    val text = stringResource(id = textResId)
-    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
+}
+
+@Composable
+private fun TitleView() {
+    Image(
+        painter = painterResource(R.drawable.eoy_review),
+        contentDescription = stringResource(LR.string.end_of_year_review),
+        contentScale = ContentScale.FillBounds
+    )
+}
+
+@Composable
+private fun ImageTwenty(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .drawWithContent {
+                withTransform({
+                    scale(1.07f, 1f)
+                    translate(left = -size.width * .025f, top = 0f)
+                }) {
+                    this@drawWithContent.drawContent()
+                }
+            }
+
+    ) {
+        Image(
+            painter = painterResource(R.drawable.img_20),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds
+        )
+    }
+}
+
+@Composable
+private fun ImageTwentyThree(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .drawWithContent {
+                withTransform({
+                    scale(1.17f, 1f)
+                    translate(left = -size.width * .06f, top = 0f)
+                }) {
+                    this@drawWithContent.drawContent()
+                }
+            }
+
+    ) {
+        Image(
+            painter = painterResource(R.drawable.img_23),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -85,9 +132,7 @@ private fun StoryIntroPreview(
 ) {
     AppTheme(themeType) {
         Surface(color = Color.Black) {
-            StoryIntroView(
-                StoryIntro(),
-            )
+            StoryIntroView()
         }
     }
 }
