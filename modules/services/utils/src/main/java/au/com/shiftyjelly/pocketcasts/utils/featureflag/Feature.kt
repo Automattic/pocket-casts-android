@@ -67,7 +67,7 @@ enum class Feature(
 
     companion object {
 
-        fun isAvailable(
+        fun isUserEntitled(
             feature: Feature,
             userTier: UserTier,
             releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
@@ -77,7 +77,7 @@ enum class Feature(
             UserTier.Patron -> when (feature.tier) {
                 FeatureTier.Patron,
                 is FeatureTier.Plus,
-                FeatureTier.Free -> FeatureFlag.isEnabled(feature)
+                FeatureTier.Free -> true
             }
 
             UserTier.Plus -> {
@@ -93,16 +93,15 @@ enum class Feature(
                         val relativeToEarlyAccess = feature.tier.patronExclusiveAccessRelease?.let {
                             releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
                         }
-                        FeatureFlag.isEnabled(feature) &&
-                            when (relativeToEarlyAccess) {
-                                null -> true // no early access release
-                                EarlyAccessState.Before,
-                                EarlyAccessState.During -> isReleaseCandidate
-                                EarlyAccessState.After -> true
-                            }
+                        when (relativeToEarlyAccess) {
+                            null -> true // no early access release
+                            EarlyAccessState.Before,
+                            EarlyAccessState.During -> isReleaseCandidate
+                            EarlyAccessState.After -> true
+                        }
                     }
 
-                    FeatureTier.Free -> FeatureFlag.isEnabled(feature)
+                    FeatureTier.Free -> true
                 }
             }
 
@@ -110,7 +109,7 @@ enum class Feature(
             UserTier.Free -> when (feature.tier) {
                 FeatureTier.Patron -> false
                 is FeatureTier.Plus -> false
-                FeatureTier.Free -> FeatureFlag.isEnabled(feature)
+                FeatureTier.Free -> true
             }
         }
     }

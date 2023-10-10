@@ -39,7 +39,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                 .collect {
                     val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                     val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
+                        Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
 
                     _state.update { state ->
                         state.copy(

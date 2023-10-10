@@ -32,7 +32,7 @@ class EpisodeListBookmarkViewModel
                         val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                         state.copy(
                             isBookmarkFeatureAvailable = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                                Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
+                                Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
                         )
                     }
                 }

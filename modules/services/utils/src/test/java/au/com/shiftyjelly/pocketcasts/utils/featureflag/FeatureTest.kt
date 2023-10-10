@@ -19,38 +19,11 @@ class FeatureTest {
     private val productionAfterEarlyAccessRelease = ReleaseVersion(7, 51)
 
     /*
-     * isAvailable: all users
-     */
-
-    @Test
-    fun `no users can use free features that default to false`() {
-        listOf(
-            UserTier.Free,
-            UserTier.Plus,
-            UserTier.Patron,
-        ).forEach { userTier ->
-
-            listOf(
-                FeatureTier.Free,
-                FeatureTier.Plus(null),
-                FeatureTier.Patron,
-            ).forEach { featureTier ->
-
-                val feature = mock<Feature> {
-                    on { defaultValue } doReturn false
-                    on { tier } doReturn featureTier
-                }
-                assertFalse("$userTier", Feature.isAvailable(feature, userTier))
-            }
-        }
-    }
-
-    /*
      * isAvailable: patron users
      */
 
     @Test
-    fun `patron can use features that default to true`() {
+    fun `patron can use features`() {
         listOf(
             FeatureTier.Free,
             FeatureTier.Plus(null),
@@ -58,26 +31,9 @@ class FeatureTest {
         ).forEach { featureTier ->
 
             val feature = mock<Feature> {
-                on { defaultValue } doReturn true
                 on { tier } doReturn featureTier
             }
-            assertTrue("$featureTier", Feature.isAvailable(feature, UserTier.Patron))
-        }
-    }
-
-    @Test
-    fun `patron cannot use features that default to false`() {
-        listOf(
-            FeatureTier.Free,
-            FeatureTier.Plus(null),
-            FeatureTier.Patron,
-        ).forEach { featureTier ->
-
-            val feature = mock<Feature> {
-                on { defaultValue } doReturn false
-                on { tier } doReturn featureTier
-            }
-            assertFalse("$featureTier", Feature.isAvailable(feature, UserTier.Patron))
+            assertTrue("$featureTier", Feature.isUserEntitled(feature, UserTier.Patron))
         }
     }
 
@@ -85,19 +41,7 @@ class FeatureTest {
      * isAvailable: plus user
      */
     @Test
-    fun `plus cannot use plus features that default to false even if not in early access`() {
-        val plusTier = mock<FeatureTier.Plus> {
-            on { patronExclusiveAccessRelease } doReturn productionAfterEarlyAccessRelease
-        }
-        val feature = mock<Feature> {
-            on { defaultValue } doReturn false
-            on { tier } doReturn plusTier
-        }
-        assertFalse(Feature.isAvailable(feature, UserTier.Plus))
-    }
-
-    @Test
-    fun `plus can use plus features that default to true if before early access (beta)`() {
+    fun `plus can use plus features if before early access (beta)`() {
         val releaseVersionWrapper = mock<ReleaseVersionWrapper>() {
             on { currentReleaseVersion } doReturn betaBeforeEarlyAccessRelease
         }
@@ -105,14 +49,13 @@ class FeatureTest {
             on { patronExclusiveAccessRelease } doReturn productionEarlyAccessRelease
         }
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn plusTier
         }
-        assertTrue(Feature.isAvailable(feature, UserTier.Plus, releaseVersionWrapper))
+        assertTrue(Feature.isUserEntitled(feature, UserTier.Plus, releaseVersionWrapper))
     }
 
     @Test
-    fun `plus cannot use plus features that default to true if before early access (production)`() {
+    fun `plus cannot use plus features if before early access (production)`() {
         val releaseVersionWrapper = mock<ReleaseVersionWrapper> {
             on { currentReleaseVersion } doReturn productionBeforeEarlyAccessRelease
         }
@@ -120,14 +63,13 @@ class FeatureTest {
             on { patronExclusiveAccessRelease } doReturn productionEarlyAccessRelease
         }
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn plusTier
         }
-        assertFalse(Feature.isAvailable(feature, UserTier.Plus, releaseVersionWrapper))
+        assertFalse(Feature.isUserEntitled(feature, UserTier.Plus, releaseVersionWrapper))
     }
 
     @Test
-    fun `plus can use plus features that default to true if in early access (beta)`() {
+    fun `plus can use plus features if in early access (beta)`() {
         val releaseVersionWrapper = mock<ReleaseVersionWrapper>() {
             on { currentReleaseVersion } doReturn betaEarlyAccessRelease
         }
@@ -135,14 +77,13 @@ class FeatureTest {
             on { patronExclusiveAccessRelease } doReturn productionEarlyAccessRelease
         }
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn plusTier
         }
-        assertTrue(Feature.isAvailable(feature, UserTier.Plus, releaseVersionWrapper))
+        assertTrue(Feature.isUserEntitled(feature, UserTier.Plus, releaseVersionWrapper))
     }
 
     @Test
-    fun `plus cannot use plus features that default to true if in early access (production)`() {
+    fun `plus cannot use plus features if in early access (production)`() {
         val releaseVersionWrapper = mock<ReleaseVersionWrapper> {
             on { currentReleaseVersion } doReturn productionEarlyAccessRelease
         }
@@ -150,14 +91,13 @@ class FeatureTest {
             on { patronExclusiveAccessRelease } doReturn productionEarlyAccessRelease
         }
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn plusTier
         }
-        assertFalse(Feature.isAvailable(feature, UserTier.Plus, releaseVersionWrapper))
+        assertFalse(Feature.isUserEntitled(feature, UserTier.Plus, releaseVersionWrapper))
     }
 
     @Test
-    fun `plus can use plus features that default to true and are after early access (beta)`() {
+    fun `plus can use plus features and are after early access (beta)`() {
         val releaseVersionWrapper = mock<ReleaseVersionWrapper> {
             on { currentReleaseVersion } doReturn betaAfterEarlyAccessRelease
         }
@@ -165,14 +105,13 @@ class FeatureTest {
             on { patronExclusiveAccessRelease } doReturn productionEarlyAccessRelease
         }
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn plusTier
         }
-        assertTrue(Feature.isAvailable(feature, UserTier.Plus, releaseVersionWrapper))
+        assertTrue(Feature.isUserEntitled(feature, UserTier.Plus, releaseVersionWrapper))
     }
 
     @Test
-    fun `plus can use plus features that default to true and are after early access (production)`() {
+    fun `plus can use plus features and are after early access (production)`() {
         val releaseVersionWrapper = mock<ReleaseVersionWrapper> {
             on { currentReleaseVersion } doReturn productionAfterEarlyAccessRelease
         }
@@ -180,10 +119,9 @@ class FeatureTest {
             on { patronExclusiveAccessRelease } doReturn productionEarlyAccessRelease
         }
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn plusTier
         }
-        assertTrue(Feature.isAvailable(feature, UserTier.Plus, releaseVersionWrapper))
+        assertTrue(Feature.isUserEntitled(feature, UserTier.Plus, releaseVersionWrapper))
     }
 
     /*
@@ -191,21 +129,11 @@ class FeatureTest {
      */
 
     @Test
-    fun `free user can use free features that default to true`() {
+    fun `free user can use free features`() {
         val feature = mock<Feature> {
-            on { defaultValue } doReturn true
             on { tier } doReturn FeatureTier.Free
         }
-        assertTrue(Feature.isAvailable(feature, UserTier.Free))
-    }
-
-    @Test
-    fun `free user cannot use free features that default to false`() {
-        val feature = mock<Feature> {
-            on { defaultValue } doReturn false
-            on { tier } doReturn FeatureTier.Free
-        }
-        assertFalse(Feature.isAvailable(feature, UserTier.Free))
+        assertTrue(Feature.isUserEntitled(feature, UserTier.Free))
     }
 
     @Test
@@ -213,7 +141,7 @@ class FeatureTest {
         val feature = mock<Feature> {
             on { tier } doReturn FeatureTier.Plus(null)
         }
-        assertFalse(Feature.isAvailable(feature, UserTier.Free))
+        assertFalse(Feature.isUserEntitled(feature, UserTier.Free))
     }
 
     @Test
@@ -221,6 +149,6 @@ class FeatureTest {
         val feature = mock<Feature> {
             on { tier } doReturn FeatureTier.Patron
         }
-        assertFalse(Feature.isAvailable(feature, UserTier.Free))
+        assertFalse(Feature.isUserEntitled(feature, UserTier.Free))
     }
 }

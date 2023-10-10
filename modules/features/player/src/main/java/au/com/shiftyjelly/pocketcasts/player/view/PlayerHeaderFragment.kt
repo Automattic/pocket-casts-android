@@ -478,7 +478,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     fun onAddBookmarkClick() {
-        if (Feature.isAvailable(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
+        if (Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
             viewModel.buildBookmarkArguments { arguments ->
                 activityLauncher.launch(arguments.getIntent(requireContext()))
             }
