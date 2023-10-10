@@ -4,6 +4,6 @@ import androidx.compose.runtime.Composable
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 
 @Composable
-fun GiveRatingListenMore() {
+fun GiveRatingListenMoreScreen() {
     TextH10("Listen more before rating")
 }

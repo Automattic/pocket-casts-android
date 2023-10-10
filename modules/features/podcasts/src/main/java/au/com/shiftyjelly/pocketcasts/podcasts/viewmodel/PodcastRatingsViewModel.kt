@@ -95,7 +95,8 @@ class PodcastRatingsViewModel
             AnalyticsProp.ratingStarsTapped(podcastUuid)
         )
         if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
-            fragmentHostListener.addFragment(GiveRatingFragment())
+            val fragment = GiveRatingFragment.newInstance(podcastUuid)
+            fragmentHostListener.addFragment(fragment)
         }
     }
 
