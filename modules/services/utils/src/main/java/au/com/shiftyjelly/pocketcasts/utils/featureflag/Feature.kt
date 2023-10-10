@@ -19,14 +19,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
-    SHOW_RATINGS_ENABLED(
-        key = "show_ratings_enabled",
-        title = "Show Ratings",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
-    ),
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",
         title = "Patron",

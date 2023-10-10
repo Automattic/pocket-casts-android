@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,24 +34,22 @@ class PodcastRatingsViewModel
     val stateFlow: StateFlow<RatingState> = _stateFlow
 
     fun loadRatings(podcastUuid: String) {
-        if (FeatureFlag.isEnabled(Feature.SHOW_RATINGS_ENABLED)) {
-            viewModelScope.launch {
-                try {
-                    ratingsManager.podcastRatings(podcastUuid)
-                        .stateIn(viewModelScope)
-                        .collect { ratings ->
-                            _stateFlow.update {
-                                RatingState.Loaded(
-                                    podcastUuid = ratings.podcastUuid,
-                                    stars = getStars(ratings.average),
-                                    total = ratings.total
-                                )
-                            }
+        viewModelScope.launch {
+            try {
+                ratingsManager.podcastRatings(podcastUuid)
+                    .stateIn(viewModelScope)
+                    .collect { ratings ->
+                        _stateFlow.update {
+                            RatingState.Loaded(
+                                podcastUuid = ratings.podcastUuid,
+                                stars = getStars(ratings.average),
+                                total = ratings.total
+                            )
                         }
-                } catch (e: IOException) {
-                    Timber.e(e, "Failed to load podcast ratings")
-                    _stateFlow.update { RatingState.Error }
-                }
+                    }
+            } catch (e: IOException) {
+                Timber.e(e, "Failed to load podcast ratings")
+                _stateFlow.update { RatingState.Error }
             }
         }
     }
