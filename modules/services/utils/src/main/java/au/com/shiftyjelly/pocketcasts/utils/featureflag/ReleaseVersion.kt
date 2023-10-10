@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
-import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
-import timber.log.Timber
 
 data class ReleaseVersion(
     val major: Int,
@@ -24,29 +22,22 @@ data class ReleaseVersion(
 
     companion object {
 
-        private val currentReleaseVersion by lazy {
+        val currentReleaseVersion by lazy {
             fromString(BuildConfig.VERSION_NAME) ?: error("Invalid version name: ${BuildConfig.VERSION_NAME}")
         }
 
-        fun ReleaseVersion?.matchesCurrentReleaseForEarlyPatronAccess() =
-            this.matchesCurrentReleaseForEarlyPatronAccess(currentReleaseVersion)
+        fun ReleaseVersion.comparedToEarlyPatronAccess(patronExclusiveAccessRelease: ReleaseVersion): EarlyAccessState =
+            when {
+                this.major < patronExclusiveAccessRelease.major ||
+                    (this.major == patronExclusiveAccessRelease.major && this.minor < patronExclusiveAccessRelease.minor)
+                -> EarlyAccessState.Before
 
-        // If major and minor versions match, and this is not a release candidate, this is the
-        // early access release. We don't want to include release candidates because we want to
-        // allow broader testing of the feature. Patch versions are ignored.
-        @VisibleForTesting
-        internal fun ReleaseVersion?.matchesCurrentReleaseForEarlyPatronAccess(
-            currentReleaseVersion: ReleaseVersion, // this parameter is just to allow testing
-        ) = when {
-            this == null -> {
-                Timber.e("ReleaseVersion.matchesCurrentReleaseForEarlyPatronAccess called on null")
-                false
+                this.major > patronExclusiveAccessRelease.major ||
+                    (this.major == patronExclusiveAccessRelease.major && this.minor > patronExclusiveAccessRelease.minor)
+                -> EarlyAccessState.After
+
+                else -> EarlyAccessState.During
             }
-            this.major != currentReleaseVersion.major -> false
-            minor != currentReleaseVersion.minor -> false
-            releaseCandidate != null -> false
-            else -> true
-        }
 
         fun fromString(versionName: String): ReleaseVersion? {
             val regex = Regex("""(\d+)\.(\d+)(?:\.(\d+))?(?:-rc-(\d+))?""")

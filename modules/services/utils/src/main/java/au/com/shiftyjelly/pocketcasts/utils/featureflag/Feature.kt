@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.matchesCurrentReleaseForEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 
 enum class Feature(
     val key: String,
@@ -44,15 +44,32 @@ enum class Feature(
         hasDevToggle = true,
     );
 
+    fun isCurrentlyExclusiveToPatron(): Boolean {
+        val isReleaseCandidate = ReleaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
+            ReleaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+        }
+        return when (relativeToEarlyAccessState) {
+            null -> false
+            EarlyAccessState.Before,
+            EarlyAccessState.During -> !isReleaseCandidate
+            EarlyAccessState.After -> false
+        }
+    }
+
     companion object {
 
-        fun isAvailable(feature: Feature, userTier: UserTier) = when (userTier) {
+        fun isUserEntitled(
+            feature: Feature,
+            userTier: UserTier,
+            releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
+        ) = when (userTier) {
 
             // Patron users can use all features
             UserTier.Patron -> when (feature.tier) {
                 FeatureTier.Patron,
                 is FeatureTier.Plus,
-                FeatureTier.Free -> FeatureFlag.isEnabled(feature)
+                FeatureTier.Free -> true
             }
 
             UserTier.Plus -> {
@@ -62,12 +79,21 @@ enum class Feature(
                     // Patron features can only be used by Patrons
                     FeatureTier.Patron -> false
 
-                    // Plus users cannot use Plus features during early access for patrons
-                    is FeatureTier.Plus ->
-                        FeatureFlag.isEnabled(feature) &&
-                            !feature.tier.patronExclusiveAccessRelease.matchesCurrentReleaseForEarlyPatronAccess()
+                    // Plus users cannot use Plus features during early access for patrons except when the app is in beta
+                    is FeatureTier.Plus -> {
+                        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+                        val relativeToEarlyAccess = feature.tier.patronExclusiveAccessRelease?.let {
+                            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+                        }
+                        when (relativeToEarlyAccess) {
+                            null -> true // no early access release
+                            EarlyAccessState.Before,
+                            EarlyAccessState.During -> isReleaseCandidate
+                            EarlyAccessState.After -> true
+                        }
+                    }
 
-                    FeatureTier.Free -> FeatureFlag.isEnabled(feature)
+                    FeatureTier.Free -> true
                 }
             }
 
@@ -75,7 +101,7 @@ enum class Feature(
             UserTier.Free -> when (feature.tier) {
                 FeatureTier.Patron -> false
                 is FeatureTier.Plus -> false
-                FeatureTier.Free -> FeatureFlag.isEnabled(feature)
+                FeatureTier.Free -> true
             }
         }
     }
