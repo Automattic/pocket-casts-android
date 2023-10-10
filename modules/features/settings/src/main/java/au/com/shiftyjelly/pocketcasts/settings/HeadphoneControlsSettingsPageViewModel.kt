@@ -39,7 +39,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                 .collect {
                     val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                     val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                        Feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)
+                        Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
 
                     _state.update { state ->
                         state.copy(
@@ -132,17 +132,21 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     )
 
     private val addBookmarkIconId
-        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
-            is FeatureTier.Patron -> R.drawable.ic_patron
-            is FeatureTier.Plus -> R.drawable.ic_plus
-            is FeatureTier.Free -> null
+        get() = when {
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> R.drawable.ic_patron
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> R.drawable.ic_plus
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
+            else -> null
         }
 
     private val addBookmarkIconColor
-        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
-            is FeatureTier.Patron -> SubscriptionTierColor.patronPurple
-            is FeatureTier.Plus -> SubscriptionTierColor.plusGold
-            is FeatureTier.Free -> null
+        get() = when {
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> SubscriptionTierColor.patronPurple
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> SubscriptionTierColor.plusGold
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
+            else -> null
         }
 
     enum class UpsellSourceAction {

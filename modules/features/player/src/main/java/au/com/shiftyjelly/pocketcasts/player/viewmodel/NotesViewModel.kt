@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -14,15 +15,11 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class NotesViewModel
@@ -33,15 +30,16 @@ class NotesViewModel
     @ApplicationContext context: Context
 ) : ViewModel() {
 
-    private val disposables = CompositeDisposable()
     private val showNotesFormatter = ShowNotesFormatter(context).apply {
         backgroundColor = "#FFFFFF"
         textColor = "#FFFFFF"
         linkColor = "#FFFFFF"
         setConvertTimesToLinks(true)
     }
+    private val errorLoadingString = context.getString(LR.string.error_loading_show_notes)
+    private var loadShowNotesJob: Job? = null
 
-    val showNotes = MutableLiveData<Pair<String, Boolean>>().apply { postValue(Pair("", false)) }
+    val showNotes = MutableLiveData<ShowNotesState>().apply { postValue(ShowNotesState.Loaded("")) }
     val episode = MutableLiveData<PodcastEpisode>()
 
     fun loadEpisode(episode: BaseEpisode, color: Int) {
@@ -52,38 +50,37 @@ class NotesViewModel
         this.episode.postValue(episode)
         // convert times to links if the episode is now playing
         showNotesFormatter.setConvertTimesToLinks(playbackManager.upNextQueue.isCurrentEpisode(episode))
-        podcastManager.findPodcastByUuidRx(episode.podcastUuid)
-            // update the show notes link tint
-            .doOnSuccess { podcast ->
-                val linkColor = if (podcast.tintColorForDarkBg == 0) Color.WHITE else podcast.tintColorForDarkBg
-                showNotesFormatter.linkColor = ColorUtils.colorIntToHexString(linkColor)
+        // show the loading state
+        showNotes.postValue(ShowNotesState.Loading)
+        // cancel any previous jobs
+        loadShowNotesJob?.cancel()
+        // load the podcast and show notes in the background
+        loadShowNotesJob = viewModelScope.launch {
+            loadPodcastAndShowNotes(episode)
+        }
+    }
+
+    private suspend fun loadPodcastAndShowNotes(episode: PodcastEpisode) {
+        try {
+            val podcastUuid = episode.podcastUuid
+            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+            if (podcast == null) {
+                showNotes.postValue(ShowNotesState.NotFound)
+                return
             }
+            // update the show notes link tint
+            val linkColor = if (podcast.tintColorForDarkBg == 0) Color.WHITE else podcast.tintColorForDarkBg
+            showNotesFormatter.linkColor = ColorUtils.colorIntToHexString(linkColor)
             // load the show notes
-            .flatMapCompletable { loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
-    }
-
-    private fun loadShowNotes(podcastUuid: String, episodeUuid: String): Completable {
-        // Clear previous show notes while loading new notes
-        updateShowNotes("", inProgress = true)
-        return rxCompletable {
-            val state = serverShowNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
-            val showNotes = if (state is ShowNotesState.Loaded) state.showNotes else ""
-            updateShowNotes(showNotes, inProgress = false)
+            val state = serverShowNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episode.uuid)
+            // show an error message if the show notes couldn't be loaded
+            val text = if (state is ShowNotesState.Loaded) state.showNotes else errorLoadingString
+            // theme the show notes
+            val formattedText = showNotesFormatter.format(text) ?: ""
+            showNotes.postValue(ShowNotesState.Loaded(formattedText))
+        } catch (e: Exception) {
+            Timber.e(e)
+            showNotes.postValue(ShowNotesState.Error(e))
         }
-    }
-
-    private fun updateShowNotes(notes: String, inProgress: Boolean) {
-        showNotesFormatter.format(notes)?.let { formatted ->
-            showNotes.postValue(Pair(formatted, inProgress))
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
     }
 }

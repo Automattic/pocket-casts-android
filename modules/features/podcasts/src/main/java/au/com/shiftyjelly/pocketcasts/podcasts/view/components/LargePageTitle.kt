@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components
+package au.com.shiftyjelly.pocketcasts.podcasts.view.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme

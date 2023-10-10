@@ -35,7 +35,8 @@ class BookmarkUpsellViewHolder(
                         val source = OnboardingUpgradeSource.BOOKMARKS
                         val onboardingFlow = OnboardingFlow.Upsell(
                             source = source,
-                            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron,
+                            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
+                                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
                         )
                         OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
                     },

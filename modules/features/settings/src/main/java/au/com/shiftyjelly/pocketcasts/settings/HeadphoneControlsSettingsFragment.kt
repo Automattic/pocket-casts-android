@@ -271,7 +271,8 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
-            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron,
+            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
