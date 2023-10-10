@@ -57,8 +57,9 @@ class GiveRatingFragment : BaseFragment() {
                 val state by viewModel.state.collectAsState()
                 when (state) {
                     State.Loading -> GiveRatingLoadingScreen()
-                    State.CanRate -> GiveRatingScreen()
+                    State.CanRate -> GiveRatingScreen("Ratings Screen")
                     State.MustListenMore -> GiveRatingListenMoreScreen()
+                    State.NotSignedIn -> GiveRatingScreen("Please sign in to rate")
                 }
             }
         }
