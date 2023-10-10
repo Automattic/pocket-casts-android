@@ -612,7 +612,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                     podcastUuid = podcastUuid,
                     sortType = settings.podcastBookmarksSortType.flow.value
-                ).asObservable()
+                ).asObservable(),
+                fragmentHostListener = activity as FragmentHostListener,
             )
         }
 

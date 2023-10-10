@@ -42,6 +42,14 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+    ),
+    GIVE_RATINGS(
+        key = "give_ratings",
+        title = "Give Ratings",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true
     );
 
     fun isCurrentlyExclusiveToPatron(): Boolean {
