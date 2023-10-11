@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiStat
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun WhatsNewPage(
@@ -63,8 +64,8 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        WhatsNewFeature.AutoPlay -> AutoPlayHeader()
-                        WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
+                        is WhatsNewFeature.AutoPlay -> AutoPlayHeader()
+                        is WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -152,8 +153,8 @@ private fun WhatsNewPageLoaded(
                 RowButton(
                     text = stringResource(state.feature.confirmButtonTitle),
                     colors = when (state.feature) {
-                        WhatsNewFeature.AutoPlay -> ButtonDefaults.buttonColors()
-                        WhatsNewFeature.Bookmarks -> ButtonDefaults.buttonColors(
+                        is WhatsNewFeature.AutoPlay -> ButtonDefaults.buttonColors()
+                        is WhatsNewFeature.Bookmarks -> ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.theme.colors.primaryText01,
                             contentColor = MaterialTheme.theme.colors.primaryInteractive02
                         )
@@ -218,7 +219,10 @@ private fun WhatsNewBookmarksPreview(
     AppThemeWithBackground(themeType) {
         WhatsNewPageLoaded(
             state = UiState.Loaded(
-                feature = WhatsNewFeature.Bookmarks,
+                feature = WhatsNewFeature.Bookmarks(
+                    title = LR.string.whats_new_bookmarks_title,
+                    message = LR.string.whats_new_bookmarks_body,
+                ),
                 tier = UserTier.Plus,
             ),
             header = { BookmarksHeader(onClose = {}) },

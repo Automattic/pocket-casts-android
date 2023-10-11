@@ -18,8 +18,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class WhatsNewViewModel @Inject constructor(
-    settings: Settings,
-    feature: FeatureWrapper,
+    private val settings: Settings,
+    private val feature: FeatureWrapper
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state = _state.asStateFlow()
@@ -31,17 +31,34 @@ class WhatsNewViewModel @Inject constructor(
         val isBookmarksEnabled = FeatureFlag.isEnabled(feature.bookmarksFeature)
 
         _state.value = UiState.Loaded(
-            feature = if (isBookmarksEnabled) WhatsNewFeature.Bookmarks else WhatsNewFeature.AutoPlay,
-            tier = if (isBookmarksEnabled) settings.userTier else UserTier.Free,
+            feature = if (isBookmarksEnabled) bookmarksFeature() else WhatsNewFeature.AutoPlay,
+            tier = if (isBookmarksEnabled) bookmarksTier() else UserTier.Free,
         )
     }
+
+    private fun bookmarksFeature(): WhatsNewFeature.Bookmarks {
+        val isBookmarksCurrentlyExclusiveToPatron = feature.bookmarksFeature.isCurrentlyExclusiveToPatron()
+        val isUserEntitledForBookmarks = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
+        val showJoinBeta = isBookmarksCurrentlyExclusiveToPatron && !isUserEntitledForBookmarks
+
+        return WhatsNewFeature.Bookmarks(
+            title = if (showJoinBeta) {
+                LR.string.whats_new_boomarks_join_beta_testing_title
+            } else {
+                LR.string.whats_new_bookmarks_title
+            },
+            message = LR.string.whats_new_bookmarks_body,
+        )
+    }
+
+    private fun bookmarksTier() = settings.userTier
 
     fun onConfirm() {
         viewModelScope.launch {
             val currentState = state.value as? UiState.Loaded ?: return@launch
             val target = when (currentState.feature) {
-                WhatsNewFeature.AutoPlay -> NavigationState.PlaybackSettings
-                WhatsNewFeature.Bookmarks -> NavigationState.HeadphoneControlsSettings
+                is WhatsNewFeature.AutoPlay -> NavigationState.PlaybackSettings
+                is WhatsNewFeature.Bookmarks -> NavigationState.HeadphoneControlsSettings
             }
             _navigationState.emit(target)
         }
@@ -56,8 +73,8 @@ class WhatsNewViewModel @Inject constructor(
     }
 
     sealed class WhatsNewFeature(
-        @StringRes val title: Int,
-        @StringRes val message: Int,
+        @StringRes open val title: Int,
+        @StringRes open val message: Int,
         @StringRes val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
@@ -68,9 +85,12 @@ class WhatsNewViewModel @Inject constructor(
             closeButtonTitle = LR.string.whats_new_autoplay_maybe_later_button,
         )
 
-        object Bookmarks : WhatsNewFeature(
-            title = LR.string.whats_new_bookmarks_title,
-            message = LR.string.whats_new_bookmarks_body,
+        data class Bookmarks(
+            @StringRes override val title: Int,
+            @StringRes override val message: Int,
+        ) : WhatsNewFeature(
+            title = title,
+            message = message,
             confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
         )
     }
