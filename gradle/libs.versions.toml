@@ -1,13 +1,12 @@
 # Upgrade Guide
 # -------------
-# When upgrading the Compose, Kotlin, and KSP versions need to be compatible.
+# When upgrading the Compose, Kotlin, and KSP the versions need to be compatible.
 #
 # 1. Check here for the Compose Compiler and Kotlin versions. https://developer.android.com/jetpack/androidx/releases/compose-kotlin
 # compose-kotlin-compiler = Compose Compiler Version (can be found in composeOptions -> kotlinCompilerExtensionVersion)
 # kotlin = Kotlin Version
 #
-# 2. Upgrade KSP version to match Kotlin version:
-# https://github.com/google/ksp/releases
+# 2. Upgrade KSP version to match Kotlin version. https://github.com/google/ksp/releases
 
 [versions]
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
