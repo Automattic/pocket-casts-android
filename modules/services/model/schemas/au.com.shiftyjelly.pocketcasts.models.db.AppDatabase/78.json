@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 78,
-    "identityHash": "371641780d7745953794e960c3d63ce0",
+    "identityHash": "8521e08b414294350beaecfb72bf0a06",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1482,7 +1482,7 @@
       },
       {
         "tableName": "podcast_ratings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`podcast_uuid` TEXT NOT NULL, `average` REAL NOT NULL, `total` INTEGER NOT NULL, PRIMARY KEY(`podcast_uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`podcast_uuid` TEXT NOT NULL, `average` REAL, `total` INTEGER, PRIMARY KEY(`podcast_uuid`))",
         "fields": [
           {
             "fieldPath": "podcastUuid",
@@ -1494,13 +1494,13 @@
             "fieldPath": "average",
             "columnName": "average",
             "affinity": "REAL",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "total",
             "columnName": "total",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1516,7 +1516,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '371641780d7745953794e960c3d63ce0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8521e08b414294350beaecfb72bf0a06')"
     ]
   }
 }

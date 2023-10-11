@@ -457,27 +457,29 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
         }
 
-        // Change total column to no null
+        // Change average column to be nullable
         val MIGRATION_77_78 = addMigration(77, 78) { database ->
             database.execSQL(
                 """
-                    CREATE TABLE IF NOT EXISTS `podcast_ratings_temp` (
-                        `podcast_uuid` TEXT NOT NULL, 
-                        `average` REAL NOT NULL, 
-                        `total` INTEGER NOT NULL, 
+                    CREATE TABLE IF NOT EXISTS `temp_podcast_ratings` (
+                        `podcast_uuid` TEXT NOT NULL,
+                        `average` REAL,
+                        `total` INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     )
                 """.trimIndent()
             )
+
             database.execSQL(
                 """
-                    INSERT INTO `podcast_ratings_temp` (`podcast_uuid`, `average`, `total`)
-                    SELECT `podcast_uuid`, `average`, IFNULL(`total`, 0)
+                    INSERT INTO `temp_podcast_ratings` (`podcast_uuid`, `average`, `total`)
+                    SELECT `podcast_uuid`, `average`, `total` 
                     FROM `podcast_ratings`
                 """.trimIndent()
             )
-            database.execSQL("DROP TABLE `podcast_ratings`")
-            database.execSQL("ALTER TABLE `podcast_ratings_temp` RENAME TO `podcast_ratings`")
+
+            database.execSQL("DROP TABLE `podcast_ratings`;")
+            database.execSQL("ALTER TABLE `temp_podcast_ratings` RENAME TO `podcast_ratings`;")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {

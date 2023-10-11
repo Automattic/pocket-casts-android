@@ -9,6 +9,6 @@ import androidx.room.PrimaryKey
 )
 data class PodcastRatings(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "podcast_uuid") var podcastUuid: String,
-    @ColumnInfo(name = "average") var average: Double,
-    @ColumnInfo(name = "total") var total: Int,
+    @ColumnInfo(name = "average") var average: Double? = null,
+    @ColumnInfo(name = "total") var total: Int? = null,
 )
