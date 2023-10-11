@@ -1,36 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext {
-        kotlin_version = '1.7.10'
-        // KSP releases need to match the Kotlin version - https://github.com/google/ksp/releases
-        ksp_version = "$kotlin_version-1.0.6"
-        hilt_version = '2.43.2'
-    }
-    repositories {
-        google()
-        mavenLocal()
-
-        maven {
-            url 'https://a8c-libs.s3.amazonaws.com/android' 
-            content {
-                includeGroup "com.automattic.android"
-                includeGroup "com.automattic.android.publish-to-s3"
-            }
-        }
-    }
-
     // Gradle Plugins
     dependencies {
-        // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:8.1.0'
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
         classpath "com.google.gms:google-services:4.3.14"
-        // Kotlin
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // Open source licenses plugin
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.5'
-        // Hilt dependency injection
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
     }
 
     // Force proguard to the new version to fix "proguard.ParseException: Use of generics not allowed for java type at '<1>_<2>_<3>JsonAdapter' in line 31 of file '/Users/philip/.gradle/caches/transforms-2/files-2.1/d5ca2d039e1d32e9ba6bfd6a67df5151/META-INF/proguard/moshi.pro'"
@@ -42,11 +17,15 @@ buildscript {
 }
 
 plugins {
+    alias libs.plugins.android.application apply false
+    alias libs.plugins.kotlin.android apply false
+    alias libs.plugins.kapt apply false
+    alias libs.plugins.ksp apply false
+    alias libs.plugins.hilt apply false
     id 'com.mikepenz.aboutlibraries.plugin' version '10.4.0' apply false
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'com.diffplug.spotless' version '6.2.2'
     id 'io.sentry.android.gradle' version '3.10.0' apply false
-    id 'com.google.devtools.ksp' version "$ksp_version" apply false
 }
 
 apply plugin: 'base'
@@ -71,20 +50,6 @@ dependencyUpdates.resolutionStrategy {
             }
             if (rejected) {
                 selection.reject('Release candidate')
-            }
-        }
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url "https://a8c-libs.s3.amazonaws.com/android"
-            content {
-                includeGroup "com.automattic"
-                includeGroup "com.automattic.tracks"
             }
         }
     }

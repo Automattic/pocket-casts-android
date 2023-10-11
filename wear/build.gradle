@@ -87,7 +87,7 @@ dependencies {
     implementation androidLibs.composeUi
     implementation androidLibs.composeMaterialIconsExtended
     implementation androidLibs.composeUiToolingPreview
-    implementation libs.hiltNavigationCompose
+    implementation androidLibs.hiltNavigationCompose
 
     // Compose for Wear OS Dependencies
     implementation androidLibs.wearComposeMaterial

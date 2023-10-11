@@ -13,7 +13,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation androidLibs.appCompat
     implementation androidLibs.ktx
-    testImplementation libs.junit
+    testImplementation androidLibs.junit
     androidTestImplementation androidLibs.junitExt
     androidTestImplementation androidLibs.testEspressoCore
 }

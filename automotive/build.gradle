@@ -58,9 +58,9 @@ dependencies {
     implementation androidLibs.ktx
     implementation androidLibs.design
     implementation androidLibs.constraintLayout
-    implementation libs.aboutLibrariesCore
-    implementation libs.aboutLibrariesCompose
-    testImplementation libs.junit
+    implementation androidLibs.aboutLibrariesCore
+    implementation androidLibs.aboutLibrariesCompose
+    testImplementation androidLibs.junit
     androidTestImplementation androidLibs.junitExt
     androidTestImplementation androidLibs.testEspressoCore
 
