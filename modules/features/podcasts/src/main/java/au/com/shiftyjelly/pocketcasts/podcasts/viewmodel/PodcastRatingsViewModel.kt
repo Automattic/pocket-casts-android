@@ -111,10 +111,7 @@ class PodcastRatingsViewModel
             val podcastUuid: String,
             val stars: List<Star>,
             val total: Int?,
-        ) : RatingState() {
-            val noRatings: Boolean
-                get() = total == null || total == 0
-        }
+        ) : RatingState()
 
         object Error : RatingState()
     }
