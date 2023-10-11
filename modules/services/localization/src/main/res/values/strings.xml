@@ -544,7 +544,7 @@
     <string name="podcast_no_season">No season</string>
     <string name="podcast_season_x">Season %d</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
-    <string name="podcast_no_ratings">No ratings</string>
+    <string name="podcast_not_enough_ratings">Not enough ratings</string>
 
     <!-- Episodes -->
 

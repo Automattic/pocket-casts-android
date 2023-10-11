@@ -78,7 +78,7 @@ private fun Content(
         state.total?.let {
             TextP40(
                 text = when (it) {
-                    0 -> stringResource(LR.string.podcast_no_ratings)
+                    0 -> stringResource(LR.string.podcast_not_enough_ratings)
                     else -> it.abbreviated
                 },
                 modifier = Modifier.padding(start = 6.dp)
