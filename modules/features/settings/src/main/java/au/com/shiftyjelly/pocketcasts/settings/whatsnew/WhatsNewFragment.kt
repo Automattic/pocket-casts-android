@@ -8,18 +8,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class WhatsNewFragment : BaseFragment() {
@@ -50,18 +49,13 @@ class WhatsNewFragment : BaseFragment() {
                         activity?.onBackPressed()
                     }
                     WhatsNewPage(
-                        title = stringResource(LR.string.whats_new_autoplay_title),
-                        message = stringResource(LR.string.whats_new_autoplay_body),
-                        confirmButtonTitle = stringResource(LR.string.whats_new_autoplay_enable_button),
-                        closeButtonTitle = stringResource(LR.string.whats_new_autoplay_maybe_later_button),
-                        header = { AutoPlayHeader() },
                         onConfirm = {
                             analyticsTracker.track(
                                 AnalyticsEvent.WHATSNEW_CONFIRM_BUTTON_TAPPED,
                                 mapOf("version" to Settings.WHATS_NEW_VERSION_CODE)
                             )
                             onClose()
-                            performConfirmAction()
+                            performConfirmAction(it)
                         },
                         onClose = {
                             analyticsTracker.track(
@@ -75,7 +69,13 @@ class WhatsNewFragment : BaseFragment() {
             }
         }
 
-    private fun performConfirmAction() {
+    private fun performConfirmAction(navigationState: NavigationState) {
+        when (navigationState) {
+            NavigationState.PlaybackSettings -> gotoPlaybackSettings()
+        }
+    }
+
+    private fun gotoPlaybackSettings() {
         val fragmentHostListener = activity as? FragmentHostListener
             ?: throw IllegalStateException("Activity must implement FragmentHostListener")
         val fragment = PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true)

@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
@@ -35,20 +38,50 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun WhatsNewPage(
-    title: String,
-    message: String,
-    confirmButtonTitle: String,
-    closeButtonTitle: String? = null,
+    viewModel: WhatsNewViewModel = hiltViewModel(),
+
+    onConfirm: (WhatsNewViewModel.NavigationState) -> Unit,
+    onClose: () -> Unit,
+) {
+    val state by viewModel.state.collectAsState()
+    when (state) {
+        is UiState.Loading -> Unit
+        is UiState.Loaded -> {
+            val uiState = state as UiState.Loaded
+            WhatsNewPageLoaded(
+                state = uiState,
+                header = {
+                    when (uiState.feature) {
+                        WhatsNewFeature.AutoPlay -> AutoPlayHeader()
+                    }
+                },
+                onConfirm = { viewModel.onConfirm() },
+                onClose = onClose,
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationState
+            .collect { navigationState ->
+                onConfirm(navigationState)
+            }
+    }
+}
+
+@Composable
+fun WhatsNewPageLoaded(
+    state: UiState.Loaded,
     header: @Composable () -> Unit,
     onConfirm: () -> Unit,
     onClose: () -> Unit,
 ) {
-
     var closing by remember { mutableStateOf(false) }
     val targetAlpha = if (closing) 0f else 0.66f
     val scrimAlpha: Float by animateFloatAsState(
@@ -87,7 +120,7 @@ fun WhatsNewPage(
             ) {
 
                 TextH20(
-                    text = title,
+                    text = stringResource(id = state.feature.title),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.theme.colors.primaryText01,
                 )
@@ -95,7 +128,7 @@ fun WhatsNewPage(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextP40(
-                    text = message,
+                    text = stringResource(state.feature.message),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
@@ -103,18 +136,18 @@ fun WhatsNewPage(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 RowButton(
-                    text = confirmButtonTitle,
+                    text = stringResource(state.feature.confirmButtonTitle),
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
 
-                closeButtonTitle?.let {
+                state.feature.closeButtonTitle?.let {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     RowTextButton(
-                        text = closeButtonTitle,
+                        text = stringResource(it),
                         fontSize = 15.sp,
                         onClick = performClose,
                         includePadding = false,
@@ -127,15 +160,14 @@ fun WhatsNewPage(
 
 @Composable
 @Preview
-private fun WhatsNewPagePreview(
+private fun WhatsNewAutoPlayPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        WhatsNewPage(
-            title = stringResource(R.string.whats_new_autoplay_title),
-            message = stringResource(R.string.whats_new_autoplay_body),
-            confirmButtonTitle = stringResource(R.string.whats_new_autoplay_enable_button),
-            closeButtonTitle = stringResource(R.string.whats_new_autoplay_maybe_later_button),
+        WhatsNewPageLoaded(
+            state = UiState.Loaded(
+                feature = WhatsNewFeature.AutoPlay,
+            ),
             header = { AutoPlayHeader() },
             onConfirm = {},
             onClose = {}
