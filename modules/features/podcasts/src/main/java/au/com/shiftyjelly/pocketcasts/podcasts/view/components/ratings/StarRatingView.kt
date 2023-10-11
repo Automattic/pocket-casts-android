@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -26,14 +27,13 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import java.util.UUID
 
 @Composable
 fun StarRatingView(
-    fragmentHostListener: FragmentHostListener,
+    fragmentManager: FragmentManager,
     viewModel: PodcastRatingsViewModel,
 ) {
     val state by viewModel.stateFlow.collectAsState()
@@ -46,7 +46,7 @@ fun StarRatingView(
                 onClick = {
                     viewModel.onRatingStarsTapped(
                         podcastUuid = loadedState.podcastUuid,
-                        fragmentHostListener = fragmentHostListener
+                        fragmentManager = fragmentManager,
                     )
                 },
             )

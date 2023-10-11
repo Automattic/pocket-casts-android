@@ -613,7 +613,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     podcastUuid = podcastUuid,
                     sortType = settings.podcastBookmarksSortType.flow.value
                 ).asObservable(),
-                fragmentHostListener = activity as FragmentHostListener,
+                fragmentManager = parentFragmentManager,
             )
         }
 

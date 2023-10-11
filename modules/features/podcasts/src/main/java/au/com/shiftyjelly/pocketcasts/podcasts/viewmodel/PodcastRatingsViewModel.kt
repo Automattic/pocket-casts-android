@@ -1,12 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -88,7 +88,7 @@ class PodcastRatingsViewModel
 
     fun onRatingStarsTapped(
         podcastUuid: String,
-        fragmentHostListener: FragmentHostListener,
+        fragmentManager: FragmentManager,
     ) {
         analyticsTracker.track(
             AnalyticsEvent.RATING_STARS_TAPPED,
@@ -96,7 +96,7 @@ class PodcastRatingsViewModel
         )
         if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
             val fragment = GiveRatingFragment.newInstance(podcastUuid)
-            fragmentHostListener.addFragment(fragment)
+            fragment.show(fragmentManager, "give_rating")
         }
     }
 
