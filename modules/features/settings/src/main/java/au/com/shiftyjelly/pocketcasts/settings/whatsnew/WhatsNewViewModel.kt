@@ -54,10 +54,10 @@ class WhatsNewViewModel @Inject constructor(
 
     private fun updateStateForBookmarks() {
         val userTier = settings.userTier
-        val featureAvailable = feature.isUserEntitled(feature.bookmarksFeature, userTier)
-        if (featureAvailable) {
+        val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, userTier)
+        if (isUserEntitled) {
             _state.value = UiState.Loaded(
-                feature = bookmarksFeature(),
+                feature = bookmarksFeature(isUserEntitled = true),
                 tier = userTier,
             )
         } else {
@@ -91,7 +91,10 @@ class WhatsNewViewModel @Inject constructor(
                         )
 
                         _state.value = UiState.Loaded(
-                            feature = bookmarksFeature(trialExists),
+                            feature = bookmarksFeature(
+                                trialExists = trialExists,
+                                isUserEntitled = false
+                            ),
                             tier = userTier,
                         )
                     }
@@ -101,10 +104,12 @@ class WhatsNewViewModel @Inject constructor(
 
     private fun bookmarksFeature(
         trialExists: Boolean = false,
+        isUserEntitled: Boolean,
     ) = WhatsNewFeature.Bookmarks(
         title = titleResId(),
         message = LR.string.whats_new_bookmarks_body,
         hasFreeTrial = trialExists,
+        isUserEntitled = isUserEntitled
     )
 
     private fun titleResId(): Int {
@@ -135,7 +140,11 @@ class WhatsNewViewModel @Inject constructor(
             val currentState = state.value as? UiState.Loaded ?: return@launch
             val target = when (currentState.feature) {
                 is WhatsNewFeature.AutoPlay -> NavigationState.PlaybackSettings
-                is WhatsNewFeature.Bookmarks -> NavigationState.HeadphoneControlsSettings
+                is WhatsNewFeature.Bookmarks -> if (currentState.feature.isUserEntitled) {
+                    NavigationState.HeadphoneControlsSettings
+                } else {
+                    NavigationState.StartUpsellFlow
+                }
             }
             _navigationState.emit(target)
         }
@@ -172,6 +181,7 @@ class WhatsNewViewModel @Inject constructor(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
             val hasFreeTrial: Boolean,
+            val isUserEntitled: Boolean,
         ) : WhatsNewFeature(
             title = title,
             message = message,
@@ -182,5 +192,6 @@ class WhatsNewViewModel @Inject constructor(
     sealed class NavigationState {
         object PlaybackSettings : NavigationState()
         object HeadphoneControlsSettings : NavigationState()
+        object StartUpsellFlow : NavigationState()
     }
 }
