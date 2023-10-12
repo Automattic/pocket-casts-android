@@ -6,14 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingFragmentViewModel
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingFragmentViewModel.State
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,32 +43,35 @@ class GiveRatingFragment : BaseDialogFragment() {
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
 
-                val viewModel = hiltViewModel<GiveRatingFragmentViewModel>()
+                val viewModel = hiltViewModel<GiveRatingViewModel>()
 
-                val context = LocalContext.current
                 LaunchedEffect(podcastUuid) {
                     viewModel.checkIfUserCanRatePodcast(
-                        context = context,
                         podcastUuid = podcastUuid,
                         onFailure = ::exitWithError
                     )
                 }
 
-                val state by viewModel.state.collectAsState()
+                val state = viewModel.state.collectAsState().value
                 when (state) {
-                    State.Loading -> GiveRatingLoadingScreen()
-                    State.CanRate -> GiveRatingScreen("Ratings Screen")
-                    State.MustListenMore -> GiveRatingListenMoreScreen()
-                    State.NoNetwork -> GiveRatingScreen("Please connect to the internet to leave a rating")
-                    State.NotSignedIn -> GiveRatingScreen("Please sign in to rate")
+                    is GiveRatingViewModel.State.Loaded -> GiveRatingScreen(
+                        state = state,
+                        onDismiss = ::dismiss,
+                        setStars = viewModel::setStars,
+                        submitRating = {
+                            viewModel.submitRating(
+                                onSuccess = ::dismiss,
+                            )
+                        },
+                    )
+                    GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
                 }
             }
         }
     }
 
-    @Suppress("Deprecation")
     private fun exitWithError(message: String) {
         LogBuffer.e(LogBuffer.TAG_INVALID_STATE, message)
-        activity?.onBackPressed()
+        dismiss()
     }
 }

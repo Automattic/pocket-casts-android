@@ -152,6 +152,7 @@
     <string name="support">Support</string>
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
+    <string name="submit">Submit</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -544,6 +545,7 @@
     <string name="podcast_no_season">No season</string>
     <string name="podcast_season_x">Season %d</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
+    <string name="podcast_rate">Rate %s</string>
 
     <!-- Episodes -->
 
