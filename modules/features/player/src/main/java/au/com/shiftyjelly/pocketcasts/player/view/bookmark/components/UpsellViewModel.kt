@@ -86,7 +86,7 @@ class UpsellViewModel @Inject constructor(
             UiState.Loaded(
                 tier = subscriptionTier,
                 hasFreeTrial = trialExists,
-                showEarlyAccessMessage = bookmarksFeature.isCurrentlyExclusiveToPatron(),
+                showEarlyAccessMessage = bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion),
             )
         }
     }
