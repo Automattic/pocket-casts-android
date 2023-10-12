@@ -3,23 +3,36 @@ package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class WhatsNewViewModel @Inject constructor(
+    private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
-    private val feature: FeatureWrapper
+    private val releaseVersion: ReleaseVersionWrapper,
+    private val feature: FeatureWrapper,
+    featureFlag: FeatureFlagWrapper,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state = _state.asStateFlow()
@@ -28,30 +41,94 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        val isBookmarksEnabled = FeatureFlag.isEnabled(feature.bookmarksFeature)
-
-        _state.value = UiState.Loaded(
-            feature = if (isBookmarksEnabled) bookmarksFeature() else WhatsNewFeature.AutoPlay,
-            tier = if (isBookmarksEnabled) bookmarksTier() else UserTier.Free,
-        )
+        val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
+        if (isBookmarksEnabled) {
+            updateStateForBookmarks()
+        } else {
+            _state.value = UiState.Loaded(
+                feature = WhatsNewFeature.AutoPlay,
+                tier = UserTier.Free,
+            )
+        }
     }
 
-    private fun bookmarksFeature(): WhatsNewFeature.Bookmarks {
-        val isBookmarksCurrentlyExclusiveToPatron = feature.bookmarksFeature.isCurrentlyExclusiveToPatron()
-        val isUserEntitledForBookmarks = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
-        val showJoinBeta = isBookmarksCurrentlyExclusiveToPatron && !isUserEntitledForBookmarks
+    private fun updateStateForBookmarks() {
+        val userTier = settings.userTier
+        val featureAvailable = feature.isUserEntitled(feature.bookmarksFeature, userTier)
+        if (featureAvailable) {
+            _state.value = UiState.Loaded(
+                feature = bookmarksFeature(),
+                tier = userTier,
+            )
+        } else {
+            viewModelScope.launch {
+                subscriptionManager
+                    .observeProductDetails()
+                    .asFlow()
+                    .stateIn(viewModelScope)
+                    .collect { productDetails ->
+                        val subscriptions = when (productDetails) {
+                            is ProductDetailsState.Error -> null
+                            is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
+                                // Get subscriptions from product details to check if trial exists
+                                Subscription.fromProductDetails(
+                                    productDetails = productDetailsState,
+                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
+                                    )
+                                )
+                            }
+                        } ?: emptyList()
 
-        return WhatsNewFeature.Bookmarks(
-            title = if (showJoinBeta) {
-                LR.string.whats_new_boomarks_join_beta_testing_title
-            } else {
-                LR.string.whats_new_bookmarks_title
-            },
-            message = LR.string.whats_new_bookmarks_body,
-        )
+                        val availableForFeatureTier = if (feature.bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion)) {
+                            FeatureTier.Patron
+                        } else {
+                            feature.bookmarksFeature.tier
+                        }
+                        val trialExists = subscriptionManager.trialExists(
+                            tier = availableForFeatureTier.toSubscriptionTier(),
+                            subscriptions = subscriptions,
+                        )
+
+                        _state.value = UiState.Loaded(
+                            feature = bookmarksFeature(trialExists),
+                            tier = userTier,
+                        )
+                    }
+            }
+        }
     }
 
-    private fun bookmarksTier() = settings.userTier
+    private fun bookmarksFeature(
+        trialExists: Boolean = false,
+    ) = WhatsNewFeature.Bookmarks(
+        title = titleResId(),
+        message = LR.string.whats_new_bookmarks_body,
+        hasFreeTrial = trialExists,
+    )
+
+    private fun titleResId(): Int {
+        val bookmarksFeature = feature.bookmarksFeature
+        val patronExclusiveAccessRelease = (bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
+
+        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
+            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+        }
+
+        val showJoinBeta = when (relativeToEarlyPatronAccess) {
+            EarlyAccessState.Before,
+            EarlyAccessState.During -> isReleaseCandidate
+            EarlyAccessState.After -> false
+            null -> false
+        }
+
+        return if (showJoinBeta) {
+            LR.string.whats_new_boomarks_join_beta_testing_title
+        } else {
+            LR.string.whats_new_bookmarks_title
+        }
+    }
 
     fun onConfirm() {
         viewModelScope.launch {
@@ -62,6 +139,12 @@ class WhatsNewViewModel @Inject constructor(
             }
             _navigationState.emit(target)
         }
+    }
+
+    private fun FeatureTier.toSubscriptionTier() = when (this) {
+        is FeatureTier.Patron -> Subscription.SubscriptionTier.PATRON
+        is FeatureTier.Plus -> Subscription.SubscriptionTier.PLUS
+        is FeatureTier.Free -> Subscription.SubscriptionTier.UNKNOWN
     }
 
     sealed class UiState {
@@ -88,6 +171,7 @@ class WhatsNewViewModel @Inject constructor(
         data class Bookmarks(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
+            val hasFreeTrial: Boolean,
         ) : WhatsNewFeature(
             title = title,
             message = message,

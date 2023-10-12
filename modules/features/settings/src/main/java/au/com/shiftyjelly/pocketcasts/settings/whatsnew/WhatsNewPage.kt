@@ -222,6 +222,7 @@ private fun WhatsNewBookmarksPreview(
                 feature = WhatsNewFeature.Bookmarks(
                     title = LR.string.whats_new_bookmarks_title,
                     message = LR.string.whats_new_bookmarks_body,
+                    hasFreeTrial = false,
                 ),
                 tier = UserTier.Plus,
             ),
