@@ -81,7 +81,7 @@ class GiveRatingViewModel @Inject constructor(
         }
 
     private fun getStarsFromRating(podcastRatings: PodcastRatings): State.Loaded.Stars? {
-        val rating = podcastRatings.average
+        val rating = podcastRatings.average ?: 0.0
 
         val ratingInt = rating.toInt()
         val half = rating % 1 >= 0.5

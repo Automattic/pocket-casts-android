@@ -1,14 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.StarHalf
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,13 +51,7 @@ class PodcastRatingsViewModel
                 ratingsManager.podcastRatings(podcastUuid)
                     .stateIn(viewModelScope)
                     .collect { ratings ->
-                        _stateFlow.update {
-                            RatingState.Loaded(
-                                podcastUuid = ratings.podcastUuid,
-                                stars = getStars(ratings.average),
-                                total = ratings.total
-                            )
-                        }
+                        _stateFlow.value = RatingState.Loaded(ratings)
                     }
             } catch (e: IOException) {
                 Timber.e(e, "Failed to load podcast ratings")
@@ -74,18 +76,6 @@ class PodcastRatingsViewModel
         }
     }
 
-    private fun getStars(rating: Double): List<Star> {
-        // truncate the floating points off without rounding
-        val ratingInt = rating.toInt()
-        // Get the float value
-        val half = rating % 1
-
-        val stars = (0 until MAX_STARS).map { index ->
-            getStarFor(index, ratingInt, half)
-        }
-        return stars
-    }
-
     fun onRatingStarsTapped(
         podcastUuid: String,
         fragmentManager: FragmentManager,
@@ -100,27 +90,89 @@ class PodcastRatingsViewModel
         }
     }
 
-    private fun getStarFor(index: Int, rating: Int, half: Double) = when {
-        index < rating -> Star.FilledStar
-        (index == rating) && (half >= 0.5) -> Star.HalfStar
-        else -> Star.BorderedStar
-    }
-
     sealed class RatingState {
         object Loading : RatingState()
+
         data class Loaded(
-            val podcastUuid: String,
-            val stars: List<Star>,
-            val total: Int?,
+            private val ratings: PodcastRatings,
         ) : RatingState() {
-            val noRatings: Boolean
-                get() = total == null || total == 0
+
+            val podcastUuid = ratings.podcastUuid
+            private val total = ratings.total
+            private val average = ratings.average
+
+            val stars: List<Star> = starsList()
+            val ratingText: RatingText = ratingText()
+
+            private fun starsList(): List<Star> {
+                val rating = average ?: 0.0
+                // truncate the floating points off without rounding
+                val ratingInt = rating.toInt()
+                // Get the float value
+                val half = rating % 1
+
+                val stars = (0 until MAX_STARS).map { index ->
+                    starFor(index, ratingInt, half)
+                }
+                return stars
+            }
+
+            private fun starFor(index: Int, rating: Int, half: Double) = when {
+                index < rating -> Star.FilledStar
+                (index == rating) && (half >= 0.5) -> Star.HalfStar
+                else -> Star.BorderedStar
+            }
+
+            private fun ratingText() = when (total) {
+                null ->
+                    if (average == null) {
+                        RatingText.NotEnoughToRate
+                    } else {
+                        LogBuffer.e(
+                            LogBuffer.TAG_INVALID_STATE,
+                            "Rating total is null but the average is not. This should never happen."
+                        )
+                        RatingText.ShowNothing
+                    }
+
+                0 ->
+                    if (average == null || average == 0.0) {
+                        RatingText.NotEnoughToRate
+                    } else {
+                        LogBuffer.e(
+                            LogBuffer.TAG_INVALID_STATE,
+                            "Rating total is 0 but the average is not 0. This should never happen."
+                        )
+                        RatingText.ShowNothing
+                    }
+
+                else ->
+                    if (average != null) {
+                        RatingText.ShowTotal(total.abbreviated)
+                    } else {
+                        LogBuffer.e(
+                            LogBuffer.TAG_INVALID_STATE,
+                            "Has ratings but the average is null. This should never happen."
+                        )
+                        RatingText.ShowNothing
+                    }
+            }
+
+            sealed class RatingText {
+                object NotEnoughToRate : RatingText()
+                class ShowTotal(val text: String) : RatingText()
+                object ShowNothing : RatingText()
+            }
         }
 
         object Error : RatingState()
     }
 
-    enum class Star { FilledStar, HalfStar, BorderedStar }
+    enum class Star(val icon: ImageVector) {
+        FilledStar(Icons.Filled.Star),
+        HalfStar(Icons.Default.StarHalf),
+        BorderedStar(Icons.Filled.StarBorder),
+    }
 
     companion object {
         private object AnalyticsProp {

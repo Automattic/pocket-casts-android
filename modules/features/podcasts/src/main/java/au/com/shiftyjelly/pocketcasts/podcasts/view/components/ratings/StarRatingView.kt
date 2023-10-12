@@ -6,16 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -24,12 +21,14 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState.Loaded.RatingText
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import java.util.UUID
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun StarRatingView(
@@ -62,9 +61,6 @@ private fun Content(
     state: RatingState.Loaded,
     onClick: () -> Unit
 ) {
-    if (state.noRatings) {
-        return
-    }
     Row(
         modifier = Modifier
             .padding(horizontal = 14.dp, vertical = 4.dp)
@@ -76,9 +72,16 @@ private fun Content(
             stars = state.stars,
             color = MaterialTheme.theme.colors.filter03
         )
-        state.total?.let {
+
+        val ratingText = when (state.ratingText) {
+            RatingText.NotEnoughToRate -> stringResource(LR.string.podcast_not_enough_ratings)
+            is RatingText.ShowTotal -> state.ratingText.text
+            RatingText.ShowNothing -> null
+        }
+
+        ratingText?.let {
             TextP40(
-                text = it.abbreviated,
+                text = it,
                 modifier = Modifier.padding(start = 6.dp)
             )
         }
@@ -93,18 +96,12 @@ private fun Stars(
     Row(horizontalArrangement = Arrangement.Start) {
         stars.forEach { star ->
             Icon(
-                imageVector = star.mapToIcon(),
+                imageVector = star.icon,
                 contentDescription = null,
                 tint = color
             )
         }
     }
-}
-
-fun Star.mapToIcon() = when (this) {
-    Star.FilledStar -> Icons.Filled.Star
-    Star.HalfStar -> Icons.Default.StarHalf
-    Star.BorderedStar -> Icons.Filled.StarBorder
 }
 
 @Preview
@@ -115,15 +112,11 @@ private fun PodcastRatingsPreview(
     AppThemeWithBackground(themeType) {
         Content(
             state = RatingState.Loaded(
-                podcastUuid = UUID.randomUUID().toString(),
-                stars = listOf(
-                    Star.FilledStar,
-                    Star.FilledStar,
-                    Star.FilledStar,
-                    Star.HalfStar,
-                    Star.BorderedStar,
-                ),
-                total = 1200
+                PodcastRatings(
+                    podcastUuid = UUID.randomUUID().toString(),
+                    average = 3.5,
+                    total = 1200
+                )
             ),
             onClick = {}
         )
