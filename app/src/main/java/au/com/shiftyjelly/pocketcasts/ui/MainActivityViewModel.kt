@@ -16,6 +16,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -38,6 +44,9 @@ class MainActivityViewModel
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val theme: Theme,
+    private val feature: FeatureWrapper,
+    private val featureFlag: FeatureFlagWrapper,
+    private val releaseVersion: ReleaseVersionWrapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
@@ -57,7 +66,21 @@ class MainActivityViewModel
             val lastSeenVersionCode = settings.getWhatsNewVersionCode()
             val migratedVersion = settings.getMigratedVersionCode()
             if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-                val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
+                var whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
+                val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
+                if (isBookmarksEnabled) {
+                    val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
+
+                    val patronExclusiveAccessRelease = (feature.bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
+                    val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
+                        releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+                    }
+                    val shouldShowWhatsNewWhenUserNotEntitled = patronExclusiveAccessRelease == null ||
+                        relativeToEarlyPatronAccess == EarlyAccessState.After
+
+                    whatsNewShouldBeShown = whatsNewShouldBeShown &&
+                        (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
+                }
                 _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
             }
         }
