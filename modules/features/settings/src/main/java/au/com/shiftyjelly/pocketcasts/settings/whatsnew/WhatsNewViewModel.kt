@@ -110,7 +110,7 @@ class WhatsNewViewModel @Inject constructor(
         subscriptionTier: Subscription.SubscriptionTier? = null,
     ) = WhatsNewFeature.Bookmarks(
         title = titleResId(),
-        message = LR.string.whats_new_bookmarks_body,
+        message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
         hasFreeTrial = trialExists,
         isUserEntitled = isUserEntitled,
         subscriptionTier = subscriptionTier,
