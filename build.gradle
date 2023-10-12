@@ -2,17 +2,7 @@
 buildscript {
     // Gradle Plugins
     dependencies {
-        // Google Services - https://developers.google.com/android/guides/google-services-plugin
-        classpath "com.google.gms:google-services:4.3.14"
-        // Open source licenses plugin
-        classpath 'com.google.android.gms:oss-licenses-plugin:0.10.5'
-    }
-
-    // Force proguard to the new version to fix "proguard.ParseException: Use of generics not allowed for java type at '<1>_<2>_<3>JsonAdapter' in line 31 of file '/Users/philip/.gradle/caches/transforms-2/files-2.1/d5ca2d039e1d32e9ba6bfd6a67df5151/META-INF/proguard/moshi.pro'"
-    configurations.all {
-        resolutionStrategy {
-            force 'net.sf.proguard:proguard-gradle:6.1.1'
-        }
+        classpath libs.ossLicenses.plugin
     }
 }
 
@@ -22,10 +12,11 @@ plugins {
     alias libs.plugins.kapt apply false
     alias libs.plugins.ksp apply false
     alias libs.plugins.hilt apply false
-    id 'com.mikepenz.aboutlibraries.plugin' version '10.4.0' apply false
-    id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'com.diffplug.spotless' version '6.2.2'
-    id 'io.sentry.android.gradle' version '3.10.0' apply false
+    alias libs.plugins.google.services apply false
+    alias libs.plugins.aboutlibraries apply false
+    alias libs.plugins.ben.manes.versions
+    alias libs.plugins.spotless
+    alias libs.plugins.sentry apply false
 }
 
 apply plugin: 'base'
