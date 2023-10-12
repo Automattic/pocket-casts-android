@@ -13,11 +13,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import dagger.hilt.android.AndroidEntryPoint
 
 private const val ARG_PODCAST_UUID = "podcastUuid"
 
-@AndroidEntryPoint
 class GiveRatingFragment : BaseDialogFragment() {
 
     companion object {
