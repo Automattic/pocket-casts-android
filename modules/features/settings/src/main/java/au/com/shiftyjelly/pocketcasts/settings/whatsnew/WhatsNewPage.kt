@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun WhatsNewPage(
     viewModel: WhatsNewViewModel = hiltViewModel(),
-
     onConfirm: (WhatsNewViewModel.NavigationState) -> Unit,
     onClose: () -> Unit,
 ) {
