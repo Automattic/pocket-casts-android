@@ -85,15 +85,17 @@ class WhatsNewViewModel @Inject constructor(
                         } else {
                             feature.bookmarksFeature.tier
                         }
+                        val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
                         val trialExists = subscriptionManager.trialExists(
-                            tier = availableForFeatureTier.toSubscriptionTier(),
+                            tier = subscriptionTier,
                             subscriptions = subscriptions,
                         )
 
                         _state.value = UiState.Loaded(
                             feature = bookmarksFeature(
                                 trialExists = trialExists,
-                                isUserEntitled = false
+                                isUserEntitled = false,
+                                subscriptionTier = subscriptionTier,
                             ),
                             tier = userTier,
                         )
@@ -105,11 +107,13 @@ class WhatsNewViewModel @Inject constructor(
     private fun bookmarksFeature(
         trialExists: Boolean = false,
         isUserEntitled: Boolean,
+        subscriptionTier: Subscription.SubscriptionTier? = null,
     ) = WhatsNewFeature.Bookmarks(
         title = titleResId(),
         message = LR.string.whats_new_bookmarks_body,
         hasFreeTrial = trialExists,
-        isUserEntitled = isUserEntitled
+        isUserEntitled = isUserEntitled,
+        subscriptionTier = subscriptionTier,
     )
 
     private fun titleResId(): Int {
@@ -182,6 +186,7 @@ class WhatsNewViewModel @Inject constructor(
             @StringRes override val message: Int,
             val hasFreeTrial: Boolean,
             val isUserEntitled: Boolean,
+            val subscriptionTier: Subscription.SubscriptionTier? = null, // To show subscription when user is not entitled to the feature
         ) : WhatsNewFeature(
             title = title,
             message = message,

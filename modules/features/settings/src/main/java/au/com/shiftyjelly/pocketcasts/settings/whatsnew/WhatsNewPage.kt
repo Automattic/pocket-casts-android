@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiStat
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -151,7 +152,7 @@ private fun WhatsNewPageLoaded(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 RowButton(
-                    text = stringResource(state.feature.confirmButtonTitle),
+                    text = getButtonTitle(state),
                     colors = when (state.feature) {
                         is WhatsNewFeature.AutoPlay -> ButtonDefaults.buttonColors()
                         is WhatsNewFeature.Bookmarks -> ButtonDefaults.buttonColors(
@@ -194,6 +195,34 @@ private fun WhatsNewSubscriptionBadge(tier: UserTier) = when (tier) {
 }
 
 @Composable
+private fun getButtonTitle(
+    state: UiState.Loaded,
+): String = when (state.feature) {
+    WhatsNewFeature.AutoPlay -> stringResource(state.feature.confirmButtonTitle)
+    is WhatsNewFeature.Bookmarks -> {
+        when {
+            state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
+            state.feature.hasFreeTrial -> stringResource(LR.string.profile_start_free_trial)
+            else -> {
+                if (state.feature.subscriptionTier != null) {
+                    stringResource(
+                        LR.string.upgrade_to,
+                        when (state.feature.subscriptionTier) {
+                            Subscription.SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
+                            Subscription.SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
+                            Subscription.SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
+                        }
+                    )
+                } else {
+                    Timber.e("Subscription tier is null. This should not happen when user is not entitled to a feature.")
+                    ""
+                }
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun WhatsNewAutoPlayPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
@@ -224,6 +253,7 @@ private fun WhatsNewBookmarksPreview(
                     message = LR.string.whats_new_bookmarks_body,
                     hasFreeTrial = false,
                     isUserEntitled = true,
+                    subscriptionTier = Subscription.SubscriptionTier.PLUS,
                 ),
                 tier = UserTier.Plus,
             ),
