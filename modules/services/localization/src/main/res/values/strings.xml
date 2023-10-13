@@ -547,6 +547,7 @@
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_not_enough_ratings">Not enough ratings</string>
+    <string name="podcast_log_in_to_rate">You must log in to leave a rating</string>
 
     <!-- Episodes -->
 
