@@ -13,7 +13,6 @@ import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -438,35 +437,34 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         val multiSelectToolbar = binding.multiSelectToolbar
         multiSelectHelper.source = SourceView.FILTERS
-        multiSelectHelper.isMultiSelectingLive.observe(
-            viewLifecycleOwner,
-            Observer {
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            if (!multiSelectLoaded) {
+                multiSelectLoaded = true
+                return@observe // Skip the initial value or else it will always hide the filter controls on load
+            }
 
-                if (!multiSelectLoaded) {
-                    multiSelectLoaded = true
-                    return@Observer // Skip the initial value or else it will always hide the filter controls on load
-                }
-
+            val wasMultiSelecting = multiSelectToolbar.isVisible
+            if (wasMultiSelecting != isMultiSelecting) {
                 analyticsTracker.track(
-                    if (it) {
+                    if (isMultiSelecting) {
                         AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
                     } else {
                         AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
                     }
                 )
-
-                if (!multiSelectToolbar.isVisible) {
-                    showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
-                    setShowFilterOptions(false)
-                } else {
-                    setShowFilterOptions(showingFilterOptionsBeforeMultiSelect)
-                }
-                multiSelectToolbar.isVisible = it
-                toolbar.isVisible = !it
-
-                adapter.notifyDataSetChanged()
             }
-        )
+
+            if (isMultiSelecting) {
+                showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
+                setShowFilterOptions(false)
+            } else {
+                setShowFilterOptions(showingFilterOptionsBeforeMultiSelect)
+            }
+            multiSelectToolbar.isVisible = isMultiSelecting
+            toolbar.isVisible = !isMultiSelecting
+
+            adapter.notifyDataSetChanged()
+        }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
