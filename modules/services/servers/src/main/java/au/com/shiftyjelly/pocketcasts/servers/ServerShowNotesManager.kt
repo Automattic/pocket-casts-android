@@ -51,9 +51,9 @@ class ServerShowNotesManager @Inject constructor(
      * Download the show notes, if that fails try the cache.
      */
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState {
-        val showNotesDownloaded = downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
         var downloadException: Exception? = null
         try {
+            val showNotesDownloaded = downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
             if (showNotesDownloaded != null) {
                 return ShowNotesState.Loaded(showNotesDownloaded)
             }

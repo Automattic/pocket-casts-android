@@ -3,13 +3,10 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
-import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -18,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehavi
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
@@ -25,8 +24,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetti
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
-import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -88,6 +87,7 @@ interface Settings {
 
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
+        const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_EPISODE = "bookmarksSortTypeForEpisode"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST = "bookmarksSortTypeForPodcast"
 
@@ -182,9 +182,6 @@ interface Settings {
     val refreshStateObservable: Observable<RefreshState>
     val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
-
-    val bookmarkSortTypeForPlayerFlow: StateFlow<BookmarksSortTypeForPlayer>
-    val bookmarkSortTypeForPodcastFlow: StateFlow<BookmarksSortTypeForPodcast>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -414,9 +411,9 @@ interface Settings {
     // is not easy due to the way our modules are structured.
     val appIcon: UserSetting<AppIconSetting>
 
-    fun <T> setBookmarksSortType(sortType: T)
-    fun getBookmarksSortTypeForPlayer(): BookmarksSortTypeForPlayer
-    fun getBookmarksSortTypeForPodcast(): BookmarksSortTypeForPodcast
+    val episodeBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
+    val playerBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
+    val podcastBookmarksSortType: UserSetting<BookmarksSortTypeForPodcast>
 
     fun addReviewRequestedDate()
     fun getReviewRequestedDates(): List<String>

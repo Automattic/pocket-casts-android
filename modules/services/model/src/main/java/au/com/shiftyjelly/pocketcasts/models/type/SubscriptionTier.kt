@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
-import au.com.shiftyjelly.pocketcasts.featureflag.UserTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 
 enum class SubscriptionTier(val label: String) {
     NONE("none"),

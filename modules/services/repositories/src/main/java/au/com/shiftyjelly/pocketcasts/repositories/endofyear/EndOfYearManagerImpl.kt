@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -20,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
@@ -37,7 +37,7 @@ class EndOfYearManagerImpl @Inject constructor(
 ) : EndOfYearManager, CoroutineScope {
 
     companion object {
-        private const val YEAR = 2022
+        private const val YEAR = 2023
         private const val EPISODE_MINIMUM_PLAYED_TIME_IN_MIN = 5L
     }
 
