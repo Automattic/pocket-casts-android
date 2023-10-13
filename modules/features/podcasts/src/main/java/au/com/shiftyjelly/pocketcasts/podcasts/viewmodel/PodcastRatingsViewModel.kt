@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -12,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -78,14 +78,15 @@ class PodcastRatingsViewModel
 
     fun onRatingStarsTapped(
         podcastUuid: String,
-        fragmentHostListener: FragmentHostListener,
+        fragmentManager: FragmentManager,
     ) {
         analyticsTracker.track(
             AnalyticsEvent.RATING_STARS_TAPPED,
             AnalyticsProp.ratingStarsTapped(podcastUuid)
         )
         if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
-            fragmentHostListener.addFragment(GiveRatingFragment())
+            val fragment = GiveRatingFragment.newInstance(podcastUuid)
+            fragment.show(fragmentManager, "give_rating")
         }
     }
 
