@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,11 +37,15 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 
 @Composable
 fun WhatsNewPage(
@@ -58,6 +63,7 @@ fun WhatsNewPage(
                 header = {
                     when (uiState.feature) {
                         WhatsNewFeature.AutoPlay -> AutoPlayHeader()
+                        WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -118,6 +124,14 @@ private fun WhatsNewPageLoaded(
                     .padding(all = 16.dp),
             ) {
 
+                WhatsNewSubscriptionBadge(state.tier)
+
+                Spacer(
+                    modifier = Modifier.height(
+                        if (state.tier == UserTier.Free) 0.dp else 16.dp
+                    )
+                )
+
                 TextH20(
                     text = stringResource(id = state.feature.title),
                     textAlign = TextAlign.Center,
@@ -136,15 +150,22 @@ private fun WhatsNewPageLoaded(
 
                 RowButton(
                     text = stringResource(state.feature.confirmButtonTitle),
+                    colors = when (state.feature) {
+                        WhatsNewFeature.AutoPlay -> ButtonDefaults.buttonColors()
+                        WhatsNewFeature.Bookmarks -> ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                            contentColor = MaterialTheme.theme.colors.primaryInteractive02
+                        )
+                    },
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
 
-                state.feature.closeButtonTitle?.let {
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
+                state.feature.closeButtonTitle?.let {
                     RowTextButton(
                         text = stringResource(it),
                         fontSize = 15.sp,
@@ -158,6 +179,19 @@ private fun WhatsNewPageLoaded(
 }
 
 @Composable
+private fun WhatsNewSubscriptionBadge(tier: UserTier) = when (tier) {
+    UserTier.Patron -> SubscriptionBadgeForTier(
+        tier = Subscription.SubscriptionTier.PATRON,
+        displayMode = SubscriptionBadgeDisplayMode.Colored
+    )
+    UserTier.Plus -> SubscriptionBadgeForTier(
+        tier = Subscription.SubscriptionTier.PLUS,
+        displayMode = SubscriptionBadgeDisplayMode.Colored
+    )
+    UserTier.Free -> Box {}
+}
+
+@Composable
 @Preview
 private fun WhatsNewAutoPlayPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
@@ -166,8 +200,27 @@ private fun WhatsNewAutoPlayPreview(
         WhatsNewPageLoaded(
             state = UiState.Loaded(
                 feature = WhatsNewFeature.AutoPlay,
+                tier = UserTier.Free,
             ),
             header = { AutoPlayHeader() },
+            onConfirm = {},
+            onClose = {}
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun WhatsNewBookmarksPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        WhatsNewPageLoaded(
+            state = UiState.Loaded(
+                feature = WhatsNewFeature.Bookmarks,
+                tier = UserTier.Plus,
+            ),
+            header = { BookmarksHeader(onClose = {}) },
             onConfirm = {},
             onClose = {}
         )

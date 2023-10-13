@@ -8,11 +8,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -71,14 +73,14 @@ class WhatsNewFragment : BaseFragment() {
 
     private fun performConfirmAction(navigationState: NavigationState) {
         when (navigationState) {
-            NavigationState.PlaybackSettings -> gotoPlaybackSettings()
+            NavigationState.PlaybackSettings -> openFragment(PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true))
+            NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
         }
     }
 
-    private fun gotoPlaybackSettings() {
+    private fun openFragment(fragment: Fragment) {
         val fragmentHostListener = activity as? FragmentHostListener
             ?: throw IllegalStateException("Activity must implement FragmentHostListener")
-        val fragment = PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true)
         fragmentHostListener.addFragment(fragment)
     }
 

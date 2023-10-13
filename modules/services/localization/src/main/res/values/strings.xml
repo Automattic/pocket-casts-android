@@ -1409,6 +1409,10 @@
     <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
     <string name="whats_new_autoplay_enable_button">Enable it now</string>
     <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
+    <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
+    <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
+    <string name="whats_new_bookmarks_try_now_button">Try it now</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Join us in the beta testing for bookmarks!</string>
 
     <!-- Errors -->
 
