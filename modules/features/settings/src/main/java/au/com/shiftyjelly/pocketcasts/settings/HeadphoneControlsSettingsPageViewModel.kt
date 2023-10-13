@@ -1,28 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionTierColor
+import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val userManager: UserManager,
     private val settings: Settings,
 ) : ViewModel() {
 
@@ -31,13 +34,22 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userManager.getSignInState().asFlow()
+            settings.cachedSubscriptionStatus.flow
                 .stateIn(viewModelScope)
                 .collect {
-                    val isAddBookmarkEnabled =
-                        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && it.isSignedInAsPatron
+                    val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+                    val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+                        Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
 
-                    _state.update { state -> state.copy(isAddBookmarkEnabled = isAddBookmarkEnabled) }
+                    _state.update { state ->
+                        state.copy(
+                            isAddBookmarkEnabled = isAddBookmarkEnabled,
+                            addBookmarkIconId = addBookmarkIconId
+                                .takeIf { !isAddBookmarkEnabled },
+                            addBookmarkIconColor = addBookmarkIconColor
+                                .takeIf { !isAddBookmarkEnabled } ?: SubscriptionTierColor.plusGold,
+                        )
+                    }
 
                     _state.value.startUpsellFromSource?.let { upsellFrom ->
                         onUpsellComplete(upsellFrom)
@@ -115,7 +127,27 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     data class UiState(
         val isAddBookmarkEnabled: Boolean = false,
         val startUpsellFromSource: UpsellSourceAction? = null,
+        val addBookmarkIconId: Int? = null,
+        val addBookmarkIconColor: Color = SubscriptionTierColor.plusGold,
     )
+
+    private val addBookmarkIconId
+        get() = when {
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> R.drawable.ic_patron
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> R.drawable.ic_plus
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
+            else -> null
+        }
+
+    private val addBookmarkIconColor
+        get() = when {
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> SubscriptionTierColor.patronPurple
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> SubscriptionTierColor.plusGold
+            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
+            else -> null
+        }
 
     enum class UpsellSourceAction {
         PREVIOUS,

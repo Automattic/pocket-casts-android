@@ -80,12 +80,15 @@ class FileStatusIconsView @JvmOverloads constructor(
         upNextChangesObservable: Observable<UpNextQueue.State>,
         userBookmarksObservable: Observable<List<Bookmark>>,
         hideErrorDetails: Boolean = false,
+        bookmarksAvailable: Boolean = false,
+        tintColor: Int,
     ) {
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
         progressCircle.setColor(captionColor)
         progressBar.indeterminateTintList = ColorStateList.valueOf(captionColor)
+        imgBookmark.imageTintList = ColorStateList.valueOf(tintColor)
 
         val downloadUpdates = downloadProgressUpdates
             .filter { it.episodeUuid == episode.uuid }
@@ -130,7 +133,7 @@ class FileStatusIconsView @JvmOverloads constructor(
             .doOnNext { combinedData ->
                 episode.playing = combinedData.playbackState.isPlaying && combinedData.playbackState.episodeUuid == episode.uuid
                 imgUpNext.visibility = if (combinedData.isInUpNext) View.VISIBLE else View.GONE
-                imgBookmark.visibility = if (episode.hasBookmark) View.VISIBLE else View.GONE
+                imgBookmark.visibility = if (episode.hasBookmark && bookmarksAvailable) View.VISIBLE else View.GONE
 
                 imgIcon.isVisible = false
                 if (combinedData.playbackState.episodeUuid == episode.uuid && combinedData.playbackState.isBuffering) {
@@ -228,7 +231,10 @@ class FileStatusIconsView @JvmOverloads constructor(
                 lblStatus.contentDescription = lblStatus.text.toString()
                 statusText = lblStatus.text.toString()
 
-                imgCloud.alpha = if (episodeGreyedOut) 0.5f else 1f
+                val imageAlpha = if (episodeGreyedOut) 0.5f else 1f
+                imgCloud.alpha = imageAlpha
+                imgBookmark.alpha = imageAlpha
+                imgIcon.alpha = imageAlpha
             }
             .subscribe()
             .addTo(disposables)

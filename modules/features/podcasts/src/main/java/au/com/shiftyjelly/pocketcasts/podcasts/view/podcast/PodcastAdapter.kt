@@ -23,6 +23,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -30,8 +31,6 @@ import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -43,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
@@ -59,6 +58,8 @@ import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
@@ -138,6 +139,7 @@ class PodcastAdapter(
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val sourceView: SourceView,
+    private val fragmentManager: FragmentManager,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -185,6 +187,9 @@ class PodcastAdapter(
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
     private var signInState: SignInState = SignInState.SignedOut
+
+    private var bookmarksAvailable: Boolean = false
+
     var castConnected: Boolean = false
         set(value) {
             field = value
@@ -249,7 +254,7 @@ class PodcastAdapter(
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
-                StarRatingView(ratingsViewModel)
+                StarRatingView(fragmentManager, ratingsViewModel)
             }
         }
 
@@ -315,7 +320,8 @@ class PodcastAdapter(
             multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             disposables = disposables,
-            bookmarksObservable = podcastBookmarksObservable
+            bookmarksObservable = podcastBookmarksObservable,
+            bookmarksAvailable = bookmarksAvailable,
         )
         holder.episodeRow.setOnClickListener {
             if (multiSelectEpisodesHelper.isMultiSelecting) {
@@ -359,10 +365,8 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
-            if (FeatureFlag.isEnabled(Feature.SHOW_RATINGS_ENABLED)) {
-                ratingsViewModel.loadRatings(podcast.uuid)
-                ratingsViewModel.refreshPodcastRatings(podcast.uuid)
-            }
+            ratingsViewModel.loadRatings(podcast.uuid)
+            ratingsViewModel.refreshPodcastRatings(podcast.uuid)
             onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
@@ -468,7 +472,7 @@ class PodcastAdapter(
                 add(Podcast())
                 add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
 
-                if (!signInState.isSignedInAsPatron) {
+                if (!bookmarksAvailable) {
                     add(BookmarkUpsell)
                 } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
                     add(NoBookmarkMessage)
@@ -515,6 +519,10 @@ class PodcastAdapter(
             }
         }
         submitList(content)
+    }
+
+    fun setBookmarksAvailable(bookmarksAvailable: Boolean) {
+        this.bookmarksAvailable = bookmarksAvailable
     }
 
     fun setError() {

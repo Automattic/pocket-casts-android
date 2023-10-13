@@ -12,7 +12,9 @@ import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -28,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -57,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -83,6 +87,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     private val viewModel by viewModels<FilterEpisodeListViewModel>()
+    private val episodeListBookmarkViewModel by viewModels<EpisodeListBookmarkViewModel>()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
 
     @Inject lateinit var downloadManager: DownloadManager
@@ -275,6 +280,15 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                episodeListBookmarkViewModel.stateFlow.collect {
+                    adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
         // Load color from bundle first
         if (arguments?.containsKey(ARG_COLOR) == true) {
             val color = arguments?.getInt(ARG_COLOR) ?: 0
@@ -423,35 +437,34 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         val multiSelectToolbar = binding.multiSelectToolbar
         multiSelectHelper.source = SourceView.FILTERS
-        multiSelectHelper.isMultiSelectingLive.observe(
-            viewLifecycleOwner,
-            Observer {
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            if (!multiSelectLoaded) {
+                multiSelectLoaded = true
+                return@observe // Skip the initial value or else it will always hide the filter controls on load
+            }
 
-                if (!multiSelectLoaded) {
-                    multiSelectLoaded = true
-                    return@Observer // Skip the initial value or else it will always hide the filter controls on load
-                }
-
+            val wasMultiSelecting = multiSelectToolbar.isVisible
+            if (wasMultiSelecting != isMultiSelecting) {
                 analyticsTracker.track(
-                    if (it) {
+                    if (isMultiSelecting) {
                         AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
                     } else {
                         AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
                     }
                 )
-
-                if (!multiSelectToolbar.isVisible) {
-                    showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
-                    setShowFilterOptions(false)
-                } else {
-                    setShowFilterOptions(showingFilterOptionsBeforeMultiSelect)
-                }
-                multiSelectToolbar.isVisible = it
-                toolbar.isVisible = !it
-
-                adapter.notifyDataSetChanged()
             }
-        )
+
+            if (isMultiSelecting) {
+                showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
+                setShowFilterOptions(false)
+            } else {
+                setShowFilterOptions(showingFilterOptionsBeforeMultiSelect)
+            }
+            multiSelectToolbar.isVisible = isMultiSelecting
+            toolbar.isVisible = !isMultiSelecting
+
+            adapter.notifyDataSetChanged()
+        }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {

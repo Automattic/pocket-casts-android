@@ -244,7 +244,7 @@ private fun StorySharableContent(
             contentAlignment = Alignment.Center
         ) {
             when (story) {
-                is StoryIntro -> StoryIntroView(story)
+                is StoryIntro -> StoryIntroView()
                 is StoryListeningTime -> StoryListeningTimeView(story)
                 is StoryListenedCategories -> StoryListenedCategoriesView(story)
                 is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)

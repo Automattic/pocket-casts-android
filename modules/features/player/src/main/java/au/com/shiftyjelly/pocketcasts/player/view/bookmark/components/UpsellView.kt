@@ -74,7 +74,9 @@ private fun UpsellViewContent(
                 )
             }
         },
-        message = stringResource(LR.string.bookmarks_create_instructions),
+        message = getMessage(
+            state.showEarlyAccessMessage,
+        ),
         buttonTitle = getButtonTitle(state.tier, state.hasFreeTrial),
         buttonAction = onClick,
         style = style,
@@ -105,6 +107,15 @@ private fun getButtonTitle(
     )
 }
 
+@Composable
+private fun getMessage(
+    showEarlyAccessMessage: Boolean,
+) = if (showEarlyAccessMessage) {
+    stringResource(LR.string.bookmarks_upsell_instructions_early_access,)
+} else {
+    stringResource(LR.string.bookmarks_upsell_instructions)
+}
+
 @Preview
 @Composable
 private fun UpsellPreview(
@@ -113,7 +124,11 @@ private fun UpsellPreview(
     AppTheme(themeType) {
         UpsellViewContent(
             style = MessageViewColors.Default,
-            state = UiState.Loaded(tier = SubscriptionTier.PATRON, hasFreeTrial = false),
+            state = UiState.Loaded(
+                tier = SubscriptionTier.PATRON,
+                hasFreeTrial = false,
+                showEarlyAccessMessage = false,
+            ),
             onClick = {},
         )
     }

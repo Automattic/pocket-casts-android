@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.junit.Before
 import org.junit.Test

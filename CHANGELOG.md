@@ -1,3 +1,13 @@
+7.50
+-----
+
+*   Updates:
+    *   Show if a podcast has no ratings
+        ([#1453](https://github.com/Automattic/pocket-casts-android/pull/1453))
+*   Bug Fixes:
+    *   Fixed show notes loading issues
+        ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
+
 7.49
 -----
 
@@ -10,6 +20,9 @@
         ([#1399](https://github.com/Automattic/pocket-casts-android/pull/1399))
     *   Improve RTL handling in episode search box
         ([#1405](https://github.com/Automattic/pocket-casts-android/pull/1405))
+*   New Feature:
+    *   Enables Patron (Internal)
+        ([#1442](https://github.com/Automattic/pocket-casts-android/pull/1442))
 
 7.48
 -----

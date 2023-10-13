@@ -9,7 +9,10 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -21,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBinding
@@ -47,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,6 +73,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     lateinit var itemTouchHelper: EpisodeItemTouchHelper
 
     private val viewModel: CloudFilesViewModel by viewModels()
+    private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private var binding: FragmentCloudFilesBinding? = null
 
@@ -176,6 +182,15 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             binding?.emptyLayout?.isVisible = it.userEpisodes.isEmpty()
             adapter.submitList(it.userEpisodes)
             adapter.notifyDataSetChanged()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                episodeListBookmarkViewModel.stateFlow.collect {
+                    adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
+                    adapter.notifyDataSetChanged()
+                }
+            }
         }
 
         binding?.layoutUsage?.isVisible = false

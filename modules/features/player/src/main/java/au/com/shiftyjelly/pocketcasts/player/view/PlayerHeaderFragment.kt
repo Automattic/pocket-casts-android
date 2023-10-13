@@ -33,12 +33,17 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -473,9 +478,23 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     fun onAddBookmarkClick() {
-        viewModel.buildBookmarkArguments { arguments ->
-            activityLauncher.launch(arguments.getIntent(requireContext()))
+        if (Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
+            viewModel.buildBookmarkArguments { arguments ->
+                activityLauncher.launch(arguments.getIntent(requireContext()))
+            }
+        } else {
+            startUpsellFlow()
         }
+    }
+
+    private fun startUpsellFlow() {
+        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = source,
+            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
+        )
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
     override fun onShareClick() {

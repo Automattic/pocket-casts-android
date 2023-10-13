@@ -10,11 +10,19 @@ import android.os.Build
 import android.os.Looper
 import android.text.format.Formatter
 import android.view.accessibility.AccessibilityManager
+import androidx.car.app.connection.CarConnection
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.map
 import java.util.Locale
 
 object Util {
     private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
     private var appPlatform: AppPlatform? = null
+
+    fun isAndroidAutoConnectedFlow(context: Context) =
+        CarConnection(context).type
+            .map { it == CarConnection.CONNECTION_TYPE_PROJECTION }
+            .asFlow()
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager

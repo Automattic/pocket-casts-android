@@ -9,20 +9,23 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortType
-import au.com.shiftyjelly.pocketcasts.models.type.BookmarksSortTypeForPlayer
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -39,7 +42,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,11 +51,11 @@ class BookmarksViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
-    private val userManager: UserManager,
     private val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
+    private val feature: FeatureWrapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -77,13 +79,15 @@ class BookmarksViewModel
         this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
-            userManager.getSignInState().asFlow().collectLatest {
-                if (!it.isSignedInAsPatron) {
+            settings.cachedSubscriptionStatus.flow.collectLatest {
+                val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+                if (!feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)) {
                     _uiState.value = UiState.Upsell(sourceView)
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                        val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
                         val bookmarksFlow =
-                            settings.bookmarkSortTypeForPlayerFlow.flatMapLatest { sortType ->
+                            bookmarksSortTypeFlow.flatMapLatest { sortType ->
                                 bookmarkManager.findEpisodeBookmarksFlow(
                                     episode = episode,
                                     sortType = sortType,
@@ -189,13 +193,13 @@ class BookmarksViewModel
 
     fun onOptionsMenuClicked() {
         viewModelScope.launch {
-            _showOptionsDialog.emit(settings.getBookmarksSortTypeForPlayer().labelId)
+            _showOptionsDialog.emit(sourceView.mapToBookmarksSortTypeUserSetting().flow.value.labelId)
         }
     }
 
     fun changeSortOrder(order: BookmarksSortType) {
-        if (order !is BookmarksSortTypeForPlayer) return
-        settings.setBookmarksSortType(order)
+        if (order !is BookmarksSortTypeDefault) return
+        sourceView.mapToBookmarksSortTypeUserSetting().set(order)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
@@ -250,6 +254,16 @@ class BookmarksViewModel
             }
         }
     }
+
+    private fun SourceView.mapToBookmarksSortTypeUserSetting() =
+        when (sourceView) {
+            SourceView.FILES,
+            SourceView.EPISODE_DETAILS,
+            -> settings.episodeBookmarksSortType
+
+            SourceView.PLAYER -> settings.playerBookmarksSortType
+            else -> throw IllegalAccessException("Bookmarks sort accessed in unknown source view: $this")
+        }
 
     sealed class UiState {
         data class Empty(val sourceView: SourceView) : UiState() {

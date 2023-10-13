@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,12 +21,14 @@ class BetaFeaturesViewModel @Inject constructor() : ViewModel() {
     val state: StateFlow<State> = _state
 
     private val featureFlags: List<FeatureFlagWrapper>
-        get() = Feature.values().map {
-            FeatureFlagWrapper(
-                featureFlag = it,
-                isEnabled = FeatureFlag.isEnabled(it)
-            )
-        }
+        get() = Feature.values()
+            .filter { it.hasDevToggle }
+            .map {
+                FeatureFlagWrapper(
+                    featureFlag = it,
+                    isEnabled = FeatureFlag.isEnabled(it)
+                )
+            }
 
     fun setFeatureEnabled(feature: Feature, enabled: Boolean) {
         FeatureFlag.setEnabled(feature, enabled)

@@ -50,6 +50,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -484,7 +486,14 @@ class MediaSessionManager(
 
         private fun onAddBookmark() {
             logEvent("add bookmark")
-            bookmarkHelper.handleAddBookmarkAction(context)
+            val coroutineContext = CoroutineScope(Dispatchers.Main + Job())
+            coroutineContext.launch {
+                Util.isAndroidAutoConnectedFlow(context).collect {
+                    bookmarkHelper.handleAddBookmarkAction(context, it)
+                    // Cancel the coroutine after the bookmark has been added
+                    coroutineContext.cancel()
+                }
+            }
         }
 
         private fun getCurrentControllerInfo(): String {

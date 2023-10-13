@@ -57,7 +57,7 @@ data class PodcastRatingsResponse(
     fun toPodcastRatings(podcastUuid: String) = PodcastRatings(
         podcastUuid = podcastUuid,
         average = average ?: 0.0,
-        total = total
+        total = total ?: 0
     )
 }
 

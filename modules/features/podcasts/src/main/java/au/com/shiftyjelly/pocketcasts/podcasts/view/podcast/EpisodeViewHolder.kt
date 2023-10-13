@@ -133,7 +133,19 @@ class EpisodeViewHolder constructor(
             return listOf(archiveItem, shareItem)
         }
 
-    fun setup(episode: PodcastEpisode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable, bookmarksObservable: Observable<List<Bookmark>>) {
+    fun setup(
+        episode: PodcastEpisode,
+        fromListUuid: String?,
+        tintColor: Int,
+        playButtonListener: PlayButton.OnClickListener,
+        streamByDefault: Boolean,
+        upNextAction: Settings.UpNextAction,
+        multiSelectEnabled: Boolean = false,
+        isSelected: Boolean = false,
+        disposables: CompositeDisposable,
+        bookmarksObservable: Observable<List<Bookmark>>,
+        bookmarksAvailable: Boolean,
+    ) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
@@ -154,6 +166,7 @@ class EpisodeViewHolder constructor(
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
         binding.progressCircle.setColor(captionColor)
         binding.progressBar.indeterminateTintList = ColorStateList.valueOf(captionColor)
+        binding.imgBookmark.imageTintList = ColorStateList.valueOf(tintColor)
 
         val downloadUpdates = downloadProgressUpdates
             .filter { it.episodeUuid == episode.uuid }
@@ -201,7 +214,7 @@ class EpisodeViewHolder constructor(
                 val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
                 binding.inUpNext = combinedData.isInUpNext
-                binding.hasBookmarks = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid)
+                binding.hasBookmarks = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid) && bookmarksAvailable
 
                 imgIcon.isVisible = false
                 progressCircle.isVisible = false
@@ -258,7 +271,10 @@ class EpisodeViewHolder constructor(
                 updateRowText(episode, captionColor, tintColor, date, title, lblStatus, combinedData.isInUpNext)
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
-                imgArtwork.alpha = if (episodeGreyedOut) 0.5f else 1f
+                val imageAlpha = if (episodeGreyedOut) 0.5f else 1f
+                imgArtwork.alpha = imageAlpha
+                binding.imgBookmark.alpha = imageAlpha
+
                 binding.executePendingBindings()
             }
             .subscribe()

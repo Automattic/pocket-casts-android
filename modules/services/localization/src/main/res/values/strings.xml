@@ -152,6 +152,7 @@
     <string name="support">Support</string>
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
+    <string name="submit">Submit</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -544,6 +545,8 @@
     <string name="podcast_no_season">No season</string>
     <string name="podcast_season_x">Season %d</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
+    <string name="podcast_rate">Rate %s</string>
+    <string name="podcast_not_enough_ratings">Not enough ratings</string>
 
     <!-- Episodes -->
 
@@ -1408,11 +1411,15 @@
     <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
     <string name="whats_new_autoplay_enable_button">Enable it now</string>
     <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
+    <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
+    <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
+    <string name="whats_new_bookmarks_try_now_button">Try it now</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Join us in the beta testing for bookmarks!</string>
 
     <!-- Errors -->
 
     <string name="error_webview_not_installed">Unable to load show notes due to no system WebView installed.</string>
-    <string name="error_loading_show_notes">Unable to load show notes.</string>
+    <string name="error_loading_show_notes">Unable to find show notes for this episode.</string>
     <string name="error_chartable">The producer is using Chartable analytics which is being blocked, if you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_chartable_streaming">Streaming failed. The producer is using Chartable analytics which is being blocked, if you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_streaming_internet">Streaming failed check your internet connection.</string>
@@ -1557,6 +1564,7 @@
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
     <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
+    <string name="end_of_year_review">End of Year Review</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
     <string name="end_of_year_listening_time_english_only" translatable="false">In 2022, you spent\n%1$s\nlistening to podcasts.</string>
@@ -1644,7 +1652,7 @@
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50GB Cloud Storage</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100GB Cloud Storage</string>
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
@@ -1725,7 +1733,8 @@
     <string name="bookmark_notification_title_added">Bookmark added</string>
     <string name="bookmark_notification_content_tap_to_view">Tap to view</string>
     <string name="bookmark_notification_action_change_title">Change title</string>
-
+    <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
+    <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
 
     <!--    Tasker Plugin-->
 
