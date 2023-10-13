@@ -362,8 +362,6 @@ platform :android do
     commit_version_bump
     UI.success "Done! New Release Version: #{current_release_version}. New Build Code: #{current_build_code}"
 
-    version = current_release_version
-
     # Download Localizations
     android_download_translations(
       res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
