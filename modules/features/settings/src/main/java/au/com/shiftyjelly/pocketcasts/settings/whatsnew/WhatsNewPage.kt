@@ -50,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 @Composable
 fun WhatsNewPage(
     viewModel: WhatsNewViewModel = hiltViewModel(),
-
     onConfirm: (WhatsNewViewModel.NavigationState) -> Unit,
     onClose: () -> Unit,
 ) {
