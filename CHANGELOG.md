@@ -7,6 +7,8 @@
 *   Bug Fixes:
     *   Fixed show notes loading issues
         ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
+    *   Fixed discover search bar at high device zoom
+        ([#1469](https://github.com/Automattic/pocket-casts-android/pull/1442))
 
 7.49
 -----
