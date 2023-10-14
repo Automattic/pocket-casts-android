@@ -40,6 +40,8 @@
             style="?attr/textBody1"
             android:importantForAccessibility="no"
             android:textColor="?attr/contrast_01"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="@string/search_podcasts_or_add_url"/>
     </LinearLayout>
 
