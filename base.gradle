@@ -1,8 +1,6 @@
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'dagger.hilt.android.plugin'
-apply plugin: 'com.google.devtools.ksp'
+/**
+ * Base configuration for app, automotive, wear, and all modules.
+ */
 
 def SERVER_MAIN_URL_PROD = "\"https://refresh.pocketcasts.com\""
 def SERVER_API_URL_PROD = "\"https://api.pocketcasts.com\""

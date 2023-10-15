@@ -22,7 +22,6 @@ sentry = "3.10.0"
 
 [libraries]
 # Dagger / Hilt
-hilt-android-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 hilt-compiler =  { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -33,6 +32,7 @@ ossLicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-application" }
+android-library = { id = "com.android.library", version.ref = "android-application" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

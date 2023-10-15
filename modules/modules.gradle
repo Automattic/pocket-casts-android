@@ -1,3 +1,1 @@
-apply plugin: 'com.android.library'
-
 apply from: "../../../base.gradle"
