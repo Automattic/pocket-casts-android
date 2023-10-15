@@ -237,7 +237,7 @@ dependencies {
     implementation androidLibs.lottie
     implementation androidLibs.lottieCompose
     implementation androidLibs.materialProgressBar
-    implementation libs.dagger.hilt.android
+    implementation libs.hilt.android
     implementation androidLibs.hiltWorkManager
     implementation androidLibs.hiltNavigationCompose
     implementation androidLibs.accompanistFlowLayout
@@ -265,7 +265,7 @@ dependencies {
     ksp androidLibs.showkaseProcessor
     // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
     kapt libs.hilt.compiler
-    kapt libs.dagger.compiler
+    kapt libs.dagger.hilt.compiler
 
     debugImplementation androidLibs.composeUiTooling
     debugProdImplementation androidLibs.composeUiTooling

@@ -263,7 +263,6 @@ project.ext {
             // RxKotlin
             rxKoltin: "io.reactivex.rxjava2:rxkotlin:2.4.0",
             // Hilt
-            hiltCompiler: "androidx.hilt:hilt-compiler:1.0.0",
             hiltWorkManager: "androidx.hilt:hilt-work:1.0.0",
             hiltNavigationCompose: "androidx.hilt:hilt-navigation-compose:1.0.0",
             // Lottie
