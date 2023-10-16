@@ -21,7 +21,6 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
@@ -57,11 +56,7 @@ fun StoryListenedNumbersView(
 
         SecondaryText(story)
 
-        Spacer(modifier = modifier.weight(0.8f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
+        Spacer(modifier = modifier.weight(1f))
     }
 }
 
