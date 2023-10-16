@@ -1,3 +1,7 @@
+7.51
+-----
+
+
 7.50
 -----
 
@@ -5,6 +9,8 @@
     *   Show if a podcast has no ratings
         ([#1453](https://github.com/Automattic/pocket-casts-android/pull/1453))
 *   Bug Fixes:
+    *   Fixed chapter progress circle on full-screen player
+        ([#1461](https://github.com/Automattic/pocket-casts-android/pull/1461))
     *   Fixed show notes loading issues
         ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
 

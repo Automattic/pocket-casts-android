@@ -153,7 +153,6 @@ Language: ja_JP
     <string name="onboarding_plus_feature_gratitude_title">Pocket Casts をお使いの皆さまに感謝の気持ちを込めて</string>
     <string name="onboarding_patron_feature_special_icons_title">特別な Pocket Casts アプリのアイコン</string>
     <string name="onboarding_patron_feature_profile_badge_title">サポーターのプロフィールバッジ</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50GB のクラウドストレージ</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Plus の全機能</string>
     <string name="onboarding_patron_features_title">Pocket Casts のサービスにご賛同いただける皆さまのサポートをお待ちしています。</string>
     <string name="server_user_delete_account_with_sub_failed">お使いのアカウントに有効な Pocket Casts Plus サブスクリプションがあります。 アカウントを削除する前に、このサブスクリプションをキャンセルしてください。</string>
@@ -647,7 +646,6 @@ Language: ja_JP
     <string name="error_streaming_internet">ストリーミングに失敗しました。インターネット接続を確認してください。</string>
     <string name="error_chartable_streaming">ストリーミングに失敗しました。 プロデューサーが、ブロックされている Chartable アナリティクスを使用しています。AdGuard などのフィルタリングアプリを実行する場合、エピソードを再生するには chtbl.com をホワイトリストに登録する必要があります。</string>
     <string name="error_chartable">プロデューサーが、ブロックされている Chartable アナリティクスを使用しています。AdGuard などのフィルタリングアプリを実行する場合、エピソードを再生するには chtbl.com をホワイトリストに登録する必要があります。</string>
-    <string name="error_loading_show_notes">ショーノートを読み込めません。</string>
     <string name="error_webview_not_installed">システムに WebView がインストールされていないため、ショーノートを読み込めません。</string>
     <string name="settings_status_service_support_summary">サポートの FAQ にアクセスして当社までお問い合わせください。</string>
     <string name="settings_status_service_support">サポート</string>

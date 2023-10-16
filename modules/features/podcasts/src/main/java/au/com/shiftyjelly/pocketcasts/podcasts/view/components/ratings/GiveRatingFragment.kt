@@ -78,7 +78,11 @@ class GiveRatingFragment : BaseDialogFragment() {
                         setStars = viewModel::setStars,
                         submitRating = {
                             viewModel.submitRating(
-                                onSuccess = ::dismiss,
+                                context = context,
+                                onSuccess = {
+                                    Toast.makeText(context, "TODO: Submit rating", Toast.LENGTH_LONG).show()
+                                    dismiss()
+                                },
                             )
                         },
                     )

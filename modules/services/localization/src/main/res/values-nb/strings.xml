@@ -134,7 +134,6 @@ Language: nb_NO
     <string name="episode_downloading">Laster ned</string>
     <string name="onboarding_patron_features_title">Har du tro på det vi gjør og ønsker å vise oss din støtte?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Alt i Plus</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50 GB lagringsplass i skyen</string>
     <string name="onboarding_patron_feature_profile_badge_title">Støtteprofilmerke</string>
     <string name="onboarding_patron_feature_special_icons_title">Spesielle Pocket Casts-appikoner</string>
     <string name="onboarding_plus_feature_gratitude_title">Den evigvarende takknemligheten fra alle her hos Pocket Casts</string>
@@ -627,7 +626,6 @@ Language: nb_NO
     <string name="error_streaming_internet">Strømming mislyktes. Sjekk Internett-tilkoblingen.</string>
     <string name="error_chartable_streaming">Strømming mislyktes. Produsenten bruker Chartable-analyse, som er blokkert. Hvis du kjører en filtreringsapp, for eksempel AdGuard, må du hviteliste chtbl.com for å spille av episoden.</string>
     <string name="error_chartable">Produsenten bruker Chartable-analyse, som er blokkert. Hvis du kjører en filtreringsapp, for eksempel AdGuard, må du hviteliste chtbl.com for å spille av episoden.</string>
-    <string name="error_loading_show_notes">Kan ikke laste inn programnotater.</string>
     <string name="error_webview_not_installed">Kan ikke laste inn programnotater fordi WebView ikke er installert for systemet.</string>
     <string name="settings_status_service_support_summary">Gå til vanlige støttespørsmål, og kontakt oss.</string>
     <string name="settings_status_service_support">Støtte</string>

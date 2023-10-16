@@ -642,7 +642,6 @@ Language: en_GB
     <string name="error_streaming_internet">Streaming failed, check your internet connection.</string>
     <string name="error_chartable_streaming">Streaming failed. The producer is using Chartable analytics which is being blocked. If you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_chartable">The producer is using Chartable analytics which is being blocked. If you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
-    <string name="error_loading_show_notes">Unable to load show notes.</string>
     <string name="error_webview_not_installed">Unable to load show notes due to no system WebView installed.</string>
     <string name="settings_status_service_support_summary">Access to the support FAQ and Contact Us.</string>
     <string name="settings_status_service_support">Support</string>
