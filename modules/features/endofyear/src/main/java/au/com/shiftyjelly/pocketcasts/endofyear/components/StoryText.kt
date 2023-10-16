@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -31,6 +32,8 @@ fun StoryPrimaryText(
         disableScale = true,
         fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
         fontWeight = FontWeight.W600,
+        fontSize = 25.sp,
+        lineHeight = 31.sp,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -48,18 +47,17 @@ fun StoryListenedNumbersView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .padding(vertical = 40.dp)
         ) {
-            Spacer(modifier = modifier.height(40.dp))
-
             Spacer(modifier = modifier.weight(0.2f))
 
             PrimaryText(story)
 
-            Spacer(modifier = modifier.height(16.dp))
+            Spacer(modifier = modifier.weight(0.1f))
 
             SecondaryText(story)
 
-            Spacer(modifier = modifier.weight(0.7f))
+            Spacer(modifier = modifier.weight(1f))
 
             PodcastCoverStack(story.topPodcasts.reversed())
 
