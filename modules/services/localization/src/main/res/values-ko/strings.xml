@@ -153,7 +153,6 @@ Language: ko_KR
     <string name="onboarding_plus_feature_gratitude_title">Pocket Casts에서 여러분께 드리는 감사 선물</string>
     <string name="onboarding_patron_feature_special_icons_title">특별한 Pocket Casts 앱 아이콘</string>
     <string name="onboarding_patron_feature_profile_badge_title">후원자 프로필 배지</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">클라우드 저장 공간 50GB</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Plus의 모든 것</string>
     <string name="onboarding_patron_features_title">마음을 다하여 믿고 후원해 주시겠어요?</string>
     <string name="server_user_delete_account_with_sub_failed">계정에 활성 Pocket Casts Plus 구독이 있습니다. 먼저 취소하고 계정을 삭제하세요.</string>
@@ -647,7 +646,6 @@ Language: ko_KR
     <string name="error_streaming_internet">스트리밍에 실패했습니다. 인터넷 연결을 확인하세요.</string>
     <string name="error_chartable_streaming">스트리밍에 실패했습니다. 차단 중인 Chartable 분석을 프로듀서가 사용하고 있습니다. AdGuard와 같은 필터링 앱을 사용하는 경우 에피소드를 재생하려면 chtbl.com을 화이트리스트에 추가해야 합니다.</string>
     <string name="error_chartable">차단 중인 Chartable 분석을 프로듀서가 사용하고 있습니다. AdGuard와 같은 필터링 앱을 사용하는 경우 에피소드를 재생하려면 chtbl.com을 화이트리스트에 추가해야 합니다.</string>
-    <string name="error_loading_show_notes">프로그램 메모를 로드할 수 없습니다.</string>
     <string name="error_webview_not_installed">설치된 시스템 WebView가 없어서 프로그램 메모를 로드할 수 없습니다.</string>
     <string name="settings_status_service_support_summary">후원 FAQ를 이용하여 문의하세요.</string>
     <string name="settings_status_service_support">후원</string>

@@ -16,9 +16,6 @@ import androidx.databinding.BindingConversion
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressBar
-import au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -133,23 +130,5 @@ object BindingAdapters {
     @JvmStatic
     fun setConstraintWidthPercent(view: View, percent: Float) {
         view.updateLayoutParams<ConstraintLayout.LayoutParams> { matchConstraintPercentWidth = percent }
-    }
-
-    @BindingAdapter("progress")
-    @JvmStatic
-    fun setChapterProgress(view: ChapterProgressCircle, chapter: Chapter?) {
-        view.percent = 1f - (chapter?.progress ?: 0f)
-    }
-
-    @BindingAdapter("progress")
-    @JvmStatic
-    fun setChapterProgress(view: ChapterProgressBar, chapter: Chapter?) {
-        view.progress = chapter?.progress ?: 0f
-    }
-
-    @BindingAdapter("textRemaining")
-    @JvmStatic
-    fun setChapterTimeRemaining(view: TextView, chapter: Chapter?) {
-        view.text = chapter?.remainingTime()
     }
 }

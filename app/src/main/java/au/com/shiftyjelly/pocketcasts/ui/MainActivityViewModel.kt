@@ -76,10 +76,10 @@ class MainActivityViewModel
                         releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
                     }
                     val shouldShowWhatsNewWhenUserNotEntitled = patronExclusiveAccessRelease == null ||
-                        relativeToEarlyPatronAccess == EarlyAccessState.After
+                            relativeToEarlyPatronAccess == EarlyAccessState.After
 
                     whatsNewShouldBeShown = whatsNewShouldBeShown &&
-                        (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
+                            (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
                 }
                 _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
             }

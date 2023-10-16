@@ -104,7 +104,7 @@ class ChaptersViewModel
             } else if (chapter.containsTime(playbackPositionMs)) {
                 // the chapter currently playing
                 currentChapter = chapter
-                val progress = if (chapter.duration <= 0) 0f else ((playbackPositionMs - chapter.startTime) / chapter.duration.toFloat())
+                val progress = chapter.calculateProgress(playbackPositionMs)
                 ChapterState.Playing(chapter = chapter, progress = progress)
             } else {
                 // a chapter that has been played

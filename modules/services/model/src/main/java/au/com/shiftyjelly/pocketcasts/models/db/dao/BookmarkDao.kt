@@ -115,7 +115,7 @@ abstract class BookmarkDao {
     abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
 
     @Query(
-        """SELECT *
+        """SELECT bookmarks.*
             FROM bookmarks
             JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
             AND deleted = :deleted"""

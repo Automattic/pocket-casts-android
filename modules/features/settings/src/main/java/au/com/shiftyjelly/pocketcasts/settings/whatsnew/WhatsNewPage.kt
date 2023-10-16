@@ -51,7 +51,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun WhatsNewPage(
     viewModel: WhatsNewViewModel = hiltViewModel(),
-
     onConfirm: (WhatsNewViewModel.NavigationState) -> Unit,
     onClose: () -> Unit,
 ) {

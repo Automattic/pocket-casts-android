@@ -62,7 +62,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class
     ],
-    version = 77,
+    version = 78,
     exportSchema = true
 )
 @TypeConverters(
@@ -457,6 +457,31 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
         }
 
+        // Change average column to be nullable
+        val MIGRATION_77_78 = addMigration(77, 78) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS `temp_podcast_ratings` (
+                        `podcast_uuid` TEXT NOT NULL,
+                        `average` REAL,
+                        `total` INTEGER, 
+                        PRIMARY KEY(`podcast_uuid`)
+                    )
+                """.trimIndent()
+            )
+
+            database.execSQL(
+                """
+                    INSERT INTO `temp_podcast_ratings` (`podcast_uuid`, `average`, `total`)
+                    SELECT `podcast_uuid`, `average`, `total` 
+                    FROM `podcast_ratings`
+                """.trimIndent()
+            )
+
+            database.execSQL("DROP TABLE `podcast_ratings`;")
+            database.execSQL("ALTER TABLE `temp_podcast_ratings` RENAME TO `podcast_ratings`;")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -824,6 +849,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_74_75,
                 MIGRATION_75_76,
                 MIGRATION_76_77,
+                MIGRATION_77_78,
             )
         }
 
