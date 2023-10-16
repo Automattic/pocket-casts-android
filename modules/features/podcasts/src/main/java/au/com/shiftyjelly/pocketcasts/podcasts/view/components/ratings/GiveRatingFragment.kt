@@ -75,7 +75,7 @@ class GiveRatingFragment : BaseDialogFragment() {
                     is GiveRatingViewModel.State.Loaded -> GiveRatingScreen(
                         state = state,
                         onDismiss = ::dismiss,
-                        setStars = viewModel::setStars,
+                        setRating = viewModel::setRating,
                         submitRating = {
                             viewModel.submitRating(
                                 context = context,
