@@ -7,7 +7,7 @@ plugins {
     alias libs.plugins.kotlin.parcelize
 }
 
-apply from: "../../modules.gradle"
+apply from: "${project.rootDir}/base.gradle"
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.navigation'
