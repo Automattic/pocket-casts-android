@@ -190,7 +190,7 @@ class WhatsNewViewModel @Inject constructor(
         ) : WhatsNewFeature(
             title = title,
             message = message,
-            confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
+            confirmButtonTitle = LR.string.whats_new_bookmarks_enable_now_button,
         )
     }
 
