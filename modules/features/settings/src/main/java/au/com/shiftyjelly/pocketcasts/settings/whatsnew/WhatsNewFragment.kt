@@ -95,7 +95,7 @@ class WhatsNewFragment : BaseFragment() {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
             showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                    Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron()
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron()
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
