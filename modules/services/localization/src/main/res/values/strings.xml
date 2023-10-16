@@ -547,6 +547,7 @@
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_not_enough_ratings">Not enough ratings</string>
+    <string name="podcast_submit_rating_no_internet">No internet connection found. Please connect to the internet to submit a rating.</string>
 
     <!-- Episodes -->
 

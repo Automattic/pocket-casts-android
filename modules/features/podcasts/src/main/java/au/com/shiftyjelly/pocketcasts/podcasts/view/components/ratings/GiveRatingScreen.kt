@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,26 +25,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun GiveRatingScreen(
-    state: GiveRatingViewModel.State.Loaded,
-    setRating: (Double) -> Unit,
-    submitRating: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-
-    val context = LocalContext.current
-    Content(
-        state = state,
-        setRating = { setRating(it) },
-        submitRating = {
-            Toast.makeText(context, "TODO: Submit rating", Toast.LENGTH_LONG).show()
-            submitRating()
-        },
-        onDismiss = onDismiss,
-    )
-}
-
-@Composable
-private fun Content(
     state: GiveRatingViewModel.State.Loaded,
     setRating: (Double) -> Unit,
     submitRating: () -> Unit,
