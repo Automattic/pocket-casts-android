@@ -58,7 +58,7 @@ class GiveRatingFragment : BaseDialogFragment() {
                         podcastUuid = podcastUuid,
                         onUserSignedOut = {
                             OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
-                            Toast.makeText(requireContext(), context.getString(LR.string.podcast_log_in_to_rate), Toast.LENGTH_LONG)
+                            Toast.makeText(context, context.getString(LR.string.podcast_log_in_to_rate), Toast.LENGTH_LONG)
                                 .show()
                             coroutineScope.launch {
                                 // a short delay prevents the screen from flashing before the onboarding flow is shown
