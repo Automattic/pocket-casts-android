@@ -4,7 +4,7 @@ plugins {
     alias libs.plugins.kapt
     alias libs.plugins.ksp
     alias libs.plugins.hilt
-    id 'kotlin-parcelize'
+    alias libs.plugins.kotlin.parcelize
 }
 
 apply from: "../../modules.gradle"
