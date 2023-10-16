@@ -80,6 +80,7 @@ class WhatsNewFragment : BaseFragment() {
         when (navigationState) {
             NavigationState.PlaybackSettings -> openFragment(PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true))
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
+            NavigationState.FullScreenPlayerScreen -> {}
             NavigationState.StartUpsellFlow -> startUpsellFlow()
         }
     }

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.whatsnew
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel
@@ -39,6 +40,9 @@ class WhatsNewViewModelTest {
 
     @Mock
     lateinit var settings: Settings
+
+    @Mock
+    lateinit var playbackManager: PlaybackManager
 
     @Mock
     lateinit var subscriptionManager: SubscriptionManager
@@ -207,6 +211,7 @@ class WhatsNewViewModelTest {
         whenever(featureFlag.isEnabled(feature.bookmarksFeature)).thenReturn(true)
 
         viewModel = WhatsNewViewModel(
+            playbackManager = playbackManager,
             subscriptionManager = subscriptionManager,
             settings = settings,
             releaseVersion = releaseVersion,

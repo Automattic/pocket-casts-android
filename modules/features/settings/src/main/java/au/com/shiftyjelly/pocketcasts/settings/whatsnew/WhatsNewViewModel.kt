@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class WhatsNewViewModel @Inject constructor(
+    private val playbackManager: PlaybackManager,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
     private val releaseVersion: ReleaseVersionWrapper,
@@ -108,13 +110,17 @@ class WhatsNewViewModel @Inject constructor(
         trialExists: Boolean = false,
         isUserEntitled: Boolean,
         subscriptionTier: Subscription.SubscriptionTier? = null,
-    ) = WhatsNewFeature.Bookmarks(
-        title = titleResId(),
-        message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
-        hasFreeTrial = trialExists,
-        isUserEntitled = isUserEntitled,
-        subscriptionTier = subscriptionTier,
-    )
+    ): WhatsNewFeature.Bookmarks {
+        val currentEpisode = playbackManager.getCurrentEpisode()
+        return WhatsNewFeature.Bookmarks(
+            title = titleResId(),
+            message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
+            confirmButtonTitle = if (currentEpisode == null) LR.string.whats_new_bookmarks_enable_now_button else LR.string.whats_new_bookmarks_try_now_button,
+            hasFreeTrial = trialExists,
+            isUserEntitled = isUserEntitled,
+            subscriptionTier = subscriptionTier,
+        )
+    }
 
     private fun titleResId(): Int {
         val bookmarksFeature = feature.bookmarksFeature
@@ -142,10 +148,15 @@ class WhatsNewViewModel @Inject constructor(
     fun onConfirm() {
         viewModelScope.launch {
             val currentState = state.value as? UiState.Loaded ?: return@launch
+            val currentEpisode = playbackManager.getCurrentEpisode()
             val target = when (currentState.feature) {
                 is WhatsNewFeature.AutoPlay -> NavigationState.PlaybackSettings
                 is WhatsNewFeature.Bookmarks -> if (currentState.feature.isUserEntitled) {
-                    NavigationState.HeadphoneControlsSettings
+                    if (currentEpisode == null) {
+                        NavigationState.HeadphoneControlsSettings
+                    } else {
+                        NavigationState.FullScreenPlayerScreen
+                    }
                 } else {
                     NavigationState.StartUpsellFlow
                 }
@@ -171,7 +182,7 @@ class WhatsNewViewModel @Inject constructor(
     sealed class WhatsNewFeature(
         @StringRes open val title: Int,
         @StringRes open val message: Int,
-        @StringRes val confirmButtonTitle: Int,
+        @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
         object AutoPlay : WhatsNewFeature(
@@ -184,19 +195,21 @@ class WhatsNewViewModel @Inject constructor(
         data class Bookmarks(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
+            @StringRes override val confirmButtonTitle: Int,
             val hasFreeTrial: Boolean,
             val isUserEntitled: Boolean,
             val subscriptionTier: Subscription.SubscriptionTier? = null, // To show subscription when user is not entitled to the feature
         ) : WhatsNewFeature(
             title = title,
             message = message,
-            confirmButtonTitle = LR.string.whats_new_bookmarks_enable_now_button,
+            confirmButtonTitle = confirmButtonTitle,
         )
     }
 
     sealed class NavigationState {
         object PlaybackSettings : NavigationState()
         object HeadphoneControlsSettings : NavigationState()
+        object FullScreenPlayerScreen : NavigationState()
         object StartUpsellFlow : NavigationState()
     }
 }
