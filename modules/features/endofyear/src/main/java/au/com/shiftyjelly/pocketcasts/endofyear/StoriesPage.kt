@@ -11,10 +11,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
@@ -54,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ShareCompat
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowCloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -201,7 +197,7 @@ private fun StoriesView(
                             .fillMaxWidth(),
                     )
 
-                    CloseButtonView(onCloseClicked)
+                    RowCloseButton(onCloseClicked)
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -288,29 +284,6 @@ private fun ShareButton(
 }
 
 @Composable
-private fun CloseButtonView(
-    onCloseClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-        IconButton(
-            onClick = onCloseClicked
-        ) {
-            Icon(
-                imageVector = NavigationButton.Close.image,
-                contentDescription = stringResource(NavigationButton.Close.contentDescription),
-                tint = Color.White
-            )
-        }
-    }
-}
-
-@Composable
 private fun StoriesLoadingView(
     progress: Float,
     onCloseClicked: () -> Unit,
@@ -380,7 +353,7 @@ private fun StoriesEmptyView(
             .fillMaxSize()
             .background(color = Color.Black)
     ) {
-        CloseButtonView(onCloseClicked)
+        RowCloseButton(onCloseClicked)
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier.fillMaxSize()
