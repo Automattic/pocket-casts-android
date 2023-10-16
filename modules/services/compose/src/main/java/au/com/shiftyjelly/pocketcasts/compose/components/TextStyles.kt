@@ -84,6 +84,7 @@ fun TextH30(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     maxLines: Int = Int.MAX_VALUE,
     disableScale: Boolean = false,
@@ -94,6 +95,7 @@ fun TextH30(
     Text(
         text = text,
         color = color,
+        fontFamily = fontFamily,
         fontSize = if (disableScale) fontSizeUpdated.value.nonScaledSp else fontSizeUpdated,
         lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight.value.sp,
         textAlign = textAlign,

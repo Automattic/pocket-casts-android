@@ -9,13 +9,13 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,11 +44,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ShareCompat
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
@@ -90,8 +93,8 @@ import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 private val StoriesViewMaxSize = 700.dp
 private const val MaxHeightPercentFactor = 0.9f
@@ -172,14 +175,12 @@ private fun StoriesView(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(color = Color.Black)) {
-        var onCaptureBitmap: (() -> Bitmap)? = null
         state.currentStory?.let { story ->
             Box(
                 modifier = modifier
-                    .weight(weight = 1f, fill = true)
                     .clip(RoundedCornerShape(StoryViewCornerSize))
             ) {
-                onCaptureBitmap =
+                val onCaptureBitmap =
                     convertibleToBitmap(content = {
                         StorySharableContent(
                             story,
@@ -191,23 +192,27 @@ private fun StoriesView(
                             modifier
                         )
                     })
-                SegmentedProgressIndicator(
-                    progressFlow = progress,
-                    segmentsData = state.segmentsData,
-                    modifier = modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                )
+                Column {
+                    SegmentedProgressIndicator(
+                        progressFlow = progress,
+                        segmentsData = state.segmentsData,
+                        modifier = modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                    )
+
+                    CloseButtonView(onCloseClicked)
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    if (state.currentStory.shareable) {
+                        ShareButton(
+                            onClick = { onShareClicked.invoke(onCaptureBitmap) },
+                        )
+                    }
+                }
                 if (state.preparingShareText) {
                     LoadingOverContentView()
-                }
-                CloseButtonView(onCloseClicked)
-            }
-            if (state.currentStory.shareable) {
-                requireNotNull(onCaptureBitmap).let {
-                    ShareButton(
-                        onClick = { onShareClicked.invoke(it) },
-                    )
                 }
             }
         }
@@ -264,13 +269,15 @@ private fun ShareButton(
     modifier: Modifier = Modifier,
 ) {
     RowOutlinedButton(
-        text = stringResource(id = LR.string.share),
-        border = BorderStroke(ShareButtonStrokeWidth, Color.White),
+        text = stringResource(id = LR.string.end_of_year_share_story),
+        border = null,
         colors = ButtonDefaults
             .outlinedButtonColors(
                 backgroundColor = Color.Transparent,
                 contentColor = Color.White,
             ),
+        fontSize = 14.sp,
+        fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
         textIcon = rememberVectorPainter(Icons.Default.Share),
         onClick = {
             onClick.invoke()
