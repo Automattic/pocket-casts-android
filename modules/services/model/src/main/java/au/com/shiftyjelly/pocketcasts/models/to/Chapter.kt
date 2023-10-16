@@ -5,14 +5,12 @@ import kotlin.math.roundToInt
 
 data class Chapter(
     val title: String,
-    val url: HttpUrl?,
     var startTime: Int,
     var endTime: Int,
-    val imagePath: String?,
-    val mimeType: String?,
-    var played: Boolean = false,
-    var index: Int = 0,
-    var progress: Float = 0.0f
+    val url: HttpUrl? = null,
+    val imagePath: String? = null,
+    val mimeType: String? = null,
+    var index: Int = 0
 ) {
 
     val isImagePresent: Boolean
@@ -32,7 +30,8 @@ data class Chapter(
         return endTime <= currentTimeMs && endTime != -1
     }
 
-    fun remainingTime(): String {
+    fun remainingTime(playbackPositionMs: Int): String {
+        val progress = calculateProgress(playbackPositionMs)
         val length = endTime - startTime
         val remaining = length * (1f - progress)
         val minutesRemaining = remaining / 1000f / 60f
@@ -44,7 +43,10 @@ data class Chapter(
         }
     }
 
-    fun progressPercentage(): Int {
-        return (progress * 100f).roundToInt()
+    fun calculateProgress(playbackPositionMs: Int): Float {
+        if (playbackPositionMs == 0 || playbackPositionMs < startTime || playbackPositionMs > endTime || duration <= 0) {
+            return 0f
+        }
+        return (playbackPositionMs - startTime).toFloat() / duration.toFloat()
     }
 }
