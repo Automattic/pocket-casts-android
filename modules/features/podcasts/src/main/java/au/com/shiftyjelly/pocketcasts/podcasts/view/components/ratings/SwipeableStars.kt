@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
-import android.content.Context
-import android.view.accessibility.AccessibilityManager
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -22,6 +20,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +35,13 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.abs
 import kotlin.math.max
@@ -54,6 +53,9 @@ fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    val viewModel = hiltViewModel<SwipeableStarsViewModel>()
+    val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
     var stopPointType by remember { mutableStateOf(StopPointType.FullAndHalfStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
@@ -135,12 +137,6 @@ fun SwipeableStars(
                     )
                 }
         ) {
-            val context = LocalContext.current
-            // Only check this once, this means that switching TalkBack on/off while on this screen
-            // will not update the screen and the user will have to exit and come back. This is
-            // something that could be improved.
-            val isTalkbackEnabled = remember { isTalkbackEnabled(context) }
-
             Stars(
                 filled = true,
                 modifier = { index ->
@@ -158,7 +154,7 @@ fun SwipeableStars(
                         .fillMaxHeight()
                         .aspectRatio(1f)
                         .then(
-                            if (isTalkbackEnabled) {
+                            if (isTalkBackEnabled) {
                                 Modifier
                                     .clickable {
                                         touchX = right // select the full star
@@ -318,13 +314,6 @@ private enum class StopPointType {
 private enum class ChangeType {
     Immediate,
     Animated,
-}
-
-private fun isTalkbackEnabled(context: Context): Boolean {
-    val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager?
-    val isEnabled = accessibilityManager?.isEnabled ?: false
-    val isTouchExplorationEnabled = accessibilityManager?.isTouchExplorationEnabled ?: false
-    return isEnabled && isTouchExplorationEnabled
 }
 
 @Preview
