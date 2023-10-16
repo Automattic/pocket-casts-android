@@ -80,7 +80,7 @@ class WhatsNewFragment : BaseFragment() {
         when (navigationState) {
             NavigationState.PlaybackSettings -> openFragment(PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true))
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
-            NavigationState.FullScreenPlayerScreen -> {}
+            NavigationState.FullScreenPlayerScreen -> openPlayer()
             NavigationState.StartUpsellFlow -> startUpsellFlow()
         }
     }
@@ -89,6 +89,12 @@ class WhatsNewFragment : BaseFragment() {
         val fragmentHostListener = activity as? FragmentHostListener
             ?: throw IllegalStateException("Activity must implement FragmentHostListener")
         fragmentHostListener.addFragment(fragment)
+    }
+
+    private fun openPlayer() {
+        val fragmentHostListener = activity as? FragmentHostListener
+            ?: throw IllegalStateException("Activity must implement FragmentHostListener")
+        fragmentHostListener.openPlayer()
     }
 
     private fun startUpsellFlow() {
