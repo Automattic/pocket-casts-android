@@ -151,7 +151,7 @@ open class PlaybackManager @Inject constructor(
 
     private val tonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
-            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.tone}"))
+            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.bookmark_creation_sound}"))
             prepare()
         }
     }

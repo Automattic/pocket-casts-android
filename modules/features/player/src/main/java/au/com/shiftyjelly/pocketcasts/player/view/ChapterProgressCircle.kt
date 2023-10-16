@@ -8,6 +8,10 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 
+/**
+ * A circular progress bar that is used to show the progress of a chapter.
+ * As the chapter progresses, the circle is emptied.
+ */
 class ChapterProgressCircle @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -21,10 +25,12 @@ class ChapterProgressCircle @JvmOverloads constructor(
     private var circleRect = RectF()
     private var degrees: Float = 0f
 
-    var percent: Float = 0f
+    // 0 = the chapter hasn't started and the circle is full
+    // 1 = the chapter is complete and the circle is empty
+    var progress: Float = 0f
         set(value) {
             field = value
-            degrees = 360f * value
+            degrees = 360f * (1f - value)
             invalidate()
         }
 

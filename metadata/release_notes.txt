@@ -1,13 +1,10 @@
 
-*   New Feature:
-    *   Suggest episodes to play in Automotive
-        ([#1362](https://github.com/Automattic/pocket-casts-android/pull/1362))
+*   Updates:
+    *   Show if a podcast has no ratings
+        ([#1453](https://github.com/Automattic/pocket-casts-android/pull/1453))
 *   Bug Fixes:
-    *   Avoid memory leak when opening Up Next queue
-        ([#1397](https://github.com/Automattic/pocket-casts-android/pull/1397))
-    *   Improved multiselect handling in Up Next queue
-        ([#1395](https://github.com/Automattic/pocket-casts-android/pull/1392))
-    *   Improved the downloading of episode show notes
-        ([#1390](https://github.com/Automattic/pocket-casts-android/pull/1390))
+    *   Fixed chapter progress circle on full-screen player
+        ([#1461](https://github.com/Automattic/pocket-casts-android/pull/1461))
+    *   Fixed show notes loading issues
+        ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
 
-        

@@ -10,6 +10,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +28,8 @@ import javax.inject.Inject
 class UpsellViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
+    private val feature: FeatureWrapper,
+    private val releaseVersion: ReleaseVersionWrapper,
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
@@ -54,19 +61,32 @@ class UpsellViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val subscriptionTier = SubscriptionTier.PATRON
-        val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
+        val bookmarksFeature = feature.bookmarksFeature
+        val patronExclusiveAccessRelease = (bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
 
-        // Check the server subscriptions to see if the Patron tier has a free trial
-        val selectedSubscription = subscriptionManager.getDefaultSubscription(
-            tier = subscriptionTier,
-            subscriptions = updatedSubscriptions,
+        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
+            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+        }
+        val availableForFeatureTier = when (relativeToEarlyPatronAccess) {
+            null -> bookmarksFeature.tier
+            EarlyAccessState.Before,
+            EarlyAccessState.During -> if (isReleaseCandidate) bookmarksFeature.tier else FeatureTier.Patron
+            EarlyAccessState.After -> bookmarksFeature.tier
+        }
+        val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
+
+        // Check if subscription has a free trial
+        val trialExists = subscriptionManager.trialExists(
+            tier = availableForFeatureTier.toSubscriptionTier(),
+            subscriptions = subscriptions,
         )
 
         _state.update {
             UiState.Loaded(
                 tier = subscriptionTier,
-                hasFreeTrial = selectedSubscription?.trialPricingPhase != null,
+                hasFreeTrial = trialExists,
+                showEarlyAccessMessage = bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion),
             )
         }
     }
@@ -78,11 +98,18 @@ class UpsellViewModel @Inject constructor(
         )
     }
 
+    private fun FeatureTier.toSubscriptionTier() = when (this) {
+        FeatureTier.Patron -> SubscriptionTier.PATRON
+        is FeatureTier.Plus -> SubscriptionTier.PLUS
+        FeatureTier.Free -> SubscriptionTier.UNKNOWN
+    }
+
     sealed class UiState {
         object Loading : UiState()
         data class Loaded(
             val tier: SubscriptionTier,
             val hasFreeTrial: Boolean,
+            val showEarlyAccessMessage: Boolean,
         ) : UiState()
     }
 }

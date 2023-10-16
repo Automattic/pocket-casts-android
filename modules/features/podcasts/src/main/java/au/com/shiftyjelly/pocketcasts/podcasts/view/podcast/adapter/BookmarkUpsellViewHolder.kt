@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 
 class BookmarkUpsellViewHolder(
     private val composeView: ComposeView,
@@ -31,7 +33,11 @@ class BookmarkUpsellViewHolder(
                     sourceView = sourceView,
                     onClick = {
                         val source = OnboardingUpgradeSource.BOOKMARKS
-                        val onboardingFlow = OnboardingFlow.Upsell(source, true)
+                        val onboardingFlow = OnboardingFlow.Upsell(
+                            source = source,
+                            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
+                                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
+                        )
                         OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
                     },
                     modifier = Modifier

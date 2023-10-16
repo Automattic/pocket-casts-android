@@ -149,7 +149,7 @@ Language: en_GB
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50GB Cloud Storage</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100GB Cloud Storage</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_features_title">Believe in what we’re doing and want to show your support?</string>
     <string name="server_user_delete_account_with_sub_failed">Your account has an active Pocket Casts Plus subscription. Please cancel this first before deleting your account.</string>
@@ -642,7 +642,6 @@ Language: en_GB
     <string name="error_streaming_internet">Streaming failed, check your internet connection.</string>
     <string name="error_chartable_streaming">Streaming failed. The producer is using Chartable analytics which is being blocked. If you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
     <string name="error_chartable">The producer is using Chartable analytics which is being blocked. If you run any filtering app such as AdGuard you will need to whitelist chtbl.com to play the episode.</string>
-    <string name="error_loading_show_notes">Unable to load show notes.</string>
     <string name="error_webview_not_installed">Unable to load show notes due to no system WebView installed.</string>
     <string name="settings_status_service_support_summary">Access to the support FAQ and Contact Us.</string>
     <string name="settings_status_service_support">Support</string>

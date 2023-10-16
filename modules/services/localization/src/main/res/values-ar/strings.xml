@@ -135,7 +135,6 @@ Language: ar
     <string name="episode_downloading">تنزيل</string>
     <string name="onboarding_patron_features_title">هل تؤمن بما نفعله وترغب في إظهار دعمك؟</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">كل شيء في Plus</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">مساحة تخزين على السحابة قدرها 50 جيجابايت</string>
     <string name="onboarding_patron_feature_profile_badge_title">شعار الملف الشخصي للداعمين</string>
     <string name="onboarding_patron_feature_special_icons_title">أيقونات تطبيق Pocket Casts الخاصة</string>
     <string name="onboarding_plus_feature_gratitude_title">الامتنان الدائم للجميع هنا في Pocket Casts</string>
@@ -628,7 +627,6 @@ Language: ar
     <string name="error_streaming_internet">فشل البث، تحقَّق من اتصالك بالإنترنت.</string>
     <string name="error_chartable_streaming">فشل البث. يستخدم المنتِج تحليلات Chartable التي يتم حظرها، إذا قمت بتشغيل أي تطبيق تصفية مثل AdGuard، فسيتعيَّن عليك إدراج chtbl.com في القائمة البيضاء لتشغيل الحلقة.</string>
     <string name="error_chartable">يستخدم المنتِج تحليلات Chartable التي تم حظرها، إذا قمت بتشغيل أي تطبيق تصفية مثل AdGuard، فسيتعيَّن عليك إدراج chtbl.com في القائمة البيضاء لتشغيل الحلقة.</string>
-    <string name="error_loading_show_notes">يتعذر تحميل ملحوظات العرض.</string>
     <string name="error_webview_not_installed">يتعذر تحميل ملحوظات العرض بسبب عدم تثبيت أي WebView على النظام.</string>
     <string name="settings_status_service_support_summary">يمكنك الوصول إلى دعم الأسئلة المتداولة والاتصال بنا.</string>
     <string name="settings_status_service_support">الدعم</string>

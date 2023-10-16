@@ -8,19 +8,17 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -28,15 +26,16 @@ class BookmarkHelper @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val bookmarkManager: BookmarkManager,
     private val settings: Settings,
-) : CoroutineScope {
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
-
-    fun handleAddBookmarkAction(
+) {
+    suspend fun handleAddBookmarkAction(
         context: Context,
+        isAndroidAutoConnected: Boolean,
     ) {
         if (!shouldAllowAddBookmark()) return
-        if (context.isAppForeground()) {
+        if (context.isAppForeground() &&
+            Util.getAppPlatform(context) == AppPlatform.Phone &&
+            !isAndroidAutoConnected
+        ) {
             val bookmarkIntent =
                 context.packageManager.getLaunchIntentForPackage(context.packageName)
                     ?.apply { action = INTENT_OPEN_APP_ADD_BOOKMARK }
@@ -44,39 +43,36 @@ class BookmarkHelper @Inject constructor(
             context.startActivity(bookmarkIntent)
         } else {
             if (playbackManager.getCurrentEpisode() == null) return
-            launch {
-                val episode = playbackManager.getCurrentEpisode() ?: return@launch
-                val timeInSecs = playbackManager.getCurrentTimeMs(episode) / 1000
 
-                // Load existing bookmark
-                val bookmark = bookmarkManager.findByEpisodeTime(
+            val episode = playbackManager.getCurrentEpisode() ?: return
+            val timeInSecs = playbackManager.getCurrentTimeMs(episode) / 1000
+
+            // Load existing bookmark
+            val bookmark = bookmarkManager.findByEpisodeTime(
+                episode = episode,
+                timeSecs = timeInSecs
+            )
+
+            if (bookmark == null) {
+                bookmarkManager.add(
                     episode = episode,
-                    timeSecs = timeInSecs
+                    timeSecs = timeInSecs,
+                    title = context.getString(LR.string.bookmark),
+                    creationSource = BookmarkManager.CreationSource.HEADPHONES,
                 )
-
-                if (bookmark == null) {
-                    bookmarkManager.add(
-                        episode = episode,
-                        timeSecs = timeInSecs,
-                        title = context.getString(LR.string.bookmark),
-                        creationSource = BookmarkManager.CreationSource.HEADPHONES,
-                    )
-                }
-
-                if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
-                    playbackManager.playTone()
-                }
-
-                buildAndShowNotification(context)
             }
+
+            if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
+                playbackManager.playTone()
+            }
+
+            buildAndShowNotification(context)
         }
     }
 
-    private fun shouldAllowAddBookmark(): Boolean {
-        return settings.cachedSubscriptionStatus.value?.let { subscriptionStatus ->
-            (subscriptionStatus as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
-        } ?: false
-    }
+    private fun shouldAllowAddBookmark() =
+        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+            Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)
 }
 
 private fun buildAndShowNotification(

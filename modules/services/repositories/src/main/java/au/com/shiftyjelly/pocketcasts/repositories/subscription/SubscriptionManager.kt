@@ -39,4 +39,8 @@ interface SubscriptionManager {
         tier: Subscription.SubscriptionTier? = null,
         frequency: SubscriptionFrequency? = null,
     ): Subscription?
+    fun trialExists(
+        tier: Subscription.SubscriptionTier,
+        subscriptions: List<Subscription>
+    ): Boolean
 }

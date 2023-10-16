@@ -755,16 +755,17 @@ class MainActivity :
             lifecycleScope.launch { watchSync.sendAuthToDataLayer() }
         }
 
-        val lastSeenVersionCode = settings.getWhatsNewVersionCode()
-        val migratedVersion = settings.getMigratedVersionCode()
-        if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-            val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
-            if (whatsNewShouldBeShown) {
-                settings.setWhatsNewVersionCode(Settings.WHATS_NEW_VERSION_CODE)
-                showBottomSheet(
-                    fragment = WhatsNewFragment(),
-                    swipeEnabled = false,
-                )
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.state.collect { state ->
+                    if (state.shouldShowWhatsNew) {
+                        showBottomSheet(
+                            fragment = WhatsNewFragment(),
+                            swipeEnabled = false,
+                        )
+                        viewModel.onWhatsNewShown()
+                    }
+                }
             }
         }
 

@@ -14,11 +14,20 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
@@ -29,13 +38,18 @@ class MainActivityViewModel
 @Inject constructor(
     private val playbackManager: PlaybackManager,
     userManager: UserManager,
-    val settings: Settings,
+    private val settings: Settings,
     private val endOfYearManager: EndOfYearManager,
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val theme: Theme,
+    private val feature: FeatureWrapper,
+    private val featureFlag: FeatureFlagWrapper,
+    private val releaseVersion: ReleaseVersionWrapper,
 ) : ViewModel() {
+    private val _state = MutableStateFlow(State())
+    val state = _state.asStateFlow()
 
     var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
@@ -43,7 +57,38 @@ class MainActivityViewModel
     var waitingForSignInToShowStories = false
 
     init {
+        showWhatsNewIfNeeded()
         updateStoriesModalShowState(!settings.getEndOfYearModalHasBeenShown())
+    }
+
+    private fun showWhatsNewIfNeeded() {
+        viewModelScope.launch {
+            val lastSeenVersionCode = settings.getWhatsNewVersionCode()
+            val migratedVersion = settings.getMigratedVersionCode()
+            if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
+                var whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
+                val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
+                if (isBookmarksEnabled) {
+                    val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
+
+                    val patronExclusiveAccessRelease = (feature.bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
+                    val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
+                        releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+                    }
+                    val shouldShowWhatsNewWhenUserNotEntitled = patronExclusiveAccessRelease == null ||
+                        relativeToEarlyPatronAccess == EarlyAccessState.After
+
+                    whatsNewShouldBeShown = whatsNewShouldBeShown &&
+                        (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
+                }
+                _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
+            }
+        }
+    }
+
+    fun onWhatsNewShown() {
+        settings.setWhatsNewVersionCode(Settings.WHATS_NEW_VERSION_CODE)
+        _state.update { state -> state.copy(shouldShowWhatsNew = false) }
     }
 
     private val playbackStateRx = playbackManager.playbackStateRelay
@@ -110,4 +155,8 @@ class MainActivityViewModel
             onSuccess(arguments)
         }
     }
+
+    data class State(
+        val shouldShowWhatsNew: Boolean = false,
+    )
 }

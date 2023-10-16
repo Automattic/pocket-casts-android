@@ -39,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressBar
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

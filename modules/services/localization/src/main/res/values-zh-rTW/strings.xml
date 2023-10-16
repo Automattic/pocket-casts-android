@@ -153,7 +153,6 @@ Language: zh_TW
     <string name="onboarding_plus_feature_gratitude_title">來自 Pocket Casts 所有使用者的誠摯謝意</string>
     <string name="onboarding_patron_feature_special_icons_title">特殊 Pocket Casts 應用程式圖示</string>
     <string name="onboarding_patron_feature_profile_badge_title">支持者個人檔案徽章</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50 GB 雲端儲存空間</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">包含 Plus 所有功能</string>
     <string name="onboarding_patron_features_title">肯定我們的服務，並想表達支持嗎？</string>
     <string name="server_user_delete_account_with_sub_failed">你的帳號已有啟用的 Pocket Casts Plus 訂購項目。 請先取消訂購再刪除帳號。</string>
@@ -647,7 +646,6 @@ Language: zh_TW
     <string name="error_streaming_internet">串流失敗，請檢查你的網路連線。</string>
     <string name="error_chartable_streaming">串流失敗。製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等 篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
     <string name="error_chartable">製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
-    <string name="error_loading_show_notes">無法載入節目備註。</string>
     <string name="error_webview_not_installed">未安裝系統 WebView，無法載入節目備註。</string>
     <string name="settings_status_service_support_summary">請參考支援常見問題並聯絡我們。</string>
     <string name="settings_status_service_support">支援</string>
