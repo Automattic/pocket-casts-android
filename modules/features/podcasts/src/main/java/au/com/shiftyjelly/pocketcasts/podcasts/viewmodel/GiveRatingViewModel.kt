@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class GiveRatingViewModel @Inject constructor(
@@ -96,7 +101,17 @@ class GiveRatingViewModel @Inject constructor(
         }
     }
 
-    fun submitRating(onSuccess: () -> Unit) {
+    fun submitRating(context: Context, onSuccess: () -> Unit) {
+        if (!Network.isConnected(context)) {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Cannot submit rating, no network connection")
+            Toast.makeText(
+                context,
+                context.getString(LR.string.podcast_submit_rating_no_internet),
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         Timber.e("submitRating function not implemented yet")
         onSuccess()
     }
