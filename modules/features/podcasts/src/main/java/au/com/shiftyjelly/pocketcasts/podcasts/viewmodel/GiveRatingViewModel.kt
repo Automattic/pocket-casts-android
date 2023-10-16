@@ -5,8 +5,10 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val ratingsManager: RatingsManager,
+    private val userManager: UserManager,
 ) : ViewModel() {
 
     sealed class State {
@@ -58,15 +61,28 @@ class GiveRatingViewModel @Inject constructor(
 
     fun checkIfUserCanRatePodcast(
         podcastUuid: String,
+        onUserSignedOut: () -> Unit,
         onFailure: (String) -> Unit
     ) {
         _state.value = State.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            val newState = getPodcastInfo(podcastUuid)
-            if (newState != null) {
-                _state.value = newState
-            } else {
-                onFailure("Cannot give rating, unable to fetch podcast with id $podcastUuid")
+
+        viewModelScope.launch {
+
+            val signInState = userManager.getSignInState().blockingFirst()
+            when (signInState) {
+
+                SignInState.SignedOut -> {
+                    onUserSignedOut()
+                }
+
+                is SignInState.SignedIn -> {
+                    val newState = getPodcastInfo(podcastUuid)
+                    if (newState != null) {
+                        _state.value = newState
+                    } else {
+                        onFailure("Cannot give rating, unable to fetch podcast with id $podcastUuid")
+                    }
+                }
             }
         }
     }
