@@ -1,8 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
+import android.content.Context
+import android.view.accessibility.AccessibilityManager
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -33,6 +36,11 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -127,20 +135,41 @@ fun SwipeableStars(
                     )
                 }
         ) {
+            val context = LocalContext.current
+            // Only check this once, this means that switching TalkBack on/off while on this screen
+            // will not update the screen and the user will have to exit and come back. This is
+            // something that could be improved.
+            val isTalkbackEnabled = remember { isTalkbackEnabled(context) }
+
             Stars(
                 filled = true,
-                modifier = Modifier
-                    // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
-                    .onGloballyPositioned {
-                        val left = it.positionInParent().x
-                        val right = left + it.size.width
-                        iconPositions += Position(
-                            left = left,
-                            right = right,
+                modifier = { index ->
+                    var right by remember { mutableStateOf(0f) }
+                    Modifier
+                        // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
+                        .onGloballyPositioned {
+                            val left = it.positionInParent().x
+                            right = left + it.size.width
+                            iconPositions += Position(
+                                left = left,
+                                right = right,
+                            )
+                        }
+                        .fillMaxHeight()
+                        .aspectRatio(1f)
+                        .then(
+                            if (isTalkbackEnabled) {
+                                Modifier
+                                    .clickable {
+                                        touchX = right // select the full star
+                                    }
+                                    .semantics {
+                                        contentDescription = "${index + 1} Stars"
+                                        role = Role.Button
+                                    }
+                            } else Modifier
                         )
-                    }
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
+                }
             )
         }
     }
@@ -234,10 +263,10 @@ private fun getDesiredStopPoint(
 @Composable
 fun Stars(
     filled: Boolean,
-    modifier: Modifier = Modifier,
+    modifier: @Composable (index: Int) -> Modifier = { Modifier },
 ) {
     Row {
-        for (i in 0 until numStars) {
+        for (index in 0 until numStars) {
             Icon(
                 imageVector = if (filled) {
                     Icons.Filled.Star
@@ -246,7 +275,7 @@ fun Stars(
                 },
                 tint = MaterialTheme.theme.colors.primaryIcon01,
                 contentDescription = null,
-                modifier = modifier
+                modifier = modifier(index)
                     .fillMaxHeight()
                     .aspectRatio(1f)
             )
@@ -289,6 +318,13 @@ private enum class StopPointType {
 private enum class ChangeType {
     Immediate,
     Animated,
+}
+
+private fun isTalkbackEnabled(context: Context): Boolean {
+    val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager?
+    val isEnabled = accessibilityManager?.isEnabled ?: false
+    val isTouchExplorationEnabled = accessibilityManager?.isTouchExplorationEnabled ?: false
+    return isEnabled && isTouchExplorationEnabled
 }
 
 @Preview
