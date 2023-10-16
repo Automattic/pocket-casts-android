@@ -31,13 +31,12 @@ class ChangeEmailFragment : BaseFragment() {
     private val viewModel: ChangeEmailViewModel by viewModels()
     private val doneViewModel: DoneViewModel by activityViewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
                 val email: String by viewModel.email.observeAsState("")
                 val password: String by viewModel.password.observeAsState("")
                 AppThemeWithBackground(theme.activeTheme) {
-                    // Text("Test")
                     ChangeEmailFragmentPage(
                         changeEmailState = viewModel.changeEmailState.value,
                         email = email,
