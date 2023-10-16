@@ -130,13 +130,18 @@ class UpsellViewModelTest {
 
     @Test
     fun `given patron exclusive feature, when production early access release, early access message shown`() {
+        val releaseVersionMock = mock<ReleaseVersionWrapper>().apply {
+            doReturn(productionEarlyAccessRelease).whenever(this).currentReleaseVersion
+        }
+
         val bookmarksFeatureMock = mock<Feature>().apply {
             doReturn(FeatureTier.Plus(productionEarlyAccessRelease)).whenever(this).tier
-            doReturn(true).whenever(this).isCurrentlyExclusiveToPatron()
+            doReturn(true).whenever(this).isCurrentlyExclusiveToPatron(releaseVersionMock)
         }
         initViewModel(
             currentRelease = productionEarlyAccessRelease,
             patronExclusiveAccessRelease = productionEarlyAccessRelease,
+            releaseVersionMock = releaseVersionMock,
             bookmarksFeatureMock = bookmarksFeatureMock,
         )
 
@@ -170,11 +175,12 @@ class UpsellViewModelTest {
         currentRelease: ReleaseVersion,
         patronExclusiveAccessRelease: ReleaseVersion?,
         bookmarksFeatureMock: Feature? = null,
+        releaseVersionMock: ReleaseVersionWrapper? = null,
     ) {
         val bookmarksFeature = bookmarksFeatureMock ?: mock<Feature>().apply {
             doReturn(FeatureTier.Plus(patronExclusiveAccessRelease)).whenever(this).tier
         }
-        val releaseVersion = mock<ReleaseVersionWrapper>().apply {
+        val releaseVersion = releaseVersionMock ?: mock<ReleaseVersionWrapper>().apply {
             doReturn(currentRelease).whenever(this).currentReleaseVersion
         }
         val feature = mock<FeatureWrapper>().apply {

@@ -75,19 +75,18 @@ class UpsellViewModel @Inject constructor(
             EarlyAccessState.After -> bookmarksFeature.tier
         }
         val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
-        val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
 
         // Check if subscription has a free trial
-        val selectedSubscription = subscriptionManager.getDefaultSubscription(
-            tier = subscriptionTier,
-            subscriptions = updatedSubscriptions,
+        val trialExists = subscriptionManager.trialExists(
+            tier = availableForFeatureTier.toSubscriptionTier(),
+            subscriptions = subscriptions,
         )
 
         _state.update {
             UiState.Loaded(
                 tier = subscriptionTier,
-                hasFreeTrial = selectedSubscription?.trialPricingPhase != null,
-                showEarlyAccessMessage = bookmarksFeature.isCurrentlyExclusiveToPatron(),
+                hasFreeTrial = trialExists,
+                showEarlyAccessMessage = bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion),
             )
         }
     }

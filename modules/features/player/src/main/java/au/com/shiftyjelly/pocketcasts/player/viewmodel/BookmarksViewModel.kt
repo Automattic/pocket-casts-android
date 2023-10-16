@@ -81,7 +81,7 @@ class BookmarksViewModel
         viewModelScope.launch(ioDispatcher) {
             settings.cachedSubscriptionStatus.flow.collectLatest {
                 val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                if (!feature.isAvailable(Feature.BOOKMARKS_ENABLED, userTier)) {
+                if (!feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)) {
                     _uiState.value = UiState.Upsell(sourceView)
                 } else {
                     episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
