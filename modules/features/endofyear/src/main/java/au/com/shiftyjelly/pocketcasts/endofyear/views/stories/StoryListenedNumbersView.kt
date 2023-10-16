@@ -44,17 +44,17 @@ fun StoryListenedNumbersView(
     ) {
         Spacer(modifier = modifier.height(40.dp))
 
-        Spacer(modifier = modifier.weight(0.3f))
-
-        PodcastCoverStack(story.topPodcasts.reversed())
-
-        Spacer(modifier = modifier.weight(0.3f))
+        Spacer(modifier = modifier.weight(0.2f))
 
         PrimaryText(story)
 
-        Spacer(modifier = modifier.weight(0.25f))
+        Spacer(modifier = modifier.height(16.dp))
 
         SecondaryText(story)
+
+        Spacer(modifier = modifier.weight(0.7f))
+
+        PodcastCoverStack(story.topPodcasts.reversed())
 
         Spacer(modifier = modifier.weight(1f))
     }
