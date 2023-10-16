@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -153,13 +152,6 @@ private fun WhatsNewPageLoaded(
 
                 RowButton(
                     text = getButtonTitle(state),
-                    colors = when (state.feature) {
-                        is WhatsNewFeature.AutoPlay -> ButtonDefaults.buttonColors()
-                        is WhatsNewFeature.Bookmarks -> ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                            contentColor = MaterialTheme.theme.colors.primaryInteractive02
-                        )
-                    },
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
