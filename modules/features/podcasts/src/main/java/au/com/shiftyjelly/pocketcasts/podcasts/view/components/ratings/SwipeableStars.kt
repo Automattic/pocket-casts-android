@@ -130,7 +130,7 @@ fun SwipeableStars(
             Stars(
                 filled = true,
                 modifier = Modifier
-                    // We could have applied this onGloballyePositioned modifier to the empty stars with the same effect
+                    // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
                     .onGloballyPositioned {
                         val left = it.positionInParent().x
                         val right = left + it.size.width
