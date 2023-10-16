@@ -6,7 +6,7 @@ plugins {
     alias libs.plugins.hilt
     alias libs.plugins.sentry
     alias libs.plugins.aboutlibraries
-    id 'kotlin-parcelize'
+    alias libs.plugins.kotlin.parcelize
 }
 
 apply from: "../base.gradle"

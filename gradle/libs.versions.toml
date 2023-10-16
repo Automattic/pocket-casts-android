@@ -42,3 +42,4 @@ sentry = { id = "io.sentry.android.gradle", version.ref = "sentry" }
 aboutlibraries = "com.mikepenz.aboutlibraries.plugin:10.4.0"
 ben-manes-versions = "com.github.ben-manes.versions:0.42.0"
 spotless = "com.diffplug.spotless:6.2.2"
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
