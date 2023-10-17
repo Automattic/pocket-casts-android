@@ -13,11 +13,14 @@
 android-application = "8.1.0"
 # @keep
 compose-kotlin-compiler = "1.3.0"
+firebase = "30.5.0"
 kotlin = "1.7.10"
 ksp = "1.7.10-1.0.6"
 hilt = "2.43.2"
 hilt-compiler = "1.0.0"
 google-services = "4.3.14"
+lifecycle = "2.6.0"
+paging = "3.1.1"
 sentry = "3.10.0"
 
 [libraries]
@@ -26,9 +29,55 @@ hilt-compiler =  { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-c
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 
-# Google Play Services OSS Licenses
-# (The following line is still needed as there is no plugin marker available as of yet)
+# Firebase
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-config = { module = "com.google.firebase:firebase-config-ktx" }
+
+# Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
 ossLicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
+
+# Lifecycle
+lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
+lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
+lifecycle-reactivestreams = { module = "androidx.lifecycle:lifecycle-reactivestreams-ktx", version.ref = "lifecycle" }
+lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+
+# Paging
+paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
+paging-rxjava2 = { module = "androidx.paging:paging-rxjava2", version.ref = "paging" }
+
+# Individual dependencies
+
+browser = "androidx.browser:browser:1.4.0"
+cardview = "androidx.cardview:cardview:1.0.0"
+cast = "com.google.android.gms:play-services-cast-framework:21.2.0"
+constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
+
+[bundles]
+firebase = [
+    "firebase-bom",
+    "firebase-analytics",
+    "firebase-config"
+]
+
+lifecycle = [
+    "lifecycle-livedata",
+    "lifecycle-process",
+    "lifecycle-reactivestreams",
+    "lifecycle-runtime",
+    "lifecycle-runtime-compose",
+    "lifecycle-viewmodel",
+    "lifecycle-viewmodel-compose"
+]
+
+paging = [
+    "paging-runtime",
+    "paging-rxjava2"
+]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-application" }
