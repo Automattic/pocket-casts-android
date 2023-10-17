@@ -50,7 +50,7 @@ lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel
 paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
 paging-rxjava2 = { module = "androidx.paging:paging-rxjava2", version.ref = "paging" }
 
-# Individual dependencies
+# Other dependencies
 
 browser = "androidx.browser:browser:1.4.0"
 cardview = "androidx.cardview:cardview:1.0.0"
