@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -65,26 +64,26 @@ private fun BackgroundImage() {
     ) {
         NumberImage(
             xMultiplier = -0.2f,
-            yMultiplier = -0.35f,
-            depthMultiplier = 8,
+            yMultiplier = 0f,
+            depthMultiplier = 4,
             imageRes = R.drawable.img_2,
         )
         NumberImage(
             xMultiplier = 0.65f,
-            yMultiplier = -0.25f,
-            depthMultiplier = 12,
+            yMultiplier = 0.2f,
+            depthMultiplier = 10,
             imageRes = R.drawable.img_0,
         )
         NumberImage(
-            xMultiplier = -0.05f,
-            yMultiplier = 1.25f,
-            depthMultiplier = 12,
+            xMultiplier = -0.1f,
+            yMultiplier = 0.6f,
+            depthMultiplier = 8,
             imageRes = R.drawable.img_2_1,
         )
         NumberImage(
-            xMultiplier = 0.3f,
-            yMultiplier = 0.75f,
-            depthMultiplier = 10,
+            xMultiplier = 0.35f,
+            yMultiplier = 0.45f,
+            depthMultiplier = 6,
             imageRes = R.drawable.img_3,
         )
     }
@@ -116,7 +115,7 @@ private fun NumberImage(
     ParallaxView(depthMultiplier = depthMultiplier) { modifier, biasAlignment ->
         Box(
             modifier = modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .drawWithContent {
                     withTransform({
                         translate(
@@ -131,7 +130,6 @@ private fun NumberImage(
             Image(
                 painter = painterResource(imageRes),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds,
                 alignment = biasAlignment,
             )
         }
