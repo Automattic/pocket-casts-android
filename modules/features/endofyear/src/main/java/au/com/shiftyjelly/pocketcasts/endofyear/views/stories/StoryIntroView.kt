@@ -72,8 +72,8 @@ private fun TitleView() {
     ParallaxView(
         content = { modifier, biasAlignment ->
             Image(
-                painter = painterResource(R.drawable.eoy_review),
-                contentDescription = stringResource(LR.string.end_of_year_review),
+                painter = painterResource(R.drawable.pocket_casts_playback),
+                contentDescription = stringResource(LR.string.end_of_year_pocket_casts_playback),
                 contentScale = ContentScale.FillBounds,
                 modifier = modifier,
                 alignment = biasAlignment,
