@@ -92,7 +92,7 @@ private fun BackgroundImage() {
 @Composable
 private fun TitleView() {
     ParallaxView(
-        depthMultiplier = 30,
+        depthMultiplier = 20,
         content = { modifier, biasAlignment ->
             Image(
                 painter = painterResource(R.drawable.pocket_casts_playback),
