@@ -16,13 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
+import java.util.LinkedList
 
 // https://rb.gy/pwz9r
 @Composable
 fun ParallaxView(
     modifier: Modifier = Modifier,
+    depthMultiplier: Int = 20,
     content: @Composable (Modifier, BiasAlignment) -> Unit,
 ) {
     val context = LocalContext.current
@@ -33,6 +37,7 @@ fun ParallaxView(
     Content(
         modifier = modifier,
         data = data,
+        depthMultiplier = depthMultiplier,
         content = content,
     )
 
@@ -43,6 +48,7 @@ fun ParallaxView(
         val job = scope.launch {
             dataManager.data
                 .receiveAsFlow()
+                .runningAverage(3)
                 .collect { data = it }
         }
 
@@ -58,7 +64,7 @@ fun ParallaxView(
 private fun Content(
     modifier: Modifier = Modifier,
     data: SensorData?,
-    depthMultiplier: Int = 20,
+    depthMultiplier: Int,
     content: @Composable (Modifier, BiasAlignment) -> Unit,
 ) {
     val roll by derivedStateOf { (data?.roll ?: 0f) * depthMultiplier }
@@ -79,4 +85,31 @@ private fun Content(
             )
         )
     }
+}
+
+private fun Flow<SensorData>.runningAverage(windowSize: Int): Flow<SensorData> {
+    require(windowSize > 0) { "Window size must be positive" }
+    return transform {
+        val buffer = LinkedList<SensorData>()
+        collect { value ->
+            if (buffer.size == windowSize) {
+                buffer.removeFirst()
+            }
+            buffer.add(value)
+            val bufferAverage = averageSensorData(buffer)
+            emit(bufferAverage)
+        }
+    }
+}
+
+private fun averageSensorData(sensorDataList: List<SensorData>): SensorData {
+    require(sensorDataList.isNotEmpty()) { "Sensor data list must not be empty" }
+
+    val totalRoll = sensorDataList.sumOf { it.roll.toDouble() }
+    val totalPitch = sensorDataList.sumOf { it.pitch.toDouble() }
+
+    val averageRoll = (totalRoll / sensorDataList.size).toFloat()
+    val averagePitch = (totalPitch / sensorDataList.size).toFloat()
+
+    return SensorData(averageRoll, averagePitch)
 }
