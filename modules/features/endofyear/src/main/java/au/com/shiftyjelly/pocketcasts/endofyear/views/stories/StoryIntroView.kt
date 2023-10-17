@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,14 +63,37 @@ private fun BackgroundImage() {
     Box(
         contentAlignment = Alignment.Center,
     ) {
-        ImageTwenty()
-        ImageTwentyThree()
+        NumberImage(
+            xMultiplier = -0.2f,
+            yMultiplier = -0.35f,
+            depthMultiplier = 8,
+            imageRes = R.drawable.img_2,
+        )
+        NumberImage(
+            xMultiplier = 0.65f,
+            yMultiplier = -0.25f,
+            depthMultiplier = 12,
+            imageRes = R.drawable.img_0,
+        )
+        NumberImage(
+            xMultiplier = -0.05f,
+            yMultiplier = 1.25f,
+            depthMultiplier = 12,
+            imageRes = R.drawable.img_2_1,
+        )
+        NumberImage(
+            xMultiplier = 0.3f,
+            yMultiplier = 0.75f,
+            depthMultiplier = 10,
+            imageRes = R.drawable.img_3,
+        )
     }
 }
 
 @Composable
 private fun TitleView() {
     ParallaxView(
+        depthMultiplier = 30,
         content = { modifier, biasAlignment ->
             Image(
                 painter = painterResource(R.drawable.pocket_casts_playback),
@@ -83,52 +107,34 @@ private fun TitleView() {
 }
 
 @Composable
-private fun ImageTwenty(
-    modifier: Modifier = Modifier,
+private fun NumberImage(
+    xMultiplier: Float,
+    yMultiplier: Float,
+    depthMultiplier: Int,
+    @DrawableRes imageRes: Int,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .drawWithContent {
-                withTransform({
-                    scale(1.07f, 1f)
-                    translate(left = -size.width * .025f, top = 0f)
-                }) {
-                    this@drawWithContent.drawContent()
+    ParallaxView(depthMultiplier = depthMultiplier) { modifier, biasAlignment ->
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .drawWithContent {
+                    withTransform({
+                        translate(
+                            left = size.width * xMultiplier,
+                            top = size.height * yMultiplier,
+                        )
+                    }) {
+                        this@drawWithContent.drawContent()
+                    }
                 }
-            }
-
-    ) {
-        Image(
-            painter = painterResource(R.drawable.img_20),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds
-        )
-    }
-}
-
-@Composable
-private fun ImageTwentyThree(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .drawWithContent {
-                withTransform({
-                    scale(1.17f, 1f)
-                    translate(left = -size.width * .06f, top = 0f)
-                }) {
-                    this@drawWithContent.drawContent()
-                }
-            }
-
-    ) {
-        Image(
-            painter = painterResource(R.drawable.img_23),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds
-        )
+        ) {
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                alignment = biasAlignment,
+            )
+        }
     }
 }
 
