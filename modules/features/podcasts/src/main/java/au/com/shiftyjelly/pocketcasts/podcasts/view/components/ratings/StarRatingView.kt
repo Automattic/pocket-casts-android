@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -24,11 +23,10 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState.Loaded.RatingText
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import java.util.UUID
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun StarRatingView(
@@ -61,6 +59,9 @@ private fun Content(
     state: RatingState.Loaded,
     onClick: () -> Unit
 ) {
+
+    if (state.noRatings) return
+
     Row(
         modifier = Modifier
             .padding(horizontal = 14.dp, vertical = 4.dp)
@@ -68,20 +69,15 @@ private fun Content(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+
         Stars(
             stars = state.stars,
             color = MaterialTheme.theme.colors.filter03
         )
 
-        val ratingText = when (state.ratingText) {
-            RatingText.NotEnoughToRate -> stringResource(LR.string.podcast_not_enough_ratings)
-            is RatingText.ShowTotal -> state.ratingText.text
-            RatingText.ShowNothing -> null
-        }
-
-        ratingText?.let {
+        state.total?.let {
             TextP40(
-                text = it,
+                text = it.abbreviated,
                 modifier = Modifier.padding(start = 6.dp)
             )
         }
