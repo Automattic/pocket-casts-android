@@ -1,10 +1,14 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-parcelize'
-    id 'io.sentry.android.gradle'
-    id 'com.mikepenz.aboutlibraries.plugin'
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kapt
+    alias libs.plugins.ksp
+    alias libs.plugins.hilt
+    alias libs.plugins.sentry
+    alias libs.plugins.aboutlibraries
+    alias libs.plugins.kotlin.parcelize
 }
+
 apply from: "../base.gradle"
 
 android {
@@ -58,9 +62,9 @@ dependencies {
     implementation androidLibs.ktx
     implementation androidLibs.design
     implementation androidLibs.constraintLayout
-    implementation libs.aboutLibrariesCore
-    implementation libs.aboutLibrariesCompose
-    testImplementation libs.junit
+    implementation androidLibs.aboutLibrariesCore
+    implementation androidLibs.aboutLibrariesCompose
+    testImplementation androidLibs.junit
     androidTestImplementation androidLibs.junitExt
     androidTestImplementation androidLibs.testEspressoCore
 

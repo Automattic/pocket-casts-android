@@ -1,8 +1,6 @@
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'dagger.hilt.android.plugin'
-apply plugin: 'com.google.devtools.ksp'
+/**
+ * Base configuration for app, automotive, wear, and all modules.
+ */
 
 def SERVER_MAIN_URL_PROD = "\"https://refresh.pocketcasts.com\""
 def SERVER_API_URL_PROD = "\"https://api.pocketcasts.com\""
@@ -60,7 +58,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion project.versionComposeCompiler
+        kotlinCompilerExtensionVersion libs.versions.compose.kotlin.compiler.get()
     }
 
     testOptions {
@@ -209,78 +207,77 @@ dependencies {
     implementation androidLibs.composeUiUtil
     implementation androidLibs.wearPlayServices
 
-    implementation libs.kotlinCoroutines
-    implementation libs.kotlinCoroutinesAndroid
-    implementation libs.kotlinCoroutinesPlayServices
-    implementation libs.kotlinCoroutinesRx
-    implementation libs.deviceNames
-    implementation libs.glide
-    implementation libs.glideOkHttp
-    implementation libs.coil
-    implementation libs.coilCompose
-    implementation libs.okHttp
-    implementation libs.okHttpLogging
-    implementation libs.rxJava
-    implementation libs.rxAndroid
-    implementation libs.rxKoltin
-    implementation libs.rxRelay
-    implementation libs.retrofit
-    implementation libs.retrofitMoshi
-    implementation(libs.retrofitProtobuf) {
+    implementation androidLibs.kotlinCoroutines
+    implementation androidLibs.kotlinCoroutinesAndroid
+    implementation androidLibs.kotlinCoroutinesPlayServices
+    implementation androidLibs.kotlinCoroutinesRx
+    implementation androidLibs.deviceNames
+    implementation androidLibs.glide
+    implementation androidLibs.glideOkHttp
+    implementation androidLibs.coil
+    implementation androidLibs.coilCompose
+    implementation androidLibs.okHttp
+    implementation androidLibs.okHttpLogging
+    implementation androidLibs.rxJava
+    implementation androidLibs.rxAndroid
+    implementation androidLibs.rxKoltin
+    implementation androidLibs.rxRelay
+    implementation androidLibs.retrofit
+    implementation androidLibs.retrofitMoshi
+    implementation(androidLibs.retrofitProtobuf) {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
     }
-    implementation libs.retrofitRxJava
-    implementation libs.moshi
-    implementation libs.moshiAdapters
-    implementation libs.kotlin
-    implementation libs.timber
-    implementation libs.materialDialog
-    implementation libs.lottie
-    implementation libs.lottieCompose
-    implementation libs.materialProgressBar
-    implementation libs.hiltAndroid
-    implementation libs.hiltWorkManager
-    implementation libs.hiltNavigationCompose
-    implementation libs.accompanistFlowLayout
-    implementation libs.accompanistSystemUiController
-    implementation platform(libs.sentryBom)
-    implementation libs.sentryAndroidCore
-    implementation libs.sentryFragment
-    implementation libs.sentryTimber
-    implementation libs.media3Cast
-    implementation libs.media3Datasource
-    implementation libs.media3Exoplayer
-    implementation libs.media3ExoplayerHls
-    implementation libs.media3Extractor
-    implementation libs.media3Ui
-    implementation libs.showkase
-    testImplementation (libs.junit) {
+    implementation androidLibs.retrofitRxJava
+    implementation androidLibs.moshi
+    implementation androidLibs.moshiAdapters
+    implementation androidLibs.timber
+    implementation androidLibs.materialDialog
+    implementation androidLibs.lottie
+    implementation androidLibs.lottieCompose
+    implementation androidLibs.materialProgressBar
+    implementation libs.hilt.android
+    implementation androidLibs.hiltWorkManager
+    implementation androidLibs.hiltNavigationCompose
+    implementation androidLibs.accompanistFlowLayout
+    implementation androidLibs.accompanistSystemUiController
+    implementation platform(androidLibs.sentryBom)
+    implementation androidLibs.sentryAndroidCore
+    implementation androidLibs.sentryFragment
+    implementation androidLibs.sentryTimber
+    implementation androidLibs.media3Cast
+    implementation androidLibs.media3Datasource
+    implementation androidLibs.media3Exoplayer
+    implementation androidLibs.media3ExoplayerHls
+    implementation androidLibs.media3Extractor
+    implementation androidLibs.media3Ui
+    implementation androidLibs.showkase
+    testImplementation (androidLibs.junit) {
         exclude group: 'org.hamcrest'
     }
-    testImplementation libs.kotlinCoroutinesTest
-    implementation libs.protobufKotlinLite
-    implementation libs.protobufJavaLite
+    testImplementation androidLibs.kotlinCoroutinesTest
+    implementation androidLibs.protobufKotlinLite
+    implementation androidLibs.protobufJavaLite
 
-    ksp libs.moshiKotlinCompile
-    ksp libs.glideCompile
-    ksp libs.showkaseProcessor
+    ksp androidLibs.moshiKotlinCompile
+    ksp androidLibs.glideCompile
+    ksp androidLibs.showkaseProcessor
     // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
-    kapt libs.hiltCompiler
-    kapt libs.hiltDaggerCompiler
+    kapt libs.hilt.compiler
+    kapt libs.dagger.hilt.compiler
 
     debugImplementation androidLibs.composeUiTooling
     debugProdImplementation androidLibs.composeUiTooling
     debugImplementation androidLibs.composeUiTestManifest
     debugProdImplementation androidLibs.composeUiTestManifest
 
-    testImplementation libs.junit
-    testImplementation libs.jsonAssert
-    testImplementation libs.mockWebServer
-    testImplementation libs.testMokitoKotlin
-    testImplementation libs.turbine
-    testImplementation libs.testMokitoKotlinInline
-    testImplementation libs.kotlinCoroutinesTest
-    androidTestImplementation libs.jsonAssert
+    testImplementation androidLibs.junit
+    testImplementation androidLibs.jsonAssert
+    testImplementation androidLibs.mockWebServer
+    testImplementation androidLibs.testMokitoKotlin
+    testImplementation androidLibs.turbine
+    testImplementation androidLibs.testMokitoKotlinInline
+    testImplementation androidLibs.kotlinCoroutinesTest
+    androidTestImplementation androidLibs.jsonAssert
     androidTestImplementation androidLibs.androidTestCore
     androidTestImplementation androidLibs.roomTest
     androidTestImplementation androidLibs.annotations
@@ -295,22 +292,15 @@ dependencies {
     androidTestImplementation androidLibs.testUiautomator
     androidTestImplementation androidLibs.workManagerTest
     androidTestImplementation androidLibs.composeUiTestJunit
-    androidTestImplementation libs.testMockitoAndroid
-    androidTestImplementation libs.testMokitoKotlin
-    androidTestImplementation libs.mockWebServer
-    androidTestImplementation(libs.barista) {
+    androidTestImplementation androidLibs.testMockitoAndroid
+    androidTestImplementation androidLibs.testMokitoKotlin
+    androidTestImplementation androidLibs.mockWebServer
+    androidTestImplementation(androidLibs.barista) {
         exclude group: 'org.jetbrains.kotlin'
     }
     androidTestImplementation androidLibs.accessibilityTestFramework
 
     coreLibraryDesugaring androidLibs.desugarJdk
-
-    constraints {
-        // Avoid duplicate class compile failure: https://stackoverflow.com/a/75298544/1910286
-        implementation(libs.kotlinJdk8) {
-            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-        }
-    }
 }
 
 // Exclude the Timber integration from the Sentry Android SDK temporarily.

@@ -1,12 +1,15 @@
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'io.sentry.android.gradle'
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kapt
+    alias libs.plugins.ksp
+    alias libs.plugins.hilt
+    alias libs.plugins.sentry
+    alias libs.plugins.google.services
+    alias libs.plugins.kotlin.parcelize
 }
-
-apply plugin: 'com.google.gms.google-services'
 
 apply from: "../base.gradle"
 
@@ -87,7 +90,7 @@ dependencies {
     implementation androidLibs.composeUi
     implementation androidLibs.composeMaterialIconsExtended
     implementation androidLibs.composeUiToolingPreview
-    implementation libs.hiltNavigationCompose
+    implementation androidLibs.hiltNavigationCompose
 
     // Compose for Wear OS Dependencies
     implementation androidLibs.wearComposeMaterial
