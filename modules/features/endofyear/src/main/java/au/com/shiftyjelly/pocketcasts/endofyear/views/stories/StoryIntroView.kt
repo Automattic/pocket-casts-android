@@ -2,27 +2,20 @@ package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.parallaxview.ParallaxView
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -36,69 +29,108 @@ fun StoryIntroView(
     modifier: Modifier = Modifier,
 ) {
     Box {
-        BackgroundImage()
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+
+        ConstraintLayout(
+            modifier = modifier.fillMaxSize()
         ) {
-            Spacer(modifier = modifier.weight(1f))
 
-            TitleView()
+            val (yearFirst2, year0, yearSecond2, year3, text, bottomLogo) = createRefs()
 
-            Spacer(modifier = modifier.weight(1f))
+            // First 2 in 2023
+            NumberImage(
+                depthMultiplier = 8,
+                imageRes = R.drawable.img_2,
+                modifier = Modifier
+                    .offset(
+                        x = 230.dp,
+                        y = 150.dp,
+                    )
+                    .constrainAs(yearFirst2) {
+                        bottom.linkTo(text.top)
+                        end.linkTo(text.start)
+                    }
+            )
 
-            PodcastLogoWhite()
+            // 3 in 2023
+            NumberImage(
+                depthMultiplier = 10,
+                imageRes = R.drawable.img_3,
+                modifier = Modifier
+                    .offset(
+                        x = (-240).dp,
+                        y = (-150).dp,
+                    )
+                    .constrainAs(year3) {
+                        top.linkTo(text.bottom)
+                        start.linkTo(text.end)
+                    }
+            )
 
-            Spacer(modifier = modifier.height(30.dp))
+            TitleView(
+                depthMultiplier = 14,
+                modifier = Modifier.constrainAs(text) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
+
+            // 0 in 2023
+            NumberImage(
+                depthMultiplier = 20,
+                imageRes = R.drawable.img_0,
+                modifier = Modifier
+                    .offset(
+                        x = (-140).dp,
+                        y = 70.dp,
+                    )
+                    .constrainAs(year0) {
+                        bottom.linkTo(text.top)
+                        start.linkTo(text.end)
+                    }
+            )
+
+            // Second 2 in 2023
+            NumberImage(
+                depthMultiplier = 17,
+                imageRes = R.drawable.img_2_1,
+                modifier = Modifier
+                    .offset(
+                        x = 125.dp,
+                        y = (-85).dp,
+                    )
+                    .constrainAs(yearSecond2) {
+                        top.linkTo(text.bottom)
+                        end.linkTo(text.start)
+                    }
+            )
+
+            PodcastLogoWhite(
+                modifier = Modifier.constrainAs(bottomLogo) {
+                    bottom.linkTo(parent.bottom, margin = 30.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
         }
     }
 }
 
 @Composable
-private fun BackgroundImage() {
-    Box(
-        contentAlignment = Alignment.Center,
-    ) {
-        NumberImage(
-            xMultiplier = -0.2f,
-            yMultiplier = 0f,
-            depthMultiplier = 4,
-            imageRes = R.drawable.img_2,
-        )
-        NumberImage(
-            xMultiplier = 0.65f,
-            yMultiplier = 0.2f,
-            depthMultiplier = 10,
-            imageRes = R.drawable.img_0,
-        )
-        NumberImage(
-            xMultiplier = -0.1f,
-            yMultiplier = 0.6f,
-            depthMultiplier = 8,
-            imageRes = R.drawable.img_2_1,
-        )
-        NumberImage(
-            xMultiplier = 0.35f,
-            yMultiplier = 0.45f,
-            depthMultiplier = 6,
-            imageRes = R.drawable.img_3,
-        )
-    }
-}
-
-@Composable
-private fun TitleView() {
+private fun TitleView(
+    depthMultiplier: Int,
+    modifier: Modifier,
+) {
     ParallaxView(
-        depthMultiplier = 20,
-        content = { modifier, biasAlignment ->
+        depthMultiplier = depthMultiplier,
+        modifier = modifier,
+        content = { parallaxModifier, biasAlignment ->
             Image(
                 painter = painterResource(R.drawable.pocket_casts_playback),
                 contentDescription = stringResource(LR.string.end_of_year_pocket_casts_playback),
                 contentScale = ContentScale.FillBounds,
-                modifier = modifier,
+                modifier = parallaxModifier,
                 alignment = biasAlignment,
             )
         }
@@ -107,25 +139,16 @@ private fun TitleView() {
 
 @Composable
 private fun NumberImage(
-    xMultiplier: Float,
-    yMultiplier: Float,
     depthMultiplier: Int,
     @DrawableRes imageRes: Int,
+    modifier: Modifier = Modifier,
 ) {
-    ParallaxView(depthMultiplier = depthMultiplier) { modifier, biasAlignment ->
+    ParallaxView(
+        depthMultiplier = depthMultiplier,
+        modifier = modifier,
+    ) { parallaxModifier, biasAlignment ->
         Box(
-            modifier = modifier
-                .fillMaxSize()
-                .drawWithContent {
-                    withTransform({
-                        translate(
-                            left = size.width * xMultiplier,
-                            top = size.height * yMultiplier,
-                        )
-                    }) {
-                        this@drawWithContent.drawContent()
-                    }
-                }
+            modifier = parallaxModifier
         ) {
             Image(
                 painter = painterResource(imageRes),
