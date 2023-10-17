@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.compose.parallaxview
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
@@ -14,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
@@ -70,13 +74,32 @@ private fun Content(
     val roll by derivedStateOf { (data?.roll ?: 0f) * depthMultiplier }
     val pitch by derivedStateOf { (data?.pitch ?: 0f) * depthMultiplier }
 
+    val animationSpec = remember {
+        spring<Int>(stiffness = Spring.StiffnessMediumLow)
+    }
+
+    val x by animateIntAsState(
+        targetValue = with(LocalDensity.current) {
+            (roll * 1.5).dp.roundToPx()
+        },
+        animationSpec = animationSpec,
+        label = "x",
+    )
+    val y by animateIntAsState(
+        targetValue = with(LocalDensity.current) {
+            -(pitch * 2).dp.roundToPx()
+        },
+        animationSpec = animationSpec,
+        label = "y",
+    )
+
     Box(modifier = modifier) {
         content(
             Modifier
                 .offset {
                     IntOffset(
-                        x = (roll * 1.5).dp.roundToPx(),
-                        y = -(pitch* 2).dp.roundToPx()
+                        x = x,
+                        y = y,
                     )
                 },
             BiasAlignment(
