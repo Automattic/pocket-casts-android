@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.atSafeIndex
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedNumbers
@@ -153,7 +154,3 @@ private fun SecondaryText(
     val text = stringResource(R.string.end_of_year_story_listened_to_numbers_subtitle)
     StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
 }
-
-private fun List<TopPodcast>.atSafeIndex(index: Int) =
-    this[index.coerceAtMost(size - 1)]
-        .toPodcast()

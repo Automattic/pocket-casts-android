@@ -272,6 +272,7 @@ private fun ShareButton(
                 backgroundColor = Color.Transparent,
                 contentColor = Color.White,
             ),
+        disableScale = true,
         fontSize = 14.sp,
         fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
         textIcon = rememberVectorPainter(Icons.Default.Share),
