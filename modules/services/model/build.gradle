@@ -25,6 +25,7 @@ dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:utils')
 
+    api libs.room.ktx
     implementation libs.bundles.room
 
     ksp libs.room.compiler
