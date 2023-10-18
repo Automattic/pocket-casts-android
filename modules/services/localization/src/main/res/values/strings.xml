@@ -1591,7 +1591,7 @@
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->
     <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in 2022</string>
     <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title and %2$s is a placeholder for the author. -->
-    <string name="end_of_year_story_top_podcast">Your top podcast was %1$s by %2$s</string>
+    <string name="end_of_year_story_top_podcast">%1$s was your most listened show in 2023</string>
     <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is a placeholder for the number of episodes and %2$s is a placeholder for the listened time. -->
     <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top podcast of the year story to Twitter. %1$s is the URL to the podcast. -->

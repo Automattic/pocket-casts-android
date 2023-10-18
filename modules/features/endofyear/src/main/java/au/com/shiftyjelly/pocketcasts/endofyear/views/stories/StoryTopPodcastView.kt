@@ -113,7 +113,7 @@ private fun PrimaryText(
 ) {
     val text = stringResource(
         id = R.string.end_of_year_story_top_podcast,
-        story.topPodcast.title, story.topPodcast.author
+        story.topPodcast.title
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
