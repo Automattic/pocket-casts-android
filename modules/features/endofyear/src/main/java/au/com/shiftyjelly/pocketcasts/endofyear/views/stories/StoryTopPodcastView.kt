@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -20,9 +21,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -33,27 +34,35 @@ fun StoryTopPodcastView(
     story: StoryTopPodcast,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .podcastDynamicBackground(story.topPodcast.toPodcast())
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(modifier = modifier.weight(0.2f))
+    Box {
+        StoryBlurredBackground(
+            Offset(
+                -LocalView.current.width * 0.75f,
+                LocalView.current.height * 0.3f
+            ),
+        )
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 40.dp)
+        ) {
+            Spacer(modifier = modifier.weight(0.2f))
 
-        PrimaryText(story)
+            PrimaryText(story)
 
-        Spacer(modifier = modifier.weight(0.1f))
+            Spacer(modifier = modifier.weight(0.1f))
 
-        SecondaryText(story)
+            SecondaryText(story)
 
-        Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
 
-        PodcastCoverStack(story)
+            PodcastCoverStack(story)
 
-        Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
+        }
     }
 }
 
