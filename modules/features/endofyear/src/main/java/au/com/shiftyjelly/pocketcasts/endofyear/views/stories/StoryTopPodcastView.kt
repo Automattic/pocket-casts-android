@@ -5,25 +5,26 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
-import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
-import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.atSafeIndex
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -57,7 +58,7 @@ fun StoryTopPodcastView(
 
             SecondaryText(story)
 
-            Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(0.5f))
 
             PodcastCoverStack(story)
 
@@ -73,42 +74,58 @@ private fun PodcastCoverStack(
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
-    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.2f
-
-    Box {
-        (0..2).reversed().forEach { index ->
-            Box(
-                modifier = modifier
-                    .padding(top = (index * (coverWidth.value * .17)).dp)
-                    .transformPodcastCover()
-            ) {
-                with(story.topPodcast) {
-                    when (index) {
-                        0 -> PodcastCover(
-                            uuid = uuid,
-                            coverWidth = coverWidth,
-                            coverSize = CoverSize.BIG
-                        )
-
-                        1 -> {
-                            val backgroundColor = Color(toPodcast().getTintColor(false))
-                            RectangleCover(
-                                coverWidth = coverWidth,
-                                backgroundColor = backgroundColor
-                            )
-                        }
-
-                        2 -> {
-                            val backgroundColor = Color(toPodcast().getTintColor(true))
-                            RectangleCover(
-                                coverWidth = coverWidth,
-                                backgroundColor = backgroundColor
-                            )
-                        }
-                    }
-                }
-            }
-        }
+    val widthInDp = currentLocalView.width.pxToDp(context)
+    val heightInDp = currentLocalView.height.pxToDp(context)
+    Box(
+        modifier = modifier
+            .wrapContentSize(unbounded = true),
+        contentAlignment = Alignment.Center,
+    ) {
+        PodcastCover(
+            uuid = story.topPodcasts.atSafeIndex(1).uuid,
+            coverWidth = (widthInDp * .3).dp,
+            modifier = Modifier
+                .offset(
+                    x = -(widthInDp * .53).dp,
+                    y = -(heightInDp * .13).dp,
+                )
+                .alpha(0.3f)
+        )
+        PodcastCover(
+            uuid = story.topPodcasts.atSafeIndex(2).uuid,
+            coverWidth = (widthInDp * .25).dp,
+            modifier = Modifier
+                .offset(
+                    x = -(widthInDp * .3).dp,
+                    y = (heightInDp * .2).dp,
+                )
+                .alpha(0.5f)
+        )
+        PodcastCover(
+            uuid = story.topPodcasts.atSafeIndex(3).uuid,
+            coverWidth = (widthInDp * .32).dp,
+            modifier = Modifier
+                .offset(
+                    x = (widthInDp * .3).dp,
+                    y = (heightInDp * .23).dp,
+                )
+                .alpha(0.5f)
+        )
+        PodcastCover(
+            uuid = story.topPodcasts.atSafeIndex(4).uuid,
+            coverWidth = (widthInDp * .2).dp,
+            modifier = Modifier
+                .offset(
+                    x = (widthInDp * .4).dp,
+                    y = -(heightInDp * .11).dp,
+                )
+                .alpha(0.2f)
+        )
+        PodcastCover(
+            uuid = story.topPodcast.uuid,
+            coverWidth = (widthInDp * .7).dp,
+            coverSize = CoverSize.BIG
+        )
     }
 }
 
