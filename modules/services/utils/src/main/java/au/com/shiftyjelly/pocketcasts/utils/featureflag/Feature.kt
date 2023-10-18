@@ -17,7 +17,7 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
+        hasDevToggle = true,
     ),
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",

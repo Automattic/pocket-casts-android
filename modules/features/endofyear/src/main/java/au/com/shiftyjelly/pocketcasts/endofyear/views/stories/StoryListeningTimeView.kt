@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
@@ -59,11 +58,7 @@ fun StoryListeningTimeView(
 
         PodcastCoverRow(story, modifier)
 
-        Spacer(modifier = modifier.weight(.5f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
+        Spacer(modifier = modifier.weight(1f))
     }
 }
 

@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -58,10 +57,6 @@ fun StoryTopFivePodcastsView(
         PodcastList(story)
 
         Spacer(modifier = modifier.weight(1f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
     }
 }
 

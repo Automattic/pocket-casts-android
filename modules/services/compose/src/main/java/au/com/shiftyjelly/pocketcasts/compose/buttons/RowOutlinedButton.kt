@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -45,6 +46,7 @@ fun RowOutlinedButton(
     border: BorderStroke? = outlinedBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     textIcon: Painter? = null,
+    fontFamily: FontFamily? = null,
     fontSize: TextUnit? = null,
     leadingIcon: Painter? = null,
     tintIcon: Boolean = true,
@@ -82,6 +84,7 @@ fun RowOutlinedButton(
                         text = text,
                         color = colors.contentColor(enabled = true).value,
                         textAlign = TextAlign.Center,
+                        fontFamily = fontFamily,
                         fontSize = fontSize,
                         modifier = Modifier.padding(6.dp)
                     )

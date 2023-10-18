@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.endofyear.components.CategoryPillar
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.dynamicBackground
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
@@ -54,10 +53,6 @@ fun StoryTopListenedCategoriesView(
         CategoryPillars(story, modifier)
 
         Spacer(modifier = modifier.weight(1f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
     }
 }
 
