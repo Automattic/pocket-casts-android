@@ -14,7 +14,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
@@ -146,6 +145,7 @@ fun PodcastItem(
                     text = podcast.title,
                     color = tintColor,
                     maxLines = 2,
+                    fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
                     fontWeight = FontWeight.Bold,
                     disableScale = disableScale(),
                     modifier = modifier
@@ -155,9 +155,9 @@ fun PodcastItem(
                     text = podcast.author,
                     color = subtitleColor,
                     maxLines = 1,
+                    fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
                     fontWeight = FontWeight.Bold,
                     disableScale = disableScale(),
-                    modifier = modifier.alpha(0.8f)
                 )
             }
         }
