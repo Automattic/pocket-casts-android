@@ -1616,6 +1616,10 @@
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
+    <!-- Title of the top categories story. %1$@ being the name of the most listened category. -->
+    <string name="end_of_year_story_top_categories_title">Did you know that %1$s was your favorite category</string>
+    <!-- Subtitle of the top categories story. %1$@ is the total number of episodes and %2$@ is the total listened time. -->
+    <string name="end_of_year_story_top_categories_subtitle">You listened to %1$s episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top categories story to Twitter. -->
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <!-- Description to why the user needs to create an account to see their end of year stats. -->

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,12 +19,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.endofyear.components.CategoryPillar
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
-import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -48,10 +49,13 @@ fun StoryTopListenedCategoriesView(
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 40.dp)
         ) {
+            Spacer(modifier = modifier.weight(0.2f))
 
-            Spacer(modifier = modifier.weight(1f))
+            PrimaryText(story)
 
-            Title(story)
+            Spacer(modifier = modifier.height(14.dp))
+
+            SecondaryText(story)
 
             Spacer(modifier = modifier.weight(0.5f))
 
@@ -63,20 +67,33 @@ fun StoryTopListenedCategoriesView(
 }
 
 @Composable
-private fun Title(
+private fun PrimaryText(
     story: StoryTopListenedCategories,
     modifier: Modifier = Modifier,
 ) {
-    val text = stringResource(LR.string.end_of_year_story_top_categories)
-    TextH30(
-        text = text,
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        disableScale = disableScale(),
-        modifier = modifier
-            .padding(horizontal = 40.dp)
-            .fillMaxWidth()
+    val text = stringResource(
+        LR.string.end_of_year_story_top_categories_title,
+        story.listenedCategories[0].simplifiedCategoryName()
     )
+    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
+}
+
+@Composable
+private fun SecondaryText(
+    story: StoryTopListenedCategories,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val timeText = StatsHelper.secondsToFriendlyString(
+        story.listenedCategories[0].totalPlayedTime,
+        context.resources
+    )
+    val text = stringResource(
+        id = R.string.end_of_year_story_top_categories_subtitle,
+        story.listenedCategories[0].numberOfEpisodes,
+        timeText
+    )
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
 
 @Composable

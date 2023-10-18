@@ -12,4 +12,12 @@ data class ListenedCategory(
     val mostListenedPodcastTintColor: Int,
 ) {
     fun toPodcast() = Podcast(uuid = mostListenedPodcastId, tintColorForLightBg = mostListenedPodcastTintColor)
+
+    fun simplifiedCategoryName() = when (category) {
+        "Health & Fitness" -> "Health"
+        "Kids & Family" -> "Family"
+        "Religion & Spirituality" -> "Spirituality"
+        "Society & Culture" -> "Culture"
+        else -> category
+    }
 }
