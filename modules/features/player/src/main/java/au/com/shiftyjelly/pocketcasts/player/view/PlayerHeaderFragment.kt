@@ -525,11 +525,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.nextChapter()
     }
 
-    fun openMoreMenu(sourceView: SourceView?) {
-        onMoreClicked(sourceView)
-    }
-
-    private fun onMoreClicked(sourceView: SourceView? = null) {
+    fun onMoreClicked(sourceView: SourceView? = null) {
         // stop double taps
         if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
             return

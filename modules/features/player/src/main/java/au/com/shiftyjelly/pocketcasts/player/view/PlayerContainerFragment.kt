@@ -221,7 +221,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         if (sourceView == SourceView.WHATS_NEW) {
             ((childFragmentManager.fragments.firstOrNull { it is PlayerHeaderFragment }) as? PlayerHeaderFragment)
-                ?.openMoreMenu(sourceView)
+                ?.onMoreClicked(sourceView)
         }
     }
 
