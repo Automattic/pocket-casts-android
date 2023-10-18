@@ -105,7 +105,7 @@ class EndOfYearManagerImpl @Inject constructor(
             stories.add(StoryTopListenedCategories(listenedCategories))
         }
         if (topPodcasts.isNotEmpty()) {
-            stories.add(StoryTopPodcast(topPodcasts.first()))
+            stories.add(StoryTopPodcast(topPodcasts))
             if (topPodcasts.size > 1) {
                 stories.add(StoryTopFivePodcasts(topPodcasts.take(5)))
             }
