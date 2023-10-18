@@ -152,5 +152,5 @@ private fun SecondaryText(
     modifier: Modifier = Modifier,
 ) {
     val text = stringResource(R.string.end_of_year_story_listened_to_numbers_subtitle)
-    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

@@ -19,6 +19,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -32,10 +34,11 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroun
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun StoryTopFivePodcastsView(
@@ -78,7 +81,7 @@ private fun PrimaryText(
     story: StoryTopFivePodcasts,
     modifier: Modifier = Modifier,
 ) {
-    val text = stringResource(R.string.eoy_story_top_podcasts_title)
+    val text = stringResource(LR.string.eoy_story_top_podcasts_title)
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
 
@@ -87,8 +90,8 @@ private fun SecondaryText(
     story: StoryTopFivePodcasts,
     modifier: Modifier = Modifier,
 ) {
-    val text = stringResource(R.string.eoy_story_top_podcasts_subtitle)
-    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
+    val text = stringResource(LR.string.eoy_story_top_podcasts_subtitle)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
 
 @Composable
@@ -97,7 +100,8 @@ private fun PodcastList(story: StoryTopFivePodcasts) {
         PodcastItem(
             podcast = topPodcast.toPodcast(),
             position = index,
-            tintColor = story.tintColor
+            tintColor = story.tintColor,
+            subtitleColor = story.subtitleColor,
         )
     }
 }
@@ -107,6 +111,7 @@ fun PodcastItem(
     podcast: Podcast,
     position: Int,
     tintColor: Color,
+    subtitleColor: Color,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -116,9 +121,10 @@ fun PodcastItem(
             .padding(horizontal = 40.dp)
     ) {
         TextH30(
-            text = "${position + 1}.",
-            color = tintColor,
-            fontWeight = FontWeight.Normal,
+            text = "${position + 1}",
+            color = subtitleColor,
+            fontWeight = FontWeight.W700,
+            fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
             disableScale = disableScale(),
             modifier = modifier.padding(end = 14.dp)
         )
@@ -147,7 +153,7 @@ fun PodcastItem(
                 )
                 TextH70(
                     text = podcast.author,
-                    color = tintColor,
+                    color = subtitleColor,
                     maxLines = 1,
                     fontWeight = FontWeight.Bold,
                     disableScale = disableScale(),
@@ -173,6 +179,7 @@ private fun PodcastItemPreview(
                 ),
                 position = 0,
                 tintColor = Color.White,
+                subtitleColor = Color(0xFF8F97A4),
             )
         }
     }

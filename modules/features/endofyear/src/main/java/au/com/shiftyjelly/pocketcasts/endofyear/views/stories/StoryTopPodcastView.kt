@@ -178,5 +178,5 @@ private fun SecondaryText(
         story.topPodcast.numberOfPlayedEpisodes,
         timeText
     )
-    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
