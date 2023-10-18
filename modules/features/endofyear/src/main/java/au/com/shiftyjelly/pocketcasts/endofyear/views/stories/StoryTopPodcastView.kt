@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -54,7 +55,7 @@ fun StoryTopPodcastView(
 
             PrimaryText(story)
 
-            Spacer(modifier = modifier.weight(0.1f))
+            Spacer(modifier = modifier.height(14.dp))
 
             SecondaryText(story)
 

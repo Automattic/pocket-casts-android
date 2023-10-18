@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -36,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -62,15 +66,15 @@ fun StoryTopFivePodcastsView(
 
             PrimaryText(story)
 
-            Spacer(modifier = modifier.weight(0.1f))
+            Spacer(modifier = modifier.height(14.dp))
 
             SecondaryText(story)
 
-            Spacer(modifier = modifier.weight(0.5f))
+            Spacer(modifier = modifier.weight(0.3f))
 
             PodcastList(story)
 
-            Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(0.5f))
         }
     }
 }
@@ -113,6 +117,9 @@ fun PodcastItem(
     subtitleColor: Color,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val currentLocalView = LocalView.current
+    val heightInDp = currentLocalView.height.pxToDp(context)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -125,7 +132,9 @@ fun PodcastItem(
             fontWeight = FontWeight.W700,
             fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
             disableScale = disableScale(),
-            modifier = modifier.padding(end = 14.dp)
+            modifier = modifier
+                .padding(end = 14.dp)
+                .widthIn(min = 16.dp)
         )
         Row(
             modifier = modifier
@@ -135,7 +144,7 @@ fun PodcastItem(
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
-                modifier = modifier.size(64.dp)
+                modifier = modifier.size((heightInDp * 0.09f).dp)
             )
             Column(
                 modifier = modifier
