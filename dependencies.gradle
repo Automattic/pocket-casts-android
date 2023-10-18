@@ -82,45 +82,4 @@ project.ext {
     sharingServerSecret = secretProperties.getProperty("pocketcastsSharingServerSecret", "")
     pocketcastsSentryDsn = secretProperties.getProperty("pocketcastsSentryDsn", "")
     googleSignInServerClientId = secretProperties.getProperty("googleSignInServerClientId", "")
-
-    // Library versions
-    versionComposeAccompanist = '0.30.1'
-    versionGlide = '4.13.2'
-
-    // Automattic library versions
-    versionTracks = 'trunk-b3655d42123501a1d9a304789b738610ab4403c8'
-
-    androidLibs = [
-
-            // Glide (image loading) - https://github.com/bumptech/glide
-            glide: "com.github.bumptech.glide:glide:$versionGlide",
-            glideOkHttp: "com.github.bumptech.glide:okhttp3-integration:$versionGlide",
-            glideCompile: "com.github.bumptech.glide:compiler:$versionGlide",
-            coil: "io.coil-kt:coil:2.2.1",
-            coilCompose: "io.coil-kt:coil-compose:2.2.1",
-            // OkHttp (http client) - https://github.com/square/okhttp
-            okHttp: "com.squareup.okhttp3:okhttp:4.9.3",
-            okHttpLogging: "com.squareup.okhttp3:logging-interceptor:4.9.3",
-            // RxJava - https://github.com/ReactiveX/RxAndroid/releases
-            rxAndroid: "io.reactivex.rxjava2:rxandroid:2.1.1",
-            rxJava: "io.reactivex.rxjava2:rxjava:2.2.21",
-            rxRelay: "com.jakewharton.rxrelay2:rxrelay:2.1.1",
-            rxKoltin: "io.reactivex.rxjava2:rxkotlin:2.4.0",
-            // Lottie
-            lottie: "com.airbnb.android:lottie:5.2.0",
-            lottieCompose: "com.airbnb.android:lottie-compose:5.2.0",
-            // Mockito
-            testMockitoAndroid: "org.mockito:mockito-android:4.6.1",
-            testMokitoKotlin: "org.mockito.kotlin:mockito-kotlin:4.0.0",
-            testMokitoKotlinInline: 'org.mockito:mockito-inline:4.4.0',
-            // Protocol Buffers
-            // For Android users, it's recommended to use protobuf Java Lite runtime because of its smaller code size.
-            // Java Lite runtime also works better with Proguard because it doesn't rely on Java reflection and is optimized
-            // to allow as much code stripping as possible.
-            protobufKotlinLite: 'com.google.protobuf:protobuf-kotlin-lite:3.23.4',
-            protobufJavaLite: 'com.google.protobuf:protobuf-javalite:3.23.4',
-            mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
-            // Automattic Tracks
-            automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks"
-    ]
 }
