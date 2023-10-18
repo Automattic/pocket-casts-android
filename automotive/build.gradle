@@ -61,7 +61,7 @@ dependencies {
     implementation androidLibs.appCompat
     implementation androidLibs.ktx
     implementation androidLibs.design
-    implementation androidLibs.constraintLayout
+    implementation libs.constraintlayout
     implementation androidLibs.aboutLibrariesCore
     implementation androidLibs.aboutLibrariesCompose
     testImplementation androidLibs.junit

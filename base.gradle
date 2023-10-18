@@ -164,22 +164,15 @@ dependencies {
     implementation androidLibs.palette
     implementation androidLibs.recyclerview
     implementation androidLibs.design
-    implementation androidLibs.cardview
+    implementation libs.cardview
     implementation androidLibs.preference
-    implementation androidLibs.browser
-    implementation androidLibs.constraintLayout
-    implementation androidLibs.cast
-    implementation platform(androidLibs.firebaseBom)
-    implementation androidLibs.firebaseAnalytics
-    implementation androidLibs.firebaseConfig
-    implementation androidLibs.liveDataReactiveStreams
-    implementation androidLibs.lifecycleViewModel
-    implementation androidLibs.lifecycleScope
-    implementation androidLibs.lifecycleScopeCompose
-    implementation androidLibs.lifecycleLiveData
-    implementation androidLibs.lifecycleProcess
-    implementation androidLibs.paging
-    implementation androidLibs.pagingRx
+    implementation libs.browser
+    implementation libs.constraintlayout
+    implementation libs.cast
+    implementation platform(libs.firebase.bom)
+    implementation libs.bundles.firebase
+    implementation libs.bundles.lifecycle
+    implementation libs.bundles.paging
     implementation androidLibs.playReview
     implementation androidLibs.workManager
     implementation androidLibs.workManagerRx
@@ -203,7 +196,6 @@ dependencies {
     implementation androidLibs.composeRx
     implementation androidLibs.composeUi
     implementation androidLibs.composeUiToolingPreview
-    implementation androidLibs.composeViewModel
     implementation androidLibs.composeUiUtil
     implementation androidLibs.wearPlayServices
 
