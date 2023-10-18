@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -42,19 +41,17 @@ fun StoryTopPodcastView(
             .podcastDynamicBackground(story.topPodcast.toPodcast())
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = modifier.height(40.dp))
-
-        Spacer(modifier = modifier.weight(0.7f))
-
-        PodcastCoverStack(story)
-
-        Spacer(modifier = modifier.weight(0.3f))
+        Spacer(modifier = modifier.weight(0.2f))
 
         PrimaryText(story)
 
-        Spacer(modifier = modifier.weight(0.25f))
+        Spacer(modifier = modifier.weight(0.1f))
 
         SecondaryText(story)
+
+        Spacer(modifier = modifier.weight(1f))
+
+        PodcastCoverStack(story)
 
         Spacer(modifier = modifier.weight(1f))
     }
