@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -15,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,10 +28,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
@@ -40,28 +42,34 @@ fun StoryTopFivePodcastsView(
     story: StoryTopFivePodcasts,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .podcastDynamicBackground(story.topPodcasts[0].toPodcast())
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(modifier = modifier.height(40.dp))
+    Box {
+        StoryBlurredBackground(
+            Offset(
+                LocalView.current.width * 0.6f,
+                -LocalView.current.height * 0.4f
+            ),
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 40.dp)
+        ) {
+            Spacer(modifier = modifier.weight(0.2f))
 
-        Spacer(modifier = modifier.weight(1f))
+            PrimaryText(story)
 
-        PrimaryText(story)
+            Spacer(modifier = modifier.weight(0.1f))
 
-        Spacer(modifier = modifier.weight(0.1f))
+            SecondaryText(story)
 
-        SecondaryText(story)
+            Spacer(modifier = modifier.weight(0.5f))
 
-        Spacer(modifier = modifier.weight(0.5f))
+            PodcastList(story)
 
-        PodcastList(story)
-
-        Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
+        }
     }
 }
 
