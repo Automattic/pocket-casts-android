@@ -242,6 +242,7 @@ private fun WhatsNewBookmarksPreview(
                 feature = WhatsNewFeature.Bookmarks(
                     title = LR.string.whats_new_bookmarks_title,
                     message = LR.string.whats_new_bookmarks_body,
+                    confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
                     hasFreeTrial = false,
                     isUserEntitled = true,
                     subscriptionTier = Subscription.SubscriptionTier.PLUS,

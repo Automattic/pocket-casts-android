@@ -936,12 +936,28 @@ class MainActivity :
         updateStatusBar()
     }
 
-    override fun openPlayer() {
+    override fun openPlayer(source: String?) {
+        val sourceView = SourceView.fromString(source)
         binding.playerBottomSheet.openPlayer()
+
+        if (sourceView == SourceView.WHATS_NEW) {
+            showNowPlayingTab(sourceView)
+        }
     }
 
     override fun closePlayer() {
         binding.playerBottomSheet.closePlayer()
+    }
+
+    private fun showNowPlayingTab(sourceView: SourceView?) {
+        launch {
+            delay(300) // To let the player open
+            withContext(Dispatchers.Main) {
+                val playerContainerFragment =
+                    supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
+                playerContainerFragment?.openPlayer(sourceView)
+            }
+        }
     }
 
     override fun onPlayClicked() {
