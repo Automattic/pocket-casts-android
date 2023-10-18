@@ -52,10 +52,11 @@ fun StoryTopListenedCategoriesView(
 ) {
     Box {
         StoryBlurredBackground(
-            Offset(
+            offset = Offset(
                 -LocalView.current.width * 0.4f,
                 -LocalView.current.height * 0.4f
             ),
+            rotate = 110f,
         )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

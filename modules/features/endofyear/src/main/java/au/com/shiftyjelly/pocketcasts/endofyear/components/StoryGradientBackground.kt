@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -20,8 +22,11 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 @Composable
 fun StoryBlurredBackground(
     offset: Offset,
+    rotate: Float = 0f,
 ) {
-    Box(Modifier.wrapContentWidth(unbounded = true)) {
+    Box(
+        Modifier.wrapContentWidth(unbounded = true)
+    ) {
         val context = LocalContext.current
         val screenWidthInPx = LocalView.current.width
         val screenWidthInDp = screenWidthInPx.pxToDp(context)
@@ -32,12 +37,14 @@ fun StoryBlurredBackground(
                     x = offset.x.toInt().pxToDp(context).dp,
                     y = offset.y.toInt().pxToDp(context).dp
                 )
+                .rotate(rotate)
         ) {
             Image(
                 painterResource(id = R.drawable.story_blurred_background),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
+                    .alpha(0.6f)
             )
         }
     }
