@@ -154,65 +154,63 @@ dependencies {
 //    debugImplementation libs.leakcanary
 //    debugProdImplementation libs.leakcanary
 
+    implementation libs.bundles.accompanist
+    implementation libs.bundles.billing
+    implementation libs.bundles.coroutines
+    implementation libs.bundles.firebase
+    implementation libs.bundles.hilt
+    implementation libs.bundles.lifecycle
+    implementation libs.bundles.lottie
+    implementation libs.bundles.media3
+    implementation libs.bundles.moshi
+    implementation libs.bundles.navigation
+    implementation libs.bundles.okhttp
+    implementation libs.bundles.paging
+    implementation libs.bundles.protobuf
+    implementation libs.bundles.retrofit
+    implementation libs.bundles.rxjava
+    implementation libs.bundles.sentry
+    implementation libs.bundles.work
+
+    implementation platform(libs.firebase.bom)
+    implementation platform(libs.sentry.bom)
+
     implementation libs.appcompat
     implementation libs.auth
-    implementation libs.car
-    implementation libs.core.ktx
-    implementation libs.fragment.ktx
-    implementation libs.preference.ktx
-    implementation libs.mediarouter
-    implementation libs.palette
-    implementation libs.recyclerview
-    implementation libs.material
-    implementation libs.cardview
-    implementation libs.preference
     implementation libs.browser
-    implementation libs.constraintlayout
-    implementation libs.cast
-    implementation platform(libs.firebase.bom)
-    implementation libs.bundles.firebase
-    implementation libs.bundles.lifecycle
-    implementation libs.bundles.paging
-    implementation libs.play.review
-    implementation libs.bundles.work
-    implementation libs.bundles.navigation
-    implementation libs.bundles.billing
-    implementation libs.oss.licenses
-    implementation libs.viewpager
-    implementation libs.swiperefreshlayout
     implementation libs.browser.helper
-    implementation libs.guava
-    implementation libs.flexbox
-    implementation libs.bundles.compose
-    implementation libs.play.services.wearable
-    implementation libs.bundles.coroutines
-    implementation libs.device.names
-    implementation libs.glide
-    implementation libs.glide.okhttp
+    implementation libs.car
+    implementation libs.cardview
+    implementation libs.cast
     implementation libs.coil
     implementation libs.coil.compose
-    implementation libs.bundles.okhttp
-    implementation libs.bundles.rxjava
-    implementation libs.bundles.retrofit
+    implementation libs.bundles.compose
+    implementation libs.constraintlayout
+    implementation libs.core.ktx
+    implementation libs.device.names
+    implementation libs.flexbox
+    implementation libs.fragment.ktx
+    implementation libs.glide
+    implementation libs.glide.okhttp
+    implementation libs.guava
+    implementation libs.material
+    implementation libs.material.dialogs
+    implementation libs.material.progressbar
+    implementation libs.mediarouter
+    implementation libs.oss.licenses
+    implementation libs.palette
+    implementation libs.play.review
+    implementation libs.play.services.wearable
+    implementation libs.preference
+    implementation libs.preference.ktx
+    implementation libs.recyclerview
     implementation(libs.retrofit.protobuf) {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
     }
-    implementation libs.bundles.moshi
-    implementation libs.timber
-    implementation libs.material.dialogs
-    implementation libs.bundles.lottie
-    implementation libs.material.progressbar
-    implementation libs.bundles.hilt
-    implementation libs.bundles.accompanist
-    implementation platform(libs.sentry.bom)
-    implementation libs.bundles.sentry
-    implementation libs.bundles.media3
     implementation libs.showkase
-    testImplementation (libs.junit) {
-        exclude group: 'org.hamcrest'
-    }
-    testImplementation libs.coroutines.test
-    implementation libs.bundles.protobuf
+    implementation libs.swiperefreshlayout
+    implementation libs.timber
+    implementation libs.viewpager
 
     ksp libs.moshi.kotlin.codegen
     ksp libs.glide.compiler
@@ -221,34 +219,37 @@ dependencies {
     kapt libs.hilt.compiler
     kapt libs.dagger.hilt.compiler
 
-    debugImplementation libs.compose.ui.tooling
-    debugProdImplementation libs.compose.ui.tooling
     debugImplementation libs.compose.ui.test.manifest
+    debugImplementation libs.compose.ui.tooling
     debugProdImplementation libs.compose.ui.test.manifest
+    debugProdImplementation libs.compose.ui.tooling
 
-    testImplementation libs.junit
-    testImplementation libs.jsonassert
-    testImplementation libs.okHttp.mockwebserver
-    testImplementation libs.mockito.kotlin
-    testImplementation libs.turbine
-    testImplementation libs.mockito.inline
-    testImplementation libs.coroutines.test
-    androidTestImplementation libs.jsonassert
-    androidTestImplementation libs.bundles.test
-    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.accessibility.test.framework
     androidTestImplementation libs.annotation
-    androidTestImplementation libs.navigation.testing
-    androidTestImplementation libs.bundles.espresso
-    androidTestImplementation libs.uiautomator
-    androidTestImplementation libs.work.test
-    androidTestImplementation libs.compose.ui.test.junit4
-    androidTestImplementation libs.mockito.android
-    androidTestImplementation libs.mockito.kotlin
-    androidTestImplementation libs.okHttp.mockwebserver
     androidTestImplementation(libs.barista) {
         exclude group: 'org.jetbrains.kotlin'
     }
-    androidTestImplementation libs.accessibility.test.framework
+    androidTestImplementation libs.bundles.espresso
+    androidTestImplementation libs.bundles.test
+    androidTestImplementation libs.compose.ui.test.junit4
+    androidTestImplementation libs.jsonassert
+    androidTestImplementation libs.mockito.android
+    androidTestImplementation libs.mockito.kotlin
+    androidTestImplementation libs.navigation.testing
+    androidTestImplementation libs.okHttp.mockwebserver
+    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.uiautomator
+    androidTestImplementation libs.work.test
+
+    testImplementation libs.coroutines.test
+    testImplementation libs.jsonassert
+    testImplementation (libs.junit) {
+        exclude group: 'org.hamcrest'
+    }
+    testImplementation libs.mockito.inline
+    testImplementation libs.mockito.kotlin
+    testImplementation libs.okHttp.mockwebserver
+    testImplementation libs.turbine
 
     coreLibraryDesugaring libs.desugar.jdk
 }
