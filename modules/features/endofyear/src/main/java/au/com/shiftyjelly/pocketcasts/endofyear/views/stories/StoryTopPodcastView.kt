@@ -92,7 +92,7 @@ private fun PodcastCoverStack(
                 .alpha(0.3f)
         )
         PodcastCover(
-            uuid = story.topPodcasts.atSafeIndex(2).uuid,
+            uuid = story.topPodcasts.atSafeIndex(3).uuid,
             coverWidth = (widthInDp * .25).dp,
             modifier = Modifier
                 .offset(
@@ -102,7 +102,7 @@ private fun PodcastCoverStack(
                 .alpha(0.5f)
         )
         PodcastCover(
-            uuid = story.topPodcasts.atSafeIndex(3).uuid,
+            uuid = story.topPodcasts.atSafeIndex(2).uuid,
             coverWidth = (widthInDp * .32).dp,
             modifier = Modifier
                 .offset(
