@@ -18,13 +18,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.atSafeIndex
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -81,8 +81,9 @@ private fun PodcastCoverStack(
             .wrapContentSize(unbounded = true),
         contentAlignment = Alignment.Center,
     ) {
-        PodcastCover(
-            uuid = story.topPodcasts.atSafeIndex(1).uuid,
+        PodcastCoverOrEmpty(
+            story = story,
+            index = 1,
             coverWidth = (widthInDp * .3).dp,
             modifier = Modifier
                 .offset(
@@ -91,8 +92,9 @@ private fun PodcastCoverStack(
                 )
                 .alpha(0.3f)
         )
-        PodcastCover(
-            uuid = story.topPodcasts.atSafeIndex(3).uuid,
+        PodcastCoverOrEmpty(
+            story = story,
+            index = 3,
             coverWidth = (widthInDp * .25).dp,
             modifier = Modifier
                 .offset(
@@ -101,8 +103,9 @@ private fun PodcastCoverStack(
                 )
                 .alpha(0.5f)
         )
-        PodcastCover(
-            uuid = story.topPodcasts.atSafeIndex(2).uuid,
+        PodcastCoverOrEmpty(
+            story = story,
+            index = 2,
             coverWidth = (widthInDp * .32).dp,
             modifier = Modifier
                 .offset(
@@ -111,8 +114,9 @@ private fun PodcastCoverStack(
                 )
                 .alpha(0.5f)
         )
-        PodcastCover(
-            uuid = story.topPodcasts.atSafeIndex(4).uuid,
+        PodcastCoverOrEmpty(
+            story = story,
+            index = 4,
             coverWidth = (widthInDp * .2).dp,
             modifier = Modifier
                 .offset(
@@ -126,6 +130,24 @@ private fun PodcastCoverStack(
             coverWidth = (widthInDp * .7).dp,
             coverSize = CoverSize.BIG
         )
+    }
+}
+
+@Composable
+private fun PodcastCoverOrEmpty(
+    story: StoryTopPodcast,
+    index: Int,
+    coverWidth: Dp,
+    modifier: Modifier,
+) {
+    if (index < story.topPodcasts.size) {
+        PodcastCover(
+            uuid = story.topPodcasts[index].uuid,
+            coverWidth = coverWidth,
+            modifier = modifier
+        )
+    } else {
+        Unit
     }
 }
 
