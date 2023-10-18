@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -27,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -50,7 +51,11 @@ fun StoryTopFivePodcastsView(
 
         Spacer(modifier = modifier.weight(1f))
 
-        Title(story)
+        PrimaryText(story)
+
+        Spacer(modifier = modifier.weight(0.1f))
+
+        SecondaryText(story)
 
         Spacer(modifier = modifier.weight(0.5f))
 
@@ -61,20 +66,21 @@ fun StoryTopFivePodcastsView(
 }
 
 @Composable
-private fun Title(
+private fun PrimaryText(
     story: StoryTopFivePodcasts,
     modifier: Modifier = Modifier,
 ) {
-    val text = stringResource(R.string.end_of_year_story_top_podcasts)
-    TextH30(
-        text = text,
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        disableScale = disableScale(),
-        modifier = modifier
-            .padding(horizontal = 40.dp)
-            .fillMaxWidth()
-    )
+    val text = stringResource(R.string.eoy_story_top_podcasts_title)
+    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
+}
+
+@Composable
+private fun SecondaryText(
+    story: StoryTopFivePodcasts,
+    modifier: Modifier = Modifier,
+) {
+    val text = stringResource(R.string.eoy_story_top_podcasts_subtitle)
+    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
 }
 
 @Composable
