@@ -1,12 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,45 +14,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.endofyear.components.CategoryPillar
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.dynamicBackground
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private const val BackgroundColor = 0xFF744F9D
 
 @Composable
 fun StoryTopListenedCategoriesView(
     story: StoryTopListenedCategories,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .dynamicBackground(Color(BackgroundColor))
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(modifier = modifier.height(40.dp))
+    Box {
+        StoryBlurredBackground(
+            Offset(
+                -LocalView.current.width * 0.4f,
+                -LocalView.current.height * 0.4f
+            ),
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 40.dp)
+        ) {
 
-        Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
 
-        Title(story)
+            Title(story)
 
-        Spacer(modifier = modifier.weight(0.5f))
+            Spacer(modifier = modifier.weight(0.5f))
 
-        CategoryPillars(story, modifier)
+            CategoryPillars(story, modifier)
 
-        Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
+        }
     }
 }
 
