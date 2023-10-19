@@ -25,9 +25,8 @@ dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:utils')
 
-    api androidLibs.room
-    implementation androidLibs.roomRx
-    implementation androidLibs.roomKtx
+    api libs.room.ktx
+    implementation libs.bundles.room
 
-    ksp androidLibs.roomCompile
+    ksp libs.room.compiler
 }

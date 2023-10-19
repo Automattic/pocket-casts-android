@@ -58,15 +58,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // Commented out the Automotive library as it clashes with the Material library and we don't use it. Duplicate value for resource attr/navigationIconTint.
     //implementation 'androidx.car:car:1.0.0-alpha7'
-    implementation androidLibs.appCompat
-    implementation androidLibs.ktx
-    implementation androidLibs.design
+    implementation libs.appcompat
+    implementation libs.core.ktx
+    implementation libs.material
     implementation libs.constraintlayout
-    implementation androidLibs.aboutLibrariesCore
-    implementation androidLibs.aboutLibrariesCompose
-    testImplementation androidLibs.junit
-    androidTestImplementation androidLibs.junitExt
-    androidTestImplementation androidLibs.testEspressoCore
+    implementation libs.bundles.aboutlibraries
+    testImplementation libs.junit
+    androidTestImplementation libs.junit.ext
+    androidTestImplementation libs.espresso.core
 
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
