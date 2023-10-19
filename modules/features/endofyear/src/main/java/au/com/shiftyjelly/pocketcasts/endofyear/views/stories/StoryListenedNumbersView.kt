@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -54,7 +55,7 @@ fun StoryListenedNumbersView(
 
             PrimaryText(story)
 
-            Spacer(modifier = modifier.weight(0.1f))
+            Spacer(modifier = modifier.height(14.dp))
 
             SecondaryText(story)
 
@@ -152,5 +153,5 @@ private fun SecondaryText(
     modifier: Modifier = Modifier,
 ) {
     val text = stringResource(R.string.end_of_year_story_listened_to_numbers_subtitle)
-    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

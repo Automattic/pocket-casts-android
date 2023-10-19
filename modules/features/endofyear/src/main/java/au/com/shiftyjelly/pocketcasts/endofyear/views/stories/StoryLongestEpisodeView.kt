@@ -132,5 +132,5 @@ private fun SecondaryText(
         id = R.string.end_of_year_story_longest_episode_duration,
         timeText
     )
-    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

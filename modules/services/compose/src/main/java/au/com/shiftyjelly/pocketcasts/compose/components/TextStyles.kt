@@ -300,6 +300,7 @@ fun TextH70(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    fontFamily: FontFamily? = null,
     fontWeight: FontWeight = FontWeight.W500,
     maxLines: Int = Int.MAX_VALUE,
     disableScale: Boolean = false
@@ -308,6 +309,7 @@ fun TextH70(
         text = text,
         color = color,
         fontSize = if (disableScale) 12.nonScaledSp else 12.sp,
+        fontFamily = fontFamily,
         fontWeight = fontWeight,
         lineHeight = if (disableScale) 14.nonScaledSp else 14.sp,
         letterSpacing = if (disableScale) .25f.nonScaledSp else .25.sp,
