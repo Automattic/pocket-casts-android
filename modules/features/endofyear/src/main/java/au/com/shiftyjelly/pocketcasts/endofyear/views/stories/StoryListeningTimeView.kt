@@ -89,7 +89,7 @@ private fun SecondaryText(
         story.listeningTimeInSecs,
         context.resources
     )
-    StorySecondaryText(text = funnyText, color = story.tintColor, modifier = modifier)
+    StorySecondaryText(text = funnyText, color = story.subtitleColor, modifier = modifier)
 }
 
 @Composable
