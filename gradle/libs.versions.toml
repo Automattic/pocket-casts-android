@@ -447,7 +447,6 @@ work = [
 aboutlibraries = "com.mikepenz.aboutlibraries.plugin:10.4.0"
 android-application = { id = "com.android.application", version.ref = "android-application" }
 android-library = { id = "com.android.library", version.ref = "android-application" }
-ben-manes-versions = "com.github.ben-manes.versions:0.42.0"
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
