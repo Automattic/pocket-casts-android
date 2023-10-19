@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -80,14 +81,21 @@ class WhatsNewFragment : BaseFragment() {
         when (navigationState) {
             NavigationState.PlaybackSettings -> openFragment(PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true))
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
+            NavigationState.FullScreenPlayerScreen -> openPlayer()
             NavigationState.StartUpsellFlow -> startUpsellFlow()
         }
     }
 
     private fun openFragment(fragment: Fragment) {
         val fragmentHostListener = activity as? FragmentHostListener
-            ?: throw IllegalStateException("Activity must implement FragmentHostListener")
+            ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
         fragmentHostListener.addFragment(fragment)
+    }
+
+    private fun openPlayer() {
+        val fragmentHostListener = activity as? FragmentHostListener
+            ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
+        fragmentHostListener.openPlayer(SourceView.WHATS_NEW.analyticsValue)
     }
 
     private fun startUpsellFlow() {
@@ -101,6 +109,7 @@ class WhatsNewFragment : BaseFragment() {
     }
 
     companion object {
+        private const val FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED = "Activity must implement FragmentHostListener"
         fun isWhatsNewNewerThan(versionCode: Int?): Boolean {
             return Settings.WHATS_NEW_VERSION_CODE > (versionCode ?: 0)
         }
