@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -22,9 +24,9 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -35,29 +37,35 @@ fun StoryListeningTimeView(
     story: StoryListeningTime,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .podcastDynamicBackground(story.podcasts[0].toPodcast())
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(modifier = modifier.height(40.dp))
+    Box {
+        StoryBlurredBackground(
+            Offset(
+                -LocalView.current.width * 0.7f,
+                LocalView.current.height * 0.3f
+            ),
+        )
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 40.dp)
+        ) {
+            Spacer(modifier = modifier.weight(0.2f))
 
-        Spacer(modifier = modifier.weight(.75f))
+            PrimaryText(story, modifier)
 
-        PrimaryText(story, modifier)
+            Spacer(modifier = modifier.height(14.dp))
 
-        Spacer(modifier = modifier.weight(0.25f))
+            SecondaryText(story, modifier)
 
-        SecondaryText(story, modifier)
+            Spacer(modifier = modifier.weight(0.25f))
 
-        Spacer(modifier = modifier.weight(0.25f))
+            PodcastCoverRow(story, modifier)
 
-        PodcastCoverRow(story, modifier)
-
-        Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
+        }
     }
 }
 
