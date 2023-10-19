@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
-import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -71,9 +70,9 @@ private fun PrimaryText(
     val language = Locale.current.language
     val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
     val textResId = if (language == "en") {
-        LR.string.end_of_year_listening_time_english_only
+        LR.string.end_of_year_listening_time_title_english_only
     } else {
-        LR.string.end_of_year_listening_time
+        LR.string.end_of_year_listening_time_title
     }
     val text = stringResource(textResId, timeText)
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
@@ -84,12 +83,8 @@ private fun SecondaryText(
     story: StoryListeningTime,
     modifier: Modifier,
 ) {
-    val context = LocalContext.current
-    val funnyText = FunnyTimeConverter().timeSecsToFunnyText(
-        story.listeningTimeInSecs,
-        context.resources
-    )
-    StorySecondaryText(text = funnyText, color = story.subtitleColor, modifier = modifier)
+    val text = stringResource(LR.string.end_of_year_listening_time_subtitle)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
 
 @Composable
