@@ -39,6 +39,6 @@ dependencies {
     implementation project(':modules:services:views')
 
     // android libs
-    implementation androidLibs.horologistAuthDataPhone
-    implementation androidLibs.horologistDatalayer
+    implementation libs.horologist.auth.data.phone
+    implementation libs.horologist.datalayer
 }

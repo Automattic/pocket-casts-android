@@ -82,38 +82,21 @@ sentry {
 }
 
 dependencies {
-    implementation androidLibs.wearInput
-    implementation androidLibs.wearRemoteInteractions
+    implementation libs.wear.input
+    implementation libs.wear.remote.interactions
 
     // General Compose dependencies
-    implementation androidLibs.composeActivity
-    implementation androidLibs.composeUi
-    implementation androidLibs.composeMaterialIconsExtended
-    implementation androidLibs.composeUiToolingPreview
-    implementation androidLibs.hiltNavigationCompose
+    implementation libs.compose.activity
+    implementation libs.compose.ui
+    implementation libs.compose.icons
+    implementation libs.compose.ui.tooling.preview
+    implementation libs.hilt.navigation.compose
 
     // Compose for Wear OS Dependencies
-    implementation androidLibs.wearComposeMaterial
-    implementation androidLibs.wearComposeFoundation
-    implementation androidLibs.wearComposeNavigation
+    implementation libs.bundles.wear.compose
 
-    // Horologist Dependencies
-    implementation androidLibs.horologistAudioUi
-    implementation androidLibs.horologistAuthData
-    implementation androidLibs.horologistAuthComposables
-    implementation androidLibs.horologistAuthUi
-    implementation androidLibs.horologistComposeMaterial
-    implementation androidLibs.horologistDatalayer
-    implementation androidLibs.horologistMedia
-    implementation androidLibs.horologistMedia3Backend
-    implementation androidLibs.horologistMediaData
-    implementation androidLibs.horologistMediaUi
-    implementation androidLibs.horologistNetworkAwarnessOkHttp
-
-    implementation androidLibs.media3DatasourceOkhttp
-
-    implementation androidLibs.horologistComposeLayout
-
+    implementation libs.bundles.horologist
+    implementation libs.media3.datasource.okhttp
     implementation project(':modules:services:analytics')
     implementation project(':modules:services:compose')
     implementation project(':modules:services:images')

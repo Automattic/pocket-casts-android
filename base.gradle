@@ -151,156 +151,107 @@ android {
 
 dependencies {
     // Uncomment if you want to run with leak canary
-//    debugImplementation androidLibs.leakCanary
-//    debugProdImplementation androidLibs.leakCanary
+//    debugImplementation libs.leakcanary
+//    debugProdImplementation libs.leakcanary
 
-    implementation androidLibs.appCompat
-    implementation androidLibs.auth
-    implementation androidLibs.car
-    implementation androidLibs.ktx
-    implementation androidLibs.ktxFragment
-    implementation androidLibs.ktxPreference
-    implementation androidLibs.mediarouter
-    implementation androidLibs.palette
-    implementation androidLibs.recyclerview
-    implementation androidLibs.design
-    implementation androidLibs.cardview
-    implementation androidLibs.preference
-    implementation androidLibs.browser
-    implementation androidLibs.constraintLayout
-    implementation androidLibs.cast
-    implementation platform(androidLibs.firebaseBom)
-    implementation androidLibs.firebaseAnalytics
-    implementation androidLibs.firebaseConfig
-    implementation androidLibs.liveDataReactiveStreams
-    implementation androidLibs.lifecycleViewModel
-    implementation androidLibs.lifecycleScope
-    implementation androidLibs.lifecycleScopeCompose
-    implementation androidLibs.lifecycleLiveData
-    implementation androidLibs.lifecycleProcess
-    implementation androidLibs.paging
-    implementation androidLibs.pagingRx
-    implementation androidLibs.playReview
-    implementation androidLibs.workManager
-    implementation androidLibs.workManagerRx
-    implementation androidLibs.navigationFragment
-    implementation androidLibs.navigationUi
-    implementation androidLibs.billing
-    implementation androidLibs.billingKtx
-    implementation androidLibs.openSource
-    implementation androidLibs.viewPager
-    implementation androidLibs.swipeToRefresh
-    implementation androidLibs.browserHelper
-    implementation androidLibs.guava
-    implementation androidLibs.flexbox
-    implementation androidLibs.composeActivity
-    implementation androidLibs.composeAnimation
-    implementation androidLibs.composeConstraint
-    implementation androidLibs.composeIcons
-    implementation androidLibs.composeLiveData
-    implementation androidLibs.composeMaterial
-    implementation androidLibs.composeNavigation
-    implementation androidLibs.composeRx
-    implementation androidLibs.composeUi
-    implementation androidLibs.composeUiToolingPreview
-    implementation androidLibs.composeViewModel
-    implementation androidLibs.composeUiUtil
-    implementation androidLibs.wearPlayServices
+    implementation libs.bundles.accompanist
+    implementation libs.bundles.billing
+    implementation libs.bundles.coroutines
+    implementation libs.bundles.firebase
+    implementation libs.bundles.hilt
+    implementation libs.bundles.lifecycle
+    implementation libs.bundles.lottie
+    implementation libs.bundles.media3
+    implementation libs.bundles.moshi
+    implementation libs.bundles.navigation
+    implementation libs.bundles.okhttp
+    implementation libs.bundles.paging
+    implementation libs.bundles.protobuf
+    implementation libs.bundles.retrofit
+    implementation libs.bundles.rxjava
+    implementation libs.bundles.sentry
+    implementation libs.bundles.work
 
-    implementation androidLibs.kotlinCoroutines
-    implementation androidLibs.kotlinCoroutinesAndroid
-    implementation androidLibs.kotlinCoroutinesPlayServices
-    implementation androidLibs.kotlinCoroutinesRx
-    implementation androidLibs.deviceNames
-    implementation androidLibs.glide
-    implementation androidLibs.glideOkHttp
-    implementation androidLibs.coil
-    implementation androidLibs.coilCompose
-    implementation androidLibs.okHttp
-    implementation androidLibs.okHttpLogging
-    implementation androidLibs.rxJava
-    implementation androidLibs.rxAndroid
-    implementation androidLibs.rxKoltin
-    implementation androidLibs.rxRelay
-    implementation androidLibs.retrofit
-    implementation androidLibs.retrofitMoshi
-    implementation(androidLibs.retrofitProtobuf) {
+    implementation platform(libs.firebase.bom)
+    implementation platform(libs.sentry.bom)
+
+    implementation libs.appcompat
+    implementation libs.auth
+    implementation libs.browser
+    implementation libs.browser.helper
+    implementation libs.car
+    implementation libs.cardview
+    implementation libs.cast
+    implementation libs.coil
+    implementation libs.coil.compose
+    implementation libs.bundles.compose
+    implementation libs.constraintlayout
+    implementation libs.core.ktx
+    implementation libs.device.names
+    implementation libs.flexbox
+    implementation libs.fragment.ktx
+    implementation libs.glide
+    implementation libs.glide.okhttp
+    implementation libs.guava
+    implementation libs.material
+    implementation libs.material.dialogs
+    implementation libs.material.progressbar
+    implementation libs.mediarouter
+    implementation libs.oss.licenses
+    implementation libs.palette
+    implementation libs.play.review
+    implementation libs.play.services.wearable
+    implementation libs.preference
+    implementation libs.preference.ktx
+    implementation libs.recyclerview
+    implementation(libs.retrofit.protobuf) {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
     }
-    implementation androidLibs.retrofitRxJava
-    implementation androidLibs.moshi
-    implementation androidLibs.moshiAdapters
-    implementation androidLibs.timber
-    implementation androidLibs.materialDialog
-    implementation androidLibs.lottie
-    implementation androidLibs.lottieCompose
-    implementation androidLibs.materialProgressBar
-    implementation libs.hilt.android
-    implementation androidLibs.hiltWorkManager
-    implementation androidLibs.hiltNavigationCompose
-    implementation androidLibs.accompanistFlowLayout
-    implementation androidLibs.accompanistSystemUiController
-    implementation platform(androidLibs.sentryBom)
-    implementation androidLibs.sentryAndroidCore
-    implementation androidLibs.sentryFragment
-    implementation androidLibs.sentryTimber
-    implementation androidLibs.media3Cast
-    implementation androidLibs.media3Datasource
-    implementation androidLibs.media3Exoplayer
-    implementation androidLibs.media3ExoplayerHls
-    implementation androidLibs.media3Extractor
-    implementation androidLibs.media3Ui
-    implementation androidLibs.showkase
-    testImplementation (androidLibs.junit) {
-        exclude group: 'org.hamcrest'
-    }
-    testImplementation androidLibs.kotlinCoroutinesTest
-    implementation androidLibs.protobufKotlinLite
-    implementation androidLibs.protobufJavaLite
+    implementation libs.showkase
+    implementation libs.swiperefreshlayout
+    implementation libs.timber
+    implementation libs.viewpager
 
-    ksp androidLibs.moshiKotlinCompile
-    ksp androidLibs.glideCompile
-    ksp androidLibs.showkaseProcessor
+    ksp libs.moshi.kotlin.codegen
+    ksp libs.glide.compiler
+    ksp libs.showkase.processor
     // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
     kapt libs.hilt.compiler
     kapt libs.dagger.hilt.compiler
 
-    debugImplementation androidLibs.composeUiTooling
-    debugProdImplementation androidLibs.composeUiTooling
-    debugImplementation androidLibs.composeUiTestManifest
-    debugProdImplementation androidLibs.composeUiTestManifest
+    debugImplementation libs.compose.ui.test.manifest
+    debugImplementation libs.compose.ui.tooling
+    debugProdImplementation libs.compose.ui.test.manifest
+    debugProdImplementation libs.compose.ui.tooling
 
-    testImplementation androidLibs.junit
-    testImplementation androidLibs.jsonAssert
-    testImplementation androidLibs.mockWebServer
-    testImplementation androidLibs.testMokitoKotlin
-    testImplementation androidLibs.turbine
-    testImplementation androidLibs.testMokitoKotlinInline
-    testImplementation androidLibs.kotlinCoroutinesTest
-    androidTestImplementation androidLibs.jsonAssert
-    androidTestImplementation androidLibs.androidTestCore
-    androidTestImplementation androidLibs.roomTest
-    androidTestImplementation androidLibs.annotations
-    androidTestImplementation androidLibs.navigationTest
-    androidTestImplementation androidLibs.testRunner
-    androidTestImplementation androidLibs.testRules
-    androidTestImplementation androidLibs.testEspressoCore
-    androidTestImplementation androidLibs.testEspressoContrib
-    androidTestImplementation androidLibs.testExpressoWeb
-    androidTestImplementation androidLibs.testExpressoIdlingConcurrent
-    androidTestImplementation androidLibs.testExpressoIdlingResouce
-    androidTestImplementation androidLibs.testUiautomator
-    androidTestImplementation androidLibs.workManagerTest
-    androidTestImplementation androidLibs.composeUiTestJunit
-    androidTestImplementation androidLibs.testMockitoAndroid
-    androidTestImplementation androidLibs.testMokitoKotlin
-    androidTestImplementation androidLibs.mockWebServer
-    androidTestImplementation(androidLibs.barista) {
+    androidTestImplementation libs.accessibility.test.framework
+    androidTestImplementation libs.annotation
+    androidTestImplementation(libs.barista) {
         exclude group: 'org.jetbrains.kotlin'
     }
-    androidTestImplementation androidLibs.accessibilityTestFramework
+    androidTestImplementation libs.bundles.espresso
+    androidTestImplementation libs.bundles.test
+    androidTestImplementation libs.compose.ui.test.junit4
+    androidTestImplementation libs.jsonassert
+    androidTestImplementation libs.mockito.android
+    androidTestImplementation libs.mockito.kotlin
+    androidTestImplementation libs.navigation.testing
+    androidTestImplementation libs.okHttp.mockwebserver
+    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.uiautomator
+    androidTestImplementation libs.work.test
 
-    coreLibraryDesugaring androidLibs.desugarJdk
+    testImplementation libs.coroutines.test
+    testImplementation libs.jsonassert
+    testImplementation (libs.junit) {
+        exclude group: 'org.hamcrest'
+    }
+    testImplementation libs.mockito.inline
+    testImplementation libs.mockito.kotlin
+    testImplementation libs.okHttp.mockwebserver
+    testImplementation libs.turbine
+
+    coreLibraryDesugaring libs.desugar.jdk
 }
 
 // Exclude the Timber integration from the Sentry Android SDK temporarily.

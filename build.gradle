@@ -16,7 +16,6 @@ plugins {
     alias libs.plugins.hilt apply false
     alias libs.plugins.google.services apply false
     alias libs.plugins.aboutlibraries apply false
-    alias libs.plugins.ben.manes.versions
     alias libs.plugins.spotless
     alias libs.plugins.sentry apply false
     alias libs.plugins.kotlin.parcelize apply false
@@ -31,18 +30,5 @@ spotless {
         targetExclude("$buildDir/**/*.kt")
         targetExclude('bin/**/*.kt')
         ktlint('0.45.1')
-    }
-}
-
-dependencyUpdates.resolutionStrategy {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
     }
 }
