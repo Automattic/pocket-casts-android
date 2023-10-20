@@ -43,7 +43,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private val CategoryColor = Color(0xFF686C74)
-private val CategoryFontSize = 54.sp
+private val CategoryFontSize = 40.sp
 private val DefaultFontFamily = FontFamily(listOf(Font(UR.font.dm_sans)))
 
 @Composable
@@ -199,7 +199,7 @@ private fun CategoryTexts(
             color = titleColor,
             fontSize = CategoryFontSize,
             fontFamily = DefaultFontFamily,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.W500,
             disableScale = true,
             modifier = modifier,
         )
@@ -209,7 +209,7 @@ private fun CategoryTexts(
             color = subtitleColor,
             maxLines = 1,
             fontFamily = DefaultFontFamily,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.W600,
             disableScale = disableScale(),
         )
     }
