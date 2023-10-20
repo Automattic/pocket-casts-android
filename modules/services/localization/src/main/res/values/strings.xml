@@ -1463,14 +1463,22 @@
     <string name="discover_category_fiction">Fiction</string>
     <string name="discover_category_government">Government</string>
     <string name="discover_category_health"><![CDATA[Health & Fitness]]></string>
+    <!-- Abbreviation for the podcast category Health & Fitness, using only "Health" -->
+    <string name="discover_category_health_abbreviation">Health</string>
     <string name="discover_category_history">History</string>
     <string name="discover_category_kids"><![CDATA[Kids & Family]]></string>
+    <!-- Abbreviation for the podcast category Kids & Family, using only "Family" -->
+    <string name="discover_category_kids_abbreviation">Family</string>
     <string name="discover_category_leisure">Leisure</string>
     <string name="discover_category_music">Music</string>
     <string name="discover_category_news">News</string>
     <string name="discover_category_religion"><![CDATA[Religion & Spirituality]]></string>
+    <!-- Abbreviation for the podcast category Religion & Spirituality, using only "Spirituality" -->
+    <string name="discover_category_religion_abbreviation">Spirituality</string>
     <string name="discover_category_science">Science</string>
     <string name="discover_category_society"><![CDATA[Society & Culture]]></string>
+    <!-- Abbreviation for the podcast category Society & Culture, using only "Culture" -->
+    <string name="discover_category_society_abbreviation">Culture</string>
     <string name="discover_category_sports">Sports</string>
     <string name="discover_category_technology">Technology</string>
     <string name="discover_category_crime">True Crime</string>

@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.textGradient
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -87,9 +88,10 @@ private fun PrimaryText(
     story: StoryTopListenedCategories,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val text = stringResource(
         LR.string.end_of_year_story_top_categories_title,
-        story.listenedCategories[0].simplifiedCategoryName()
+        story.listenedCategories[0].simplifiedCategoryName().tryToLocalise(context.resources)
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
