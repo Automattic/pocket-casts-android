@@ -86,20 +86,3 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-
-task useGoogleServicesDebugFile {
-    description 'Copies the debug google-services.json file if file is missing.'
-    doLast {
-        def googleServicesFile = "google-services.json"
-        if (!file("${project.projectDir}/$googleServicesFile").exists()) {
-            def debugOnlyFile = "google-services.json_debug-only"
-            println "$googleServicesFile file is missing. Copying $debugOnlyFile"
-            copy {
-                from "${project.projectDir}/$debugOnlyFile"
-                into project.projectDir
-                rename { googleServicesFile }
-            }
-        }
-    }
-}
-preBuild.dependsOn(useGoogleServicesDebugFile)
