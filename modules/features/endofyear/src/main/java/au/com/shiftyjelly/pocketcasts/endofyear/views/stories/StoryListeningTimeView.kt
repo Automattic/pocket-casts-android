@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroun
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryFontFamily
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.TimeCirclesView
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -73,6 +74,10 @@ fun StoryListeningTimeView(
             Spacer(modifier = modifier.weight(0.25f))
 
             ListenedTimeTexts(story)
+
+            Spacer(modifier = Modifier.weight(0.16f))
+
+            TimeCirclesView(story.listeningTimeInSecs)
 
             Spacer(modifier = modifier.weight(1f))
         }
