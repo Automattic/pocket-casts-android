@@ -1,36 +1,46 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
-import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryFontFamily
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
-import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val ListenedTimeFontSize = 100
 
 @Composable
 fun StoryListeningTimeView(
@@ -62,7 +72,7 @@ fun StoryListeningTimeView(
 
             Spacer(modifier = modifier.weight(0.25f))
 
-            PodcastCoverRow(story, modifier)
+            ListenedTimeTexts(story)
 
             Spacer(modifier = modifier.weight(1f))
         }
@@ -96,33 +106,61 @@ private fun SecondaryText(
 }
 
 @Composable
-private fun PodcastCoverRow(
-    story: StoryListeningTime,
-    modifier: Modifier = Modifier,
-) {
+private fun ListenedTimeTexts(story: StoryListeningTime) {
     val context = LocalContext.current
-    val currentLocalView = LocalView.current
-    val coverWidth = (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3
-    Box(
-        modifier = modifier
-            .graphicsLayer { translationY = coverWidth.toPx() / 1.75f }
-            .height(coverWidth * 2.2f)
+    val listeningTimeDisplayStrings = getListeningTimeDisplayStrings(context, story.listeningTimeInSecs)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Row(
-            modifier
-                .transformPodcastCover()
-        ) {
-            listOf(1, 0, 2).forEach { index ->
-                val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
-                Row {
-                    PodcastCover(
-                        uuid = story.podcasts[podcastIndex].uuid,
-                        coverWidth = coverWidth,
-                        coverSize = CoverSize.SMALL
+        Text(
+            text = listeningTimeDisplayStrings.firstNumber,
+            color = story.tintColor,
+            fontSize = ListenedTimeFontSize.nonScaledSp,
+            lineHeight = ListenedTimeFontSize.nonScaledSp,
+            fontWeight = FontWeight.W300,
+            fontFamily = StoryFontFamily,
+            style = LocalTextStyle.current.merge(
+                @Suppress("DEPRECATION")
+                TextStyle(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false,
+                    ),
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = LineHeightStyle.Alignment.Top,
+                        trim = LineHeightStyle.Trim.Both
                     )
-                    Spacer(modifier = modifier.width(5.dp))
-                }
-            }
-        }
+                )
+            ),
+            modifier = Modifier.paddingFromBaseline(top = 0.sp, bottom = 0.sp),
+        )
+        TextH50(
+            text = listeningTimeDisplayStrings.subtitle,
+            textAlign = TextAlign.Center,
+            color = story.subtitleColor,
+            fontFamily = StoryFontFamily,
+            fontWeight = FontWeight.W600,
+            disableScale = disableScale(),
+        )
     }
 }
+
+private fun getListeningTimeDisplayStrings(
+    context: Context,
+    listeningTimeInSecs: Long,
+): ListeningTimeDisplayStrings {
+    val timeText = StatsHelper.secondsToFriendlyString(listeningTimeInSecs, context.resources)
+    val timeTextStrings = timeText.split(" ")
+    val firstNumber = timeTextStrings.firstOrNull() ?: ""
+    val subtitle = if (timeTextStrings.size > 1) {
+        timeTextStrings.drop(1).joinToString(" ")
+    } else {
+        ""
+    }
+    return ListeningTimeDisplayStrings(firstNumber, subtitle)
+}
+
+data class ListeningTimeDisplayStrings(
+    val firstNumber: String,
+    val subtitle: String,
+)
