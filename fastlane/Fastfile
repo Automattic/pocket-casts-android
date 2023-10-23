@@ -276,7 +276,7 @@ platform :android do
   lane :build_and_upload_to_play_store do |options|
     version = current_version_name
     build_code = current_build_code
-    is_beta = is_beta_version(version)
+    is_beta = beta_version?(version)
     unless options[:skip_prechecks]
       # Match branch names that begin with `release/`
       ensure_git_branch(branch: '^release/') unless is_ci
@@ -462,7 +462,7 @@ platform :android do
     key_file_secrets[name]
   end
 
-  def is_beta_version(version)
+  def beta_version?(version)
     version.include? '-rc-'
   end
 
