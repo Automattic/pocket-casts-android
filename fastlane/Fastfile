@@ -57,7 +57,7 @@ SUPPORTED_LOCALES = [
 ########################################################################
 Dotenv.load(USER_ENV_FILE_PATH)
 DEFAULT_BRANCH = 'main'
-ENV['SUPPLY_UPLOAD_MAX_RETRIES']='5'
+ENV['SUPPLY_UPLOAD_MAX_RETRIES'] = '5'
 GH_REPOSITORY = 'automattic/pocket-casts-android'
 APPS_APP = 'app'
 APPS_AUTOMOTIVE = 'automotive'
@@ -78,7 +78,7 @@ before_all do |_lane|
 end
 
 platform :android do
-  lane :code_freeze do | options |
+  lane :code_freeze do |options|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
     ensure_git_branch(branch: DEFAULT_BRANCH)
@@ -130,7 +130,7 @@ platform :android do
     setfrozentag(repository: GH_REPOSITORY, milestone: new_version)
   end
 
-  lane :complete_code_freeze do | options |
+  lane :complete_code_freeze do |options|
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
@@ -138,14 +138,12 @@ platform :android do
 
     UI.important("Completing code freeze for: #{new_version}")
 
-    unless options[:skip_confirm]
-      UI.user_error!('Aborted by user request') unless UI.confirm('Do you want to continue?')
-    end
+    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
 
-  lane :new_beta_release do | options |
+  lane :new_beta_release do |options|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
 
@@ -170,9 +168,7 @@ platform :android do
 
     UI.important(message)
 
-    unless options[:skip_confirm]
-      UI.user_error!('Aborted by user request') unless UI.confirm('Do you want to continue?')
-    end
+    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
 
     # Bump the release version and build code
     UI.message 'Bumping beta version and build code...'
@@ -224,9 +220,7 @@ platform :android do
 
     UI.important(message)
 
-    unless options[:skip_confirm]
-      UI.user_error!('Aborted by user request') unless UI.confirm('Do you want to continue?')
-    end
+    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
 
     # Check tags
     UI.user_error!("The version `#{new_version}` tag already exists!") if git_tag_exists(tag: new_version)
@@ -254,9 +248,7 @@ platform :android do
 
     UI.important("Triggering hotfix build for version: #{current_release_version}")
 
-    unless options[:skip_confirm]
-      UI.user_error!('Aborted by user request') unless UI.confirm('Do you want to continue?')
-    end
+    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{current_release_version}")
   end
@@ -280,20 +272,18 @@ platform :android do
   # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
   # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
   #
-  desc "Builds and uploads a new build to Google Play (without releasing it)"
-  lane :build_and_upload_to_play_store do | options |
+  desc 'Builds and uploads a new build to Google Play (without releasing it)'
+  lane :build_and_upload_to_play_store do |options|
     version = current_version_name
     build_code = current_build_code
     is_beta = is_beta_version(version)
-    unless (options[:skip_prechecks])
+    unless options[:skip_prechecks]
       # Match branch names that begin with `release/`
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{current_version_name} (#{current_build_code}) for upload to Google Play Console")
 
-      unless options[:skip_confirm]
-        UI.user_error!('Aborted by user request') unless UI.confirm('Do you want to continue?')
-      end
+      UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
@@ -304,33 +294,33 @@ platform :android do
     release_assets = []
 
     APPS.each do |app|
-        build_bundle(app: app, version: version, build_code: build_code)
+      build_bundle(app:, version:, build_code:)
 
-        aab_artifact_path = aab_artifact_path(app, version)
-        UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
+      aab_artifact_path = aab_artifact_path(app, version)
+      UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
 
-        track = if (app == APPS_AUTOMOTIVE)
-            is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
-        elsif (app == APPS_WEAR)
-            is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
-        else
-            is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
-        end
+      track = if app == APPS_AUTOMOTIVE
+                is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
+              elsif app == APPS_WEAR
+                is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
+              else
+                is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
+              end
 
-        upload_to_play_store(
-          package_name: APP_PACKAGE_NAME,
-          aab: aab_artifact_path,
-          track: track,
-          release_status: 'draft',
-          skip_upload_apk: true,
-          skip_upload_metadata: true,
-          skip_upload_changelogs: true,
-          skip_upload_images: true,
-          skip_upload_screenshots: true,
-          json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
-        )
+      upload_to_play_store(
+        package_name: APP_PACKAGE_NAME,
+        aab: aab_artifact_path,
+        track:,
+        release_status: 'draft',
+        skip_upload_apk: true,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true,
+        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+      )
 
-        release_assets << aab_artifact_path
+      release_assets << aab_artifact_path
     end
 
     create_gh_release(version:, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
@@ -345,9 +335,7 @@ platform :android do
 
     UI.important("Finalizing release: #{current_release_version}")
 
-    unless options[:skip_confirm]
-      UI.user_error!('Aborted by user request') unless UI.confirm('Do you want to continue?')
-    end
+    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
 
     configure_apply(force: is_ci)
 
@@ -371,10 +359,10 @@ platform :android do
     version = current_release_version
 
     # Wrap up
-    removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version}")
-    setfrozentag(repository:GH_REPOSITORY, milestone: version, freeze: false)
-    create_new_milestone(repository:GH_REPOSITORY, need_appstore_submission: true)
-    close_milestone(repository:GH_REPOSITORY, milestone: version)
+    removebranchprotection(repository: GH_REPOSITORY, branch: "release/#{version}")
+    setfrozentag(repository: GH_REPOSITORY, milestone: version, freeze: false)
+    create_new_milestone(repository: GH_REPOSITORY, need_appstore_submission: true)
+    close_milestone(repository: GH_REPOSITORY, milestone: version)
 
     push_to_git_remote(tags: false)
     trigger_release_build(branch_to_build: "release/#{version}")
@@ -449,7 +437,7 @@ platform :android do
 
     create_release(
       repository: GH_REPOSITORY,
-      version: version,
+      version:,
       release_notes_file_path: nil,
       prerelease:,
       release_assets: release_assets.join(',')
@@ -475,7 +463,7 @@ platform :android do
   end
 
   def is_beta_version(version)
-    version.include? "-rc-"
+    version.include? '-rc-'
   end
 
   def override_default_release_branch(version)
