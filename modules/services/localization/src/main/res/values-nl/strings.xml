@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 13:54:04+0000
+Translation-Revision-Date: 2023-10-24 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Dit is je top 5 meest geluisterd in 2023*</string>
+    <string name="eoy_story_top_podcasts_title">En deze shows vond je ook geweldig!</string>
+    <string name="end_of_year_story_top_podcast">%1$s was jouw meest beluisterde show in 2023</string>
+    <string name="end_of_year_share_story">Deel dit verhaal</string>
+    <string name="end_of_year_pocket_casts_playback">Pocket Casts Playback</string>
+    <string name="whats_new_bookmarks_enable_now_button">Nu inschakelen</string>
+    <string name="podcast_log_in_to_rate">Je moet inloggen om een beoordeling achter te laten</string>
+    <string name="podcast_submit_rating_no_internet">Geen internetverbinding gevonden. Maak verbinding met het internet om een beoordeling in te dienen.</string>
+    <string name="podcast_rate">Tarief %s</string>
+    <string name="submit">Verzenden</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Doe mee met de betatests voor bladwijzers!</string>
+    <string name="whats_new_bookmarks_try_now_button">Probeer het nu</string>
+    <string name="whats_new_bookmarks_title">De bladwijzers zijn er!</string>
+    <string name="podcast_not_enough_ratings">Niet genoeg beoordelingen</string>
+    <string name="bookmarks_upsell_instructions_early_access">Krijg vroegtijdige toegang tot deze functie met Pocket Casts Patron en sla tijdstempels op van je favoriete afleveringen. Binnenkort beschikbaar voor Plus-abonnees.</string>
+    <string name="bookmarks_upsell_instructions">Sla tijdstempels op van je favoriete afleveringen en ontgrendel nog veel meer functies met Pocket Casts Plus.</string>
+    <string name="error_loading_show_notes">Kan geen shownotes vinden voor deze aflevering.</string>
     <string name="podcast_no_bookmarks_matching">Deze podcast heeft geen bladwijzers die overeenkomen met je zoekcriteria.</string>
     <string name="podcast_no_bookmarks_found">Geen bladwijzers gevonden</string>
     <string name="player_tab_notes">Details</string>
@@ -153,6 +170,7 @@ Language: nl
     <string name="onboarding_plus_feature_gratitude_title">De eeuwige dank van iedereen bij Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Speciale Pocket Casts app-pictogrammen</string>
     <string name="onboarding_patron_feature_profile_badge_title">Profielbadge voor supporters</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100 GB cloudopslag</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Alles in plus</string>
     <string name="onboarding_patron_features_title">Geloof je in wat we doen en wil je laten zien dat je ons steunt?</string>
     <string name="server_user_delete_account_with_sub_failed">Je account heeft een actief Pocket Casts Plus abonnement. Annuleer dit abonnement voordat je je account verwijdert.</string>
@@ -319,13 +337,11 @@ Language: nl
     <string name="end_of_year_story_longest_episode">De langste aflevering die je hebt geluisterd was %1$s van de podcast %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Je beste podcasts</string>
     <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van 2022! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
-    <string name="end_of_year_story_top_podcast">Je beste podcast was %1$s van %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in 2022 naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde…</string>
-    <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
+    <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2022 naar %1$d verschillende categorieën geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Laten we eens kijken naar wat van je favorieten…</string>
     <string name="end_of_year_story_listened_to_categories">Je hebt dit jaar naar %1$d verschillende categorieën geluisterd</string>

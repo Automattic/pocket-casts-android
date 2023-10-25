@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 11:54:03+0000
+Translation-Revision-Date: 2023-10-24 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">2023年に最も視聴されたトップ5です</string>
+    <string name="eoy_story_top_podcasts_title">そしてこれらのショーも大変気に入っていただけました !</string>
+    <string name="end_of_year_story_top_podcast">%1$s は2023年で最も視聴されたショーでした</string>
+    <string name="end_of_year_share_story">このストーリーを共有</string>
+    <string name="end_of_year_pocket_casts_playback">Pocket Casts のプレイバック</string>
+    <string name="whats_new_bookmarks_enable_now_button">すぐに有効化</string>
+    <string name="podcast_log_in_to_rate">評価を残すにはログインする必要があります</string>
+    <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>
+    <string name="podcast_rate">%s を評価する</string>
+    <string name="submit">送信</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">ブックマークのベータテストに参加してください !</string>
+    <string name="whats_new_bookmarks_try_now_button">今すぐ試す</string>
+    <string name="whats_new_bookmarks_title">ブックマークはこちら !</string>
+    <string name="podcast_not_enough_ratings">評価が足りません</string>
+    <string name="bookmarks_upsell_instructions_early_access">お早めに Pocket Casts Patron でこの機能にアクセスすると、お気に入りのエピソードのタイムスタンプを保存できます。 まもなく Plus にご登録の皆さまもご利用いただけるようになります。</string>
+    <string name="bookmarks_upsell_instructions">Pocket Casts Plus でお気に入りのエピソードのタイムスタンプを保存し、その他多くの機能のロックを解除します。</string>
+    <string name="error_loading_show_notes">このエピソードのショーノートが見つかりません。</string>
     <string name="podcast_no_bookmarks_matching">このポッドキャストには検索条件に一致するブックマークがありません。</string>
     <string name="podcast_no_bookmarks_found">ブックマークが見つかりません</string>
     <string name="player_tab_notes">詳細</string>
@@ -153,6 +170,7 @@ Language: ja_JP
     <string name="onboarding_plus_feature_gratitude_title">Pocket Casts をお使いの皆さまに感謝の気持ちを込めて</string>
     <string name="onboarding_patron_feature_special_icons_title">特別な Pocket Casts アプリのアイコン</string>
     <string name="onboarding_patron_feature_profile_badge_title">サポーターのプロフィールバッジ</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100GB のクラウドストレージ</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Plus の全機能</string>
     <string name="onboarding_patron_features_title">Pocket Casts のサービスにご賛同いただける皆さまのサポートをお待ちしています。</string>
     <string name="server_user_delete_account_with_sub_failed">お使いのアカウントに有効な Pocket Casts Plus サブスクリプションがあります。 アカウントを削除する前に、このサブスクリプションをキャンセルしてください。</string>
@@ -319,13 +337,11 @@ Language: ja_JP
     <string name="end_of_year_story_longest_episode">お聴きになった最長のエピソードは、ポッドキャスト %2$s の %1$s のエピソードでした</string>
     <string name="end_of_year_story_top_podcasts_list_title">2022年に再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">人気のポッドキャスト</string>
     <string name="end_of_year_story_top_podcast_share_text">2022年のお気に入りのポッドキャストはこちら ! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">%1$d話のエピソードで合計%2$s聴きました</string>
-    <string name="end_of_year_story_top_podcast">一番再生したポッドキャストは %2$s による %1$s でした</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">2022年は%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
-    <string name="end_of_year_story_listened_to_numbers">%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
+    <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_share_text">2022年は%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">お気に入りをいくつか振り返りましょう…</string>
     <string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>

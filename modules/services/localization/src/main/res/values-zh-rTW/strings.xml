@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 09:54:03+0000
+Translation-Revision-Date: 2023-10-25 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">這是你在 2023 年最常收聽的前 5 個節目</string>
+    <string name="eoy_story_top_podcasts_title">你也是這些節目的忠實粉絲！</string>
+    <string name="end_of_year_story_top_podcast">%1$s 是你在 2023 年最常收聽的節目</string>
+    <string name="end_of_year_share_story">分享這個故事</string>
+    <string name="end_of_year_pocket_casts_playback">Pocket Casts 播放</string>
+    <string name="whats_new_bookmarks_enable_now_button">立即啟用</string>
+    <string name="podcast_log_in_to_rate">你必須登入才能評分</string>
+    <string name="podcast_submit_rating_no_internet">找不到網際網路連線。 請連線至網際網路以提交評分。</string>
+    <string name="podcast_rate">為 %s 評分</string>
+    <string name="submit">提交</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">加入我們的書籤 Beta 測試！</string>
+    <string name="whats_new_bookmarks_try_now_button">立即試試</string>
+    <string name="whats_new_bookmarks_title">書籤登場！</string>
+    <string name="podcast_not_enough_ratings">沒有足夠的評分</string>
+    <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>
+    <string name="bookmarks_upsell_instructions">利用 Pocket Casts Plus 儲存你所愛單集的時間戳記，並解鎖其他許多功能。</string>
+    <string name="error_loading_show_notes">找不到此單集的節目說明。</string>
     <string name="podcast_no_bookmarks_matching">此 Podcast 沒有符合您搜尋條件的書籤。</string>
     <string name="podcast_no_bookmarks_found">找不到書籤</string>
     <string name="player_tab_notes">詳細資料</string>
@@ -153,6 +170,7 @@ Language: zh_TW
     <string name="onboarding_plus_feature_gratitude_title">來自 Pocket Casts 所有使用者的誠摯謝意</string>
     <string name="onboarding_patron_feature_special_icons_title">特殊 Pocket Casts 應用程式圖示</string>
     <string name="onboarding_patron_feature_profile_badge_title">支持者個人檔案徽章</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100GB 雲端儲存空間</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">包含 Plus 所有功能</string>
     <string name="onboarding_patron_features_title">肯定我們的服務，並想表達支持嗎？</string>
     <string name="server_user_delete_account_with_sub_failed">你的帳號已有啟用的 Pocket Casts Plus 訂購項目。 請先取消訂購再刪除帳號。</string>
@@ -319,13 +337,11 @@ Language: zh_TW
     <string name="end_of_year_story_longest_episode">你收聽時間最長的一集為 Podcast「%2$s」的「%1$s」</string>
     <string name="end_of_year_story_top_podcasts_list_title">2022 年我最愛的 Podcast</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
-    <string name="end_of_year_story_top_podcasts">你最愛的 Podcast</string>
     <string name="end_of_year_story_top_podcast_share_text">2022 年我最愛的 Podcast！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
-    <string name="end_of_year_story_top_podcast">你最愛的 Podcast 是 %2$s 的「%1$s」</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">我在 2022 年收聽了 %1$d 個不同 Podcast 節目、%2$d 集內容</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
-    <string name="end_of_year_story_listened_to_numbers">你收聽了 %1$d 個不同 Podcast 節目和 %2$d 集內容</string>
+    <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2022 年收聽了 %1$d 個不同分類</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
     <string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
