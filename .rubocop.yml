@@ -1,12 +1,6 @@
-inherit_mode:
-  merge:
-    - Include
-
 AllCops:
   Exclude:
     - vendor/**/*
-  Include:
-    - .buildkite/danger/**/*
   NewCops: enable
 
 Layout/LineLength:
@@ -25,7 +19,3 @@ Metrics/MethodLength:
   Exclude:
     - fastlane/Fastfile
     - scripts/themes/generate_themes.rb
-
-Naming/FileName:
-  Exclude:
-    - .buildkite/danger/Dangerfile
