@@ -81,7 +81,7 @@ class BookmarksViewModelTest {
         whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
-        whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
+        whenever(feature.isUserEntitled(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
 
         bookmarksViewModel = BookmarksViewModel(
             bookmarkManager = bookmarkManager,
@@ -117,7 +117,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given feature not available, when bookmarks loaded, then Upsell state shown`() = runTest {
-        whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(false)
+        whenever(feature.isUserEntitled(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(false)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
@@ -126,7 +126,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given feature available, when bookmarks loaded, then Upsell state not shown`() = runTest {
-        whenever(feature.isAvailable(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
+        whenever(feature.isUserEntitled(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 

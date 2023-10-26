@@ -74,7 +74,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         onBackPressed()
     }
 
-    override fun openPlayer() {
+    override fun openPlayer(source: String?) {
     }
 
     override fun closePlayer() {

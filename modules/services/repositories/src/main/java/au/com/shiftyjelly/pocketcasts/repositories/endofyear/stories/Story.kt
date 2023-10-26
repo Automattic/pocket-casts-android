@@ -8,5 +8,6 @@ abstract class Story {
     open val storyLength: Long = 5.seconds()
     open val backgroundColor: Color = Color.Black
     val tintColor: Color = Color.White
+    val subtitleColor: Color = Color(0xFF8F97A4)
     open val shareable: Boolean = true
 }

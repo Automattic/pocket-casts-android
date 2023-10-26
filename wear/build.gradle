@@ -1,12 +1,15 @@
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'io.sentry.android.gradle'
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kapt
+    alias libs.plugins.ksp
+    alias libs.plugins.hilt
+    alias libs.plugins.sentry
+    alias libs.plugins.google.services
+    alias libs.plugins.kotlin.parcelize
 }
-
-apply plugin: 'com.google.gms.google-services'
 
 apply from: "../base.gradle"
 
@@ -79,38 +82,21 @@ sentry {
 }
 
 dependencies {
-    implementation androidLibs.wearInput
-    implementation androidLibs.wearRemoteInteractions
+    implementation libs.wear.input
+    implementation libs.wear.remote.interactions
 
     // General Compose dependencies
-    implementation androidLibs.composeActivity
-    implementation androidLibs.composeUi
-    implementation androidLibs.composeMaterialIconsExtended
-    implementation androidLibs.composeUiToolingPreview
-    implementation libs.hiltNavigationCompose
+    implementation libs.compose.activity
+    implementation libs.compose.ui
+    implementation libs.compose.icons
+    implementation libs.compose.ui.tooling.preview
+    implementation libs.hilt.navigation.compose
 
     // Compose for Wear OS Dependencies
-    implementation androidLibs.wearComposeMaterial
-    implementation androidLibs.wearComposeFoundation
-    implementation androidLibs.wearComposeNavigation
+    implementation libs.bundles.wear.compose
 
-    // Horologist Dependencies
-    implementation androidLibs.horologistAudioUi
-    implementation androidLibs.horologistAuthData
-    implementation androidLibs.horologistAuthComposables
-    implementation androidLibs.horologistAuthUi
-    implementation androidLibs.horologistComposeMaterial
-    implementation androidLibs.horologistDatalayer
-    implementation androidLibs.horologistMedia
-    implementation androidLibs.horologistMedia3Backend
-    implementation androidLibs.horologistMediaData
-    implementation androidLibs.horologistMediaUi
-    implementation androidLibs.horologistNetworkAwarnessOkHttp
-
-    implementation androidLibs.media3DatasourceOkhttp
-
-    implementation androidLibs.horologistComposeLayout
-
+    implementation libs.bundles.horologist
+    implementation libs.media3.datasource.okhttp
     implementation project(':modules:services:analytics')
     implementation project(':modules:services:compose')
     implementation project(':modules:services:images')
@@ -129,20 +115,3 @@ dependencies {
     implementation project(':modules:features:settings')
     implementation project(':modules:features:shared')
 }
-
-task useGoogleServicesDebugFile {
-    description 'Copies the debug google-services.json file if file is missing.'
-    doLast {
-        def googleServicesFile = "google-services.json"
-        if (!file("${project.projectDir}/$googleServicesFile").exists()) {
-            def debugOnlyFile = "google-services.json_debug-only"
-            println "$googleServicesFile file is missing. Copying $debugOnlyFile"
-            copy {
-                from "${project.projectDir}/$debugOnlyFile"
-                into project.projectDir
-                rename { googleServicesFile }
-            }
-        }
-    }
-}
-preBuild.dependsOn(useGoogleServicesDebugFile)

@@ -96,19 +96,19 @@ class EndOfYearManagerImpl @Inject constructor(
         val stories = mutableListOf<Story>()
 
         stories.add(StoryIntro())
-        listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
-        if (listenedCategories.isNotEmpty()) {
-            stories.add(StoryListenedCategories(listenedCategories))
-            stories.add(StoryTopListenedCategories(listenedCategories))
-        }
         if (listenedNumbers.numberOfEpisodes > 1 && listenedNumbers.numberOfPodcasts > 1) {
             stories.add(StoryListenedNumbers(listenedNumbers, topPodcasts))
         }
         if (topPodcasts.isNotEmpty()) {
-            stories.add(StoryTopPodcast(topPodcasts.first()))
+            stories.add(StoryTopPodcast(topPodcasts = topPodcasts))
             if (topPodcasts.size > 1) {
                 stories.add(StoryTopFivePodcasts(topPodcasts.take(5)))
             }
+        }
+        listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
+        if (listenedCategories.isNotEmpty()) {
+            stories.add(StoryListenedCategories(listenedCategories))
+            stories.add(StoryTopListenedCategories(listenedCategories))
         }
         longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
         stories.add(StoryEpilogue())

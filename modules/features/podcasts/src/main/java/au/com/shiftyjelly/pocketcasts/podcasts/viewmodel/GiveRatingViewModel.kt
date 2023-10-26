@@ -5,8 +5,10 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val ratingsManager: RatingsManager,
+    private val userManager: UserManager,
 ) : ViewModel() {
 
     sealed class State {
@@ -33,9 +36,8 @@ class GiveRatingViewModel @Inject constructor(
             val podcastTitle: String,
             private val _stars: Stars?,
         ) : State() {
-
             val stars: Stars = _stars
-                ?: Stars.TwoAndHalf // default to 2.5 stars if there is no previous rating
+                ?: Stars.Zero
 
             enum class Stars {
                 Zero,
@@ -58,15 +60,28 @@ class GiveRatingViewModel @Inject constructor(
 
     fun checkIfUserCanRatePodcast(
         podcastUuid: String,
+        onUserSignedOut: () -> Unit,
         onFailure: (String) -> Unit
     ) {
         _state.value = State.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            val newState = getPodcastInfo(podcastUuid)
-            if (newState != null) {
-                _state.value = newState
-            } else {
-                onFailure("Cannot give rating, unable to fetch podcast with id $podcastUuid")
+
+        viewModelScope.launch {
+
+            val signInState = userManager.getSignInState().blockingFirst()
+            when (signInState) {
+
+                SignInState.SignedOut -> {
+                    onUserSignedOut()
+                }
+
+                is SignInState.SignedIn -> {
+                    val newState = getPodcastInfo(podcastUuid)
+                    if (newState != null) {
+                        _state.value = newState
+                    } else {
+                        onFailure("Cannot give rating, unable to fetch podcast with id $podcastUuid")
+                    }
+                }
             }
         }
     }
@@ -111,16 +126,31 @@ class GiveRatingViewModel @Inject constructor(
             ).show()
             return
         }
-
-        Timber.e("submitRating function not implemented yet")
+        val stars = (state.value as State.Loaded).stars
+        Timber.e("submitRating function not implemented yet, but would have submitted a rating of $stars")
         onSuccess()
     }
 
-    fun setStars(stars: State.Loaded.Stars) {
+    fun setRating(rating: Double) {
+        val stars = ratingToStars(rating)
         val stateValue = _state.value
         if (stateValue !is State.Loaded) {
             throw IllegalStateException("Cannot set stars when state is not CanRate")
         }
         _state.value = stateValue.copy(_stars = stars)
+    }
+
+    private fun ratingToStars(rating: Double) = when {
+        rating <= 0 -> State.Loaded.Stars.Zero
+        rating <= 0.5 -> State.Loaded.Stars.Half
+        rating <= 1 -> State.Loaded.Stars.One
+        rating <= 1.5 -> State.Loaded.Stars.OneAndHalf
+        rating <= 2 -> State.Loaded.Stars.Two
+        rating <= 2.5 -> State.Loaded.Stars.TwoAndHalf
+        rating <= 3 -> State.Loaded.Stars.Three
+        rating <= 3.5 -> State.Loaded.Stars.ThreeAndHalf
+        rating <= 4 -> State.Loaded.Stars.Four
+        rating <= 4.5 -> State.Loaded.Stars.FourAndHalf
+        else -> State.Loaded.Stars.Five
     }
 }

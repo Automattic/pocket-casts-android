@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
@@ -57,11 +56,7 @@ fun StoryLongestEpisodeView(
 
         SecondaryText(story)
 
-        Spacer(modifier = modifier.weight(0.8f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
+        Spacer(modifier = modifier.weight(1f))
     }
 }
 
@@ -137,5 +132,5 @@ private fun SecondaryText(
         id = R.string.end_of_year_story_longest_episode_duration,
         timeText
     )
-    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
+    StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

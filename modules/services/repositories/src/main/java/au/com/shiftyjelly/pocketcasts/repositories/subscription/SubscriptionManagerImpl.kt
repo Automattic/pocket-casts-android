@@ -419,6 +419,18 @@ class SubscriptionManagerImpl @Inject constructor(
             }
         } ?: tierSubscriptions.firstOrNull() // If no matching subscription is found, select first available one
     }
+
+    override fun trialExists(
+        tier: Subscription.SubscriptionTier,
+        subscriptions: List<Subscription>
+    ): Boolean {
+        val updatedSubscriptions = subscriptions.filter { it.tier == tier }
+        val defaultSubscription = getDefaultSubscription(
+            subscriptions = updatedSubscriptions,
+            tier = tier,
+        )
+        return defaultSubscription?.trialPricingPhase != null
+    }
 }
 
 private fun shouldAllowUpgradePlan(
