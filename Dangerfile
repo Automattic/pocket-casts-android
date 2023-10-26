@@ -7,8 +7,16 @@ def wip_feature?
   has_wip_label || has_wip_title
 end
 
+def finished_reviews?
+  repo_name = github.pr_json['base']['repo']['full_name']
+  pr_number = github.pr_json['number']
+
+  !github.api.pull_request_reviews(repo_name, pr_number).empty?
+end
+
 def requested_reviewers?
-  !github.pr_json['requested_teams'].to_a.empty? || !github.pr_json['requested_reviewers'].to_a.empty?
+  has_requested_reviews = !github.pr_json['requested_teams'].to_a.empty? || !github.pr_json['requested_reviewers'].to_a.empty?
+  has_requested_reviews || finished_reviews?
 end
 
 return if github.pr_labels.include?('Releases')
