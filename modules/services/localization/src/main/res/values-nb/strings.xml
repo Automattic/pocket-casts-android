@@ -290,12 +290,9 @@ Language: nb_NO
     <string name="onboarding_forgot_password">Har du glemt passordet?</string>
     <string name="onboarding_email_invalid_message">Oppgi en gyldig e-postadresse</string>
     <string name="log_in">Logg på</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Men det var én du stadig kom tilbake til…</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Jeg lyttet til %1$d forskjellige podcaster og %2$d episoder i 2022</string>
-    <string name="end_of_year_story_top_podcast">Favorittpodcasten var %1$s av %2$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Du lyttet til %1$d episoder av totalt %2$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Min favorittpodcast i 2022! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Favorittpodcastene dine</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mine favorittpodcaster for året! %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mine favorittpodcaster for 2022</string>
     <string name="end_of_year_story_longest_episode">Den lengste episoden du lyttet til, var %1$s fra podcasten %2$s</string>
@@ -312,7 +309,6 @@ Language: nb_NO
     <string name="end_of_year_story_listened_to_categories">Du lyttet til %1$d forskjellige kategorier dette året</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">La oss ta en kikk på noen av favorittene…</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Jeg lyttet til %1$d forskjellige kategorier i 2022</string>
-    <string name="end_of_year_story_listened_to_numbers">Du lyttet til %1$d forskjellige podcaster og %2$d episoder</string>
     <string name="end_of_year_replay">Spill av på nytt</string>
     <string name="playback_speed">Avspillingshastighet</string>
     <string name="settings_media_notification_controls">Medievarslingskontroller</string>

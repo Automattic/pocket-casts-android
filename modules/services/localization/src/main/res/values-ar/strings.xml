@@ -291,12 +291,9 @@ Language: ar
     <string name="onboarding_forgot_password">هل نسيت كلمة المرور؟</string>
     <string name="onboarding_email_invalid_message">يرجى إدخال بريد إلكتروني صالح</string>
     <string name="log_in">تسجيل الدخول</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">لكن كانت هناك حلقة واصلتَ الرجوع إليها…</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">لقد استمعتُ إلى ⁦%1$d⁩ من حلقات البودكاست المختلفة و⁦%2$d⁩ من الحلقات في 2022</string>
-    <string name="end_of_year_story_top_podcast">كانت أهم حلقات البودكاست الخاصة بك ⁦%1$s⁩ بواسطة ⁦%2$s⁩</string>
     <string name="end_of_year_story_top_podcast_subtitle">لقد استمعتَ إلى ⁦%1$d⁩ من الحلقات بإجمالي ⁦%2$s⁩</string>
     <string name="end_of_year_story_top_podcast_share_text">حلقات البودكاست التي أفضّلها في 2022! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">أهم حلقات البودكاست الخاصة بك</string>
     <string name="end_of_year_story_top_podcasts_share_text">أهم حلقات البودكاست الخاصة بي في العام! %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">أهم حلقات البودكاست الخاصة بي في 2022</string>
     <string name="end_of_year_story_longest_episode">كانت أطول حلقة استمعت إليها ⁦%1$s⁩ من حلقة البودكاست ⁦%2$s⁩</string>
@@ -313,7 +310,6 @@ Language: ar
     <string name="end_of_year_story_listened_to_categories">لقد استمعتَ إلى ⁦%1$d⁩ من التصنيفات المختلفة في هذا العام</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">لنلقِ نظرة إلى بعض مفضلاتك…</string>
     <string name="end_of_year_story_listened_to_categories_share_text">لقد استمعتُ إلى ⁦%1$d⁩ من التصنيفات المختلفة في 2022</string>
-    <string name="end_of_year_story_listened_to_numbers">لقد استمعتُ إلى ⁦%1$d⁩ من حلقات البودكاست المختلفة و⁦%2$d⁩ من الحلقات</string>
     <string name="end_of_year_replay">إعادة التشغيل</string>
     <string name="playback_speed">سرعة التشغيل</string>
     <string name="settings_media_notification_controls">عناصر التحكم في تنبيهات الوسائط</string>

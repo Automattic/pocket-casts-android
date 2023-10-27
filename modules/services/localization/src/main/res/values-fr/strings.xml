@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 11:54:03+0000
+Translation-Revision-Date: 2023-10-23 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Voici les 5 émissions que vous avez le plus écoutées en 2023\"</string>
+    <string name="eoy_story_top_podcasts_title">Vous avez aussi adoré ces émissions !</string>
+    <string name="end_of_year_story_top_podcast">%1$s est l’émission que vous avez le plus écoutée en 2023</string>
+    <string name="end_of_year_share_story">Partager cette story</string>
+    <string name="end_of_year_pocket_casts_playback">Lecture des Pocket Casts</string>
+    <string name="whats_new_bookmarks_enable_now_button">Activez-la maintenant</string>
+    <string name="podcast_log_in_to_rate">Vous devez vous connecter pour laisser une note</string>
+    <string name="podcast_submit_rating_no_internet">Aucune connexion Internet détectée. Veuillez vous connecter à Internet pour envoyer une note.</string>
+    <string name="podcast_rate">Évaluer %s</string>
+    <string name="submit">Envoyer</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Rejoignez-nous pour le bêta-test des favoris !</string>
+    <string name="whats_new_bookmarks_try_now_button">Essayer maintenant</string>
+    <string name="whats_new_bookmarks_title">Les favoris sont là !</string>
+    <string name="podcast_not_enough_ratings">Pas assez d’évaluations</string>
+    <string name="bookmarks_upsell_instructions_early_access">Bénéficiez d’un accès anticipé à cette fonctionnalité avec Pocket Casts Patron et enregistrez les horodatages de vos épisodes favoris. Bientôt disponible pour les abonnés Plus.</string>
+    <string name="bookmarks_upsell_instructions">Enregistrez les horodatages de vos épisodes favoris et déverrouillez bien d’autres fonctionnalités avec Pocket Casts Plus.</string>
+    <string name="error_loading_show_notes">Impossible de trouver des notes pour cet épisode.</string>
     <string name="podcast_no_bookmarks_matching">Ce podcast n’a aucun signet correspondant à vos critères de recherche.</string>
     <string name="podcast_no_bookmarks_found">Aucun signet trouvé</string>
     <string name="player_tab_notes">Détails</string>
@@ -153,6 +170,7 @@ Language: fr
     <string name="onboarding_plus_feature_gratitude_title">L’infinie gratitude de tous les membres de Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Icônes spéciales de l’application Pocket Casts</string>
     <string name="onboarding_patron_feature_profile_badge_title">Badge du profil de membre payant</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100 Go de stockage Cloud</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Toutes les fonctionnalités disponibles avec l’abonnement Plus</string>
     <string name="onboarding_patron_features_title">Vous partagez nos convictions et vous aimeriez nous témoigner votre soutien ?</string>
     <string name="server_user_delete_account_with_sub_failed">Votre compte est associé à un abonnement Pocket Casts Plus actif. Merci de résilier cet abonnement avant de supprimer votre compte.</string>
@@ -319,13 +337,11 @@ Language: fr
     <string name="end_of_year_story_longest_episode">L’épisode le plus long que vous avez écouté durait %1$s et provient du podcast %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mes meilleurs podcasts de 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mes meilleurs podcasts de l\'année ! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Vos meilleurs podcasts</string>
     <string name="end_of_year_story_top_podcast_share_text">Mon podcast préféré de 2022 ! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Vous avez écouté %1$d épisodes pour une durée totale de %2$s</string>
-    <string name="end_of_year_story_top_podcast">Votre meilleur podcast était %1$s de %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">J\'ai écouté %1$d podcasts différents et %2$d épisodes en 2022</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois un même podcast…</string>
-    <string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d podcasts différents et %2$d épisodes</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois une même émission…</string>
+    <string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d émissions différentes et %2$d épisodes au total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">J\'ai écouté %1$d catégories différentes en 2022</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Rétrospective sur certains de vos podcasts préférés…</string>
     <string name="end_of_year_story_listened_to_categories">Cette année, vous avez écouté %1$d catégories différentes</string>

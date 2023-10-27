@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 13:54:04+0000
+Translation-Revision-Date: 2023-10-17 18:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="podcast_rate">Оцените %s</string>
+    <string name="submit">Отправить</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Примите участие в бета-тестировании закладок!</string>
+    <string name="whats_new_bookmarks_try_now_button">Попробовать</string>
+    <string name="whats_new_bookmarks_title">Закладки уже готовы!</string>
+    <string name="podcast_not_enough_ratings">Недостаточно оценок</string>
+    <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>
+    <string name="bookmarks_upsell_instructions">Сохраняйте отметки времени понравившихся вам эпизодов и разблокируйте многие другие функции с Pocket Casts Plus.</string>
+    <string name="error_loading_show_notes">Не удалось найти заметки для показа к этому эпизоду.</string>
     <string name="podcast_no_bookmarks_matching">В этом подкасте нет закладок, соответствующих вашим условиям поиска.</string>
     <string name="podcast_no_bookmarks_found">Закладки не найдены</string>
     <string name="player_tab_notes">Сведения</string>
@@ -153,6 +162,7 @@ Language: ru
     <string name="onboarding_plus_feature_gratitude_title">Бесконечная благодарность всей команде Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Специальные значки приложения Pocket Casts</string>
     <string name="onboarding_patron_feature_profile_badge_title">Значок профиля спонсора</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">Облачное хранилище объемом 100 ГБ</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Все в Plus</string>
     <string name="onboarding_patron_features_title">Верите в нас и хотите поддержать?</string>
     <string name="server_user_delete_account_with_sub_failed">У вашей учетной записи есть активная подписка Pocket Casts Plus. Отмените подписку перед удалением учетной записи.</string>
@@ -319,13 +329,9 @@ Language: ru
     <string name="end_of_year_story_longest_episode">Самым длинным выпуском, который вы слушали, был эпизод %1$s подкаста %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Мои любимые подкасты в 2022 году</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Ваши любимые подкасты</string>
     <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в 2022 году! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Вы прослушали %1$d выпусков (-а) общей продолжительностью %2$s</string>
-    <string name="end_of_year_story_top_podcast">Ваш любимый подкаст — %1$s (автор: %2$s)</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал (-а) %1$d подкастов (-а) и %2$d выпусков (-а) в 2022 году</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Но к одному подкасту вы всегда возвращались…</string>
-    <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d подкастов (-а) и %2$d выпусков (-а)</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Я выбрал (-а) %1$d рубрик (-и) в 2022 году</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Взглянем на самые популярные…</string>
     <string name="end_of_year_story_listened_to_categories">В этом году вы выбрали %1$d рубрик (-и)</string>
