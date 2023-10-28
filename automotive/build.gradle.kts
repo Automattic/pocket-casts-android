@@ -34,10 +34,10 @@ android {
             manifestPlaceholders["sentryDsn"] = ""
         }
 
-//        named("debugProd") {
-//            initWith(getByName("debug"))
-//            isDebuggable = true
-//        }
+        named("debugProd") {
+            initWith(getByName("debug"))
+            isDebuggable = true
+        }
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
