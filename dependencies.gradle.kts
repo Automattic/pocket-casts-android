@@ -3,8 +3,8 @@ import java.util.Properties
 val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
 
-val secretProperties = loadPropertiesFromFile(file("$rootDir/secret.properties"))
-val versionProperties = loadPropertiesFromFile(file("${rootDir}/version.properties"))
+val secretProperties = loadPropertiesFromFile(file("secret.properties"))
+val versionProperties = loadPropertiesFromFile(file("version.properties"))
 
 fun loadPropertiesFromFile(file: File): Properties {
     val properties = Properties()
@@ -64,28 +64,30 @@ project.apply {
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
         // App Signing
-        val storePath = secretProperties.getProperty("signingKeyStoreFile", null)
-        val storeFile = file(storePath)
-        if (storeFile.exists()) {
-            // Use secret properties
+        var canSignRelease = false
+        // Check secret.properties for signing information
+        val storeFilePath = secretProperties.getProperty("signingKeyStoreFile", null)
+        if (!storeFilePath.isNullOrBlank()) {
+            val storeFile = file(storeFilePath)
+            canSignRelease = storeFile.exists()
             set("storeFile", storeFile)
             set("storePassword", secretProperties.getProperty("signingKeyStorePassword", null))
             set("keyAlias", secretProperties.getProperty("signingKeyAlias", null))
             set("keyPassword", secretProperties.getProperty("signingKeyPassword", null))
-        } else {
-            // Check local gradle properties
-            val pocketcastsKeyStoreFile: String? by project
+        }
+        // Next check Gradle properties such as local.properties or ~/.gradle/gradle.properties
+        if (!canSignRelease && project.hasProperty("pocketcastsKeyStoreFile")) {
+            val pocketcastsKeyStoreFile = project.property("pocketcastsKeyStoreFile").toString()
             if (!pocketcastsKeyStoreFile.isNullOrBlank()) {
-                set("storeFile", file(pocketcastsKeyStoreFile))
-                val pocketcastsKeyStorePassword: String by project
-                set("storePassword", pocketcastsKeyStorePassword)
-                val pocketcastsKeyStoreAlias: String by project
-                set("keyAlias", pocketcastsKeyStoreAlias)
-                val pocketcastsKeyStoreAliasPassword: String by project
-                set("keyPassword", pocketcastsKeyStoreAliasPassword)
+                val storeFile = file(pocketcastsKeyStoreFile)
+                canSignRelease = storeFile.exists()
+                set("storeFile", storeFile)
+                set("storePassword", project.property("pocketcastsKeyStorePassword").toString())
+                set("keyAlias", project.property("pocketcastsKeyStoreAlias").toString())
+                set("keyPassword", project.property("pocketcastsKeyStoreAliasPassword").toString())
             }
         }
-        set("canSignRelease", storeFile.exists())
+        set("canSignRelease", canSignRelease)
 
         // Secrets
         set("settingsEncryptSecret", secretProperties.getProperty("pocketcastsSettingsEncryptSecret", ""))
