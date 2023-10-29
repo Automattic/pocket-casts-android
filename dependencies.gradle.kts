@@ -64,9 +64,11 @@ project.apply {
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
         // App Signing
-        val storeFile = file("$rootDir/${secretProperties.getProperty("signingKeyStoreFile", null)}")
+        val storePath = secretProperties.getProperty("signingKeyStoreFile", null)
+        val storeFile = file(storePath)
         if (storeFile.exists()) {
             // Use secret properties
+            set("storeFile", storeFile)
             set("storePassword", secretProperties.getProperty("signingKeyStorePassword", null))
             set("keyAlias", secretProperties.getProperty("signingKeyAlias", null))
             set("keyPassword", secretProperties.getProperty("signingKeyPassword", null))

@@ -82,7 +82,7 @@ android {
         arg("skipPrivatePreviews", "true")
     }
 
-    if (canSignRelease) {
+    if (project.canSignRelease) {
         signingConfigs {
             release {
                 storeFile = project.storeFile
@@ -142,7 +142,7 @@ android {
             buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
             buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
 
-            if (canSignRelease) {
+            if (project.canSignRelease) {
                 signingConfig signingConfigs.release
             }
         }
