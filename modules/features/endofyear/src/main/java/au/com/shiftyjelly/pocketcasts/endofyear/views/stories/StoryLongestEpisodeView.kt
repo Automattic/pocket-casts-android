@@ -111,9 +111,14 @@ private fun PrimaryText(
     story: StoryLongestEpisode,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val timeText = StatsHelper.secondsToFriendlyString(
+        story.longestEpisode.duration.toLong(),
+        context.resources
+    )
     val text = stringResource(
-        id = R.string.end_of_year_story_longest_episode,
-        story.longestEpisode.title, story.longestEpisode.podcastTitle
+        id = R.string.end_of_year_story_longest_episode_title,
+        timeText
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
@@ -123,14 +128,9 @@ private fun SecondaryText(
     story: StoryLongestEpisode,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val timeText = StatsHelper.secondsToFriendlyString(
-        story.longestEpisode.duration.toLong(),
-        context.resources
-    )
     val text = stringResource(
-        id = R.string.end_of_year_story_longest_episode_duration,
-        timeText
+        id = R.string.end_of_year_story_longest_episode_subtitle,
+        story.longestEpisode.title, story.longestEpisode.podcastTitle
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
