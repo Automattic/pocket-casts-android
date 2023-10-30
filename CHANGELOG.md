@@ -1,6 +1,9 @@
 7.51
 -----
 
+*   Updates:
+    *   Take user to alarm permission when the app needs permission for sleep timer
+        ([#1487](https://github.com/Automattic/pocket-casts-android/pull/1487))
 
 7.50
 -----
