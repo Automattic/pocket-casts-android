@@ -4,6 +4,9 @@
 *   Updates:
     *   Take user to alarm permission when the app needs permission for sleep timer
         ([#1487](https://github.com/Automattic/pocket-casts-android/pull/1487))
+*   Bug Fixes:
+    *    Fix Play button color not updating after changing filter color 
+         ([#1470](https://github.com/Automattic/pocket-casts-android/pull/1470))
 
 7.50
 -----
