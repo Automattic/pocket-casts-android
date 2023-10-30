@@ -29,22 +29,18 @@ val isAutomotiveBuild = (project.findProperty("IS_AUTOMOTIVE_BUILD") as? String)
 val isWearBuild = (project.findProperty("IS_WEAR_BUILD") as? String)?.toBoolean() ?: false
 val getVersionCode = {
     val appVersionCode = versionProperties.getProperty("versionCode", null).toInt()
-    if (isAutomotiveBuild) {
-        appVersionCode + versionCodeDifferenceBetweenAppAndAutomotive
-    } else if (isWearBuild) {
-        appVersionCode + versionCodeDifferenceBetweenAppAndWear
-    } else {
-        appVersionCode
+    when {
+        isAutomotiveBuild -> appVersionCode + versionCodeDifferenceBetweenAppAndAutomotive
+        isWearBuild -> appVersionCode + versionCodeDifferenceBetweenAppAndWear
+        else -> appVersionCode
     }
 }
 val getVersionName = {
     val versionName = versionProperties.getProperty("versionName", null)
-    if (isAutomotiveBuild) {
-        "${versionName}a"
-    } else if (isWearBuild) {
-        "${versionName}w"
-    } else {
-        versionName
+    when {
+        isAutomotiveBuild -> "${versionName}a"
+        isWearBuild -> "${versionName}w"
+        else -> versionName
     }
 }
 
