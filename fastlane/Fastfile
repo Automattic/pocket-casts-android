@@ -56,9 +56,6 @@ SUPPORTED_LOCALES = [
 # Environment
 ########################################################################
 Dotenv.load(USER_ENV_FILE_PATH)
-ENV["PROJECT_NAME"] = "pocket-casts-android"
-ENV["PROJECT_ROOT_FOLDER"] = "./"
-ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
 DEFAULT_BRANCH = 'main'
 ENV['SUPPLY_UPLOAD_MAX_RETRIES']='5'
 GH_REPOSITORY = "automattic/pocket-casts-android"
@@ -341,7 +338,9 @@ platform :android do
   end
 
   lane :finalize_release do | options |
-    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if android_current_branch_is_hotfix
+    if android_current_branch_is_hotfix(version_properties_path: VERSION_PROPERTIES_PATH)
+      UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes')
+    end
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
