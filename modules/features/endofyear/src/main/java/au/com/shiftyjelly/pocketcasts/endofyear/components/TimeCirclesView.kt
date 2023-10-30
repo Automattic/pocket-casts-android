@@ -13,12 +13,12 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.rainbowBrush
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import kotlin.math.ceil
 import kotlin.math.max
@@ -77,12 +77,7 @@ private fun Modifier.timeCircleBackground(
 ) =
     graphicsLayer { alpha = 0.99f }
         .drawWithCache {
-            val brush = Brush.linearGradient(
-                0.00f to Color(red = 0.25f, green = 0.11f, blue = 0.92f),
-                0.24f to Color(red = 0.68f, green = 0.89f, blue = 0.86f),
-                0.50f to Color(red = 0.87f, green = 0.91f, blue = 0.53f),
-                0.74f to Color(red = 0.91f, green = 0.35f, blue = 0.26f),
-                1.00f to Color(red = 0.1f, green = 0.1f, blue = 0.1f),
+            val brush = rainbowBrush(
                 start = Offset(0f, 0f),
                 end = Offset(1.22f * size.width, 1.25f * size.height),
             )
