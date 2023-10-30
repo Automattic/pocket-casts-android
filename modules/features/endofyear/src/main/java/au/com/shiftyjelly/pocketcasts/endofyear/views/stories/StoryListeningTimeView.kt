@@ -31,11 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
+import au.com.shiftyjelly.pocketcasts.endofyear.components.DayCirclesView
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryFontFamily
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.components.TimeCirclesView
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -77,7 +77,7 @@ fun StoryListeningTimeView(
 
             Spacer(modifier = Modifier.weight(0.16f))
 
-            TimeCirclesView(story.listeningTimeInSecs)
+            DayCirclesView(story.listeningTimeInSecs)
 
             Spacer(modifier = modifier.weight(1f))
         }

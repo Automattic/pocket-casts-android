@@ -29,7 +29,7 @@ private const val SecsInOneDay = 60 * 60 * 24
 private const val MissingDaysOverlayColor = 0xFF8F97A4
 
 @Composable
-fun TimeCirclesView(
+fun DayCirclesView(
     timeInSecs: Long,
 ) {
     val context = LocalContext.current
