@@ -1463,14 +1463,22 @@
     <string name="discover_category_fiction">Fiction</string>
     <string name="discover_category_government">Government</string>
     <string name="discover_category_health"><![CDATA[Health & Fitness]]></string>
+    <!-- Abbreviation for the podcast category Health & Fitness, using only "Health" -->
+    <string name="discover_category_health_abbreviation">Health</string>
     <string name="discover_category_history">History</string>
     <string name="discover_category_kids"><![CDATA[Kids & Family]]></string>
+    <!-- Abbreviation for the podcast category Kids & Family, using only "Family" -->
+    <string name="discover_category_kids_abbreviation">Family</string>
     <string name="discover_category_leisure">Leisure</string>
     <string name="discover_category_music">Music</string>
     <string name="discover_category_news">News</string>
     <string name="discover_category_religion"><![CDATA[Religion & Spirituality]]></string>
+    <!-- Abbreviation for the podcast category Religion & Spirituality, using only "Spirituality" -->
+    <string name="discover_category_religion_abbreviation">Spirituality</string>
     <string name="discover_category_science">Science</string>
     <string name="discover_category_society"><![CDATA[Society & Culture]]></string>
+    <!-- Abbreviation for the podcast category Society & Culture, using only "Culture" -->
+    <string name="discover_category_society_abbreviation">Culture</string>
     <string name="discover_category_sports">Sports</string>
     <string name="discover_category_technology">Technology</string>
     <string name="discover_category_crime">True Crime</string>
@@ -1591,7 +1599,7 @@
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->
     <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in 2022</string>
     <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title and %2$s is a placeholder for the author. -->
-    <string name="end_of_year_story_top_podcast">%1$s was your most listened show in 2023</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s was your most listened show in 2023</string>
     <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is a placeholder for the number of episodes and %2$s is a placeholder for the listened time. -->
     <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top podcast of the year story to Twitter. %1$s is the URL to the podcast. -->
@@ -1616,6 +1624,10 @@
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
+    <!-- Title of the top categories story. %1$@ being the name of the most listened category. -->
+    <string name="end_of_year_story_top_categories_title">Did you know that %1$s was your favorite category</string>
+    <!-- Subtitle of the top categories story. %1$@ is the total number of episodes and %2$@ is the total listened time. -->
+    <string name="end_of_year_story_top_categories_subtitle">You listened to %1$s episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top categories story to Twitter. -->
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <!-- Description to why the user needs to create an account to see their end of year stats. -->

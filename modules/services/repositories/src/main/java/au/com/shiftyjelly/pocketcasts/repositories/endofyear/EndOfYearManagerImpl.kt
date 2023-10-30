@@ -105,11 +105,11 @@ class EndOfYearManagerImpl @Inject constructor(
                 stories.add(StoryTopFivePodcasts(topPodcasts.take(5)))
             }
         }
-        listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
         if (listenedCategories.isNotEmpty()) {
-            stories.add(StoryListenedCategories(listenedCategories))
             stories.add(StoryTopListenedCategories(listenedCategories))
+            stories.add(StoryListenedCategories(listenedCategories))
         }
+        listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
         longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
         stories.add(StoryEpilogue())
 

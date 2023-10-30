@@ -158,7 +158,7 @@ private fun PrimaryText(
     modifier: Modifier = Modifier,
 ) {
     val text = stringResource(
-        id = R.string.end_of_year_story_top_podcast,
+        id = R.string.end_of_year_story_top_podcast_title,
         story.topPodcast.title
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
