@@ -27,3 +27,6 @@ Metrics/MethodLength:
     - scripts/themes/download_themes.rb
     - scripts/themes/generate_themes.rb
     - scripts/themes/generate_kotlin.rb
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never

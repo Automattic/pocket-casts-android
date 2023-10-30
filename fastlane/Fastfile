@@ -122,7 +122,7 @@ platform :android do
       extracted_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH
     )
     android_update_release_notes(
-      new_version:,
+      new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
     push_to_git_remote(tags: false)
@@ -294,7 +294,7 @@ platform :android do
     release_assets = []
 
     APPS.each do |app|
-      build_bundle(app:, version:, build_code:)
+      build_bundle(app: app, version: version, build_code: build_code)
 
       aab_artifact_path = aab_artifact_path(app, version)
       UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
@@ -310,7 +310,7 @@ platform :android do
       upload_to_play_store(
         package_name: APP_PACKAGE_NAME,
         aab: aab_artifact_path,
-        track:,
+        track: track,
         release_status: 'draft',
         skip_upload_apk: true,
         skip_upload_metadata: true,
@@ -323,7 +323,7 @@ platform :android do
       release_assets << aab_artifact_path
     end
 
-    create_gh_release(version:, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
   end
 
   lane :finalize_release do | options |
@@ -437,9 +437,9 @@ platform :android do
 
     create_release(
       repository: GH_REPOSITORY,
-      version:,
+      version: version,
       release_notes_file_path: nil,
-      prerelease:,
+      prerelease: prerelease,
       release_assets: release_assets.join(',')
     )
   end
