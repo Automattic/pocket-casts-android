@@ -7,11 +7,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MaxFontScale = 1.15f
 
@@ -21,14 +25,18 @@ fun StoryPrimaryText(
     color: Color,
     modifier: Modifier = Modifier,
 ) {
-    TextH20(
+    TextH10(
         text = text,
         textAlign = TextAlign.Center,
         color = color,
-        disableScale = disableScale(),
+        disableScale = true,
+        fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
+        fontWeight = FontWeight.W600,
+        fontSize = 25.sp,
+        lineHeight = 31.sp,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
     )
 }
 
@@ -38,16 +46,17 @@ fun StorySecondaryText(
     color: Color,
     modifier: Modifier = Modifier,
 ) {
-    TextP40(
+    TextH50(
         text = text,
         textAlign = TextAlign.Center,
         color = color,
-        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
+        fontWeight = FontWeight.W600,
         disableScale = disableScale(),
         modifier = modifier
             .fillMaxWidth()
             .alpha(0.8f)
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
     )
 }
 

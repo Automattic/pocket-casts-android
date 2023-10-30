@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-11 22:54:26+0000
+Translation-Revision-Date: 2023-10-23 15:54:04+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Estes são os 5 mais ouvidos do seu 2023</string>
+    <string name="eoy_story_top_podcasts_title">E você marcou presença nestes programas também!</string>
+    <string name="end_of_year_story_top_podcast">%1$s foi o seu programa mais ouvido em 2023</string>
+    <string name="end_of_year_share_story">Compartilhar este story</string>
+    <string name="end_of_year_pocket_casts_playback">Reprodução do Pocket Casts</string>
+    <string name="whats_new_bookmarks_enable_now_button">Ativar agora</string>
+    <string name="podcast_log_in_to_rate">Faça login para avaliar</string>
+    <string name="podcast_submit_rating_no_internet">Sem conexão com a Internet. Conecte-se à Internet para enviar a avaliação.</string>
+    <string name="podcast_rate">Avalie o %s</string>
+    <string name="submit">Enviar</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Junte-se a nós na versão beta dos favoritos!</string>
+    <string name="whats_new_bookmarks_try_now_button">Experimentar agora</string>
+    <string name="whats_new_bookmarks_title">Chegaram os favoritos!</string>
+    <string name="podcast_not_enough_ratings">Sem avaliações suficientes</string>
+    <string name="bookmarks_upsell_instructions_early_access">Obtenha o Pocket Casts Patron para receber acesso antecipado a esta funcionalidade e salvar a data/hora dos seus episódios favoritos. Disponível para assinantes do Plus em breve.</string>
+    <string name="bookmarks_upsell_instructions">Salve a data/hora dos seus episódios favoritos e obtenha muito mais funcionalidades com o Pocket Casts Plus.</string>
+    <string name="error_loading_show_notes">Não é possível encontrar observações para este episódio.</string>
     <string name="podcast_no_bookmarks_matching">Este podcast não tem favoritos correspondentes aos seus critérios de pesquisa.</string>
     <string name="podcast_no_bookmarks_found">Nenhum favorito encontrado</string>
     <string name="player_tab_notes">Detalhes</string>
@@ -153,7 +170,7 @@ Language: pt_BR
     <string name="onboarding_plus_feature_gratitude_title">A eterna gratidão de todos aqui no Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Ícones especiais do aplicativo Pocket Casts</string>
     <string name="onboarding_patron_feature_profile_badge_title">Selo perfil de apoiadores</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50 GB de armazenamento na nuvem</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100 GB de armazenamento na nuvem</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Tudo no Plus</string>
     <string name="onboarding_patron_features_title">Acredita no nosso trabalho e quer mostrar seu apoio?</string>
     <string name="server_user_delete_account_with_sub_failed">Sua conta tem uma assinatura do Pocket Casts Plus ativa. Cancele antes de excluir sua conta.</string>
@@ -320,13 +337,11 @@ Language: pt_BR
     <string name="end_of_year_story_longest_episode">O maior episódio que você ouviu foi %1$s do podcast %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meus principais podcasts de 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meus principais podcasts do ano! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Seus principais podcasts</string>
     <string name="end_of_year_story_top_podcast_share_text">Meu podcast favorito de 2022! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Você ouviu %1$d episódios em um total de %2$s</string>
-    <string name="end_of_year_story_top_podcast">Seu principal podcast foi %1$s de %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Eu ouvi %1$d podcasts diferentes e %2$d episódios em 2022</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Mas tinha um que sempre fazia você pedir bis…</string>
-    <string name="end_of_year_story_listened_to_numbers">Você ouviu %1$d podcasts diferentes e %2$d episódios</string>
+    <string name="end_of_year_story_listened_to_numbers">Você ouviu %1$d programas diferentes e %2$d episódios no total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Eu ouvi %1$d categorias diferentes em 2022</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Vamos dar uma olhada em alguns dos seus favoritos…</string>
     <string name="end_of_year_story_listened_to_categories">Você ouviu %1$d categorias diferentes neste ano</string>
@@ -647,7 +662,6 @@ Language: pt_BR
     <string name="error_streaming_internet">Falha na reprodução. Verifique sua conexão com a Internet.</string>
     <string name="error_chartable_streaming">Falha na reprodução. O produtor está usando as análises do Chartable e foi bloqueado. Se você estiver usando algum aplicativo de filtro, como o AdGuard, será preciso autorizar o chtbl.com para reproduzir o episódio.</string>
     <string name="error_chartable">O produtor está usando as análises do Chartable e foi bloqueado. Se você estiver usando algum aplicativo de filtro, como o AdGuard, será preciso autorizar o chtbl.com para reproduzir o episódio.</string>
-    <string name="error_loading_show_notes">Não foi possível carregar as observações do programa.</string>
     <string name="error_webview_not_installed">Não foi possível carregar as observações do programa pois não há um sistema WebView instalado.</string>
     <string name="settings_status_service_support_summary">Acesso às seções de perguntas frequentes e contato.</string>
     <string name="settings_status_service_support">Suporte</string>

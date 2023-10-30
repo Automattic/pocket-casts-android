@@ -17,7 +17,7 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
+        hasDevToggle = true,
     ),
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",
@@ -52,10 +52,12 @@ enum class Feature(
         hasDevToggle = true
     );
 
-    fun isCurrentlyExclusiveToPatron(): Boolean {
-        val isReleaseCandidate = ReleaseVersion.currentReleaseVersion.releaseCandidate != null
+    fun isCurrentlyExclusiveToPatron(
+        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper()
+    ): Boolean {
+        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
         val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
-            ReleaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
         }
         return when (relativeToEarlyAccessState) {
             null -> false

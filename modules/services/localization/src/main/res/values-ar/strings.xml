@@ -135,7 +135,6 @@ Language: ar
     <string name="episode_downloading">تنزيل</string>
     <string name="onboarding_patron_features_title">هل تؤمن بما نفعله وترغب في إظهار دعمك؟</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">كل شيء في Plus</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">مساحة تخزين على السحابة قدرها 50 جيجابايت</string>
     <string name="onboarding_patron_feature_profile_badge_title">شعار الملف الشخصي للداعمين</string>
     <string name="onboarding_patron_feature_special_icons_title">أيقونات تطبيق Pocket Casts الخاصة</string>
     <string name="onboarding_plus_feature_gratitude_title">الامتنان الدائم للجميع هنا في Pocket Casts</string>
@@ -292,12 +291,9 @@ Language: ar
     <string name="onboarding_forgot_password">هل نسيت كلمة المرور؟</string>
     <string name="onboarding_email_invalid_message">يرجى إدخال بريد إلكتروني صالح</string>
     <string name="log_in">تسجيل الدخول</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">لكن كانت هناك حلقة واصلتَ الرجوع إليها…</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">لقد استمعتُ إلى ⁦%1$d⁩ من حلقات البودكاست المختلفة و⁦%2$d⁩ من الحلقات في 2022</string>
-    <string name="end_of_year_story_top_podcast">كانت أهم حلقات البودكاست الخاصة بك ⁦%1$s⁩ بواسطة ⁦%2$s⁩</string>
     <string name="end_of_year_story_top_podcast_subtitle">لقد استمعتَ إلى ⁦%1$d⁩ من الحلقات بإجمالي ⁦%2$s⁩</string>
     <string name="end_of_year_story_top_podcast_share_text">حلقات البودكاست التي أفضّلها في 2022! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">أهم حلقات البودكاست الخاصة بك</string>
     <string name="end_of_year_story_top_podcasts_share_text">أهم حلقات البودكاست الخاصة بي في العام! %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">أهم حلقات البودكاست الخاصة بي في 2022</string>
     <string name="end_of_year_story_longest_episode">كانت أطول حلقة استمعت إليها ⁦%1$s⁩ من حلقة البودكاست ⁦%2$s⁩</string>
@@ -314,7 +310,6 @@ Language: ar
     <string name="end_of_year_story_listened_to_categories">لقد استمعتَ إلى ⁦%1$d⁩ من التصنيفات المختلفة في هذا العام</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">لنلقِ نظرة إلى بعض مفضلاتك…</string>
     <string name="end_of_year_story_listened_to_categories_share_text">لقد استمعتُ إلى ⁦%1$d⁩ من التصنيفات المختلفة في 2022</string>
-    <string name="end_of_year_story_listened_to_numbers">لقد استمعتُ إلى ⁦%1$d⁩ من حلقات البودكاست المختلفة و⁦%2$d⁩ من الحلقات</string>
     <string name="end_of_year_replay">إعادة التشغيل</string>
     <string name="playback_speed">سرعة التشغيل</string>
     <string name="settings_media_notification_controls">عناصر التحكم في تنبيهات الوسائط</string>
@@ -628,7 +623,6 @@ Language: ar
     <string name="error_streaming_internet">فشل البث، تحقَّق من اتصالك بالإنترنت.</string>
     <string name="error_chartable_streaming">فشل البث. يستخدم المنتِج تحليلات Chartable التي يتم حظرها، إذا قمت بتشغيل أي تطبيق تصفية مثل AdGuard، فسيتعيَّن عليك إدراج chtbl.com في القائمة البيضاء لتشغيل الحلقة.</string>
     <string name="error_chartable">يستخدم المنتِج تحليلات Chartable التي تم حظرها، إذا قمت بتشغيل أي تطبيق تصفية مثل AdGuard، فسيتعيَّن عليك إدراج chtbl.com في القائمة البيضاء لتشغيل الحلقة.</string>
-    <string name="error_loading_show_notes">يتعذر تحميل ملحوظات العرض.</string>
     <string name="error_webview_not_installed">يتعذر تحميل ملحوظات العرض بسبب عدم تثبيت أي WebView على النظام.</string>
     <string name="settings_status_service_support_summary">يمكنك الوصول إلى دعم الأسئلة المتداولة والاتصال بنا.</string>
     <string name="settings_status_service_support">الدعم</string>

@@ -1,10 +1,16 @@
-7.50
+7.51
 -----
 
 *   Updates:
-    *   Show if a podcast has no ratings
-        ([#1453](https://github.com/Automattic/pocket-casts-android/pull/1453))
+    *   Take user to alarm permission when the app needs permission for sleep timer
+        ([#1487](https://github.com/Automattic/pocket-casts-android/pull/1487))
+
+7.50
+-----
+
 *   Bug Fixes:
+    *   Fixed chapter progress circle on full-screen player
+        ([#1461](https://github.com/Automattic/pocket-casts-android/pull/1461))
     *   Fixed show notes loading issues
         ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
 

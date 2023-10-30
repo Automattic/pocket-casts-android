@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 09:54:03+0000
+Translation-Revision-Date: 2023-10-24 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Questa è la tua top 5 dei podcast più ascoltati nel 2023\"</string>
+    <string name="eoy_story_top_podcasts_title">Anche tu eri grande in questi programmi.</string>
+    <string name="end_of_year_story_top_podcast">%1$s è stato il podcast che hai ascoltato di più nel 2023</string>
+    <string name="end_of_year_share_story">Condividi questa storia</string>
+    <string name="end_of_year_pocket_casts_playback">Pocket Casts Playback</string>
+    <string name="whats_new_bookmarks_enable_now_button">Attiva ora</string>
+    <string name="podcast_log_in_to_rate">Devi accedere per lasciare una valutazione</string>
+    <string name="podcast_submit_rating_no_internet">Nessuna connessione a Internet trovata. Connettiti a Internet per inviare una valutazione.</string>
+    <string name="podcast_rate">Valuta %s</string>
+    <string name="submit">Invia</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Unisciti a noi per il beta test della funzionalità dei segnalibri.</string>
+    <string name="whats_new_bookmarks_try_now_button">Prova ora</string>
+    <string name="whats_new_bookmarks_title">I segnalibri sono disponibili.</string>
+    <string name="podcast_not_enough_ratings">Numero di valutazioni non sufficiente</string>
+    <string name="bookmarks_upsell_instructions_early_access">Ottieni l\'accesso anticipato a questa funzionalità con Pocket Casts Patron e salva le date e le ore dei tuoi episodi preferiti. Presto disponibile per gli abbonati a Plus.</string>
+    <string name="bookmarks_upsell_instructions">Salva le date e le ore dei tuoi episodi preferiti e sblocca molte altre funzionalità con Pocket Casts Plus.</string>
+    <string name="error_loading_show_notes">Impossibile trovare le note di show per questo episodio.</string>
     <string name="podcast_no_bookmarks_matching">In questo podcast non ci sono segnalibri che corrispondono ai tuoi criteri di ricerca.</string>
     <string name="podcast_no_bookmarks_found">Nessun segnalibro trovato</string>
     <string name="player_tab_notes">Dettagli</string>
@@ -153,7 +170,7 @@ Language: it
     <string name="onboarding_plus_feature_gratitude_title">La gratitudine di tutti qui a Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Icone speciali dell\'app Pocket Casts</string>
     <string name="onboarding_patron_feature_profile_badge_title">Distintivo del profilo dei sostenitori</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50 GB di archiviazione su cloud</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100 GB di archiviazione su cloud</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Tutto è Plus</string>
     <string name="onboarding_patron_features_title">Credi in ciò che stiamo facendo e vuoi mostrare il tuo sostegno?</string>
     <string name="server_user_delete_account_with_sub_failed">Il tuo account ha un abbonamento attivo a Pocket Casts Plus. Annullalo prima di eliminare il tuo account.</string>
@@ -320,13 +337,11 @@ Language: it
     <string name="end_of_year_story_longest_episode">L\'episodio più lungo che hai ascoltato è stato di %1$s del podcast %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">I miei podcast preferiti del 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">I miei podcast preferiti dell\'anno! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">I migliori podcast</string>
     <string name="end_of_year_story_top_podcast_share_text">Il mio podcast preferito del 2022! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Hai ascoltato %1$d episodi per un totale di %2$s</string>
-    <string name="end_of_year_story_top_podcast">Il podcast migliore è stato %1$s di %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Nel 2022 ho ascoltato %1$d podcast differenti e %2$d episodi</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">C\'è stato però uno su cui continuavi a tornare…</string>
-    <string name="end_of_year_story_listened_to_numbers">Hai ascoltato %1$d differenti podcast e %2$d episodi</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">C\'è stato però uno su cui continuavi ad andare…</string>
+    <string name="end_of_year_story_listened_to_numbers">Hai ascoltato %1$d podcast diversi e %2$d episodi in totale</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ho ascoltato %1$d categrie diverse nel 2022</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Diamo un\'occhiata ad alcuni dei tuoi preferiti…</string>
     <string name="end_of_year_story_listened_to_categories">Hai ascoltato %1$d differenti categorie quest\'anno</string>
@@ -647,7 +662,6 @@ Language: it
     <string name="error_streaming_internet">Streaming non riuscito, controlla la tua connessione Internet.</string>
     <string name="error_chartable_streaming">Streaming non riuscito. Il produttore sta usando l\'analisi di Chartable che viene bloccata, se esegui un\'app di filtraggio come AdGuard dovrai inserire nella lista bianca chtbl.com per riprodurre l\'episodio.</string>
     <string name="error_chartable">Il produttore sta usando l\'analisi di Chartable che viene bloccata, se esegui un\'app di filtraggio come AdGuard dovrai inserire nella lista bianca chtbl.com per riprodurre l\'episodio.</string>
-    <string name="error_loading_show_notes">Impossibile caricare le note dello show.</string>
     <string name="error_webview_not_installed">Impossibile caricare le note dello show in quanto System WebView non è installato.</string>
     <string name="settings_status_service_support_summary">Accedi alle domande frequenti del supporto e contattaci.</string>
     <string name="settings_status_service_support">Supporto</string>

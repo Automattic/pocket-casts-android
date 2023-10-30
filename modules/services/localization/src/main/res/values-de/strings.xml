@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-11 16:54:03+0000
+Translation-Revision-Date: 2023-10-17 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="podcast_rate">%s bewerten</string>
+    <string name="submit">Übermitteln</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Sei beim Testen der Beta-Version der Lesezeichen dabei!</string>
+    <string name="whats_new_bookmarks_try_now_button">Jetzt testen</string>
+    <string name="whats_new_bookmarks_title">Die Lesezeichen sind da!</string>
+    <string name="podcast_not_enough_ratings">Nicht genügend Bewertungen</string>
+    <string name="bookmarks_upsell_instructions_early_access">Profitiere mit Pocket Casts Patron von frühzeitigem Zugriff auf diese Funktion und speichere Zeitstempel für deine Lieblingsfolgen. Bald für Plus-Abonnenten verfügbar.</string>
+    <string name="bookmarks_upsell_instructions">Speichere Zeitstempel für deine Lieblingsfolgen und schalte viele weitere Funktionen mit Pocket Casts Plus frei.</string>
+    <string name="error_loading_show_notes">Notizen zur Show konnten für diese Folge nicht gefunden werden.</string>
     <string name="podcast_no_bookmarks_matching">Dieser Podcast enthält keine Lesezeichen, die deinen Suchkriterien entsprechen.</string>
     <string name="podcast_no_bookmarks_found">Keine Lesezeichen gefunden</string>
     <string name="player_tab_notes">Details</string>
@@ -153,7 +162,7 @@ Language: de
     <string name="onboarding_plus_feature_gratitude_title">Die unendliche Dankbarkeit von allen bei Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Besondere Pocket Casts-App-Icons</string>
     <string name="onboarding_patron_feature_profile_badge_title">Profil-Badge für Unterstützer</string>
-    <string name="onboarding_patron_feature_cloud_storage_title">50 GB Cloud-Speicher</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100 GB Cloud-Speicher</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Alle Vorteile von Plus</string>
     <string name="onboarding_patron_features_title">Du glaubst an uns und möchtest uns unterstützen?</string>
     <string name="server_user_delete_account_with_sub_failed">Für dein Konto ist ein Pocket Casts Plus-Abonnement aktiviert. Bitte storniere es, bevor du dein Konto löschst.</string>
@@ -320,13 +329,9 @@ Language: de
     <string name="end_of_year_story_longest_episode">Die längste von dir angehörte Folge war %1$s aus dem Podcast %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Deine Top-Podcasts</string>
     <string name="end_of_year_story_top_podcast_share_text">Mein Lieblings-Podcast 2022! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Du hast dir %1$d Folgen mit einer Gesamtdauer von %2$s angehört</string>
-    <string name="end_of_year_story_top_podcast">Dein Lieblings-Podcast war %1$s von %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Ich habe mir im Jahr 2022 %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab einen, der dir besonders gut gefallen hat …</string>
-    <string name="end_of_year_story_listened_to_numbers">Du hast dir %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ich hab mir im Jahr 2022 %1$d unterschiedliche Kategorien angehört</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Sehen wir uns einige deiner Favoriten an …</string>
     <string name="end_of_year_story_listened_to_categories">Du hast dir in diesem Jahr %1$d unterschiedliche Kategorien angehört</string>
@@ -647,7 +652,6 @@ Language: de
     <string name="error_streaming_internet">Fehler beim Streaming. Überprüfe deine Internetverbindung.</string>
     <string name="error_chartable_streaming">Fehler beim Streaming. Der Produzent verwendet das Tool Chartable Analytics, das blockiert wird. Wenn du eine Filter-App wie AdGuard verwendest, musst du chtbl.com auf die Positivliste setzen, um die Folge abspielen zu können.</string>
     <string name="error_chartable">Der Produzent verwendet das Tool Chartable Analytics, das blockiert wird. Wenn du eine Filter-App wie AdGuard verwendest, musst du chtbl.com auf die Positivliste setzen, um die Folge abspielen zu können.</string>
-    <string name="error_loading_show_notes">Podcast-Beschreibung kann nicht geladen werden.</string>
     <string name="error_webview_not_installed">Da kein WebView im System installiert ist, kann die Podcast-Beschreibung nicht geladen werden.</string>
     <string name="settings_status_service_support_summary">Zugriff auf die FAQ zum Support und Kontaktaufnahme.</string>
     <string name="settings_status_service_support">Support</string>

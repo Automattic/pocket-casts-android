@@ -1,6 +1,13 @@
-apply from: "../../modules.gradle"
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
+plugins {
+    alias libs.plugins.android.library
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kapt
+    alias libs.plugins.ksp
+    alias libs.plugins.hilt
+    alias libs.plugins.kotlin.parcelize
+}
+
+apply from: "${project.rootDir}/base.gradle"
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.model'
@@ -18,9 +25,8 @@ dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:utils')
 
-    api androidLibs.room
-    implementation androidLibs.roomRx
-    implementation androidLibs.roomKtx
+    api libs.room.ktx
+    implementation libs.bundles.room
 
-    ksp androidLibs.roomCompile
+    ksp libs.room.compiler
 }

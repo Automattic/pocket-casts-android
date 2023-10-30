@@ -1,7 +1,13 @@
-apply from: "../../modules.gradle"
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
-apply plugin: 'kotlin-kapt'
+plugins {
+    alias libs.plugins.android.library
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kapt
+    alias libs.plugins.ksp
+    alias libs.plugins.hilt
+    alias libs.plugins.kotlin.parcelize
+}
+
+apply from: "${project.rootDir}/base.gradle"
 
 android {
     namespace 'au.com.shiftyjelly.pocketcasts.account'
@@ -33,6 +39,6 @@ dependencies {
     implementation project(':modules:services:views')
 
     // android libs
-    implementation androidLibs.horologistAuthDataPhone
-    implementation androidLibs.horologistDatalayer
+    implementation libs.horologist.auth.data.phone
+    implementation libs.horologist.datalayer
 }

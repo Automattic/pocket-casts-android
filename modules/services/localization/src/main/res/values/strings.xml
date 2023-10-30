@@ -546,7 +546,8 @@
     <string name="podcast_season_x">Season %d</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
-    <string name="podcast_not_enough_ratings">Not enough ratings</string>
+    <string name="podcast_log_in_to_rate">You must log in to leave a rating</string>
+    <string name="podcast_submit_rating_no_internet">No internet connection found. Please connect to the internet to submit a rating.</string>
 
     <!-- Episodes -->
 
@@ -1413,6 +1414,7 @@
     <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
     <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
     <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
+    <string name="whats_new_bookmarks_enable_now_button">Enable it now</string>
     <string name="whats_new_bookmarks_try_now_button">Try it now</string>
     <string name="whats_new_boomarks_join_beta_testing_title">Join us in the beta testing for bookmarks!</string>
 
@@ -1461,14 +1463,22 @@
     <string name="discover_category_fiction">Fiction</string>
     <string name="discover_category_government">Government</string>
     <string name="discover_category_health"><![CDATA[Health & Fitness]]></string>
+    <!-- Abbreviation for the podcast category Health & Fitness, using only "Health" -->
+    <string name="discover_category_health_abbreviation">Health</string>
     <string name="discover_category_history">History</string>
     <string name="discover_category_kids"><![CDATA[Kids & Family]]></string>
+    <!-- Abbreviation for the podcast category Kids & Family, using only "Family" -->
+    <string name="discover_category_kids_abbreviation">Family</string>
     <string name="discover_category_leisure">Leisure</string>
     <string name="discover_category_music">Music</string>
     <string name="discover_category_news">News</string>
     <string name="discover_category_religion"><![CDATA[Religion & Spirituality]]></string>
+    <!-- Abbreviation for the podcast category Religion & Spirituality, using only "Spirituality" -->
+    <string name="discover_category_religion_abbreviation">Spirituality</string>
     <string name="discover_category_science">Science</string>
     <string name="discover_category_society"><![CDATA[Society & Culture]]></string>
+    <!-- Abbreviation for the podcast category Society & Culture, using only "Culture" -->
+    <string name="discover_category_society_abbreviation">Culture</string>
     <string name="discover_category_sports">Sports</string>
     <string name="discover_category_technology">Technology</string>
     <string name="discover_category_crime">True Crime</string>
@@ -1564,11 +1574,11 @@
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
     <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
-    <string name="end_of_year_review">End of Year Review</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
     <string name="end_of_year_listening_time_english_only" translatable="false">In 2022, you spent\n%1$s\nlistening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
+    <string name="end_of_year_share_story">Share this story</string>
     <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
     <string name="end_of_year_story_intro_title_english_only" translatable="false">Let’s celebrate your year\nof listening!</string>
     <!-- Text that appears when someone shares the listened to story to Twitter, for example. %1$s is a placeholder for the amount of time. -->
@@ -1581,20 +1591,22 @@
     <!-- Text that appears when someone shares the listened categories to story to Twitter, for example. %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories_share_text">I listened to %1$d different categories in 2022</string>
     <!-- String telling the user how much podcasts and episodes they listened to this year, %1$d is a placeholder for the number of podcasts and %2$d is a placeholder fo the number of episodes. -->
-    <string name="end_of_year_story_listened_to_numbers">You listened to %1$d different podcasts and %2$d episodes</string>
-    <string name="end_of_year_story_listened_to_numbers_english_only" translatable="false">You listened to\n%1$d different podcasts\nand %2$d episodes</string>
+    <string name="end_of_year_story_listened_to_numbers">You listened to %1$d different shows and %2$d episodes in total</string>
+    <string name="end_of_year_story_listened_to_numbers_english_only" translatable="false">You listened to\n%1$d different shows\nand %2$d episodes in total</string>
     <!-- Subtitle for the story containing number of podcasts and episodes played this year. Segway for the next story. -->
-    <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming back to…</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming to…</string>
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->
     <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in 2022</string>
     <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title and %2$s is a placeholder for the author. -->
-    <string name="end_of_year_story_top_podcast">Your top podcast was %1$s by %2$s</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s was your most listened show in 2023</string>
     <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is a placeholder for the number of episodes and %2$s is a placeholder for the listened time. -->
     <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top podcast of the year story to Twitter. %1$s is the URL to the podcast. -->
     <string name="end_of_year_story_top_podcast_share_text">My favorite podcast of 2022! %1$s</string>
     <!-- Title for the story showing the top podcasts for the user in the current year. -->
-    <string name="end_of_year_story_top_podcasts">Your Top Podcasts</string>
+    <string name="eoy_story_top_podcasts_title">And you were big on these shows too!</string>
+    <!-- Subtitle for the story showing the top podcasts for the user in the current year. -->
+    <string name="eoy_story_top_podcasts_subtitle">This is your top 5 most listened to in 2023"</string>
     <!-- Text that appear when someone share the top 5 podcasts of the year story to Twitter. %1$s is a link to the list of the top podcasts. -->
     <string name="end_of_year_story_top_podcasts_share_text">My top podcasts of the year! %1$s</string>
     <!-- Title of a list of podcasts created containing the user's top 5 podcasts of 2022. -->
@@ -1611,6 +1623,10 @@
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
+    <!-- Title of the top categories story. %1$@ being the name of the most listened category. -->
+    <string name="end_of_year_story_top_categories_title">Did you know that %1$s was your favorite category</string>
+    <!-- Subtitle of the top categories story. %1$@ is the total number of episodes and %2$@ is the total listened time. -->
+    <string name="end_of_year_story_top_categories_subtitle">You listened to %1$s episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top categories story to Twitter. -->
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <!-- Description to why the user needs to create an account to see their end of year stats. -->

@@ -8,7 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -20,33 +19,32 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.util.Locale
-
-private val Float.nonScaledSp
-    @Composable
-    get() = (this / LocalDensity.current.fontScale).sp
-
-private val Int.nonScaledSp
-    @Composable
-    get() = (this / LocalDensity.current.fontScale).sp
 
 @Composable
 fun TextH10(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    disableScale: Boolean = false,
+    fontFamily: FontFamily? = null,
+    fontSize: TextUnit = 31.sp,
+    fontWeight: FontWeight = FontWeight.W700,
     maxLines: Int = Int.MAX_VALUE,
-    textAlign: TextAlign? = null
+    lineHeight: TextUnit = 37.sp,
+    textAlign: TextAlign? = null,
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 31.sp,
-        lineHeight = 37.sp,
-        fontWeight = FontWeight.W700,
+        fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
+        lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight,
+        fontFamily = fontFamily,
+        fontWeight = fontWeight,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
@@ -84,6 +82,7 @@ fun TextH30(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     maxLines: Int = Int.MAX_VALUE,
     disableScale: Boolean = false,
@@ -94,6 +93,7 @@ fun TextH30(
     Text(
         text = text,
         color = color,
+        fontFamily = fontFamily,
         fontSize = if (disableScale) fontSizeUpdated.value.nonScaledSp else fontSizeUpdated,
         lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight.value.sp,
         textAlign = textAlign,
@@ -181,16 +181,19 @@ fun TextH50(
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE,
+    fontFamily: FontFamily? = null,
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight = FontWeight.W500,
+    disableScale: Boolean = false,
     lineHeight: TextUnit = 20.sp,
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = fontSize,
+        fontFamily = fontFamily,
+        fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
         fontWeight = fontWeight,
-        lineHeight = lineHeight,
+        lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight,
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
@@ -297,6 +300,7 @@ fun TextH70(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    fontFamily: FontFamily? = null,
     fontWeight: FontWeight = FontWeight.W500,
     maxLines: Int = Int.MAX_VALUE,
     disableScale: Boolean = false
@@ -305,6 +309,7 @@ fun TextH70(
         text = text,
         color = color,
         fontSize = if (disableScale) 12.nonScaledSp else 12.sp,
+        fontFamily = fontFamily,
         fontWeight = fontWeight,
         lineHeight = if (disableScale) 14.nonScaledSp else 14.sp,
         letterSpacing = if (disableScale) .25f.nonScaledSp else .25.sp,

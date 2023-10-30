@@ -13,10 +13,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,11 +96,13 @@ class PodcastRatingsViewModel
         ) : RatingState() {
 
             val podcastUuid = ratings.podcastUuid
-            private val total = ratings.total
+            val total = ratings.total
             private val average = ratings.average
 
+            val noRatings: Boolean
+                get() = total == null || total == 0
+
             val stars: List<Star> = starsList()
-            val ratingText: RatingText = ratingText()
 
             private fun starsList(): List<Star> {
                 val rating = average ?: 0.0
@@ -121,47 +121,6 @@ class PodcastRatingsViewModel
                 index < rating -> Star.FilledStar
                 (index == rating) && (half >= 0.5) -> Star.HalfStar
                 else -> Star.BorderedStar
-            }
-
-            private fun ratingText() = when (total) {
-                null ->
-                    if (average == null) {
-                        RatingText.NotEnoughToRate
-                    } else {
-                        LogBuffer.e(
-                            LogBuffer.TAG_INVALID_STATE,
-                            "Rating total is null but the average is not. This should never happen."
-                        )
-                        RatingText.ShowNothing
-                    }
-
-                0 ->
-                    if (average == null || average == 0.0) {
-                        RatingText.NotEnoughToRate
-                    } else {
-                        LogBuffer.e(
-                            LogBuffer.TAG_INVALID_STATE,
-                            "Rating total is 0 but the average is not 0. This should never happen."
-                        )
-                        RatingText.ShowNothing
-                    }
-
-                else ->
-                    if (average != null) {
-                        RatingText.ShowTotal(total.abbreviated)
-                    } else {
-                        LogBuffer.e(
-                            LogBuffer.TAG_INVALID_STATE,
-                            "Has ratings but the average is null. This should never happen."
-                        )
-                        RatingText.ShowNothing
-                    }
-            }
-
-            sealed class RatingText {
-                object NotEnoughToRate : RatingText()
-                class ShowTotal(val text: String) : RatingText()
-                object ShowNothing : RatingText()
             }
         }
 

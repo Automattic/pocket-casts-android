@@ -288,6 +288,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
 
             binding.archive.setImageResource(if (headerViewModel.isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
+            binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
+            binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
 
             binding.executePendingBindings()
         }
@@ -523,13 +525,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.nextChapter()
     }
 
-    fun onMoreClicked() {
+    fun onMoreClicked(sourceView: SourceView? = null) {
         // stop double taps
         if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
             return
         }
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
-        ShelfBottomSheet().show(childFragmentManager, "shelf_bottom_sheet")
+        ShelfBottomSheet.newInstance(sourceView).show(childFragmentManager, "shelf_bottom_sheet")
     }
 
     override fun onPlayClicked() {

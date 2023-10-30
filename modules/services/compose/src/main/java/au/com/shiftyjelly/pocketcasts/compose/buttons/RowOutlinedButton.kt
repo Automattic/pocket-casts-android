@@ -22,12 +22,14 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -44,7 +46,9 @@ fun RowOutlinedButton(
     includePadding: Boolean = true,
     border: BorderStroke? = outlinedBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    disableScale: Boolean = false,
     textIcon: Painter? = null,
+    fontFamily: FontFamily? = null,
     fontSize: TextUnit? = null,
     leadingIcon: Painter? = null,
     tintIcon: Boolean = true,
@@ -82,7 +86,8 @@ fun RowOutlinedButton(
                         text = text,
                         color = colors.contentColor(enabled = true).value,
                         textAlign = TextAlign.Center,
-                        fontSize = fontSize,
+                        fontFamily = fontFamily,
+                        fontSize = if (disableScale) fontSize?.value?.nonScaledSp else fontSize,
                         modifier = Modifier.padding(6.dp)
                     )
                 }

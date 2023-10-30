@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +45,8 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiStat
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun WhatsNewPage(
@@ -62,8 +63,8 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        WhatsNewFeature.AutoPlay -> AutoPlayHeader()
-                        WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
+                        is WhatsNewFeature.AutoPlay -> AutoPlayHeader()
+                        is WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -149,14 +150,7 @@ private fun WhatsNewPageLoaded(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 RowButton(
-                    text = stringResource(state.feature.confirmButtonTitle),
-                    colors = when (state.feature) {
-                        WhatsNewFeature.AutoPlay -> ButtonDefaults.buttonColors()
-                        WhatsNewFeature.Bookmarks -> ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                            contentColor = MaterialTheme.theme.colors.primaryInteractive02
-                        )
-                    },
+                    text = getButtonTitle(state),
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
@@ -192,6 +186,34 @@ private fun WhatsNewSubscriptionBadge(tier: UserTier) = when (tier) {
 }
 
 @Composable
+private fun getButtonTitle(
+    state: UiState.Loaded,
+): String = when (state.feature) {
+    WhatsNewFeature.AutoPlay -> stringResource(state.feature.confirmButtonTitle)
+    is WhatsNewFeature.Bookmarks -> {
+        when {
+            state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
+            state.feature.hasFreeTrial -> stringResource(LR.string.profile_start_free_trial)
+            else -> {
+                if (state.feature.subscriptionTier != null) {
+                    stringResource(
+                        LR.string.upgrade_to,
+                        when (state.feature.subscriptionTier) {
+                            Subscription.SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
+                            Subscription.SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
+                            Subscription.SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
+                        }
+                    )
+                } else {
+                    Timber.e("Subscription tier is null. This should not happen when user is not entitled to a feature.")
+                    ""
+                }
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun WhatsNewAutoPlayPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
@@ -217,7 +239,14 @@ private fun WhatsNewBookmarksPreview(
     AppThemeWithBackground(themeType) {
         WhatsNewPageLoaded(
             state = UiState.Loaded(
-                feature = WhatsNewFeature.Bookmarks,
+                feature = WhatsNewFeature.Bookmarks(
+                    title = LR.string.whats_new_bookmarks_title,
+                    message = LR.string.whats_new_bookmarks_body,
+                    confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
+                    hasFreeTrial = false,
+                    isUserEntitled = true,
+                    subscriptionTier = Subscription.SubscriptionTier.PLUS,
+                ),
                 tier = UserTier.Plus,
             ),
             header = { BookmarksHeader(onClose = {}) },

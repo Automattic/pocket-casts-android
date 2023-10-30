@@ -458,6 +458,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
             SourceView.STATS,
+            SourceView.WHATS_NEW,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,

@@ -9,7 +9,7 @@ interface FragmentHostListener {
     fun replaceFragment(fragment: Fragment)
     fun showBottomSheet(fragment: Fragment)
     fun bottomSheetClosePressed(fragment: Fragment)
-    fun openPlayer()
+    fun openPlayer(source: String? = null)
     fun closePlayer()
     fun showModal(fragment: Fragment)
     fun closeModal(fragment: Fragment)

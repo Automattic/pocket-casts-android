@@ -126,6 +126,8 @@ class PlayerViewModel @Inject constructor(
 
         val isChaptersPresent: Boolean = !chapters.isEmpty
         val chapter: Chapter? = chapters.getChapter(positionMs)
+        val chapterProgress: Float = chapter?.calculateProgress(positionMs) ?: 0f
+        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs) ?: ""
         val chapterSummary: String = chapters.getChapterSummary(positionMs)
         val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs)
         val isLastChapter: Boolean = chapters.isLastChapter(positionMs)
