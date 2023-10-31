@@ -9,10 +9,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +32,8 @@ class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
     private val shareableTextProvider: ShareableTextProvider,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val settings: Settings,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading())
@@ -76,7 +79,8 @@ class StoriesViewModel @Inject constructor(
                     segmentsData = SegmentsData(
                         xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
                         widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
-                    )
+                    ),
+                    userTier = settings.userTier,
                 )
             }
             mutableState.value = state
@@ -204,6 +208,7 @@ class StoriesViewModel @Inject constructor(
             val currentStory: Story?,
             val segmentsData: SegmentsData,
             val preparingShareText: Boolean = false,
+            val userTier: UserTier,
         ) : State() {
             data class SegmentsData(
                 val widths: List<Float> = emptyList(),
