@@ -98,7 +98,7 @@ private fun PulsatingHeart(
     )
     Box(modifier = Modifier.scale(scale)) {
         Image(
-            painter = painterResource(id = R.drawable.heart),
+            painter = painterResource(id = R.drawable.heart_rainbow),
             contentDescription = null,
             modifier = modifier
                 .size(HeartImageSize)
