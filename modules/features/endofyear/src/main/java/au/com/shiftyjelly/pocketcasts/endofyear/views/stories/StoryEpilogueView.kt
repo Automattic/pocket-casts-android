@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,11 +39,13 @@ import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroundStyle
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryFontFamily
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val HeartImageSize = 72.dp
@@ -82,7 +86,7 @@ fun StoryEpilogueView(
 
             SecondaryText(story)
 
-            Spacer(modifier = modifier.weight(0.32f))
+            Spacer(modifier = modifier.weight(0.16f))
 
             ReplayButton(onClick = onReplayClicked)
 
@@ -139,14 +143,15 @@ private fun ReplayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val currentLocalView = LocalView.current
+    val screenWidth = currentLocalView.width.pxToDp(context)
     Button(
         onClick = { onClick() },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(4.dp),
         colors = ButtonDefaults
-            .buttonColors(
-                backgroundColor = Color.White,
-                contentColor = Color.White
-            ),
+            .buttonColors(backgroundColor = Color.White),
+        modifier = Modifier.width((screenWidth * 0.6f).dp),
     ) {
         Icon(
             imageVector = Icons.Default.Refresh,
@@ -156,6 +161,7 @@ private fun ReplayButton(
         TextP40(
             text = stringResource(id = LR.string.end_of_year_replay),
             color = Color.Black,
+            fontFamily = StoryFontFamily,
             disableScale = disableScale(),
             modifier = modifier.padding(2.dp)
         )
