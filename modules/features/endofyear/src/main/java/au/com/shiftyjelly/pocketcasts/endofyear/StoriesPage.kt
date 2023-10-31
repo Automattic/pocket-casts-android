@@ -69,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryLongestEpisod
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcastsView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryYearOverYearView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
@@ -81,6 +82,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLonges
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -256,6 +258,7 @@ private fun StorySharableContent(
                 is StoryTopPodcast -> StoryTopPodcastView(story)
                 is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
                 is StoryLongestEpisode -> StoryLongestEpisodeView(story)
+                is StoryYearOverYear -> StoryYearOverYearView(story)
                 is StoryEpilogue -> StoryEpilogueView(
                     story = story,
                     userTier = userTier,
