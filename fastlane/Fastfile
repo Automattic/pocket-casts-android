@@ -326,10 +326,8 @@ platform :android do
     create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
   end
 
-  lane :finalize_release do | options |
-    if android_current_branch_is_hotfix(version_properties_path: VERSION_PROPERTIES_PATH)
-      UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes')
-    end
+  lane :finalize_release do |options|
+    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if android_current_branch_is_hotfix(version_properties_path: VERSION_PROPERTIES_PATH)
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
