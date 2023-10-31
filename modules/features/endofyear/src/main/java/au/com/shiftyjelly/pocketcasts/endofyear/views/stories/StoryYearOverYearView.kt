@@ -31,9 +31,10 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlin.math.max
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -44,6 +45,7 @@ private const val MinimumPillarPercentage = 0.4
 fun StoryYearOverYearView(
     story: StoryYearOverYear,
     modifier: Modifier = Modifier,
+    userTier: UserTier,
 ) {
     Column(
         verticalArrangement = Arrangement.Bottom,
@@ -57,7 +59,7 @@ fun StoryYearOverYearView(
         Spacer(modifier = modifier.weight(0.2f))
 
         SubscriptionBadgeForTier(
-            tier = Subscription.SubscriptionTier.PLUS,
+            tier = SubscriptionTier.fromUserTier(userTier),
             displayMode = SubscriptionBadgeDisplayMode.Colored,
         )
 
