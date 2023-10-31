@@ -152,4 +152,9 @@ class DeveloperViewModel
             }
         }
     }
+
+    fun resetEoYModalProfileBadge() {
+        settings.setEndOfYearShowBadge2023(true)
+        settings.setEndOfYearModalHasBeenShown(false)
+    }
 }
