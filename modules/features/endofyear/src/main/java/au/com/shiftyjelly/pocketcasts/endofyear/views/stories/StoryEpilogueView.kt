@@ -6,12 +6,11 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -27,21 +26,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroundStyle
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val HeartImageSize = 72.dp
-private const val BackgroundColor = 0xFF1A1A1A
 
 @Composable
 fun StoryEpilogueView(
@@ -49,37 +52,44 @@ fun StoryEpilogueView(
     onReplayClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(BackgroundColor))
-            .verticalScroll(rememberScrollState())
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Spacer(modifier = modifier.height(40.dp))
+        val context = LocalView.current.context
+        StoryBlurredBackground(
+            offset = Offset(
+                -maxWidth.value.toInt().dpToPx(context) * 0.4f,
+                -maxHeight.value.toInt().dpToPx(context) * 0.4f
+            ),
+            style = StoryBlurredBackgroundStyle.Default,
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 40.dp)
+        ) {
+            Spacer(modifier = modifier.weight(1f))
 
-        Spacer(modifier = modifier.weight(1f))
+            PulsatingHeart()
 
-        PulsatingHeart()
+            Spacer(modifier = modifier.weight(0.34f))
 
-        Spacer(modifier = modifier.weight(0.34f))
+            PrimaryText(story)
 
-        PrimaryText(story)
+            Spacer(modifier = modifier.weight(0.16f))
 
-        Spacer(modifier = modifier.weight(0.16f))
+            SecondaryText(story)
 
-        SecondaryText(story)
+            Spacer(modifier = modifier.weight(0.32f))
 
-        Spacer(modifier = modifier.weight(0.32f))
+            ReplayButton(onClick = onReplayClicked)
 
-        ReplayButton(onClick = onReplayClicked)
+            Spacer(modifier = modifier.weight(1f))
 
-        Spacer(modifier = modifier.weight(1f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
+            PodcastLogoWhite()
+        }
     }
 }
 
