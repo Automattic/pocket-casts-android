@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.Confetti
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryAppLogo
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroundStyle
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryFontFamily
@@ -93,7 +93,7 @@ fun StoryEpilogueView(
 
             Spacer(modifier = modifier.weight(1f))
 
-            PodcastLogoWhite()
+            StoryAppLogo()
         }
         Confetti {}
     }
