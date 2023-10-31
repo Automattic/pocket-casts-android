@@ -6,14 +6,15 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,11 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.Confetti
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
@@ -45,8 +47,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -60,7 +62,9 @@ fun StoryEpilogueView(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(story.backgroundColor)
     ) {
         val context = LocalView.current.context
         StoryBlurredBackground(
@@ -147,28 +151,29 @@ private fun ReplayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val currentLocalView = LocalView.current
-    val screenWidth = currentLocalView.width.pxToDp(context)
-    Button(
-        onClick = { onClick() },
-        shape = RoundedCornerShape(4.dp),
-        colors = ButtonDefaults
-            .buttonColors(backgroundColor = Color.White),
-        modifier = Modifier.width((screenWidth * 0.6f).dp),
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth(0.6f),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Refresh,
-            contentDescription = null,
-            tint = Color.Black
-        )
-        TextP40(
-            text = stringResource(id = LR.string.end_of_year_replay),
-            color = Color.Black,
-            fontFamily = StoryFontFamily,
-            disableScale = disableScale(),
-            modifier = modifier.padding(2.dp)
-        )
+        Button(
+            onClick = { onClick() },
+            shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults
+                .buttonColors(backgroundColor = Color.White),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                tint = Color.Black
+            )
+            TextP40(
+                text = stringResource(id = LR.string.end_of_year_replay),
+                color = Color.Black,
+                fontFamily = StoryFontFamily,
+                disableScale = disableScale(),
+                modifier = modifier.padding(2.dp)
+            )
+        }
     }
 }
 
@@ -176,4 +181,28 @@ private fun ReplayButton(
 private fun blurredBackgroundStyle(userTier: UserTier) = when (userTier) {
     UserTier.Patron, UserTier.Plus -> StoryBlurredBackgroundStyle.Plus
     UserTier.Free -> StoryBlurredBackgroundStyle.Default
+}
+
+@Preview(name = "Free user")
+@Composable
+fun EpilogueFreeUserPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        StoryEpilogueView(
+            StoryEpilogue(),
+            userTier = UserTier.Free,
+            onReplayClicked = {}
+        )
+    }
+}
+
+@Preview(name = "Paid user")
+@Composable
+fun EpiloguePaidUserPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        StoryEpilogueView(
+            StoryEpilogue(),
+            userTier = UserTier.Plus,
+            onReplayClicked = {}
+        )
+    }
 }
