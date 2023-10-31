@@ -68,8 +68,8 @@ class SettingsImpl @Inject constructor(
     companion object {
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
-        private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
-        private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
+        private const val END_OF_YEAR_SHOW_BADGE_2023_KEY = "EndOfYearShowBadge2023Key"
+        private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_2023_KEY = "EndOfYearModalHasBeenShown2023Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
@@ -1155,19 +1155,19 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setEndOfYearShowBadge2022(value: Boolean) {
-        setBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, value)
+    override fun setEndOfYearShowBadge2023(value: Boolean) {
+        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
     }
 
-    override fun getEndOfYearShowBadge2022(): Boolean =
-        getBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, true)
+    override fun getEndOfYearShowBadge2023(): Boolean =
+        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
 
     override fun setEndOfYearModalHasBeenShown(value: Boolean) {
-        setBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, value)
+        setBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_2023_KEY, value)
     }
 
     override fun getEndOfYearModalHasBeenShown(): Boolean =
-        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, false)
+        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_2023_KEY, false)
 
     override fun hasCompletedOnboarding() = getBoolean(DONE_INITIAL_ONBOARDING_KEY, false)
 

@@ -306,7 +306,7 @@ class MainActivity :
                     if (!settings.getEndOfYearModalHasBeenShown()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
-                    if (settings.getEndOfYearShowBadge2022()) {
+                    if (settings.getEndOfYearShowBadge2023()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
@@ -376,7 +376,7 @@ class MainActivity :
                             VR.id.navigation_profile -> {
                                 if (settings.getEndOfYearModalHasBeenShown()) {
                                     binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-                                    settings.setEndOfYearShowBadge2022(false)
+                                    settings.setEndOfYearShowBadge2023(false)
                                 }
                                 FirebaseAnalyticsTracker.navigatedToProfile()
                             }
