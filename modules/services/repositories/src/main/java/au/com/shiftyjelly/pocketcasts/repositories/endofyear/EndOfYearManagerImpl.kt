@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLonges
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -43,6 +45,9 @@ class EndOfYearManagerImpl @Inject constructor(
 
     private val yearStart = epochAtStartOfYear(YEAR)
     private val yearEnd = epochAtStartOfYear(YEAR + 1)
+
+    private val previousYearStart = epochAtStartOfYear(YEAR - 1)
+    private val previousYearEnd = epochAtStartOfYear(YEAR)
 
     private fun epochAtStartOfYear(year: Int) = LocalDate.of(year, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
@@ -93,6 +98,7 @@ class EndOfYearManagerImpl @Inject constructor(
         val listenedNumbers = findListenedNumbersForYear(YEAR)
         val topPodcasts = findTopPodcastsForYear(YEAR, limit = 10)
         val longestEpisode = findLongestPlayedEpisodeForYear(YEAR)
+        val yearOverYearListeningTime = getYearOverYearListeningTime()
         val stories = mutableListOf<Story>()
 
         stories.add(StoryIntro())
@@ -111,6 +117,9 @@ class EndOfYearManagerImpl @Inject constructor(
         }
         listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
         longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
+        if (yearOverYearListeningTime.totalPlayedTimeThisYear != 0L || yearOverYearListeningTime.totalPlayedTimeLastYear != 0L) {
+            stories.add(StoryYearOverYear(yearOverYearListeningTime))
+        }
         stories.add(StoryEpilogue())
 
         return stories
@@ -148,5 +157,14 @@ class EndOfYearManagerImpl @Inject constructor(
 
     override suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode? {
         return episodeManager.findLongestPlayedEpisode(yearStart, yearEnd)
+    }
+
+    override suspend fun getYearOverYearListeningTime(): YearOverYearListeningTime {
+        return episodeManager.yearOverYearListeningTime(
+            fromEpochMsPreviousYear = previousYearStart,
+            toEpochMsPreviousYear = previousYearEnd,
+            fromEpochMsCurrentYear = yearStart,
+            toEpochMsCurrentYear = yearEnd,
+        )
     }
 }

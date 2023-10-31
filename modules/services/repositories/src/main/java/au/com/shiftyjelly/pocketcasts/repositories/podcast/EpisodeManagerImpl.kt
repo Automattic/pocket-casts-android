@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
+import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -1158,5 +1159,19 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         return totalPlaytime
+    }
+
+    override suspend fun yearOverYearListeningTime(
+        fromEpochMsPreviousYear: Long,
+        toEpochMsPreviousYear: Long,
+        fromEpochMsCurrentYear: Long,
+        toEpochMsCurrentYear: Long,
+    ): YearOverYearListeningTime {
+        val previousYearListeningTime = episodeDao.calculateListeningTime(fromEpochMsPreviousYear, toEpochMsPreviousYear,)
+        val currentYearListeningTime = episodeDao.calculateListeningTime(fromEpochMsCurrentYear, toEpochMsCurrentYear,)
+        return YearOverYearListeningTime(
+            totalPlayedTimeLastYear = previousYearListeningTime ?: 0L,
+            totalPlayedTimeThisYear = currentYearListeningTime ?: 0L
+        )
     }
 }
