@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,6 +36,9 @@ class StoriesViewModelTest {
 
     @Mock
     private lateinit var endOfYearManager: EndOfYearManager
+
+    @Mock
+    private lateinit var settings: Settings
 
     @Test
     fun `when vm starts, then progress is zero`() = runTest {
@@ -118,11 +123,13 @@ class StoriesViewModelTest {
 
     private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
         whenever(endOfYearManager.loadStories()).thenReturn(mockStories)
+        whenever(settings.userTier).thenReturn(UserTier.Free)
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
             fileUtilWrapper = fileUtilWrapper,
             shareableTextProvider = mock(),
             analyticsTracker = mock(),
+            settings = settings,
         )
     }
 }

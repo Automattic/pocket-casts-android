@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val HeartImageSize = 72.dp
@@ -54,6 +55,7 @@ private val HeartImageSize = 72.dp
 @Composable
 fun StoryEpilogueView(
     story: StoryEpilogue,
+    userTier: UserTier,
     onReplayClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -66,7 +68,7 @@ fun StoryEpilogueView(
                 -maxWidth.value.toInt().dpToPx(context) * 0.4f,
                 -maxHeight.value.toInt().dpToPx(context) * 0.4f
             ),
-            style = StoryBlurredBackgroundStyle.Default,
+            style = blurredBackgroundStyle(userTier),
         )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -168,4 +170,10 @@ private fun ReplayButton(
             modifier = modifier.padding(2.dp)
         )
     }
+}
+
+@Composable
+private fun blurredBackgroundStyle(userTier: UserTier) = when (userTier) {
+    UserTier.Patron, UserTier.Plus -> StoryBlurredBackgroundStyle.Plus
+    UserTier.Free -> StoryBlurredBackgroundStyle.Default
 }

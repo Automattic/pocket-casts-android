@@ -84,6 +84,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPod
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
@@ -180,6 +181,7 @@ private fun StoriesView(
                     convertibleToBitmap(content = {
                         StorySharableContent(
                             story,
+                            state.userTier,
                             onSkipPrevious,
                             onSkipNext,
                             onPause,
@@ -225,6 +227,7 @@ private fun LoadingOverContentView() {
 @Composable
 private fun StorySharableContent(
     story: Story,
+    userTier: UserTier,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
     onPause: () -> Unit,
@@ -253,7 +256,11 @@ private fun StorySharableContent(
                 is StoryTopPodcast -> StoryTopPodcastView(story)
                 is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
                 is StoryLongestEpisode -> StoryLongestEpisodeView(story)
-                is StoryEpilogue -> StoryEpilogueView(story, onReplayClicked)
+                is StoryEpilogue -> StoryEpilogueView(
+                    story = story,
+                    userTier = userTier,
+                    onReplayClicked = onReplayClicked
+                )
             }
         }
     }
@@ -485,7 +492,8 @@ private fun StoriesScreenPreview(
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
                     widths = listOf(0.25f, 0.75f)
-                )
+                ),
+                userTier = UserTier.Free,
             ),
             progress = MutableStateFlow(0.75f),
             onSkipPrevious = {},
