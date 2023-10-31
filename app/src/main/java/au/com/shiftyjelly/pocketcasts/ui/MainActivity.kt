@@ -652,8 +652,7 @@ class MainActivity :
             showStories(StoriesSource.fromString(source))
         } else {
             viewModel.waitingForSignInToShowStories = true
-            val intent = Intent(this, AccountActivity::class.java)
-            startActivity(intent)
+            openOnboardingFlow(OnboardingFlow.LoggedOut)
         }
     }
 
