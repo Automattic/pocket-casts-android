@@ -6,24 +6,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
-import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
-import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -39,22 +36,21 @@ fun StoryLongestEpisodeView(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .podcastDynamicBackground(story.longestEpisode.toPodcast())
             .verticalScroll(rememberScrollState())
+            .padding(vertical = 40.dp)
     ) {
-        Spacer(modifier = modifier.height(40.dp))
 
-        Spacer(modifier = modifier.weight(0.7f))
-
-        PodcastCoverStack(story)
-
-        Spacer(modifier = modifier.weight(0.3f))
+        Spacer(modifier = modifier.weight(0.2f))
 
         PrimaryText(story)
 
-        Spacer(modifier = modifier.weight(0.25f))
+        Spacer(modifier = modifier.height(14.dp))
 
         SecondaryText(story)
+
+        Spacer(modifier = modifier.weight(0.2f))
+
+        PodcastCoverStack(story)
 
         Spacer(modifier = modifier.weight(1f))
     }
@@ -67,59 +63,66 @@ private fun PodcastCoverStack(
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
-    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.2f
-
-    Box {
-        (0..2).reversed().forEach { index ->
-            Box(
-                modifier = modifier
-                    .padding(top = (index * (coverWidth.value * .17)).dp)
-                    .transformPodcastCover()
-            ) {
-                with(story.longestEpisode) {
-                    when (index) {
-                        0 -> PodcastCover(
-                            uuid = podcastUuid,
-                            coverWidth = coverWidth,
-                            coverSize = CoverSize.BIG
-                        )
-
-                        1 -> {
-                            val backgroundColor = Color(toPodcast().getTintColor(false))
-                            RectangleCover(
-                                coverWidth = coverWidth,
-                                backgroundColor = backgroundColor
-                            )
-                        }
-
-                        2 -> {
-                            val backgroundColor = Color(toPodcast().getTintColor(true))
-                            RectangleCover(
-                                coverWidth = coverWidth,
-                                backgroundColor = backgroundColor
-                            )
-                        }
-                    }
-                }
-            }
-        }
+    val width = currentLocalView.width
+    val podcastUuid = story.longestEpisode.podcastUuid
+    Box(
+        modifier = modifier
+            .wrapContentSize()
+            .offset(
+                x = (width * 0.04f).toInt().pxToDp(context).dp,
+                y = (width * 0.05f).toInt().pxToDp(context).dp,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        PodcastCover(
+            uuid = podcastUuid,
+            coverWidth = (width * 0.5f).toInt().pxToDp(context).dp,
+            modifier = Modifier.offset(
+                x = -(width * 0.4f).toInt().pxToDp(context).dp,
+                y = (width * 0.4f).toInt().pxToDp(context).dp,
+            ),
+        )
+        PodcastCover(
+            uuid = podcastUuid,
+            coverWidth = (width * 0.55f).toInt().pxToDp(context).dp,
+            modifier = Modifier.offset(
+                x = -(width * 0.32f).toInt().pxToDp(context).dp,
+                y = (width * 0.32f).toInt().pxToDp(context).dp,
+            ),
+        )
+        PodcastCover(
+            uuid = podcastUuid,
+            coverWidth = (width * 0.6f).toInt().pxToDp(context).dp,
+            modifier = Modifier.offset(
+                x = -(width * 0.24f).toInt().pxToDp(context).dp,
+                y = (width * 0.24f).toInt().pxToDp(context).dp,
+            ),
+        )
+        PodcastCover(
+            uuid = podcastUuid,
+            coverWidth = (width * 0.65f).toInt().pxToDp(context).dp,
+            modifier = Modifier.offset(
+                x = -(width * 0.16f).toInt().pxToDp(context).dp,
+                y = (width * 0.16f).toInt().pxToDp(context).dp,
+            ),
+        )
+        PodcastCover(
+            uuid = podcastUuid,
+            coverWidth = (width * 0.7f).toInt().pxToDp(context).dp,
+            modifier = Modifier.offset(
+                x = -(width * 0.08f).toInt().pxToDp(context).dp,
+                y = (width * 0.08f).toInt().pxToDp(context).dp,
+            ),
+        )
+        PodcastCover(
+            uuid = podcastUuid,
+            coverWidth = (width * 0.75f).toInt().pxToDp(context).dp,
+        )
     }
 }
 
 @Composable
 private fun PrimaryText(
-    story: StoryLongestEpisode,
-    modifier: Modifier = Modifier,
-) {
-    val text = stringResource(
-        id = R.string.end_of_year_story_longest_episode,
-        story.longestEpisode.title, story.longestEpisode.podcastTitle
-    )
-    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
-}
-
-@Composable
-private fun SecondaryText(
     story: StoryLongestEpisode,
     modifier: Modifier = Modifier,
 ) {
@@ -129,8 +132,20 @@ private fun SecondaryText(
         context.resources
     )
     val text = stringResource(
-        id = R.string.end_of_year_story_longest_episode_duration,
+        id = R.string.end_of_year_story_longest_episode_title,
         timeText
+    )
+    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
+}
+
+@Composable
+private fun SecondaryText(
+    story: StoryLongestEpisode,
+    modifier: Modifier = Modifier,
+) {
+    val text = stringResource(
+        id = R.string.end_of_year_story_longest_episode_subtitle,
+        story.longestEpisode.title, story.longestEpisode.podcastTitle
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

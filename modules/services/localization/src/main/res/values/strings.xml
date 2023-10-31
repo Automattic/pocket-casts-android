@@ -1612,10 +1612,10 @@
     <string name="end_of_year_story_top_podcasts_share_text">My top podcasts of the year! %1$s</string>
     <!-- Title of a list of podcasts created containing the user's top 5 podcasts of 2022. -->
     <string name="end_of_year_story_top_podcasts_list_title">My top podcasts of 2022</string>
-    <!-- Title for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode title and %2$s is a placeholder for the podcast title. -->
-    <string name="end_of_year_story_longest_episode">The longest episode you listened to was %1$s from the podcast %2$s</string>
-    <!-- Subtitle for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode length. -->
-    <string name="end_of_year_story_longest_episode_duration">This episode was %1$s long</string>
+    <!-- Title for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode length. -->
+    <string name="end_of_year_story_longest_episode_title">The longest episode you listened to was %1$s</string>
+    <!-- Subtitle for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode title and %2$s is a placeholder for the podcast title. -->
+    <string name="end_of_year_story_longest_episode_subtitle">It was none other than \"%1$s\" from \"%2$s\"</string>
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in 2022 %1$s</string>
     <!-- Title for the epilogue story -->
