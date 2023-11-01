@@ -1650,6 +1650,11 @@
     <string name="eoy_year_over_year_title_skyrocketed">Compared to 2022, your listening time skyrocketed!</string>
     <!-- Text for when a user shares the story comparing the 2022 and 2023 listening time. -->
     <string name="end_of_year_stories_year_over_share_text">My 2023 listening time compared to 2022</string>
+    <!-- Title for the completion rate. %1$d is the percentage.-->
+    <string name="end_of_year_stories_year_completion_rate_title">Your completion rate this year was %1$d%%</string>
+    <!-- Title for the completion rate. %1$d is the total of episodes listened this year, %2$d is the total of episodes fully listened to. -->
+    <string name="end_of_year_stories_year_completion_rate_subtitle">From the %1$d episodes you started you listened fully to a total of %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate">completion rate</string>
 
     <!-- Onboarding -->
 

@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedNumbers
@@ -98,6 +100,7 @@ class EndOfYearManagerImpl @Inject constructor(
         val topPodcasts = findTopPodcastsForYear(YEAR, limit = 10)
         val longestEpisode = findLongestPlayedEpisodeForYear(YEAR)
         val yearOverYearListeningTime = getYearOverYearListeningTime()
+        val episodesStartedAndCompleted = countEpisodesStartedAndCompleted()
         val stories = mutableListOf<Story>()
 
         stories.add(StoryIntro())
@@ -118,6 +121,7 @@ class EndOfYearManagerImpl @Inject constructor(
         if (yearOverYearListeningTime.totalPlayedTimeThisYear != 0L || yearOverYearListeningTime.totalPlayedTimeLastYear != 0L) {
             stories.add(StoryYearOverYear(yearOverYearListeningTime))
         }
+        stories.add(StoryCompletionRate(episodesStartedAndCompleted))
         stories.add(StoryEpilogue())
 
         return stories
@@ -164,5 +168,9 @@ class EndOfYearManagerImpl @Inject constructor(
             fromEpochMsCurrentYear = yearStart,
             toEpochMsCurrentYear = yearEnd,
         )
+    }
+
+    override suspend fun countEpisodesStartedAndCompleted(): EpisodesStartedAndCompleted {
+        return episodeManager.countEpisodesStartedAndCompleted(yearStart, yearEnd)
     }
 }

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -163,4 +164,5 @@ interface EpisodeManager {
         fromEpochMsCurrentYear: Long,
         toEpochMsCurrentYear: Long,
     ): YearOverYearListeningTime
+    suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
 }
