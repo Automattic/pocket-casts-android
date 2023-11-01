@@ -732,7 +732,7 @@ class MainActivity :
                 if (viewModel.waitingForSignInToShowStories) {
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
-                } else if (!settings.getEndOfYearShowModal()) {
+                } else if (settings.getEndOfYearShowModal()) {
                     viewModel.updateStoriesModalShowState(true)
                     launch(Dispatchers.Main) {
                         if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
