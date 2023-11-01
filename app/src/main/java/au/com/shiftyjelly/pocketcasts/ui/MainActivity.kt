@@ -303,10 +303,10 @@ class MainActivity :
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
                 if (isEligible) {
-                    if (!settings.getEndOfYearModalHasBeenShown()) {
+                    if (settings.getEndOfYearShowModal()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
-                    if (settings.getEndOfYearShowBadge2022()) {
+                    if (settings.getEndOfYearShowBadge2023()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
@@ -373,16 +373,14 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> {
-                                if (settings.getEndOfYearModalHasBeenShown()) {
-                                    binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-                                    settings.setEndOfYearShowBadge2022(false)
-                                }
-                                FirebaseAnalyticsTracker.navigatedToProfile()
-                            }
+                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
                         }
                     }
                     settings.setSelectedTab(currentTab)
+                } else if (it is NavigatorAction.NewFragmentAdded) {
+                    if (navigator.currentTab() == VR.id.navigation_profile) {
+                        resetEoYBadgeIfNeeded()
+                    }
                 }
             }
             .subscribe()
@@ -393,6 +391,15 @@ class MainActivity :
         updateSystemColors()
 
         mediaRouter = MediaRouter.getInstance(this)
+    }
+
+    private fun resetEoYBadgeIfNeeded() {
+        if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
+            settings.getEndOfYearShowBadge2023()
+        ) {
+            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+            settings.setEndOfYearShowBadge2023(false)
+        }
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
@@ -638,7 +645,7 @@ class MainActivity :
                         },
                         onExpanded = {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                            settings.setEndOfYearModalHasBeenShown(true)
+                            settings.setEndOfYearShowModal(false)
                             viewModel.updateStoriesModalShowState(false)
                         }
                     )
@@ -725,7 +732,7 @@ class MainActivity :
                 if (viewModel.waitingForSignInToShowStories) {
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
-                } else if (!settings.getEndOfYearModalHasBeenShown()) {
+                } else if (!settings.getEndOfYearShowModal()) {
                     viewModel.updateStoriesModalShowState(true)
                     launch(Dispatchers.Main) {
                         if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()

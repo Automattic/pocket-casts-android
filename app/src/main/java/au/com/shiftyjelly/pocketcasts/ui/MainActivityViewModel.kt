@@ -58,7 +58,7 @@ class MainActivityViewModel
 
     init {
         showWhatsNewIfNeeded()
-        updateStoriesModalShowState(!settings.getEndOfYearModalHasBeenShown())
+        updateStoriesModalShowState(settings.getEndOfYearShowModal())
     }
 
     private fun showWhatsNewIfNeeded() {
