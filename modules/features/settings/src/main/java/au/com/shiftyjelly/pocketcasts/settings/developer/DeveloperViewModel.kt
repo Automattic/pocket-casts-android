@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.stream.Collectors.toList
 import javax.inject.Inject
 
 @HiltViewModel
@@ -155,6 +154,6 @@ class DeveloperViewModel
 
     fun resetEoYModalProfileBadge() {
         settings.setEndOfYearShowBadge2023(true)
-        settings.setEndOfYearModalHasBeenShown(false)
+        settings.setEndOfYearShowModal(true)
     }
 }

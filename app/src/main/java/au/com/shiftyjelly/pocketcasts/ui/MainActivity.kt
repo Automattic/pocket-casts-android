@@ -303,7 +303,7 @@ class MainActivity :
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
                 if (isEligible) {
-                    if (!settings.getEndOfYearModalHasBeenShown()) {
+                    if (settings.getEndOfYearShowModal()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
                     if (settings.getEndOfYearShowBadge2023()) {
@@ -374,7 +374,7 @@ class MainActivity :
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
                             VR.id.navigation_profile -> {
-                                if (settings.getEndOfYearModalHasBeenShown()) {
+                                if (settings.getEndOfYearShowModal()) {
                                     binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
                                     settings.setEndOfYearShowBadge2023(false)
                                 }
@@ -638,7 +638,7 @@ class MainActivity :
                         },
                         onExpanded = {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                            settings.setEndOfYearModalHasBeenShown(true)
+                            settings.setEndOfYearShowModal(false)
                             viewModel.updateStoriesModalShowState(false)
                         }
                     )
@@ -725,7 +725,7 @@ class MainActivity :
                 if (viewModel.waitingForSignInToShowStories) {
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
-                } else if (!settings.getEndOfYearModalHasBeenShown()) {
+                } else if (!settings.getEndOfYearShowModal()) {
                     viewModel.updateStoriesModalShowState(true)
                     launch(Dispatchers.Main) {
                         if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()

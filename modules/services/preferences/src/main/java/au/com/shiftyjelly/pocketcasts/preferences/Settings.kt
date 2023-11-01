@@ -373,8 +373,8 @@ interface Settings {
     fun setEndOfYearShowBadge2023(value: Boolean)
     fun getEndOfYearShowBadge2023(): Boolean
 
-    fun setEndOfYearModalHasBeenShown(value: Boolean)
-    fun getEndOfYearModalHasBeenShown(): Boolean
+    fun setEndOfYearShowModal(value: Boolean)
+    fun getEndOfYearShowModal(): Boolean
 
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
