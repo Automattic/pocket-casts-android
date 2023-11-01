@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
-import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
@@ -113,9 +112,8 @@ class EndOfYearManagerImpl @Inject constructor(
         }
         if (listenedCategories.isNotEmpty()) {
             stories.add(StoryTopListenedCategories(listenedCategories))
-            stories.add(StoryListenedCategories(listenedCategories))
         }
-        listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
+        listeningTime?.let { stories.add(StoryListeningTime(it)) }
         longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
         if (yearOverYearListeningTime.totalPlayedTimeThisYear != 0L || yearOverYearListeningTime.totalPlayedTimeLastYear != 0L) {
             stories.add(StoryYearOverYear(yearOverYearListeningTime))
