@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -99,6 +100,7 @@ class EndOfYearManagerImpl @Inject constructor(
         val topPodcasts = findTopPodcastsForYear(YEAR, limit = 10)
         val longestEpisode = findLongestPlayedEpisodeForYear(YEAR)
         val yearOverYearListeningTime = getYearOverYearListeningTime()
+        val episodesStartedAndCompleted = countEpisodesStartedAndCompleted()
         val stories = mutableListOf<Story>()
 
         stories.add(StoryIntro())
@@ -119,11 +121,7 @@ class EndOfYearManagerImpl @Inject constructor(
         if (yearOverYearListeningTime.totalPlayedTimeThisYear != 0L || yearOverYearListeningTime.totalPlayedTimeLastYear != 0L) {
             stories.add(StoryYearOverYear(yearOverYearListeningTime))
         }
-        stories.add(
-            StoryCompletionRate(
-                percent = 75f,
-            )
-        )
+        stories.add(StoryCompletionRate(episodesStartedAndCompleted))
         stories.add(StoryEpilogue())
 
         return stories
@@ -170,5 +168,9 @@ class EndOfYearManagerImpl @Inject constructor(
             fromEpochMsCurrentYear = yearStart,
             toEpochMsCurrentYear = yearEnd,
         )
+    }
+
+    override suspend fun countEpisodesStartedAndCompleted(): EpisodesStartedAndCompleted {
+        return episodeManager.countEpisodesStartedAndCompleted(yearStart, yearEnd)
     }
 }

@@ -18,9 +18,10 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
-import au.com.shiftyjelly.pocketcasts.endofyear.components.CompletionCircle
+import au.com.shiftyjelly.pocketcasts.endofyear.components.CompletionRateCircle
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -59,8 +60,10 @@ fun StoryCompletionRateView(
 
         Spacer(modifier = modifier.weight(0.2f))
 
-        CompletionCircle(
-            story = story,
+        CompletionRateCircle(
+            percent = story.episodesStartedAndCompleted.percentage.toInt(),
+            titleColor = story.tintColor,
+            subTitleColor = story.subtitleColor,
             modifier = modifier
                 .weight(1f)
         )
@@ -76,7 +79,7 @@ private fun PrimaryText(
 ) {
     val text = stringResource(
         LR.string.end_of_year_stories_year_completion_rate_title,
-        "10%"
+        story.episodesStartedAndCompleted.percentage.toInt(),
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
@@ -87,19 +90,20 @@ private fun SecondaryText(
     modifier: Modifier = Modifier,
 ) {
     val text = stringResource(
-        LR.string.end_of_year_stories_year_over_year_subtitle_went_up,
-        30
+        LR.string.end_of_year_stories_year_completion_rate_subtitle,
+        story.episodesStartedAndCompleted.started,
+        story.episodesStartedAndCompleted.completed,
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
 
 @Preview
 @Composable
-fun CompletionRate10percentPreview() {
+fun StoryCompletionRatPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         StoryCompletionRateView(
             StoryCompletionRate(
-                percent = 40f,
+                EpisodesStartedAndCompleted(started = 100, completed = 30),
             ),
             userTier = UserTier.Plus,
         )
