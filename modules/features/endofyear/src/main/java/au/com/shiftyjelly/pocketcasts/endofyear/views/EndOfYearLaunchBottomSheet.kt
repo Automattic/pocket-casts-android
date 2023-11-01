@@ -75,7 +75,7 @@ fun ImageContent(modifier: Modifier = Modifier) {
         ) {
             Image(
                 painter = painterResource(R.drawable.img_2023_modal),
-                contentDescription = stringResource(id = LR.string.end_of_year_pocket_casts_playback),
+                contentDescription = "Pocket Casts Playback", // Intentionally not translated
                 modifier = modifier
             )
         }
