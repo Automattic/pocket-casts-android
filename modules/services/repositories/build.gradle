@@ -25,4 +25,5 @@ dependencies {
     implementation project(':modules:services:protobuf')
     implementation project(':modules:services:servers')
     implementation project(':modules:services:utils')
+    testImplementation project(':modules:services:sharedtest')
 }
