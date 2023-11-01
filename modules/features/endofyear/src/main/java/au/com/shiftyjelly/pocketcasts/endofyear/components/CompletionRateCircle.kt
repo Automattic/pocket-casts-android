@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val PercentFontSize = 45.sp
+private val PercentFontSize = 80.sp
 private const val CompletionCircleAvailableWidthPercent = .75f
 private val CompletionCircleBaseColor = Color(0xFF292B2E)
 
