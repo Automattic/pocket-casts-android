@@ -373,16 +373,14 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> {
-                                if (settings.getEndOfYearShowModal()) {
-                                    binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-                                    settings.setEndOfYearShowBadge2023(false)
-                                }
-                                FirebaseAnalyticsTracker.navigatedToProfile()
-                            }
+                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
                         }
                     }
                     settings.setSelectedTab(currentTab)
+                } else if (it is NavigatorAction.NewFragmentAdded) {
+                    if (navigator.currentTab() == VR.id.navigation_profile) {
+                        resetEoYBadgeIfNeeded()
+                    }
                 }
             }
             .subscribe()
@@ -393,6 +391,15 @@ class MainActivity :
         updateSystemColors()
 
         mediaRouter = MediaRouter.getInstance(this)
+    }
+
+    private fun resetEoYBadgeIfNeeded() {
+        if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
+            settings.getEndOfYearShowBadge2023()
+        ) {
+            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+            settings.setEndOfYearShowBadge2023(false)
+        }
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
