@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -1174,4 +1175,12 @@ class EpisodeManagerImpl @Inject constructor(
             totalPlayedTimeThisYear = currentYearListeningTime ?: 0L
         )
     }
+
+    override suspend fun countEpisodesStartedAndCompleted(
+        fromEpochMs: Long,
+        toEpochMs: Long,
+    ) = EpisodesStartedAndCompleted(
+        started = episodeDao.countEpisodesStarted(fromEpochMs, toEpochMs),
+        completed = episodeDao.countEpisodesCompleted(fromEpochMs, toEpochMs),
+    )
 }

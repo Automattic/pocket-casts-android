@@ -405,4 +405,24 @@ abstract class EpisodeDao {
         """
     )
     abstract suspend fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
+
+    @Query(
+        """
+            SELECT COUNT(DISTINCT uuid) AS started FROM podcast_episodes
+            WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL 
+            AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
+        """
+    )
+    abstract suspend fun countEpisodesStarted(fromEpochMs: Long, toEpochMs: Long): Int
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT uuid) AS completed 
+        FROM podcast_episodes 
+        WHERE playing_status = 3 OR played_up_to >= 0.9 * duration 
+        AND podcast_episodes.last_playback_interaction_date IS NOT NULL 
+        AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
+        """
+    )
+    abstract suspend fun countEpisodesCompleted(fromEpochMs: Long, toEpochMs: Long): Int
 }
