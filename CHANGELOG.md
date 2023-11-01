@@ -1,6 +1,9 @@
 7.52
 -----
 
+* Bug Fixes
+    *   Hide Plus upgrade banner for Patron users
+        ([#1508](https://github.com/Automattic/pocket-casts-android/pull/1508))
 
 7.51
 -----
