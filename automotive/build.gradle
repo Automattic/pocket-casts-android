@@ -52,6 +52,12 @@ android {
             shrinkResources true
         }
     }
+    variantFilter { variant ->
+        if (variant.flavors*.name.contains("free")) {
+            // Android Automotive apps must include proprietary libs
+            setIgnore(true)
+        }
+    }
 }
 
 dependencies {

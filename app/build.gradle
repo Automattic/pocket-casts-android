@@ -7,7 +7,6 @@ plugins {
     alias libs.plugins.ksp
     alias libs.plugins.hilt
     alias libs.plugins.sentry
-    alias libs.plugins.google.services
     alias libs.plugins.kotlin.parcelize
 }
 
@@ -73,6 +72,18 @@ android {
             shrinkResources true
         }
     }
+
+    productFlavors {
+        free {
+            applicationIdSuffix ".free"
+            afterEvaluate {
+                tasks.matching { it.name.contains("GoogleServices") && !it.name.contains("Gplay") }*.enabled = false
+            }
+        }
+        gplay {
+            apply plugin: 'com.google.gms.google-services'
+        }
+    }
 }
 
 sentry {
@@ -110,6 +121,6 @@ dependencies {
     testImplementation project(':modules:services:sharedtest')
 }
 
-task appStart(type: Exec, dependsOn: 'installDebug') {
+task appStart(type: Exec, dependsOn: 'installGplayDebug') {
     commandLine 'adb', 'shell', 'am', 'start', '-n', 'au.com.shiftyjelly.pocketcasts.debug/au.com.shiftyjelly.pocketcasts.ui.MainActivity'
 }
