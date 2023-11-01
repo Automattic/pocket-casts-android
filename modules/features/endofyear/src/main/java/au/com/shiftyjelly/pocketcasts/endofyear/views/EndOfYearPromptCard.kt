@@ -16,9 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -31,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val PromptCardSummaryTextAlpha = 0.8f
+private const val PromptCardSummaryTextAlpha = 0.7f
 private val PromptCardCornerSize = 8.dp
 private val PromptCardImageSize = 150.dp
 
@@ -74,15 +76,16 @@ fun EndOfYearPromptCard(
                 TextH70(
                     text = stringResource(LR.string.end_of_year_prompt_card_summary),
                     color = MaterialTheme.theme.colors.contrast02,
+                    fontWeight = FontWeight.W600,
                     modifier = modifier.alpha(PromptCardSummaryTextAlpha)
                 )
             }
             Image(
-                painter = painterResource(R.drawable.img_2022),
+                painter = painterResource(R.drawable.img_23),
                 contentDescription = null,
                 modifier = modifier
                     .size(PromptCardImageSize)
-                    .padding(top = 20.dp, bottom = 20.dp, end = 24.dp),
+                    .scale(1.5f),
             )
         }
     }
