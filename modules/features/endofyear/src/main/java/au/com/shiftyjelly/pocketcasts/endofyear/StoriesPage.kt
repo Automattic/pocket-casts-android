@@ -60,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.waitForUpOrCancelInitial
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryCompletionRateView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryIntroView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedCategoriesView
@@ -73,6 +74,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryYearOverYearV
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
@@ -259,6 +261,10 @@ private fun StorySharableContent(
                 is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
                 is StoryLongestEpisode -> StoryLongestEpisodeView(story)
                 is StoryYearOverYear -> StoryYearOverYearView(
+                    story = story,
+                    userTier = userTier,
+                )
+                is StoryCompletionRate -> StoryCompletionRateView(
                     story = story,
                     userTier = userTier,
                 )
