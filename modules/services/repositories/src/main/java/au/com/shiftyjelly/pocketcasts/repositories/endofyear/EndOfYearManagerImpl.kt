@@ -119,7 +119,11 @@ class EndOfYearManagerImpl @Inject constructor(
         if (yearOverYearListeningTime.totalPlayedTimeThisYear != 0L || yearOverYearListeningTime.totalPlayedTimeLastYear != 0L) {
             stories.add(StoryYearOverYear(yearOverYearListeningTime))
         }
-        stories.add(StoryCompletionRate())
+        stories.add(
+            StoryCompletionRate(
+                percent = 75f,
+            )
+        )
         stories.add(StoryEpilogue())
 
         return stories

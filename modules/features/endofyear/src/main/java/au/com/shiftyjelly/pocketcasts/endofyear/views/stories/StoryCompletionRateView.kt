@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,13 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
+import au.com.shiftyjelly.pocketcasts.endofyear.components.CompletionCircle
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,6 +38,7 @@ fun StoryCompletionRateView(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
+            .background(story.backgroundColor)
             .verticalScroll(rememberScrollState())
             .padding(vertical = 40.dp)
     ) {
@@ -50,6 +56,14 @@ fun StoryCompletionRateView(
         Spacer(modifier = modifier.height(14.dp))
 
         SecondaryText(story)
+
+        Spacer(modifier = modifier.weight(0.2f))
+
+        CompletionCircle(
+            story = story,
+            modifier = modifier
+                .weight(1f)
+        )
 
         Spacer(modifier = modifier.weight(0.2f))
     }
@@ -77,4 +91,17 @@ private fun SecondaryText(
         30
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
+}
+
+@Preview
+@Composable
+fun CompletionRate10percentPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        StoryCompletionRateView(
+            StoryCompletionRate(
+                percent = 40f,
+            ),
+            userTier = UserTier.Plus,
+        )
+    }
 }
