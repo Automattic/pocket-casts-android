@@ -597,11 +597,6 @@
                 android:name="com.google.android.gms.car.application.theme"
                 android:resource="@style/CarTheme"/>
 
-        <!-- Dev version number -->
-        <meta-data
-                android:name="au.com.shiftyjelly.pocketcasts.gitHash"
-                android:value="${gitHash}"/>
-
         <!-- File sharing / Opml export -->
         <provider
                 android:name="androidx.core.content.FileProvider"
