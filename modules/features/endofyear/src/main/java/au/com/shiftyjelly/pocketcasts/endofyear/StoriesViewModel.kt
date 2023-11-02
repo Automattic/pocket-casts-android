@@ -25,6 +25,7 @@ import java.io.File
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 @HiltViewModel
@@ -57,6 +58,10 @@ class StoriesViewModel @Inject constructor(
         get() = STORY_GAP_LENGTH_MS * numOfStories.minus(1).coerceAtLeast(0)
 
     private var timer: Timer? = null
+
+    private val currentStoryIsPlus: Boolean
+        get() = stories.value[currentIndex].plusOnly
+    private var manuallySkipped = false
 
     init {
         viewModelScope.launch {
@@ -104,11 +109,17 @@ class StoriesViewModel @Inject constructor(
         timer?.cancel()
         timer = fixedRateTimer(period = PROGRESS_UPDATE_INTERVAL_MS) {
             viewModelScope.launch {
-                val newProgress = (progress.value + progressFraction)
+                var newProgress = (progress.value + progressFraction)
                     .coerceIn(PROGRESS_START_VALUE, PROGRESS_END_VALUE)
 
                 if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
-                    currentIndex = nextIndex
+                    manuallySkipped = false
+                    if (shouldSkipPlusStories()) {
+                        currentIndex = nextIndex + numberOfPlusStoriesAfterTheCurrentOne()
+                        newProgress = getXStartOffsetAtIndex(currentIndex)
+                    } else {
+                        currentIndex = nextIndex
+                    }
                     mutableState.value =
                         currentState.copy(currentStory = stories.value[currentIndex])
                 }
@@ -120,11 +131,18 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun skipPrevious() {
-        val prevIndex = (currentIndex.minus(1)).coerceAtLeast(0)
+        val prevIndex = (currentIndex.minus(max(numberOfPlusStoriesBeforeTheCurrentOne(), 1))).coerceAtLeast(0)
+        manuallySkipped = true
         skipToStoryAtIndex(prevIndex)
     }
 
     fun skipNext() {
+        currentIndex = if (currentStoryIsPlus) {
+            currentIndex + numberOfPlusStoriesAfterTheCurrentOne()
+        } else {
+            currentIndex
+        }
+        manuallySkipped = true
         skipToStoryAtIndex(nextIndex)
     }
 
@@ -177,6 +195,48 @@ class StoriesViewModel @Inject constructor(
         }
     }
 
+    private fun numberOfPlusStoriesBeforeTheCurrentOne(): Int {
+        if (isPaidUser()) return 0
+
+        var currentStoryIndex = currentIndex
+        var numberOfStoriesToSkip = 0
+        while (currentStoryIndex > 0 && (stories.value[currentStoryIndex - 1]).plusOnly) {
+            numberOfStoriesToSkip += 1
+            currentStoryIndex -= 1
+        }
+
+        return numberOfStoriesToSkip
+    }
+
+    private fun numberOfPlusStoriesAfterTheCurrentOne(): Int {
+        if (isPaidUser()) return 0
+
+        var currentStoryIndex = currentIndex
+        var numberOfStoriesToSkip = 0
+        while (currentStoryIndex + 1 < numOfStories && (stories.value[currentStoryIndex + 1]).plusOnly) {
+            numberOfStoriesToSkip += 1
+            currentStoryIndex += 1
+        }
+
+        return numberOfStoriesToSkip
+    }
+
+    private fun isPaidUser(): Boolean {
+        val currentState = state.value as State.Loaded
+        return currentState.userTier != UserTier.Free
+    }
+
+    private fun nextStoryIsPlus() =
+        if (currentIndex + 1 < numOfStories) {
+            stories.value[currentIndex + 1].plusOnly
+        } else {
+            false
+        }
+
+    /* Whether some Plus stories should be skipped or not */
+    private fun shouldSkipPlusStories() =
+        !isPaidUser() && !manuallySkipped && currentStoryIsPlus && nextStoryIsPlus()
+
     private fun cancelTimer() {
         timer?.cancel()
         timer = null
@@ -202,8 +262,9 @@ class StoriesViewModel @Inject constructor(
 
     sealed class State {
         data class Loading(
-            val progress: Float = 0f
+            val progress: Float = 0f,
         ) : State()
+
         data class Loaded(
             val currentStory: Story?,
             val segmentsData: SegmentsData,
