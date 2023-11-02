@@ -1602,18 +1602,36 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        val chromeCastConnected = castManager.isConnected()
-        val currentPosition = player?.getCurrentPositionMs()
-        if (isPlayerSwitchRequired() || isPlayerResetNeeded(episode, sameEpisode, chromeCastConnected)) { // Don't create a player if we aren't playing because it will start to buffer
+        // We want to make sure we get the current position at the last possible moment before changing/resetting the player
+        val currentPositionMs = if (
+            isPlayerSwitchRequired() ||
+            isPlayerResetNeeded(episode, sameEpisode, castManager.isConnected())
+        ) {
+            // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
+
                 Timber.d("Resetting player")
+                val playerPositionMs = player?.getCurrentPositionMs()
+
+                if (sameEpisode && playerPositionMs != null) {
+                    val playerPositionSeconds = playerPositionMs / 1000.0
+                    // Make sure that the episode is updated with the latest position before resetting the player.
+                    // This helps avoid having the audio jump "back" a second or so when the currently playing episode
+                    // is downloaded.
+                    episodeManager.updatePlayedUpTo(episode, playerPositionSeconds, forceUpdate = true)
+                }
+
                 resetPlayer()
+                playerPositionMs
             } else {
                 Timber.d("Stopping player")
+                val playerPositionMs = player?.getCurrentPositionMs()
                 stopPlayer()
+                playerPositionMs
             }
         } else {
             Timber.d("Player reset not required")
+            player?.getCurrentPositionMs()
         }
 
         player?.setPodcast(podcast)
@@ -1655,8 +1673,8 @@ open class PlaybackManager @Inject constructor(
         widgetManager.updateWidget(podcast, play, episode)
 
         if (play) {
-            if (sameEpisode && currentPosition != null) {
-                player?.seekToTimeMs(currentPosition)
+            if (sameEpisode && currentPositionMs != null) {
+                player?.seekToTimeMs(currentPositionMs)
             }
             play(sourceView)
         } else {
@@ -1776,7 +1794,10 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun play(sourceView: SourceView = SourceView.UNKNOWN) {
-        val episode = getCurrentEpisode()
+        val episode = getCurrentEpisode()?.let {
+            // Make sure we have the most up-to-date episode instance
+            episodeManager.findEpisodeByUuid(it.uuid)
+        }
         if (episode == null || player == null) {
             return
         }
