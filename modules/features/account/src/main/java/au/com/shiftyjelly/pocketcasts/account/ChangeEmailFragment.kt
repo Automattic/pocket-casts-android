@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentChangeEmailBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailError
@@ -25,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -101,46 +103,48 @@ class ChangeEmailFragment : BaseFragment() {
             viewModel.updatePassword(it)
         }
 
-        viewModel.changeEmailState.observe(viewLifecycleOwner) {
-            when (it) {
-                is ChangeEmailState.Empty -> {
-                    updateForm(invalidEmail = false, invalidPwd = false)
-                }
-                is ChangeEmailState.Failure -> {
-                    progress.isVisible = false
-
-                    val invalidEmail = it.errors.contains(ChangeEmailError.INVALID_EMAIL)
-                    val invalidPwd = it.errors.contains(ChangeEmailError.INVALID_PASSWORD)
-                    val serverFail = it.errors.contains(ChangeEmailError.SERVER)
-
-                    updateForm(invalidEmail, invalidPwd)
-
-                    if (serverFail) {
-                        val error = it.message ?: "Check your email"
-                        txtError.text = error
-                        viewModel.clearServerError()
+        lifecycleScope.launch {
+            viewModel.changeEmailState.collect {
+                when (it) {
+                    is ChangeEmailState.Empty -> {
+                        updateForm(invalidEmail = false, invalidPwd = false)
                     }
-                }
-                is ChangeEmailState.Loading -> {
-                    txtError.text = ""
-                    progress.isVisible = true
-                }
-                is ChangeEmailState.Success -> {
-                    progress.isVisible = false
+                    is ChangeEmailState.Failure -> {
+                        progress.isVisible = false
 
-                    val second = viewModel.email.value ?: ""
-                    doneViewModel.updateTitle(getString(LR.string.profile_email_address_changed))
-                    doneViewModel.updateDetail(second)
-                    doneViewModel.updateImage(R.drawable.ic_email_address_changed)
-                    doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
+                        val invalidEmail = it.errors.contains(ChangeEmailError.INVALID_EMAIL)
+                        val invalidPwd = it.errors.contains(ChangeEmailError.INVALID_PASSWORD)
+                        val serverFail = it.errors.contains(ChangeEmailError.SERVER)
 
-                    val activity = requireActivity()
+                        updateForm(invalidEmail, invalidPwd)
 
-                    @Suppress("DEPRECATION")
-                    activity.onBackPressed() // done fragment needs to back to profile page
+                        if (serverFail) {
+                            val error = it.message ?: "Check your email"
+                            txtError.text = error
+                            viewModel.clearServerError()
+                        }
+                    }
+                    is ChangeEmailState.Loading -> {
+                        txtError.text = ""
+                        progress.isVisible = true
+                    }
+                    is ChangeEmailState.Success -> {
+                        progress.isVisible = false
 
-                    val fragment = ChangeDoneFragment.newInstance()
-                    (activity as FragmentHostListener).addFragment(fragment)
+                        val second = viewModel.email.value ?: ""
+                        doneViewModel.updateTitle(getString(LR.string.profile_email_address_changed))
+                        doneViewModel.updateDetail(second)
+                        doneViewModel.updateImage(R.drawable.ic_email_address_changed)
+                        doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
+
+                        val activity = requireActivity()
+
+                        @Suppress("DEPRECATION")
+                        activity.onBackPressed() // done fragment needs to back to profile page
+
+                        val fragment = ChangeDoneFragment.newInstance()
+                        (activity as FragmentHostListener).addFragment(fragment)
+                    }
                 }
             }
         }
