@@ -72,15 +72,15 @@ project.apply {
             set("keyPassword", secretProperties.getProperty("signingKeyPassword", null))
         }
         // Next check Gradle properties such as local.properties or ~/.gradle/gradle.properties
-        if (!canSignRelease && project.hasProperty("pocketcastsKeyStoreFile")) {
-            val pocketcastsKeyStoreFile = project.property("pocketcastsKeyStoreFile").toString()
-            if (!pocketcastsKeyStoreFile.isNullOrBlank()) {
-                val storeFile = file(pocketcastsKeyStoreFile)
+        if (!canSignRelease && project.hasProperty("signingKeyStoreFile")) {
+            val signingKeyStoreFile = project.property("signingKeyStoreFile").toString()
+            if (!signingKeyStoreFile.isNullOrBlank()) {
+                val storeFile = file(signingKeyStoreFile)
                 canSignRelease = storeFile.exists()
                 set("storeFile", storeFile)
-                set("storePassword", project.property("pocketcastsKeyStorePassword").toString())
-                set("keyAlias", project.property("pocketcastsKeyStoreAlias").toString())
-                set("keyPassword", project.property("pocketcastsKeyStoreAliasPassword").toString())
+                set("storePassword", project.property("signingKeyStorePassword").toString())
+                set("keyAlias", project.property("signingKeyAlias").toString())
+                set("keyPassword", project.property("signingKeyPassword").toString())
             }
         }
         set("canSignRelease", canSignRelease)
