@@ -52,7 +52,7 @@ interface SyncServer {
     suspend fun exchangeSonos(@Header("Authorization") authorization: String): ExchangeSonosResponse
 
     @POST("/user/change_email")
-    fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>
+    suspend fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): UserChangeResponse
 
     @POST("/user/delete_account")
     fun deleteAccount(@Header("Authorization") authorization: String): Single<UserChangeResponse>

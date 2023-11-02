@@ -91,7 +91,7 @@ open class SyncServerManager @Inject constructor(
         return server.exchangeSonos(addBearer(token))
     }
 
-    fun emailChange(newEmail: String, password: String, token: AccessToken): Single<UserChangeResponse> {
+    suspend fun emailChange(newEmail: String, password: String, token: AccessToken): UserChangeResponse {
         val request = EmailChangeRequest(
             newEmail,
             password,
