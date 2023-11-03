@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -58,7 +59,7 @@ private fun UpsellViewContent(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val description = stringResource(state.tier.getContentDescription())
+    val description = stringResource(state.freeTrial.subscriptionTier.getContentDescription())
     MessageView(
         titleView = {
             Row(
@@ -69,7 +70,7 @@ private fun UpsellViewContent(
                 HorizontalLogoText()
                 Spacer(modifier = Modifier.width(8.dp))
                 SubscriptionBadgeForTier(
-                    tier = state.tier,
+                    tier = state.freeTrial.subscriptionTier,
                     displayMode = SubscriptionBadgeDisplayMode.Colored
                 )
             }
@@ -77,7 +78,7 @@ private fun UpsellViewContent(
         message = getMessage(
             state.showEarlyAccessMessage,
         ),
-        buttonTitle = getButtonTitle(state.tier, state.hasFreeTrial),
+        buttonTitle = getButtonTitle(state.freeTrial.subscriptionTier, state.freeTrial.exists),
         buttonAction = onClick,
         style = style,
         modifier = modifier,
@@ -125,8 +126,10 @@ private fun UpsellPreview(
         UpsellViewContent(
             style = MessageViewColors.Default,
             state = UiState.Loaded(
-                tier = SubscriptionTier.PATRON,
-                hasFreeTrial = false,
+                freeTrial = FreeTrial(
+                    exists = false,
+                    subscriptionTier = SubscriptionTier.PATRON,
+                ),
                 showEarlyAccessMessage = false,
             ),
             onClick = {},
