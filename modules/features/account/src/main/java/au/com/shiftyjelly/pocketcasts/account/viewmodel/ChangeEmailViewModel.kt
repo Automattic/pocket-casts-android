@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ class ChangeEmailViewModel
 
     var existingEmail = syncManager.getEmail()
 
-    val changeEmailState = MutableLiveData<ChangeEmailState>().apply { value = ChangeEmailState.Empty }
+    val changeEmailState =
+        MutableLiveData<ChangeEmailState>().apply { value = ChangeEmailState.Empty }
     private val disposables = CompositeDisposable()
 
     private fun errorUpdate(error: ChangeEmailError, add: Boolean, message: String?) {
@@ -27,6 +29,7 @@ class ChangeEmailViewModel
             is ChangeEmailState.Failure -> {
                 errors.addAll(existingState.errors)
             }
+
             else -> {}
         }
         if (add) errors.add(error) else errors.remove(error)
@@ -81,7 +84,9 @@ class ChangeEmailViewModel
                 }
             }
             .doFinally {
-                disposables.clear()
+                if (disposables.isDisposed.not()) {
+                    disposables.clear()
+                }
             }
             .subscribeBy(onError = {
                 Timber.e(it)
@@ -101,5 +106,6 @@ sealed class ChangeEmailState {
     object Empty : ChangeEmailState()
     object Loading : ChangeEmailState()
     data class Success(val result: String) : ChangeEmailState()
-    data class Failure(val errors: MutableSet<ChangeEmailError>, val message: String?) : ChangeEmailState()
+    data class Failure(val errors: MutableSet<ChangeEmailError>, val message: String?) :
+        ChangeEmailState()
 }
