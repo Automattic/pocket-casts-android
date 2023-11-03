@@ -1655,7 +1655,10 @@
     <!-- Title for the completion rate. %1$d is the total of episodes listened this year, %2$d is the total of episodes fully listened to. -->
     <string name="end_of_year_stories_year_completion_rate_subtitle">From the %1$d episodes you started you listened fully to a total of %2$d</string>
     <string name="end_of_year_stories_year_completion_rate">completion rate</string>
-
+    <!-- Title of the story paywall. Telling the users that there are more stories to check. -->
+    <string name="end_of_year_stories_theres_more">There\’s more!</string>>
+    <!-- Subtitle explaining the user why they should susbcribe to Plus in the context of the end of year stories. -->
+    <string name="end_of_year_stories_subscribe_to_plus">Subscribe to Plus and find out how your listening compares to 2022, other fun stats, and Premium features like bookmarks and folders.</string>
     <!-- Onboarding -->
 
     <string name="onboarding_welcome_back">Welcome Back</string>
