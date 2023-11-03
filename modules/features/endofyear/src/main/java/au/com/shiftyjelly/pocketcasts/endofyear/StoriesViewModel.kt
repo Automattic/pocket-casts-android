@@ -9,16 +9,21 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -35,6 +40,7 @@ class StoriesViewModel @Inject constructor(
     private val shareableTextProvider: ShareableTextProvider,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val settings: Settings,
+    private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading())
@@ -69,33 +75,45 @@ class StoriesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadStories() {
+    private suspend fun CoroutineScope.loadStories() {
         try {
             val onProgressChanged: (Float) -> Unit = { progress ->
                 mutableState.value = State.Loading(progress)
             }
             endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
             stories.value = endOfYearManager.loadStories()
-            val state = if (stories.value.isEmpty()) {
-                State.Error
-            } else {
-                State.Loaded(
-                    currentStory = stories.value[currentIndex],
-                    segmentsData = SegmentsData(
-                        xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
-                        widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
-                    ),
-                    userTier = settings.userTier,
-                )
-            }
-            mutableState.value = state
-            if (state is State.Loaded) start()
+
+            subscriptionManager.freeTrialForSubscriptionTierFlow(
+                subscriptionTier = Subscription.SubscriptionTier.PLUS,
+            )
+                .stateIn(this)
+                .collect { freeTrial ->
+                    updateState(freeTrial)
+                    if (state.value is State.Loaded) start()
+                }
         } catch (ex: Exception) {
             val message = "Failed to load end of year stories."
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, message)
             SentryHelper.recordException(message, ex)
             mutableState.value = State.Error
         }
+    }
+
+    private fun updateState(freeTrial: FreeTrial) {
+        val state = if (stories.value.isEmpty()) {
+            State.Error
+        } else {
+            State.Loaded(
+                currentStory = stories.value[currentIndex],
+                segmentsData = SegmentsData(
+                    xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                    widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
+                ),
+                userTier = settings.userTier,
+                freeTrial = freeTrial,
+            )
+        }
+        mutableState.value = state
     }
 
     fun start() {
@@ -273,6 +291,7 @@ class StoriesViewModel @Inject constructor(
             val segmentsData: SegmentsData,
             val preparingShareText: Boolean = false,
             val userTier: UserTier,
+            val freeTrial: FreeTrial,
         ) : State() {
             data class SegmentsData(
                 val widths: List<Float> = emptyList(),

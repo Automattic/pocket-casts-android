@@ -19,15 +19,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.UpsellButtonTitle
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PaidStoryWallView(
+    freeTrial: FreeTrial,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -56,7 +59,7 @@ fun PaidStoryWallView(
 
         Spacer(modifier = modifier.height(14.dp))
 
-        UpgradeButton()
+        UpsellButton(freeTrial)
 
         Spacer(modifier = modifier.weight(1f))
     }
@@ -79,12 +82,15 @@ private fun SecondaryText(
 }
 
 @Composable
-private fun UpgradeButton(
+private fun UpsellButton(
+    freeTrial: FreeTrial,
     modifier: Modifier = Modifier,
 ) {
-    val text = stringResource(LR.string.trial_start)
     RowButton(
-        text = text,
+        text = UpsellButtonTitle(
+            tier = freeTrial.subscriptionTier,
+            hasFreeTrial = freeTrial.exists,
+        ),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
         textColor = Color.Black,
         onClick = {},
@@ -97,6 +103,11 @@ private fun UpgradeButton(
 @Composable
 fun PaidStoryWallViewPreview() {
     AppTheme(Theme.ThemeType.DARK) {
-        PaidStoryWallView()
+        PaidStoryWallView(
+            freeTrial = FreeTrial(
+                subscriptionTier = SubscriptionTier.PLUS,
+                exists = true,
+            )
+        )
     }
 }

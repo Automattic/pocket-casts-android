@@ -74,6 +74,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCa
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryYearOverYearView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
@@ -87,6 +88,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFiv
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -191,6 +193,7 @@ private fun StoriesView(
                         StorySharableContent(
                             story,
                             state.userTier,
+                            state.freeTrial,
                             shouldShowUpsell,
                             onSkipPrevious,
                             onSkipNext,
@@ -238,6 +241,7 @@ private fun LoadingOverContentView() {
 private fun StorySharableContent(
     story: Story,
     userTier: UserTier,
+    freeTrial: FreeTrial,
     shouldShowUpsell: () -> Boolean,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
@@ -292,7 +296,7 @@ private fun StorySharableContent(
                 )
             }
             if (shouldShowUpsell()) {
-                PaidStoryWallView()
+                PaidStoryWallView(freeTrial)
                 onPause()
             }
         }
@@ -527,6 +531,10 @@ private fun StoriesScreenPreview(
                     widths = listOf(0.25f, 0.75f)
                 ),
                 userTier = UserTier.Free,
+                freeTrial = FreeTrial(
+                    subscriptionTier = Subscription.SubscriptionTier.PLUS,
+                    exists = false,
+                ),
             ),
             progress = MutableStateFlow(0.75f),
             shouldShowUpsell = { false },
