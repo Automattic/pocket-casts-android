@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.UpsellButtonTitle
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
@@ -86,27 +84,36 @@ private fun UpsellButton(
     freeTrial: FreeTrial,
     modifier: Modifier = Modifier,
 ) {
-    RowButton(
+    StoryButton(
         text = UpsellButtonTitle(
             tier = freeTrial.subscriptionTier,
             hasFreeTrial = freeTrial.exists,
         ),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-        textColor = Color.Black,
-        onClick = {},
         modifier = modifier
-            .fillMaxSize(.65f)
     )
 }
 
-@Preview
+@Preview("has free trial")
 @Composable
-fun PaidStoryWallViewPreview() {
+fun PaidStoryWallViewFreeTrialPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         PaidStoryWallView(
             freeTrial = FreeTrial(
                 subscriptionTier = SubscriptionTier.PLUS,
                 exists = true,
+            )
+        )
+    }
+}
+
+@Preview("does not have free trial")
+@Composable
+fun PaidStoryWallViewNoFreeTrialPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        PaidStoryWallView(
+            freeTrial = FreeTrial(
+                subscriptionTier = SubscriptionTier.PLUS,
+                exists = false,
             )
         )
     }
