@@ -195,6 +195,9 @@ class StoriesViewModel @Inject constructor(
         }
     }
 
+    fun shouldShowUpsell() =
+        currentStoryIsPlus && !isPaidUser()
+
     private fun numberOfPlusStoriesBeforeTheCurrentOne(): Int {
         if (isPaidUser()) return 0
 
