@@ -16,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -34,8 +36,10 @@ fun RowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    fontFamily: FontFamily? = null,
     @DrawableRes leadingIcon: Int? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    cornerRadius: Dp = 12.dp,
 ) {
     Box(
         modifier = modifier
@@ -44,7 +48,7 @@ fun RowButton(
     ) {
         Button(
             onClick = { onClick() },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(cornerRadius),
             border = border,
             modifier = Modifier.fillMaxWidth(),
             colors = colors,
@@ -62,6 +66,7 @@ fun RowButton(
                 }
                 TextP40(
                     text = text,
+                    fontFamily = fontFamily,
                     modifier = Modifier
                         .padding(6.dp)
                         .align(Alignment.Center),
