@@ -12,6 +12,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResult
 import io.reactivex.Flowable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 interface SubscriptionManager {
 
@@ -39,8 +40,5 @@ interface SubscriptionManager {
         tier: Subscription.SubscriptionTier? = null,
         frequency: SubscriptionFrequency? = null,
     ): Subscription?
-    fun trialExists(
-        tier: Subscription.SubscriptionTier,
-        subscriptions: List<Subscription>
-    ): Boolean
+    fun freeTrialForSubscriptionTierFlow(subscriptionTier: Subscription.SubscriptionTier): Flow<FreeTrial>
 }
