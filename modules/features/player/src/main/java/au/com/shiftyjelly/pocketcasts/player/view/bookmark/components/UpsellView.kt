@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.buttons.UpsellButtonTitle
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoText
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
@@ -78,7 +79,10 @@ private fun UpsellViewContent(
         message = getMessage(
             state.showEarlyAccessMessage,
         ),
-        buttonTitle = getButtonTitle(state.freeTrial.subscriptionTier, state.freeTrial.exists),
+        buttonTitle = UpsellButtonTitle(
+            state.freeTrial.subscriptionTier,
+            state.freeTrial.exists
+        ),
         buttonAction = onClick,
         style = style,
         modifier = modifier,
@@ -89,23 +93,6 @@ private fun SubscriptionTier.getContentDescription() = when (this) {
     SubscriptionTier.PATRON -> LR.string.pocket_casts_patron
     SubscriptionTier.PLUS -> LR.string.pocket_casts_plus
     SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
-}
-
-@Composable
-private fun getButtonTitle(
-    tier: SubscriptionTier,
-    hasFreeTrial: Boolean
-) = if (hasFreeTrial) {
-    stringResource(LR.string.profile_start_free_trial)
-} else {
-    stringResource(
-        LR.string.upgrade_to,
-        when (tier) {
-            SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
-            SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
-            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
-        }
-    )
 }
 
 @Composable
