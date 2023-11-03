@@ -23,6 +23,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -82,15 +83,13 @@ class StoriesViewModel @Inject constructor(
             }
             endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
             stories.value = endOfYearManager.loadStories()
-
-            subscriptionManager.freeTrialForSubscriptionTierFlow(
-                subscriptionTier = Subscription.SubscriptionTier.PLUS,
-            )
-                .stateIn(this)
-                .collect { freeTrial ->
-                    updateState(freeTrial)
-                    if (state.value is State.Loaded) start()
-                }
+            combine(
+                subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS),
+                settings.cachedSubscriptionStatus.flow
+            ) { upsellState, _ ->
+                updateState(upsellState)
+                if (state.value is State.Loaded) start()
+            }.stateIn(this)
         } catch (ex: Exception) {
             val message = "Failed to load end of year stories."
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, message)

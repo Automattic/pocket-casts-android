@@ -113,6 +113,7 @@ fun StoriesPage(
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
     onRetryClicked: () -> Unit,
+    onUpsellClicked: () -> Unit,
 ) {
     val shareLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -154,6 +155,7 @@ fun StoriesPage(
                             )
                         }
                     },
+                    onUpsellClicked = onUpsellClicked,
                 )
             }
             is State.Loading -> StoriesLoadingView(
@@ -180,6 +182,7 @@ private fun StoriesView(
     onCloseClicked: () -> Unit,
     onShareClicked: (() -> Bitmap) -> Unit,
     onReplayClicked: () -> Unit,
+    onUpsellClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(color = Color.Black)) {
@@ -200,6 +203,7 @@ private fun StoriesView(
                             onPause,
                             onStart,
                             onReplayClicked,
+                            onUpsellClicked,
                             modifier
                         )
                     })
@@ -248,6 +252,7 @@ private fun StorySharableContent(
     onPause: () -> Unit,
     onStart: () -> Unit,
     onReplayClicked: () -> Unit,
+    onUpsellClicked: () -> Unit,
     modifier: Modifier,
 ) {
     StorySwitcher(
@@ -296,7 +301,10 @@ private fun StorySharableContent(
                 )
             }
             if (shouldShowUpsell()) {
-                PaidStoryWallView(freeTrial)
+                PaidStoryWallView(
+                    freeTrial = freeTrial,
+                    onUpsellClicked = onUpsellClicked
+                )
                 onPause()
             }
         }
@@ -545,6 +553,7 @@ private fun StoriesScreenPreview(
             onCloseClicked = {},
             onShareClicked = {},
             onReplayClicked = {},
+            onUpsellClicked = {},
         )
     }
 }
