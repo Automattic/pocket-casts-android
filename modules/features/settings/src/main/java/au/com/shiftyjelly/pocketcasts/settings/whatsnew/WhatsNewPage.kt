@@ -125,7 +125,10 @@ private fun WhatsNewPageLoaded(
                     .padding(all = 16.dp),
             ) {
 
-                WhatsNewSubscriptionBadge(state.tier)
+                SubscriptionBadgeForTier(
+                    tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
+                    displayMode = SubscriptionBadgeDisplayMode.Colored
+                )
 
                 Spacer(
                     modifier = Modifier.height(
@@ -170,19 +173,6 @@ private fun WhatsNewPageLoaded(
             }
         }
     }
-}
-
-@Composable
-private fun WhatsNewSubscriptionBadge(tier: UserTier) = when (tier) {
-    UserTier.Patron -> SubscriptionBadgeForTier(
-        tier = Subscription.SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.Colored
-    )
-    UserTier.Plus -> SubscriptionBadgeForTier(
-        tier = Subscription.SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.Colored
-    )
-    UserTier.Free -> Box {}
 }
 
 @Composable

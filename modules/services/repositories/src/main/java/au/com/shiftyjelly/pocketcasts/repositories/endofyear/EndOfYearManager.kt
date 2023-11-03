@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 
 interface EndOfYearManager {
@@ -16,4 +18,6 @@ interface EndOfYearManager {
     suspend fun findListenedNumbersForYear(year: Int): ListenedNumbers
     suspend fun findTopPodcastsForYear(year: Int, limit: Int): List<TopPodcast>
     suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode?
+    suspend fun getYearOverYearListeningTime(): YearOverYearListeningTime?
+    suspend fun countEpisodesStartedAndCompleted(): EpisodesStartedAndCompleted
 }

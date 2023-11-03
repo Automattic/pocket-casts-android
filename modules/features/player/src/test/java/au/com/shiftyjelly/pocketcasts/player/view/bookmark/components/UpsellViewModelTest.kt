@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -9,13 +9,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
-import com.android.billingclient.api.ProductDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.rx2.asFlowable
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,25 +31,12 @@ class UpsellViewModelTest {
     @Mock
     private lateinit var subscriptionManager: SubscriptionManager
 
-    @Mock
-    private lateinit var productDetailsState: ProductDetailsState.Loaded
-
-    @Mock
-    private lateinit var productDetails: ProductDetails
-
     private lateinit var upsellViewModel: UpsellViewModel
 
     private val betaEarlyAccessRelease = ReleaseVersion(7, 50, null, 1)
     private val productionEarlyAccessRelease = ReleaseVersion(7, 50)
     private val betaFullAccessRelease = ReleaseVersion(7, 51, null, 1)
     private val productionFullAccessRelease = ReleaseVersion(7, 51)
-
-    @Before
-    fun setUp() {
-        whenever(productDetailsState.productDetails).thenReturn(listOf(productDetails))
-        whenever(subscriptionManager.observeProductDetails()).thenReturn(flowOf(productDetailsState).asFlowable())
-        whenever(productDetails.productId).thenReturn("productId")
-    }
 
     /* Early Access Availability */
     // Current Release                   | Beta         | Production
@@ -69,7 +53,7 @@ class UpsellViewModelTest {
         )
 
         val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
-        assertTrue(state.tier == Subscription.SubscriptionTier.PLUS)
+        assertTrue(state.freeTrial.subscriptionTier == SubscriptionTier.PLUS)
     }
 
     @Test
@@ -80,7 +64,7 @@ class UpsellViewModelTest {
         )
 
         val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
-        assertTrue(state.tier == Subscription.SubscriptionTier.PATRON)
+        assertTrue(state.freeTrial.subscriptionTier == SubscriptionTier.PATRON)
     }
 
     @Test
@@ -91,7 +75,7 @@ class UpsellViewModelTest {
         )
 
         val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
-        assertTrue(state.tier == Subscription.SubscriptionTier.PLUS)
+        assertTrue(state.freeTrial.subscriptionTier == SubscriptionTier.PLUS)
     }
 
     @Test
@@ -102,7 +86,7 @@ class UpsellViewModelTest {
         )
 
         val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
-        assertTrue(state.tier == Subscription.SubscriptionTier.PLUS)
+        assertTrue(state.freeTrial.subscriptionTier == SubscriptionTier.PLUS)
     }
 
     @Test
@@ -113,7 +97,7 @@ class UpsellViewModelTest {
         )
 
         val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
-        assertTrue(state.tier == Subscription.SubscriptionTier.PLUS)
+        assertTrue(state.freeTrial.subscriptionTier == SubscriptionTier.PLUS)
     }
 
     /* Early Access Message */
@@ -177,6 +161,12 @@ class UpsellViewModelTest {
         bookmarksFeatureMock: Feature? = null,
         releaseVersionMock: ReleaseVersionWrapper? = null,
     ) {
+        whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(SubscriptionTier.PATRON))
+            .thenReturn(flowOf(FreeTrial(subscriptionTier = SubscriptionTier.PATRON)))
+
+        whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(SubscriptionTier.PLUS))
+            .thenReturn(flowOf(FreeTrial(subscriptionTier = SubscriptionTier.PLUS)))
+
         val bookmarksFeature = bookmarksFeatureMock ?: mock<Feature>().apply {
             doReturn(FeatureTier.Plus(patronExclusiveAccessRelease)).whenever(this).tier
         }
@@ -188,9 +178,9 @@ class UpsellViewModelTest {
         }
         upsellViewModel = UpsellViewModel(
             analyticsTracker = mock(),
-            subscriptionManager = subscriptionManager,
             feature = feature,
             releaseVersion = releaseVersion,
+            subscriptionManager = subscriptionManager,
         )
     }
 }

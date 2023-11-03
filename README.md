@@ -79,9 +79,9 @@ Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, 
 
 ## Signing a Release
 
-To build a _signed_ release, add these lines to your ~/.gradle/gradle.properties file
+To build a _signed_ release, add these lines to your local.properties file
 
-    pocketcastsKeyStoreFile=/Users/username/git/secret.keystore
-    pocketcastsKeyStorePassword=
-    pocketcastsKeyStoreAlias=
-    pocketcastsKeyStoreAliasPassword=
+    signingKeyStoreFile=/Users/username/git/secret.keystore
+    signingKeyStorePassword=
+    signingKeyAlias=
+    signingKeyPassword=
