@@ -80,14 +80,15 @@ class ChangeEmailViewModel
                     changeEmailState.postValue(ChangeEmailState.Failure(errors, response.message))
                 }
             }
-            .subscribeBy(onError = { Timber.e(it) })
+            .doFinally {
+                disposables.clear()
+            }
+            .subscribeBy(onError = {
+                Timber.e(it)
+            })
             .addTo(disposables)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
-    }
 }
 
 enum class ChangeEmailError {
