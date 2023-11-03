@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -93,7 +92,6 @@ class ChangeEmailViewModel
             })
             .addTo(disposables)
     }
-
 }
 
 enum class ChangeEmailError {
