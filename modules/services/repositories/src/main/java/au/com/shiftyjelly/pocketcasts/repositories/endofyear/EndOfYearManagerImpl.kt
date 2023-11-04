@@ -44,11 +44,8 @@ class EndOfYearManagerImpl @Inject constructor(
         private const val EPISODE_MINIMUM_PLAYED_TIME_IN_MIN = 5L
     }
 
-    private val yearStart = epochAtStartOfYear(YEAR)
-    private val yearEnd = epochAtStartOfYear(YEAR + 1)
-
-    private val previousYearStart = epochAtStartOfYear(YEAR - 1)
-    private val previousYearEnd = epochAtStartOfYear(YEAR)
+    private fun yearStart(year: Int) = epochAtStartOfYear(year)
+    private fun yearEnd(year: Int) = epochAtStartOfYear(year + 1)
 
     private fun epochAtStartOfYear(year: Int) = LocalDate.of(year, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
@@ -67,14 +64,14 @@ class EndOfYearManagerImpl @Inject constructor(
             return
         }
         // check for an episode interacted with before this year and assume they have the full listening history if they exist
-        if (anyEpisodeInteractionBeforeYear()) {
+        if (anyEpisodeInteractionBeforeYear(YEAR)) {
             return
         }
         // only download the count to check if we are missing history episodes
         val countResponse = syncManager.historyYear(year = YEAR, count = true)
         onProgressChanged(0.1f)
         val serverCount = countResponse.count ?: 0
-        val localCount = countEpisodeInteractionsInYear()
+        val localCount = countEpisodeInteractionsInYear(YEAR)
         Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
         if (serverCount > localCount) {
             // sync the year's listening history
@@ -99,8 +96,8 @@ class EndOfYearManagerImpl @Inject constructor(
         val listenedNumbers = findListenedNumbersForYear(YEAR)
         val topPodcasts = findTopPodcastsForYear(YEAR, limit = 10)
         val longestEpisode = findLongestPlayedEpisodeForYear(YEAR)
-        val yearOverYearListeningTime = getYearOverYearListeningTime()
-        val episodesStartedAndCompleted = countEpisodesStartedAndCompleted()
+        val yearOverYearListeningTime = getYearOverYearListeningTime(YEAR)
+        val episodesStartedAndCompleted = countEpisodesStartedAndCompleted(YEAR)
         val stories = mutableListOf<Story>()
 
         stories.add(StoryIntro())
@@ -129,48 +126,48 @@ class EndOfYearManagerImpl @Inject constructor(
 
     /* Returns whether user listened to at least one episode for more than given time for the year */
     override suspend fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Boolean {
-        return episodeManager.countEpisodesPlayedUpto(yearStart, yearEnd, playedUpToInSecs) > 0
+        return episodeManager.countEpisodesPlayedUpto(yearStart(year), yearEnd(year), playedUpToInSecs) > 0
     }
 
-    private suspend fun anyEpisodeInteractionBeforeYear(): Boolean {
-        return episodeManager.findEpisodeInteractedBefore(yearStart) != null
+    private suspend fun anyEpisodeInteractionBeforeYear(year: Int): Boolean {
+        return episodeManager.findEpisodeInteractedBefore(yearStart(year)) != null
     }
 
-    private suspend fun countEpisodeInteractionsInYear(): Int {
-        return episodeManager.countEpisodesInListeningHistory(yearStart, yearEnd)
+    private suspend fun countEpisodeInteractionsInYear(year: Int): Int {
+        return episodeManager.countEpisodesInListeningHistory(yearStart(year), yearEnd(year))
     }
 
     override suspend fun getTotalListeningTimeInSecsForYear(year: Int): Long? {
-        return episodeManager.calculateListeningTime(yearStart, yearEnd)
+        return episodeManager.calculateListeningTime(yearStart(year), yearEnd(year))
     }
 
     override suspend fun findListenedCategoriesForYear(year: Int): List<ListenedCategory> {
-        return episodeManager.findListenedCategories(yearStart, yearEnd)
+        return episodeManager.findListenedCategories(yearStart(year), yearEnd(year))
     }
 
     override suspend fun findListenedNumbersForYear(year: Int): ListenedNumbers {
-        return episodeManager.findListenedNumbers(yearStart, yearEnd)
+        return episodeManager.findListenedNumbers(yearStart(year), yearEnd(year))
     }
 
     /* Returns top podcasts ordered by total played time. If there's a tie on total played time, check number of played episodes. */
     override suspend fun findTopPodcastsForYear(year: Int, limit: Int): List<TopPodcast> {
-        return podcastManager.findTopPodcasts(yearStart, yearEnd, limit)
+        return podcastManager.findTopPodcasts(yearStart(year), yearEnd(year), limit)
     }
 
     override suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode? {
-        return episodeManager.findLongestPlayedEpisode(yearStart, yearEnd)
+        return episodeManager.findLongestPlayedEpisode(yearStart(year), yearEnd(year))
     }
 
-    override suspend fun getYearOverYearListeningTime(): YearOverYearListeningTime {
+    override suspend fun getYearOverYearListeningTime(thisYear: Int): YearOverYearListeningTime {
         return episodeManager.yearOverYearListeningTime(
-            fromEpochMsPreviousYear = previousYearStart,
-            toEpochMsPreviousYear = previousYearEnd,
-            fromEpochMsCurrentYear = yearStart,
-            toEpochMsCurrentYear = yearEnd,
+            fromEpochMsPreviousYear = yearStart(thisYear - 1),
+            toEpochMsPreviousYear = yearEnd(thisYear - 1),
+            fromEpochMsCurrentYear = yearStart(thisYear),
+            toEpochMsCurrentYear = yearEnd(thisYear),
         )
     }
 
-    override suspend fun countEpisodesStartedAndCompleted(): EpisodesStartedAndCompleted {
-        return episodeManager.countEpisodesStartedAndCompleted(yearStart, yearEnd)
+    override suspend fun countEpisodesStartedAndCompleted(year: Int): EpisodesStartedAndCompleted {
+        return episodeManager.countEpisodesStartedAndCompleted(yearStart(year), yearEnd(year))
     }
 }
