@@ -28,7 +28,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -68,8 +70,14 @@ class StoriesViewModelTest {
     @Mock
     private lateinit var cachedSubscriptionStatus: SubscriptionStatus
 
+    @Mock
+    private lateinit var userSetting: UserSetting<SubscriptionStatus?>
+
+    private lateinit var cachedSubscriptionStatusFlow: MutableStateFlow<SubscriptionStatus>
+
     @Before
     fun setup() {
+        cachedSubscriptionStatusFlow = MutableStateFlow(cachedSubscriptionStatus)
         whenever(settings.userTier).thenReturn(UserTier.Free)
         whenever(plusStory1.plusOnly).thenReturn(true)
         whenever(plusStory2.plusOnly).thenReturn(true)
@@ -229,12 +237,38 @@ class StoriesViewModelTest {
         assertFalse(shouldShowUpsell)
     }
 
+    /* Subscription updated */
+    @Test
+    fun `given subscription updated, then listening history and stories reloaded`() = runTest {
+        whenever(settings.userTier)
+            .thenReturn(UserTier.Free)
+            .thenReturn(UserTier.Plus)
+        initViewModel(listOf(plusStory1))
+
+        cachedSubscriptionStatusFlow.value = mock()
+
+        verify(endOfYearManager, times(2)).downloadListeningHistory(anyOrNull())
+        verify(endOfYearManager, times(2)).loadStories()
+    }
+
+    @Test
+    fun `given subscription not updated, then listening history and stories not reloaded`() = runTest {
+        whenever(settings.userTier)
+            .thenReturn(UserTier.Free)
+            .thenReturn(UserTier.Free)
+        initViewModel(listOf(plusStory1))
+
+        cachedSubscriptionStatusFlow.value = mock()
+
+        verify(endOfYearManager, times(1)).downloadListeningHistory(anyOrNull())
+        verify(endOfYearManager, times(1)).loadStories()
+    }
+
     private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
         whenever(endOfYearManager.loadStories()).thenReturn(mockStories)
         whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS))
             .thenReturn(flowOf(FreeTrial(Subscription.SubscriptionTier.PLUS)))
-        val userSetting = mock<UserSetting<SubscriptionStatus?>>()
-        whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
+        whenever(userSetting.flow).thenReturn(cachedSubscriptionStatusFlow)
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         return StoriesViewModel(
