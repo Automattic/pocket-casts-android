@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
+import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
@@ -82,9 +83,15 @@ class EndOfYearManagerImpl @Inject constructor(
             awaitAll(
                 *yearsToSync.map { year ->
                     // Download listening history for each year in parallel
+                    if (BuildConfig.DEBUG) {
+                        Timber.i("End of Year: Downloading listening history for year $year")
+                    }
                     async { downloadListeningHistory(year, onProgressChanged) }
                 }.toTypedArray()
             )
+        }
+        if (BuildConfig.DEBUG) {
+            Timber.i("End of Year: listening history sync complete")
         }
         onProgressChanged(1f)
     }
@@ -115,6 +122,9 @@ class EndOfYearManagerImpl @Inject constructor(
                 onProgressChanged = {
                     synced += 1
                     val progress = min((0.2f + (synced / syncTotal) * 0.8f), 0.95).toFloat()
+                    if (BuildConfig.DEBUG) {
+                        Timber.i("End of Year: listening history sync year: $year total progress: $progress")
+                    }
                     onProgressChanged(progress)
                 },
             )
