@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PaidStoryWallView(
     freeTrial: FreeTrial,
+    onUpsellClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -61,7 +62,10 @@ fun PaidStoryWallView(
 
         Spacer(modifier = modifier.height(14.dp))
 
-        UpsellButton(freeTrial)
+        UpsellButton(
+            freeTrial,
+            onUpsellClicked,
+        )
 
         Spacer(modifier = modifier.weight(1f))
     }
@@ -86,13 +90,15 @@ private fun SecondaryText(
 @Composable
 private fun UpsellButton(
     freeTrial: FreeTrial,
+    onUpsellClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     StoryButton(
         text = UpsellButtonTitle(
             tier = freeTrial.subscriptionTier,
-            hasFreeTrial = freeTrial.exists,
+            hasFreeTrial = freeTrial.exists
         ),
+        onClick = onUpsellClicked,
         modifier = modifier
     )
 }
@@ -122,7 +128,8 @@ fun PaidStoryWallViewFreeTrialPreview() {
             freeTrial = FreeTrial(
                 subscriptionTier = SubscriptionTier.PLUS,
                 exists = true,
-            )
+            ),
+            onUpsellClicked = {}
         )
     }
 }
@@ -135,7 +142,8 @@ fun PaidStoryWallViewNoFreeTrialPreview() {
             freeTrial = FreeTrial(
                 subscriptionTier = SubscriptionTier.PLUS,
                 exists = false,
-            )
+            ),
+            onUpsellClicked = {}
         )
     }
 }

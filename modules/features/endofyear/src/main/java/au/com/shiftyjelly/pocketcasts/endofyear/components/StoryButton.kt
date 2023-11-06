@@ -13,6 +13,7 @@ private val ButtonTextColor = Color(0xFF161718)
 @Composable
 fun StoryButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RowButton(
@@ -21,7 +22,7 @@ fun StoryButton(
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
         cornerRadius = 4.dp,
         textColor = ButtonTextColor,
-        onClick = {},
+        onClick = onClick,
         modifier = modifier
             .fillMaxSize(.65f)
     )

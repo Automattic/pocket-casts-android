@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
@@ -14,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -61,6 +64,9 @@ class StoriesViewModelTest {
 
     @Mock
     private lateinit var subscriptionManager: SubscriptionManager
+
+    @Mock
+    private lateinit var cachedSubscriptionStatus: SubscriptionStatus
 
     @Before
     fun setup() {
@@ -227,6 +233,9 @@ class StoriesViewModelTest {
         whenever(endOfYearManager.loadStories()).thenReturn(mockStories)
         whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS))
             .thenReturn(flowOf(FreeTrial(Subscription.SubscriptionTier.PLUS)))
+        val userSetting = mock<UserSetting<SubscriptionStatus?>>()
+        whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
+        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
