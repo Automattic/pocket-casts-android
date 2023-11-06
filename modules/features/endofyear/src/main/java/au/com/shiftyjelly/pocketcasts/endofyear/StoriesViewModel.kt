@@ -68,6 +68,7 @@ class StoriesViewModel @Inject constructor(
 
     private val currentStoryIsPlus: Boolean
         get() = stories.value[currentIndex].plusOnly
+    private var currentUserTier: UserTier = UserTier.Free
     private var manuallySkipped = false
 
     init {
@@ -81,12 +82,17 @@ class StoriesViewModel @Inject constructor(
             val onProgressChanged: (Float) -> Unit = { progress ->
                 mutableState.value = State.Loading(progress)
             }
-            endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
-            stories.value = endOfYearManager.loadStories()
             combine(
                 subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS),
                 settings.cachedSubscriptionStatus.flow
             ) { upsellState, _ ->
+                currentUserTier = settings.userTier
+                val lastUserTier = (state.value as? State.Loaded)?.userTier
+                if (lastUserTier == this@StoriesViewModel.currentUserTier) return@combine
+
+                endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
+                stories.value = endOfYearManager.loadStories()
+
                 updateState(upsellState)
                 if (state.value is State.Loaded) start()
             }.stateIn(this)
@@ -108,7 +114,7 @@ class StoriesViewModel @Inject constructor(
                     xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
                     widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
                 ),
-                userTier = settings.userTier,
+                userTier = currentUserTier,
                 freeTrial = freeTrial,
             )
         }
@@ -242,7 +248,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     private fun isPaidUser(): Boolean {
-        val currentState = state.value as State.Loaded
+        val currentState = state.value as? State.Loaded ?: return false
         return currentState.userTier != UserTier.Free
     }
 

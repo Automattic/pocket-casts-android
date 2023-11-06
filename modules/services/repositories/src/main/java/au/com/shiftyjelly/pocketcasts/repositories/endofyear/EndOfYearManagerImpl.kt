@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
@@ -23,20 +24,26 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 
 class EndOfYearManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val historyManager: HistoryManager,
     private val syncManager: SyncManager,
+    private val settings: Settings,
 ) : EndOfYearManager, CoroutineScope {
 
     companion object {
@@ -47,6 +54,13 @@ class EndOfYearManagerImpl @Inject constructor(
     private fun yearStart(year: Int) = epochAtStartOfYear(year)
     private fun yearEnd(year: Int) = epochAtStartOfYear(year + 1)
 
+    private val yearsToSync
+        get() = if (settings.userTier != UserTier.Free) {
+            listOf(YEAR, YEAR - 1)
+        } else {
+            listOf(YEAR)
+        }
+
     private fun epochAtStartOfYear(year: Int) = LocalDate.of(year, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     override val coroutineContext: CoroutineContext
@@ -56,38 +70,60 @@ class EndOfYearManagerImpl @Inject constructor(
         hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN)) &&
             FeatureFlag.isEnabled(Feature.END_OF_YEAR_ENABLED)
 
-    /**
-     * Download the year's listening history.
-     */
+    private var synced: Double = 0.0
+    private var syncTotal: Double = 0.0
+
     override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
         if (!syncManager.isLoggedIn()) {
             return
         }
+        resetSyncCount()
+        coroutineScope {
+            awaitAll(
+                *yearsToSync.map { year ->
+                    // Download listening history for each year in parallel
+                    async { downloadListeningHistory(year, onProgressChanged) }
+                }.toTypedArray()
+            )
+        }
+        onProgressChanged(1f)
+    }
+
+    /**
+     * Download the year's listening history.
+     */
+    private suspend fun downloadListeningHistory(year: Int, onProgressChanged: (Float) -> Unit) {
         // check for an episode interacted with before this year and assume they have the full listening history if they exist
-        if (anyEpisodeInteractionBeforeYear(YEAR)) {
+        if (anyEpisodeInteractionBeforeYear(year)) {
             return
         }
         // only download the count to check if we are missing history episodes
-        val countResponse = syncManager.historyYear(year = YEAR, count = true)
+        val countResponse = syncManager.historyYear(year = year, count = true)
         onProgressChanged(0.1f)
         val serverCount = countResponse.count ?: 0
-        val localCount = countEpisodeInteractionsInYear(YEAR)
+        val localCount = countEpisodeInteractionsInYear(year)
         Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
         if (serverCount > localCount) {
             // sync the year's listening history
-            val response = syncManager.historyYear(year = YEAR, count = false)
+            val response = syncManager.historyYear(year = year, count = false)
             onProgressChanged(0.2f)
             val history = response.history ?: return
             historyManager.processServerResponse(
                 response = history,
                 updateServerModified = false,
+                updateSyncTotal = { syncTotal += it },
                 onProgressChanged = {
-                    onProgressChanged(0.2f + (it * 0.8f))
+                    synced += 1
+                    val progress = min((0.2f + (synced / syncTotal) * 0.8f), 0.95).toFloat()
+                    onProgressChanged(progress)
                 },
             )
-        } else {
-            onProgressChanged(1f)
         }
+    }
+
+    private fun resetSyncCount() {
+        synced = 0.0
+        syncTotal = 0.0
     }
 
     override suspend fun loadStories(): List<Story> {

@@ -34,8 +34,14 @@ class HistoryManager @Inject constructor(
      * Read the server listening history response.
      * @param response The server response.
      * @param updateServerModified Set to true when this is latest listening history, rather than part of the user's history.
+     * @param updateSyncTotal Callback to update the total number of podcasts to sync.
      */
-    suspend fun processServerResponse(response: HistorySyncResponse, updateServerModified: Boolean, onProgressChanged: ((Float) -> Unit)? = null) = withContext(Dispatchers.IO) {
+    suspend fun processServerResponse(
+        response: HistorySyncResponse,
+        updateServerModified: Boolean,
+        updateSyncTotal: ((Float) -> Unit)? = null,
+        onProgressChanged: (() -> Unit)? = null,
+    ) = withContext(Dispatchers.IO) {
         if (!response.hasChanged(0) || response.changes.isNullOrEmpty()) {
             return@withContext
         }
@@ -51,7 +57,7 @@ class HistoryManager @Inject constructor(
         val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
 
         val total = missingPodcastUuids.size.toFloat()
-        var progress = 0
+        updateSyncTotal?.invoke(total)
 
         // add the podcasts five at a time
         Observable.fromIterable(missingPodcastUuids)
@@ -65,8 +71,7 @@ class HistoryManager @Inject constructor(
                 }, true, ADD_PODCAST_CONCURRENCY
             )
             .doOnNext {
-                progress += 1
-                onProgressChanged?.invoke(progress / total)
+                onProgressChanged?.invoke()
             }
             .toList()
             .await()
