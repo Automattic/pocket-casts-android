@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import okhttp3.HttpUrl
-import kotlin.math.roundToInt
 
 data class Chapter(
     val title: String,
