@@ -31,7 +31,9 @@ enum class Feature(
         key = "bookmarks_enabled",
         title = "Bookmarks",
         defaultValue = true,
-        tier = FeatureTier.Plus(ReleaseVersion(major = 7, minor = 52)),
+        tier = FeatureTier.Plus(
+            patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52)
+        ),
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
