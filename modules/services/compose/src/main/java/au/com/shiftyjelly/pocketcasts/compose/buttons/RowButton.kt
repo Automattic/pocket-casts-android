@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.compose.buttons
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -26,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun RowButton(
@@ -40,6 +44,7 @@ fun RowButton(
     @DrawableRes leadingIcon: Int? = null,
     onClick: () -> Unit,
     cornerRadius: Dp = 12.dp,
+    @DrawableRes textIcon: Int? = null,
 ) {
     Box(
         modifier = modifier
@@ -64,15 +69,28 @@ fun RowButton(
                             .padding(4.dp)
                     )
                 }
-                TextP40(
-                    text = text,
-                    fontFamily = fontFamily,
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .align(Alignment.Center),
-                    textAlign = TextAlign.Center,
-                    color = textColor
-                )
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (textIcon != null) {
+                        Image(
+                            painter = painterResource(textIcon),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(textColor),
+                            modifier = Modifier
+                        )
+                    }
+                    TextP40(
+                        text = text,
+                        fontFamily = fontFamily,
+                        modifier = Modifier
+                            .padding(6.dp),
+                        textAlign = TextAlign.Center,
+                        color = textColor
+                    )
+                }
             }
         }
     }
@@ -111,5 +129,18 @@ fun RowButtonDisabledPreview() {
 fun RowButtonNoPaddingPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", includePadding = false, onClick = {})
+    }
+}
+
+@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Text icon")
+@Preview(name = "Text icon")
+@Composable
+fun RowButtonTextIconPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        RowButton(
+            text = "Share",
+            textIcon = IR.drawable.ic_retry,
+            onClick = {}
+        )
     }
 }
