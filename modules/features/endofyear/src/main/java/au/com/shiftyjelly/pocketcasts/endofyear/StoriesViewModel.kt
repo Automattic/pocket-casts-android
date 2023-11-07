@@ -307,11 +307,16 @@ class StoriesViewModel @Inject constructor(
         object Error : State()
     }
 
-    fun trackStoryShown() {
+    fun trackStoryOrUpsellShown() {
         val currentState = state.value as State.Loaded
         val currentStory = requireNotNull(currentState.currentStory)
+        val event = if (shouldShowUpsell()) {
+            AnalyticsEvent.END_OF_YEAR_UPSELL_SHOWN
+        } else {
+            AnalyticsEvent.END_OF_YEAR_STORY_SHOWN
+        }
         analyticsTracker.track(
-            AnalyticsEvent.END_OF_YEAR_STORY_SHOWN,
+            event,
             AnalyticsProp.storyShown(currentStory.identifier)
         )
     }
