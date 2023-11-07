@@ -25,7 +25,7 @@ class ShareableTextProvider @Inject constructor(
 ) {
     var chosenActivity: String? = null
     private var shortURL: String = Settings.SERVER_SHORT_URL
-    private val hashtags = listOf("pocketcasts", "endofyear2023").joinToString(" ") { "#$it" }
+    private val hashtags = listOf("pocketcasts", "playback2023").joinToString(" ") { "#$it" }
 
     suspend fun getShareableDataForStory(
         story: Story,
