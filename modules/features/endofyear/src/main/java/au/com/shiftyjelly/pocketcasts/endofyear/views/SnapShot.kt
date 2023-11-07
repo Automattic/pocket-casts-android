@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear.views
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.drawable.VectorDrawable
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -11,10 +12,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewAspectRatioForTablet
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.deviceAspectRatio
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+
+private const val AppLogoWidthInDp = 130
+private const val AppLogoHeightInDp = 26
 
 /* Returns a callback to get bitmap for the passed composable.
 The composable is converted to ComposeView and laid out into AndroidView otherwise an illegal state exception is thrown:
@@ -65,9 +72,33 @@ fun createBitmapFromView(view: View, width: Int, height: Int): Bitmap {
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
     canvas.setBitmap(bitmap)
+    // Draw story view
     view.draw(canvas)
+    // Draw app logo
+    canvas.drawAppLogo(view.context)
 
     return bitmap
+}
+
+private fun Canvas.drawAppLogo(
+    context: Context,
+) {
+    val appLogoBitmap = (
+        ContextCompat
+            .getDrawable(context, IR.drawable.ic_logo_title_hor_light) as? VectorDrawable
+        )
+        ?.toBitmap(
+            width = AppLogoWidthInDp.dpToPx(context),
+            height = AppLogoHeightInDp.dpToPx(context),
+        )
+    appLogoBitmap?.let {
+        drawBitmap(
+            it,
+            (this.width - appLogoBitmap.width) / 2f,
+            (this.height - (appLogoBitmap.height + 40)).toFloat(),
+            null,
+        )
+    }
 }
 
 private fun getAspectRatioForBitmap(context: Context) =
