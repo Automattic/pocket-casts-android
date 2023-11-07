@@ -1626,6 +1626,7 @@
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
     <!-- Title of the top categories story. %1$s being the name of the most listened category. -->
     <string name="end_of_year_story_top_categories_title">Did you know that %1$s was your favorite category</string>
+    <string name="end_of_year_story_top_categories_title_english_only" translatable="false">Did you know that %1$s\nwas your favorite\ncategory</string>
     <!-- Subtitle of the top categories story. %1$s is the total number of episodes and %2$s is the total listened time. -->
     <string name="end_of_year_story_top_categories_subtitle">You listened to %1$s episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top categories story to Twitter. -->
