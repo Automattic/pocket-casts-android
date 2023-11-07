@@ -79,7 +79,7 @@ fun StoryEpilogueView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 40.dp)
+                .padding(vertical = 30.dp)
         ) {
             Spacer(modifier = modifier.weight(1f))
 

@@ -39,6 +39,7 @@ fun StoryListenedCategoriesView(
             .fillMaxSize()
             .podcastDynamicBackground(story.listenedCategories[0].toPodcast())
             .verticalScroll(rememberScrollState())
+            .padding(vertical = 30.dp)
     ) {
         Spacer(modifier = modifier.height(40.dp))
 

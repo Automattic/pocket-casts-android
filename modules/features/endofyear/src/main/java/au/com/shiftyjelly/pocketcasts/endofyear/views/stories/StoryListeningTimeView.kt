@@ -61,9 +61,9 @@ fun StoryListeningTimeView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 40.dp)
+                .padding(vertical = 30.dp)
         ) {
-            Spacer(modifier = modifier.weight(0.2f))
+            Spacer(modifier = modifier.height(40.dp))
 
             PrimaryText(story, modifier)
 
