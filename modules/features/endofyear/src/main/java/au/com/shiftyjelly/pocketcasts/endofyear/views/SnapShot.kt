@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private const val AppLogoWidthInDp = 130
 private const val AppLogoHeightInDp = 26
+private const val AppLogoPaddingBottomInDp = 40
 
 /* Returns a callback to get bitmap for the passed composable.
 The composable is converted to ComposeView and laid out into AndroidView otherwise an illegal state exception is thrown:
@@ -95,7 +96,7 @@ private fun Canvas.drawAppLogo(
         drawBitmap(
             it,
             (this.width - appLogoBitmap.width) / 2f,
-            (this.height - (appLogoBitmap.height + 40)).toFloat(),
+            (this.height - (appLogoBitmap.height + AppLogoPaddingBottomInDp.dpToPx(context))).toFloat(),
             null,
         )
     }
