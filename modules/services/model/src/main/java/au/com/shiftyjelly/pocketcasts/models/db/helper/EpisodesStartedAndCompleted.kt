@@ -5,7 +5,7 @@ data class EpisodesStartedAndCompleted(
     val completed: Int,
 ) {
     val percentage: Double = if (started == 0) {
-        100.0
+        0.0
     } else {
         (completed.toDouble() / started.toDouble()) * 100.0
     }
