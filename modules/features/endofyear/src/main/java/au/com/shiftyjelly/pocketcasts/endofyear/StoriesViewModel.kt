@@ -68,7 +68,6 @@ class StoriesViewModel @Inject constructor(
 
     private val currentStoryIsPlus: Boolean
         get() = stories.value[currentIndex].plusOnly
-    private var currentUserTier: UserTier = UserTier.Free
     private var manuallySkipped = false
 
     init {
@@ -85,15 +84,18 @@ class StoriesViewModel @Inject constructor(
             combine(
                 subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS),
                 settings.cachedSubscriptionStatus.flow
-            ) { upsellState, _ ->
-                currentUserTier = settings.userTier
+            ) { freeTrial, _ ->
+                val currentUserTier = settings.userTier
                 val lastUserTier = (state.value as? State.Loaded)?.userTier
-                if (lastUserTier == this@StoriesViewModel.currentUserTier) return@combine
+                if (lastUserTier == currentUserTier) return@combine
 
                 endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
                 stories.value = endOfYearManager.loadStories()
 
-                updateState(upsellState)
+                updateState(
+                    freeTrial = freeTrial,
+                    currentUserTier = currentUserTier
+                )
                 if (state.value is State.Loaded) start()
             }.stateIn(this)
         } catch (ex: Exception) {
@@ -104,7 +106,10 @@ class StoriesViewModel @Inject constructor(
         }
     }
 
-    private fun updateState(freeTrial: FreeTrial) {
+    private fun updateState(
+        freeTrial: FreeTrial,
+        currentUserTier: UserTier,
+    ) {
         val state = if (stories.value.isEmpty()) {
             State.Error
         } else {
