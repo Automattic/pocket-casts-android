@@ -37,7 +37,6 @@ import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.min
 
 class EndOfYearManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
@@ -71,14 +70,11 @@ class EndOfYearManagerImpl @Inject constructor(
         hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN)) &&
             FeatureFlag.isEnabled(Feature.END_OF_YEAR_ENABLED)
 
-    private var synced: Double = 0.0
-    private var syncTotal: Double = 0.0
-
     override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
         if (!syncManager.isLoggedIn()) {
             return
         }
-        resetSyncCount()
+        historyManager.resetSyncCount()
         coroutineScope {
             awaitAll(
                 *yearsToSync.map { year ->
@@ -118,22 +114,9 @@ class EndOfYearManagerImpl @Inject constructor(
             historyManager.processServerResponse(
                 response = history,
                 updateServerModified = false,
-                updateSyncTotal = { syncTotal += it },
-                onProgressChanged = {
-                    synced += 1
-                    val progress = min((0.2f + (synced / syncTotal) * 0.8f), 0.95).toFloat()
-                    if (BuildConfig.DEBUG) {
-                        Timber.i("End of Year: listening history sync year: $year total progress: $progress")
-                    }
-                    onProgressChanged(progress)
-                },
+                onProgressChanged = onProgressChanged,
             )
         }
-    }
-
-    private fun resetSyncCount() {
-        synced = 0.0
-        syncTotal = 0.0
     }
 
     override suspend fun loadStories(): List<Story> {
