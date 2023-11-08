@@ -34,7 +34,7 @@ enum class Feature(
         tier = FeatureTier.Plus(
             patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52)
         ),
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     IN_APP_REVIEW_ENABLED(
