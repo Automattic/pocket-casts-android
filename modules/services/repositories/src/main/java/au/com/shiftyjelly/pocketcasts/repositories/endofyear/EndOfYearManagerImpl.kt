@@ -68,7 +68,7 @@ class EndOfYearManagerImpl @Inject constructor(
 
     override suspend fun isEligibleForStories(): Boolean =
         hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN)) &&
-                FeatureFlag.isEnabled(Feature.END_OF_YEAR_ENABLED)
+            FeatureFlag.isEnabled(Feature.END_OF_YEAR_ENABLED)
 
     override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
         if (!syncManager.isLoggedIn()) {
