@@ -78,7 +78,7 @@ class EndOfYearManagerImplTest {
         endOfYearManagerImpl.downloadListeningHistory {}
 
         verify(historyManager, times(0))
-            .processServerResponse(any(), any(), anyOrNull(), anyOrNull())
+            .processServerResponse(any(), any(), anyOrNull())
     }
 
     @Test
@@ -92,7 +92,7 @@ class EndOfYearManagerImplTest {
         endOfYearManagerImpl.downloadListeningHistory {}
 
         verify(historyManager, atLeast(1))
-            .processServerResponse(any(), any(), anyOrNull(), anyOrNull())
+            .processServerResponse(any(), any(), anyOrNull())
     }
 
     @Test
