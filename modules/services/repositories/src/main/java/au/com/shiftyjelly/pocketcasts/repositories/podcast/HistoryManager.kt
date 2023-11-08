@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
+import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Observable
@@ -14,6 +15,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 
 class HistoryManager @Inject constructor(
     private val podcastManager: PodcastManager,
@@ -30,17 +32,18 @@ class HistoryManager @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    private var synced: Double = 0.0
+    private var syncTotal: Double = 0.0
+
     /**
      * Read the server listening history response.
      * @param response The server response.
      * @param updateServerModified Set to true when this is latest listening history, rather than part of the user's history.
-     * @param updateSyncTotal Callback to update the total number of podcasts to sync.
      */
     suspend fun processServerResponse(
         response: HistorySyncResponse,
         updateServerModified: Boolean,
-        updateSyncTotal: ((Float) -> Unit)? = null,
-        onProgressChanged: (() -> Unit)? = null,
+        onProgressChanged: ((Float) -> Unit)? = null,
     ) = withContext(Dispatchers.IO) {
         if (!response.hasChanged(0) || response.changes.isNullOrEmpty()) {
             return@withContext
@@ -57,7 +60,7 @@ class HistoryManager @Inject constructor(
         val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
 
         val total = missingPodcastUuids.size.toFloat()
-        updateSyncTotal?.invoke(total)
+        syncTotal += total
 
         // add the podcasts five at a time
         Observable.fromIterable(missingPodcastUuids)
@@ -71,7 +74,15 @@ class HistoryManager @Inject constructor(
                 }, true, ADD_PODCAST_CONCURRENCY
             )
             .doOnNext {
-                onProgressChanged?.invoke()
+                synced += 1
+                // Progress events towards the end can be too close to 100%
+                // giving an impression that nothing is happening even when progress is complete,
+                // so we cap it at 95% until it's done.
+                val progress = min((0.2f + (synced / syncTotal) * 0.8f), 0.95).toFloat()
+                if (BuildConfig.DEBUG) {
+                    Timber.i("Listening history sync progress: $progress")
+                }
+                onProgressChanged?.invoke(progress)
             }
             .toList()
             .await()
@@ -108,5 +119,10 @@ class HistoryManager @Inject constructor(
         if (updateServerModified) {
             settings.setHistoryServerModified(response.serverModified)
         }
+    }
+
+    fun resetSyncCount() {
+        synced = 0.0
+        syncTotal = 0.0
     }
 }

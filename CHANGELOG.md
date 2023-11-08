@@ -4,6 +4,8 @@
 *   Bug Fixes:
     *   Avoid brief audio skip back when a streaming episode is downloaded
         ([#1510](https://github.com/Automattic/pocket-casts-android/pull/1510))
+    *   Fix change email handling issues
+        ([#1518](https://github.com/Automattic/pocket-casts-android/pull/1518))
 
 7.51
 -----
