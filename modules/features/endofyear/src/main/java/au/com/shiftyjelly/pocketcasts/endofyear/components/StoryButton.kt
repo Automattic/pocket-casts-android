@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.components
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.annotation.DrawableRes
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +15,7 @@ fun StoryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    @DrawableRes textIcon: Int? = null,
 ) {
     RowButton(
         text = text,
@@ -23,7 +24,7 @@ fun StoryButton(
         cornerRadius = 4.dp,
         textColor = ButtonTextColor,
         onClick = onClick,
-        modifier = modifier
-            .fillMaxSize(.65f)
+        modifier = modifier,
+        textIcon = textIcon,
     )
 }

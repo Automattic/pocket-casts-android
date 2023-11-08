@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -64,9 +65,9 @@ fun StoryTopListenedCategoriesView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 40.dp)
+                .padding(vertical = 30.dp)
         ) {
-            Spacer(modifier = modifier.weight(0.2f))
+            Spacer(modifier = modifier.height(40.dp))
 
             PrimaryText(story)
 
@@ -89,8 +90,14 @@ private fun PrimaryText(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val language = Locale.current.language
+    val textResId = if (language == "en") {
+        LR.string.end_of_year_story_top_categories_title_english_only
+    } else {
+        LR.string.end_of_year_story_top_categories_title
+    }
     val text = stringResource(
-        LR.string.end_of_year_story_top_categories_title,
+        textResId,
         story.listenedCategories[0].simplifiedCategoryName().tryToLocalise(context.resources)
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
