@@ -30,9 +30,11 @@ enum class Feature(
     BOOKMARKS_ENABLED(
         key = "bookmarks_enabled",
         title = "Bookmarks",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(null),
-        hasFirebaseRemoteFlag = false,
+        defaultValue = true,
+        tier = FeatureTier.Plus(
+            patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52)
+        ),
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     IN_APP_REVIEW_ENABLED(
