@@ -81,13 +81,21 @@ class StoriesViewModel @Inject constructor(
             val onProgressChanged: (Float) -> Unit = { progress ->
                 mutableState.value = State.Loading(progress)
             }
-            endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
-            stories.value = endOfYearManager.loadStories()
             combine(
                 subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS),
                 settings.cachedSubscriptionStatus.flow
-            ) { upsellState, _ ->
-                updateState(upsellState)
+            ) { freeTrial, _ ->
+                val currentUserTier = settings.userTier
+                val lastUserTier = (state.value as? State.Loaded)?.userTier
+                if (lastUserTier == currentUserTier) return@combine
+
+                endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
+                stories.value = endOfYearManager.loadStories()
+
+                updateState(
+                    freeTrial = freeTrial,
+                    currentUserTier = currentUserTier
+                )
                 if (state.value is State.Loaded) start()
             }.stateIn(this)
         } catch (ex: Exception) {
@@ -98,7 +106,10 @@ class StoriesViewModel @Inject constructor(
         }
     }
 
-    private fun updateState(freeTrial: FreeTrial) {
+    private fun updateState(
+        freeTrial: FreeTrial,
+        currentUserTier: UserTier,
+    ) {
         val state = if (stories.value.isEmpty()) {
             State.Error
         } else {
@@ -108,7 +119,7 @@ class StoriesViewModel @Inject constructor(
                     xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
                     widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
                 ),
-                userTier = settings.userTier,
+                userTier = currentUserTier,
                 freeTrial = freeTrial,
             )
         }
@@ -242,7 +253,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     private fun isPaidUser(): Boolean {
-        val currentState = state.value as State.Loaded
+        val currentState = state.value as? State.Loaded ?: return false
         return currentState.userTier != UserTier.Free
     }
 

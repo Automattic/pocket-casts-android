@@ -18,6 +18,6 @@ interface EndOfYearManager {
     suspend fun findListenedNumbersForYear(year: Int): ListenedNumbers
     suspend fun findTopPodcastsForYear(year: Int, limit: Int): List<TopPodcast>
     suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode?
-    suspend fun getYearOverYearListeningTime(): YearOverYearListeningTime?
-    suspend fun countEpisodesStartedAndCompleted(): EpisodesStartedAndCompleted
+    suspend fun getYearOverYearListeningTime(thisYear: Int): YearOverYearListeningTime?
+    suspend fun countEpisodesStartedAndCompleted(year: Int): EpisodesStartedAndCompleted
 }
