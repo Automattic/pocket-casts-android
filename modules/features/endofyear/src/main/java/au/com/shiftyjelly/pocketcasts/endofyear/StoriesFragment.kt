@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.ScreenshotDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +36,9 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject
+    lateinit var screenshotDetector: ScreenshotDetector
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -64,6 +68,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                     analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN, AnalyticsProp.storiesShown(source))
                     StoriesPage(
                         viewModel = viewModel,
+                        screenshotDetector = screenshotDetector,
                         onCloseClicked = {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED, AnalyticsProp.StoriesDismissed.closeButton)
                             dismiss()

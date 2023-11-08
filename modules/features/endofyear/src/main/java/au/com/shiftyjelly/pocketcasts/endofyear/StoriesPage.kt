@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.Manifest
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +28,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowCloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
@@ -59,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PaidStoryWallView
+import au.com.shiftyjelly.pocketcasts.endofyear.components.ShareScreenshotAlert
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.waitForUpOrCancelInitial
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
@@ -91,6 +96,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOv
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.ScreenshotDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,14 +113,26 @@ private const val LongPressThresholdTimeInMs = 250
 private val StoriesViewBlurRadius = 50.dp
 const val StoriesViewAspectRatioForTablet = 2f
 
+private val PermissionToReadScreenshot = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    Manifest.permission.READ_MEDIA_IMAGES
+} else {
+    Manifest.permission.READ_EXTERNAL_STORAGE
+}
+private var onCaptureBitmap: (() -> Bitmap)? = null
+
 @Composable
 fun StoriesPage(
     modifier: Modifier = Modifier,
     viewModel: StoriesViewModel,
+    screenshotDetector: ScreenshotDetector,
     onCloseClicked: () -> Unit,
     onRetryClicked: () -> Unit,
     onUpsellClicked: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val state: State by viewModel.state.collectAsState()
+    var showShareScreenshotAlert by remember { mutableStateOf(false) }
+
     val shareLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -125,9 +143,32 @@ fun StoriesPage(
         viewModel.start()
     }
 
-    val context = LocalContext.current
+    val onShareClicked = {
+        val currentStory = requireNotNull((state as State.Loaded).currentStory)
+        onCaptureBitmap?.let {
+            viewModel.onShareClicked(it, context) { file, shareTextData ->
+                showShareForFile(
+                    context,
+                    file,
+                    currentStory.identifier,
+                    shareLauncher,
+                    shareTextData
+                )
+            }
+        }
+    }
 
-    val state: State by viewModel.state.collectAsState()
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { permissionGranted ->
+        if (permissionGranted) {
+            screenshotDetector.start {
+                viewModel.pause()
+                showShareScreenshotAlert = true
+            }
+        }
+    }
+
     val dialogSize = remember { getDialogSize(context) }
     Box(modifier = modifier.size(dialogSize)) {
         when (state) {
@@ -143,18 +184,7 @@ fun StoriesPage(
                     onStart = { viewModel.start() },
                     onCloseClicked = onCloseClicked,
                     onReplayClicked = { viewModel.replay() },
-                    onShareClicked = {
-                        val currentStory = requireNotNull((state as State.Loaded).currentStory)
-                        viewModel.onShareClicked(it, context) { file, shareTextData ->
-                            showShareForFile(
-                                context,
-                                file,
-                                currentStory.identifier,
-                                shareLauncher,
-                                shareTextData
-                            )
-                        }
-                    },
+                    onShareClicked = { onShareClicked() },
                     onUpsellClicked = onUpsellClicked,
                 )
             }
@@ -167,6 +197,31 @@ fun StoriesPage(
                 StoriesErrorView(onCloseClicked, onRetryClicked)
             }
         }
+    }
+
+    if (showShareScreenshotAlert) {
+        ShareScreenshotAlert(
+            onPositiveButtonClicked = {
+                onShareClicked()
+                showShareScreenshotAlert = false
+            },
+            onNegativeButtonClicked = {
+                viewModel.start()
+                showShareScreenshotAlert = false
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        if (havePermissionToReadScreenshot(context)) {
+            screenshotDetector.start {
+                viewModel.pause()
+                showShareScreenshotAlert = true
+            }
+        } else {
+            requestPermissionLauncher.launch(PermissionToReadScreenshot)
+        }
+        onDispose { screenshotDetector.stop() }
     }
 }
 
@@ -191,7 +246,7 @@ private fun StoriesView(
                 modifier = modifier
                     .clip(RoundedCornerShape(StoryViewCornerSize))
             ) {
-                val onCaptureBitmap =
+                onCaptureBitmap =
                     convertibleToBitmap(content = {
                         StorySharableContent(
                             story,
@@ -222,7 +277,7 @@ private fun StoriesView(
 
                     if (state.currentStory.shareable && !shouldShowUpsell()) {
                         ShareButton(
-                            onClick = { onShareClicked.invoke(onCaptureBitmap) },
+                            onClick = { onCaptureBitmap?.let { onShareClicked.invoke(it) } },
                         )
                     }
                 }
@@ -462,6 +517,12 @@ private fun StorySwitcher(
         content?.invoke()
     }
 }
+
+private fun havePermissionToReadScreenshot(context: Context) =
+    ContextCompat.checkSelfPermission(
+        context,
+        PermissionToReadScreenshot
+    ) == PackageManager.PERMISSION_GRANTED
 
 private fun showShareForFile(
     context: Context,
