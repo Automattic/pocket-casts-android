@@ -9,7 +9,8 @@
         ([#1510](https://github.com/Automattic/pocket-casts-android/pull/1510))
     *   Fix change email handling issues
         ([#1518](https://github.com/Automattic/pocket-casts-android/pull/1518))
-
+    *   Fix Chapter Length Calculation Mismatch
+        ([#1525](https://github.com/Automattic/pocket-casts-android/pull/1525))
 7.51
 -----
 
