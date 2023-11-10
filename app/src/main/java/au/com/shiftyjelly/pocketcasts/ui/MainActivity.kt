@@ -654,6 +654,13 @@ class MainActivity :
         )
     }
 
+    private fun showEndOfYearModal() {
+        viewModel.updateStoriesModalShowState(true)
+        launch(Dispatchers.Main) {
+            if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
+        }
+    }
+
     override fun showStoriesOrAccount(source: String) {
         if (viewModel.isSignedIn) {
             showStories(StoriesSource.fromString(source))
@@ -733,10 +740,8 @@ class MainActivity :
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
                 } else if (settings.getEndOfYearShowModal()) {
-                    viewModel.updateStoriesModalShowState(true)
-                    launch(Dispatchers.Main) {
-                        if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
-                    }
+                    if(isWhatsNewShowing()) return@observe
+                    showEndOfYearModal()
                 }
             }
 
@@ -796,6 +801,11 @@ class MainActivity :
                     }
                 }
             })
+    }
+
+    override fun whatsNewDismissed(fromConfirmAction: Boolean) {
+        if (fromConfirmAction) return
+        if (settings.getEndOfYearShowModal()) showEndOfYearModal()
     }
 
     override fun updatePlayerView() {
@@ -911,6 +921,8 @@ class MainActivity :
     }
 
     override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
+
+    private fun isWhatsNewShowing()  = bottomSheetTag == WhatsNewFragment::class.java.name
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
