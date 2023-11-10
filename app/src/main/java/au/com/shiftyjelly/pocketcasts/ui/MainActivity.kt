@@ -743,7 +743,7 @@ class MainActivity :
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
                 } else if (settings.getEndOfYearShowModal()) {
-                    if(isWhatsNewShowing()) return@observe
+                    if (isWhatsNewShowing()) return@observe
                     showEndOfYearModal()
                 }
             }
@@ -925,7 +925,7 @@ class MainActivity :
 
     override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
 
-    private fun isWhatsNewShowing()  = bottomSheetTag == WhatsNewFragment::class.java.name
+    private fun isWhatsNewShowing() = bottomSheetTag == WhatsNewFragment::class.java.name
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
