@@ -119,7 +119,9 @@ class MainActivityViewModel
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
     fun updateStoriesModalShowState(show: Boolean) {
         viewModelScope.launch {
-            shouldShowStoriesModal.value = show && isEndOfYearStoriesEligible()
+            shouldShowStoriesModal.value = show &&
+                isEndOfYearStoriesEligible() &&
+                !state.value.shouldShowWhatsNew
         }
     }
 
