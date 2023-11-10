@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MaxFontScale = 1.15f
+val StoryFontFamily = FontFamily(listOf(Font(UR.font.dm_sans)))
 
 @Composable
 fun StoryPrimaryText(

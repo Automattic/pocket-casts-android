@@ -33,7 +33,8 @@ class DeveloperFragment : BaseFragment() {
                         onForceRefreshClick = viewModel::forceRefresh,
                         onTriggerNotificationClick = viewModel::triggerNotification,
                         onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
-                        onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails
+                        onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails,
+                        onTriggerResetEoYModalProfileBadge = viewModel::resetEoYModalProfileBadge,
                     )
                 }
             }

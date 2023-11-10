@@ -17,12 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.buttons.UpsellButtonTitle
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoText
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -58,7 +60,7 @@ private fun UpsellViewContent(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val description = stringResource(state.tier.getContentDescription())
+    val description = stringResource(state.freeTrial.subscriptionTier.getContentDescription())
     MessageView(
         titleView = {
             Row(
@@ -69,7 +71,7 @@ private fun UpsellViewContent(
                 HorizontalLogoText()
                 Spacer(modifier = Modifier.width(8.dp))
                 SubscriptionBadgeForTier(
-                    tier = state.tier,
+                    tier = state.freeTrial.subscriptionTier,
                     displayMode = SubscriptionBadgeDisplayMode.Colored
                 )
             }
@@ -77,7 +79,10 @@ private fun UpsellViewContent(
         message = getMessage(
             state.showEarlyAccessMessage,
         ),
-        buttonTitle = getButtonTitle(state.tier, state.hasFreeTrial),
+        buttonTitle = UpsellButtonTitle(
+            state.freeTrial.subscriptionTier,
+            state.freeTrial.exists
+        ),
         buttonAction = onClick,
         style = style,
         modifier = modifier,
@@ -88,23 +93,6 @@ private fun SubscriptionTier.getContentDescription() = when (this) {
     SubscriptionTier.PATRON -> LR.string.pocket_casts_patron
     SubscriptionTier.PLUS -> LR.string.pocket_casts_plus
     SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
-}
-
-@Composable
-private fun getButtonTitle(
-    tier: SubscriptionTier,
-    hasFreeTrial: Boolean
-) = if (hasFreeTrial) {
-    stringResource(LR.string.profile_start_free_trial)
-} else {
-    stringResource(
-        LR.string.upgrade_to,
-        when (tier) {
-            SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
-            SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
-            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
-        }
-    )
 }
 
 @Composable
@@ -125,8 +113,10 @@ private fun UpsellPreview(
         UpsellViewContent(
             style = MessageViewColors.Default,
             state = UiState.Loaded(
-                tier = SubscriptionTier.PATRON,
-                hasFreeTrial = false,
+                freeTrial = FreeTrial(
+                    exists = false,
+                    subscriptionTier = SubscriptionTier.PATRON,
+                ),
                 showEarlyAccessMessage = false,
             ),
             onClick = {},

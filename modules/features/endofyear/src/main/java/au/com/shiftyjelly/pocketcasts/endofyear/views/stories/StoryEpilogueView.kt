@@ -8,78 +8,92 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.Confetti
 import au.com.shiftyjelly.pocketcasts.endofyear.R
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryAppLogo
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroundStyle
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryButton
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val HeartImageSize = 72.dp
-private const val BackgroundColor = 0xFF1A1A1A
 
 @Composable
 fun StoryEpilogueView(
     story: StoryEpilogue,
+    userTier: UserTier,
     onReplayClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+    BoxWithConstraints(
+        modifier = Modifier
             .fillMaxSize()
-            .background(Color(BackgroundColor))
-            .verticalScroll(rememberScrollState())
+            .background(story.backgroundColor)
     ) {
-        Spacer(modifier = modifier.height(40.dp))
+        val context = LocalView.current.context
+        StoryBlurredBackground(
+            offset = Offset(
+                -maxWidth.value.toInt().dpToPx(context) * 0.4f,
+                -maxHeight.value.toInt().dpToPx(context) * 0.4f
+            ),
+            style = blurredBackgroundStyle(userTier),
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 30.dp)
+        ) {
+            Spacer(modifier = modifier.weight(1f))
 
-        Spacer(modifier = modifier.weight(1f))
+            PulsatingHeart()
 
-        PulsatingHeart()
+            Spacer(modifier = modifier.weight(0.34f))
 
-        Spacer(modifier = modifier.weight(0.34f))
+            PrimaryText(story)
 
-        PrimaryText(story)
+            Spacer(modifier = modifier.weight(0.16f))
 
-        Spacer(modifier = modifier.weight(0.16f))
+            SecondaryText(story)
 
-        SecondaryText(story)
+            Spacer(modifier = modifier.weight(0.16f))
 
-        Spacer(modifier = modifier.weight(0.32f))
+            ReplayButton(onClick = onReplayClicked)
 
-        ReplayButton(onClick = onReplayClicked)
+            Spacer(modifier = modifier.weight(1f))
 
-        Spacer(modifier = modifier.weight(1f))
-
-        PodcastLogoWhite()
-
-        Spacer(modifier = modifier.height(30.dp))
+            StoryAppLogo()
+        }
+        Confetti {}
     }
 }
 
@@ -98,7 +112,7 @@ private fun PulsatingHeart(
     )
     Box(modifier = Modifier.scale(scale)) {
         Image(
-            painter = painterResource(id = R.drawable.heart),
+            painter = painterResource(id = R.drawable.heart_rainbow),
             contentDescription = null,
             modifier = modifier
                 .size(HeartImageSize)
@@ -129,25 +143,40 @@ private fun ReplayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = ButtonDefaults
-            .buttonColors(
-                backgroundColor = Color.White,
-                contentColor = Color.White
-            ),
-    ) {
-        Icon(
-            imageVector = Icons.Default.Refresh,
-            contentDescription = null,
-            tint = Color.Black
+    StoryButton(
+        text = stringResource(id = LR.string.end_of_year_replay),
+        onClick = onClick,
+        textIcon = IR.drawable.ic_retry,
+        modifier = modifier.width(250.dp)
+    )
+}
+
+@Composable
+private fun blurredBackgroundStyle(userTier: UserTier) = when (userTier) {
+    UserTier.Patron, UserTier.Plus -> StoryBlurredBackgroundStyle.Plus
+    UserTier.Free -> StoryBlurredBackgroundStyle.Default
+}
+
+@Preview(name = "Free user")
+@Composable
+fun EpilogueFreeUserPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        StoryEpilogueView(
+            StoryEpilogue(),
+            userTier = UserTier.Free,
+            onReplayClicked = {}
         )
-        TextP40(
-            text = stringResource(id = LR.string.end_of_year_replay),
-            color = Color.Black,
-            disableScale = disableScale(),
-            modifier = modifier.padding(2.dp)
+    }
+}
+
+@Preview(name = "Paid user")
+@Composable
+fun EpiloguePaidUserPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        StoryEpilogueView(
+            StoryEpilogue(),
+            userTier = UserTier.Plus,
+            onReplayClicked = {}
         )
     }
 }

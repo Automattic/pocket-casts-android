@@ -157,6 +157,7 @@ fun TextP40(
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE,
     disableScale: Boolean = false,
+    fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     fontSize: TextUnit = 16.sp,
     lineHeight: TextUnit = 22.sp,
@@ -169,6 +170,7 @@ fun TextP40(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
+        fontFamily = fontFamily,
         fontWeight = fontWeight,
         modifier = modifier
     )

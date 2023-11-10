@@ -2,9 +2,10 @@ package au.com.shiftyjelly.pocketcasts.whatsnew
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -15,13 +16,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
-import com.android.billingclient.api.ProductDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,25 +45,12 @@ class WhatsNewViewModelTest {
     @Mock
     lateinit var subscriptionManager: SubscriptionManager
 
-    @Mock
-    private lateinit var productDetailsState: ProductDetailsState.Loaded
-
-    @Mock
-    private lateinit var productDetails: ProductDetails
-
     private lateinit var viewModel: WhatsNewViewModel
 
     private val betaEarlyAccessRelease = ReleaseVersion(7, 50, null, 1)
     private val productionEarlyAccessRelease = ReleaseVersion(7, 50)
     private val betaFullAccessRelease = ReleaseVersion(7, 51, null, 1)
     private val productionFullAccessRelease = ReleaseVersion(7, 51)
-
-    @Before
-    fun setUp() {
-        whenever(productDetailsState.productDetails).thenReturn(listOf(productDetails))
-        whenever(subscriptionManager.observeProductDetails()).thenReturn(flowOf(productDetailsState).asFlowable())
-        whenever(productDetails.productId).thenReturn("productId")
-    }
 
     /* Title */
     @Test
@@ -197,6 +182,9 @@ class WhatsNewViewModelTest {
         currentRelease: ReleaseVersion,
         patronExclusiveAccessRelease: ReleaseVersion?,
     ) {
+        whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS))
+            .thenReturn(flowOf(FreeTrial(subscriptionTier = Subscription.SubscriptionTier.PLUS)))
+
         val releaseVersion = mock<ReleaseVersionWrapper>().apply {
             doReturn(currentRelease).whenever(this).currentReleaseVersion
         }

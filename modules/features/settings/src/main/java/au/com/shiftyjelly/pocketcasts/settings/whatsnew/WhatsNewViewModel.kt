@@ -4,10 +4,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
@@ -23,7 +21,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -64,38 +61,20 @@ class WhatsNewViewModel @Inject constructor(
             )
         } else {
             viewModelScope.launch {
+                val availableForFeatureTier = if (feature.bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion)) {
+                    FeatureTier.Patron
+                } else {
+                    feature.bookmarksFeature.tier
+                }
+                val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
+
                 subscriptionManager
-                    .observeProductDetails()
-                    .asFlow()
+                    .freeTrialForSubscriptionTierFlow(subscriptionTier)
                     .stateIn(viewModelScope)
-                    .collect { productDetails ->
-                        val subscriptions = when (productDetails) {
-                            is ProductDetailsState.Error -> null
-                            is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                                // Get subscriptions from product details to check if trial exists
-                                Subscription.fromProductDetails(
-                                    productDetails = productDetailsState,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
-                                    )
-                                )
-                            }
-                        } ?: emptyList()
-
-                        val availableForFeatureTier = if (feature.bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion)) {
-                            FeatureTier.Patron
-                        } else {
-                            feature.bookmarksFeature.tier
-                        }
-                        val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
-                        val trialExists = subscriptionManager.trialExists(
-                            tier = subscriptionTier,
-                            subscriptions = subscriptions,
-                        )
-
+                    .collect { freeTrial ->
                         _state.value = UiState.Loaded(
                             feature = bookmarksFeature(
-                                trialExists = trialExists,
+                                trialExists = freeTrial.exists,
                                 isUserEntitled = false,
                                 subscriptionTier = subscriptionTier,
                             ),

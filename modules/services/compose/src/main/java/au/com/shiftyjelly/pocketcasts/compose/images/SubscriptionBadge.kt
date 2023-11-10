@@ -111,7 +111,7 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.Colored -> Color.White
             },
         )
-        SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+        SubscriptionTier.UNKNOWN -> Unit
     }
 }
 

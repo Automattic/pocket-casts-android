@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.parallaxview.ParallaxView
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.R
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryAppLogo
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
@@ -104,7 +104,7 @@ fun StoryIntroView(
                     }
             )
 
-            PodcastLogoWhite(
+            StoryAppLogo(
                 modifier = Modifier.constrainAs(bottomLogo) {
                     bottom.linkTo(parent.bottom, margin = 30.dp)
                     start.linkTo(parent.start)

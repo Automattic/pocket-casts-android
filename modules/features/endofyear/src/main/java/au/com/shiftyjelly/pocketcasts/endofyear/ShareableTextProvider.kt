@@ -3,12 +3,14 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -24,7 +26,7 @@ class ShareableTextProvider @Inject constructor(
 ) {
     var chosenActivity: String? = null
     private var shortURL: String = Settings.SERVER_SHORT_URL
-    private val hashtags = listOf("pocketcasts", "endofyear2022").joinToString(" ") { "#$it" }
+    private val hashtags = listOf("pocketcasts", "playback2023").joinToString(" ") { "#$it" }
 
     suspend fun getShareableDataForStory(
         story: Story,
@@ -114,6 +116,16 @@ class ShareableTextProvider @Inject constructor(
                     LR.string.end_of_year_story_longest_episode_share_text,
                     shareableLink
                 )
+            }
+
+            is StoryYearOverYear -> {
+                resources.getString(
+                    LR.string.end_of_year_stories_year_over_share_text
+                )
+            }
+
+            is StoryCompletionRate -> {
+                resources.getString(LR.string.end_of_year_stories_completion_rate_share_text)
             }
 
             else -> ""

@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -57,9 +58,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PaidStoryWallView
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.waitForUpOrCancelInitial
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryCompletionRateView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryIntroView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedCategoriesView
@@ -69,9 +72,12 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryLongestEpisod
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcastsView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryYearOverYearView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
@@ -81,9 +87,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLonges
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
@@ -95,6 +104,7 @@ private val StoryViewCornerSize = 10.dp
 private val StoriesViewMaxSize = 700.dp
 private const val MaxHeightPercentFactor = 0.9f
 private const val LongPressThresholdTimeInMs = 250
+private val StoriesViewBlurRadius = 50.dp
 const val StoriesViewAspectRatioForTablet = 2f
 
 @Composable
@@ -103,6 +113,7 @@ fun StoriesPage(
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
     onRetryClicked: () -> Unit,
+    onUpsellClicked: () -> Unit,
 ) {
     val shareLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -121,10 +132,11 @@ fun StoriesPage(
     Box(modifier = modifier.size(dialogSize)) {
         when (state) {
             is State.Loaded -> {
-                viewModel.trackStoryShown()
+                viewModel.trackStoryOrUpsellShown()
                 StoriesView(
                     state = state as State.Loaded,
                     progress = viewModel.progress,
+                    shouldShowUpsell = { viewModel.shouldShowUpsell() },
                     onSkipPrevious = { viewModel.skipPrevious() },
                     onSkipNext = { viewModel.skipNext() },
                     onPause = { viewModel.pause() },
@@ -143,6 +155,7 @@ fun StoriesPage(
                             )
                         }
                     },
+                    onUpsellClicked = onUpsellClicked,
                 )
             }
             is State.Loading -> StoriesLoadingView(
@@ -161,6 +174,7 @@ fun StoriesPage(
 private fun StoriesView(
     state: State.Loaded,
     progress: StateFlow<Float>,
+    shouldShowUpsell: () -> Boolean,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
     onPause: () -> Unit,
@@ -168,6 +182,7 @@ private fun StoriesView(
     onCloseClicked: () -> Unit,
     onShareClicked: (() -> Bitmap) -> Unit,
     onReplayClicked: () -> Unit,
+    onUpsellClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(color = Color.Black)) {
@@ -180,11 +195,15 @@ private fun StoriesView(
                     convertibleToBitmap(content = {
                         StorySharableContent(
                             story,
+                            state.userTier,
+                            state.freeTrial,
+                            shouldShowUpsell,
                             onSkipPrevious,
                             onSkipNext,
                             onPause,
                             onStart,
                             onReplayClicked,
+                            onUpsellClicked,
                             modifier
                         )
                     })
@@ -201,7 +220,7 @@ private fun StoriesView(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (state.currentStory.shareable) {
+                    if (state.currentStory.shareable && !shouldShowUpsell()) {
                         ShareButton(
                             onClick = { onShareClicked.invoke(onCaptureBitmap) },
                         )
@@ -225,11 +244,15 @@ private fun LoadingOverContentView() {
 @Composable
 private fun StorySharableContent(
     story: Story,
+    userTier: UserTier,
+    freeTrial: FreeTrial,
+    shouldShowUpsell: () -> Boolean,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
     onPause: () -> Unit,
     onStart: () -> Unit,
     onReplayClicked: () -> Unit,
+    onUpsellClicked: () -> Unit,
     modifier: Modifier,
 ) {
     StorySwitcher(
@@ -244,16 +267,45 @@ private fun StorySharableContent(
                 .background(color = story.backgroundColor),
             contentAlignment = Alignment.Center
         ) {
+            val storyModifier = modifier.then(
+                if (userTier == UserTier.Free && story.plusOnly) {
+                    Modifier.blur(StoriesViewBlurRadius)
+                } else {
+                    Modifier
+                }
+            )
             when (story) {
-                is StoryIntro -> StoryIntroView()
-                is StoryListeningTime -> StoryListeningTimeView(story)
-                is StoryListenedCategories -> StoryListenedCategoriesView(story)
-                is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)
-                is StoryListenedNumbers -> StoryListenedNumbersView(story)
-                is StoryTopPodcast -> StoryTopPodcastView(story)
-                is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
-                is StoryLongestEpisode -> StoryLongestEpisodeView(story)
-                is StoryEpilogue -> StoryEpilogueView(story, onReplayClicked)
+                is StoryIntro -> StoryIntroView(storyModifier)
+                is StoryListeningTime -> StoryListeningTimeView(story, storyModifier)
+                is StoryListenedCategories -> StoryListenedCategoriesView(story, storyModifier)
+                is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story, storyModifier)
+                is StoryListenedNumbers -> StoryListenedNumbersView(story, storyModifier)
+                is StoryTopPodcast -> StoryTopPodcastView(story, storyModifier)
+                is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story, storyModifier)
+                is StoryLongestEpisode -> StoryLongestEpisodeView(story, storyModifier)
+                is StoryYearOverYear -> StoryYearOverYearView(
+                    story = story,
+                    userTier = userTier,
+                    modifier = storyModifier,
+                )
+                is StoryCompletionRate -> StoryCompletionRateView(
+                    story = story,
+                    userTier = userTier,
+                    modifier = storyModifier,
+                )
+                is StoryEpilogue -> StoryEpilogueView(
+                    story = story,
+                    userTier = userTier,
+                    onReplayClicked = onReplayClicked,
+                    modifier = storyModifier,
+                )
+            }
+            if (shouldShowUpsell()) {
+                PaidStoryWallView(
+                    freeTrial = freeTrial,
+                    onUpsellClicked = onUpsellClicked
+                )
+                onPause()
             }
         }
     }
@@ -485,9 +537,15 @@ private fun StoriesScreenPreview(
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
                     widths = listOf(0.25f, 0.75f)
-                )
+                ),
+                userTier = UserTier.Free,
+                freeTrial = FreeTrial(
+                    subscriptionTier = Subscription.SubscriptionTier.PLUS,
+                    exists = false,
+                ),
             ),
             progress = MutableStateFlow(0.75f),
+            shouldShowUpsell = { false },
             onSkipPrevious = {},
             onSkipNext = {},
             onPause = {},
@@ -495,6 +553,7 @@ private fun StoriesScreenPreview(
             onCloseClicked = {},
             onShareClicked = {},
             onReplayClicked = {},
+            onUpsellClicked = {},
         )
     }
 }

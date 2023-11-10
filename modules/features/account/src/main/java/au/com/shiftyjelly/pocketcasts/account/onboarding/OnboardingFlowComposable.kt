@@ -199,7 +199,8 @@ private fun Content(
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.BOOKMARKS,
-                OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS -> false
+                OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
+                OnboardingUpgradeSource.END_OF_YEAR -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }

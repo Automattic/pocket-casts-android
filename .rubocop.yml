@@ -1,0 +1,21 @@
+AllCops:
+  Exclude:
+    - vendor/**/*
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 180
+  Exclude:
+    - fastlane/Fastfile
+    - scripts/themes/generate_themes.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - fastlane/Fastfile
+    - scripts/themes/generate_themes.rb
+    
+Metrics/MethodLength:
+  Max: 30
+  Exclude:
+    - fastlane/Fastfile
+    - scripts/themes/generate_themes.rb

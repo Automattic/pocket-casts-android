@@ -65,7 +65,7 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
     fun setTintColor(color: Int?, theme: Theme.ThemeType) {
         val themeColor = ThemeColor.playerHighlight01(theme, color ?: Color.WHITE)
         seekBar.thumbTintList = ColorStateList.valueOf(ThemeColor.playerContrast01(theme))
-        seekBar.progressTintList = ColorStateList.valueOf(themeColor)
+        seekBar.progressTintList = ColorStateList.valueOf(ThemeColor.playerContrast01(theme))
         seekBar.secondaryProgressTintList = ColorStateList.valueOf(ThemeColor.playerContrast05(theme))
         seekBar.backgroundTintList = ColorStateList.valueOf(ThemeColor.playerContrast05(theme))
 

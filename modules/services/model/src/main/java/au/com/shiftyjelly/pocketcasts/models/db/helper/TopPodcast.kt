@@ -11,6 +11,7 @@ data class TopPodcast(
     val tintColorForDarkBg: Int,
     val numberOfPlayedEpisodes: Int,
     val totalPlayedTime: Double,
+    val weighted: Double,
 ) {
     fun toPodcast() = Podcast(
         uuid = uuid,

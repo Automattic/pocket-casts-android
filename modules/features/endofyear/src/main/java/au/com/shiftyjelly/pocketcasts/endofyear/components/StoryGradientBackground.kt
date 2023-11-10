@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 fun StoryBlurredBackground(
     offset: Offset,
     rotate: Float = 0f,
+    style: StoryBlurredBackgroundStyle = StoryBlurredBackgroundStyle.Default,
 ) {
     Box(
         Modifier.wrapContentWidth(unbounded = true)
@@ -40,12 +41,28 @@ fun StoryBlurredBackground(
                 .rotate(rotate)
         ) {
             Image(
-                painterResource(id = R.drawable.story_blurred_background),
+                painterResource(style.imgResId()),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-                    .alpha(0.6f)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(style.alpha())
             )
         }
+    }
+}
+
+enum class StoryBlurredBackgroundStyle {
+    Default,
+    Plus;
+
+    fun imgResId() = when (this) {
+        Default -> R.drawable.story_blurred_background_default
+        Plus -> R.drawable.story_blurred_background_gold
+    }
+
+    fun alpha() = when (this) {
+        Default -> 0.6f
+        Plus -> 0.8f
     }
 }
