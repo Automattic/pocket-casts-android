@@ -373,7 +373,10 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
+                            VR.id.navigation_profile -> {
+                                resetEoYBadgeIfNeeded()
+                                FirebaseAnalyticsTracker.navigatedToProfile()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
