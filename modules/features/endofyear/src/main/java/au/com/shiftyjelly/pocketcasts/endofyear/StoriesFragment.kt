@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
@@ -84,6 +85,11 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     private object AnalyticsProp {
