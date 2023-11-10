@@ -1,17 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-10-17 10:54:03+0000
+Translation-Revision-Date: 2023-11-07 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="end_of_year_stories_subscribe_to_plus">Abonniere Plus und vergleiche dein diesjähriges Audioerlebnis mit dem in 2022 und nutze weitere unterhaltsame Statistiken sowie Premium-Funktionen wie Lesezeichen und Ordner.</string>
+    <string name="end_of_year_stories_theres_more">Es gibt noch mehr!</string>
+    <string name="end_of_year_stories_year_completion_rate">Abschlussquote</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Von deinen %1$d angefangenen Episoden, hast du insgesamt %2$d vollständig angehört</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Deine Abschlussquote lag dieses Jahr bei %1$d %%</string>
+    <string name="end_of_year_stories_year_over_share_text">Meine Audiozeit in 2023 im Vergleich zu 2022</string>
+    <string name="eoy_year_over_year_title_skyrocketed">Im Vergleich zu 2022 ist deine Audiozeit in die Höhe geschnellt!</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Man muss das Leben genießen, nicht wahr?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Im Vergleich zu 2022 ist deine Audiozeit ein wenig zurückgegangen</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Man sagt, Beständigkeit ist der Schlüssel zum Erfolg … oder so ähnlich!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Im Vergleich zu 2022 hat sich deine Audiozeit kaum verändert</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Bist du bereit, sie in 2024 zu überbieten?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Im Vergleich zu 2022 ist deine Audiozeit um ganze %1$s %% angestiegen</string>
+    <string name="end_of_year_prompt_card_summary">Schau dir deine Audiostatistiken, Top-Podcasts und mehr an.</string>
+    <string name="end_of_year_story_epilogue_title">Vielen Dank, dass du dieses Jahr dein Audioerlebnis mit uns genossen hast.\nWir hören uns 2024!</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Es war keine geringere als „%1$s“ aus „%2$s“</string>
+    <string name="end_of_year_story_longest_episode_title">Die längste von dir angehörte Folge war %1$s</string>
+    <string name="end_of_year_replay">Erneut abspielen</string>
+    <string name="end_of_year_listening_time_subtitle">Wir hoffen, du hast jede Minute genossen!</string>
+    <string name="end_of_year_listening_time_title">Dies ist die Gesamtzeit der von dir angehörten Podcasts.</string>
+    <string name="end_of_year_story_top_categories_subtitle">Du hast dir %1$s Folgen mit einer Gesamtdauer von %2$s angehört</string>
+    <string name="end_of_year_story_top_categories_title">Schon gewusst? %1$s war deine Lieblingskategorie</string>
+    <string name="discover_category_society_abbreviation">Kultur</string>
+    <string name="discover_category_religion_abbreviation">Spiritualität</string>
+    <string name="discover_category_kids_abbreviation">Familie</string>
+    <string name="discover_category_health_abbreviation">Gesundheit</string>
+    <string name="eoy_story_top_podcasts_subtitle">Das sind deine Top 5 am häufigsten angehörten Shows im Jahr 2023</string>
+    <string name="eoy_story_top_podcasts_title">Und auch diese Shows haben dir gefallen!</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s war deine am häufigsten angehörte Show im Jahr 2023</string>
+    <string name="end_of_year_share_story">Diese Story teilen</string>
+    <string name="whats_new_bookmarks_enable_now_button">Jetzt aktivieren</string>
+    <string name="podcast_log_in_to_rate">Bitte melde dich an, um eine Bewertung abzugeben</string>
+    <string name="podcast_submit_rating_no_internet">Keine Internetverbindung gefunden. Bitte stelle eine Internetverbindung her, um eine Bewertung abzugeben.</string>
     <string name="podcast_rate">%s bewerten</string>
     <string name="submit">Übermitteln</string>
     <string name="whats_new_boomarks_join_beta_testing_title">Sei beim Testen der Beta-Version der Lesezeichen dabei!</string>
     <string name="whats_new_bookmarks_try_now_button">Jetzt testen</string>
     <string name="whats_new_bookmarks_title">Die Lesezeichen sind da!</string>
-    <string name="podcast_not_enough_ratings">Nicht genügend Bewertungen</string>
     <string name="bookmarks_upsell_instructions_early_access">Profitiere mit Pocket Casts Patron von frühzeitigem Zugriff auf diese Funktion und speichere Zeitstempel für deine Lieblingsfolgen. Bald für Plus-Abonnenten verfügbar.</string>
     <string name="bookmarks_upsell_instructions">Speichere Zeitstempel für deine Lieblingsfolgen und schalte viele weitere Funktionen mit Pocket Casts Plus frei.</string>
     <string name="error_loading_show_notes">Notizen zur Show konnten für diese Folge nicht gefunden werden.</string>
@@ -323,22 +355,15 @@ Language: de
     <string name="end_of_year_story_top_categories_share_text">Meine am häufigsten gehörten Podcast-Kategorien</string>
     <string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
-    <string name="end_of_year_story_epilogue_title">Danke, dass Pocket Casts zu deinem Audioerlebnis 2022 gehört</string>
-    <string name="end_of_year_story_longest_episode_share_text">Die längste Folge, die ich mir im Jahr 2022 angehört habe (%1$s)</string>
-    <string name="end_of_year_story_longest_episode_duration">Diese Folge dauerte %1$s</string>
-    <string name="end_of_year_story_longest_episode">Die längste von dir angehörte Folge war %1$s aus dem Podcast %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Mein Lieblings-Podcast 2022! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Du hast dir %1$d Folgen mit einer Gesamtdauer von %2$s angehört</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Ich habe mir im Jahr 2022 %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
-    <string name="end_of_year_story_listened_to_categories_share_text">Ich hab mir im Jahr 2022 %1$d unterschiedliche Kategorien angehört</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab eine, die dir besonders gut gefallen hat …</string>
+    <string name="end_of_year_story_listened_to_numbers">Du hast dir insgesamt %1$d verschiedene Shows und %2$d Folgen angehört</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Sehen wir uns einige deiner Favoriten an …</string>
     <string name="end_of_year_story_listened_to_categories">Du hast dir in diesem Jahr %1$d unterschiedliche Kategorien angehört</string>
-    <string name="end_of_year_story_listened_to_share_text">Ich habe 2022 %1$s mit dem Hören von Podcasts verbracht</string>
     <string name="end_of_year_story_intro_title">Feiern wir dein Audio-Jahr!</string>
     <string name="end_of_year_launch_modal_image_title">Das Jahr in Podcasts</string>
-    <string name="end_of_year_replay">Erneut abspielen</string>
     <string name="settings_media_notification_controls">Benachrichtigungskontrollen für Medien</string>
     <string name="playback_speed">Wiedergabegeschwindigkeit</string>
     <string name="volume_boost_enabled_not_valid">Der Wert für „Lautstärke-Booster aktiviert“ muss „wahr“ oder „falsch“ sein, war jedoch  %1$s</string>
@@ -350,13 +375,11 @@ Language: de
     <string name="playback_speed_between_values">Wiedergabegeschwindigkeit (zwischen 0,5 und 3)</string>
     <string name="set_playback_speed">Wiedergabegeschwindigkeit einstellen</string>
     <string name="playback_speed_not_valid">Wiedergabegeschwindigkeit %1$s nicht gültig</string>
-    <string name="end_of_year_listening_time">2022 hast du %1$s mit dem Anhören von Podcasts verbracht</string>
     <string name="profile_account_upgraded">Konto aktualisiert</string>
     <string name="pocket_casts_control_playback">Pocket Casts-Wiedergabe-Steuerung</string>
     <string name="pocket_casts_play_filter">Pocket Casts-Abspiel-Filter</string>
     <string name="time_to_skip_not_valid">Zeitpunkt, auf den du springen möchtest (%1$s), ist nicht gültig</string>
     <string name="time_to_skip_seconds">Zeitpunkt, auf den du springen möchtest (Sekunden)</string>
-    <string name="end_of_year_prompt_card_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an.</string>
     <string name="settings_select_filters">Filter auswählen</string>
     <string name="settings_import_url_summary">Importiere deine Podcasts von einer OPML-Datei mithilfe einer URL.</string>
     <string name="settings_import_url">Durch URL</string>
@@ -377,7 +400,7 @@ Language: de
     <string name="filter_x_not_found">Filter %1$s nicht gefunden</string>
     <string name="must_provide_filter_name">Filtername erforderlich</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Nicht jetzt</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Mein Jahr 2022 anzeigen</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Mein 2023 anzeigen</string>
     <string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
     <string name="end_of_year_launch_modal_title">Dein Jahr in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>

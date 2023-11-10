@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-10-25 09:54:04+0000
+Translation-Revision-Date: 2023-11-07 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독하며 2022년과 비교한 청취 수준, 기타 재미있는 통계, 북마크 및 폴더와 같은 프리미엄 기능을 알아보세요.</string>
+    <string name="end_of_year_stories_theres_more">더 있습니다!</string>
+    <string name="end_of_year_stories_year_completion_rate">완료율</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">시작하신 %1$d개 에피소드 중에서 총 %2$d개 완전히 청취</string>
+    <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다.</string>
+    <string name="end_of_year_stories_year_over_share_text">2022년 대비 내 2023년 청취 시간</string>
+    <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">2022년 대비 청취 시간이 조금 줄었습니다.</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">2022년 대비 청취 시간이 상당히 일정하게 유지되었습니다.</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">2024년에 정점을 찍을 준비가 되셨나요?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">2022년에 비해 청취 시간이 %1$s%%나 늘었습니다.</string>
+    <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
+    <string name="end_of_year_story_epilogue_title">올해 청취해 주셔서 감사합니다.\n2024년에 뵙겠습니다.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">다름 아닌 \"%2$s\"의 \"%1$s\"였습니다.</string>
+    <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
+    <string name="end_of_year_replay">다시 재생</string>
+    <string name="end_of_year_listening_time_subtitle">매 순간이 마음에 들었기를 바랍니다!</string>
+    <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
+    <string name="end_of_year_story_top_categories_subtitle">총 %2$s 동안 %1$s개 에피소드를 청취하셨습니다.</string>
+    <string name="end_of_year_story_top_categories_title">%1$s이(가) 좋아하는 카테고리라는 것을 알고 계셨습니까?</string>
+    <string name="discover_category_society_abbreviation">문화</string>
+    <string name="discover_category_religion_abbreviation">영성</string>
+    <string name="discover_category_kids_abbreviation">가족</string>
+    <string name="discover_category_health_abbreviation">건강</string>
     <string name="eoy_story_top_podcasts_subtitle">2023년 가장 많이 청취한 프로그램 5개</string>
     <string name="eoy_story_top_podcasts_title">이런 프로그램도 많이 청취하셨습니다!</string>
-    <string name="end_of_year_story_top_podcast">2023년 가장 많이 청취한 프로그램은 %1$s였습니다.</string>
+    <string name="end_of_year_story_top_podcast_title">2023년 가장 많이 청취한 프로그램은 %1$s였습니다.</string>
     <string name="end_of_year_share_story">이 스토리 공유</string>
-    <string name="end_of_year_pocket_casts_playback">Pocket Casts 재생</string>
     <string name="whats_new_bookmarks_enable_now_button">지금 활성화</string>
     <string name="podcast_log_in_to_rate">평가를 남기려면 로그인 필요</string>
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
@@ -19,7 +44,6 @@ Language: ko_KR
     <string name="whats_new_boomarks_join_beta_testing_title">북마크에 대한 베타 테스트에 참여하세요!</string>
     <string name="whats_new_bookmarks_try_now_button">지금 시도</string>
     <string name="whats_new_bookmarks_title">북마크는 여기 있습니다!</string>
-    <string name="podcast_not_enough_ratings">충분하지 않은 평점</string>
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>
     <string name="bookmarks_upsell_instructions">Pocket Casts Plus로 좋아하는 에피소드의 타임스탬프를 저장하고 다양한 기능을 이용해보세요.</string>
     <string name="error_loading_show_notes">이 에피소드의 프로그램 메모를 찾을 수 없습니다.</string>
@@ -331,24 +355,15 @@ Language: ko_KR
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
     <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
-    <string name="end_of_year_story_epilogue_title">2022년에 Pocket Casts를 회원님의 청취 환경에 포함해 주셔서 감사합니다.</string>
-    <string name="end_of_year_story_longest_episode_share_text">2022년에 내가 청취한 가장 긴 에피소드 %1$s</string>
-    <string name="end_of_year_story_longest_episode_duration">이 에피소드 길이는 %1$s</string>
-    <string name="end_of_year_story_longest_episode">회원님이 청취한 가장 긴 에피소드는 %2$s 팟캐스트의 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">나의 2022년 상위 팟캐스트</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">내가 즐겨 찾는 2022년 팟캐스트입니다! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">총 %2$s 동안 %1$d개 에피소드를 청취하셨습니다.</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">나는 2022년에 청취한 팟캐스트는 %1$d가지, 에피소드는 %2$d개</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_listened_to_numbers">청취하신 총 프로그램 %1$d개, 에피소드 %2$d개</string>
-    <string name="end_of_year_story_listened_to_categories_share_text">내가 2022년에 청취한 카테고리는 %1$d가지</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">회원님의 즐겨찾기 중 일부를 살펴보겠습니다…</string>
     <string name="end_of_year_story_listened_to_categories">회원님이 올해 청취한 카테고리는 %1$d가지</string>
-    <string name="end_of_year_story_listened_to_share_text">내가 2022년에 팟캐스트를 청취한 시간은 %1$s</string>
     <string name="end_of_year_story_intro_title">회원님의 청취 원년을 축하합니다!</string>
     <string name="end_of_year_launch_modal_image_title">팟캐스트 원년</string>
-    <string name="end_of_year_replay">재생</string>
     <string name="settings_media_notification_controls">미디어 알림 컨트롤</string>
     <string name="playback_speed">재생 속도</string>
     <string name="volume_boost_enabled_not_valid">Volume Boost 활성화됨 값은 \'true\' 또는 \'false\'여야 하며,  %1$s였음</string>
@@ -360,13 +375,11 @@ Language: ko_KR
     <string name="playback_speed_between_values">재생 속도(0.5~3)</string>
     <string name="set_playback_speed">재생 속도 설정</string>
     <string name="playback_speed_not_valid">재생 속도 %1$s 유효하지 않음</string>
-    <string name="end_of_year_listening_time">2022에 팟캐스트를 청취하신 시간은 %1$s입니다.</string>
     <string name="profile_account_upgraded">계정 업그레이드됨</string>
     <string name="pocket_casts_control_playback">Pocket Casts 컨트롤 재생</string>
     <string name="pocket_casts_play_filter">Pocket Casts 재생 필터</string>
     <string name="time_to_skip_not_valid">건너뛰기 시간 %1$s 유효하지 않음</string>
     <string name="time_to_skip_seconds">건너뛰기 시간(초)</string>
-    <string name="end_of_year_prompt_card_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다.</string>
     <string name="settings_select_filters">필터 선택</string>
     <string name="settings_import_url_summary">URL을 사용하여 OPML 파일에서 팟캐스트를 가져오세요.</string>
     <string name="settings_import_url">URL 사용</string>
@@ -387,7 +400,7 @@ Language: ko_KR
     <string name="filter_x_not_found">%1$s 필터 찾을 수 없음</string>
     <string name="must_provide_filter_name">필터 이름을 제공해야 함</string>
     <string name="end_of_year_launch_modal_secondary_button_title">나중에</string>
-    <string name="end_of_year_launch_modal_primary_button_title">내 2022년 보기</string>
+    <string name="end_of_year_launch_modal_primary_button_title">내 2023년 보기</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="end_of_year_launch_modal_title">회원님의 팟캐스트 원년</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
