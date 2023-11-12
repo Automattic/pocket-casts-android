@@ -7,13 +7,11 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,8 +28,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -76,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -91,8 +87,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.delay
-import java.lang.Long.max
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -522,54 +516,16 @@ private fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
 
 @Composable
 private fun FeatureRow(scrollAutomatically: Boolean) {
-
-    // Not using rememberLazyListState() because we want to reset
-    // the scroll state on orientation changes so that the hardcoded column
-    // is redisplayed, which insures the height is correctly calculated. For that
-    // reason, we want to use remember, not rememberSaveable.
-    val state = remember { LazyListState() }
-
-    val localConfiguration = LocalConfiguration.current
-    LaunchedEffect(scrollAutomatically) {
-        if (scrollAutomatically) {
-            // This seems to get a good scroll speed across multiple devices
-            val scrollDelay = max(1L, (1000L - localConfiguration.densityDpi) / 125)
-            autoScroll(scrollDelay, state)
-        }
-    }
-    LazyRow(
-        state = state,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        userScrollEnabled = !scrollAutomatically,
-    ) {
-        if (scrollAutomatically) {
-            items(500) { // arbitrary large number that users will probably never hit
-                // Nesting a Row of FeatureItems inside the LazyRow because a Row can use IntrinsidSize.Max
-                // to determine the height of the tallest list item and keep a consistent
-                // height, regardless of which items are visible. This ensures that the
-                // LazyRow as a whole always has a single, consistent height that does not
-                // change as items scroll into/out-of view. If IntrinsicSize.Max could work
-                // with LazyRows, we wouldn't need to nest Rows in the LazyRow.
-                FeatureItems()
-            }
-        } else {
-            item {
-                FeatureItems()
-            }
-        }
-    }
+    ScrollingRow(
+        scrollAutomatically = scrollAutomatically,
+        rowItems = { FeatureItems() },
+    )
 }
 
 @Composable
 private fun FeatureItems() {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .height(IntrinsicSize.Max)
-    ) {
-        OldPlusUpgradeFeatureItem.values().forEach {
-            OldFeatureItem(it)
-        }
+    OldPlusUpgradeFeatureItem.values().forEach {
+        OldFeatureItem(it)
     }
 }
 
@@ -666,22 +622,6 @@ fun NoSubscriptionsLayout(
         }
         Spacer(modifier = Modifier.weight(1f))
     }
-}
-
-// Based on https://stackoverflow.com/a/71344813/1910286
-private tailrec suspend fun autoScroll(
-    scrollDelay: Long,
-    lazyListState: LazyListState,
-) {
-    val scrollAmount = lazyListState.scrollBy(1f)
-    if (scrollAmount == 0f) {
-        // If we can't scroll, we're at the end, so jump to the beginning.
-        // This will be an abrupt jump, but users shouldn't really ever be
-        // getting to the end of the list, so it should be very rare.
-        lazyListState.scrollToItem(0)
-    }
-    delay(scrollDelay)
-    autoScroll(scrollDelay, lazyListState)
 }
 
 private fun Modifier.fadeBackground() = this
