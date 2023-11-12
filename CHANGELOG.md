@@ -4,6 +4,8 @@
 * New Features:
     *   Bookmarks entering Patron early access with full release for Plus users in 7.53
         ([#1526](https://github.com/Automattic/pocket-casts-android/pull/1526))
+    *   Enables Playback 2023
+        ([#1537](https://github.com/Automattic/pocket-casts-android/pull/1537))
 *   Bug Fixes:
     *   Avoid brief audio skip back when a streaming episode is downloaded
         ([#1510](https://github.com/Automattic/pocket-casts-android/pull/1510))
