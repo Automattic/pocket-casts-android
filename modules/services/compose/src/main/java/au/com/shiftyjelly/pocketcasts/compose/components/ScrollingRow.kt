@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import java.lang.Long.max
@@ -20,7 +21,9 @@ private const val MAX_ITEMS = 500
 
 @Composable
 fun ScrollingRow(
+    scrollDirection: ScrollDirection = ScrollDirection.RIGHT,
     scrollAutomatically: Boolean = true,
+    spacedBy: Dp = 16.dp,
     rowItems: @Composable () -> Unit,
 ) {
 
@@ -35,7 +38,10 @@ fun ScrollingRow(
         if (scrollAutomatically) {
             // This seems to get a good scroll speed across multiple devices
             val scrollDelay = max(1L, (1000L - localConfiguration.densityDpi) / 90)
-            autoScroll(scrollDelay, state)
+            if (scrollDirection == ScrollDirection.LEFT) {
+                state.scrollToItem(MAX_ITEMS - 1)
+            }
+            autoScroll(scrollDirection, scrollDelay, state)
         }
     }
     LazyRow(
@@ -51,11 +57,11 @@ fun ScrollingRow(
                 // LazyRow as a whole always has a single, consistent height that does not
                 // change as items scroll into/out-of view. If IntrinsicSize.Max could work
                 // with LazyRows, we wouldn't need to nest Rows in the LazyRow.
-                NestedRow(rowItems)
+                NestedRow(rowItems, spacedBy)
             }
         } else {
             item {
-                NestedRow(rowItems)
+                NestedRow(rowItems, spacedBy)
             }
         }
     }
@@ -64,9 +70,10 @@ fun ScrollingRow(
 @Composable
 fun NestedRow(
     rowItems: @Composable () -> Unit,
+    spacedBy: Dp,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacedBy),
         modifier = Modifier
             .height(IntrinsicSize.Max)
     ) {
@@ -76,16 +83,22 @@ fun NestedRow(
 
 // Based on https://stackoverflow.com/a/71344813/1910286
 private tailrec suspend fun autoScroll(
+    scrollDirection: ScrollDirection,
     scrollDelay: Long,
     lazyListState: LazyListState,
 ) {
-    val scrollAmount = lazyListState.scrollBy(1f)
+    val scrollAmount = lazyListState.scrollBy(if (scrollDirection == ScrollDirection.RIGHT) 1f else -1f)
     if (scrollAmount == 0f) {
-        // If we can't scroll, we're at the end, so jump to the beginning.
+        // If we can't scroll, we're at one end, so jump to the other end.
         // This will be an abrupt jump, but users shouldn't really ever be
         // getting to the end of the list, so it should be very rare.
-        lazyListState.scrollToItem(0)
+        lazyListState.scrollToItem(if (scrollDirection == ScrollDirection.RIGHT) 0 else MAX_ITEMS -1)
     }
     delay(scrollDelay)
-    autoScroll(scrollDelay, lazyListState)
+    autoScroll(scrollDirection, scrollDelay, lazyListState)
+}
+
+enum class ScrollDirection {
+    LEFT,
+    RIGHT
 }
