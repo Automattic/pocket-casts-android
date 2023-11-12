@@ -170,6 +170,7 @@ dependencies {
     implementation libs.bundles.retrofit
     implementation libs.bundles.rxjava
     implementation libs.bundles.sentry
+    implementation libs.bundles.shared.elements
     implementation libs.bundles.work
 
     implementation platform(libs.firebase.bom)

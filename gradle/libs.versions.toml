@@ -55,6 +55,7 @@ retrofit = "2.9.0"
 room = "2.5.1"
 sentry = "6.28.0"
 sentry-plugin = "3.10.0"
+shared-elements = "0.1.0-SNAPSHOT"
 showkase = "1.0.0-beta18"
 test = "1.5.0"
 wear-compose = "1.2.0-beta02"
@@ -218,6 +219,9 @@ sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
 sentry-android-core = { module = "io.sentry:sentry-android-core" }
 sentry-fragment = { module = "io.sentry:sentry-android-fragment" }
 sentry-timber = { module = "io.sentry:sentry-android-timber" }
+
+# SharedElements
+shared-elements = { module = "com.mxalbert.sharedelements:shared-elements", version.ref = "shared-elements" }
 
 # Showkase
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
@@ -424,6 +428,10 @@ sentry = [
     "sentry-android-core",
     "sentry-fragment",
     "sentry-timber"
+]
+
+shared-elements =  [
+    "shared-elements"
 ]
 
 test = [
