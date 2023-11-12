@@ -284,7 +284,7 @@ private fun StorySharableContent(
                 is StoryListenedNumbers -> StoryListenedNumbersView(story, paused, storyModifier)
                 is StoryTopPodcast -> StoryTopPodcastView(story, storyModifier)
                 is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story, storyModifier)
-                is StoryLongestEpisode -> StoryLongestEpisodeView(story, storyModifier)
+                is StoryLongestEpisode -> StoryLongestEpisodeView(story, paused, storyModifier)
                 is StoryYearOverYear -> StoryYearOverYearView(
                     story = story,
                     userTier = userTier,
