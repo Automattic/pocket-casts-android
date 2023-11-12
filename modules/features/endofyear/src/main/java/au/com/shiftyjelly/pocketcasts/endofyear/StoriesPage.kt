@@ -195,6 +195,7 @@ private fun StoriesView(
                     convertibleToBitmap(content = {
                         StorySharableContent(
                             story,
+                            state.paused,
                             state.userTier,
                             state.freeTrial,
                             shouldShowUpsell,
@@ -244,6 +245,7 @@ private fun LoadingOverContentView() {
 @Composable
 private fun StorySharableContent(
     story: Story,
+    paused: Boolean,
     userTier: UserTier,
     freeTrial: FreeTrial,
     shouldShowUpsell: () -> Boolean,
@@ -279,7 +281,7 @@ private fun StorySharableContent(
                 is StoryListeningTime -> StoryListeningTimeView(story, storyModifier)
                 is StoryListenedCategories -> StoryListenedCategoriesView(story, storyModifier)
                 is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story, storyModifier)
-                is StoryListenedNumbers -> StoryListenedNumbersView(story, storyModifier)
+                is StoryListenedNumbers -> StoryListenedNumbersView(story, paused, storyModifier)
                 is StoryTopPodcast -> StoryTopPodcastView(story, storyModifier)
                 is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story, storyModifier)
                 is StoryLongestEpisode -> StoryLongestEpisodeView(story, storyModifier)

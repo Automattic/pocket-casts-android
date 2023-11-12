@@ -38,6 +38,7 @@ private const val PodcastCoverScaleFactor = 1.5f
 @Composable
 fun StoryListenedNumbersView(
     story: StoryListenedNumbers,
+    paused: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box {
@@ -65,7 +66,7 @@ fun StoryListenedNumbersView(
 
             Spacer(modifier = modifier.weight(1f))
 
-            PodcastCoverStack(story.topPodcasts.reversed())
+            PodcastCoverStack(story.topPodcasts.reversed(), paused)
 
             Spacer(modifier = modifier.weight(1f))
         }
@@ -75,6 +76,7 @@ fun StoryListenedNumbersView(
 @Composable
 private fun PodcastCoverStack(
     topPodcasts: List<TopPodcast>,
+    paused: Boolean,
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
@@ -92,6 +94,7 @@ private fun PodcastCoverStack(
         ScrollingRow(
             scrollDirection = ScrollDirection.RIGHT,
             spacedBy = spacedBy,
+            paused = paused,
         ) {
             for (i in 0..3) {
                 PodcastCover(
@@ -104,6 +107,7 @@ private fun PodcastCoverStack(
         ScrollingRow(
             scrollDirection = ScrollDirection.LEFT,
             spacedBy = spacedBy,
+            paused = paused,
         ) {
             for (i in 4..7) {
                 PodcastCover(

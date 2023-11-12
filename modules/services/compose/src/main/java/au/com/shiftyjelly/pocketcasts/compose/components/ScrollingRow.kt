@@ -9,7 +9,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
@@ -24,6 +27,7 @@ fun ScrollingRow(
     scrollDirection: ScrollDirection = ScrollDirection.RIGHT,
     scrollAutomatically: Boolean = true,
     spacedBy: Dp = 16.dp,
+    paused: Boolean = false,
     rowItems: @Composable () -> Unit,
 ) {
 
@@ -32,16 +36,19 @@ fun ScrollingRow(
     // is redisplayed, which insures the height is correctly calculated. For that
     // reason, we want to use remember, not rememberSaveable.
     val state = remember { LazyListState() }
-
+    var initialScrollCompleted by remember { mutableStateOf(false) }
     val localConfiguration = LocalConfiguration.current
-    LaunchedEffect(scrollAutomatically) {
+    LaunchedEffect(scrollAutomatically && paused) {
         if (scrollAutomatically) {
             // This seems to get a good scroll speed across multiple devices
             val scrollDelay = max(1L, (1000L - localConfiguration.densityDpi) / 90)
-            if (scrollDirection == ScrollDirection.LEFT) {
-                state.scrollToItem(MAX_ITEMS - 1)
+            if (!initialScrollCompleted) {
+                if (scrollDirection == ScrollDirection.LEFT) {
+                    state.scrollToItem(MAX_ITEMS - 1)
+                }
+                initialScrollCompleted = true
             }
-            autoScroll(scrollDirection, scrollDelay, state)
+            autoScroll(scrollDirection, scrollDelay, state, paused)
         }
     }
     LazyRow(
@@ -86,16 +93,19 @@ private tailrec suspend fun autoScroll(
     scrollDirection: ScrollDirection,
     scrollDelay: Long,
     lazyListState: LazyListState,
+    paused: Boolean = false,
 ) {
     val scrollAmount = lazyListState.scrollBy(if (scrollDirection == ScrollDirection.RIGHT) 1f else -1f)
     if (scrollAmount == 0f) {
         // If we can't scroll, we're at one end, so jump to the other end.
         // This will be an abrupt jump, but users shouldn't really ever be
         // getting to the end of the list, so it should be very rare.
-        lazyListState.scrollToItem(if (scrollDirection == ScrollDirection.RIGHT) 0 else MAX_ITEMS -1)
+        lazyListState.scrollToItem(if (scrollDirection == ScrollDirection.RIGHT) 0 else MAX_ITEMS - 1)
     }
-    delay(scrollDelay)
-    autoScroll(scrollDirection, scrollDelay, lazyListState)
+    if (!paused) {
+        delay(scrollDelay)
+        autoScroll(scrollDirection, scrollDelay, lazyListState)
+    }
 }
 
 enum class ScrollDirection {
