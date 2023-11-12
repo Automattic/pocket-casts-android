@@ -40,8 +40,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import com.mxalbert.sharedelements.ProgressThresholds
+import com.mxalbert.sharedelements.SharedElement
+import com.mxalbert.sharedelements.SharedElementsTransitionSpec
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+
+private const val AniDurationInMs = 500
 
 @Composable
 fun StoryTopFivePodcastsView(
@@ -101,6 +106,7 @@ private fun SecondaryText(
 private fun PodcastList(story: StoryTopFivePodcasts) {
     story.topPodcasts.forEachIndexed { index, topPodcast ->
         PodcastItem(
+            storyIdentifier = story.identifier,
             podcast = topPodcast.toPodcast(),
             position = index,
             tintColor = story.tintColor,
@@ -111,6 +117,7 @@ private fun PodcastList(story: StoryTopFivePodcasts) {
 
 @Composable
 fun PodcastItem(
+    storyIdentifier: String,
     podcast: Podcast,
     position: Int,
     tintColor: Color,
@@ -142,10 +149,19 @@ fun PodcastItem(
                 .weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            PodcastImage(
-                uuid = podcast.uuid,
-                modifier = modifier.size((heightInDp * 0.09f).dp)
-            )
+            SharedElement(
+                key = "cover$position",
+                screenKey = storyIdentifier,
+                transitionSpec = SharedElementsTransitionSpec(
+                    durationMillis = AniDurationInMs,
+                    scaleProgressThresholds = ProgressThresholds(0f, 0.9f),
+                )
+            ) {
+                PodcastImage(
+                    uuid = podcast.uuid,
+                    modifier = modifier.size((heightInDp * 0.09f).dp)
+                )
+            }
             Column(
                 modifier = modifier
                     .padding(start = 14.dp)
@@ -181,6 +197,7 @@ private fun PodcastItemPreview(
     AppTheme(themeType) {
         Surface(color = Color.Black) {
             PodcastItem(
+                storyIdentifier = "storyIdentifier",
                 podcast = Podcast(
                     uuid = "",
                     title = "Title",

@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
@@ -30,6 +29,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import com.mxalbert.sharedelements.SharedElement
+import com.mxalbert.sharedelements.SharedElementsTransitionSpec
+
+private const val AniDurationInMs = 500
 
 @Composable
 fun StoryTopPodcastView(
@@ -126,10 +129,11 @@ private fun PodcastCoverStack(
                 )
                 .alpha(0.2f)
         )
-        PodcastCover(
-            uuid = story.topPodcast.uuid,
+        PodcastCoverOrEmpty(
+            story = story,
+            index = 0,
             coverWidth = (widthInDp * .7).dp,
-            coverSize = CoverSize.BIG
+            modifier = Modifier,
         )
     }
 }
@@ -142,11 +146,20 @@ private fun PodcastCoverOrEmpty(
     modifier: Modifier,
 ) {
     if (index < story.topPodcasts.size) {
-        PodcastCover(
-            uuid = story.topPodcasts[index].uuid,
-            coverWidth = coverWidth,
-            modifier = modifier
-        )
+        SharedElement(
+            key = "cover$index",
+            screenKey = story.identifier,
+            transitionSpec = SharedElementsTransitionSpec(
+                durationMillis = AniDurationInMs,
+                waitForFrames = 0,
+            )
+        ) {
+            PodcastCover(
+                uuid = story.topPodcasts[index].uuid,
+                coverWidth = coverWidth,
+                modifier = modifier
+            )
+        }
     } else {
         Unit
     }

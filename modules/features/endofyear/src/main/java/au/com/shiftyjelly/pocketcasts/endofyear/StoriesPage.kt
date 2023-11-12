@@ -93,6 +93,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import com.mxalbert.sharedelements.SharedElementsRoot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
@@ -276,38 +277,42 @@ private fun StorySharableContent(
                     Modifier
                 }
             )
-            when (story) {
-                is StoryIntro -> StoryIntroView(storyModifier)
-                is StoryListeningTime -> StoryListeningTimeView(story, storyModifier)
-                is StoryListenedCategories -> StoryListenedCategoriesView(story, storyModifier)
-                is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story, storyModifier)
-                is StoryListenedNumbers -> StoryListenedNumbersView(story, paused, storyModifier)
-                is StoryTopPodcast -> StoryTopPodcastView(story, storyModifier)
-                is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story, storyModifier)
-                is StoryLongestEpisode -> StoryLongestEpisodeView(story, paused, storyModifier)
-                is StoryYearOverYear -> StoryYearOverYearView(
-                    story = story,
-                    userTier = userTier,
-                    modifier = storyModifier,
-                )
-                is StoryCompletionRate -> StoryCompletionRateView(
-                    story = story,
-                    userTier = userTier,
-                    modifier = storyModifier,
-                )
-                is StoryEpilogue -> StoryEpilogueView(
-                    story = story,
-                    userTier = userTier,
-                    onReplayClicked = onReplayClicked,
-                    modifier = storyModifier,
-                )
-            }
-            if (shouldShowUpsell()) {
-                PaidStoryWallView(
-                    freeTrial = freeTrial,
-                    onUpsellClicked = onUpsellClicked
-                )
-                onPause()
+            SharedElementsRoot {
+                when (story) {
+                    is StoryIntro -> StoryIntroView(storyModifier)
+                    is StoryListeningTime -> StoryListeningTimeView(story, storyModifier)
+                    is StoryListenedCategories -> StoryListenedCategoriesView(story, storyModifier)
+                    is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story, storyModifier)
+                    is StoryListenedNumbers -> StoryListenedNumbersView(story, paused, storyModifier)
+                    is StoryTopPodcast -> StoryTopPodcastView(story, storyModifier)
+                    is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story, storyModifier)
+                    is StoryLongestEpisode -> StoryLongestEpisodeView(story, paused, storyModifier)
+                    is StoryYearOverYear -> StoryYearOverYearView(
+                        story = story,
+                        userTier = userTier,
+                        modifier = storyModifier,
+                    )
+
+                    is StoryCompletionRate -> StoryCompletionRateView(
+                        story = story,
+                        userTier = userTier,
+                        modifier = storyModifier,
+                    )
+
+                    is StoryEpilogue -> StoryEpilogueView(
+                        story = story,
+                        userTier = userTier,
+                        onReplayClicked = onReplayClicked,
+                        modifier = storyModifier,
+                    )
+                }
+                if (shouldShowUpsell()) {
+                    PaidStoryWallView(
+                        freeTrial = freeTrial,
+                        onUpsellClicked = onUpsellClicked
+                    )
+                    onPause()
+                }
             }
         }
     }
