@@ -88,19 +88,19 @@ private fun PodcastCoverStack(
         ) {
             PodcastCover(
                 coverWidth = size,
-                uuid = topPodcasts.atSafeIndex(5).uuid,
-            )
-            PodcastCover(
-                coverWidth = size,
-                uuid = topPodcasts.atSafeIndex(4).uuid,
-            )
-            PodcastCover(
-                coverWidth = size,
                 uuid = topPodcasts.atSafeIndex(0).uuid,
             )
             PodcastCover(
                 coverWidth = size,
+                uuid = topPodcasts.atSafeIndex(1).uuid,
+            )
+            PodcastCover(
+                coverWidth = size,
                 uuid = topPodcasts.atSafeIndex(2).uuid,
+            )
+            PodcastCover(
+                coverWidth = size,
+                uuid = topPodcasts.atSafeIndex(3).uuid,
             )
         }
 
@@ -110,11 +110,11 @@ private fun PodcastCoverStack(
         ) {
             PodcastCover(
                 coverWidth = size,
-                uuid = topPodcasts.atSafeIndex(1).uuid,
+                uuid = topPodcasts.atSafeIndex(4).uuid,
             )
             PodcastCover(
                 coverWidth = size,
-                uuid = topPodcasts.atSafeIndex(3).uuid,
+                uuid = topPodcasts.atSafeIndex(5).uuid,
             )
             PodcastCover(
                 coverWidth = size,
