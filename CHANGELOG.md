@@ -15,6 +15,8 @@
         ([#1518](https://github.com/Automattic/pocket-casts-android/pull/1518))
     *   Fix Chapter Length Calculation Mismatch
         ([#1525](https://github.com/Automattic/pocket-casts-android/pull/1525))
+    *   Fix multiselect not working in some cases
+        ([#1535](https://github.com/Automattic/pocket-casts-android/pull/1535))
     
 7.51
 -----
