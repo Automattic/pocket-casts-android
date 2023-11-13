@@ -1,3 +1,7 @@
+7.53
+-----
+
+
 7.52
 -----
 
@@ -15,6 +19,7 @@
         ([#1525](https://github.com/Automattic/pocket-casts-android/pull/1525))
     *   Fix multiselect not working in some cases
         ([#1535](https://github.com/Automattic/pocket-casts-android/pull/1535))
+    
 7.51
 -----
 
@@ -24,6 +29,8 @@
 *   Bug Fixes:
     *    Fix Play button color not updating after changing filter color 
          ([#1470](https://github.com/Automattic/pocket-casts-android/pull/1470))
+    *    Hide Plus upgrade banner for Patron users
+         ([#1508](https://github.com/Automattic/pocket-casts-android/pull/1508))
 
 7.50
 -----
