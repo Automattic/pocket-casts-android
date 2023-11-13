@@ -127,9 +127,8 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun start() {
-        if (state.value !is State.Loaded) return
-
-        val currentState = state.value as State.Loaded
+        val currentState = state.value as? State.Loaded ?: return
+        mutableState.value = currentState.copy(paused = false)
         val progressFraction =
             (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
                 .coerceAtMost(PROGRESS_END_VALUE)
@@ -149,7 +148,10 @@ class StoriesViewModel @Inject constructor(
                         currentIndex = nextIndex
                     }
                     mutableState.value =
-                        currentState.copy(currentStory = stories.value[currentIndex])
+                        currentState.copy(
+                            currentStory = stories.value[currentIndex],
+                            paused = false,
+                        )
                 }
 
                 mutableProgress.value = newProgress
@@ -175,6 +177,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun pause() {
+        mutableState.value = (state.value as State.Loaded).copy(paused = true)
         cancelTimer()
     }
 
@@ -187,7 +190,10 @@ class StoriesViewModel @Inject constructor(
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
-        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories.value[index])
+        mutableState.value = (state.value as State.Loaded).copy(
+            currentStory = stories.value[index],
+            paused = false
+        )
     }
 
     fun onRetryClicked() {
@@ -302,6 +308,7 @@ class StoriesViewModel @Inject constructor(
             val preparingShareText: Boolean = false,
             val userTier: UserTier,
             val freeTrial: FreeTrial,
+            val paused: Boolean = false,
         ) : State() {
             data class SegmentsData(
                 val widths: List<Float> = emptyList(),
