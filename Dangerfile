@@ -19,7 +19,7 @@ def requested_reviewers?
   has_requested_reviews || finished_reviews?
 end
 
-return if github.pr_labels.include?('Releases')
+return if github.pr_labels.include?('releases')
 
 github.dismiss_out_of_range_messages
 
