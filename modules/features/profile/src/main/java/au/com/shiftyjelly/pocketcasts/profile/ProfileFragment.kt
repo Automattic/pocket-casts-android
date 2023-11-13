@@ -175,7 +175,7 @@ class ProfileFragment : BaseFragment() {
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
             binding.userView.signedInState = state
 
-            binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlus
+            binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
             if (binding.upgradeLayout.root.isInvisible) {
                 // We need this to get the correct padding below refresh
                 binding.upgradeLayout.root.updateLayoutParams<ConstraintLayout.LayoutParams> { height = 16.dpToPx(view.context) }
@@ -234,6 +234,10 @@ class ProfileFragment : BaseFragment() {
                     EndOfYearPromptCard(
                         onClick = {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                            // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
+                            if (settings.getEndOfYearShowModal()) {
+                                settings.setEndOfYearShowModal(false)
+                            }
                             (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
                         }
                     )

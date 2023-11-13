@@ -4,6 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -56,6 +61,7 @@ class WhatsNewFragment : BaseFragment() {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
                     }
+                    var confirmActionClicked: Boolean by remember { mutableStateOf(false) }
                     WhatsNewPage(
                         onConfirm = {
                             analyticsTracker.track(
@@ -64,6 +70,7 @@ class WhatsNewFragment : BaseFragment() {
                             )
                             onClose()
                             performConfirmAction(it)
+                            confirmActionClicked = true
                         },
                         onClose = {
                             analyticsTracker.track(
@@ -72,7 +79,16 @@ class WhatsNewFragment : BaseFragment() {
                             )
                             onClose()
                         },
+
                     )
+
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            val fragmentHostListener = activity as? FragmentHostListener
+                                ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
+                            fragmentHostListener.whatsNewDismissed(fromConfirmAction = confirmActionClicked)
+                        }
+                    }
                 }
             }
         }

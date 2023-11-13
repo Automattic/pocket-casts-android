@@ -1,9 +1,15 @@
+7.53
+-----
+
+
 7.52
 -----
 
 * New Features:
     *   Bookmarks entering Patron early access with full release for Plus users in 7.53
         ([#1526](https://github.com/Automattic/pocket-casts-android/pull/1526))
+    *   Enables Playback 2023
+        ([#1537](https://github.com/Automattic/pocket-casts-android/pull/1537))
 *   Bug Fixes:
     *   Avoid brief audio skip back when a streaming episode is downloaded
         ([#1510](https://github.com/Automattic/pocket-casts-android/pull/1510))
@@ -13,6 +19,7 @@
         ([#1525](https://github.com/Automattic/pocket-casts-android/pull/1525))
     *   Fix multiselect not working in some cases
         ([#1535](https://github.com/Automattic/pocket-casts-android/pull/1535))
+    
 7.51
 -----
 
@@ -22,6 +29,8 @@
 *   Bug Fixes:
     *    Fix Play button color not updating after changing filter color 
          ([#1470](https://github.com/Automattic/pocket-casts-android/pull/1470))
+    *    Hide Plus upgrade banner for Patron users
+         ([#1508](https://github.com/Automattic/pocket-casts-android/pull/1508))
 
 7.50
 -----
