@@ -57,32 +57,34 @@ class MainActivityViewModel
     var waitingForSignInToShowStories = false
 
     init {
-        showWhatsNewIfNeeded()
-        updateStoriesModalShowState(settings.getEndOfYearShowModal())
+        viewModelScope.launch {
+            showWhatsNewIfNeeded()
+            if (!state.value.shouldShowWhatsNew) {
+                updateStoriesModalShowState(settings.getEndOfYearShowModal())
+            }
+        }
     }
 
     private fun showWhatsNewIfNeeded() {
-        viewModelScope.launch {
-            val lastSeenVersionCode = settings.getWhatsNewVersionCode()
-            val migratedVersion = settings.getMigratedVersionCode()
-            if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-                var whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
-                val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
-                if (isBookmarksEnabled) {
-                    val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
+        val lastSeenVersionCode = settings.getWhatsNewVersionCode()
+        val migratedVersion = settings.getMigratedVersionCode()
+        if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
+            var whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
+            val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
+            if (isBookmarksEnabled) {
+                val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
 
-                    val patronExclusiveAccessRelease = (feature.bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
-                    val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
-                        releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-                    }
-                    val shouldShowWhatsNewWhenUserNotEntitled = patronExclusiveAccessRelease == null ||
-                        relativeToEarlyPatronAccess == EarlyAccessState.After
-
-                    whatsNewShouldBeShown = whatsNewShouldBeShown &&
-                        (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
+                val patronExclusiveAccessRelease = (feature.bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
+                val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
+                    releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
                 }
-                _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
+                val shouldShowWhatsNewWhenUserNotEntitled = patronExclusiveAccessRelease == null ||
+                    relativeToEarlyPatronAccess == EarlyAccessState.After
+
+                whatsNewShouldBeShown = whatsNewShouldBeShown &&
+                    (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
             }
+            _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
         }
     }
 
@@ -119,7 +121,9 @@ class MainActivityViewModel
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
     fun updateStoriesModalShowState(show: Boolean) {
         viewModelScope.launch {
-            shouldShowStoriesModal.value = show && isEndOfYearStoriesEligible()
+            shouldShowStoriesModal.value = show &&
+                isEndOfYearStoriesEligible() &&
+                !state.value.shouldShowWhatsNew
         }
     }
 

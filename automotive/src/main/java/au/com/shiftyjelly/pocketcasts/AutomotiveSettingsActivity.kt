@@ -143,4 +143,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
 
     override fun showStoriesOrAccount(source: String) {
     }
+
+    override fun whatsNewDismissed(fromConfirmAction: Boolean) {
+    }
 }

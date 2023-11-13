@@ -29,4 +29,5 @@ interface FragmentHostListener {
     fun overrideNextRefreshTimer()
     fun isUpNextShowing(): Boolean
     fun showStoriesOrAccount(source: String)
+    fun whatsNewDismissed(fromConfirmAction: Boolean = false)
 }
