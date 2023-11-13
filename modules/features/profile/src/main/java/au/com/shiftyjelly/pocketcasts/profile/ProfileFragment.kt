@@ -236,7 +236,7 @@ class ProfileFragment : BaseFragment() {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
                             // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
                             if (settings.getEndOfYearShowModal()) {
-                                settings.setEndOfYearShowModal(true)
+                                settings.setEndOfYearShowModal(false)
                             }
                             (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
                         }
