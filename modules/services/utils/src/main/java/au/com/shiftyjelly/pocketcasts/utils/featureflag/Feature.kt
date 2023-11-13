@@ -16,7 +16,7 @@ enum class Feature(
         title = "End of Year",
         defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ADD_PATRON_ENABLED(
