@@ -212,6 +212,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun <T> onRowLongPress(): (entity: T) -> Unit = {
+        when (multiSelectEpisodesHelper.listener) {
+            null -> binding?.setupMultiSelect()
+        }
         when (it) {
             is PodcastEpisode ->
                 multiSelectEpisodesHelper
