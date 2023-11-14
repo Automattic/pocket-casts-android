@@ -241,6 +241,7 @@ dependencies {
     androidTestImplementation libs.uiautomator
     androidTestImplementation libs.work.test
 
+    testImplementation libs.arch.core
     testImplementation libs.coroutines.test
     testImplementation libs.jsonassert
     testImplementation (libs.junit) {
