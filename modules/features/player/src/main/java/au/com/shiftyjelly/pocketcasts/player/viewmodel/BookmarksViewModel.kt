@@ -79,47 +79,44 @@ class BookmarksViewModel
         this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
-            settings.cachedSubscriptionStatus.flow.collectLatest {
-                val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                if (!feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)) {
-                    _uiState.value = UiState.Upsell(sourceView)
-                } else {
-                    episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
-                        val bookmarksFlow =
-                            bookmarksSortTypeFlow.flatMapLatest { sortType ->
-                                bookmarkManager.findEpisodeBookmarksFlow(
-                                    episode = episode,
-                                    sortType = sortType,
-                                )
-                            }
-                        val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
-                        val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
-                        combine(
-                            bookmarksFlow,
-                            isMultiSelectingFlow,
-                            selectedListFlow,
-                        ) { bookmarks, isMultiSelecting, selectedList ->
-                            _uiState.value = if (bookmarks.isEmpty()) {
-                                UiState.Empty(sourceView)
-                            } else {
-                                UiState.Loaded(
-                                    bookmarks = bookmarks,
-                                    isMultiSelecting = isMultiSelecting,
-                                    isSelected = { selectedBookmark ->
-                                        selectedList.map { bookmark -> bookmark.uuid }
-                                            .contains(selectedBookmark.uuid)
-                                    },
-                                    onRowClick = ::onRowClick,
-                                    sourceView = sourceView,
-                                )
-                            }
-                        }.stateIn(viewModelScope)
-                    } ?: run { // This shouldn't happen in the ideal world
-                        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
-                        _uiState.value = UiState.Empty(sourceView)
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
+                val bookmarksFlow =
+                    bookmarksSortTypeFlow.flatMapLatest { sortType ->
+                        bookmarkManager.findEpisodeBookmarksFlow(
+                            episode = episode,
+                            sortType = sortType,
+                        )
                     }
-                }
+                val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
+                val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
+                combine(
+                    bookmarksFlow,
+                    isMultiSelectingFlow,
+                    selectedListFlow,
+                    settings.cachedSubscriptionStatus.flow,
+                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus ->
+                    val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+                    _uiState.value = if (!feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)) {
+                        UiState.Upsell(sourceView)
+                    } else if (bookmarks.isEmpty()) {
+                        UiState.Empty(sourceView)
+                    } else {
+                        UiState.Loaded(
+                            bookmarks = bookmarks,
+                            isMultiSelecting = isMultiSelecting,
+                            isSelected = { selectedBookmark ->
+                                selectedList.map { bookmark -> bookmark.uuid }
+                                    .contains(selectedBookmark.uuid)
+                            },
+                            onRowClick = ::onRowClick,
+                            sourceView = sourceView,
+                        )
+                    }
+                }.stateIn(viewModelScope)
+            } ?: run { // This shouldn't happen in the ideal world
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
+                _uiState.value = UiState.Empty(sourceView)
             }
         }
 
