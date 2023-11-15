@@ -91,7 +91,11 @@ class SyncUpdateResponseParser(
             "UserFolder" -> readFolder(reader, response)
             "UserPodcast" -> readPodcast(reader, response)
             "UserEpisode" -> readEpisode(reader, response)
-            "UserBookmark" -> readBookmark(reader, response)
+            "UserBookmark" -> if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                reader.skipValue()
+            } else {
+                readBookmark(reader, response)
+            }
             null -> throw Exception("No type found for field")
             else -> reader.skipValue()
         }
@@ -224,10 +228,6 @@ class SyncUpdateResponseParser(
     }
 
     private fun readBookmark(reader: JsonReader, response: SyncUpdateResponse) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
-
         var uuid: String? = null
         var podcastUuid: String? = null
         var episodeUuid: String? = null
