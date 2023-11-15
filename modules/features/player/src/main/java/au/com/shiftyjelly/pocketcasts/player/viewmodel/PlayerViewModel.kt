@@ -203,6 +203,7 @@ class PlayerViewModel @Inject constructor(
         if (list.isEmpty()) {
             ShelfItems.itemsList
         } else {
+            // Add missing bookmark item if the feature flag is enabled
             val updatedList = when {
                 list.contains(ShelfItem.Bookmark.id) -> list
                 FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) -> {
