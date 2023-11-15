@@ -523,6 +523,12 @@ class EpisodeManagerImpl @Inject constructor(
 
         // Auto archive after playing
         archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
+
+        if (episode is UserEpisode) {
+            launch {
+                userEpisodeManager.deletePlayedEpisodeIfReq(episode, playbackManager)
+            }
+        }
     }
 
     override fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
