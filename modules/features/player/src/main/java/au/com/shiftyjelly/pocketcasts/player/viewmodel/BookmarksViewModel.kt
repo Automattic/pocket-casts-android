@@ -33,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +43,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val DELAY_IN_MS = 300L
 
 @HiltViewModel
 class BookmarksViewModel
@@ -208,13 +211,15 @@ class BookmarksViewModel
     fun play(bookmark: Bookmark) {
         viewModelScope.launch {
             val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+            var shouldLoadOrSwitchEpisode = false
             bookmarkEpisode?.let {
-                val shouldPlayEpisode = !playbackManager.isPlaying() ||
+                shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-                if (shouldPlayEpisode) {
+                if (shouldLoadOrSwitchEpisode) {
                     playbackManager.playNow(it, sourceView = sourceView)
                 }
             }
+            delay(if (shouldLoadOrSwitchEpisode) DELAY_IN_MS else 0) // Allow to load or switch episode
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
             analyticsTracker.track(
                 AnalyticsEvent.BOOKMARK_PLAY_TAPPED,

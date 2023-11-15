@@ -51,6 +51,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -59,6 +60,8 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val DELAY_IN_MS = 300L
 
 @HiltViewModel
 class PodcastViewModel
@@ -400,14 +403,18 @@ class PodcastViewModel
 
     fun play(bookmark: Bookmark) {
         val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+        var shouldLoadOrSwitchEpisode = false
         bookmarkEpisode?.let {
-            val shouldPlayEpisode = !playbackManager.isPlaying() ||
+            shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                 playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-            if (shouldPlayEpisode) {
+            if (shouldLoadOrSwitchEpisode) {
                 playbackManager.playNow(it, sourceView = SourceView.PODCAST_SCREEN)
             }
         }
-        playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+        launch {
+            delay(if (shouldLoadOrSwitchEpisode) DELAY_IN_MS else 0) // Allow to load or switch episode
+            playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+        }
     }
 
     fun multiSelectSelectNone() {
