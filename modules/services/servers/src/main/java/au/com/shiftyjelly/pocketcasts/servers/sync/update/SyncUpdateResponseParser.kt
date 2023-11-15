@@ -91,10 +91,10 @@ class SyncUpdateResponseParser(
             "UserFolder" -> readFolder(reader, response)
             "UserPodcast" -> readPodcast(reader, response)
             "UserEpisode" -> readEpisode(reader, response)
-            "UserBookmark" -> if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                reader.skipValue()
-            } else {
+            "UserBookmark" -> if (featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
                 readBookmark(reader, response)
+            } else {
+                reader.skipValue()
             }
             null -> throw Exception("No type found for field")
             else -> reader.skipValue()
