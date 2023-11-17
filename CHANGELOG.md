@@ -23,6 +23,8 @@
         ([#1525](https://github.com/Automattic/pocket-casts-android/pull/1525))
     *   Fix multiselect not working in some cases
         ([#1535](https://github.com/Automattic/pocket-casts-android/pull/1535))
+    *   Fix occasional crash on rearranging player shelf items 
+        ([#1551](https://github.com/Automattic/pocket-casts-android/pull/1551))
     
 7.51
 -----
