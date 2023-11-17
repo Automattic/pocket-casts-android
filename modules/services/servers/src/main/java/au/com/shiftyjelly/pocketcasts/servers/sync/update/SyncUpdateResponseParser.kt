@@ -250,14 +250,14 @@ class SyncUpdateResponseParser(
         }
         reader.endObject()
 
-        if (uuid != null && podcastUuid != null && episodeUuid != null && time != null && title != null && deleted != null && createdAt != null) {
+        if (uuid != null && podcastUuid != null && episodeUuid != null && time != null && title != null && createdAt != null) {
             val bookmark = Bookmark(
                 uuid = uuid,
                 podcastUuid = podcastUuid,
                 episodeUuid = episodeUuid,
                 timeSecs = time,
                 title = title,
-                deleted = deleted,
+                deleted = deleted ?: false,
                 createdAt = createdAt,
                 syncStatus = SyncStatus.SYNCED
             )
