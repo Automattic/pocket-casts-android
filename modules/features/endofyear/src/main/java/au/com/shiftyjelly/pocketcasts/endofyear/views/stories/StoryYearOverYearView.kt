@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -41,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlin.math.max
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val YearFontSize = 50
+private const val YearFontSize = 60
 private const val MinimumPillarPercentage = 0.4
 
 @Composable
@@ -63,7 +64,7 @@ fun StoryYearOverYearView(
 
         SubscriptionBadgeForTier(
             tier = SubscriptionTier.fromUserTier(userTier),
-            displayMode = SubscriptionBadgeDisplayMode.Colored,
+            displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
         )
 
         Spacer(modifier = modifier.height(14.dp))
@@ -74,7 +75,7 @@ fun StoryYearOverYearView(
 
         SecondaryText(story)
 
-        Spacer(modifier = modifier.weight(0.2f))
+        Spacer(modifier = modifier.weight(0.15f))
 
         YearPillars(
             story = story,
@@ -198,6 +199,7 @@ private fun YearTextContent(
             fontWeight = FontWeight.W500,
             maxFontSize = YearFontSize.sp,
             maxLines = 1,
+            letterSpacing = 0.sp,
         )
         TextH50(
             text = timeText,
@@ -205,6 +207,7 @@ private fun YearTextContent(
             disableScale = disableScale(),
             fontFamily = StoryFontFamily,
             fontWeight = FontWeight.W600,
+            modifier = Modifier.offset(y = (-8).dp)
         )
     }
 }
@@ -212,7 +215,7 @@ private fun YearTextContent(
 private fun previousYearPillarPercentageSize(
     yearOverYearListeningTime: YearOverYearListeningTime,
 ) = when {
-    yearOverYearListeningTime.percentage == Double.POSITIVE_INFINITY -> 0.25
+    yearOverYearListeningTime.percentage == Double.POSITIVE_INFINITY -> 0.3
     yearOverYearListeningTime.percentage > 0.0 -> max(
         yearOverYearListeningTime.totalPlayedTimeLastYear.toDouble() / yearOverYearListeningTime.totalPlayedTimeThisYear,
         MinimumPillarPercentage

@@ -30,7 +30,7 @@ fun GradientPillar(
         contentAlignment = Alignment.TopStart,
         modifier = modifier
             .pillarGradient(pillarStyle)
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
         content()
     }

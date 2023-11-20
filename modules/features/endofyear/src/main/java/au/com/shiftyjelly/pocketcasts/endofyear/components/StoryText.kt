@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
@@ -56,7 +55,6 @@ fun StorySecondaryText(
         disableScale = disableScale(),
         modifier = modifier
             .fillMaxWidth()
-            .alpha(0.8f)
             .padding(horizontal = 24.dp)
     )
 }

@@ -47,7 +47,7 @@ fun StoryCompletionRateView(
 
         SubscriptionBadgeForTier(
             tier = SubscriptionTier.fromUserTier(userTier),
-            displayMode = SubscriptionBadgeDisplayMode.Colored,
+            displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
         )
 
         Spacer(modifier = modifier.height(14.dp))
