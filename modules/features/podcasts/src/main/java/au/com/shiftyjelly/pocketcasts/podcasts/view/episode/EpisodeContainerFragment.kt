@@ -275,7 +275,8 @@ class EpisodeContainerFragment :
 
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
-                    episodeUuid = requireNotNull(episodeUUID)
+                    episodeUuid = requireNotNull(episodeUUID),
+                    forceDarkTheme = forceDarkTheme
                 )
             }
         }
