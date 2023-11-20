@@ -70,6 +70,67 @@ class BookmarksViewModel
             multiSelectHelper.source = value
         }
 
+    private val multiSelectListener = object : MultiSelectHelper.Listener<Bookmark> {
+        override fun multiSelectSelectAll() {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let {
+                multiSelectHelper.selectAllInList(it)
+            }
+        }
+
+        override fun multiSelectSelectNone() {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                multiSelectHelper.deselectAllInList(bookmarks)
+            }
+        }
+
+        override fun multiDeselectAllAbove(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    val episodesAbove = bookmarks.subList(0, startIndex + 1)
+                    multiSelectHelper.deselectAllInList(episodesAbove)
+                }
+            }
+        }
+
+        override fun multiDeselectAllBelow(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    val bookmarksBelow = bookmarks.subList(startIndex, bookmarks.size)
+                    multiSelectHelper.deselectAllInList(bookmarksBelow)
+                }
+            }
+        }
+
+        override fun multiSelectSelectAllUp(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectHelper.selectAllInList(bookmarks.subList(0, startIndex + 1))
+                }
+            }
+        }
+
+        override fun multiSelectSelectAllDown(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectHelper.selectAllInList(
+                        bookmarks.subList(
+                            startIndex,
+                            bookmarks.size
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    init {
+        multiSelectHelper.listener = multiSelectListener
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
         episodeUuid: String,
@@ -118,63 +179,14 @@ class BookmarksViewModel
                 _uiState.value = UiState.Empty(sourceView)
             }
         }
+    }
 
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener<Bookmark> {
-            override fun multiSelectSelectAll() {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let {
-                    multiSelectHelper.selectAllInList(it)
-                }
-            }
+    fun onPlayerOpen() {
+        multiSelectHelper.listener = multiSelectListener
+    }
 
-            override fun multiSelectSelectNone() {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    multiSelectHelper.deselectAllInList(bookmarks)
-                }
-            }
-
-            override fun multiDeselectAllAbove(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        val episodesAbove = bookmarks.subList(0, startIndex + 1)
-                        multiSelectHelper.deselectAllInList(episodesAbove)
-                    }
-                }
-            }
-
-            override fun multiDeselectAllBelow(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        val bookmarksBelow = bookmarks.subList(startIndex, bookmarks.size)
-                        multiSelectHelper.deselectAllInList(bookmarksBelow)
-                    }
-                }
-            }
-
-            override fun multiSelectSelectAllUp(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        multiSelectHelper.selectAllInList(bookmarks.subList(0, startIndex + 1))
-                    }
-                }
-            }
-
-            override fun multiSelectSelectAllDown(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        multiSelectHelper.selectAllInList(
-                            bookmarks.subList(
-                                startIndex,
-                                bookmarks.size
-                            )
-                        )
-                    }
-                }
-            }
-        }
+    fun onPlayerClose() {
+        multiSelectHelper.listener = null
     }
 
     private fun onRowClick(bookmark: Bookmark) {

@@ -202,4 +202,12 @@ class BookmarksFragment : BaseFragment() {
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
+
+    fun onPlayerOpen() {
+        bookmarksViewModel.onPlayerOpen()
+    }
+
+    fun onPlayerClose() {
+        bookmarksViewModel.onPlayerClose()
+    }
 }

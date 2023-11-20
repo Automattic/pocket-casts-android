@@ -224,6 +224,7 @@ class EpisodeContainerFragment :
         binding = null
         multiSelectHelper.isMultiSelecting = false
         multiSelectHelper.context = null
+        multiSelectHelper.listener = null
     }
 
     private class ViewPagerAdapter(
