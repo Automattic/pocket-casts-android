@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -63,6 +64,8 @@ class BookmarksViewModel
 
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
+
+    private var isFragmentActive: Boolean = true
 
     private var sourceView: SourceView = SourceView.UNKNOWN
         set(value) {
@@ -174,6 +177,8 @@ class BookmarksViewModel
                         )
                     }
                 }.stateIn(viewModelScope)
+                    .takeWhile { !isFragmentActive } /* Stop collecting on player close
+                    when viewModelScope is still active but fragment is not. */
             } ?: run { // This shouldn't happen in the ideal world
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
                 _uiState.value = UiState.Empty(sourceView)
@@ -182,10 +187,12 @@ class BookmarksViewModel
     }
 
     fun onPlayerOpen() {
+        isFragmentActive = true
         multiSelectHelper.listener = multiSelectListener
     }
 
     fun onPlayerClose() {
+        isFragmentActive = false
         multiSelectHelper.listener = null
     }
 
