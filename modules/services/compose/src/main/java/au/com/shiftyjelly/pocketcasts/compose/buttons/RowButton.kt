@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -41,9 +42,11 @@ fun RowButton(
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
     fontFamily: FontFamily? = null,
+    fontWeight: FontWeight? = null,
     @DrawableRes leadingIcon: Int? = null,
     onClick: () -> Unit,
     cornerRadius: Dp = 12.dp,
+    textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
 ) {
     Box(
@@ -85,8 +88,9 @@ fun RowButton(
                     TextP40(
                         text = text,
                         fontFamily = fontFamily,
+                        fontWeight = fontWeight,
                         modifier = Modifier
-                            .padding(6.dp),
+                            .padding(vertical = textVerticalPadding, horizontal = 6.dp),
                         textAlign = TextAlign.Center,
                         color = textColor
                     )

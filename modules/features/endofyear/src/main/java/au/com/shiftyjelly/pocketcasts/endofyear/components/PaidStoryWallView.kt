@@ -99,7 +99,7 @@ private fun UpsellButton(
             hasFreeTrial = freeTrial.exists
         ),
         onClick = onUpsellClicked,
-        modifier = modifier.fillMaxSize(.65f)
+        modifier = modifier.fillMaxSize(.75f)
     )
 }
 
