@@ -100,22 +100,26 @@ class EndOfYearManagerImpl @Inject constructor(
         if (anyEpisodeInteractionBeforeYear(year)) {
             return
         }
-        // only download the count to check if we are missing history episodes
-        val countResponse = syncManager.historyYear(year = year, count = true)
-        onProgressChanged(0.1f)
-        val serverCount = countResponse.count ?: 0
-        val localCount = countEpisodeInteractionsInYear(year)
-        Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
-        if (serverCount > localCount) {
-            // sync the year's listening history
-            val response = syncManager.historyYear(year = year, count = false)
-            onProgressChanged(0.2f)
-            val history = response.history ?: return
-            historyManager.processServerResponse(
-                response = history,
-                updateServerModified = false,
-                onProgressChanged = onProgressChanged,
-            )
+        try {
+            // only download the count to check if we are missing history episodes
+            val countResponse = syncManager.historyYear(year = year, count = true)
+            onProgressChanged(0.1f)
+            val serverCount = countResponse.count ?: 0
+            val localCount = countEpisodeInteractionsInYear(year)
+            Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
+            if (serverCount > localCount) {
+                // sync the year's listening history
+                val response = syncManager.historyYear(year = year, count = false)
+                onProgressChanged(0.2f)
+                val history = response.history ?: return
+                historyManager.processServerResponse(
+                    response = history,
+                    updateServerModified = false,
+                    onProgressChanged = onProgressChanged,
+                )
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "End of Year: Error downloading listening history for year $year")
         }
     }
 
