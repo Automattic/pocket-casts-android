@@ -72,7 +72,7 @@ private fun UpsellViewContent(
                 Spacer(modifier = Modifier.width(8.dp))
                 SubscriptionBadgeForTier(
                     tier = state.freeTrial.subscriptionTier,
-                    displayMode = SubscriptionBadgeDisplayMode.Colored
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
                 )
             }
         },

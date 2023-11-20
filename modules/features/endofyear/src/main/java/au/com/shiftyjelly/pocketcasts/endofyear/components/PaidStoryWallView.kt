@@ -49,7 +49,7 @@ fun PaidStoryWallView(
 
         SubscriptionBadgeForTier(
             tier = SubscriptionTier.PLUS,
-            displayMode = SubscriptionBadgeDisplayMode.Colored,
+            displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
         )
 
         Spacer(modifier = modifier.height(14.dp))
