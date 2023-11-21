@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -50,6 +51,7 @@ fun StoryYearOverYearView(
     story: StoryYearOverYear,
     modifier: Modifier = Modifier,
     userTier: UserTier,
+    paused: Boolean,
 ) {
     Column(
         verticalArrangement = Arrangement.Bottom,
@@ -79,6 +81,7 @@ fun StoryYearOverYearView(
 
         YearPillars(
             story = story,
+            paused = paused,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
@@ -141,6 +144,7 @@ private fun SecondaryText(
 @Composable
 fun YearPillars(
     story: StoryYearOverYear,
+    paused: Boolean,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -153,6 +157,7 @@ fun YearPillars(
         ) {
             GradientPillar(
                 pillarStyle = PillarStyle.Grey,
+                paused = paused,
                 modifier = Modifier
                     .height((this@BoxWithConstraints.maxHeight.value * previousYearPillarPercentageSize(story.yearOverYearListeningTime)).dp)
                     .weight(0.5f)
@@ -161,11 +166,13 @@ fun YearPillars(
                     year = "2022",
                     textColor = story.subtitleColor,
                     playedTime = story.yearOverYearListeningTime.totalPlayedTimeLastYear,
+                    modifier = Modifier.alpha(it)
                 )
             }
 
             GradientPillar(
                 pillarStyle = PillarStyle.Rainbow,
+                paused = paused,
                 modifier = Modifier
                     .height((this@BoxWithConstraints.maxHeight.value * currentYearPillarPercentageSize(story.yearOverYearListeningTime)).dp)
                     .weight(0.5f),
@@ -174,6 +181,7 @@ fun YearPillars(
                     year = "2023",
                     textColor = story.tintColor,
                     playedTime = story.yearOverYearListeningTime.totalPlayedTimeThisYear,
+                    modifier = Modifier.alpha(it)
                 )
             }
         }
@@ -185,11 +193,13 @@ private fun YearTextContent(
     year: String,
     textColor: Color,
     playedTime: Long,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val timeText = StatsHelper.secondsToFriendlyString(playedTime, context.resources)
     Column(
         verticalArrangement = Arrangement.Top,
+        modifier = modifier,
     ) {
         AutoResizeText(
             text = year,
@@ -244,6 +254,7 @@ fun YearOverYearWentDownPreview() {
                 yearOverYearListeningTime = YearOverYearListeningTime(totalPlayedTimeThisYear = 200, totalPlayedTimeLastYear = 400)
             ),
             userTier = UserTier.Plus,
+            paused = true,
         )
     }
 }
@@ -257,6 +268,7 @@ fun YearOverYearWentUpPreview() {
                 YearOverYearListeningTime(totalPlayedTimeThisYear = 200, totalPlayedTimeLastYear = 130),
             ),
             userTier = UserTier.Plus,
+            paused = true,
         )
     }
 }
@@ -270,6 +282,7 @@ fun YearOverYearStayedSamePreview() {
                 YearOverYearListeningTime(totalPlayedTimeThisYear = 140, totalPlayedTimeLastYear = 140),
             ),
             userTier = UserTier.Plus,
+            paused = true,
         )
     }
 }
@@ -283,6 +296,7 @@ fun YearOverYearNoListeningTimePastYearPreview() {
                 YearOverYearListeningTime(totalPlayedTimeThisYear = 140, totalPlayedTimeLastYear = 0),
             ),
             userTier = UserTier.Plus,
+            paused = true,
         )
     }
 }
