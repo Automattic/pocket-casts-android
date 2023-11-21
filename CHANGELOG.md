@@ -1,10 +1,8 @@
 7.53
 -----
-
-
-7.53
------
-
+*   Bug Fixes:
+    *   Ensure we have the most up-to-date episode urls before attempting playback
+        ([#1561](https://github.com/Automattic/pocket-casts-android/pull/1561))
 
 7.52
 -----
