@@ -229,7 +229,7 @@ class BookmarksViewModel
             val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
             bookmarkEpisode?.let {
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+                        playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
                 if (shouldLoadOrSwitchEpisode) {
                     playbackManager.playNowSync(it, sourceView = sourceView)
                 }

@@ -403,7 +403,7 @@ class PodcastViewModel
             val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
             bookmarkEpisode?.let {
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+                        playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
                 if (shouldLoadOrSwitchEpisode) {
                     playbackManager.playNowSync(it, sourceView = SourceView.PODCAST_SCREEN)
                 }
