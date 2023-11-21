@@ -53,7 +53,7 @@ fun ScrollingRow(
     }
     LazyRow(
         state = state,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacedBy),
         userScrollEnabled = !scrollAutomatically,
     ) {
         if (scrollAutomatically) {

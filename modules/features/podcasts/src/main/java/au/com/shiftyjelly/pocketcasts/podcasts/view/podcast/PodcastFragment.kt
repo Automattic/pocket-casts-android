@@ -212,16 +212,21 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun <T> onRowLongPress(): (entity: T) -> Unit = {
-        when (multiSelectEpisodesHelper.listener) {
-            null -> binding?.setupMultiSelect()
-        }
         when (it) {
-            is PodcastEpisode ->
+            is PodcastEpisode -> {
+                if (multiSelectEpisodesHelper.listener == null) {
+                    binding?.setupMultiSelect()
+                }
                 multiSelectEpisodesHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
-            is Bookmark ->
+            }
+            is Bookmark -> {
+                if (multiSelectBookmarksHelper.listener == null) {
+                    binding?.setupMultiSelect()
+                }
                 multiSelectBookmarksHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
+            }
         }
         adapter?.notifyDataSetChanged()
     }
@@ -675,6 +680,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         listener = object : MultiSelectHelper.Listener<T> {
             override fun multiSelectSelectNone() {
                 viewModel.multiSelectSelectNone()
+                this@setUp.closeMultiSelect()
                 adapter?.notifyDataSetChanged()
             }
 

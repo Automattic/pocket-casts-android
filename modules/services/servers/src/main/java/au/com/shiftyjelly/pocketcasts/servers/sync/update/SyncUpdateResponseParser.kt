@@ -91,7 +91,11 @@ class SyncUpdateResponseParser(
             "UserFolder" -> readFolder(reader, response)
             "UserPodcast" -> readPodcast(reader, response)
             "UserEpisode" -> readEpisode(reader, response)
-            "UserBookmark" -> readBookmark(reader, response)
+            "UserBookmark" -> if (featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+                readBookmark(reader, response)
+            } else {
+                reader.skipValue()
+            }
             null -> throw Exception("No type found for field")
             else -> reader.skipValue()
         }
@@ -224,10 +228,6 @@ class SyncUpdateResponseParser(
     }
 
     private fun readBookmark(reader: JsonReader, response: SyncUpdateResponse) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
-
         var uuid: String? = null
         var podcastUuid: String? = null
         var episodeUuid: String? = null
@@ -250,14 +250,14 @@ class SyncUpdateResponseParser(
         }
         reader.endObject()
 
-        if (uuid != null && podcastUuid != null && episodeUuid != null && time != null && title != null && deleted != null && createdAt != null) {
+        if (uuid != null && podcastUuid != null && episodeUuid != null && time != null && title != null && createdAt != null) {
             val bookmark = Bookmark(
                 uuid = uuid,
                 podcastUuid = podcastUuid,
                 episodeUuid = episodeUuid,
                 timeSecs = time,
                 title = title,
-                deleted = deleted,
+                deleted = deleted ?: false,
                 createdAt = createdAt,
                 syncStatus = SyncStatus.SYNCED
             )

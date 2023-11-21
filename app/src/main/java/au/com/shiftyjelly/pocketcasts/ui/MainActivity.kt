@@ -881,6 +881,10 @@ class MainActivity :
         FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
+
+        val playerContainerFragment = supportFragmentManager.fragments
+            .find { it is PlayerContainerFragment } as? PlayerContainerFragment
+        playerContainerFragment?.onPlayerOpen()
     }
 
     override fun onPlayerClosed() {
@@ -888,6 +892,10 @@ class MainActivity :
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
+
+        val playerContainerFragment = supportFragmentManager.fragments
+            .find { it is PlayerContainerFragment } as? PlayerContainerFragment
+        playerContainerFragment?.onPlayerClose()
     }
 
     override fun openTab(tabId: Int) {

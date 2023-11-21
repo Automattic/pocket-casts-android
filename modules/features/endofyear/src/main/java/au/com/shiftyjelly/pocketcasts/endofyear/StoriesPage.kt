@@ -287,6 +287,7 @@ private fun StorySharableContent(
                 is StoryLongestEpisode -> StoryLongestEpisodeView(story, paused, storyModifier)
                 is StoryYearOverYear -> StoryYearOverYearView(
                     story = story,
+                    paused = paused,
                     userTier = userTier,
                     modifier = storyModifier,
                 )

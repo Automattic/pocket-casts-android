@@ -49,7 +49,7 @@ fun PaidStoryWallView(
 
         SubscriptionBadgeForTier(
             tier = SubscriptionTier.PLUS,
-            displayMode = SubscriptionBadgeDisplayMode.Colored,
+            displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
         )
 
         Spacer(modifier = modifier.height(14.dp))
@@ -99,7 +99,7 @@ private fun UpsellButton(
             hasFreeTrial = freeTrial.exists
         ),
         onClick = onUpsellClicked,
-        modifier = modifier.fillMaxSize(.65f)
+        modifier = modifier.fillMaxSize(.75f)
     )
 }
 

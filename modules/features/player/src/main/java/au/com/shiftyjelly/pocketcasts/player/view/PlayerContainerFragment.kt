@@ -214,6 +214,16 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
+    fun onPlayerOpen() {
+        ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+            ?.onPlayerOpen()
+    }
+
+    fun onPlayerClose() {
+        ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+            ?.onPlayerClose()
+    }
+
     fun openPlayer(sourceView: SourceView? = null) {
         val index = adapter.indexOfPlayer
         if (index == -1) return
