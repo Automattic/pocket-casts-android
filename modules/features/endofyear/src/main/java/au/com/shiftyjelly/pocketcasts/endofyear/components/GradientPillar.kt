@@ -91,7 +91,7 @@ private fun Modifier.pillarGradient(
     heightFraction: Float,
 ) = graphicsLayer { alpha = 0.99f }
     .drawWithCache {
-        val size = Size(size.width, size.height)
+        val size = size
         val brush = createBrush(pillarStyle, size)
         val overlayBrush = overlayBrush(size)
 
