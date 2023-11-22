@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -80,6 +81,9 @@ interface PodcastCacheServer {
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     suspend fun getPodcastAndEpisode(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): PodcastResponse
+
+    @GET("/mobile/episode/url/{podcastUuid}/{episodeUuid}")
+    suspend fun getEpisodeUrl(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Response<ResponseBody>
 
     @POST("/mobile/podcast/episode/search")
     fun searchPodcastForEpisodes(@Body searchBody: SearchBody): Single<SearchResultBody>
