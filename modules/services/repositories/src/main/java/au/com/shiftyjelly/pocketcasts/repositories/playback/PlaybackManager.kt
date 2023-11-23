@@ -1503,19 +1503,29 @@ open class PlaybackManager @Inject constructor(
         if (episode.isFinished) {
             episodeManager.markAsNotPlayed(episode)
         }
-        // check we have the latest episode url in the background
-        if (episode is PodcastEpisode) {
-            updateEpisodeUrl(episode)
-        }
 
-        if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
-            try {
-                val playbackUrl = userEpisodeManager.getPlaybackUrl(episode).await()
-                episode.downloadUrl = playbackUrl
-            } catch (e: Exception) {
-                onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
-                removeEpisode(episode, source = sourceView)
-                return
+        // make sure we have the latest episode url
+        when (episode) {
+            is PodcastEpisode -> {
+                if (!episode.isDownloaded) {
+                    val newDownloadUrl = episodeManager.updateDownloadUrl(episode)
+                    if (newDownloadUrl != null && newDownloadUrl != episode.downloadUrl) {
+                        Timber.i("Updating url for PodcastEpisode playback")
+                        episode.downloadUrl = newDownloadUrl
+                    }
+                }
+            }
+            is UserEpisode -> {
+                if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
+                    try {
+                        val newDownloadUrl = userEpisodeManager.getPlaybackUrl(episode).await()
+                        episode.downloadUrl = newDownloadUrl
+                    } catch (e: Exception) {
+                        onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
+                        removeEpisode(episode, source = sourceView)
+                        return
+                    }
+                }
             }
         }
 
@@ -1689,34 +1699,6 @@ open class PlaybackManager @Inject constructor(
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }
-    }
-
-    /**
-     * Check we have the latest episode url in the background.
-     */
-    private fun updateEpisodeUrl(episode: PodcastEpisode) {
-        if (episode.isDownloaded) {
-            return
-        }
-
-        // TODO
-//        val updateEpisodeTask = UpdateEpisodeTask(podcastCacheServerManager, episodeManager)
-//        val episodeSingle = updateEpisodeTask.download(episode.podcastUuid, episode.uuid)
-//        val disposable = episodeSingle
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(
-//                        { episodeUpdated ->
-//                            val currentEpisode = getCurrentEpisode()
-//                            if (currentEpisode != null &&
-//                                    currentEpisode.uuid == episodeUpdated.uuid &&
-//                                    currentEpisode.downloadUrl != episodeUpdated.downloadUrl) {
-//                                upNextQueue.reloadCurrentEpisode()
-//                                forcePlayerSwitch = true
-//                            }
-//                        },
-//                        { throwable -> Timber.e(throwable, "Failed to update episode url") }
-//                )
-//        disposables.add(disposable)
     }
 
     @Suppress("DEPRECATION")
