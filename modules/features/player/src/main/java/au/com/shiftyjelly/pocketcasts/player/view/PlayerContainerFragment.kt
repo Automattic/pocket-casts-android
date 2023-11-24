@@ -215,13 +215,25 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun onPlayerOpen() {
-        ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
-            ?.onPlayerOpen()
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerOpen()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
     }
 
     fun onPlayerClose() {
-        ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
-            ?.onPlayerClose()
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerClose()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
     }
 
     fun openPlayer(sourceView: SourceView? = null) {

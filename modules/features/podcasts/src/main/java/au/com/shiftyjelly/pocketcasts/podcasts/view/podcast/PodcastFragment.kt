@@ -652,6 +652,23 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.setupMultiSelect()
+
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    multiSelectBookmarksHelper.showEditBookmarkPage
+                        .collect { show ->
+                            if (show) onEditBookmarkClick()
+                        }
+                }
+            }
+        }
+    }
+
+    private fun onEditBookmarkClick() {
+        viewModel.buildBookmarkArguments { arguments ->
+            startActivity(arguments.getIntent(requireContext()))
+        }
     }
 
     private fun FragmentPodcastBinding.setupMultiSelect() {
