@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.di.PodcastCacheServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -60,4 +63,17 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
             null
         }
     }
+
+    override suspend fun getEpisodeUrl(episode: PodcastEpisode): String? =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = server.getEpisodeUrl(episode.podcastUuid, episode.uuid)
+                if (response.isSuccessful) {
+                    response.body()?.string()
+                } else null
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
+            }
+        }
 }
