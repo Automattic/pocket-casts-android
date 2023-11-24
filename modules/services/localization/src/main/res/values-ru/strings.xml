@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-07 20:54:03+0000
+Translation-Revision-Date: 2023-11-14 21:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">Мои итоги 2023 года</string>
     <string name="end_of_year_stories_subscribe_to_plus">Оформите подписку Plus и узнайте, как изменились ваши слушательские привычки по сравнению с 2022 г., посмотрите другую любопытную статистику и ознакомьтесь с такими функциями тарифного плана Premium, как закладки и папки.</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
@@ -355,13 +356,18 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
+    <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в 2023 году: %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Мои любимые подкасты в 2022 году</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в 2023 году! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Вы прослушали %1$d выпусков (-а) общей продолжительностью %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал(а) %1$d подкастов(а) и %2$d выпусков(а) в 2023 году</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d шоу и %2$d выпусков</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">Я выбрал(а) %1$d рубрик(и) в 2023 году</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Взглянем на самые популярные…</string>
     <string name="end_of_year_story_listened_to_categories">В этом году вы выбрали %1$d рубрик (-и)</string>
+    <string name="end_of_year_story_listened_to_share_text">В этом году я провел(а) %1$s, слушая подкасты</string>
     <string name="end_of_year_story_intro_title">Давайте отметим ваш год прослушивания!</string>
     <string name="end_of_year_launch_modal_image_title">Год в подкастах</string>
     <string name="settings_media_notification_controls">Элементы управления уведомлениями о медиафайлах</string>

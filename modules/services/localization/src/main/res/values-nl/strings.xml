@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-07 17:54:04+0000
+Translation-Revision-Date: 2023-11-15 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Abonneer je op Plus en bekijk hoe jouw luistergedrag is veranderd ten opzichte van 2022, andere leuke statistieken en Premium-functies zoals bladwijzers en mappen.</string>
     <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
@@ -355,13 +356,18 @@ Language: nl
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
+    <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in 2023 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in 2023 naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2023 naar %1$d verschillende categorieën geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Laten we eens kijken naar wat van je favorieten…</string>
     <string name="end_of_year_story_listened_to_categories">Je hebt dit jaar naar %1$d verschillende categorieën geluisterd</string>
+    <string name="end_of_year_story_listened_to_share_text">Dit jaar heb je %1$s naar podcasts geluisterd</string>
     <string name="end_of_year_story_intro_title">Laten we je luisterjaar vieren!</string>
     <string name="end_of_year_launch_modal_image_title">Jaar in podcasts</string>
     <string name="settings_media_notification_controls">Meldingen mediabedieningen</string>
