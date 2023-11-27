@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-07 09:54:04+0000
+Translation-Revision-Date: 2023-11-14 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">나의 2023년 완료율</string>
     <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독하며 2022년과 비교한 청취 수준, 기타 재미있는 통계, 북마크 및 폴더와 같은 프리미엄 기능을 알아보세요.</string>
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
@@ -355,13 +356,18 @@ Language: ko_KR
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
     <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
+    <string name="end_of_year_story_longest_episode_share_text">2023년에 내가 청취한 가장 긴 에피소드 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">나의 2022년 상위 팟캐스트</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">내가 즐겨찾는 2023년 팟캐스트입니다! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">총 %2$s 동안 %1$d개 에피소드를 청취하셨습니다.</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">내가 2023년에 청취한 팟캐스트는 %1$d가지, 에피소드는 %2$d개</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_listened_to_numbers">청취하신 총 프로그램 %1$d개, 에피소드 %2$d개</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">내가 2023년에 청취한 카테고리는 %1$d가지</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">회원님의 즐겨찾기 중 일부를 살펴보겠습니다…</string>
     <string name="end_of_year_story_listened_to_categories">회원님이 올해 청취한 카테고리는 %1$d가지</string>
+    <string name="end_of_year_story_listened_to_share_text">올해 %1$s 동안 팟캐스트를 청취했습니다</string>
     <string name="end_of_year_story_intro_title">회원님의 청취 원년을 축하합니다!</string>
     <string name="end_of_year_launch_modal_image_title">팟캐스트 원년</string>
     <string name="settings_media_notification_controls">미디어 알림 컨트롤</string>

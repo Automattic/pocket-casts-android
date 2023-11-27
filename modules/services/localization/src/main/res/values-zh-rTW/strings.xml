@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-07 22:54:38+0000
+Translation-Revision-Date: 2023-11-14 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">我的 2023 年完成率</string>
     <string name="end_of_year_stories_subscribe_to_plus">訂閱 Plus，了解你的收聽狀況與 2022 年相比如何、其他有趣的統計資料，以及書籤和資料夾等進階版功能。</string>
     <string name="end_of_year_stories_theres_more">還有更多有趣內容！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
@@ -355,13 +356,18 @@ Language: zh_TW
     <string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
     <string name="end_of_year_story_top_categories">你最愛的分類</string>
     <string name="end_of_year_story_epilogue_subtitle">別忘了與朋友分享，並向你最喜愛的 Podcast 創作者致意</string>
+    <string name="end_of_year_story_longest_episode_share_text">我在 2023 年收聽時間最長的一集%1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">2022 年我最愛的 Podcast</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">2023 年我最愛的 Podcast！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2023 年收聽了 %1$d 個不同的 Podcast，總共 %2$d 集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
     <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收聽了 %1$d 個不同的分類</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
     <string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
+    <string name="end_of_year_story_listened_to_share_text">你今年花了 %1$s收聽 Podcast</string>
     <string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年！</string>
     <string name="end_of_year_launch_modal_image_title">Podcast 年度回顧</string>
     <string name="settings_media_notification_controls">媒體通知控制項</string>
