@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.buttons
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,8 @@ fun RowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    fontFamily: FontFamily? = null,
+    fontWeight: FontWeight? = null,
     @DrawableRes leadingIcon: Int? = null,
     onClick: () -> Unit,
     cornerRadius: Dp = 12.dp,
@@ -57,6 +60,8 @@ fun RowButton(
         border = border,
         colors = colors,
         textColor = textColor,
+        fontFamily = fontFamily,
+        fontWeight = fontWeight,
         leadingIcon = if (leadingIcon != null) {
             {
                 Icon(
