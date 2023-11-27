@@ -2,10 +2,10 @@ package au.com.shiftyjelly.pocketcasts.preferences.model
 
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -30,8 +30,11 @@ class HeadphoneActionUserSetting(
     defaultValue = defaultAction,
     sharedPrefs = sharedPrefs,
     fromInt = {
+        val userTier = (subscriptionStatusFlow.value as? SubscriptionStatus.Paid)?.tier?.toUserTier()
+            ?: UserTier.Free
         val isAddBookmarkEnabled =
-            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) && (subscriptionStatusFlow.value as? SubscriptionStatus.Paid)?.tier == SubscriptionTier.PATRON
+            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
+                Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
         val nextAction = HeadphoneAction.values()[it]
         if (nextAction == HeadphoneAction.ADD_BOOKMARK && !isAddBookmarkEnabled) {
             defaultAction

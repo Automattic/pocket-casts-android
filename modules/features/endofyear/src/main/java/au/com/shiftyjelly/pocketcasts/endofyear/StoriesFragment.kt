@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
@@ -15,6 +16,9 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
@@ -67,11 +71,25 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                         },
                         onRetryClicked = {
                             viewModel.onRetryClicked()
-                        }
+                        },
+                        onUpsellClicked = ::onUpsellClicked
                     )
                 }
             }
         }
+    }
+
+    private fun onUpsellClicked() {
+        val source = OnboardingUpgradeSource.END_OF_YEAR
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = source,
+        )
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     private object AnalyticsProp {

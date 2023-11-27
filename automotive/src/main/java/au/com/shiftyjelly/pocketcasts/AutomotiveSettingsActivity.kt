@@ -74,7 +74,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         onBackPressed()
     }
 
-    override fun openPlayer() {
+    override fun openPlayer(source: String?) {
     }
 
     override fun closePlayer() {
@@ -142,5 +142,8 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     }
 
     override fun showStoriesOrAccount(source: String) {
+    }
+
+    override fun whatsNewDismissed(fromConfirmAction: Boolean) {
     }
 }

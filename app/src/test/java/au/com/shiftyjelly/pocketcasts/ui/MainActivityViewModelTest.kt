@@ -76,7 +76,6 @@ class MainActivityViewModelTest {
     @Before
     fun setup() = runTest {
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
-        whenever(endOfYearManager.isEligibleForStories()).thenReturn(false)
     }
 
     @Test

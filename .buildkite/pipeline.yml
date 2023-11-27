@@ -16,6 +16,31 @@ steps:
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
 
+  - group: "Linters"
+    steps:
+      - label: "☢️ Danger - PR Check"
+        command: .buildkite/commands/danger-pr-check.sh
+        plugins:
+          - docker#v5.8.0:
+              image: "public.ecr.aws/docker/library/ruby:3.2.2"
+              propagate-environment: true
+              environment:
+                - "DANGER_GITHUB_API_TOKEN"
+        if: "build.pull_request.id != null"
+        agents:
+          queue: "default"
+        retry:
+          manual:
+            permit_on_passed: true
+
+      - label: 'Lint'
+        command: |
+          echo "--- 🧹 Linting"
+          ./gradlew lintDebug
+        plugins: *common_plugins
+        artifact_paths:
+          - "**/build/reports/lint-results*.*"
+
   - label: 'Unit tests'
     command: |
       echo "--- 🧪 Testing"
@@ -27,14 +52,6 @@ steps:
       echo "--- 🔎 Checking formatting with Spotless"
       ./gradlew spotlessCheck
     plugins: *common_plugins
-
-  - label: 'Lint'
-    command: |
-      echo "--- 🧹 Linting"
-      ./gradlew lintDebug
-    plugins: *common_plugins
-    artifact_paths:
-      - "**/build/reports/lint-results*.*"
 
   - label: "Instrumented tests"
     command: |

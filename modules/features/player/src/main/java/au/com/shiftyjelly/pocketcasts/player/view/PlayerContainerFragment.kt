@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
@@ -215,10 +214,37 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
-    fun openPlayer() {
+    fun onPlayerOpen() {
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerOpen()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
+    }
+
+    fun onPlayerClose() {
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerClose()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
+    }
+
+    fun openPlayer(sourceView: SourceView? = null) {
         val index = adapter.indexOfPlayer
         if (index == -1) return
         binding?.viewPager?.currentItem = index
+
+        if (sourceView == SourceView.WHATS_NEW) {
+            ((childFragmentManager.fragments.firstOrNull { it is PlayerHeaderFragment }) as? PlayerHeaderFragment)
+                ?.onMoreClicked(sourceView)
+        }
     }
 
     fun openBookmarks() {

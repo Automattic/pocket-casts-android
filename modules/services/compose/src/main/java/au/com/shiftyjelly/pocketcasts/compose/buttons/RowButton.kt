@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.compose.buttons
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,15 +19,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun RowButton(
@@ -37,9 +44,11 @@ fun RowButton(
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
     @DrawableRes leadingIcon: Int? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    cornerRadius: Dp = 12.dp,
+    textVerticalPadding: Dp = 6.dp,
+    @DrawableRes textIcon: Int? = null,
 ) {
-
     BaseRowButton(
         text = text,
         modifier = modifier,
@@ -60,8 +69,12 @@ fun RowButton(
             }
         } else null,
         onClick = onClick,
+        cornerRadius = cornerRadius,
+        textVerticalPadding = textVerticalPadding,
+        textIcon = textIcon,
     )
 }
+
 @Composable
 fun RowLoadingButton(
     text: String,
@@ -74,7 +87,6 @@ fun RowLoadingButton(
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
     onClick: () -> Unit
 ) {
-
     BaseRowButton(
         text = text,
         modifier = modifier,
@@ -101,7 +113,7 @@ fun RowLoadingButton(
 }
 
 @Composable
-private fun BaseRowButton(
+fun BaseRowButton(
     text: String,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
@@ -109,8 +121,13 @@ private fun BaseRowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    fontFamily: FontFamily? = null,
+    fontWeight: FontWeight? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    cornerRadius: Dp = 12.dp,
+    textVerticalPadding: Dp = 6.dp,
+    @DrawableRes textIcon: Int? = null,
 ) {
     Box(
         modifier = modifier
@@ -119,7 +136,7 @@ private fun BaseRowButton(
     ) {
         Button(
             onClick = { onClick() },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(cornerRadius),
             border = border,
             modifier = Modifier.fillMaxWidth(),
             colors = colors,
@@ -135,14 +152,29 @@ private fun BaseRowButton(
                         leadingIcon()
                     }
                 }
-                TextP40(
-                    text = text,
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .align(Alignment.Center),
-                    textAlign = TextAlign.Center,
-                    color = textColor
-                )
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (textIcon != null) {
+                        Image(
+                            painter = painterResource(textIcon),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(textColor),
+                            modifier = Modifier
+                        )
+                    }
+                    TextP40(
+                        text = text,
+                        fontFamily = fontFamily,
+                        fontWeight = fontWeight,
+                        modifier = Modifier
+                            .padding(vertical = textVerticalPadding, horizontal = 6.dp),
+                        textAlign = TextAlign.Center,
+                        color = textColor
+                    )
+                }
             }
         }
     }
@@ -153,7 +185,7 @@ private fun BaseRowButton(
 @Composable
 fun RowButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        RowLoadingButton(text = "Accept", onClick = {})
+        RowButton(text = "Accept", onClick = {})
     }
 }
 
@@ -162,7 +194,7 @@ fun RowButtonLightPreview() {
 @Composable
 fun RowButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
-        RowLoadingButton(text = "Accept", onClick = {})
+        RowButton(text = "Accept", onClick = {})
     }
 }
 
@@ -171,7 +203,7 @@ fun RowButtonDarkPreview() {
 @Composable
 fun RowButtonDisabledPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        RowLoadingButton(text = "Accept", enabled = false, onClick = {})
+        RowButton(text = "Accept", enabled = false, onClick = {})
     }
 }
 
@@ -180,6 +212,19 @@ fun RowButtonDisabledPreview() {
 @Composable
 fun RowButtonNoPaddingPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        RowLoadingButton(text = "Accept", includePadding = false, onClick = {})
+        RowButton(text = "Accept", includePadding = false, onClick = {})
+    }
+}
+
+@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Text icon")
+@Preview(name = "Text icon")
+@Composable
+fun RowButtonTextIconPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        RowButton(
+            text = "Share",
+            textIcon = IR.drawable.ic_retry,
+            onClick = {}
+        )
     }
 }

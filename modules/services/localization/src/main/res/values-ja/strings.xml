@@ -1,11 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 11:54:03+0000
+Translation-Revision-Date: 2023-11-14 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">My 2023完了率</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Plus に登録すると、2022年と比較した視聴内容、その他の楽しい統計、ブックマークやフォルダーなどのプレミアム機能をご利用いただけます。</string>
+    <string name="end_of_year_stories_theres_more">その他にもございます !</string>
+    <string name="end_of_year_stories_year_completion_rate">完了率</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">開始した%1$d件のエピソードから合計%2$d件を最後まで聴きました</string>
+    <string name="end_of_year_stories_year_completion_rate_title">今年の完了率は%1$d%% です</string>
+    <string name="end_of_year_stories_year_over_share_text">2023年と2022年の聴取時間の比較</string>
+    <string name="eoy_year_over_year_title_skyrocketed">2022年と比較して、聴取時間が急増しました !</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">生きてこその人生ですね。</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">2022年と比較して、聴取時間が少し減りました</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">一貫性が成功の鍵であるとかなんとか言われています。</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">2022年と比較して、聴取時間は一定していました</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">2024年でこの記録を上回る準備はできていますか ?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">2022年と比較して、聴取時間が%1$s%% に急増しました</string>
+    <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
+    <string name="end_of_year_story_epilogue_title">本年もご視聴いただきありがとうございました。\n2024年もよろしくお願いいたします。</string>
+    <string name="end_of_year_story_longest_episode_subtitle">%2$s の %1$s を超えるものはありません</string>
+    <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
+    <string name="end_of_year_replay">もう一度再生</string>
+    <string name="end_of_year_listening_time_subtitle">いつもお楽しみいただけましたら幸いです。</string>
+    <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
+    <string name="end_of_year_story_top_categories_subtitle">%2$s話のエピソードで合計%1$s話聴きました</string>
+    <string name="end_of_year_story_top_categories_title">%1$s があなたのお気に入りのカテゴリーだとお気づきでしたか ?</string>
+    <string name="discover_category_society_abbreviation">カルチャー</string>
+    <string name="discover_category_religion_abbreviation">スピリチュアル</string>
+    <string name="discover_category_kids_abbreviation">ファミリー</string>
+    <string name="discover_category_health_abbreviation">健康</string>
+    <string name="eoy_story_top_podcasts_subtitle">2023年に最も視聴されたトップ5です</string>
+    <string name="eoy_story_top_podcasts_title">そしてこれらのショーも大変気に入っていただけました !</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s が2023年で最も視聴されたショーでした</string>
+    <string name="end_of_year_share_story">このストーリーを共有</string>
+    <string name="whats_new_bookmarks_enable_now_button">すぐに有効化</string>
+    <string name="podcast_log_in_to_rate">評価を残すにはログインする必要があります</string>
+    <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>
+    <string name="podcast_rate">%s を評価する</string>
+    <string name="submit">送信</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">ブックマークのベータテストに参加してください !</string>
+    <string name="whats_new_bookmarks_try_now_button">今すぐ試す</string>
+    <string name="whats_new_bookmarks_title">ブックマークはこちら !</string>
+    <string name="bookmarks_upsell_instructions_early_access">お早めに Pocket Casts Patron でこの機能にアクセスすると、お気に入りのエピソードのタイムスタンプを保存できます。 まもなく Plus にご登録の皆さまもご利用いただけるようになります。</string>
+    <string name="bookmarks_upsell_instructions">Pocket Casts Plus でお気に入りのエピソードのタイムスタンプを保存し、その他多くの機能のロックを解除します。</string>
+    <string name="error_loading_show_notes">このエピソードのショーノートが見つかりません。</string>
     <string name="podcast_no_bookmarks_matching">このポッドキャストには検索条件に一致するブックマークがありません。</string>
     <string name="podcast_no_bookmarks_found">ブックマークが見つかりません</string>
     <string name="player_tab_notes">詳細</string>
@@ -153,6 +195,7 @@ Language: ja_JP
     <string name="onboarding_plus_feature_gratitude_title">Pocket Casts をお使いの皆さまに感謝の気持ちを込めて</string>
     <string name="onboarding_patron_feature_special_icons_title">特別な Pocket Casts アプリのアイコン</string>
     <string name="onboarding_patron_feature_profile_badge_title">サポーターのプロフィールバッジ</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100GB のクラウドストレージ</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Plus の全機能</string>
     <string name="onboarding_patron_features_title">Pocket Casts のサービスにご賛同いただける皆さまのサポートをお待ちしています。</string>
     <string name="server_user_delete_account_with_sub_failed">お使いのアカウントに有効な Pocket Casts Plus サブスクリプションがあります。 アカウントを削除する前に、このサブスクリプションをキャンセルしてください。</string>
@@ -313,26 +356,20 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
-    <string name="end_of_year_story_epilogue_title">2022年、Pocket Casts をお聴きくださりありがとうございました</string>
-    <string name="end_of_year_story_longest_episode_share_text">2022年に聴いた最長のエピソード: %1$s</string>
-    <string name="end_of_year_story_longest_episode_duration">このエピソードの時間は%1$sです</string>
-    <string name="end_of_year_story_longest_episode">お聴きになった最長のエピソードは、ポッドキャスト %2$s の %1$s のエピソードでした</string>
+    <string name="end_of_year_story_longest_episode_share_text">2023年に聴いた最長のエピソード: %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">2022年に再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">人気のポッドキャスト</string>
-    <string name="end_of_year_story_top_podcast_share_text">2022年のお気に入りのポッドキャストはこちら ! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">2023年のお気に入りのポッドキャストはこちら ! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">%1$d話のエピソードで合計%2$s聴きました</string>
-    <string name="end_of_year_story_top_podcast">一番再生したポッドキャストは %2$s による %1$s でした</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">2022年は%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">2023年は%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
-    <string name="end_of_year_story_listened_to_numbers">%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
-    <string name="end_of_year_story_listened_to_categories_share_text">2022年は%1$d個のカテゴリーを聴きました</string>
+    <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">2023年は%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">お気に入りをいくつか振り返りましょう…</string>
     <string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>
-    <string name="end_of_year_story_listened_to_share_text">2022年、ポッドキャストを聴いた時間は合計%1$s時間です</string>
+    <string name="end_of_year_story_listened_to_share_text">今年ポッドキャストを聴いた時間は%1$s時間でした</string>
     <string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう。</string>
     <string name="end_of_year_launch_modal_image_title">ポッドキャストで振り返る1年</string>
-    <string name="end_of_year_replay">再生</string>
     <string name="settings_media_notification_controls">メディア通知コントロール</string>
     <string name="playback_speed">再生速度</string>
     <string name="volume_boost_enabled_not_valid">「ボリュームブーストを有効化」の値は \'true\' または \'false\' である必要があります、 %1$s でした</string>
@@ -344,13 +381,11 @@ Language: ja_JP
     <string name="playback_speed_between_values">再生速度 (0.5～3)</string>
     <string name="set_playback_speed">再生速度を設定</string>
     <string name="playback_speed_not_valid">再生速度 %1$s は有効ではありません</string>
-    <string name="end_of_year_listening_time">2022年、ポッドキャストを聴いた時間は合計%1$s時間です</string>
     <string name="profile_account_upgraded">アカウントはアップグレードされました</string>
     <string name="pocket_casts_control_playback">Pocket Casts プレイバックコントロール</string>
     <string name="pocket_casts_play_filter">Pocket Casts 再生フィルター</string>
     <string name="time_to_skip_not_valid">スキップ先の時間%1$sが無効です</string>
     <string name="time_to_skip_seconds">スキップ先の時間 (秒)</string>
-    <string name="end_of_year_prompt_card_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。</string>
     <string name="settings_select_filters">フィルターを選択する</string>
     <string name="settings_import_url_summary">URL を使用して OPML ファイルからポッドキャストをインポートします。</string>
     <string name="settings_import_url">URL を使用</string>
@@ -371,7 +406,7 @@ Language: ja_JP
     <string name="filter_x_not_found">フィルター %1$s は見つかりません</string>
     <string name="must_provide_filter_name">フィルター名を指定する必要があります</string>
     <string name="end_of_year_launch_modal_secondary_button_title">後で</string>
-    <string name="end_of_year_launch_modal_primary_button_title">私の2022年をプレビュー</string>
+    <string name="end_of_year_launch_modal_primary_button_title">マイ2023を表示</string>
     <string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
     <string name="end_of_year_launch_modal_title">ポッドキャストで振り返る1年</string>
     <string name="settings_app_icon_halloween">ハロウィーン</string>

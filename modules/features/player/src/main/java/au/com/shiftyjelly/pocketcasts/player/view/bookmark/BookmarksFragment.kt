@@ -120,9 +120,10 @@ class BookmarksFragment : BaseFragment() {
                             onUpgradeClicked = ::onUpgradeClicked,
                             showOptionsDialog = { showOptionsDialog(it) },
                             openFragment = { fragment ->
-                                (parentFragment as? BottomSheetDialogFragment)?.dismiss()
+                                (parentFragment as? BottomSheetDialogFragment)?.dismiss() // Closes bookmarks bottom sheet dialog if opened from user files
                                 val fragmentHostListener = (activity as? FragmentHostListener)
                                 fragmentHostListener?.apply {
+                                    closePlayer() // Closes player if open
                                     openTab(R.id.navigation_profile)
                                     addFragment(SettingsFragment())
                                     addFragment(fragment)
@@ -200,5 +201,13 @@ class BookmarksFragment : BaseFragment() {
                 Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+    }
+
+    fun onPlayerOpen() {
+        bookmarksViewModel.onPlayerOpen()
+    }
+
+    fun onPlayerClose() {
+        bookmarksViewModel.onPlayerClose()
     }
 }

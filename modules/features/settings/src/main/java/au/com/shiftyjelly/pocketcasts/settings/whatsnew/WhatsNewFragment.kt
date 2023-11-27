@@ -4,6 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -11,6 +16,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -55,6 +61,7 @@ class WhatsNewFragment : BaseFragment() {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
                     }
+                    var confirmActionClicked: Boolean by remember { mutableStateOf(false) }
                     WhatsNewPage(
                         onConfirm = {
                             analyticsTracker.track(
@@ -63,6 +70,7 @@ class WhatsNewFragment : BaseFragment() {
                             )
                             onClose()
                             performConfirmAction(it)
+                            confirmActionClicked = true
                         },
                         onClose = {
                             analyticsTracker.track(
@@ -71,7 +79,16 @@ class WhatsNewFragment : BaseFragment() {
                             )
                             onClose()
                         },
+
                     )
+
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            val fragmentHostListener = activity as? FragmentHostListener
+                                ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
+                            fragmentHostListener.whatsNewDismissed(fromConfirmAction = confirmActionClicked)
+                        }
+                    }
                 }
             }
         }
@@ -80,14 +97,21 @@ class WhatsNewFragment : BaseFragment() {
         when (navigationState) {
             NavigationState.PlaybackSettings -> openFragment(PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true))
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
+            NavigationState.FullScreenPlayerScreen -> openPlayer()
             NavigationState.StartUpsellFlow -> startUpsellFlow()
         }
     }
 
     private fun openFragment(fragment: Fragment) {
         val fragmentHostListener = activity as? FragmentHostListener
-            ?: throw IllegalStateException("Activity must implement FragmentHostListener")
+            ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
         fragmentHostListener.addFragment(fragment)
+    }
+
+    private fun openPlayer() {
+        val fragmentHostListener = activity as? FragmentHostListener
+            ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
+        fragmentHostListener.openPlayer(SourceView.WHATS_NEW.analyticsValue)
     }
 
     private fun startUpsellFlow() {
@@ -101,6 +125,7 @@ class WhatsNewFragment : BaseFragment() {
     }
 
     companion object {
+        private const val FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED = "Activity must implement FragmentHostListener"
         fun isWhatsNewNewerThan(versionCode: Int?): Boolean {
             return Settings.WHATS_NEW_VERSION_CODE > (versionCode ?: 0)
         }

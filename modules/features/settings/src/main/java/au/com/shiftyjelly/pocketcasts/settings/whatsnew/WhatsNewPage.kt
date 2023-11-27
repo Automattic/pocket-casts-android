@@ -125,7 +125,10 @@ private fun WhatsNewPageLoaded(
                     .padding(all = 16.dp),
             ) {
 
-                WhatsNewSubscriptionBadge(state.tier)
+                SubscriptionBadgeForTier(
+                    tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
+                )
 
                 Spacer(
                     modifier = Modifier.height(
@@ -170,19 +173,6 @@ private fun WhatsNewPageLoaded(
             }
         }
     }
-}
-
-@Composable
-private fun WhatsNewSubscriptionBadge(tier: UserTier) = when (tier) {
-    UserTier.Patron -> SubscriptionBadgeForTier(
-        tier = Subscription.SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.Colored
-    )
-    UserTier.Plus -> SubscriptionBadgeForTier(
-        tier = Subscription.SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.Colored
-    )
-    UserTier.Free -> Box {}
 }
 
 @Composable
@@ -242,6 +232,7 @@ private fun WhatsNewBookmarksPreview(
                 feature = WhatsNewFeature.Bookmarks(
                     title = LR.string.whats_new_bookmarks_title,
                     message = LR.string.whats_new_bookmarks_body,
+                    confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
                     hasFreeTrial = false,
                     isUserEntitled = true,
                     subscriptionTier = Subscription.SubscriptionTier.PLUS,

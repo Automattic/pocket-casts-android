@@ -46,8 +46,11 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import java.util.Date
@@ -420,17 +423,35 @@ class SubscriptionManagerImpl @Inject constructor(
         } ?: tierSubscriptions.firstOrNull() // If no matching subscription is found, select first available one
     }
 
-    override fun trialExists(
-        tier: Subscription.SubscriptionTier,
-        subscriptions: List<Subscription>
-    ): Boolean {
-        val updatedSubscriptions = subscriptions.filter { it.tier == tier }
-        val defaultSubscription = getDefaultSubscription(
-            subscriptions = updatedSubscriptions,
-            tier = tier,
-        )
-        return defaultSubscription?.trialPricingPhase != null
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun freeTrialForSubscriptionTierFlow(subscriptionTier: Subscription.SubscriptionTier) = this
+        .observeProductDetails()
+        .asFlow()
+        .transformLatest { productDetails ->
+            val subscriptions = when (productDetails) {
+                is ProductDetailsState.Error -> null
+                is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
+                    Subscription.fromProductDetails(
+                        productDetails = productDetailsState,
+                        isFreeTrialEligible = isFreeTrialEligible(
+                            mapProductIdToTier(productDetailsState.productId)
+                        )
+                    )
+                }
+            } ?: emptyList()
+
+            val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
+            val defaultSubscription = getDefaultSubscription(
+                subscriptions = updatedSubscriptions,
+                tier = subscriptionTier,
+            )
+            emit(
+                FreeTrial(
+                    subscriptionTier = subscriptionTier,
+                    exists = defaultSubscription?.trialPricingPhase != null,
+                )
+            )
+        }
 }
 
 private fun shouldAllowUpgradePlan(
@@ -460,6 +481,11 @@ sealed class SubscriptionChangedEvent {
     object AccountUpgradedToPlus : SubscriptionChangedEvent()
     object AccountDowngradedToFree : SubscriptionChangedEvent()
 }
+
+data class FreeTrial(
+    val subscriptionTier: Subscription.SubscriptionTier,
+    val exists: Boolean = false,
+)
 
 private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
     val originalPlatform = SubscriptionPlatform.values().getOrNull(platform) ?: SubscriptionPlatform.NONE

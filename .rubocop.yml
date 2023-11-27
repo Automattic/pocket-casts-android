@@ -1,0 +1,32 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - vendor/**/*
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 180
+  Exclude:
+    - fastlane/Fastfile
+    - scripts/themes/download_themes.rb
+    - scripts/themes/generate_themes.rb
+    - scripts/themes/generate_kotlin.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - fastlane/Fastfile
+    - scripts/themes/download_themes.rb
+    - scripts/themes/generate_themes.rb
+    - scripts/themes/generate_kotlin.rb
+    
+Metrics/MethodLength:
+  Max: 30
+  Exclude:
+    - fastlane/Fastfile
+    - scripts/themes/download_themes.rb
+    - scripts/themes/generate_themes.rb
+    - scripts/themes/generate_kotlin.rb
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never

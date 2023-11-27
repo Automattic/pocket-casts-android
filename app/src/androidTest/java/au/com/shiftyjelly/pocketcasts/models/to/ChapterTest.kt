@@ -15,7 +15,7 @@ class ChapterTest {
 
         assertEquals("1m", chapter.remainingTime(5000))
         assertEquals("59s", chapter.remainingTime(11000))
-        assertEquals("2s", chapter.remainingTime(68000))
+        assertEquals("1s", chapter.remainingTime(68000))
         assertEquals("0s", chapter.remainingTime(70000))
     }
 

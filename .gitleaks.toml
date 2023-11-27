@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "global allow list"
+regexes = [
+    "AIzaSyBguqVfwriVWjnSqRg50XPfZZH5r1VumNM", # google services debug api key
+]

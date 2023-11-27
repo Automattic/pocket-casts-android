@@ -1,13 +1,44 @@
+7.53
+-----
+*   Bug Fixes:
+    *   Ensure we have the most up-to-date episode urls before attempting playback
+        ([#1561](https://github.com/Automattic/pocket-casts-android/pull/1561))
+
+7.52
+-----
+
+* New Features:
+    *   Bookmarks entering Patron early access with full release for Plus users in 7.53
+        ([#1526](https://github.com/Automattic/pocket-casts-android/pull/1526))
+    *   Enables Playback 2023
+        ([#1537](https://github.com/Automattic/pocket-casts-android/pull/1537))
+*   Bug Fixes:
+    *   Avoid brief audio skip back when a streaming episode is downloaded
+        ([#1510](https://github.com/Automattic/pocket-casts-android/pull/1510))
+    *   Fix change email handling issues
+        ([#1518](https://github.com/Automattic/pocket-casts-android/pull/1518))
+    *   Fix Chapter Length Calculation Mismatch
+        ([#1525](https://github.com/Automattic/pocket-casts-android/pull/1525))
+    *   Fix multiselect not working in some cases
+        ([#1535](https://github.com/Automattic/pocket-casts-android/pull/1535))
+    *   Fix occasional crash on rearranging player shelf items 
+        ([#1551](https://github.com/Automattic/pocket-casts-android/pull/1551))
+    
 7.51
 -----
 
+*   Updates:
+    *   Take user to alarm permission when the app needs permission for sleep timer
+        ([#1487](https://github.com/Automattic/pocket-casts-android/pull/1487))
+*   Bug Fixes:
+    *    Fix Play button color not updating after changing filter color 
+         ([#1470](https://github.com/Automattic/pocket-casts-android/pull/1470))
+    *    Hide Plus upgrade banner for Patron users
+         ([#1508](https://github.com/Automattic/pocket-casts-android/pull/1508))
 
 7.50
 -----
 
-*   Updates:
-    *   Show if a podcast has no ratings
-        ([#1453](https://github.com/Automattic/pocket-casts-android/pull/1453))
 *   Bug Fixes:
     *   Fixed chapter progress circle on full-screen player
         ([#1461](https://github.com/Automattic/pocket-casts-android/pull/1461))

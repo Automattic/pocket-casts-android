@@ -116,7 +116,7 @@ class UserManagerImpl @Inject constructor(
 
                 settings.marketingOptIn.set(false)
                 settings.marketingOptIn.needsSync = false
-                settings.setEndOfYearModalHasBeenShown(false)
+                settings.setEndOfYearShowModal(true)
 
                 analyticsTracker.track(
                     AnalyticsEvent.USER_SIGNED_OUT,

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,8 +35,13 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.abs
 import kotlin.math.max
@@ -46,6 +53,9 @@ fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    val viewModel = hiltViewModel<SwipeableStarsViewModel>()
+    val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
     var stopPointType by remember { mutableStateOf(StopPointType.FullAndHalfStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
@@ -129,18 +139,33 @@ fun SwipeableStars(
         ) {
             Stars(
                 filled = true,
-                modifier = Modifier
-                    // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
-                    .onGloballyPositioned {
-                        val left = it.positionInParent().x
-                        val right = left + it.size.width
-                        iconPositions += Position(
-                            left = left,
-                            right = right,
+                modifier = { index ->
+                    var right by remember { mutableStateOf(0f) }
+                    Modifier
+                        // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
+                        .onGloballyPositioned {
+                            val left = it.positionInParent().x
+                            right = left + it.size.width
+                            iconPositions += Position(
+                                left = left,
+                                right = right,
+                            )
+                        }
+                        .fillMaxHeight()
+                        .aspectRatio(1f)
+                        .then(
+                            if (isTalkBackEnabled) {
+                                Modifier
+                                    .clickable {
+                                        touchX = right // select the full star
+                                    }
+                                    .semantics {
+                                        contentDescription = "${index + 1} Stars"
+                                        role = Role.Button
+                                    }
+                            } else Modifier
                         )
-                    }
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
+                }
             )
         }
     }
@@ -234,10 +259,10 @@ private fun getDesiredStopPoint(
 @Composable
 fun Stars(
     filled: Boolean,
-    modifier: Modifier = Modifier,
+    modifier: @Composable (index: Int) -> Modifier = { Modifier },
 ) {
     Row {
-        for (i in 0 until numStars) {
+        for (index in 0 until numStars) {
             Icon(
                 imageVector = if (filled) {
                     Icons.Filled.Star
@@ -246,7 +271,7 @@ fun Stars(
                 },
                 tint = MaterialTheme.theme.colors.primaryIcon01,
                 contentDescription = null,
-                modifier = modifier
+                modifier = modifier(index)
                     .fillMaxHeight()
                     .aspectRatio(1f)
             )

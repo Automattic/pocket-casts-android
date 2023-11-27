@@ -1,11 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 13:54:04+0000
+Translation-Revision-Date: 2023-11-15 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage 2023</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Abonneer je op Plus en bekijk hoe jouw luistergedrag is veranderd ten opzichte van 2022, andere leuke statistieken en Premium-functies zoals bladwijzers en mappen.</string>
+    <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
+    <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in 2023, ten opzichte van 2022</string>
+    <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Ten opzichte van 2022 is je luistertijd een klein beetje omlaag gegaan</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Ten opzichte van 2022 is je luistertijd redelijk hetzelfde gebleven</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Klaar om dit te overtreffen in 2024?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van 2022 is je luistertijd verhoogd met maarliefst %1$s%%</string>
+    <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
+    <string name="end_of_year_story_epilogue_title">Bedankt dat je dit jaar met ons geluisterd hebt.\nWe zien je in 2024!</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Het was niemand minder dan \'%1$s\' uit \'%2$s\'</string>
+    <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
+    <string name="end_of_year_replay">Opnieuw afspelen</string>
+    <string name="end_of_year_listening_time_subtitle">We hopen dat je hebt genoten van elke minuut!</string>
+    <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
+    <string name="end_of_year_story_top_categories_subtitle">Je hebt in totaal %2$s geluisterd naar %1$s afleveringen</string>
+    <string name="end_of_year_story_top_categories_title">Wist je dat %1$s je favoriete categorie was</string>
+    <string name="discover_category_society_abbreviation">Cultuur</string>
+    <string name="discover_category_religion_abbreviation">Spiritualiteit</string>
+    <string name="discover_category_kids_abbreviation">Familie</string>
+    <string name="discover_category_health_abbreviation">Gezondheid</string>
+    <string name="eoy_story_top_podcasts_subtitle">Dit is je top 5 meest geluisterd in 2023*</string>
+    <string name="eoy_story_top_podcasts_title">En deze shows vond je ook geweldig!</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s was jouw meest beluisterde show in 2023</string>
+    <string name="end_of_year_share_story">Deel dit verhaal</string>
+    <string name="whats_new_bookmarks_enable_now_button">Nu inschakelen</string>
+    <string name="podcast_log_in_to_rate">Je moet inloggen om een beoordeling achter te laten</string>
+    <string name="podcast_submit_rating_no_internet">Geen internetverbinding gevonden. Maak verbinding met het internet om een beoordeling in te dienen.</string>
+    <string name="podcast_rate">Tarief %s</string>
+    <string name="submit">Verzenden</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">Doe mee met de betatests voor bladwijzers!</string>
+    <string name="whats_new_bookmarks_try_now_button">Probeer het nu</string>
+    <string name="whats_new_bookmarks_title">De bladwijzers zijn er!</string>
+    <string name="bookmarks_upsell_instructions_early_access">Krijg vroegtijdige toegang tot deze functie met Pocket Casts Patron en sla tijdstempels op van je favoriete afleveringen. Binnenkort beschikbaar voor Plus-abonnees.</string>
+    <string name="bookmarks_upsell_instructions">Sla tijdstempels op van je favoriete afleveringen en ontgrendel nog veel meer functies met Pocket Casts Plus.</string>
+    <string name="error_loading_show_notes">Kan geen shownotes vinden voor deze aflevering.</string>
     <string name="podcast_no_bookmarks_matching">Deze podcast heeft geen bladwijzers die overeenkomen met je zoekcriteria.</string>
     <string name="podcast_no_bookmarks_found">Geen bladwijzers gevonden</string>
     <string name="player_tab_notes">Details</string>
@@ -153,6 +195,7 @@ Language: nl
     <string name="onboarding_plus_feature_gratitude_title">De eeuwige dank van iedereen bij Pocket Casts</string>
     <string name="onboarding_patron_feature_special_icons_title">Speciale Pocket Casts app-pictogrammen</string>
     <string name="onboarding_patron_feature_profile_badge_title">Profielbadge voor supporters</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100 GB cloudopslag</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Alles in plus</string>
     <string name="onboarding_patron_features_title">Geloof je in wat we doen en wil je laten zien dat je ons steunt?</string>
     <string name="server_user_delete_account_with_sub_failed">Je account heeft een actief Pocket Casts Plus abonnement. Annuleer dit abonnement voordat je je account verwijdert.</string>
@@ -313,26 +356,20 @@ Language: nl
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
-    <string name="end_of_year_story_epilogue_title">Bedankt dat je Pocket Casts onderdeel maakt van je luisterervaring in 2022</string>
-    <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in 2022 %1$s</string>
-    <string name="end_of_year_story_longest_episode_duration">Deze aflevering duurde %1$s</string>
-    <string name="end_of_year_story_longest_episode">De langste aflevering die je hebt geluisterd was %1$s van de podcast %2$s</string>
+    <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in 2023 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
-    <string name="end_of_year_story_top_podcasts">Je beste podcasts</string>
-    <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van 2022! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
-    <string name="end_of_year_story_top_podcast">Je beste podcast was %1$s van %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in 2022 naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde…</string>
-    <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
-    <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2022 naar %1$d verschillende categorieën geluisterd</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in 2023 naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
+    <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2023 naar %1$d verschillende categorieën geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Laten we eens kijken naar wat van je favorieten…</string>
     <string name="end_of_year_story_listened_to_categories">Je hebt dit jaar naar %1$d verschillende categorieën geluisterd</string>
-    <string name="end_of_year_story_listened_to_share_text">In 2022 heb je %1$s naar podcasts geluisterd</string>
+    <string name="end_of_year_story_listened_to_share_text">Dit jaar heb je %1$s naar podcasts geluisterd</string>
     <string name="end_of_year_story_intro_title">Laten we je luisterjaar vieren!</string>
     <string name="end_of_year_launch_modal_image_title">Jaar in podcasts</string>
-    <string name="end_of_year_replay">Herhalen</string>
     <string name="settings_media_notification_controls">Meldingen mediabedieningen</string>
     <string name="playback_speed">Afspeelsnelheid</string>
     <string name="volume_boost_enabled_not_valid">Waarde volumeboost ingeschakeld moet \'true\' (waar) of \'false\' (onwaar) zijn, maar was  %1$s</string>
@@ -344,13 +381,11 @@ Language: nl
     <string name="playback_speed_between_values">Afspeelsnelheid (tussen 0,5 en 3)</string>
     <string name="set_playback_speed">Afspeelsnelheid instellen</string>
     <string name="playback_speed_not_valid">Afspeelsnelheid %1$s niet geldig</string>
-    <string name="end_of_year_listening_time">In 2022 heb je %1$s naar podcasts geluisterd.</string>
     <string name="profile_account_upgraded">Accountupgrade uitgevoerd</string>
     <string name="pocket_casts_control_playback">Bedieningselement voor afspelen Pocket Casts</string>
     <string name="pocket_casts_play_filter">Filter afspelen Pocket Casts</string>
     <string name="time_to_skip_not_valid">Tijd om door te spoelen %1$s niet geldig</string>
     <string name="time_to_skip_seconds">Tijd om door te spoelen (seconden)</string>
-    <string name="end_of_year_prompt_card_summary">Bekijk je beste podcasts, categorieën, luisterstatistieken en meer.</string>
     <string name="settings_select_filters">Filters selecteren</string>
     <string name="settings_import_url_summary">Importeer je podcasts vanuit een OPML-bestand met een URL.</string>
     <string name="settings_import_url">Op URL</string>
@@ -371,7 +406,7 @@ Language: nl
     <string name="filter_x_not_found">Filter %1$s niet gevonden</string>
     <string name="must_provide_filter_name">Je moet een filternaam opgeven</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Niet nu</string>
-    <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Mijn 2023 bekijken</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>

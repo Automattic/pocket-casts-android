@@ -1,11 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-09-12 09:54:03+0000
+Translation-Revision-Date: 2023-11-14 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">我的 2023 年完成率</string>
+    <string name="end_of_year_stories_subscribe_to_plus">訂閱 Plus，了解你的收聽狀況與 2022 年相比如何、其他有趣的統計資料，以及書籤和資料夾等進階版功能。</string>
+    <string name="end_of_year_stories_theres_more">還有更多有趣內容！</string>
+    <string name="end_of_year_stories_year_completion_rate">完成率</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">從你開始收聽的 %1$d 集起，你完整收聽了 %2$d 集</string>
+    <string name="end_of_year_stories_year_completion_rate_title">你今年的完成率為 %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">我在 2023 年與 2022 年的收聽時間比較</string>
+    <string name="eoy_year_over_year_title_skyrocketed">比起 2022 年，你的收聽時間可說是一飛沖天！</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊啊啊…人就是要享受生活，對吧？</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">比起 2022 年，你的收聽時間稍微下降了</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">大家都說，成功的關鍵在於持之以恆…大概是這樣吧！</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">比起 2022 年，你的收聽時間大致保持不變</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">想要在 2024 年更進一步嗎？</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">比起 2022 年，你的收聽時間大幅下降了 %1$s%%</string>
+    <string name="end_of_year_prompt_card_summary">看看你的收聽統計和最愛 Podcast 等資料吧。</string>
+    <string name="end_of_year_story_epilogue_title">謝謝你今年與我們一同收聽。\n我們 2024 年見！</string>
+    <string name="end_of_year_story_longest_episode_subtitle">除了「%2$s」的「%1$s」之外，別無其他</string>
+    <string name="end_of_year_story_longest_episode_title">你收聽時間最長的一集為 %1$s</string>
+    <string name="end_of_year_replay">再次播放</string>
+    <string name="end_of_year_listening_time_subtitle">希望你每分每秒都享受！</string>
+    <string name="end_of_year_listening_time_title">這是你收聽 Podcast 的總時間。</string>
+    <string name="end_of_year_story_top_categories_subtitle">你收聽了 %1$s 集，總共 %2$s</string>
+    <string name="end_of_year_story_top_categories_title">你知道「%1$s」是你的最愛類別嗎？</string>
+    <string name="discover_category_society_abbreviation">文化</string>
+    <string name="discover_category_religion_abbreviation">心靈</string>
+    <string name="discover_category_kids_abbreviation">家庭</string>
+    <string name="discover_category_health_abbreviation">健康</string>
+    <string name="eoy_story_top_podcasts_subtitle">這是你在 2023 年最常收聽的前 5 名節目</string>
+    <string name="eoy_story_top_podcasts_title">你也是這些節目的忠實粉絲！</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s 是你在 2023 年最常收聽的節目</string>
+    <string name="end_of_year_share_story">分享這個故事</string>
+    <string name="whats_new_bookmarks_enable_now_button">立即啟用</string>
+    <string name="podcast_log_in_to_rate">評分前請先登入</string>
+    <string name="podcast_submit_rating_no_internet">找不到網際網路連線。 若要提交評分，請先連線至網際網路。</string>
+    <string name="podcast_rate">為 %s 評分</string>
+    <string name="submit">提交</string>
+    <string name="whats_new_boomarks_join_beta_testing_title">加入我們的書籤 Beta 測試！</string>
+    <string name="whats_new_bookmarks_try_now_button">立即試試</string>
+    <string name="whats_new_bookmarks_title">書籤登場！</string>
+    <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>
+    <string name="bookmarks_upsell_instructions">利用 Pocket Casts Plus 儲存你所愛單集的時間戳記，並解鎖其他許多功能。</string>
+    <string name="error_loading_show_notes">找不到此單集的節目說明。</string>
     <string name="podcast_no_bookmarks_matching">此 Podcast 沒有符合您搜尋條件的書籤。</string>
     <string name="podcast_no_bookmarks_found">找不到書籤</string>
     <string name="player_tab_notes">詳細資料</string>
@@ -153,6 +195,7 @@ Language: zh_TW
     <string name="onboarding_plus_feature_gratitude_title">來自 Pocket Casts 所有使用者的誠摯謝意</string>
     <string name="onboarding_patron_feature_special_icons_title">特殊 Pocket Casts 應用程式圖示</string>
     <string name="onboarding_patron_feature_profile_badge_title">支持者個人檔案徽章</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">100GB 雲端儲存空間</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">包含 Plus 所有功能</string>
     <string name="onboarding_patron_features_title">肯定我們的服務，並想表達支持嗎？</string>
     <string name="server_user_delete_account_with_sub_failed">你的帳號已有啟用的 Pocket Casts Plus 訂購項目。 請先取消訂購再刪除帳號。</string>
@@ -313,26 +356,20 @@ Language: zh_TW
     <string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
     <string name="end_of_year_story_top_categories">你最愛的分類</string>
     <string name="end_of_year_story_epilogue_subtitle">別忘了與朋友分享，並向你最喜愛的 Podcast 創作者致意</string>
-    <string name="end_of_year_story_epilogue_title">感謝你在 2022 年使用 Pocket Casts 收聽節目</string>
-    <string name="end_of_year_story_longest_episode_share_text">我在 2022 年 %1$s 收聽時間最長的一集</string>
-    <string name="end_of_year_story_longest_episode_duration">這集長達 %1$s</string>
-    <string name="end_of_year_story_longest_episode">你收聽時間最長的一集為 Podcast「%2$s」的「%1$s」</string>
+    <string name="end_of_year_story_longest_episode_share_text">我在 2023 年收聽時間最長的一集%1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">2022 年我最愛的 Podcast</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
-    <string name="end_of_year_story_top_podcasts">你最愛的 Podcast</string>
-    <string name="end_of_year_story_top_podcast_share_text">2022 年我最愛的 Podcast！ %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">2023 年我最愛的 Podcast！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
-    <string name="end_of_year_story_top_podcast">你最愛的 Podcast 是 %2$s 的「%1$s」</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2022 年收聽了 %1$d 個不同 Podcast 節目、%2$d 集內容</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2023 年收聽了 %1$d 個不同的 Podcast，總共 %2$d 集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
-    <string name="end_of_year_story_listened_to_numbers">你收聽了 %1$d 個不同 Podcast 節目和 %2$d 集內容</string>
-    <string name="end_of_year_story_listened_to_categories_share_text">我在 2022 年收聽了 %1$d 個不同分類</string>
+    <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收聽了 %1$d 個不同的分類</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
     <string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
-    <string name="end_of_year_story_listened_to_share_text">我在 2022 年花了 %1$s 收聽 Podcast</string>
+    <string name="end_of_year_story_listened_to_share_text">你今年花了 %1$s收聽 Podcast</string>
     <string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年！</string>
     <string name="end_of_year_launch_modal_image_title">Podcast 年度回顧</string>
-    <string name="end_of_year_replay">重播</string>
     <string name="settings_media_notification_controls">媒體通知控制項</string>
     <string name="playback_speed">播放速度</string>
     <string name="volume_boost_enabled_not_valid">「已啟用音量增強」的值必須為「true」或「false」，先前為  %1$s</string>
@@ -344,13 +381,11 @@ Language: zh_TW
     <string name="playback_speed_between_values">播放速度 (介於 0.5 到 3 倍之間)</string>
     <string name="set_playback_speed">設定播放速度</string>
     <string name="playback_speed_not_valid">播放速度 %1$s 無效</string>
-    <string name="end_of_year_listening_time">你 2022 年花了 %1$s 收聽 Podcast。</string>
     <string name="profile_account_upgraded">帳號已升級</string>
     <string name="pocket_casts_control_playback">Pocket Casts 控制播放</string>
     <string name="pocket_casts_play_filter">Pocket Casts 播放篩選條件</string>
     <string name="time_to_skip_not_valid">跳過時間「%1$s」無效</string>
     <string name="time_to_skip_seconds">跳過時間 (秒)</string>
-    <string name="end_of_year_prompt_card_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。</string>
     <string name="settings_select_filters">選取篩選條件</string>
     <string name="settings_import_url_summary">使用 URL 從 OPML 檔案匯入你的 Podcast。</string>
     <string name="settings_import_url">依 URL</string>
@@ -371,7 +406,7 @@ Language: zh_TW
     <string name="filter_x_not_found">找不到篩選條件「%1$s」</string>
     <string name="must_provide_filter_name">必須提供篩選條件名稱</string>
     <string name="end_of_year_launch_modal_secondary_button_title">先不要</string>
-    <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2022 年</string>
+    <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2023 年</string>
     <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
     <string name="end_of_year_launch_modal_title">你的 Podcast 年度回顧</string>
     <string name="settings_app_icon_halloween">萬聖節</string>

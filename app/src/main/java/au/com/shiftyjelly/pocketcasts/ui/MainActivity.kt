@@ -303,10 +303,10 @@ class MainActivity :
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
                 if (isEligible) {
-                    if (!settings.getEndOfYearModalHasBeenShown()) {
+                    if (settings.getEndOfYearShowModal()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
-                    if (settings.getEndOfYearShowBadge2022()) {
+                    if (settings.getEndOfYearShowBadge2023()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
@@ -374,15 +374,16 @@ class MainActivity :
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
                             VR.id.navigation_profile -> {
-                                if (settings.getEndOfYearModalHasBeenShown()) {
-                                    binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-                                    settings.setEndOfYearShowBadge2022(false)
-                                }
+                                resetEoYBadgeIfNeeded()
                                 FirebaseAnalyticsTracker.navigatedToProfile()
                             }
                         }
                     }
                     settings.setSelectedTab(currentTab)
+                } else if (it is NavigatorAction.NewFragmentAdded) {
+                    if (navigator.currentTab() == VR.id.navigation_profile) {
+                        resetEoYBadgeIfNeeded()
+                    }
                 }
             }
             .subscribe()
@@ -393,6 +394,15 @@ class MainActivity :
         updateSystemColors()
 
         mediaRouter = MediaRouter.getInstance(this)
+    }
+
+    private fun resetEoYBadgeIfNeeded() {
+        if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
+            settings.getEndOfYearShowBadge2023()
+        ) {
+            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+            settings.setEndOfYearShowBadge2023(false)
+        }
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
@@ -638,7 +648,7 @@ class MainActivity :
                         },
                         onExpanded = {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                            settings.setEndOfYearModalHasBeenShown(true)
+                            settings.setEndOfYearShowModal(false)
                             viewModel.updateStoriesModalShowState(false)
                         }
                     )
@@ -647,13 +657,19 @@ class MainActivity :
         )
     }
 
+    private fun showEndOfYearModal() {
+        viewModel.updateStoriesModalShowState(true)
+        launch(Dispatchers.Main) {
+            if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
+        }
+    }
+
     override fun showStoriesOrAccount(source: String) {
         if (viewModel.isSignedIn) {
             showStories(StoriesSource.fromString(source))
         } else {
             viewModel.waitingForSignInToShowStories = true
-            val intent = Intent(this, AccountActivity::class.java)
-            startActivity(intent)
+            openOnboardingFlow(OnboardingFlow.LoggedOut)
         }
     }
 
@@ -726,11 +742,9 @@ class MainActivity :
                 if (viewModel.waitingForSignInToShowStories) {
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
-                } else if (!settings.getEndOfYearModalHasBeenShown()) {
-                    viewModel.updateStoriesModalShowState(true)
-                    launch(Dispatchers.Main) {
-                        if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
-                    }
+                } else if (settings.getEndOfYearShowModal()) {
+                    if (isWhatsNewShowing()) return@observe
+                    showEndOfYearModal()
                 }
             }
 
@@ -790,6 +804,11 @@ class MainActivity :
                     }
                 }
             })
+    }
+
+    override fun whatsNewDismissed(fromConfirmAction: Boolean) {
+        if (fromConfirmAction) return
+        if (settings.getEndOfYearShowModal()) showEndOfYearModal()
     }
 
     override fun updatePlayerView() {
@@ -862,6 +881,10 @@ class MainActivity :
         FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
+
+        val playerContainerFragment = supportFragmentManager.fragments
+            .find { it is PlayerContainerFragment } as? PlayerContainerFragment
+        playerContainerFragment?.onPlayerOpen()
     }
 
     override fun onPlayerClosed() {
@@ -869,6 +892,10 @@ class MainActivity :
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
+
+        val playerContainerFragment = supportFragmentManager.fragments
+            .find { it is PlayerContainerFragment } as? PlayerContainerFragment
+        playerContainerFragment?.onPlayerClose()
     }
 
     override fun openTab(tabId: Int) {
@@ -906,6 +933,8 @@ class MainActivity :
 
     override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
 
+    private fun isWhatsNewShowing() = bottomSheetTag == WhatsNewFragment::class.java.name
+
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
         supportFragmentManager.findFragmentByTag(tag)?.let {
@@ -936,12 +965,28 @@ class MainActivity :
         updateStatusBar()
     }
 
-    override fun openPlayer() {
+    override fun openPlayer(source: String?) {
+        val sourceView = SourceView.fromString(source)
         binding.playerBottomSheet.openPlayer()
+
+        if (sourceView == SourceView.WHATS_NEW) {
+            showNowPlayingTab(sourceView)
+        }
     }
 
     override fun closePlayer() {
         binding.playerBottomSheet.closePlayer()
+    }
+
+    private fun showNowPlayingTab(sourceView: SourceView?) {
+        launch {
+            delay(300) // To let the player open
+            withContext(Dispatchers.Main) {
+                val playerContainerFragment =
+                    supportFragmentManager.fragments.find { it is PlayerContainerFragment } as? PlayerContainerFragment
+                playerContainerFragment?.openPlayer(sourceView)
+            }
+        }
     }
 
     override fun onPlayClicked() {

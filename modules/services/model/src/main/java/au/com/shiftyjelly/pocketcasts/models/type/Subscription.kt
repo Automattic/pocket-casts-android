@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.android.billingclient.api.ProductDetails
 
 sealed interface Subscription {
@@ -46,6 +47,7 @@ sealed interface Subscription {
                 recurringPricingPhase.formattedPrice
             )
         }
+
         override fun tryFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.trial_then_per_year
@@ -59,7 +61,19 @@ sealed interface Subscription {
         }
     }
 
-    enum class SubscriptionTier { PLUS, PATRON, UNKNOWN }
+    enum class SubscriptionTier {
+        PLUS,
+        PATRON,
+        UNKNOWN;
+
+        companion object {
+            fun fromUserTier(userTier: UserTier) = when (userTier) {
+                UserTier.Free -> UNKNOWN
+                UserTier.Plus -> PLUS
+                UserTier.Patron -> PATRON
+            }
+        }
+    }
 
     companion object {
         const val PLUS_PRODUCT_BASE = "com.pocketcasts.plus"

@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.text.format.DateUtils
 import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -48,16 +49,23 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
         val alarmManager = getAlarmManager()
         alarmManager.cancel(sleepIntent)
 
-        return try {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
-            sleepTimeMs = timeMs
-            true
-        } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
-            if (Build.VERSION.SDK_INT >= 31 && !alarmManager.canScheduleExactAlarms()) {
-                Toast.makeText(context, LR.string.player_sleep_timer_start_failed, Toast.LENGTH_LONG).show()
-            }
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            Toast.makeText(context, LR.string.player_sleep_timer_start_failed, Toast.LENGTH_LONG).show()
+            context.startActivity(
+                Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    // Because we're not launching this from an activity context, we must add the FLAG_ACTIVITY_NEW_TASK flag
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
             false
+        } else {
+            return try {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
+                sleepTimeMs = timeMs
+                true
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
+                false
+            }
         }
     }
 

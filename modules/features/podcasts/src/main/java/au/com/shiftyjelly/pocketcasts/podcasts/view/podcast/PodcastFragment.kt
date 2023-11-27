@@ -213,12 +213,20 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun <T> onRowLongPress(): (entity: T) -> Unit = {
         when (it) {
-            is PodcastEpisode ->
+            is PodcastEpisode -> {
+                if (multiSelectEpisodesHelper.listener == null) {
+                    binding?.setupMultiSelect()
+                }
                 multiSelectEpisodesHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
-            is Bookmark ->
+            }
+            is Bookmark -> {
+                if (multiSelectBookmarksHelper.listener == null) {
+                    binding?.setupMultiSelect()
+                }
                 multiSelectBookmarksHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
+            }
         }
         adapter?.notifyDataSetChanged()
     }
@@ -644,6 +652,23 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.setupMultiSelect()
+
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    multiSelectBookmarksHelper.showEditBookmarkPage
+                        .collect { show ->
+                            if (show) onEditBookmarkClick()
+                        }
+                }
+            }
+        }
+    }
+
+    private fun onEditBookmarkClick() {
+        viewModel.buildBookmarkArguments { arguments ->
+            startActivity(arguments.getIntent(requireContext()))
+        }
     }
 
     private fun FragmentPodcastBinding.setupMultiSelect() {
@@ -672,6 +697,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         listener = object : MultiSelectHelper.Listener<T> {
             override fun multiSelectSelectNone() {
                 viewModel.multiSelectSelectNone()
+                this@setUp.closeMultiSelect()
                 adapter?.notifyDataSetChanged()
             }
 

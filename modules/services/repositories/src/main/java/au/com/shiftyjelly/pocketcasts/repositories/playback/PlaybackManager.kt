@@ -458,6 +458,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
             SourceView.STATS,
+            SourceView.WHATS_NEW,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -1467,7 +1468,7 @@ open class PlaybackManager @Inject constructor(
                 userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
                     .flatMap {
                         if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = null, placeholderPublished = null)
+                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
                         } else {
                             Maybe.just(it)
                         }
@@ -1502,19 +1503,29 @@ open class PlaybackManager @Inject constructor(
         if (episode.isFinished) {
             episodeManager.markAsNotPlayed(episode)
         }
-        // check we have the latest episode url in the background
-        if (episode is PodcastEpisode) {
-            updateEpisodeUrl(episode)
-        }
 
-        if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
-            try {
-                val playbackUrl = userEpisodeManager.getPlaybackUrl(episode).await()
-                episode.downloadUrl = playbackUrl
-            } catch (e: Exception) {
-                onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
-                removeEpisode(episode, source = sourceView)
-                return
+        // make sure we have the latest episode url
+        when (episode) {
+            is PodcastEpisode -> {
+                if (!episode.isDownloaded) {
+                    val newDownloadUrl = episodeManager.updateDownloadUrl(episode)
+                    if (newDownloadUrl != null && newDownloadUrl != episode.downloadUrl) {
+                        Timber.i("Updating url for PodcastEpisode playback")
+                        episode.downloadUrl = newDownloadUrl
+                    }
+                }
+            }
+            is UserEpisode -> {
+                if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
+                    try {
+                        val newDownloadUrl = userEpisodeManager.getPlaybackUrl(episode).await()
+                        episode.downloadUrl = newDownloadUrl
+                    } catch (e: Exception) {
+                        onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
+                        removeEpisode(episode, source = sourceView)
+                        return
+                    }
+                }
             }
         }
 
@@ -1601,18 +1612,36 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        val chromeCastConnected = castManager.isConnected()
-        val currentPosition = player?.getCurrentPositionMs()
-        if (isPlayerSwitchRequired() || isPlayerResetNeeded(episode, sameEpisode, chromeCastConnected)) { // Don't create a player if we aren't playing because it will start to buffer
+        // We want to make sure we get the current position at the last possible moment before changing/resetting the player
+        val currentPositionMs = if (
+            isPlayerSwitchRequired() ||
+            isPlayerResetNeeded(episode, sameEpisode, castManager.isConnected())
+        ) {
+            // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
+
                 Timber.d("Resetting player")
+                val playerPositionMs = player?.getCurrentPositionMs()
+
+                if (sameEpisode && playerPositionMs != null) {
+                    val playerPositionSeconds = playerPositionMs / 1000.0
+                    // Make sure that the episode is updated with the latest position before resetting the player.
+                    // This helps avoid having the audio jump "back" a second or so when the currently playing episode
+                    // is downloaded.
+                    episodeManager.updatePlayedUpTo(episode, playerPositionSeconds, forceUpdate = true)
+                }
+
                 resetPlayer()
+                playerPositionMs
             } else {
                 Timber.d("Stopping player")
+                val playerPositionMs = player?.getCurrentPositionMs()
                 stopPlayer()
+                playerPositionMs
             }
         } else {
             Timber.d("Player reset not required")
+            player?.getCurrentPositionMs()
         }
 
         player?.setPodcast(podcast)
@@ -1654,8 +1683,8 @@ open class PlaybackManager @Inject constructor(
         widgetManager.updateWidget(podcast, play, episode)
 
         if (play) {
-            if (sameEpisode && currentPosition != null) {
-                player?.seekToTimeMs(currentPosition)
+            if (sameEpisode && currentPositionMs != null) {
+                player?.seekToTimeMs(currentPositionMs)
             }
             play(sourceView)
         } else {
@@ -1670,34 +1699,6 @@ open class PlaybackManager @Inject constructor(
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }
-    }
-
-    /**
-     * Check we have the latest episode url in the background.
-     */
-    private fun updateEpisodeUrl(episode: PodcastEpisode) {
-        if (episode.isDownloaded) {
-            return
-        }
-
-        // TODO
-//        val updateEpisodeTask = UpdateEpisodeTask(podcastCacheServerManager, episodeManager)
-//        val episodeSingle = updateEpisodeTask.download(episode.podcastUuid, episode.uuid)
-//        val disposable = episodeSingle
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(
-//                        { episodeUpdated ->
-//                            val currentEpisode = getCurrentEpisode()
-//                            if (currentEpisode != null &&
-//                                    currentEpisode.uuid == episodeUpdated.uuid &&
-//                                    currentEpisode.downloadUrl != episodeUpdated.downloadUrl) {
-//                                upNextQueue.reloadCurrentEpisode()
-//                                forcePlayerSwitch = true
-//                            }
-//                        },
-//                        { throwable -> Timber.e(throwable, "Failed to update episode url") }
-//                )
-//        disposables.add(disposable)
     }
 
     @Suppress("DEPRECATION")
@@ -1775,7 +1776,10 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun play(sourceView: SourceView = SourceView.UNKNOWN) {
-        val episode = getCurrentEpisode()
+        val episode = getCurrentEpisode()?.let {
+            // Make sure we have the most up-to-date episode instance
+            episodeManager.findEpisodeByUuid(it.uuid)
+        }
         if (episode == null || player == null) {
             return
         }

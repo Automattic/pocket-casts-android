@@ -224,6 +224,7 @@ class EpisodeContainerFragment :
         binding = null
         multiSelectHelper.isMultiSelecting = false
         multiSelectHelper.context = null
+        multiSelectHelper.listener = null
     }
 
     private class ViewPagerAdapter(
@@ -274,7 +275,8 @@ class EpisodeContainerFragment :
 
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
-                    episodeUuid = requireNotNull(episodeUUID)
+                    episodeUuid = requireNotNull(episodeUUID),
+                    forceDarkTheme = forceDarkTheme
                 )
             }
         }

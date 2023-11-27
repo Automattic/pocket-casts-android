@@ -83,13 +83,13 @@ class ChangeEmailViewModel
                     _changeEmailState.value = ChangeEmailState.Failure(errors, response.message)
                 }
             }
+            .doFinally {
+                if (disposables.isDisposed.not()) {
+                    disposables.clear()
+                }
+            }
             .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
     }
 }
 

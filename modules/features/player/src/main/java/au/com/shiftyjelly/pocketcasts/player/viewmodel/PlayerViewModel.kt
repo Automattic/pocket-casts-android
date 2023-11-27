@@ -41,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
@@ -201,7 +203,17 @@ class PlayerViewModel @Inject constructor(
         if (list.isEmpty()) {
             ShelfItems.itemsList
         } else {
-            list.mapNotNull { id ->
+            // Add missing bookmark item if the feature flag is enabled
+            val updatedList = when {
+                list.contains(ShelfItem.Bookmark.id) -> list
+                FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) -> {
+                    list.toMutableList().apply {
+                        add(list.size - 1, ShelfItem.Bookmark.id)
+                    }
+                }
+                else -> list
+            }
+            updatedList.mapNotNull { id ->
                 ShelfItems.itemForId(id)
             }
         }

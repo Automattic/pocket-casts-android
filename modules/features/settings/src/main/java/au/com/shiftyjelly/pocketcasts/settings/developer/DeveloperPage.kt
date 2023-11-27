@@ -3,16 +3,13 @@ package au.com.shiftyjelly.pocketcasts.settings.developer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
+import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -33,7 +30,8 @@ fun DeveloperPage(
     onForceRefreshClick: () -> Unit,
     onTriggerNotificationClick: () -> Unit,
     onDeleteFirstEpisodeClick: () -> Unit,
-    onTriggerUpdateEpisodeDetails: () -> Unit
+    onTriggerUpdateEpisodeDetails: () -> Unit,
+    onTriggerResetEoYModalProfileBadge: () -> Unit
 ) {
 
     Column(modifier = modifier) {
@@ -47,6 +45,7 @@ fun DeveloperPage(
         TriggerNotificationSetting(onClick = onTriggerNotificationClick)
         DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
         TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
+        EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
     }
 }
 
@@ -129,6 +128,19 @@ private fun TriggerUpdateEpisodeDetails(
     )
 }
 
+@Composable
+private fun EndOfYear(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset modal/profile badge",
+        secondaryText = "Reset modal and profile badge for end of year",
+        icon = rememberVectorPainter(Icons.Outlined.EditCalendar),
+        modifier = modifier.clickable { onClick() }
+    )
+}
+
 @Preview(name = "Light")
 @Composable
 private fun DeveloperPageLightPreview() {
@@ -153,6 +165,7 @@ private fun DeveloperPagePreview() {
         onForceRefreshClick = {},
         onTriggerNotificationClick = {},
         onDeleteFirstEpisodeClick = {},
-        onTriggerUpdateEpisodeDetails = {}
+        onTriggerUpdateEpisodeDetails = {},
+        onTriggerResetEoYModalProfileBadge = {},
     )
 }

@@ -166,7 +166,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         dragStartPosition?.let {
             val title = try {
                 (items[position] as? ShelfItem)?.analyticsValue
-            } catch (e: ArrayIndexOutOfBoundsException) {
+            } catch (e: IndexOutOfBoundsException) {
                 LogBuffer.i(LogBuffer.TAG_INVALID_STATE, "Error getting title for position $position in ShelfFragment", e)
             } ?: AnalyticsProp.Value.UNKNOWN
             val movedFrom = sectionTitleAt(it)

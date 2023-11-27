@@ -37,10 +37,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -65,11 +65,74 @@ class BookmarksViewModel
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
+    private var isFragmentActive: Boolean = true
+
     private var sourceView: SourceView = SourceView.UNKNOWN
         set(value) {
             field = value
             multiSelectHelper.source = value
         }
+
+    private val multiSelectListener = object : MultiSelectHelper.Listener<Bookmark> {
+        override fun multiSelectSelectAll() {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let {
+                multiSelectHelper.selectAllInList(it)
+            }
+        }
+
+        override fun multiSelectSelectNone() {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                multiSelectHelper.deselectAllInList(bookmarks)
+            }
+        }
+
+        override fun multiDeselectAllAbove(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    val episodesAbove = bookmarks.subList(0, startIndex + 1)
+                    multiSelectHelper.deselectAllInList(episodesAbove)
+                }
+            }
+        }
+
+        override fun multiDeselectAllBelow(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    val bookmarksBelow = bookmarks.subList(startIndex, bookmarks.size)
+                    multiSelectHelper.deselectAllInList(bookmarksBelow)
+                }
+            }
+        }
+
+        override fun multiSelectSelectAllUp(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectHelper.selectAllInList(bookmarks.subList(0, startIndex + 1))
+                }
+            }
+        }
+
+        override fun multiSelectSelectAllDown(multiSelectable: Bookmark) {
+            (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
+                val startIndex = bookmarks.indexOf(multiSelectable)
+                if (startIndex > -1) {
+                    multiSelectHelper.selectAllInList(
+                        bookmarks.subList(
+                            startIndex,
+                            bookmarks.size
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    init {
+        multiSelectHelper.listener = multiSelectListener
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
@@ -79,106 +142,58 @@ class BookmarksViewModel
         this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
-            settings.cachedSubscriptionStatus.flow.collectLatest {
-                val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                if (!feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)) {
-                    _uiState.value = UiState.Upsell(sourceView)
-                } else {
-                    episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                        val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
-                        val bookmarksFlow =
-                            bookmarksSortTypeFlow.flatMapLatest { sortType ->
-                                bookmarkManager.findEpisodeBookmarksFlow(
-                                    episode = episode,
-                                    sortType = sortType,
-                                )
-                            }
-                        val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
-                        val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
-                        combine(
-                            bookmarksFlow,
-                            isMultiSelectingFlow,
-                            selectedListFlow,
-                        ) { bookmarks, isMultiSelecting, selectedList ->
-                            _uiState.value = if (bookmarks.isEmpty()) {
-                                UiState.Empty(sourceView)
-                            } else {
-                                UiState.Loaded(
-                                    bookmarks = bookmarks,
-                                    isMultiSelecting = isMultiSelecting,
-                                    isSelected = { selectedBookmark ->
-                                        selectedList.map { bookmark -> bookmark.uuid }
-                                            .contains(selectedBookmark.uuid)
-                                    },
-                                    onRowClick = ::onRowClick,
-                                    sourceView = sourceView,
-                                )
-                            }
-                        }.stateIn(viewModelScope)
-                    } ?: run { // This shouldn't happen in the ideal world
-                        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
-                        _uiState.value = UiState.Empty(sourceView)
-                    }
-                }
-            }
-        }
-
-        multiSelectHelper.listener = object : MultiSelectHelper.Listener<Bookmark> {
-            override fun multiSelectSelectAll() {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let {
-                    multiSelectHelper.selectAllInList(it)
-                }
-            }
-
-            override fun multiSelectSelectNone() {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    multiSelectHelper.deselectAllInList(bookmarks)
-                }
-            }
-
-            override fun multiDeselectAllAbove(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        val episodesAbove = bookmarks.subList(0, startIndex + 1)
-                        multiSelectHelper.deselectAllInList(episodesAbove)
-                    }
-                }
-            }
-
-            override fun multiDeselectAllBelow(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        val bookmarksBelow = bookmarks.subList(startIndex, bookmarks.size)
-                        multiSelectHelper.deselectAllInList(bookmarksBelow)
-                    }
-                }
-            }
-
-            override fun multiSelectSelectAllUp(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        multiSelectHelper.selectAllInList(bookmarks.subList(0, startIndex + 1))
-                    }
-                }
-            }
-
-            override fun multiSelectSelectAllDown(multiSelectable: Bookmark) {
-                (_uiState.value as? UiState.Loaded)?.bookmarks?.let { bookmarks ->
-                    val startIndex = bookmarks.indexOf(multiSelectable)
-                    if (startIndex > -1) {
-                        multiSelectHelper.selectAllInList(
-                            bookmarks.subList(
-                                startIndex,
-                                bookmarks.size
-                            )
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
+                val bookmarksFlow =
+                    bookmarksSortTypeFlow.flatMapLatest { sortType ->
+                        bookmarkManager.findEpisodeBookmarksFlow(
+                            episode = episode,
+                            sortType = sortType,
                         )
                     }
-                }
+                val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
+                val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
+                combine(
+                    bookmarksFlow,
+                    isMultiSelectingFlow,
+                    selectedListFlow,
+                    settings.cachedSubscriptionStatus.flow,
+                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus ->
+                    val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+                    _uiState.value = if (!feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)) {
+                        UiState.Upsell(sourceView)
+                    } else if (bookmarks.isEmpty()) {
+                        UiState.Empty(sourceView)
+                    } else {
+                        UiState.Loaded(
+                            bookmarks = bookmarks,
+                            isMultiSelecting = isMultiSelecting,
+                            isSelected = { selectedBookmark ->
+                                selectedList.map { bookmark -> bookmark.uuid }
+                                    .contains(selectedBookmark.uuid)
+                            },
+                            onRowClick = ::onRowClick,
+                            sourceView = sourceView,
+                        )
+                    }
+                }.stateIn(viewModelScope)
+                    .takeWhile { !isFragmentActive } /* Stop collecting on player close
+                    when viewModelScope is still active but fragment is not. */
+            } ?: run { // This shouldn't happen in the ideal world
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
+                _uiState.value = UiState.Empty(sourceView)
             }
         }
+    }
+
+    fun onPlayerOpen() {
+        isFragmentActive = true
+        multiSelectHelper.listener = multiSelectListener
+    }
+
+    fun onPlayerClose() {
+        isFragmentActive = false
+        multiSelectHelper.listener = null
     }
 
     private fun onRowClick(bookmark: Bookmark) {
@@ -213,10 +228,10 @@ class BookmarksViewModel
         viewModelScope.launch {
             val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
             bookmarkEpisode?.let {
-                val shouldPlayEpisode = !playbackManager.isPlaying() ||
+                val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-                if (shouldPlayEpisode) {
-                    playbackManager.playNow(it, sourceView = sourceView)
+                if (shouldLoadOrSwitchEpisode) {
+                    playbackManager.playNowSync(it, sourceView = sourceView)
                 }
             }
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)

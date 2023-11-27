@@ -58,7 +58,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9115
+        const val WHATS_NEW_VERSION_CODE = 9116
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -370,11 +370,11 @@ interface Settings {
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
-    fun setEndOfYearShowBadge2022(value: Boolean)
-    fun getEndOfYearShowBadge2022(): Boolean
+    fun setEndOfYearShowBadge2023(value: Boolean)
+    fun getEndOfYearShowBadge2023(): Boolean
 
-    fun setEndOfYearModalHasBeenShown(value: Boolean)
-    fun getEndOfYearModalHasBeenShown(): Boolean
+    fun setEndOfYearShowModal(value: Boolean)
+    fun getEndOfYearShowModal(): Boolean
 
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
