@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-07 15:54:26+0000
+Translation-Revision-Date: 2023-11-14 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">Mon taux d’achèvement en 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Abonnez-vous à Plus et découvrez l’évolution de votre écoute par rapport à 2022, d’autres statistiques étonnantes et des fonctionnalités Premium comme les favoris et les dossiers.</string>
     <string name="end_of_year_stories_theres_more">Ce n’est pas tout !</string>
     <string name="end_of_year_stories_year_completion_rate">taux d’achèvement</string>
@@ -355,13 +356,18 @@ Language: fr
     <string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
     <string name="end_of_year_story_top_categories">Vos meilleures catégories</string>
     <string name="end_of_year_story_epilogue_subtitle">N’oubliez pas de montrer votre soutien à vos créateurs de podcasts préférés et à partager ces podcasts avec vos amis</string>
+    <string name="end_of_year_story_longest_episode_share_text">L’épisode le plus long que j’ai écouté en 2023 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mes meilleurs podcasts de 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mes meilleurs podcasts de l\'année ! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Mon podcast préféré de 2023 ! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Vous avez écouté %1$d épisodes pour une durée totale de %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">J’ai écouté %1$d podcasts différents et %2$d épisodes en 2023</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois une même émission…</string>
     <string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d émissions différentes et %2$d épisodes au total</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">J’ai écouté %1$d catégories différentes en 2023</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Rétrospective sur certains de vos podcasts préférés…</string>
     <string name="end_of_year_story_listened_to_categories">Cette année, vous avez écouté %1$d catégories différentes</string>
+    <string name="end_of_year_story_listened_to_share_text">J’ai passé %1$s à écouter des podcasts cette année</string>
     <string name="end_of_year_story_intro_title">Un an d’écoute, ça se fête !</string>
     <string name="end_of_year_launch_modal_image_title">Votre année en podcasts</string>
     <string name="settings_media_notification_controls">Contrôles de notification des médias</string>

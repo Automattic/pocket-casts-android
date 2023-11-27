@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-07 13:54:03+0000
+Translation-Revision-Date: 2023-11-14 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">我在 2023 年的完成率</string>
     <string name="end_of_year_stories_subscribe_to_plus">订阅 Plus，了解您的收听情况与 2022 年的收听情况相比如何、其他有趣的统计信息，以及书签和文件夹等高级套餐功能。</string>
     <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
@@ -355,13 +356,18 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
+    <string name="end_of_year_story_longest_episode_share_text">2023 年我收听时间最长的剧集 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">我的 2022 年热门播客</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">2023 年我最喜欢的播客！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 部剧集，共 %2$s 部</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2023 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">我们来看看您最喜欢的内容…</string>
     <string name="end_of_year_story_listened_to_categories">您今年收听了 %1$d 种不同的分类</string>
+    <string name="end_of_year_story_listened_to_share_text">我今年收听播客的时间为 %1$s</string>
     <string name="end_of_year_story_intro_title">我们来庆祝您的聆听之年！</string>
     <string name="end_of_year_launch_modal_image_title">年度播客盘点</string>
     <string name="settings_media_notification_controls">媒体通知控件</string>

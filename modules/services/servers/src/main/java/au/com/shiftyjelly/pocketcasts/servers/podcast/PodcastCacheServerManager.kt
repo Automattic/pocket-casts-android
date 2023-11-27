@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
@@ -16,4 +17,5 @@ interface PodcastCacheServerManager {
     suspend fun getPodcastRatings(podcastUuid: String): PodcastRatings
     suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse
     suspend fun getShowNotesCache(podcastUuid: String): ShowNotesResponse?
+    suspend fun getEpisodeUrl(episode: PodcastEpisode): String?
 }

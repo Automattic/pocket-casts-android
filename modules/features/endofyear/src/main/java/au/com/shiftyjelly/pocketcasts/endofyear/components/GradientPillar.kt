@@ -1,9 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -19,25 +23,72 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.rainbowBrush
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
+
+private const val AnimDurationInMs = 800
+private const val AnimAlphaDelayInMs = 500
 
 @Composable
 fun GradientPillar(
     pillarStyle: PillarStyle,
+    paused: Boolean,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    content: @Composable (Float) -> Unit,
 ) {
+    val animationSpec = tween<Float>(
+        durationMillis = AnimDurationInMs,
+        delayMillis = 0,
+    )
+    val animationAlphaSpec = tween<Float>(
+        durationMillis = AnimDurationInMs,
+        delayMillis = AnimAlphaDelayInMs,
+    )
+    val animOffsetY = remember { Animatable(1f) }
+    val animAlpha = remember { Animatable(0f) }
+    LaunchedEffect(paused) {
+        try {
+            if (paused) {
+                /* Stop animations when story is paused */
+                animOffsetY.stop()
+                animAlpha.stop()
+            }
+            /* Launch concurrent offset animations */
+            launch {
+                if (!paused) {
+                    animOffsetY.animateTo(
+                        targetValue = 0f,
+                        animationSpec = animationSpec
+                    )
+                }
+            }
+            launch {
+                if (!paused) {
+                    animAlpha.animateTo(
+                        targetValue = 1f,
+                        animationSpec = animationAlphaSpec
+                    )
+                }
+            }
+        } catch (e: CancellationException) {
+            Timber.e(e)
+        }
+    }
+
     Box(
         contentAlignment = Alignment.TopStart,
         modifier = modifier
-            .pillarGradient(pillarStyle)
-            .padding(horizontal = 24.dp),
+            .pillarGradient(pillarStyle, animOffsetY.value)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
-        content()
+        content(animAlpha.value)
     }
 }
 
 private fun Modifier.pillarGradient(
     pillarStyle: PillarStyle,
+    heightFraction: Float,
 ) = graphicsLayer { alpha = 0.99f }
     .drawWithCache {
         val size = size
@@ -47,11 +98,13 @@ private fun Modifier.pillarGradient(
         onDrawWithContent {
             drawRect(
                 brush = brush,
-                blendMode = BlendMode.SrcOver
+                blendMode = BlendMode.SrcOver,
+                topLeft = Offset(0.0f, heightFraction * size.height),
             )
             drawRect(
                 brush = overlayBrush,
-                blendMode = BlendMode.SrcOver
+                blendMode = BlendMode.SrcOver,
+                topLeft = Offset(0.0f, heightFraction * size.height),
             )
             drawContent()
         }
@@ -91,6 +144,7 @@ fun GradientPillarRainbowPreview() {
         GradientPillar(
             pillarStyle = PillarStyle.Rainbow,
             content = {},
+            paused = true,
             modifier = Modifier
                 .size(50.dp, 200.dp)
         )
@@ -105,6 +159,7 @@ fun GradientPillarGreyPreview() {
         GradientPillar(
             pillarStyle = PillarStyle.Grey,
             content = {},
+            paused = true,
             modifier = Modifier
                 .size(50.dp, 200.dp)
         )

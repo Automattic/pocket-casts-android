@@ -127,7 +127,7 @@ private fun WhatsNewPageLoaded(
 
                 SubscriptionBadgeForTier(
                     tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
-                    displayMode = SubscriptionBadgeDisplayMode.Colored
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
                 )
 
                 Spacer(

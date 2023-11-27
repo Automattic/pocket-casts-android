@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -18,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
@@ -26,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -48,6 +51,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -80,6 +84,7 @@ class PodcastViewModel
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -399,15 +404,38 @@ class PodcastViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
-        bookmarkEpisode?.let {
-            val shouldPlayEpisode = !playbackManager.isPlaying() ||
-                playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-            if (shouldPlayEpisode) {
-                playbackManager.playNow(it, sourceView = SourceView.PODCAST_SCREEN)
+        launch {
+            val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+            bookmarkEpisode?.let {
+                val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
+                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+                if (shouldLoadOrSwitchEpisode) {
+                    playbackManager.playNowSync(it, sourceView = SourceView.PODCAST_SCREEN)
+                }
+            }
+            playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+        }
+    }
+
+    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
+        multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
+            val episodeUuid = bookmark.episodeUuid
+            viewModelScope.launch(ioDispatcher) {
+                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                val backgroundColor =
+                    if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
+                val tintColor =
+                    if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
+                val arguments = BookmarkArguments(
+                    bookmarkUuid = bookmark.uuid,
+                    episodeUuid = episodeUuid,
+                    timeSecs = bookmark.timeSecs,
+                    backgroundColor = backgroundColor,
+                    tintColor = tintColor
+                )
+                onSuccess(arguments)
             }
         }
-        playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
     }
 
     fun multiSelectSelectNone() {

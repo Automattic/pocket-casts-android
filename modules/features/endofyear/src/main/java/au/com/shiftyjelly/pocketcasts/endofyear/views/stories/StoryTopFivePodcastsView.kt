@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
+import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -102,6 +103,7 @@ private fun PodcastList(story: StoryTopFivePodcasts) {
     story.topPodcasts.forEachIndexed { index, topPodcast ->
         PodcastItem(
             podcast = topPodcast.toPodcast(),
+            totalPlayedTimeInSecs = topPodcast.totalPlayedTime,
             position = index,
             tintColor = story.tintColor,
             subtitleColor = story.subtitleColor,
@@ -112,6 +114,7 @@ private fun PodcastList(story: StoryTopFivePodcasts) {
 @Composable
 fun PodcastItem(
     podcast: Podcast,
+    totalPlayedTimeInSecs: Double,
     position: Int,
     tintColor: Color,
     subtitleColor: Color,
@@ -119,6 +122,8 @@ fun PodcastItem(
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
+    val timeText =
+        StatsHelper.secondsToFriendlyString(totalPlayedTimeInSecs.toLong(), context.resources)
     val heightInDp = currentLocalView.height.pxToDp(context)
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -161,7 +166,7 @@ fun PodcastItem(
                         .padding(bottom = 3.dp)
                 )
                 TextH70(
-                    text = podcast.author,
+                    text = timeText,
                     color = subtitleColor,
                     maxLines = 1,
                     fontFamily = FontFamily(listOf(Font(UR.font.dm_sans))),
@@ -186,6 +191,7 @@ private fun PodcastItemPreview(
                     title = "Title",
                     author = "Author",
                 ),
+                totalPlayedTimeInSecs = 1000.0,
                 position = 0,
                 tintColor = Color.White,
                 subtitleColor = Color(0xFF8F97A4),

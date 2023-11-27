@@ -214,6 +214,28 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
+    fun onPlayerOpen() {
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerOpen()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
+    }
+
+    fun onPlayerClose() {
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerClose()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
+    }
+
     fun openPlayer(sourceView: SourceView? = null) {
         val index = adapter.indexOfPlayer
         if (index == -1) return

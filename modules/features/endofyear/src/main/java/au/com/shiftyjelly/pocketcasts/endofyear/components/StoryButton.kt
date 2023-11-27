@@ -5,6 +5,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 
@@ -20,11 +21,13 @@ fun StoryButton(
     RowButton(
         text = text,
         fontFamily = StoryFontFamily,
+        fontWeight = FontWeight.W600,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
         cornerRadius = 4.dp,
         textColor = ButtonTextColor,
         onClick = onClick,
         modifier = modifier,
+        textVerticalPadding = 10.dp,
         textIcon = textIcon,
     )
 }

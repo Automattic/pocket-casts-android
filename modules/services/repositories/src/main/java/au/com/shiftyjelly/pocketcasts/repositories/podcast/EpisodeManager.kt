@@ -165,4 +165,6 @@ interface EpisodeManager {
         toEpochMsCurrentYear: Long,
     ): YearOverYearListeningTime
     suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
+
+    suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
 }
