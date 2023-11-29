@@ -19,13 +19,13 @@ class DateTypeConverter {
     }
 }
 
-typealias ShouldNotBeNullDate = Date
+typealias SafeDate = Date
 
 // Type converter for dates that will not return null even if a null parameter is passed in.
 class ShouldNotBeNullDateTypeConverter {
 
     @TypeConverter
-    fun toDate(value: Long?): ShouldNotBeNullDate {
+    fun toDate(value: Long?): SafeDate {
         return if (value == null) {
             "ShouldNotBeNullDateTypeConverter::toDate called with null parameter. Returning epoch date.".let {
                 Timber.w(it)
@@ -38,5 +38,5 @@ class ShouldNotBeNullDateTypeConverter {
     }
 
     @TypeConverter
-    fun toLong(value: ShouldNotBeNullDate?): Long = value?.time ?: 0L
+    fun toLong(value: SafeDate?): Long = value?.time ?: 0L
 }
