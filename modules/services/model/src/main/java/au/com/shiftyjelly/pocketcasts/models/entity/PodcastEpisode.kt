@@ -7,6 +7,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.converter.ShouldNotBeNullDate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.io.Serializable
@@ -23,7 +24,7 @@ import java.util.Date
 data class PodcastEpisode(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") override var uuid: String,
     @ColumnInfo(name = "episode_description") override var episodeDescription: String = "",
-    @ColumnInfo(name = "published_date") override var publishedDate: Date,
+    @ColumnInfo(name = "published_date") override var publishedDate: ShouldNotBeNullDate,
     @ColumnInfo(name = "title") override var title: String = "",
     @ColumnInfo(name = "size_in_bytes") override var sizeInBytes: Long = 0,
     @ColumnInfo(name = "episode_status") override var episodeStatus: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED,

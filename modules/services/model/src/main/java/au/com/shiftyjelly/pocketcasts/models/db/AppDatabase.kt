@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.ShouldNotBeNullDateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
@@ -69,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     AnonymousBumpStat.CustomEventPropsTypeConverter::class,
     BundlePaidTypeConverter::class,
     DateTypeConverter::class,
+    ShouldNotBeNullDateTypeConverter::class,
     EpisodePlayingStatusConverter::class,
     EpisodeStatusEnumConverter::class,
     EpisodesSortTypeConverter::class,
