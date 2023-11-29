@@ -22,7 +22,7 @@ class DateTypeConverter {
 typealias SafeDate = Date
 
 // Type converter for dates that will not return null even if a null parameter is passed in.
-class ShouldNotBeNullDateTypeConverter {
+class SafeDateTypeConverter {
 
     @TypeConverter
     fun toDate(value: Long?): SafeDate {
