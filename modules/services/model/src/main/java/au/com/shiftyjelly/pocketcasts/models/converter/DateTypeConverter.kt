@@ -31,7 +31,7 @@ class ShouldNotBeNullDateTypeConverter {
                 Timber.w(it)
                 Sentry.addBreadcrumb(it)
             }
-            Date(Instant.EPOCH.toEpochMilli())
+            EPOCH
         } else {
             Date(value)
         }
@@ -39,4 +39,8 @@ class ShouldNotBeNullDateTypeConverter {
 
     @TypeConverter
     fun toLong(value: SafeDate?): Long = value?.time ?: 0L
+
+    companion object {
+        private val EPOCH = Date(Instant.EPOCH.toEpochMilli())
+    }
 }
