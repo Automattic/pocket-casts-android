@@ -15,6 +15,8 @@
         ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
     *   Fix text being cut off in discover search bar at high zoom 
         ([#1601](https://github.com/Automattic/pocket-casts-android/pull/1601))
+    *   Fix issues where multi-select on one screen would affect another screen
+        ([#1579](https://github.com/Automattic/pocket-casts-android/pull/1579))
 *   Updates:
     *   Display dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
