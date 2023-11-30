@@ -43,6 +43,15 @@ class LoggingInScreenViewModelTest {
     }
 
     @Test
+    fun `shouldClose immediately when state is RefreshComplete`() = runBlocking {
+        LoggingInScreenViewModel.State.RefreshComplete
+        val result = testSubject.shouldClose(withMinimumDelay = true)
+
+        assertEquals(true, result)
+    }
+
+
+    @Test
     fun `shouldClose with minimum delay when state is CompleteButDelaying`() =
         runBlocking {
 
