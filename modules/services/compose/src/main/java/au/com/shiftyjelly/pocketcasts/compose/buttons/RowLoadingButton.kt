@@ -58,7 +58,11 @@ fun RowLoadingButton(
 @Composable
 fun RowLoadingButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        RowLoadingButton(text = "Accept", onClick = {})
+        RowLoadingButton(
+            text = "Accept",
+            isLoading = true,
+            onClick = {}
+        )
     }
 }
 
@@ -67,7 +71,11 @@ fun RowLoadingButtonLightPreview() {
 @Composable
 fun RowLoadingButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
-        RowLoadingButton(text = "Accept", onClick = {})
+        RowLoadingButton(
+            text = "Accept",
+            isLoading = true,
+            onClick = {}
+        )
     }
 }
 
@@ -76,7 +84,12 @@ fun RowLoadingButtonDarkPreview() {
 @Composable
 fun RowLoadingButtonDisabledPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        RowLoadingButton(text = "Accept", enabled = false, onClick = {})
+        RowLoadingButton(
+            text = "Accept",
+            enabled = false,
+            isLoading = true,
+            onClick = {}
+        )
     }
 }
 
@@ -85,7 +98,12 @@ fun RowLoadingButtonDisabledPreview() {
 @Composable
 fun RowLoadingButtonNoPaddingPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        RowLoadingButton(text = "Accept", includePadding = false, onClick = {})
+        RowLoadingButton(
+            text = "Accept",
+            includePadding = false,
+            isLoading = true,
+            onClick = {}
+        )
     }
 }
 
@@ -96,7 +114,8 @@ fun RowLoadingButtonTextIconPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowLoadingButton(
             text = "Share",
-            onClick = {}
+            isLoading = true,
+            onClick = {},
         )
     }
 }
