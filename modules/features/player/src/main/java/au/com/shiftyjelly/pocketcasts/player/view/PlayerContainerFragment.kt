@@ -330,12 +330,12 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             newSections.add(Section.Notes)
         }
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            newSections.add(Section.Bookmarks)
-        }
-
         if (hasChapters) {
             newSections.add(Section.Chapters)
+        }
+
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            newSections.add(Section.Bookmarks)
         }
 
         this.sections = newSections
