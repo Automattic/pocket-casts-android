@@ -50,7 +50,6 @@ class LoggingInScreenViewModelTest {
         assertEquals(true, result)
     }
 
-
     @Test
     fun `shouldClose with minimum delay when state is CompleteButDelaying`() =
         runBlocking {
