@@ -1,6 +1,8 @@
 7.54
 -----
-
+*   Bug Fixes:
+    *   Fix user files not getting deleted after marking an episode as played
+        ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
 
 7.53
 -----
@@ -9,8 +11,10 @@
         ([#1561](https://github.com/Automattic/pocket-casts-android/pull/1561))
     *   Prevent crash if database is missing date episode is published
         ([#1573](https://github.com/Automattic/pocket-casts-android/pull/1573))
+    *   Change the Bookmarks tab position on the player to show after chapters
+        ([#1574](https://github.com/Automattic/pocket-casts-android/pull/1574))
 
-7.52
+* 7.52
 -----
 
 * New Features:

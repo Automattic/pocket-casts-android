@@ -177,7 +177,7 @@ private fun Content(
         item {
             WatchListChip(
                 title = stringResource(LR.string.settings_title_help),
-                iconRes = SR.drawable.settings_help,
+                iconRes = IR.drawable.ic_help,
                 onClick = onHelpClicked
             )
         }
