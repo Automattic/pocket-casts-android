@@ -37,7 +37,7 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.settings.HelpActivity
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,7 +63,7 @@ class StatusFragment : BaseFragment() {
     }
 
     private fun closeFragment() {
-        (activity as? HelpActivity)?.closeFragment(this)
+        (activity as? FragmentHostListener)?.closeModal(this)
     }
 }
 
