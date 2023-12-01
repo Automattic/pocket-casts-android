@@ -32,10 +32,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Confetti
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryAppLogo
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackground
-import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryBlurredBackgroundStyle
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryButton
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.blurredBackgroundStyle
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -149,12 +149,6 @@ private fun ReplayButton(
         modifier = modifier
             .fillMaxSize(.75f)
     )
-}
-
-@Composable
-private fun blurredBackgroundStyle(userTier: UserTier) = when (userTier) {
-    UserTier.Patron, UserTier.Plus -> StoryBlurredBackgroundStyle.Plus
-    UserTier.Free -> StoryBlurredBackgroundStyle.Default
 }
 
 @Preview(name = "Free user")
