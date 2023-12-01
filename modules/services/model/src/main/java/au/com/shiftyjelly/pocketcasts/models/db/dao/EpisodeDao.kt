@@ -419,7 +419,7 @@ abstract class EpisodeDao {
         """
         SELECT COUNT(DISTINCT uuid) AS completed 
         FROM podcast_episodes 
-        WHERE (playing_status = 3 OR played_up_to >= 0.9 * duration) 
+        WHERE (playing_status = 2 OR played_up_to >= 0.9 * duration) 
         AND podcast_episodes.last_playback_interaction_date IS NOT NULL 
         AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
         """
