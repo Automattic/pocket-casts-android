@@ -64,12 +64,7 @@ class LogsFragment : BaseFragment() {
         }
 
     private fun closeFragment() {
-        activity?.let {
-            when (it) {
-                is HelpActivity -> it.closeFragment(this)
-                is FragmentHostListener -> it.closeModal(this)
-            }
-        }
+        (activity as? FragmentHostListener)?.closeModal(this)
     }
 }
 

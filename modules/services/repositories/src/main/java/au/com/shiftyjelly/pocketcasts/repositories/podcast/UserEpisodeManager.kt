@@ -597,7 +597,10 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.updateAllPlayingStatus(it, System.currentTimeMillis(), EpisodePlayingStatus.COMPLETED) }
-        episodes.forEach { playbackManager.removeEpisode(it, source = SourceView.UNKNOWN, userInitiated = false) }
+        episodes.forEach {
+            playbackManager.removeEpisode(it, source = SourceView.UNKNOWN, userInitiated = false)
+            deletePlayedEpisodeIfReq(it, playbackManager)
+        }
     }
 
     override suspend fun markAllAsUnplayed(episodes: List<UserEpisode>) {

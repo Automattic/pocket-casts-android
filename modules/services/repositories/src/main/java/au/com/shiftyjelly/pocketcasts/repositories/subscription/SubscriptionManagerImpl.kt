@@ -374,8 +374,8 @@ class SubscriptionManagerImpl @Inject constructor(
                             BillingFlowParams.SubscriptionUpdateParams.newBuilder()
                                 .setOldPurchaseToken(existingPurchase.purchaseToken)
                                 /* User is changing subscription entitlement, proration rate applied at runtime (https://rb.gy/e876y)
-                                   Also, since upgrading to a more expensive tier, recommended proration rate is IMMEDIATE_AND_CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
-                                .setReplaceProrationMode(BillingFlowParams.ProrationMode.IMMEDIATE_AND_CHARGE_PRORATED_PRICE)
+                                   Also, since upgrading to a more expensive tier, recommended replacement mode is CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
+                                .setSubscriptionReplacementMode(BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE)
                                 .build()
                         )
                     }
