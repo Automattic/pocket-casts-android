@@ -1,12 +1,17 @@
 7.54
 -----
 
+*   Bug Fixes:
+    *   Fix user files not getting deleted after marking an episode as played
+        ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
 
 7.53
 -----
 *   Bug Fixes:
     *   Ensure we have the most up-to-date episode urls before attempting playback
         ([#1561](https://github.com/Automattic/pocket-casts-android/pull/1561))
+    *   Prevent crash if database is missing date episode is published
+        ([#1573](https://github.com/Automattic/pocket-casts-android/pull/1573))
 
 7.52
 -----
