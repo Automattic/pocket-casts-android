@@ -6,7 +6,7 @@
     android:layoutDirection="ltr"
     android:clickable="true"
     android:focusable="true"
-    android:theme="@style/Theme.Material3.DynamicColors.DayNight">
+    android:theme="@style/PCWidgetTheme">
 
     <FrameLayout
         android:id="@+id/widget_empty_player"
