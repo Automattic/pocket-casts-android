@@ -51,9 +51,11 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun observeByUuid(uuid: String): Flow<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
     abstract fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
     abstract fun observeDownloadingEpisodesRx(): Flowable<List<PodcastEpisode>>
 
@@ -170,12 +172,14 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
     abstract fun findLatestRx(podcastUuid: String): Maybe<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeStatusEnum OR (episode_status == :failedEpisodeStatusEnum AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadingEpisodesIncludingFailed(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status == :notDownloaded)")
     abstract suspend fun findStaleDownloads(notDownloaded: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadedEpisodes(downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
