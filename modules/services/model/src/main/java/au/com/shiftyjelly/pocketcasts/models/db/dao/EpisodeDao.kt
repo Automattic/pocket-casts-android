@@ -134,9 +134,11 @@ abstract class EpisodeDao {
     )
     abstract fun findNotificationEpisodes(date: Date, playingStatus: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
     abstract fun observeByPodcastOrderTitleAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
     abstract fun observeByPodcastOrderTitleDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
