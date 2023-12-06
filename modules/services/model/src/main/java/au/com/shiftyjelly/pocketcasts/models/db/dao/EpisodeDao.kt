@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -86,15 +87,19 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
     abstract suspend fun findByPodcastOrderTitleDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract fun findByPodcastOrderPublishedDateAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract suspend fun findByPodcastOrderPublishedDateAscSuspend(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract fun findByPodcastOrderPublishedDateDesc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract suspend fun findByPodcastOrderPublishedDateDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
@@ -131,9 +136,11 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
     abstract fun observeByPodcastOrderTitleDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract fun observeByPodcastOrderPublishedDateAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract fun observeByPodcastOrderPublishedDateDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
