@@ -106,15 +106,19 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid AND playing_status != 2 AND archived = 0 ORDER BY published_date DESC LIMIT 1")
     abstract fun findLatestUnfinishedEpisodeByPodcast(podcastUuid: String): PodcastEpisode?
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract fun findByPodcastOrderDurationAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract suspend fun findByPodcastOrderDurationAscSuspend(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun findByPodcastOrderDurationDesc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract suspend fun findByPodcastOrderDurationDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
@@ -144,9 +148,11 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract fun observeByPodcastOrderPublishedDateDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract fun observeByPodcastOrderDurationAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun observeByPodcastOrderDurationDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
