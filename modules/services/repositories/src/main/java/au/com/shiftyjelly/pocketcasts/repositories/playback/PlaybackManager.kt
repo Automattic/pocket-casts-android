@@ -1592,7 +1592,10 @@ open class PlaybackManager @Inject constructor(
                                     Timber.d("Episode is not downloaded $this")
                                 }
                             },
-                            onError = { Timber.e(it, "Error observing episode") }
+                            onError = {
+                                Timber.e(it, "Error observing episode")
+                                Sentry.captureException(it)
+                            }
                         )
                 }
             }
