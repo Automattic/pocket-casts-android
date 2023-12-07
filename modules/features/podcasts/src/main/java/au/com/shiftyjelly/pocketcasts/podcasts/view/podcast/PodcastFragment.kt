@@ -441,7 +441,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private val onNotificationsClicked: () -> Unit = {
         context?.let {
-            viewModel.toggleNotifications(it)
+            lifecycleScope.launch {
+                viewModel.toggleNotifications(it)
+            }
         }
     }
 

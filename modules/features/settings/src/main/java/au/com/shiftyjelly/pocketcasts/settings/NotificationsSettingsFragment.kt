@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
@@ -43,6 +44,7 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -70,6 +72,7 @@ class NotificationsSettingsFragment :
     private var enabledPreference: SwitchPreference? = null
     private var systemSettingsPreference: Preference? = null
     private var notificationActions: PreferenceScreen? = null
+    private var notificationPreviousSelectedPodcast: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
     private var hidePlaybackNotificationsPreference: SwitchPreference? = null
 
@@ -95,6 +98,7 @@ class NotificationsSettingsFragment :
         ringtonePreference = manager.findPreference("notificationRingtone")
         vibratePreference = manager.findPreference("notificationVibrate")
         notificationActions = manager.findPreference("notificationActions")
+        notificationPreviousSelectedPodcast = manager.findPreference("notificationPreviousSelectedPodcast")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
         hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
@@ -262,6 +266,26 @@ class NotificationsSettingsFragment :
         }
     }
 
+    private fun setupPreviousSelectedPodcast() {
+        notificationPreviousSelectedPodcast?.setOnPreferenceClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val podcastList = podcastManager.findSubscribed()
+                val hasPreviousSelectedPodcast = podcastList.any { it.previousSelectedPodcast }
+                val message = if (hasPreviousSelectedPodcast) {
+                    podcastManager.cpyPreviousSelectedPodcastToShowNotification()
+                    "Previous selected podcasts notifications enabled"
+                } else
+                    "No previous selected podcasts"
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            true
+        }
+    }
+
+
     private fun trackActionsChange(selectedActions: MutableList<NewEpisodeNotificationAction>) {
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_NOTIFICATIONS_ACTIONS_CHANGED,
@@ -304,6 +328,7 @@ class NotificationsSettingsFragment :
     private fun enabledPreferences(enabled: Boolean) {
         val notificationPodcasts = notificationPodcasts ?: return
         val notificationActions = notificationActions ?: return
+        val notificationPreviousSelectedPodcast = notificationPreviousSelectedPodcast ?: return
         val systemSettingsPreference = systemSettingsPreference ?: return
         val ringtonePreference = ringtonePreference ?: return
         val vibratePreference = vibratePreference ?: return
@@ -314,6 +339,9 @@ class NotificationsSettingsFragment :
             }
             if (findPreference<PreferenceScreen>("notificationActions") == null) {
                 category.addPreference(notificationActions)
+            }
+            if (findPreference<PreferenceScreen>("notificationPreviousSelectedPodcast") == null) {
+                category.addPreference(notificationPreviousSelectedPodcast)
             }
             if (findPreference<Preference>("openSystemSettings") == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 category.addPreference(systemSettingsPreference)
@@ -331,6 +359,7 @@ class NotificationsSettingsFragment :
             category.removePreference(ringtonePreference)
             category.removePreference(vibratePreference)
             category.removePreference(notificationActions)
+            category.removePreference(notificationPreviousSelectedPodcast)
             category.removePreference(systemSettingsPreference)
         }
     }
@@ -418,7 +447,6 @@ class NotificationsSettingsFragment :
                     )
 
                     lifecycleScope.launch {
-                        podcastManager.updateAllShowNotifications(checked)
                         // Don't change the podcasts summary until after the podcasts have been updated
                         changePodcastsSummary()
                     }
@@ -439,6 +467,7 @@ class NotificationsSettingsFragment :
                 changeVibrateSummary()
                 changeNotificationSoundSummary()
                 setupActions()
+                setupPreviousSelectedPodcast()
             }
         }
     }

@@ -62,6 +62,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -316,14 +318,33 @@ class PodcastViewModel
         }
     }
 
-    fun toggleNotifications(context: Context) {
+    suspend fun toggleNotifications(context: Context) {
         val podcast = podcast.value ?: return
         val showNotifications = !podcast.isShowNotifications
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(showNotifications))
-        Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
-        launch {
-            podcastManager.updateShowNotifications(podcast, showNotifications)
+        val notificationEnabled = withContext(Dispatchers.IO) {
+            async {
+                if (!settings.notifyRefreshPodcast.flow.value) {
+                    podcastManager.cpyShowNotificationToPreviousSelectedPodcast()
+                    podcastManager.updatePreviousSelectPodcast(podcast, true)
+                    podcastManager.updateShowNotifications(podcast, true)
+                    true
+                } else {
+                    podcastManager.updateShowNotifications(podcast, showNotifications)
+                    showNotifications
+                }
+            }.await()
         }
+
+        analyticsTracker.track(
+            AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED,
+            AnalyticsProp.notificationEnabled(notificationEnabled)
+        )
+
+        Toast.makeText(
+            context,
+            if (notificationEnabled) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     fun shouldShowArchiveAll(): Boolean {

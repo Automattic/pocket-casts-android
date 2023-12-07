@@ -1144,6 +1144,8 @@
     <string name="settings_no_thanks">No thanks</string>
     <string name="settings_notifications_new_episodes">New Episodes</string>
     <string name="settings_notification_actions">Actions</string>
+    <string name="settings_notification_previous_selected_podcast">Previous Selected Podcast</string>
+    <string name="settings_notification_previous_selected_podcast_summary">Enable notifications for all previously selected podcasts</string>
     <string name="settings_notification_advanced">Advanced settings</string>
     <string name="settings_notification_advanced_summary">Choose sounds and other system options</string>
     <string name="settings_notification_choose_podcasts">Choose podcasts</string>

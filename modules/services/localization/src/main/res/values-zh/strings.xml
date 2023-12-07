@@ -858,6 +858,8 @@ Language: zh_CN
     <string name="settings_notification_advanced_summary">选择声音和其他系统选项</string>
     <string name="settings_notification_advanced">高级设置</string>
     <string name="settings_notification_actions">动作</string>
+    <string name="settings_notification_previous_selected_podcast">先前选定的播客</string>
+    <string name="settings_notification_previous_selected_podcast_summary">启用所有先前选定播客的通知</string>
     <string name="settings_notifications_new_episodes">新剧集</string>
     <string name="settings_no_thanks">不，谢谢</string>
     <string name="settings_manage_downloads_total">总共</string>

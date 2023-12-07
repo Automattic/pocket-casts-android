@@ -69,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -247,6 +248,11 @@ class PodcastAdapter(
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
         holder.binding.podcast = podcast
+        ratingsViewModel.launch {
+            settings.notifyRefreshPodcast.flow.collect { value ->
+                holder.binding.isNotificationEnabled = value
+            }
+        }
         holder.binding.expanded = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)

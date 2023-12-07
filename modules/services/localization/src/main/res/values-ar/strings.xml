@@ -787,6 +787,8 @@ Language: ar
     <string name="settings_notification_advanced_summary">اختيار الأصوات وخيارات النظام الأخرى</string>
     <string name="settings_notification_advanced">الإعدادات المتقدمة</string>
     <string name="settings_notification_actions">الإجراءات</string>
+    <string name="settings_notification_previous_selected_podcast">البودكاست السابق المحدد</string>
+    <string name="settings_notification_previous_selected_podcast_summary">تمكين الإشعارات لجميع البودكاست السابقة المحددة</string>
     <string name="settings_notifications_new_episodes">حلقات جديدة</string>
     <string name="settings_no_thanks">لا شكرًا</string>
     <string name="settings_manage_downloads_total">الإجمالي</string>

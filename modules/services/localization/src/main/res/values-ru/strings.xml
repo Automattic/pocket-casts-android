@@ -858,6 +858,8 @@ Language: ru
     <string name="settings_notification_advanced_summary">Выбрать звуки и другие параметры системы</string>
     <string name="settings_notification_advanced">Расширенные настройки</string>
     <string name="settings_notification_actions">Действия</string>
+    <string name="settings_notification_previous_selected_podcast">Предыдущий выбранный подкаст</string>
+    <string name="settings_notification_previous_selected_podcast_summary">Включить уведомления для всех ранее выбранных подкастов</string>
     <string name="settings_notifications_new_episodes">Новые выпуски</string>
     <string name="settings_no_thanks">Нет, спасибо</string>
     <string name="settings_manage_downloads_total">Итого</string>

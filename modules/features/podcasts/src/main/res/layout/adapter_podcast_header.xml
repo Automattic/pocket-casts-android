@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
+        <variable name="isNotificationEnabled" type="Boolean" />
         <variable name="expanded" type="boolean" />
         <variable name="tintColor" type="int"/>
         <variable name="headerColor" type="int"/>
@@ -21,7 +22,9 @@
             app:tintColor="@{tintColor}"
             app:headerColor="@{headerColor}"
             app:expanded="@{expanded}"
-            app:isPlusOrPatronUser="@{isPlusOrPatronUser}"/>
+            app:isPlusOrPatronUser="@{isPlusOrPatronUser}"
+            app:isNotificationEnabled="@{isNotificationEnabled}"
+            />
 
         <include
             android:id="@+id/bottom"

@@ -858,6 +858,8 @@ Language: pt_BR
     <string name="settings_notification_advanced_summary">Escolher sons e outras opções de sistema</string>
     <string name="settings_notification_advanced">Configurações avançadas</string>
     <string name="settings_notification_actions">Ações</string>
+    <string name="settings_notification_previous_selected_podcast">Podcast Anterior Selecionado</string>
+    <string name="settings_notification_previous_selected_podcast_summary">Ativar notificações para todos os podcasts previamente selecionados</string>
     <string name="settings_notifications_new_episodes">Novos episódios</string>
     <string name="settings_no_thanks">Não, obrigado</string>
     <string name="settings_manage_downloads_total">Total</string>

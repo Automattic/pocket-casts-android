@@ -367,4 +367,14 @@ abstract class PodcastDao {
 
     @Query("SELECT * FROM podcasts ORDER BY random() LIMIT :limit")
     abstract suspend fun findRandomPodcasts(limit: Int): List<Podcast>
+
+    @Query("UPDATE podcasts SET previous_selected_podcast = :show WHERE uuid = :uuid")
+    abstract fun updatePreviousSelectPodcast(show: Boolean, uuid: String)
+
+    @Query("UPDATE podcasts SET previous_selected_podcast = show_notifications, show_notifications = 0")
+    abstract fun cpyShowNotificationToPreviousSelectedPodcast()
+
+    @Query("UPDATE podcasts SET show_notifications = previous_selected_podcast, previous_selected_podcast = 0")
+    abstract fun cpyPreviousSelectedPodcastToShowNotification()
+
 }

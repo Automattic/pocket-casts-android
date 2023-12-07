@@ -858,6 +858,8 @@ Language: ko_KR
     <string name="settings_notification_advanced_summary">소리 및 기타 시스템 옵션 선택</string>
     <string name="settings_notification_advanced">고급 설정</string>
     <string name="settings_notification_actions">작업</string>
+    <string name="settings_notification_previous_selected_podcast">이전에 선택한 팟캐스트</string>
+    <string name="settings_notification_previous_selected_podcast_summary">이전에 선택한 모든 팟캐스트에 대한 알림 활성화</string>
     <string name="settings_notifications_new_episodes">새 에피소드</string>
     <string name="settings_no_thanks">괜찮습니다</string>
     <string name="settings_manage_downloads_total">합계</string>
