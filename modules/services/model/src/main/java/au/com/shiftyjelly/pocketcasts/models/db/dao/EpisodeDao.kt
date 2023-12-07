@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -50,9 +51,11 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun observeByUuid(uuid: String): Flow<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
     abstract fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
     abstract fun observeDownloadingEpisodesRx(): Flowable<List<PodcastEpisode>>
 
@@ -86,30 +89,38 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
     abstract suspend fun findByPodcastOrderTitleDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract fun findByPodcastOrderPublishedDateAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract suspend fun findByPodcastOrderPublishedDateAscSuspend(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract fun findByPodcastOrderPublishedDateDesc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract suspend fun findByPodcastOrderPublishedDateDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid AND playing_status != 2 AND archived = 0 ORDER BY published_date DESC LIMIT 1")
     abstract fun findLatestUnfinishedEpisodeByPodcast(podcastUuid: String): PodcastEpisode?
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract fun findByPodcastOrderDurationAsc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract suspend fun findByPodcastOrderDurationAscSuspend(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun findByPodcastOrderDurationDesc(podcastUuid: String): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract suspend fun findByPodcastOrderDurationDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
@@ -125,21 +136,27 @@ abstract class EpisodeDao {
     )
     abstract fun findNotificationEpisodes(date: Date, playingStatus: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
     abstract fun observeByPodcastOrderTitleAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
     abstract fun observeByPodcastOrderTitleDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
     abstract fun observeByPodcastOrderPublishedDateAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
     abstract fun observeByPodcastOrderPublishedDateDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
     abstract fun observeByPodcastOrderDurationAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun observeByPodcastOrderDurationDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
@@ -155,12 +172,14 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
     abstract fun findLatestRx(podcastUuid: String): Maybe<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeStatusEnum OR (episode_status == :failedEpisodeStatusEnum AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadingEpisodesIncludingFailed(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status == :notDownloaded)")
     abstract suspend fun findStaleDownloads(notDownloaded: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadedEpisodes(downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
