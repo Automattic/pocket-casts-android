@@ -800,4 +800,19 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
     }
+
+    override fun updatePreviousSelectPodcast(podcast: Podcast, show: Boolean) {
+        if (show) {
+            settings.notifyRefreshPodcast.set(true)
+        }
+        podcastDao.updatePreviousSelectPodcast(show, podcast.uuid)
+    }
+
+    override fun cpyShowNotificationToPreviousSelectedPodcast() {
+        podcastDao.cpyShowNotificationToPreviousSelectedPodcast()
+    }
+
+    override fun cpyPreviousSelectedPodcastToShowNotification() {
+        podcastDao.cpyPreviousSelectedPodcastToShowNotification()
+    }
 }

@@ -143,4 +143,10 @@ interface PodcastManager {
     suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 
     suspend fun findRandomPodcasts(limit: Int): List<Podcast>
+
+    fun updatePreviousSelectPodcast(podcast: Podcast, show: Boolean)
+
+    fun cpyShowNotificationToPreviousSelectedPodcast()
+
+    fun cpyPreviousSelectedPodcastToShowNotification()
 }

@@ -11,6 +11,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -35,6 +36,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -126,7 +130,20 @@ class PodcastSelectFragment : BaseFragment() {
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = {
-                    val adapter = PodcastSelectAdapter(it, args.tintColor, imageLoader) {
+                    val adapter = PodcastSelectAdapter(
+                        list = it,
+                        tintColor = args.tintColor,
+                        imageLoader = imageLoader,
+                        object : PodcastSelectAdapter.OnCheckBoxChangeListener {
+                            override fun checked(podcast: Podcast, isChecked: Boolean) {
+                                lifecycleScope.launch {
+                                    withContext(Dispatchers.IO) {
+                                        podcastManager.updateShowNotifications(podcast, isChecked)
+                                    }
+                                }
+                            }
+
+                        }) {
                         val selectedList = it.map { it.uuid }
                         binding.lblPodcastsChosen.text =
                             resources.getStringPluralPodcastsSelected(selectedList.size)
@@ -220,7 +237,13 @@ class PodcastSelectFragment : BaseFragment() {
 }
 
 private data class SelectablePodcast(val podcast: Podcast, var selected: Boolean)
-private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt val tintColor: Int?, val imageLoader: PodcastImageLoader, val onSelectionChanged: (selected: List<Podcast>) -> Unit) : RecyclerView.Adapter<PodcastSelectAdapter.PodcastViewHolder>() {
+private class PodcastSelectAdapter(
+    val list: List<SelectablePodcast>,
+    @ColorInt val tintColor: Int?,
+    val imageLoader: PodcastImageLoader,
+    val onCheckBoxChangeListener: OnCheckBoxChangeListener,
+    val onSelectionChanged: (selected: List<Podcast>) -> Unit
+) : RecyclerView.Adapter<PodcastSelectAdapter.PodcastViewHolder>() {
 
     class PodcastViewHolder(val binding: SettingsRowPodcastBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -247,6 +270,7 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
 
         holder.itemView.setOnClickListener {
             holder.binding.checkbox.isChecked = !holder.binding.checkbox.isChecked
+            onCheckBoxChangeListener.checked(item.podcast, !holder.binding.checkbox.isChecked)
         }
         holder.binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             item.selected = isChecked
@@ -273,6 +297,10 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
         list.forEach { it.selected = false }
         notifyDataSetChanged()
         onSelectionChanged(selectedPodcasts)
+    }
+
+    interface OnCheckBoxChangeListener{
+        fun checked(podcast: Podcast, isChecked: Boolean)
     }
 }
 

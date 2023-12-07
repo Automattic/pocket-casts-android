@@ -63,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class
     ],
-    version = 78,
+    version = 79,
     exportSchema = true
 )
 @TypeConverters(
@@ -484,6 +484,13 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE `temp_podcast_ratings` RENAME TO `podcast_ratings`;")
         }
 
+        val MIGRATION_78_79 = addMigration(78, 79) { database ->
+            val podcastColumnNames = getColumnNames(database, "podcasts")
+            if (!podcastColumnNames.contains("previous_selected_podcast")) {
+                database.execSQL("ALTER TABLE podcasts ADD COLUMN previous_selected_podcast BOOLEAN NOT NULL DEFAULT 0")
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -852,6 +859,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_75_76,
                 MIGRATION_76_77,
                 MIGRATION_77_78,
+                MIGRATION_78_79,
             )
         }
 

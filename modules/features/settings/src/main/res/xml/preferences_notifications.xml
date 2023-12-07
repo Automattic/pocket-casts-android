@@ -23,6 +23,12 @@
             android:summary=""
             android:title="@string/settings_notification_actions" />
 
+        <PreferenceScreen
+            android:key="notificationPreviousSelectedPodcast"
+            android:persistent="false"
+            android:summary="@string/settings_notification_previous_selected_podcast_summary"
+            android:title="@string/settings_notification_previous_selected_podcast" />
+
         <Preference
             android:key="notificationRingtone"
             android:persistent="false"

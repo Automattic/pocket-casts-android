@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
+        <variable name="isNotificationEnabled" type="Boolean" />
         <variable name="tintColor" type="int"/>
         <variable name="headerColor" type="int"/>
         <variable name="expanded" type="boolean" />
@@ -94,7 +95,7 @@
             android:focusable="true"
             app:tint="?attr/primary_icon_02"
             app:show="@{podcast.isSubscribed}"
-            android:src="@{podcast.isShowNotifications() ? @drawable/ic_notifications_on : @drawable/ic_notifications_off}"
+            android:src="@{isNotificationEnabled &amp;&amp; podcast.isShowNotifications() ? @drawable/ic_notifications_on : @drawable/ic_notifications_off}"
             android:scaleType="center"
             app:layout_constraintEnd_toStartOf="@+id/settings"
             app:layout_constraintBottom_toBottomOf="parent" />

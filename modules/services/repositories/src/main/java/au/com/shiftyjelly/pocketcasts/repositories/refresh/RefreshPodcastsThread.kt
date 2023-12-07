@@ -384,6 +384,10 @@ class RefreshPodcastsThread(
                 return
             }
 
+            if (!settings.notifyRefreshPodcast.flow.value){
+                return
+            }
+
             settings.setNotificationLastSeenToNow()
 
             val podcastsShowingNotifications = podcastManager.countNotificationsOn()
