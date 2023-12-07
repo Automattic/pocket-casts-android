@@ -1591,7 +1591,8 @@ open class PlaybackManager @Inject constructor(
                                 } else {
                                     Timber.d("Episode is not downloaded $this")
                                 }
-                            }
+                            },
+                            onError = { Timber.e(it, "Error observing episode") }
                         )
                 }
             }
