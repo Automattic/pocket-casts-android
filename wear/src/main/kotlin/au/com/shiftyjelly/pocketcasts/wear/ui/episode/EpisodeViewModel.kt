@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -75,7 +75,7 @@ class EpisodeViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
-    private val showNotesManager: ServerShowNotesManager,
+    private val showNotesManager: ShowNotesManager,
     theme: Theme,
     @ApplicationContext appContext: Context,
     @ForApplicationScope private val coroutineScope: CoroutineScope,

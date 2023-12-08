@@ -366,6 +366,21 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateImageUrls(updates: List<ImageUrlUpdate>) {
+        appDatabase.withTransaction {
+            updates.forEach { updateImageUrl(it.episodeUuid, it.imageUrl) }
+        }
+    }
+
+    private suspend fun updateImageUrl(episodeUuid: String, imageUrl: String) {
+        findByUuid(episodeUuid)?.let { episode ->
+            if (episode.imageUrl != imageUrl) {
+                episode.imageUrl = imageUrl
+                update(episode)
+            }
+        }
+    }
+
     override suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum) {
         episode ?: return
         episode.episodeStatus = status

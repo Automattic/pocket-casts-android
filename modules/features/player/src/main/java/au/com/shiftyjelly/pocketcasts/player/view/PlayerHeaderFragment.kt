@@ -50,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import coil.load
+import coil.request.Disposable
+import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.size.Size
 import coil.transform.RoundedCornersTransformation
@@ -223,7 +225,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             if (headerViewModel.embeddedArtwork == PlayerViewModel.Artwork.None && headerViewModel.podcastUuid != null) {
                 loadArtwork(headerViewModel.podcastUuid, binding.artwork)
             } else {
-                loadEpisodeArtwork(headerViewModel.embeddedArtwork, binding.artwork)
+                loadEpisodeArtwork(headerViewModel.embeddedArtwork, binding.artwork)?.let { disposable ->
+                    launch {
+                        // If episode artwork fails to load, then load podcast artwork
+                        val result = disposable.job.await()
+                        if (result is ErrorResult && headerViewModel.podcastUuid != null) {
+                            loadArtwork(headerViewModel.podcastUuid, binding.artwork)
+                        }
+                    }
+                }
             }
 
             loadChapterArtwork(headerViewModel.chapter, binding.chapterArtwork)
@@ -413,8 +423,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private var lastLoadedEmbedded: PlayerViewModel.Artwork? = null
-    private fun loadEpisodeArtwork(embeddedArtwork: PlayerViewModel.Artwork, imageView: ImageView) {
-        if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return
+    private fun loadEpisodeArtwork(
+        embeddedArtwork: PlayerViewModel.Artwork,
+        imageView: ImageView,
+    ): Disposable? {
+
+        if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return null
+
+        var disposable: Disposable? = null
 
         if (embeddedArtwork is PlayerViewModel.Artwork.Url || embeddedArtwork is PlayerViewModel.Artwork.Path) {
             imageView.imageTintList = null
@@ -426,14 +442,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
 
             if (embeddedArtwork is PlayerViewModel.Artwork.Path) {
-                imageView.load(data = File(embeddedArtwork.path), builder = imageBuilder)
+                disposable = imageView.load(data = File(embeddedArtwork.path), builder = imageBuilder)
             } else if (embeddedArtwork is PlayerViewModel.Artwork.Url) {
-                imageView.load(data = embeddedArtwork.url, builder = imageBuilder)
+                disposable = imageView.load(data = embeddedArtwork.url, builder = imageBuilder)
             }
 
             lastLoadedEmbedded = embeddedArtwork
             lastLoadedUuid = null
         }
+        return disposable
     }
 
     private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {

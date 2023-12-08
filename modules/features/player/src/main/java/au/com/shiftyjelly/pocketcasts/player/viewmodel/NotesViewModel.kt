@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
@@ -26,7 +26,7 @@ class NotesViewModel
 @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
-    private val serverShowNotesManager: ServerShowNotesManager,
+    private val showNotesManager: ShowNotesManager,
     @ApplicationContext context: Context
 ) : ViewModel() {
 
@@ -72,7 +72,7 @@ class NotesViewModel
             val linkColor = if (podcast.tintColorForDarkBg == 0) Color.WHITE else podcast.tintColorForDarkBg
             showNotesFormatter.linkColor = ColorUtils.colorIntToHexString(linkColor)
             // load the show notes
-            val state = serverShowNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episode.uuid)
+            val state = showNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episode.uuid)
             // show an error message if the show notes couldn't be loaded
             val text = if (state is ShowNotesState.Loaded) state.showNotes else errorLoadingString
             // theme the show notes
