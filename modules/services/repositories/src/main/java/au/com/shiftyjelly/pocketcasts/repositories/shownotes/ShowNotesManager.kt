@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import kotlinx.coroutines.flow.Flow
+import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
 
 class ShowNotesManager @Inject constructor(
@@ -34,7 +35,8 @@ class ShowNotesManager @Inject constructor(
         )
     }
 
-    private suspend fun updateEpisodesWithImageUrls(showNotesResponse: ShowNotesResponse) {
+    @VisibleForTesting
+    internal suspend fun updateEpisodesWithImageUrls(showNotesResponse: ShowNotesResponse) {
         showNotesResponse.podcast?.episodes?.mapNotNull { showNotesEpisode ->
             showNotesEpisode.image?.let { image ->
                 ImageUrlUpdate(showNotesEpisode.uuid, image)
