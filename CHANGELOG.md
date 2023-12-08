@@ -4,6 +4,8 @@
 *   Bug Fixes:
     *   Fix user files not getting deleted after marking an episode as played
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
+    *   Fix crash when database emits unexpected null value
+        ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
 
 7.53
 -----
