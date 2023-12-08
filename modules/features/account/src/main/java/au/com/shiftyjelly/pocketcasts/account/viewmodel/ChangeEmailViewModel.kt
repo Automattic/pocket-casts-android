@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -18,8 +19,9 @@ class ChangeEmailViewModel
 
     var existingEmail = syncManager.getEmail()
 
-    val changeEmailState =
-        MutableLiveData<ChangeEmailState>().apply { value = ChangeEmailState.Empty }
+    private val _changeEmailState = mutableStateOf<ChangeEmailState>(ChangeEmailState.Empty)
+    val changeEmailState: State<ChangeEmailState> = _changeEmailState
+
     private val disposables = CompositeDisposable()
 
     private fun errorUpdate(error: ChangeEmailError, add: Boolean, message: String?) {
@@ -28,14 +30,13 @@ class ChangeEmailViewModel
             is ChangeEmailState.Failure -> {
                 errors.addAll(existingState.errors)
             }
-
             else -> {}
         }
         if (add) errors.add(error) else errors.remove(error)
         if (errors.isNotEmpty()) {
-            changeEmailState.value = ChangeEmailState.Failure(errors, message)
+            _changeEmailState.value = ChangeEmailState.Failure(errors, message)
         } else {
-            changeEmailState.postValue(ChangeEmailState.Empty)
+            _changeEmailState.value = ChangeEmailState.Empty
         }
     }
 
@@ -68,7 +69,7 @@ class ChangeEmailViewModel
         if (emailString.isEmpty() || pwdString.isEmpty()) {
             return
         }
-        changeEmailState.postValue(ChangeEmailState.Loading)
+        _changeEmailState.value = ChangeEmailState.Loading
 
         syncManager.emailChange(emailString, pwdString)
             .subscribeOn(Schedulers.io())
@@ -76,10 +77,10 @@ class ChangeEmailViewModel
                 val success = response.success ?: false
                 if (success) {
                     existingEmail = emailString
-                    changeEmailState.postValue(ChangeEmailState.Success("OK"))
+                    _changeEmailState.value = ChangeEmailState.Success("OK")
                 } else {
                     val errors = mutableSetOf(ChangeEmailError.SERVER)
-                    changeEmailState.postValue(ChangeEmailState.Failure(errors, response.message))
+                    _changeEmailState.value = ChangeEmailState.Failure(errors, response.message)
                 }
             }
             .doFinally {
@@ -87,9 +88,7 @@ class ChangeEmailViewModel
                     disposables.clear()
                 }
             }
-            .subscribeBy(onError = {
-                Timber.e(it)
-            })
+            .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
     }
 }
@@ -104,6 +103,5 @@ sealed class ChangeEmailState {
     object Empty : ChangeEmailState()
     object Loading : ChangeEmailState()
     data class Success(val result: String) : ChangeEmailState()
-    data class Failure(val errors: MutableSet<ChangeEmailError>, val message: String?) :
-        ChangeEmailState()
+    data class Failure(val errors: MutableSet<ChangeEmailError>, val message: String?) : ChangeEmailState()
 }
