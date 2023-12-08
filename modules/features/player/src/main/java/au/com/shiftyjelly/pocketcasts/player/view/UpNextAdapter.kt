@@ -3,8 +3,10 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.ColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
@@ -32,6 +34,11 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
+import com.airbnb.lottie.model.KeyPath
+import com.airbnb.lottie.value.LottieValueCallback
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -99,7 +106,7 @@ class UpNextAdapter(
     }
 
     private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: BaseEpisode) {
-        holder.bind(episode, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode))
+        holder.bind(episode, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), theme)
 
         holder.binding.itemContainer.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
@@ -161,16 +168,16 @@ class UpNextAdapter(
         }
 
         fun bind(playingState: UpNextPlaying) {
-            val titleColor = ThemeColor.playerContrast01(theme)
-            val tintColor = ThemeColor.playerContrast02(theme)
-
             Timber.d("Playing state episode: ${playingState.episode.playedUpTo}")
             binding.chapterProgress.theme = theme
-            binding.title.setTextColor(titleColor)
-            binding.info.setTextColor(tintColor)
             binding.playingState = playingState
-            binding.date.text = playingState.episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
-            binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.playerContrast01(theme))
+            binding.date.text = playingState.episode.getSummaryText(
+                dateFormatter = dateFormatter,
+                tintColor = ThemeColor.primaryText02(theme),
+                showDuration = false,
+                context = binding.date.context
+            )
+            binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
             binding.executePendingBindings()
 
             if (loadedUuid != playingState.episode.uuid) {
@@ -179,8 +186,18 @@ class UpNextAdapter(
                 loadedUuid = playingState.episode.uuid
             }
 
-            binding.playingAnimation.isVisible = isPlaying
+            binding.playingAnimation.apply {
+                isVisible = isPlaying
+                applyColorFilter(ThemeColor.primaryText01(theme))
+            }
         }
+    }
+
+    private fun LottieAnimationView.applyColorFilter(@ColorInt color: Int) {
+        val filter = SimpleColorFilter(color)
+        val keyPath = KeyPath("**")
+        val callback = LottieValueCallback<ColorFilter>(filter)
+        addValueCallback(keyPath, LottieProperty.COLOR_FILTER, callback)
     }
 
     private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {

@@ -28,7 +28,7 @@
                 android:layout_marginStart="16dp"
                 android:ellipsize="start"
                 style="@style/P60"
-                android:textColor="?attr/player_contrast_02"
+                android:textColor="?attr/primary_text_02"
                 android:text="@{totalTime}"
                 android:layout_marginEnd="16dp"
                 tools:text="23 min." />
@@ -66,7 +66,7 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/player_up_next_empty"
                 android:textAppearance="?attr/textH2"
-                android:textColor="?attr/player_contrast_01"/>
+                android:textColor="?attr/primary_text_01"/>
 
             <TextView
                 android:id="@+id/emptyDesc"
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/player_up_next_empty_desc"
                 android:textAppearance="?attr/textSubtitle2"
-                android:textColor="?attr/player_contrast_02"
+                android:textColor="?attr/primary_text_02"
                 android:gravity="center_horizontal"
                 android:lineSpacingExtra="6sp"
                 android:layout_marginTop="12dp"
