@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryCompletionRate
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
@@ -25,7 +26,7 @@ class ShareableTextProvider @Inject constructor(
 ) {
     var chosenActivity: String? = null
     private var shortURL: String = Settings.SERVER_SHORT_URL
-    private val hashtags = listOf("pocketcasts", "endofyear2023").joinToString(" ") { "#$it" }
+    private val hashtags = listOf("pocketcasts", "playback2023").joinToString(" ") { "#$it" }
 
     suspend fun getShareableDataForStory(
         story: Story,
@@ -121,6 +122,10 @@ class ShareableTextProvider @Inject constructor(
                 resources.getString(
                     LR.string.end_of_year_stories_year_over_share_text
                 )
+            }
+
+            is StoryCompletionRate -> {
+                resources.getString(LR.string.end_of_year_stories_completion_rate_share_text)
             }
 
             else -> ""

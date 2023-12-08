@@ -6,4 +6,5 @@ class StoryCompletionRate(
     val episodesStartedAndCompleted: EpisodesStartedAndCompleted,
 ) : Story() {
     override val identifier: String = "completion_rate"
+    override val plusOnly: Boolean = true
 }

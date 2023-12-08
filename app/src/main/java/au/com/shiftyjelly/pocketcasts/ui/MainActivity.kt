@@ -373,7 +373,10 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
+                            VR.id.navigation_profile -> {
+                                resetEoYBadgeIfNeeded()
+                                FirebaseAnalyticsTracker.navigatedToProfile()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -654,6 +657,13 @@ class MainActivity :
         )
     }
 
+    private fun showEndOfYearModal() {
+        viewModel.updateStoriesModalShowState(true)
+        launch(Dispatchers.Main) {
+            if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
+        }
+    }
+
     override fun showStoriesOrAccount(source: String) {
         if (viewModel.isSignedIn) {
             showStories(StoriesSource.fromString(source))
@@ -733,10 +743,8 @@ class MainActivity :
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
                 } else if (settings.getEndOfYearShowModal()) {
-                    viewModel.updateStoriesModalShowState(true)
-                    launch(Dispatchers.Main) {
-                        if (viewModel.isEndOfYearStoriesEligible()) setupEndOfYearLaunchBottomSheet()
-                    }
+                    if (isWhatsNewShowing()) return@observe
+                    showEndOfYearModal()
                 }
             }
 
@@ -796,6 +804,11 @@ class MainActivity :
                     }
                 }
             })
+    }
+
+    override fun whatsNewDismissed(fromConfirmAction: Boolean) {
+        if (fromConfirmAction) return
+        if (settings.getEndOfYearShowModal()) showEndOfYearModal()
     }
 
     override fun updatePlayerView() {
@@ -868,6 +881,10 @@ class MainActivity :
         FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
+
+        val playerContainerFragment = supportFragmentManager.fragments
+            .find { it is PlayerContainerFragment } as? PlayerContainerFragment
+        playerContainerFragment?.onPlayerOpen()
     }
 
     override fun onPlayerClosed() {
@@ -875,6 +892,10 @@ class MainActivity :
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
+
+        val playerContainerFragment = supportFragmentManager.fragments
+            .find { it is PlayerContainerFragment } as? PlayerContainerFragment
+        playerContainerFragment?.onPlayerClose()
     }
 
     override fun openTab(tabId: Int) {
@@ -911,6 +932,8 @@ class MainActivity :
     }
 
     override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
+
+    private fun isWhatsNewShowing() = bottomSheetTag == WhatsNewFragment::class.java.name
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name

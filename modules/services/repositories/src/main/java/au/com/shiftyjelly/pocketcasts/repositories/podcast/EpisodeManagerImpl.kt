@@ -523,6 +523,12 @@ class EpisodeManagerImpl @Inject constructor(
 
         // Auto archive after playing
         archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
+
+        if (episode is UserEpisode) {
+            launch {
+                userEpisodeManager.deletePlayedEpisodeIfReq(episode, playbackManager)
+            }
+        }
     }
 
     override fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
@@ -1183,4 +1189,20 @@ class EpisodeManagerImpl @Inject constructor(
         started = episodeDao.countEpisodesStarted(fromEpochMs, toEpochMs),
         completed = episodeDao.countEpisodesCompleted(fromEpochMs, toEpochMs),
     )
+
+    /**
+     * Get the latest episode url from the server and persist it if it is different from
+     * the locally saved downloadUrl if it is different
+     * @return the latest download url for the episode
+     */
+    override suspend fun updateDownloadUrl(episode: PodcastEpisode): String? =
+        withContext(Dispatchers.IO) {
+            val newDownloadUrl = podcastCacheServerManager.getEpisodeUrl(episode)
+            if (newDownloadUrl != null && episode.downloadUrl != newDownloadUrl) {
+                Timber.i("Updating PodcastEpisode url in database for ${episode.uuid} to $newDownloadUrl")
+                episodeDao.updateDownloadUrl(newDownloadUrl, episode.uuid)
+            }
+
+            return@withContext newDownloadUrl ?: episode.downloadUrl
+        }
 }

@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.components.DayCirclesView
@@ -41,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListen
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val ListenedTimeFontSize = 100
+private const val ListenedTimeFontSize = 200
 
 @Composable
 fun StoryListeningTimeView(
@@ -61,9 +62,9 @@ fun StoryListeningTimeView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 40.dp)
+                .padding(vertical = 30.dp)
         ) {
-            Spacer(modifier = modifier.weight(0.2f))
+            Spacer(modifier = modifier.height(40.dp))
 
             PrimaryText(story, modifier)
 
@@ -118,13 +119,14 @@ private fun ListenedTimeTexts(story: StoryListeningTime) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text(
+        AutoResizeText(
             text = listeningTimeDisplayStrings.firstNumber,
             color = story.tintColor,
-            fontSize = ListenedTimeFontSize.nonScaledSp,
+            maxFontSize = ListenedTimeFontSize.nonScaledSp,
             lineHeight = ListenedTimeFontSize.nonScaledSp,
             fontWeight = FontWeight.W300,
             fontFamily = StoryFontFamily,
+            maxLines = 1,
             style = LocalTextStyle.current.merge(
                 @Suppress("DEPRECATION")
                 TextStyle(
@@ -146,6 +148,7 @@ private fun ListenedTimeTexts(story: StoryListeningTime) {
             fontFamily = StoryFontFamily,
             fontWeight = FontWeight.W600,
             disableScale = disableScale(),
+            modifier = Modifier.offset(y = (-50).dp),
         )
     }
 }

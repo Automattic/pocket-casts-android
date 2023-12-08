@@ -1,8 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -11,15 +16,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -53,8 +64,20 @@ class StoriesViewModelTest {
     @Mock
     private lateinit var freeStory2: Story
 
+    @Mock
+    private lateinit var subscriptionManager: SubscriptionManager
+
+    @Mock
+    private lateinit var cachedSubscriptionStatus: SubscriptionStatus
+
+    @Mock
+    private lateinit var userSetting: UserSetting<SubscriptionStatus?>
+
+    private lateinit var cachedSubscriptionStatusFlow: MutableStateFlow<SubscriptionStatus>
+
     @Before
     fun setup() {
+        cachedSubscriptionStatusFlow = MutableStateFlow(cachedSubscriptionStatus)
         whenever(settings.userTier).thenReturn(UserTier.Free)
         whenever(plusStory1.plusOnly).thenReturn(true)
         whenever(plusStory2.plusOnly).thenReturn(true)
@@ -193,14 +216,68 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, plusStory3) // plusStory3 is not skipped
     }
 
+    /* Upsell */
+    @Test
+    fun `given free user, when plus story shown, then upsell shown`() = runTest {
+        whenever(settings.userTier).thenReturn(UserTier.Free)
+        val viewModel = initViewModel(listOf(plusStory1))
+
+        val shouldShowUpsell = viewModel.shouldShowUpsell()
+
+        assertTrue(shouldShowUpsell)
+    }
+
+    @Test
+    fun `given paid user, when plus story shown, then upsell not shown`() = runTest {
+        whenever(settings.userTier).thenReturn(UserTier.Plus)
+        val viewModel = initViewModel(listOf(plusStory1))
+
+        val shouldShowUpsell = viewModel.shouldShowUpsell()
+
+        assertFalse(shouldShowUpsell)
+    }
+
+    /* Subscription updated */
+    @Test
+    fun `given subscription updated, then listening history and stories reloaded`() = runTest {
+        whenever(settings.userTier)
+            .thenReturn(UserTier.Free)
+            .thenReturn(UserTier.Plus)
+        initViewModel(listOf(plusStory1))
+
+        cachedSubscriptionStatusFlow.value = mock()
+
+        verify(endOfYearManager, times(2)).downloadListeningHistory(anyOrNull())
+        verify(endOfYearManager, times(2)).loadStories()
+    }
+
+    @Test
+    fun `given subscription not updated, then listening history and stories not reloaded`() = runTest {
+        whenever(settings.userTier)
+            .thenReturn(UserTier.Free)
+            .thenReturn(UserTier.Free)
+        initViewModel(listOf(plusStory1))
+
+        cachedSubscriptionStatusFlow.value = mock()
+
+        verify(endOfYearManager, times(1)).downloadListeningHistory(anyOrNull())
+        verify(endOfYearManager, times(1)).loadStories()
+    }
+
     private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
         whenever(endOfYearManager.loadStories()).thenReturn(mockStories)
+        whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS))
+            .thenReturn(flowOf(FreeTrial(Subscription.SubscriptionTier.PLUS)))
+        whenever(userSetting.flow).thenReturn(cachedSubscriptionStatusFlow)
+        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
+
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
             fileUtilWrapper = fileUtilWrapper,
             shareableTextProvider = mock(),
             analyticsTracker = mock(),
             settings = settings,
+            subscriptionManager = subscriptionManager,
         )
     }
 }

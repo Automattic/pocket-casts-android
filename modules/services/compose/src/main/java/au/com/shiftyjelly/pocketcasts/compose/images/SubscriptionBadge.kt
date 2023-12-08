@@ -84,15 +84,18 @@ fun SubscriptionBadgeForTier(
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
-                SubscriptionBadgeDisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
-                SubscriptionBadgeDisplayMode.Colored -> SubscriptionTierColor.plusGold
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> SubscriptionTierColor.plusGold
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
-                SubscriptionBadgeDisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
         SubscriptionTier.PATRON -> SubscriptionBadge(
@@ -100,15 +103,18 @@ fun SubscriptionBadgeForTier(
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.patronPurpleLight
-                SubscriptionBadgeDisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
-                SubscriptionBadgeDisplayMode.Colored -> SubscriptionTierColor.patronPurple
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> SubscriptionTierColor.patronPurple
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
-                SubscriptionBadgeDisplayMode.Colored -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
         SubscriptionTier.UNKNOWN -> Unit
@@ -117,7 +123,8 @@ fun SubscriptionBadgeForTier(
 
 enum class SubscriptionBadgeDisplayMode {
     Black,
-    Colored,
+    ColoredWithWhiteForeground,
+    ColoredWithBlackForeground,
 }
 
 object SubscriptionTierColor {
@@ -132,7 +139,7 @@ object SubscriptionTierColor {
 fun SubscriptionBadgePlusColoredPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.Colored
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
     )
 }
 
@@ -152,7 +159,7 @@ fun SubscriptionBadgePlusBlackPreview() {
 fun SubscriptionBadgePatronColoredPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.Colored
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
     )
 }
 
@@ -163,5 +170,25 @@ fun SubscriptionBadgePatronBlackPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
         displayMode = SubscriptionBadgeDisplayMode.Black
+    )
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with black foreground")
+@Preview(name = "ColoredWithBlackForeground")
+@Composable
+fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
+    SubscriptionBadgeForTier(
+        tier = SubscriptionTier.PLUS,
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground
+    )
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored with black foreground")
+@Preview(name = "ColoredWithBlackForeground")
+@Composable
+fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
+    SubscriptionBadgeForTier(
+        tier = SubscriptionTier.PATRON,
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground
     )
 }

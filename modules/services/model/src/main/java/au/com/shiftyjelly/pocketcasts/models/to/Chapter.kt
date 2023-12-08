@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import okhttp3.HttpUrl
-import kotlin.math.roundToInt
 
 data class Chapter(
     val title: String,
@@ -35,11 +34,11 @@ data class Chapter(
         val length = endTime - startTime
         val remaining = length * (1f - progress)
         val minutesRemaining = remaining / 1000f / 60f
-        if (minutesRemaining >= 1) {
-            return "${minutesRemaining.roundToInt()}m"
+        return if (minutesRemaining >= 1) {
+            "${minutesRemaining.toInt()}m"
         } else {
             val secondsRemaining = remaining / 1000f
-            return "${secondsRemaining.roundToInt()}s"
+            "${secondsRemaining.toInt()}s"
         }
     }
 

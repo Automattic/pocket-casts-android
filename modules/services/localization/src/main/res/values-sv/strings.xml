@@ -1,17 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-10-17 14:54:03+0000
+Translation-Revision-Date: 2023-11-14 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad för 2023</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Prenumerera på Plus och ta reda på hur du lyssnar jämfört med 2022, annan rolig statistik och Premium-funktioner som bokmärken och mappar.</string>
+    <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
+    <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad i år var %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för 2023 jämfört med 2022</string>
+    <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Jämfört med 2022 har din lyssningstid minskat något</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Jämfört med 2022 var din lyssningstid ganska oförändrad</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Är du redo att toppa 2024?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med 2022 ökade din lyssningstid med hisnande %1$s%%</string>
+    <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
+    <string name="end_of_year_story_epilogue_title">Tack för att ni lyssnat med oss i år.\nVi ses 2024!</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Det var ingen mindre än \"%1$s\" från \"%2$s\"</string>
+    <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
+    <string name="end_of_year_replay">Spela upp igen</string>
+    <string name="end_of_year_listening_time_subtitle">Vi hoppas att du älskade varje minut av det!</string>
+    <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
+    <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>
+    <string name="end_of_year_story_top_categories_title">Visste du att %1$s var din favoritkategori</string>
+    <string name="discover_category_society_abbreviation">Kultur</string>
+    <string name="discover_category_religion_abbreviation">Spiritualitet</string>
+    <string name="discover_category_kids_abbreviation">Familj</string>
+    <string name="discover_category_health_abbreviation">Hälsa</string>
+    <string name="eoy_story_top_podcasts_subtitle">Det här är de fem podcasts du lyssnade mest på 2023\"</string>
+    <string name="eoy_story_top_podcasts_title">Du lyssnade även mycket på dessa podcasts.</string>
+    <string name="end_of_year_story_top_podcast_title">%1$s var den podcast du lyssnade mest på under 2023</string>
+    <string name="end_of_year_share_story">Dela den här berättelsen</string>
+    <string name="whats_new_bookmarks_enable_now_button">Aktivera det nu</string>
+    <string name="podcast_log_in_to_rate">Du måste logga in för att ge ett betyg</string>
+    <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
     <string name="podcast_rate">Omdöme %s</string>
     <string name="submit">Skicka</string>
     <string name="whats_new_boomarks_join_beta_testing_title">Var med och betatesta bokmärken!</string>
     <string name="whats_new_bookmarks_try_now_button">Testa nu</string>
     <string name="whats_new_bookmarks_title">Bokmärkena är här!</string>
-    <string name="podcast_not_enough_ratings">Inte tillräckligt med omdömen</string>
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
     <string name="bookmarks_upsell_instructions">Spara tidsstämplar för dina favoritavsnitt och lås upp många fler funktioner med Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Det gick inte att hitta programnotiser för detta avsnitt.</string>
@@ -323,22 +356,20 @@ Language: sv_SE
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_categories">Dina favoritkategorier</string>
     <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
-    <string name="end_of_year_story_epilogue_title">Tack för att du har låtit Pocket Casts vara en del av din lyssningsupplevelse under 2022</string>
-    <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under 2022 %1$s</string>
-    <string name="end_of_year_story_longest_episode_duration">Avsnittet var %1$s långt</string>
-    <string name="end_of_year_story_longest_episode">Det längsta avsnittet du lyssnade på var %1$s från podcasten %2$s</string>
+    <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under 2023 %1$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast 2022. %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under 2022</string>
-    <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2022</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under 2023</string>
+    <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
+    <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
+    <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2023</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Låt oss ta en titt på några av dina favoriter …</string>
     <string name="end_of_year_story_listened_to_categories">Du lyssnade på %1$d olika kategorier i år</string>
-    <string name="end_of_year_story_listened_to_share_text">Jag lyssnade på podcasts i %1$s under 2022</string>
+    <string name="end_of_year_story_listened_to_share_text">Jag lyssnade på podcasts %1$s i år</string>
     <string name="end_of_year_story_intro_title">Låt oss fira ditt lyssningsår.</string>
     <string name="end_of_year_launch_modal_image_title">Podcastår</string>
-    <string name="end_of_year_replay">Spela upp igen</string>
     <string name="settings_media_notification_controls">Mediaaviseringskontroller</string>
     <string name="playback_speed">Uppspelningshastighet</string>
     <string name="volume_boost_enabled_not_valid">Volymökning aktiverad-värdet måste vara \"true\" eller \"false\", men var  %1$s</string>
@@ -350,13 +381,11 @@ Language: sv_SE
     <string name="playback_speed_between_values">Uppspelningshastighet (mellan 0,5 och 3)</string>
     <string name="set_playback_speed">Ställ in Uppspelningshastighet</string>
     <string name="playback_speed_not_valid">Uppspelningshastigheten %1$s är inte giltig</string>
-    <string name="end_of_year_listening_time">Under 2022 lyssnade du på podcasts i %1$s </string>
     <string name="profile_account_upgraded">Kontot har uppgraderats</string>
     <string name="pocket_casts_control_playback">Uppspelningskontroller för Pocket Casts</string>
     <string name="pocket_casts_play_filter">Uppspelningsfilter för Pocket Casts</string>
     <string name="time_to_skip_not_valid">Ogiltig tidpunkt att hoppa över: %1$s</string>
     <string name="time_to_skip_seconds">Tidpunkt att hoppa över (sekunder)</string>
-    <string name="end_of_year_prompt_card_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera.</string>
     <string name="settings_select_filters">Välj filter</string>
     <string name="settings_import_url_summary">Importera dina podcasts från en OPML-fil med hjälp av en URL.</string>
     <string name="settings_import_url">Efter URL</string>
@@ -377,7 +406,7 @@ Language: sv_SE
     <string name="filter_x_not_found">Filtret %1$s hittades inte</string>
     <string name="must_provide_filter_name">Filternamn måste anges</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Inte nu</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2022</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2023</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
     <string name="end_of_year_launch_modal_title">Ditt podcastår</string>
     <string name="settings_app_icon_halloween">Halloween</string>

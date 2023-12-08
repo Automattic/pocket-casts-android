@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +21,8 @@ class ChangeEmailViewModel
 
     var existingEmail = syncManager.getEmail()
 
-    private val _changeEmailState = MutableStateFlow<ChangeEmailState>(ChangeEmailState.Empty)
-    val changeEmailState: StateFlow<ChangeEmailState> = _changeEmailState.asStateFlow()
+    private val _changeEmailState = mutableStateOf<ChangeEmailState>(ChangeEmailState.Empty)
+    val changeEmailState: State<ChangeEmailState> = _changeEmailState
 
     private fun errorUpdate(error: ChangeEmailError, add: Boolean, message: String?) {
         val errors = mutableSetOf<ChangeEmailError>()

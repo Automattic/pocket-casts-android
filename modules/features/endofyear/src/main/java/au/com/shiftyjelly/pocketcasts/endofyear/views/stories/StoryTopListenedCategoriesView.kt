@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -43,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private val CategoryColor = Color(0xFF686C74)
-private val CategoryFontSize = 40.sp
+private val CategoryFontSize = 50.sp
 private val DefaultFontFamily = FontFamily(listOf(Font(UR.font.dm_sans)))
 
 @Composable
@@ -64,9 +66,9 @@ fun StoryTopListenedCategoriesView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 40.dp)
+                .padding(vertical = 30.dp)
         ) {
-            Spacer(modifier = modifier.weight(0.2f))
+            Spacer(modifier = modifier.height(40.dp))
 
             PrimaryText(story)
 
@@ -89,8 +91,14 @@ private fun PrimaryText(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val language = Locale.current.language
+    val textResId = if (language == "en") {
+        LR.string.end_of_year_story_top_categories_title_english_only
+    } else {
+        LR.string.end_of_year_story_top_categories_title
+    }
     val text = stringResource(
-        LR.string.end_of_year_story_top_categories_title,
+        textResId,
         story.listenedCategories[0].simplifiedCategoryName().tryToLocalise(context.resources)
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
@@ -143,7 +151,7 @@ fun CategoryItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
     ) {
         TextH30(
             text = "${position + 1}",
@@ -157,7 +165,7 @@ fun CategoryItem(
         )
         Row(
             modifier = modifier
-                .padding(vertical = 10.dp)
+                .padding(vertical = 5.dp)
                 .weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -211,6 +219,7 @@ private fun CategoryTexts(
             fontFamily = DefaultFontFamily,
             fontWeight = FontWeight.W600,
             disableScale = disableScale(),
+            modifier = Modifier.offset(y = (-10).dp),
         )
     }
 }

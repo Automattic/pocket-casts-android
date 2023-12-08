@@ -214,6 +214,28 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
+    fun onPlayerOpen() {
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerOpen()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
+    }
+
+    fun onPlayerClose() {
+        try {
+            if (isAdded) {
+                ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
+                    ?.onPlayerClose()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e)
+        }
+    }
+
     fun openPlayer(sourceView: SourceView? = null) {
         val index = adapter.indexOfPlayer
         if (index == -1) return
@@ -308,12 +330,12 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             newSections.add(Section.Notes)
         }
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            newSections.add(Section.Bookmarks)
-        }
-
         if (hasChapters) {
             newSections.add(Section.Chapters)
+        }
+
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            newSections.add(Section.Bookmarks)
         }
 
         this.sections = newSections

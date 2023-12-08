@@ -133,6 +133,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     private val usageRelay = BehaviorRelay.create<Optional<FileAccount>>()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
+    private val upNextDao = appDatabase.upNextDao()
 
     override fun monitorUploads(context: Context) {
         WorkManager.getInstance(context).getWorkInfosByTagLiveData(WORK_MANAGER_UPLOAD_TASK)
@@ -398,9 +399,11 @@ class UserEpisodeManagerImpl @Inject constructor(
             val episode = findEpisodeByUuid(it)
             if (episode != null) {
                 if (!episode.isDownloaded) {
-                    // File deleted from server
-                    playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
-                    userEpisodeDao.delete(episode)
+                    // Remove file not found on server only if it is not added to up-next to prevent it from being removed from up-next (Github Issue#356)
+                    if (!upNextDao.containsEpisode(episode.uuid)) {
+                        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+                        userEpisodeDao.delete(episode)
+                    }
                 } else {
                     if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
                         userEpisodeDao.updateServerStatus(episode.uuid, UserEpisodeServerStatus.LOCAL)
@@ -594,7 +597,10 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.updateAllPlayingStatus(it, System.currentTimeMillis(), EpisodePlayingStatus.COMPLETED) }
-        episodes.forEach { playbackManager.removeEpisode(it, source = SourceView.UNKNOWN, userInitiated = false) }
+        episodes.forEach {
+            playbackManager.removeEpisode(it, source = SourceView.UNKNOWN, userInitiated = false)
+            deletePlayedEpisodeIfReq(it, playbackManager)
+        }
     }
 
     override suspend fun markAllAsUnplayed(episodes: List<UserEpisode>) {

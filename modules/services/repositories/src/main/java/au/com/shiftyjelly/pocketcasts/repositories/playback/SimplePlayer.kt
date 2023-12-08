@@ -245,7 +245,12 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
 
         val uri: Uri = when (location) {
             is EpisodeLocation.Stream -> {
-                Uri.parse(location.uri)
+                if (location.uri != null) {
+                    Uri.parse(location.uri)
+                } else {
+                    onError(PlayerEvent.PlayerError("Stream has no uri"))
+                    return
+                }
             }
             is EpisodeLocation.Downloaded -> {
                 val filePath = location.filePath

@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentProfileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -70,7 +71,8 @@ class ProfileFragment : BaseFragment() {
         SettingsAdapter.Item(LR.string.profile_navigation_downloads, R.drawable.ic_profile_download, ProfileEpisodeListFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_files, R.drawable.ic_file, CloudFilesFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_starred, R.drawable.ic_starred, ProfileEpisodeListFragment::class.java),
-        SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java)
+        SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java),
+        SettingsAdapter.Item(LR.string.settings_title_help, IR.drawable.ic_help, HelpFragment::class.java)
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -140,6 +142,9 @@ class ProfileFragment : BaseFragment() {
                         }
                         (activity as? FragmentHostListener)?.addFragment(fragment)
                     }
+                    HelpFragment::class.java -> {
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                    }
                     else -> Timber.e("Profile section is invalid")
                 }
             }
@@ -175,7 +180,7 @@ class ProfileFragment : BaseFragment() {
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
             binding.userView.signedInState = state
 
-            binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlus
+            binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
             if (binding.upgradeLayout.root.isInvisible) {
                 // We need this to get the correct padding below refresh
                 binding.upgradeLayout.root.updateLayoutParams<ConstraintLayout.LayoutParams> { height = 16.dpToPx(view.context) }
@@ -234,6 +239,10 @@ class ProfileFragment : BaseFragment() {
                     EndOfYearPromptCard(
                         onClick = {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                            // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
+                            if (settings.getEndOfYearShowModal()) {
+                                settings.setEndOfYearShowModal(false)
+                            }
                             (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
                         }
                     )

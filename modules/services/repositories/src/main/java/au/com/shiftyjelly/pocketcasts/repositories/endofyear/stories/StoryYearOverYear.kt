@@ -6,4 +6,5 @@ class StoryYearOverYear(
     val yearOverYearListeningTime: YearOverYearListeningTime,
 ) : Story() {
     override val identifier: String = "year_over_year"
+    override val plusOnly: Boolean = true
 }
