@@ -4,6 +4,9 @@
 *   Bug Fixes:
     *   Fix user files not getting deleted after marking an episode as played
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
+*   Updates:
+    *   Display dynamic colors for widget
+        ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
 
 7.53
 -----
