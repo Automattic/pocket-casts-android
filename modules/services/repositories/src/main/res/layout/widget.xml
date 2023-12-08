@@ -22,7 +22,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/widget_nothingloaded"
             android:layout_gravity="center"
-            android:alpha="0.4" />
+            android:alpha="0.4"
+            android:tint="?attr/colorOnPrimaryContainer"/>
 
     </FrameLayout>
 
