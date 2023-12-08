@@ -22,7 +22,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/widget_nothingloaded"
             android:layout_gravity="center"
-            android:alpha="0.4" />
+            android:alpha="0.4"
+            android:tint="?attr/colorOnPrimaryContainer"/>
 
     </FrameLayout>
 
@@ -93,10 +94,11 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:src="@drawable/widget_play"
+                        android:src="@drawable/ic_play"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
+                        android:padding="16dp"
                         android:tint="?attr/colorOnPrimaryContainer"/>
 
                 </FrameLayout>

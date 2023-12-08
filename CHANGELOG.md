@@ -6,6 +6,9 @@
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
     *   Fix crash when database emits unexpected null value
         ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
+*   Updates:
+    *   Display dynamic colors for widget
+        ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
 
 7.53
 -----
