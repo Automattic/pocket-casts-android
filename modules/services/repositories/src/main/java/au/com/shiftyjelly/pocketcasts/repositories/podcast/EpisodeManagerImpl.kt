@@ -104,14 +104,13 @@ class EpisodeManagerImpl @Inject constructor(
     override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =
         episodeDao.findByUuidRx(uuid)
 
-    override fun observeByUuid(uuid: String): Flow<PodcastEpisode> {
-        return episodeDao.observeByUuid(uuid)
-    }
+    override fun observeByUuid(uuid: String): Flow<PodcastEpisode> =
+        episodeDao.observeByUuid(uuid).filterNotNull()
 
     override fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode> {
         @Suppress("DEPRECATION")
         return findByUuidRx(uuid)
-            .flatMapPublisher<BaseEpisode> { episodeDao.observeByUuid(uuid).asFlowable() }
+            .flatMapPublisher<BaseEpisode> { observeByUuid(uuid).asFlowable() }
             .switchIfEmpty(userEpisodeManager.observeEpisodeRx(uuid))
     }
 

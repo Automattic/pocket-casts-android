@@ -49,7 +49,7 @@ abstract class EpisodeDao {
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun observeByUuid(uuid: String): Flow<PodcastEpisode>
+    abstract fun observeByUuid(uuid: String): Flow<PodcastEpisode?>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
