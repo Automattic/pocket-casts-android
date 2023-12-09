@@ -117,6 +117,10 @@ class SettingsAppearanceViewModel @Inject constructor(
         )
     }
 
+    fun updateUpNextDarkTheme(value: Boolean) {
+        settings.useDarkUpNextTheme.set(value)
+    }
+
     fun updateShowArtworkOnLockScreen(value: Boolean) {
         settings.showArtworkOnLockScreen.set(value)
         analyticsTracker.track(

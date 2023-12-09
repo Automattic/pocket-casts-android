@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.content.Context
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -104,7 +105,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
 
     val overrideTheme: Theme.ThemeType
-        get() = theme.activeTheme
+        get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {
@@ -165,7 +166,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding = FragmentUpnextBinding.inflate(inflater, container, false).also {
+        val themedContext = ContextThemeWrapper(activity, overrideTheme.resourceId)
+        val themedInflater = inflater.cloneInContext(themedContext)
+        val binding = FragmentUpnextBinding.inflate(themedInflater, container, false).also {
             realBinding = it
         }
         return binding.root

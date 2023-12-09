@@ -86,6 +86,9 @@ class AppLifecycleObserver constructor(
         if (isNewInstall) {
             appLifecycleAnalytics.onNewApplicationInstall()
 
+            // new installs don't default to having a dark up next
+            settings.useDarkUpNextTheme.set(false)
+
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive
                 AppPlatform.Automotive -> {}

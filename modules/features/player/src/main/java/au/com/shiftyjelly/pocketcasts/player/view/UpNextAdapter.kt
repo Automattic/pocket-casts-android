@@ -106,7 +106,11 @@ class UpNextAdapter(
     }
 
     private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: BaseEpisode) {
-        holder.bind(episode, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), theme)
+        holder.bind(
+            episode = episode,
+            isMultiSelecting = multiSelectHelper.isMultiSelecting,
+            isSelected = multiSelectHelper.isSelected(episode),
+        )
 
         holder.binding.itemContainer.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
