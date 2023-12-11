@@ -525,7 +525,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (episode is UserEpisode) {
             launch {
-                userEpisodeManager.deletePlayedEpisodeIfReq(episode, playbackManager)
+                userEpisodeManager.markAsPlayed(episode, playbackManager)
             }
         }
     }
