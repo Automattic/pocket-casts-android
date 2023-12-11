@@ -54,7 +54,7 @@
                 android:layout_marginTop="20dp"
                 android:clipToPadding="false"
                 android:paddingStart="72dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblTheme" />
@@ -63,8 +63,8 @@
                 android:id="@+id/lblSystemTheme"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="8dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
                 android:text="@string/settings_use_android_light_dark_mode"
                 android:textAppearance="@style/H40"
                 android:textColor="?attr/primary_text_01"
@@ -79,6 +79,17 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblSystemTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/lblSystemTheme"/>
+
+            <View
+                android:id="@+id/btnSystemTheme"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/lblSystemTheme"
                 app:layout_constraintBottom_toBottomOf="@+id/lblSystemTheme"/>
 

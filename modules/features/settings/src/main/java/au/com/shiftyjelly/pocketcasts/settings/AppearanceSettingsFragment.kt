@@ -161,6 +161,9 @@ class AppearanceSettingsFragment : BaseFragment() {
         binding.swtSystemTheme.setOnCheckedChangeListener { _, isChecked ->
             viewModel.useAndroidLightDarkMode(isChecked, activity as? AppCompatActivity)
         }
+        binding.btnSystemTheme.setOnClickListener {
+            binding.swtSystemTheme.isChecked = !binding.swtSystemTheme.isChecked
+        }
 
         binding.swtDarkUpNext.isChecked = settings.useDarkUpNextTheme.value
         binding.swtDarkUpNext.setOnCheckedChangeListener { _, isChecked ->
