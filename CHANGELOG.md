@@ -6,6 +6,8 @@
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
     *   Fix crash when database emits unexpected null value
         ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
+    *   Fix text being cut off in discover search bar at high zoom 
+        ([#1601](https://github.com/Automattic/pocket-casts-android/pull/1601))
 *   Updates:
     *   Display dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
