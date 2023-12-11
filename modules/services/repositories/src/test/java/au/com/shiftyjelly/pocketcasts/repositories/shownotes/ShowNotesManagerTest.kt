@@ -37,7 +37,7 @@ class ShowNotesManagerTest {
     }
 
     @Test
-    fun test() = runTest {
+    fun updatesEpisodesWithImageUrls() = runTest {
 
         val episodeWithImage1 = ShowNotesEpisode(
             uuid = "episode_uuid1",
