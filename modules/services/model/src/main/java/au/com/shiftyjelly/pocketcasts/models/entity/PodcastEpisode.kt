@@ -57,7 +57,8 @@ data class PodcastEpisode(
     @ColumnInfo(name = "last_playback_interaction_sync_status") var lastPlaybackInteractionSyncStatus: Long = LAST_PLAYBACK_INTERACTION_SYNCED,
     @ColumnInfo(name = "exclude_from_episode_limit") var excludeFromEpisodeLimit: Boolean = false,
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
-    @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null
+    @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null,
+    @ColumnInfo(name = "image_url") var imageUrl: String? = null,
 ) : BaseEpisode, Serializable {
 
     sealed class EpisodeType {

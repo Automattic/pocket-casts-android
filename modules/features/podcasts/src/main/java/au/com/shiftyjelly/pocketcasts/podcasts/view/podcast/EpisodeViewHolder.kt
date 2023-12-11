@@ -286,7 +286,7 @@ class EpisodeViewHolder constructor(
         val artworkVisible = viewMode is ViewMode.Artwork
         imgArtwork.isVisible = artworkVisible
         if (!sameEpisode && artworkVisible && imageLoader != null) {
-            imageLoader.load(episode).into(imgArtwork)
+            imageLoader.loadPodcastImageForEpisode(episode).into(imgArtwork)
         }
 
         val transition = AutoTransition()

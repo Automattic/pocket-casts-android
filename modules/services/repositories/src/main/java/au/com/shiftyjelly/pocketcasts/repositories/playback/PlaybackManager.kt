@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toServerPostFile
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -120,6 +121,7 @@ open class PlaybackManager @Inject constructor(
     private val syncManager: SyncManager,
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
+    private val showNotesManager: ShowNotesManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -1677,6 +1679,16 @@ open class PlaybackManager @Inject constructor(
         )
         withContext(Dispatchers.Main) {
             playbackStateRelay.accept(playbackState)
+        }
+
+        if (episode is PodcastEpisode) {
+            // Update the episode image
+            launch {
+                showNotesManager.loadShowNotes(
+                    podcastUuid = episode.podcastUuid,
+                    episodeUuid = episode.uuid,
+                )
+            }
         }
 
         // audio effects

@@ -12,7 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,7 +25,7 @@ import retrofit2.HttpException
 class UpdateShowNotesTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val showNotesManager: ServerShowNotesManager
+    private val showNotesManager: ShowNotesManager
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TASK_NAME = "UpdateShowNotesTask"

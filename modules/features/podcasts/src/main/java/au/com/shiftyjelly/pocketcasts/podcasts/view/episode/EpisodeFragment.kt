@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBindin
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.R
@@ -337,8 +336,12 @@ class EpisodeFragment : BaseFragment() {
                                 .show()
                             true
                         }
-                        binding.podcastArtwork.let {
-                            imageLoader.largePlaceholder().load(state.podcast).into(it)
+                        binding.podcastArtwork.let { imageView ->
+                            imageLoader.largePlaceholder().loadEpisodeArtworkInto(
+                                imageView = imageView,
+                                episode = state.episode,
+                                coroutineScope = this,
+                            )
                         }
 
                         binding.btnPlay.setOnPlayClicked {

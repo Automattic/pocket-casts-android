@@ -1,6 +1,9 @@
 7.54
 -----
 
+*   New Features
+    *   Display episode artwork from podcast feed on full-screen player and episode screens
+        ([#1599](https://github.com/Automattic/pocket-casts-android/pull/1599))
 *   Bug Fixes:
     *   Fix user files not getting deleted after marking an episode as played
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
