@@ -68,16 +68,21 @@ class ChangeEmailViewModel
                 return@launch
             }
             _changeEmailState.value = ChangeEmailState.Loading
-            withContext(Dispatchers.IO) {
-                val response = syncManager.emailChange(emailString, pwdString)
-                val success = response.success ?: false
-                if (success) {
-                    existingEmail = emailString
-                    _changeEmailState.value = ChangeEmailState.Success("OK")
-                } else {
-                    val errors = mutableSetOf(ChangeEmailError.SERVER)
-                    _changeEmailState.value = ChangeEmailState.Failure(errors, response.message)
+            try {
+                withContext(Dispatchers.IO) {
+                    val response = syncManager.emailChange(emailString, pwdString)
+                    val success = response.success ?: false
+                    if (success) {
+                        existingEmail = emailString
+                        _changeEmailState.value = ChangeEmailState.Success("OK")
+                    } else {
+                        val errors = mutableSetOf(ChangeEmailError.SERVER)
+                        _changeEmailState.value = ChangeEmailState.Failure(errors, response.message)
+                    }
                 }
+            }catch (e:Exception){
+                _changeEmailState.value = ChangeEmailState.Failure(mutableSetOf(ChangeEmailError.SERVER), e.message)
+
             }
         }
     }
