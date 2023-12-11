@@ -3,6 +3,13 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            setUrl("https://a8c-libs.s3.amazonaws.com/android")
+            content {
+                includeGroup("com.automattic.android")
+                includeGroup("com.automattic.android.measure-builds")
+            }
+        }
     }
 }
 
