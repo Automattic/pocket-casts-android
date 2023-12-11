@@ -4,6 +4,13 @@
 *   Bug Fixes:
     *   Fix user files not getting deleted after marking an episode as played
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
+    *   Fix crash when database emits unexpected null value
+        ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
+    *   Fix text being cut off in discover search bar at high zoom 
+        ([#1601](https://github.com/Automattic/pocket-casts-android/pull/1601))
+*   Updates:
+    *   Display dynamic colors for widget
+        ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
 
 7.53
 -----
@@ -53,6 +60,8 @@
         ([#1461](https://github.com/Automattic/pocket-casts-android/pull/1461))
     *   Fixed show notes loading issues
         ([#1436](https://github.com/Automattic/pocket-casts-android/pull/1436))
+    *   Fixed discover search bar at high device zoom
+        ([#1469](https://github.com/Automattic/pocket-casts-android/pull/1469))
 
 7.49
 -----
