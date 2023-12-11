@@ -48,7 +48,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:background="@drawable/shelf"
+            android:background="@drawable/up_next_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
