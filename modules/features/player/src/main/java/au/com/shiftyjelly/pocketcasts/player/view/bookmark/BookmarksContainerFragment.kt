@@ -10,17 +10,17 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentBookmarksContainerBinding
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -54,9 +54,7 @@ class BookmarksContainerFragment :
         )
 
     var binding: FragmentBookmarksContainerBinding? = null
-
-    @Inject
-    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,14 +114,14 @@ class BookmarksContainerFragment :
     }
 
     private fun FragmentBookmarksContainerBinding.setupMultiSelectHelper() {
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+        bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             multiSelectToolbar.isVisible = isMultiSelecting
             multiSelectToolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         }
-        multiSelectHelper.context = context
+        bookmarksViewModel.multiSelectHelper.context = context
         multiSelectToolbar.setup(
             lifecycleOwner = viewLifecycleOwner,
-            multiSelectHelper = multiSelectHelper,
+            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
             fragmentManager = parentFragmentManager,
         )
@@ -132,7 +130,9 @@ class BookmarksContainerFragment :
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        multiSelectHelper.isMultiSelecting = false
-        multiSelectHelper.context = null
+        with(bookmarksViewModel.multiSelectHelper) {
+            isMultiSelecting = false
+            context = null
+        }
     }
 }
