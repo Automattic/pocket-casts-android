@@ -1293,4 +1293,10 @@ class SettingsImpl @Inject constructor(
     override fun getReviewRequestedDates(): List<String> {
         return sharedPreferences.getStringSet(Settings.APP_REVIEW_REQUESTED_DATES, emptySet())?.toList() ?: emptyList()
     }
+
+    override val useDarkUpNextTheme: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "useDarkUpNextTheme",
+        defaultValue = true, // This default is overridden for new installs
+        sharedPrefs = sharedPreferences,
+    )
 }

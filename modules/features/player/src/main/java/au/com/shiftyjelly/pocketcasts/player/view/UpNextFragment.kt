@@ -2,11 +2,11 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.content.Context
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -51,7 +51,6 @@ import javax.inject.Inject
 import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
@@ -106,7 +105,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
 
     val overrideTheme: Theme.ThemeType
-        get() = if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
+        get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {
@@ -167,8 +166,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val themedContext = ContextThemeWrapper(activity, UR.style.ThemeDark)
-        val themedInflater = if (!Theme.isDark(context)) inflater.cloneInContext(themedContext) else inflater // If the theme is not dark we force it to ThemeDark
+        val themedContext = ContextThemeWrapper(activity, overrideTheme.resourceId)
+        val themedInflater = inflater.cloneInContext(themedContext)
         val binding = FragmentUpnextBinding.inflate(themedInflater, container, false).also {
             realBinding = it
         }
