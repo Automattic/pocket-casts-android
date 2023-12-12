@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -87,8 +86,12 @@ class UpNextEpisodeViewHolder(
         }
     }
 
-    fun bind(episode: BaseEpisode, isMultiSelecting: Boolean, isSelected: Boolean) {
-        val tintColor = ContextThemeWrapper(itemView.context, UR.style.ThemeDark).getAttrTextStyleColor(UR.attr.textSubtitle1)
+    fun bind(
+        episode: BaseEpisode,
+        isMultiSelecting: Boolean,
+        isSelected: Boolean,
+    ) {
+        val tintColor = itemView.context.getAttrTextStyleColor(UR.attr.textSubtitle1)
 
         disposable = episodeManager
             .observeByUuid(episode.uuid)

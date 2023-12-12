@@ -10,7 +10,7 @@
         android:id="@+id/itemContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
+        android:background="?attr/primary_ui_04"
         android:paddingTop="16dp">
 
         <au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressBar
@@ -48,7 +48,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             style="?attr/textOverline"
-            android:textColor="?attr/player_contrast_02"
+            android:textColor="?attr/primary_text_02"
             tools:text="TODAY"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/image"
@@ -57,6 +57,7 @@
         <TextView
             android:id="@+id/title"
             style="@style/UpNextRowTitle"
+            android:textColor="?attr/primary_text_01"
             android:textAppearance="@style/DarkSubtitle1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -96,6 +97,7 @@
             app:timeLeft="@{playingState.episode}"
             tools:text="Episode description"
             style="@style/UpNextRowSummary"
+            android:textColor="?attr/primary_text_02"
             android:textAppearance="@style/DarkBody2" />
 
         <com.airbnb.lottie.LottieAnimationView

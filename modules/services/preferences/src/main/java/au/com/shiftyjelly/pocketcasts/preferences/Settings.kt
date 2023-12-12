@@ -417,4 +417,6 @@ interface Settings {
 
     fun addReviewRequestedDate()
     fun getReviewRequestedDates(): List<String>
+
+    val useDarkUpNextTheme: UserSetting<Boolean>
 }
