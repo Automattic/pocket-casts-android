@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
+import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
 import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
 import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator

@@ -26,3 +26,11 @@ annotation class DownloadOkHttpClient
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DownloadRequestBuilder
+
+/**
+ * Annotation for providing coroutine scope that lasts the entire time the application
+ * is running. Essentially, this is the better form of GlobalScope.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ForApplicationScope
