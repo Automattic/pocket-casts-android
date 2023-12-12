@@ -1296,7 +1296,7 @@ class SettingsImpl @Inject constructor(
 
     override val useDarkUpNextTheme: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = "useDarkUpNextTheme",
-        defaultValue = true, // This default should be overridden for new installs
+        defaultValue = true, // This default is overridden for new installs
         sharedPrefs = sharedPreferences,
     )
 }

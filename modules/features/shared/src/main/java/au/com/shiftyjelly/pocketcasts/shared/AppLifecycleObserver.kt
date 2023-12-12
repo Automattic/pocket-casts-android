@@ -86,7 +86,7 @@ class AppLifecycleObserver constructor(
         if (isNewInstall) {
             appLifecycleAnalytics.onNewApplicationInstall()
 
-            // new installs don't default to having a dark up next
+            // new installs default to not forcing up next to use the dark theme
             settings.useDarkUpNextTheme.set(false)
 
             when (getAppPlatform()) {
