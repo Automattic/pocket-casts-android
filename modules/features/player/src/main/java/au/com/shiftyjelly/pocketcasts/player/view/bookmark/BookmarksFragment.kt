@@ -62,7 +62,7 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val bookmarksViewModel: BookmarksViewModel by viewModels()
+    private val bookmarksViewModel: BookmarksViewModel by viewModels({ requireParentFragment() })
 
     @Inject
     lateinit var settings: Settings
