@@ -72,8 +72,8 @@ class BookmarksContainerFragment :
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (multiSelectHelper.isMultiSelecting) {
-                        multiSelectHelper.isMultiSelecting = false
+                    if (bookmarksViewModel.multiSelectHelper.isMultiSelecting) {
+                        bookmarksViewModel.multiSelectHelper.isMultiSelecting = false
                         return
                     }
                     dismiss()
