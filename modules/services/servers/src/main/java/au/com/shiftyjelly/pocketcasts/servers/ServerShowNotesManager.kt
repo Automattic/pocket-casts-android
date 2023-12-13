@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,7 +17,11 @@ class ServerShowNotesManager @Inject constructor(
     /**
      * Check the cache for show notes then download them if not found or update the cache.
      */
-    fun loadShowNotesFlow(podcastUuid: String, episodeUuid: String): Flow<ShowNotesState> {
+    fun loadShowNotesFlow(
+        podcastUuid: String,
+        episodeUuid: String,
+        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+    ): Flow<ShowNotesState> {
         return flow {
             emit(ShowNotesState.Loading)
             var loaded = false
@@ -28,7 +33,12 @@ class ServerShowNotesManager @Inject constructor(
                     loaded = true
                 }
                 // download or update cache
-                val showNotesDownloaded = downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
+                val showNotesDownloaded =
+                    downloadShowNotes(
+                        podcastUuid = podcastUuid,
+                        episodeUuid = episodeUuid,
+                        persistImageUrls = persistImageUrls,
+                    )
                 if (showNotesDownloaded != null) {
                     if (showNotesDownloaded != showNotesCached || !loaded) {
                         emit(ShowNotesState.Loaded(showNotesDownloaded))
@@ -50,10 +60,19 @@ class ServerShowNotesManager @Inject constructor(
     /**
      * Download the show notes, if that fails try the cache.
      */
-    suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState {
+    suspend fun loadShowNotes(
+        podcastUuid: String,
+        episodeUuid: String,
+        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+    ): ShowNotesState {
         var downloadException: Exception? = null
         try {
-            val showNotesDownloaded = downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
+            val showNotesDownloaded =
+                downloadShowNotes(
+                    podcastUuid = podcastUuid,
+                    episodeUuid = episodeUuid,
+                    persistImageUrls = persistImageUrls,
+                )
             if (showNotesDownloaded != null) {
                 return ShowNotesState.Loaded(showNotesDownloaded)
             }
@@ -79,18 +98,27 @@ class ServerShowNotesManager @Inject constructor(
         return response.findEpisode(episodeUuid)?.showNotes
     }
 
-    suspend fun downloadShowNotes(podcastUuid: String, episodeUuid: String): String? {
+    private suspend fun downloadShowNotes(
+        podcastUuid: String,
+        episodeUuid: String,
+        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+    ): String? {
         if (podcastUuid.isBlank() || episodeUuid.isBlank()) {
             return null
         }
         val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
+        persistImageUrls(response)
         return response.findEpisode(episodeUuid)?.showNotes
     }
 
-    suspend fun downloadToCacheShowNotes(podcastUuid: String) {
+    suspend fun downloadToCacheShowNotes(
+        podcastUuid: String,
+        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+    ) {
         if (podcastUuid.isBlank()) {
             return
         }
-        podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
+        val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
+        persistImageUrls(response)
     }
 }

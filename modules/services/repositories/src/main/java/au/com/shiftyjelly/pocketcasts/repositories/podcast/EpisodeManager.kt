@@ -81,6 +81,7 @@ interface EpisodeManager {
     fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDuration(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
     fun updatePlayingStatus(episode: BaseEpisode?, status: EpisodePlayingStatus)
+    suspend fun updateImageUrls(updates: List<ImageUrlUpdate>)
     suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
     suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
     fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)

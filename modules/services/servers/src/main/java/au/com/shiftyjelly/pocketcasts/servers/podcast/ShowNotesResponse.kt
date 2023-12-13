@@ -21,5 +21,6 @@ data class ShowNotesPodcast(
 @JsonClass(generateAdapter = true)
 data class ShowNotesEpisode(
     @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "show_notes") val showNotes: String?
+    @field:Json(name = "show_notes") val showNotes: String?,
+    @field:Json(name = "image") val image: String?,
 )

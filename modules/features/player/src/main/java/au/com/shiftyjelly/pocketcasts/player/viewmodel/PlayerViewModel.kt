@@ -333,8 +333,12 @@ class PlayerViewModel @Inject constructor(
 
         val effects = if (podcast?.overrideGlobalEffects == true) podcast.playbackEffects else globalPlaybackEffects
 
+        val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
         val embeddedPath = playbackState.embeddedArtworkPath
-        val embeddedArtwork: Artwork = if (embeddedPath != null) {
+
+        val embeddedArtwork: Artwork = if (showNotesImageUrl != null) {
+            Artwork.Url(showNotesImageUrl)
+        } else if (embeddedPath != null) {
             Artwork.Path(embeddedPath)
         } else if (episode is UserEpisode) {
             val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)

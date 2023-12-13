@@ -54,7 +54,7 @@
                 android:layout_marginTop="20dp"
                 android:clipToPadding="false"
                 android:paddingStart="72dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblTheme" />
@@ -63,8 +63,8 @@
                 android:id="@+id/lblSystemTheme"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="8dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
                 android:text="@string/settings_use_android_light_dark_mode"
                 android:textAppearance="@style/H40"
                 android:textColor="?attr/primary_text_01"
@@ -79,6 +79,17 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblSystemTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/lblSystemTheme"/>
+
+            <View
+                android:id="@+id/btnSystemTheme"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/lblSystemTheme"
                 app:layout_constraintBottom_toBottomOf="@+id/lblSystemTheme"/>
 
@@ -257,6 +268,79 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblUseEmbeddedArtworkDetails" />
 
             <View
+                android:id="@+id/dividerViewUpNext"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblRefreshAllPodcastArtwork" />
+
+            <TextView
+                android:id="@+id/lblUpNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/up_next"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerViewUpNext" />
+
+            <TextView
+                android:id="@+id/lblUseDarkUpNext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/settings_use_dark_up_next"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:paddingTop="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowArtwork"
+                app:layout_constraintStart_toStartOf="@+id/lblUpNext"
+                app:layout_constraintTop_toBottomOf="@+id/lblUpNext" />
+
+            <Switch
+                android:id="@+id/swtDarkUpNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseDarkUpNext"
+                app:layout_constraintBottom_toBottomOf="@+id/lblUseDarkUpNext"/>
+
+            <TextView
+                android:id="@+id/lblUseDarkUpNextDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_use_dark_up_next_details"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toStartOf="@+id/swtDarkUpNext"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/lblUseDarkUpNext"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseDarkUpNext" />
+
+            <View
+                android:id="@+id/btnUseDarkUpNext"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseDarkUpNext"
+                app:layout_constraintBottom_toBottomOf="@+id/lblUseDarkUpNextDetails"/>
+
+            <View
                 android:id="@+id/dividerView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
@@ -265,7 +349,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lblRefreshAllPodcastArtwork" />
+                app:layout_constraintTop_toBottomOf="@+id/btnUseDarkUpNext" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/upgradeGroup"
