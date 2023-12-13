@@ -153,21 +153,17 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val hasChapters = !it.chapters.isEmpty
             val hasNotes = !it.podcastHeader.isUserEpisode
-            when (::adapter.isInitialized) {
-                true -> {
-                    val updated = adapter.update(hasNotes, hasChapters)
-                    if (updated)
-                        adapter.notifyDataSetChanged()
-                }
-                false -> {
-                    adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
-                    adapter.update(hasNotes, hasChapters)
-                    viewPager.adapter = adapter
-                    viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
-                    TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
-                        tab.setText(adapter.pageTitle(position))
-                    }.attach()
-                }
+            if (::adapter.isInitialized) {
+                val updated = adapter.update(hasNotes, hasChapters)
+                if (updated) adapter.notifyDataSetChanged()
+            } else {
+                adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+                adapter.update(hasNotes, hasChapters)
+                viewPager.adapter = adapter
+                viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
+                TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
+                    tab.setText(adapter.pageTitle(position))
+                }.attach()
             }
 
             val upNextCount = it.upNextEpisodes.size
