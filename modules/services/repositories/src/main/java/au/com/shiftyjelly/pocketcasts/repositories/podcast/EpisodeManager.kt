@@ -81,7 +81,6 @@ interface EpisodeManager {
     suspend fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
     fun updateLastDownloadAttemptDate(episode: BaseEpisode?)
     fun updateDownloadErrorDetails(episode: BaseEpisode?, message: String?)
-    fun setEpisodeThumbnailStatus(episode: PodcastEpisode?, thumbnailStatus: Int)
 
     fun updateAllEpisodeStatus(episodeStatus: EpisodeStatusEnum)
 

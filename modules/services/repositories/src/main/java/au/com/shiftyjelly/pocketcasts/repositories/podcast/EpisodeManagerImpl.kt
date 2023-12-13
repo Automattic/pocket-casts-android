@@ -594,12 +594,6 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.update(episode)
     }
 
-    override fun setEpisodeThumbnailStatus(episode: PodcastEpisode?, thumbnailStatus: Int) {
-        episode ?: return
-        episode.thumbnailStatus = thumbnailStatus
-        episodeDao.updateThumbnailStatus(thumbnailStatus, episode.uuid)
-    }
-
     override fun setDownloadFailed(episode: BaseEpisode, errorMessage: String) {
         if (episode is PodcastEpisode) {
             episodeDao.updateDownloadError(episode.uuid, errorMessage, EpisodeStatusEnum.DOWNLOAD_FAILED)
