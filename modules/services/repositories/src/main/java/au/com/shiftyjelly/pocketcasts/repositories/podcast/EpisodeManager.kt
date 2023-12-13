@@ -61,8 +61,6 @@ interface EpisodeManager {
     fun observeStarredEpisodes(): Flowable<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
 
-    fun exists(episodeUuid: String): Boolean
-
     /** Add methods  */
     fun add(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean
     fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode>

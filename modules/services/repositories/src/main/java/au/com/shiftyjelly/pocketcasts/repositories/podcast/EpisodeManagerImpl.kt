@@ -845,10 +845,6 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findStarredEpisodes()
     }
 
-    override fun exists(episodeUuid: String): Boolean {
-        return episodeDao.exists(episodeUuid)
-    }
-
     override fun markAsNotPlayedRx(episode: PodcastEpisode): Single<PodcastEpisode> {
         return Single.fromCallable {
             markAsNotPlayed(episode)
