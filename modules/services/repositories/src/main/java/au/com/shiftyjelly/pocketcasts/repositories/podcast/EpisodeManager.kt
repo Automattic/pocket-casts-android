@@ -42,7 +42,6 @@ interface EpisodeManager {
     suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     fun findEpisodesWhere(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>
-    fun findEpisodesByPodcast(podcast: Podcast): Single<List<PodcastEpisode>>
     fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
     suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>>

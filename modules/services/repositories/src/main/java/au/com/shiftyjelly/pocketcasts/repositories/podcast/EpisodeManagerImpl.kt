@@ -123,9 +123,6 @@ class EpisodeManagerImpl @Inject constructor(
     /**
      * Find a podcast episodes
      */
-    override fun findEpisodesByPodcast(podcast: Podcast): Single<List<PodcastEpisode>> {
-        return Single.fromCallable { episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid) }
-    }
 
     override fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode> {
         return episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid)
