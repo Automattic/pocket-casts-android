@@ -865,11 +865,6 @@ class EpisodeManagerImpl @Inject constructor(
         return findEpisodesWhere(sql)
     }
 
-    override fun countEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): Int {
-        val sql = buildEpisodeStatusWhere(queued, waitingForPower, waitingForWifi, downloading)
-        return countEpisodesWhere(sql)
-    }
-
     private fun buildEpisodeStatusWhere(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): String {
         val status = mutableSetOf<EpisodeStatusEnum>()
         if (queued) {

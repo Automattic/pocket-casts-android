@@ -55,7 +55,6 @@ interface EpisodeManager {
     fun markAllEpisodesSynced(episodes: List<PodcastEpisode>)
 
     fun findEpisodesDownloading(queued: Boolean = true, waitingForPower: Boolean = true, waitingForWifi: Boolean = true, downloading: Boolean = true): List<PodcastEpisode>
-    fun countEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): Int
 
     fun observeDownloadEpisodes(): Flowable<List<PodcastEpisode>>
     fun observeDownloadedEpisodes(): Flowable<List<PodcastEpisode>>
