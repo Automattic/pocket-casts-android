@@ -39,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.rxkotlin.zipWith
@@ -836,10 +835,6 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {
         return episodeDao.findStarredEpisodes()
-    }
-
-    override fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable {
-        return Completable.fromAction { markAsPlayed(episode, playbackManager, podcastManager) }
     }
 
     override fun findEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): List<PodcastEpisode> {

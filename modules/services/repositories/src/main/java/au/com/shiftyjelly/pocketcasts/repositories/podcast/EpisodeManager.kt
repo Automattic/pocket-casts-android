@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import kotlinx.coroutines.flow.Flow
@@ -88,7 +87,6 @@ interface EpisodeManager {
     fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable
     fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
     suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
