@@ -194,9 +194,6 @@ abstract class EpisodeDao {
     @Query("DELETE FROM podcast_episodes")
     abstract suspend fun deleteAll()
 
-    @Query("DELETE FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun deleteByUuid(uuid: String)
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insert(episode: PodcastEpisode)
 
