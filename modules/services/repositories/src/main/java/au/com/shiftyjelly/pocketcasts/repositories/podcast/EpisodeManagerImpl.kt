@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
-import androidx.paging.PagedList
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -60,7 +59,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.Date
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -122,24 +120,6 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? =
         episodeDao.findFirstBySearchQuery(query)
-
-    @Suppress("DEPRECATION")
-    override fun findAll(rowParser: (PodcastEpisode) -> Boolean) {
-        val pagingConfig = PagedList.Config.Builder()
-            .setPageSize(100)
-            .setEnablePlaceholders(false)
-            .build()
-        val episodes = episodeDao.findAll().create()
-        val pagedList = PagedList.Builder(episodes, pagingConfig)
-            .setFetchExecutor(Executors.newSingleThreadExecutor())
-            .setNotifyExecutor(Executors.newSingleThreadExecutor())
-            .build()
-        for (episode in pagedList) {
-            if (!rowParser(episode)) {
-                break
-            }
-        }
-    }
 
     /**
      * Find a podcast episodes
