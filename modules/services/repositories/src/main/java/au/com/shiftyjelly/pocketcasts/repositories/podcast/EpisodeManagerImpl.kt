@@ -42,7 +42,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -837,13 +836,6 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {
         return episodeDao.findStarredEpisodes()
-    }
-
-    override fun markAsNotPlayedRx(episode: PodcastEpisode): Single<PodcastEpisode> {
-        return Single.fromCallable {
-            markAsNotPlayed(episode)
-            episode
-        }
     }
 
     override fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable {

@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
@@ -85,7 +84,6 @@ interface EpisodeManager {
     fun updateAllEpisodeStatus(episodeStatus: EpisodeStatusEnum)
 
     fun markAsNotPlayed(episode: BaseEpisode?)
-    fun markAsNotPlayedRx(episode: PodcastEpisode): Single<PodcastEpisode>
     suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
