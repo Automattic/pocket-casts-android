@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -49,10 +48,6 @@ abstract class EpisodeDao {
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun observeByUuid(uuid: String): Flow<PodcastEpisode?>
-
-    @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")

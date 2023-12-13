@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -212,10 +211,6 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode> {
         return episodeDao.findPlaybackHistoryEpisodes()
-    }
-
-    override fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>> {
-        return episodeDao.observeDownloadingEpisodes()
     }
 
     @Suppress("USELESS_CAST")

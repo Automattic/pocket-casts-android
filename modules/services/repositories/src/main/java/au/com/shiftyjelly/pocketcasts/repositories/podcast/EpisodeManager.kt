@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import androidx.lifecycle.LiveData
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
@@ -50,7 +49,6 @@ interface EpisodeManager {
     fun findLatestEpisodeToPlay(): PodcastEpisode?
     fun observeEpisodesByPodcastOrderedRx(podcast: Podcast): Flowable<List<PodcastEpisode>>
     fun observeEpisodesWhere(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
-    fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>>
 
     fun findEpisodesToSync(): List<PodcastEpisode>
     fun findEpisodesForHistorySync(): List<PodcastEpisode>
