@@ -56,9 +56,11 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
     abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_sync_status <> 1 AND last_playback_interaction_date IS NOT NULL ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun findEpisodesForHistorySync(): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND archived = :archived AND podcast_id = :podcastUuid")
     abstract fun findByEpisodePlayingAndArchiveStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus, archived: Boolean): List<PodcastEpisode>
 
@@ -158,6 +160,7 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeStatusEnum OR (episode_status == :failedEpisodeStatusEnum AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadingEpisodesIncludingFailed(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status == :notDownloaded)")
     abstract suspend fun findStaleDownloads(notDownloaded: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED): List<PodcastEpisode>
 
@@ -165,15 +168,19 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadedEpisodes(downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
     abstract fun observeStarredEpisodes(): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
     abstract suspend fun findStarredEpisodes(): List<PodcastEpisode>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun observePlaybackHistory(): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>
 
@@ -310,6 +317,7 @@ abstract class EpisodeDao {
         return Integer.parseInt(firstResult)
     }
 
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
     abstract fun findEpisodesToSync(): List<PodcastEpisode>
 
