@@ -112,7 +112,6 @@ interface EpisodeManager {
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
     suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
-    fun deleteDownloadedEpisodeFiles()
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int

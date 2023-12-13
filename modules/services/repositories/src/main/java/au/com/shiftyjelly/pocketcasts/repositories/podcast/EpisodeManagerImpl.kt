@@ -769,25 +769,6 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.deleteAll()
     }
 
-    override fun deleteDownloadedEpisodeFiles() {
-        // remove all the files off the disk, ignore any errors and continue
-        try {
-            fileStorage.removeDirectoryFiles(fileStorage.podcastDirectory)
-            fileStorage.removeDirectoryFiles(fileStorage.tempPodcastDirectory)
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-
-        val episodes = findEpisodesWhere("episode_status = " + EpisodeStatusEnum.DOWNLOADED.ordinal)
-        if (episodes.isEmpty()) return
-
-        for (episode in episodes) {
-            runBlocking {
-                updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
-            }
-        }
-    }
-
     override fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         val episodesCopy = episodes.toList()
         launch {
