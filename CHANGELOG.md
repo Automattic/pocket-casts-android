@@ -18,6 +18,8 @@
 *   Updates:
     *   Display dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
+    *   Add theme support to Up Next screen
+        ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))
 
 7.53
 -----

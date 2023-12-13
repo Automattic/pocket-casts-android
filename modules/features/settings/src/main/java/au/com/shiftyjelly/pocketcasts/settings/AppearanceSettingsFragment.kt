@@ -161,6 +161,17 @@ class AppearanceSettingsFragment : BaseFragment() {
         binding.swtSystemTheme.setOnCheckedChangeListener { _, isChecked ->
             viewModel.useAndroidLightDarkMode(isChecked, activity as? AppCompatActivity)
         }
+        binding.btnSystemTheme.setOnClickListener {
+            binding.swtSystemTheme.isChecked = !binding.swtSystemTheme.isChecked
+        }
+
+        binding.swtDarkUpNext.isChecked = settings.useDarkUpNextTheme.value
+        binding.swtDarkUpNext.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateUpNextDarkTheme(isChecked)
+        }
+        binding.btnUseDarkUpNext.setOnClickListener {
+            binding.swtDarkUpNext.isChecked = !binding.swtDarkUpNext.isChecked
+        }
 
         binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value
         binding.swtShowArtwork.setOnCheckedChangeListener { _, isChecked ->

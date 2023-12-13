@@ -117,6 +117,14 @@ class SettingsAppearanceViewModel @Inject constructor(
         )
     }
 
+    fun updateUpNextDarkTheme(value: Boolean) {
+        settings.useDarkUpNextTheme.set(value)
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
+            mapOf("enabled" to value)
+        )
+    }
+
     fun updateShowArtworkOnLockScreen(value: Boolean) {
         settings.showArtworkOnLockScreen.set(value)
         analyticsTracker.track(
