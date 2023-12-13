@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -64,9 +63,6 @@ abstract class EpisodeDao {
 
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_sync_status <> 1 AND last_playback_interaction_date IS NOT NULL ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun findEpisodesForHistorySync(): List<PodcastEpisode>
-
-    @Query("SELECT * FROM podcast_episodes")
-    abstract fun findAll(): DataSource.Factory<Int, PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND archived = :archived AND podcast_id = :podcastUuid")
     abstract fun findByEpisodePlayingAndArchiveStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus, archived: Boolean): List<PodcastEpisode>
