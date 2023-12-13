@@ -71,9 +71,6 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes")
     abstract fun findAll(): DataSource.Factory<Int, PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND podcast_id = :podcastUuid")
-    abstract fun findByEpisodePlayingStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus): List<PodcastEpisode>
-
     @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND archived = :archived AND podcast_id = :podcastUuid")
     abstract fun findByEpisodePlayingAndArchiveStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus, archived: Boolean): List<PodcastEpisode>
 
