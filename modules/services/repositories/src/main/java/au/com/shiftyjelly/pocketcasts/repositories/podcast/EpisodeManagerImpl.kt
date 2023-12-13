@@ -572,14 +572,6 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.countWhere(queryAfterWhere, appDatabase)
     }
 
-    override fun deleteCustomFolderEpisode(episode: PodcastEpisode?, playbackManager: PlaybackManager) {
-        episode ?: return
-
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
-
-        episodeDao.delete(episode)
-    }
-
     override fun add(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean {
         val episodes = ArrayList<PodcastEpisode>()
         episodes.add(episode)
