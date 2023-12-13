@@ -51,7 +51,7 @@ class BookmarksViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
-    private val multiSelectHelper: MultiSelectBookmarksHelper,
+    val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
