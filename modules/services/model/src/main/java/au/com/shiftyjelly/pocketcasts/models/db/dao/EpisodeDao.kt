@@ -157,9 +157,6 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun observeByPodcastOrderDurationDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid AND playing_status != :playingStatus")
-    abstract fun findByPodcastAndNotPlayingStatus(podcastUuid: String, playingStatus: Int): List<PodcastEpisode>
-
     @Query("UPDATE podcast_episodes SET downloaded_error_details = NULL, episode_status = :episodeStatusNotDownloaded WHERE episode_status = :episodeStatusFailed")
     abstract fun clearAllDownloadErrors(episodeStatusNotDownloaded: EpisodeStatusEnum, episodeStatusFailed: EpisodeStatusEnum)
 
