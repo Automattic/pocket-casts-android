@@ -162,10 +162,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>> {
-        return Single.fromCallable { findEpisodesByPodcastOrdered(podcast) }
-    }
-
     override fun observeEpisodesByPodcastOrderedRx(podcast: Podcast): Flowable<List<PodcastEpisode>> {
         return when (podcast.episodesSortType) {
             EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.observeByPodcastOrderTitleAsc(podcastUuid = podcast.uuid)
