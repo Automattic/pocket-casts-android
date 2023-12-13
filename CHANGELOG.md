@@ -6,6 +6,8 @@
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
     *   Fix crash when database emits unexpected null value
         ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
+    *   Save selected tab on Player screen after screen rotation
+        ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
 
 7.53
 -----
