@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndComplet
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -230,19 +229,6 @@ class EpisodeManagerImpl @Inject constructor(
     override fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>> {
         return episodeDao.observeDownloadingEpisodesRx().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
     }
-
-    override fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode> =
-        if (uuids.isEmpty()) {
-            emptyList()
-        } else if (ordered) {
-            uuids.mapNotNull {
-                runBlocking {
-                    findByUuid(it)
-                }
-            }
-        } else {
-            findEpisodesWhere("uuid IN " + QueryHelper.convertStringArrayToInStatement(uuids))
-        }
 
     override fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
         if (playedUpTo < 0 || episode == null) {
