@@ -765,17 +765,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun deleteFinishedEpisodes(playbackManager: PlaybackManager) {
-        val episodes = findEpisodesWhere("episode_status = " + EpisodeStatusEnum.DOWNLOADED.ordinal + " AND playing_status = " + EpisodePlayingStatus.COMPLETED.ordinal)
-        if (episodes.isEmpty()) return
-
-        runBlocking {
-            for (episode in episodes) {
-                deleteEpisodeFile(episode, playbackManager, true, true)
-            }
-        }
-    }
-
     override suspend fun deleteAll() {
         episodeDao.deleteAll()
     }
