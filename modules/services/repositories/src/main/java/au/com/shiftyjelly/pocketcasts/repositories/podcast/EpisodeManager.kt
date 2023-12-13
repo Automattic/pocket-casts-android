@@ -126,7 +126,6 @@ interface EpisodeManager {
     fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?)
     fun episodeCanBeCleanedUp(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun markAsUnplayed(episodes: List<BaseEpisode>)
-    fun unarchiveAllInListAsync(episodes: List<PodcastEpisode>)
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
     fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>>
     fun setDownloadFailed(episode: BaseEpisode, errorMessage: String)

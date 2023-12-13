@@ -891,12 +891,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun unarchiveAllInListAsync(episodes: List<PodcastEpisode>) {
-        launch {
-            unarchiveAllInList(episodes)
-        }
-    }
-
     override fun unarchiveAllInList(episodes: List<PodcastEpisode>) {
         episodes.filter { it.isArchived }.chunked(500).forEach { chunked ->
             episodeDao.unarchiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
