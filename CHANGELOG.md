@@ -4,6 +4,8 @@
 *   Updates:
     *   Add theme support to Up Next screen
         ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))
+    *   Save selected tab on Player screen after screen rotation
+        ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
 
 7.54
 -----
