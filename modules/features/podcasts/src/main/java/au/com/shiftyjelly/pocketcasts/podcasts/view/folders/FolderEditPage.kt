@@ -28,8 +28,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @Composable
 fun FolderEditPage(
@@ -97,7 +97,7 @@ private fun DeleteButton(onDeleteClick: () -> Unit, modifier: Modifier = Modifie
             .clickable { onDeleteClick() }
     ) {
         Icon(
-            painter = painterResource(VR.drawable.ic_delete),
+            painter = painterResource(IR.drawable.ic_delete),
             contentDescription = null,
             tint = MaterialTheme.theme.colors.support05,
             modifier = Modifier.padding(horizontal = 16.dp)

@@ -53,7 +53,6 @@ import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class AccountDetailsFragment : BaseFragment() {
@@ -227,7 +226,7 @@ class AccountDetailsFragment : BaseFragment() {
             .setTitle(getString(LR.string.profile_delete_account_title))
             .setSummary(getString(LR.string.profile_delete_account_question))
             .setOnConfirm { deleteAccountPermanent() }
-            .setIconId(VR.drawable.ic_delete)
+            .setIconId(IR.drawable.ic_delete)
             .setIconTint(UR.attr.support_05)
             .show(childFragmentManager, "deleteaccount_warning")
     }

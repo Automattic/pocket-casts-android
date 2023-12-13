@@ -47,7 +47,6 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 class UserEpisodeViewHolder(
     val binding: AdapterUserEpisodeBinding,
@@ -117,7 +116,7 @@ class UserEpisodeViewHolder(
     override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground> =
         listOf(
             EpisodeItemTouchHelper.IconWithBackground(
-                iconRes = VR.drawable.ic_delete,
+                iconRes = IR.drawable.ic_delete,
                 backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_05)
             )
         )

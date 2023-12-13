@@ -26,7 +26,7 @@ sealed class MultiSelectBookmarkAction(
         R.id.menu_delete,
         R.id.menu_delete,
         LR.string.delete,
-        R.drawable.ic_delete,
+        IR.drawable.ic_delete,
         "delete",
     )
 

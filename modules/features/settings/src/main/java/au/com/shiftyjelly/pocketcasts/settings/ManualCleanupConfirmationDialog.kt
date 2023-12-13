@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
@@ -11,7 +12,7 @@ class ManualCleanupConfirmationDialog(context: Context, onConfirm: () -> Unit) :
     init {
         setTitle(context.getString(LR.string.settings_downloads_clean_up))
         setSummary(context.getString(LR.string.settings_downloads_clean_up_summary))
-        setIconId(au.com.shiftyjelly.pocketcasts.views.R.drawable.ic_delete)
+        setIconId(IR.drawable.ic_delete)
         setButtonType(ButtonType.Danger(context.getString(LR.string.delete)))
         setOnConfirm { onConfirm() }
     }

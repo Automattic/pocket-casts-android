@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 private const val ARG_MODE = "profile_list_mode"
 
@@ -357,7 +356,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 if (downloadManager.hasPendingOrRunningDownloads()) {
                     dialog.addTextOption(LR.string.settings_auto_download_stop_all, imageId = IR.drawable.ic_stop, click = this::stopAllDownloads)
                 }
-                dialog.addTextOption(LR.string.profile_clean_up, imageId = VR.drawable.ic_delete, click = this::showCleanupSettings)
+                dialog.addTextOption(LR.string.profile_clean_up, imageId = IR.drawable.ic_delete, click = this::showCleanupSettings)
             } else if (mode is Mode.History) {
                 analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_OPTIONS_BUTTON_TAPPED)
                 dialog.addTextOption(LR.string.profile_clear_listening_history, imageId = R.drawable.ic_history, click = this::clearListeningHistory)
