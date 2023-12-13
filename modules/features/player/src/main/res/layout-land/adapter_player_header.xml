@@ -299,7 +299,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:orientation="horizontal"
-                android:background="@drawable/shelf"
+                android:background="@drawable/player_shelf"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

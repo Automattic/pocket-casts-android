@@ -35,6 +35,7 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingBottom="32dp"
+        android:background="?attr/primary_ui_04"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
