@@ -54,7 +54,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -152,11 +151,6 @@ class MediaSessionManager(
             commandQueue.collect { (tag, command) ->
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Executing queued command: $tag")
                 command()
-
-                // arbitrary delay to increase the chance that the command will be executed before the next one
-                // is run. Ideally we wouldn't need this, but as long as the PlaybackManager launches coroutines,
-                // this is a helpful bit of extra security.
-                delay(200)
             }
         }
     }
