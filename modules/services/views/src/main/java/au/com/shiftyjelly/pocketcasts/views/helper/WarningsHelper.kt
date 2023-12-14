@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -22,8 +23,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -39,16 +39,16 @@ class WarningsHelper @Inject constructor(
     private val systemBatteryRestrictions: SystemBatteryRestrictions,
     private val userEpisodeManager: UserEpisodeManager,
     private val episodeAnalytics: EpisodeAnalytics,
+    @ForApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun streamingWarningDialog(
         episode: BaseEpisode,
         snackbarParentView: View? = null,
         sourceView: SourceView
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
-            GlobalScope.launch {
+            applicationScope.launch {
                 playbackManager.playNow(episode = episode, forceStream = true, sourceView = sourceView)
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }
@@ -92,9 +92,8 @@ class WarningsHelper @Inject constructor(
             .setOnSecondary { upload(episodeUuid, waitForWifi = true, source = source) }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun upload(episodeUuid: String, waitForWifi: Boolean, source: SourceView) {
-        GlobalScope.launch {
+        applicationScope.launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it !is UserEpisode) return@let
 
@@ -106,9 +105,8 @@ class WarningsHelper @Inject constructor(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun download(episodeUuid: String, waitForWifi: Boolean, from: String) {
-        GlobalScope.launch {
+        applicationScope.launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it.isDownloading) {
                     episodeManager.stopDownloadAndCleanUp(episodeUuid, from)

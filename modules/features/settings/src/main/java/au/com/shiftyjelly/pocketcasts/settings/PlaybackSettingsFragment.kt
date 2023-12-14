@@ -50,14 +50,14 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -72,6 +72,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject @ForApplicationScope lateinit var applicationScope: CoroutineScope
 
     companion object {
         private const val ARG_SCROLL_TO_AUTOPLAY = "scroll_to_autoplay"
@@ -557,7 +558,6 @@ class PlaybackSettingsFragment : BaseFragment() {
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun showSetAllGroupingDialog(grouping: PodcastGrouping) {
         ConfirmationDialog()
             .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.settings_apply_to_existing)))
@@ -571,14 +571,13 @@ class PlaybackSettingsFragment : BaseFragment() {
             )
             .setIconId(R.drawable.ic_podcasts)
             .setOnConfirm {
-                GlobalScope.launch {
+                applicationScope.launch {
                     podcastManager.updateGroupingForAll(grouping)
                 }
             }
             .show(parentFragmentManager, "podcast_grouping_set_all_warning")
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun showSetAllArchiveDialog(shouldShow: Boolean) {
         ConfirmationDialog()
             .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.settings_apply_to_existing)))
@@ -587,7 +586,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             .setSummary(getString(if (shouldShow) LR.string.settings_apply_archived_show else LR.string.settings_apply_archived_hide))
             .setIconId(R.drawable.ic_podcasts)
             .setOnConfirm {
-                GlobalScope.launch {
+                applicationScope.launch {
                     podcastManager.updateAllShowArchived(shouldShow)
                 }
             }
