@@ -9,7 +9,7 @@ import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -33,7 +33,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var theme: Theme
     @Inject lateinit var syncManager: SyncManager
-    @Inject @ForApplicationScope lateinit var applicationScope: CoroutineScope
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null

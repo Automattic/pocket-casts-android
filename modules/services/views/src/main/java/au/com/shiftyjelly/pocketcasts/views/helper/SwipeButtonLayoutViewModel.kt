@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -34,7 +34,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     private val userEpisodeManager: UserEpisodeManager,
-    @ForApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     fun share(

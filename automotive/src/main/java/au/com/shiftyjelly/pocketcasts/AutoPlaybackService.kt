@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
@@ -51,7 +51,7 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 class AutoPlaybackService : PlaybackService() {
 
     @Inject lateinit var listSource: ListRepository
-    @Inject @ForApplicationScope lateinit var applicationScope: CoroutineScope
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()

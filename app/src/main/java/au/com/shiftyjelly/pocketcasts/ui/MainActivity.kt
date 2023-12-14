@@ -82,7 +82,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -188,7 +188,7 @@ class MainActivity :
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var watchSync: WatchSync
-    @Inject @ForApplicationScope lateinit var applicationScope: CoroutineScope
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>

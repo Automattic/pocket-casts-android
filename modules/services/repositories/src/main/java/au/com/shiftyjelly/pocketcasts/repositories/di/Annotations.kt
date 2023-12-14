@@ -33,4 +33,4 @@ annotation class DownloadRequestBuilder
  */
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class ForApplicationScope
+annotation class ApplicationScope

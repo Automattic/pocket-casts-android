@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -37,7 +37,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
-    @ForApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     userManager: UserManager
 ) : ViewModel() {
     lateinit var state: LiveData<BottomSheetState>

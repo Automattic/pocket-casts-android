@@ -50,7 +50,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
@@ -72,7 +72,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    @Inject @ForApplicationScope lateinit var applicationScope: CoroutineScope
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     companion object {
         private const val ARG_SCROLL_TO_AUTOPLAY = "scroll_to_autoplay"

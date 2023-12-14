@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -53,7 +53,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val analyticsTracker: AnalyticsTrackerWrapper,
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics,
-    @ForApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 

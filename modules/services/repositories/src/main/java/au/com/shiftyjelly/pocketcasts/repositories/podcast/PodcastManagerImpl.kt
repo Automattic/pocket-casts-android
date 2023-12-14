@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
@@ -58,7 +58,7 @@ class PodcastManagerImpl @Inject constructor(
     private val cacheServerManager: PodcastCacheServerManager,
     private val refreshServerManager: RefreshServerManager,
     private val syncManager: SyncManager,
-    @ForApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase
 ) : PodcastManager, CoroutineScope {
 

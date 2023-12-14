@@ -2,10 +2,10 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
 import android.net.ConnectivityManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
 import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
 import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
@@ -38,7 +38,7 @@ object WearNetworkModule {
     @Provides
     fun networkRepository(
         @ApplicationContext application: Context,
-        @ForApplicationScope coroutineScope: CoroutineScope
+        @ApplicationScope coroutineScope: CoroutineScope
     ): NetworkRepository = NetworkRepositoryImpl.fromContext(
         application,
         coroutineScope
@@ -64,7 +64,7 @@ object WearNetworkModule {
     @Singleton
     fun provideHighBandwidthNetworkMediator(
         connectivityManager: ConnectivityManager,
-        @ForApplicationScope coroutineScope: CoroutineScope,
+        @ApplicationScope coroutineScope: CoroutineScope,
     ): HighBandwidthNetworkMediator =
         StandardHighBandwidthNetworkMediator(
             logger = NetworkStatusLogger.Logging,
@@ -84,7 +84,7 @@ object WearNetworkModule {
         networkRepository: NetworkRepository,
         networkingRulesEngine: NetworkingRulesEngine,
         @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
-        @ForApplicationScope coroutineScope: CoroutineScope,
+        @ApplicationScope coroutineScope: CoroutineScope,
         logger: NetworkStatusLogger
     ): Call.Factory {
 

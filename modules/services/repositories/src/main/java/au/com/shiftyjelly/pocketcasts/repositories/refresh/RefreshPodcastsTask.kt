@@ -9,7 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 class RefreshPodcastsTask @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
-    @ForApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : Worker(context, params) {
     private var refreshRunnable: RefreshPodcastsThread? = null
 

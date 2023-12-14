@@ -10,7 +10,7 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -51,7 +51,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var workerFactory: HiltWorkerFactory
-    @Inject @ForApplicationScope lateinit var applicationScope: CoroutineScope
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()

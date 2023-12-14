@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -61,7 +61,7 @@ import javax.inject.Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
-    @ForApplicationScope private val applicationScope: CoroutineScope
+    @ApplicationScope private val applicationScope: CoroutineScope
 ) : SubscriptionManager,
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {

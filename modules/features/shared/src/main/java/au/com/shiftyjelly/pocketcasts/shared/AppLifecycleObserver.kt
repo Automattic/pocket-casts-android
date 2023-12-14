@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -41,7 +41,7 @@ class AppLifecycleObserver constructor(
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
         packageUtil: PackageUtil,
         settings: Settings,
-        @ForApplicationScope applicationScope: CoroutineScope,
+        @ApplicationScope applicationScope: CoroutineScope,
     ) : this(
         appContext = appContext,
         appLifecycleAnalytics = appLifecycleAnalytics,

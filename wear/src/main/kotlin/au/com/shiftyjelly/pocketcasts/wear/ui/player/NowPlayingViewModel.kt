@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
@@ -27,7 +27,7 @@ class NowPlayingViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     settings: Settings,
     private val theme: Theme,
-    @ForApplicationScope private val coroutineScope: CoroutineScope,
+    @ApplicationScope private val coroutineScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
 ) : ViewModel() {
     private var playAttempt: Job? = null

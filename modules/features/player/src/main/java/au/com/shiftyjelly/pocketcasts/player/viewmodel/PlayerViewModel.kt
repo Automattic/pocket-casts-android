@@ -27,7 +27,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
@@ -87,7 +87,7 @@ class PlayerViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
-    @ForApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext

@@ -39,7 +39,7 @@ class RepositoryProviderModule {
 
     @Provides
     @Singleton
-    @ForApplicationScope
+    @ApplicationScope
     fun coroutineScope(): CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
 }
