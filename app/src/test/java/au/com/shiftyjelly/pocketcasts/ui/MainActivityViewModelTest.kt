@@ -40,6 +40,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -168,7 +169,7 @@ class MainActivityViewModelTest {
     fun `given episode for bookmark is current playing, when bookmark viewed from notification, then bookmarks on player shown`() = runTest {
         whenever(bookmark.episodeUuid).thenReturn(TEST_EPISODE_UUID)
         whenever(episode.uuid).thenReturn(TEST_EPISODE_UUID)
-        whenever(bookmarkManager.findBookmark(anyString())).thenReturn(bookmark)
+        whenever(bookmarkManager.findBookmark(anyString(), eq(false))).thenReturn(bookmark)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         initViewModel()
 
@@ -181,7 +182,7 @@ class MainActivityViewModelTest {
     @Test
     fun `given podcast episode for bookmark currently not playing, when bookmark viewed from notification, then bookmarks for podcast episode shown`() = runTest {
         whenever(bookmark.episodeUuid).thenReturn(TEST_EPISODE_UUID)
-        whenever(bookmarkManager.findBookmark(anyString())).thenReturn(bookmark)
+        whenever(bookmarkManager.findBookmark(anyString(), eq(false))).thenReturn(bookmark)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
         whenever(episodeManager.findEpisodeByUuid(TEST_EPISODE_UUID)).thenReturn(mock<PodcastEpisode>())
         initViewModel()
@@ -195,7 +196,7 @@ class MainActivityViewModelTest {
     @Test
     fun `given user episode for bookmark currently not playing, when bookmark viewed from notification, then bookmarks for user episode shown`() = runTest {
         whenever(bookmark.episodeUuid).thenReturn(TEST_EPISODE_UUID)
-        whenever(bookmarkManager.findBookmark(anyString())).thenReturn(bookmark)
+        whenever(bookmarkManager.findBookmark(anyString(), eq(false))).thenReturn(bookmark)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
         whenever(episodeManager.findEpisodeByUuid(TEST_EPISODE_UUID)).thenReturn(mock<UserEpisode>())
         initViewModel()
