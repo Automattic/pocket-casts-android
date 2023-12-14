@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -152,6 +154,7 @@ class PodcastSyncProcessTest {
                 folderManager = folderManager,
                 syncManager = syncManager,
                 featureFlagWrapper = featureFlagWrapper,
+                applicationScope = CoroutineScope(Dispatchers.Default),
             )
 
             val response = MockResponse()
