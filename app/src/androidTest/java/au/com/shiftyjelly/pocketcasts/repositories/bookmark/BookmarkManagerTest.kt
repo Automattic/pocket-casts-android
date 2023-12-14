@@ -162,9 +162,8 @@ class BookmarkManagerTest {
         runTest {
             val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)
             bookmarkManager.deleteToSync(bookmark.uuid)
-            val savedBookmark = bookmarkManager.findBookmark(bookmark.uuid)
+            val savedBookmark = bookmarkManager.findBookmark(bookmark.uuid, deleted = true)
             assertNotNull(savedBookmark)
-            assertEquals(true, savedBookmark?.deleted)
             assertEquals(SyncStatus.NOT_SYNCED, savedBookmark?.syncStatus)
         }
     }
