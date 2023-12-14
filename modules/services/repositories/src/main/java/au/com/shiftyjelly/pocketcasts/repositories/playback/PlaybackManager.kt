@@ -382,18 +382,24 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun playQueue(sourceView: SourceView = SourceView.UNKNOWN) {
-        launch {
-            if (upNextQueue.currentEpisode != null) {
-                loadEpisodeWhenRequired(sourceView)
-            }
+        launch { playQueueSuspend(sourceView) }
+    }
+
+    suspend fun playQueueSuspend(sourceView: SourceView = SourceView.UNKNOWN) {
+        if (upNextQueue.currentEpisode != null) {
+            loadEpisodeWhenRequired(sourceView)
         }
     }
 
     fun playNow(episode: BaseEpisode, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
-            forcePlayerSwitch = true
-            playNowSync(episode = episode, forceStream = forceStream, sourceView = sourceView)
+            playNowSuspend(episode = episode, forceStream = forceStream, sourceView = sourceView)
         }
+    }
+
+    suspend fun playNowSuspend(episode: BaseEpisode, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        forcePlayerSwitch = true
+        playNowSync(episode = episode, forceStream = forceStream, sourceView = sourceView)
     }
 
     suspend fun playNowSync(episode: BaseEpisode, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
@@ -625,6 +631,26 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        if (!transientLoss) {
+            focusManager.giveUpAudioFocus()
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(playbackState.copy(transientLoss = false))
+            }
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
+            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE, sourceView)
+        } else {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(playbackState.copy(transientLoss = true))
+            }
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Transient")
+        }
+
+        cancelUpdateTimer()
+
+        player?.pause()
+    }
+
     fun stopAsync(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             if (!isAudioFocusFailed) {
@@ -681,9 +707,13 @@ open class PlaybackManager @Inject constructor(
 
     fun seekToTimeMs(positionMs: Int, seekComplete: (() -> Unit)? = null) {
         launch {
-            seekToTimeMsInternal(positionMs)
-            seekComplete?.invoke()
+            seekToTimeMsSuspend(positionMs, seekComplete)
         }
+    }
+
+    suspend fun seekToTimeMsSuspend(positionMs: Int, seekComplete: (() -> Unit)? = null) {
+        seekToTimeMsInternal(positionMs)
+        seekComplete?.invoke()
     }
 
     fun seekIfPlayingToTimeMs(episodeUuid: String, positionMs: Int, seekComplete: (() -> Unit)? = null) {
@@ -741,41 +771,54 @@ open class PlaybackManager @Inject constructor(
         jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
     ) {
         launch {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
-
-            val episode = getCurrentEpisode() ?: return@launch
-            val jumpAmountMs = jumpAmountSeconds * 1000
-
-            val currentTimeMs = getCurrentTimeMs(episode = episode)
-            if (currentTimeMs < 0 || player?.episodeUuid != episode.uuid) return@launch // Make sure the player hasn't changed episodes before using the current time to seek
-
-            val newPositionMs = currentTimeMs + jumpAmountMs
-            val durationMs = player?.durationMs() ?: Int.MAX_VALUE // If we don't have a duration, just let them skip
-
-            statsManager.addTimeSavedSkipping((newPositionMs - currentTimeMs).toLong())
-            if (newPositionMs < durationMs) {
-                seekToTimeMsInternal(newPositionMs)
-            } else {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Seek beyond end of episode so completing. ${episode.uuid}")
-                onCompletion(episode.uuid)
-            }
+            skipForwardSuspend(sourceView, jumpAmountSeconds)
         }
+    }
+
+    suspend fun skipForwardSuspend(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
+    ) {
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
+
+        val episode = getCurrentEpisode() ?: return
+        val jumpAmountMs = jumpAmountSeconds * 1000
+
+        val currentTimeMs = getCurrentTimeMs(episode = episode)
+        if (currentTimeMs < 0 || player?.episodeUuid != episode.uuid) return // Make sure the player hasn't changed episodes before using the current time to seek
+
+        val newPositionMs = currentTimeMs + jumpAmountMs
+        val durationMs = player?.durationMs() ?: Int.MAX_VALUE // If we don't have a duration, just let them skip
+
+        statsManager.addTimeSavedSkipping((newPositionMs - currentTimeMs).toLong())
+        if (newPositionMs < durationMs) {
+            seekToTimeMsInternal(newPositionMs)
+        } else {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Seek beyond end of episode so completing. ${episode.uuid}")
+            onCompletion(episode.uuid)
+        }
+
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, sourceView)
     }
 
     fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
         launch {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
-
-            val episode = getCurrentEpisode() ?: return@launch
-
-            val jumpAmountMs = jumpAmountSeconds * 1000
-            val currentTimeMs = getCurrentTimeMs(episode = episode)
-            if (currentTimeMs < 0) return@launch
-
-            val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
-            seekToTimeMsInternal(newPositionMs)
+            skipBackwardSuspend(sourceView, jumpAmountSeconds)
         }
+    }
+
+    suspend fun skipBackwardSuspend(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
+
+        val episode = getCurrentEpisode() ?: return
+
+        val jumpAmountMs = jumpAmountSeconds * 1000
+        val currentTimeMs = getCurrentTimeMs(episode = episode)
+        if (currentTimeMs < 0) return
+
+        val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
+        seekToTimeMsInternal(newPositionMs)
+
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, sourceView)
     }
 

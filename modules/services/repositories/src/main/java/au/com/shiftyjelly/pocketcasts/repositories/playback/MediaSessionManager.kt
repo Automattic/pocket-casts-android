@@ -49,9 +49,13 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -104,8 +108,26 @@ class MediaSessionManager(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    private val commandQueue: MutableSharedFlow<QueuedCommand> = MutableSharedFlow(
+        replay = 0,
+        extraBufferCapacity = 10, // 10 is a somewhat arbitrary number--if we have more than that many commands queued, something has probably gone very wrong.
+    )
+
     init {
-        mediaSession.setCallback(MediaSessionCallback(playbackManager, episodeManager))
+        mediaSession.setCallback(
+            MediaSessionCallback(
+                playbackManager,
+                episodeManager,
+                enqueueCommand = { tag, command ->
+                    val added = commandQueue.tryEmit(Pair(tag, command))
+                    if (added) {
+                        Timber.i("Added command to queue: $tag")
+                    } else {
+                        Timber.e("Failed to add command to queue: $tag")
+                    }
+                },
+            )
+        )
 
         if (!Util.isAutomotive(context)) { // We can't start activities on automotive
             mediaSession.setSessionActivity(context.getLaunchActivityPendingIntent())
@@ -124,6 +146,19 @@ class MediaSessionManager(
         )
 
         connect()
+
+        @OptIn(DelicateCoroutinesApi::class)
+        GlobalScope.launch {
+            commandQueue.collect { (tag, command) ->
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Executing queued command: $tag")
+                command()
+
+                // arbitrary delay to increase the chance that the command will be executed before the next one
+                // is run. Ideally we wouldn't need this, but as long as the PlaybackManager launches coroutines,
+                // this is a helpful bit of extra security.
+                delay(200)
+            }
+        }
     }
 
     fun startObserving() {
@@ -453,7 +488,8 @@ class MediaSessionManager(
 
     inner class MediaSessionCallback(
         val playbackManager: PlaybackManager,
-        val episodeManager: EpisodeManager
+        val episodeManager: EpisodeManager,
+        val enqueueCommand: (String, suspend () -> Unit) -> Unit,
     ) : MediaSessionCompat.Callback() {
 
         private var playPauseTimer: Timer? = null
@@ -562,12 +598,12 @@ class MediaSessionManager(
 
         override fun onPlay() {
             logEvent("play")
-            playbackManager.playQueue(sourceView = source)
+            enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
         }
 
         override fun onPause() {
             logEvent("pause")
-            playbackManager.pause(sourceView = source)
+            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -578,22 +614,20 @@ class MediaSessionManager(
                 .subscribeBy(onError = { Timber.e(it) })
         }
 
+        // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
         override fun onStop() {
             logEvent("stop")
-            launch {
-                // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
-                playbackManager.pause(sourceView = source)
-            }
+            enqueueCommand("stop") { playbackManager.pauseSuspend(sourceView = source) }
         }
 
         override fun onSkipToPrevious() {
             logEvent("skip backwards")
-            playbackManager.skipBackward(sourceView = source)
+            enqueueCommand("skip backwards") { playbackManager.skipBackwardSuspend(sourceView = source) }
         }
 
         override fun onSkipToNext() {
             logEvent("skip forwards")
-            playbackManager.skipForward(sourceView = source)
+            enqueueCommand("skip forwards") { playbackManager.skipForwardSuspend(sourceView = source) }
         }
 
         override fun onSetRating(rating: RatingCompat?) {
@@ -614,7 +648,9 @@ class MediaSessionManager(
                 val autoMediaId = AutoMediaId.fromMediaId(mediaId)
                 val episodeId = autoMediaId.episodeId
                 episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
-                    playbackManager.playNow(episode, sourceView = source)
+                    enqueueCommand("play from media id") {
+                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                    }
                     LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
                         settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
                     }
@@ -625,15 +661,22 @@ class MediaSessionManager(
         override fun onCustomAction(action: String?, extras: Bundle?) {
             action ?: return
 
+            // FIXME enqueue these?
             when (action) {
-                APP_ACTION_SKIP_BACK -> playbackManager.skipBackward()
-                APP_ACTION_SKIP_FWD -> playbackManager.skipForward()
+                APP_ACTION_SKIP_BACK -> enqueueCommand("custom action: skip back") {
+                    playbackManager.skipBackwardSuspend()
+                }
+                APP_ACTION_SKIP_FWD -> enqueueCommand("custom action: skip forward") {
+                    playbackManager.skipForwardSuspend()
+                }
                 APP_ACTION_MARK_AS_PLAYED -> markAsPlayed()
                 APP_ACTION_STAR -> starEpisode()
                 APP_ACTION_UNSTAR -> unstarEpisode()
                 APP_ACTION_CHANGE_SPEED -> changePlaybackSpeed()
                 APP_ACTION_ARCHIVE -> archive()
-                APP_ACTION_PLAY_NEXT -> playbackManager.playNextInQueue()
+                APP_ACTION_PLAY_NEXT -> enqueueCommand("suctom action: play next") {
+                    playbackManager.playNextInQueue()
+                }
             }
         }
 
@@ -642,15 +685,17 @@ class MediaSessionManager(
             if (state is UpNextQueue.State.Loaded) {
                 state.queue.find { it.adapterId == id }?.let { episode ->
                     logEvent("play from skip to queue item")
-                    playbackManager.playNow(episode = episode, sourceView = source)
+                    enqueueCommand("skip to queue item") {
+                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                    }
                 }
             }
         }
 
         override fun onSeekTo(pos: Long) {
             logEvent("seek to $pos")
-            launch {
-                playbackManager.seekToTimeMs(pos.toInt())
+            enqueueCommand("seek to $pos") {
+                playbackManager.seekToTimeMsSuspend(pos.toInt())
                 playbackManager.trackPlaybackSeek(pos.toInt(), SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
             }
         }
@@ -841,6 +886,8 @@ class MediaSessionManager(
         return MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS.contains(Build.MANUFACTURER.lowercase())
     }
 }
+
+typealias QueuedCommand = Pair<String, suspend () -> Unit>
 
 private const val APP_ACTION_STAR = "star"
 private const val APP_ACTION_UNSTAR = "unstar"
