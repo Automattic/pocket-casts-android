@@ -313,7 +313,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                 override fun onDown(e: MotionEvent) = true
 
-                override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+                override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
                     val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
                         ?: return false
                     if (!skippedFirstTouch) {
