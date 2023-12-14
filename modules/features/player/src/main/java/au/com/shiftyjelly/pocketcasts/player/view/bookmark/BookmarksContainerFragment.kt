@@ -6,20 +6,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentBookmarksContainerBinding
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -53,9 +54,7 @@ class BookmarksContainerFragment :
         )
 
     var binding: FragmentBookmarksContainerBinding? = null
-
-    @Inject
-    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +68,19 @@ class BookmarksContainerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bottomSheetDialog = dialog as? BottomSheetDialog
+        bottomSheetDialog?.onBackPressedDispatcher?.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (bookmarksViewModel.multiSelectHelper.isMultiSelecting) {
+                        bookmarksViewModel.multiSelectHelper.isMultiSelecting = false
+                        return
+                    }
+                    dismiss()
+                }
+            }
+        )
+
         bottomSheetDialog?.behavior?.apply {
             isFitToContents = false
             state = BottomSheetBehavior.STATE_EXPANDED
@@ -102,14 +114,14 @@ class BookmarksContainerFragment :
     }
 
     private fun FragmentBookmarksContainerBinding.setupMultiSelectHelper() {
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+        bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             multiSelectToolbar.isVisible = isMultiSelecting
             multiSelectToolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         }
-        multiSelectHelper.context = context
+        bookmarksViewModel.multiSelectHelper.context = context
         multiSelectToolbar.setup(
             lifecycleOwner = viewLifecycleOwner,
-            multiSelectHelper = multiSelectHelper,
+            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
             fragmentManager = parentFragmentManager,
         )
@@ -118,7 +130,9 @@ class BookmarksContainerFragment :
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        multiSelectHelper.isMultiSelecting = false
-        multiSelectHelper.context = null
+        with(bookmarksViewModel.multiSelectHelper) {
+            isMultiSelecting = false
+            context = null
+        }
     }
 }

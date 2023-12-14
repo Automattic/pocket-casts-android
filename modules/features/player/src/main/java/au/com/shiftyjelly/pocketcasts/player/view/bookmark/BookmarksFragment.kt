@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -63,10 +62,7 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val bookmarksViewModel: BookmarksViewModel by viewModels()
-
-    @Inject
-    lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val bookmarksViewModel: BookmarksViewModel by viewModels({ requireParentFragment() })
 
     @Inject
     lateinit var settings: Settings
@@ -108,9 +104,9 @@ class BookmarksFragment : BaseFragment() {
                             textColor = requireNotNull(textColor(listData)),
                             sourceView = sourceView,
                             bookmarksViewModel = bookmarksViewModel,
-                            multiSelectHelper = multiSelectHelper,
+                            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
                             onRowLongPressed = { bookmark ->
-                                multiSelectHelper.defaultLongPress(
+                                bookmarksViewModel.multiSelectHelper.defaultLongPress(
                                     multiSelectable = bookmark,
                                     fragmentManager = childFragmentManager,
                                     forceDarkTheme = sourceView == SourceView.PLAYER,
@@ -165,7 +161,7 @@ class BookmarksFragment : BaseFragment() {
                     titleId = LR.string.bookmarks_select_option,
                     imageId = IR.drawable.ic_multiselect,
                     click = {
-                        multiSelectHelper.isMultiSelecting = true
+                        bookmarksViewModel.multiSelectHelper.isMultiSelecting = true
                     }
                 )
                 .addTextOption(
