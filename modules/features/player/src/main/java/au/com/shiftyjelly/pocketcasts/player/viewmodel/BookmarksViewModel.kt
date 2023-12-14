@@ -271,13 +271,9 @@ class BookmarksViewModel
     }
 
     private fun SourceView.mapToBookmarksSortTypeUserSetting() =
-        when (sourceView) {
-            SourceView.FILES,
-            SourceView.EPISODE_DETAILS,
-            -> settings.episodeBookmarksSortType
-
+        when (this) {
             SourceView.PLAYER -> settings.playerBookmarksSortType
-            else -> throw IllegalAccessException("Bookmarks sort accessed in unknown source view: $this")
+            else -> settings.episodeBookmarksSortType
         }
 
     sealed class UiState {

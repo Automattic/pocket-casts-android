@@ -215,6 +215,10 @@ class EpisodeContainerFragment :
                 viewModel.onPageSelected(position)
             }
         })
+
+        if (episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK) {
+            openBookmarks()
+        }
     }
 
     private fun FragmentEpisodeContainerBinding.setupMultiSelectHelper() {
@@ -229,6 +233,12 @@ class EpisodeContainerFragment :
             menuRes = null,
             fragmentManager = parentFragmentManager,
         )
+    }
+
+    private fun openBookmarks() {
+        val index = adapter.indexOfBookmarks
+        if (index == -1) return
+        binding?.viewPager?.currentItem = index
     }
 
     override fun onDestroyView() {
@@ -251,6 +261,8 @@ class EpisodeContainerFragment :
         private val fromListUuid: String?,
         private val forceDarkTheme: Boolean,
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
+        val indexOfBookmarks: Int
+            get() = sections.indexOf(Section.Bookmarks)
 
         private sealed class Section(@StringRes val titleRes: Int) {
             object Details : Section(LR.string.details)
