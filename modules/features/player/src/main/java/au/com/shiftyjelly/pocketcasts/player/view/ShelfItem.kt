@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 object ShelfItems {
     val itemsList = buildList {
@@ -119,7 +120,7 @@ sealed class ShelfItem(
         id = "archive",
         title = { if (it is UserEpisode) LR.string.delete else LR.string.archive },
         subtitle = LR.string.player_actions_show_as_delete_for_custom,
-        iconRes = { if (it is UserEpisode) IR.drawable.ic_delete else IR.drawable.ic_archive },
+        iconRes = { if (it is UserEpisode) VR.drawable.ic_delete else IR.drawable.ic_archive },
         shownWhen = Shown.Always,
         analyticsValue = "archive"
     )
@@ -137,7 +138,7 @@ sealed class ShelfItem(
         },
         iconRes = {
             if (it?.isDownloaded == true) {
-                IR.drawable.ic_delete
+                VR.drawable.ic_delete
             } else if (it?.episodeStatus == EpisodeStatusEnum.DOWNLOADING || it?.episodeStatus == EpisodeStatusEnum.QUEUED) {
                 IR.drawable.ic_cancel
             } else {

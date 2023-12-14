@@ -57,7 +57,7 @@ sealed class MultiSelectEpisodeAction(
         R.id.menu_archive,
         R.id.menu_delete,
         LR.string.delete,
-        IR.drawable.ic_delete,
+        R.drawable.ic_delete,
         "delete"
     )
     object Share : MultiSelectEpisodeAction(

@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 data class SwipeButtonLayout(
     val leftPrimary: () -> SwipeButton,
@@ -93,7 +94,7 @@ sealed interface SwipeButton {
         private val viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
 
-        override val iconRes = IR.drawable.ic_delete
+        override val iconRes = VR.drawable.ic_delete
 
         override val backgroundColor: (Context) -> Int =
             { it.getThemeColor(UR.attr.support_05) }

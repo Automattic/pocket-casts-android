@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -116,7 +115,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
                     plural = LR.string.bookmarks_delete_summary_plural
                 )
             )
-            .setIconId(IR.drawable.ic_delete)
+            .setIconId(R.drawable.ic_delete)
             .setIconTint(UR.attr.support_05)
             .setOnConfirm {
                 launch {

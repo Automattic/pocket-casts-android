@@ -7,12 +7,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class DeleteState {
@@ -70,7 +70,7 @@ object CloudDeleteHelper {
         val confirmationDialog = ConfirmationDialog()
             .setTitle(resources.getString(LR.string.profile_delete_file_title))
             .setSummary(resources.getStringPlural(count = episodes.size, singular = LR.string.profile_cloud_delete_files_singular, plural = LR.string.profile_cloud_delete_files_plural))
-            .setIconId(IR.drawable.ic_delete)
+            .setIconId(R.drawable.ic_delete)
             .setIconTint(null)
 
         when (deleteState) {

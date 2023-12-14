@@ -16,9 +16,9 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class FolderEditFragment : BaseDialogFragment() {
@@ -75,7 +75,7 @@ class FolderEditFragment : BaseDialogFragment() {
                     dismiss()
                 }
             }
-            .setIconId(IR.drawable.ic_delete)
+            .setIconId(VR.drawable.ic_delete)
             .setIconTint(UR.attr.support_05)
             .show(childFragmentManager, "delete_folder_warning")
     }
