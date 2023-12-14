@@ -118,11 +118,11 @@ class ProfileFragment : BaseFragment() {
                 when (fragmentClass) {
                     StatsFragment::class.java -> {
                         analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
                     }
                     CloudFilesFragment::class.java -> {
                         analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
                     }
                     ProfileEpisodeListFragment::class.java -> {
                         val fragment = when (section.title) {
@@ -143,7 +143,7 @@ class ProfileFragment : BaseFragment() {
                         (activity as? FragmentHostListener)?.addFragment(fragment)
                     }
                     HelpFragment::class.java -> {
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
                     }
                     else -> Timber.e("Profile section is invalid")
                 }
