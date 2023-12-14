@@ -165,7 +165,6 @@ dependencies {
     implementation libs.bundles.moshi
     implementation libs.bundles.navigation
     implementation libs.bundles.okhttp
-    implementation libs.bundles.paging
     implementation libs.bundles.protobuf
     implementation libs.bundles.retrofit
     implementation libs.bundles.rxjava
