@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -53,26 +51,13 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>>
-
-    @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
     abstract fun observeDownloadingEpisodesRx(): Flowable<List<PodcastEpisode>>
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:uuids)")
-    abstract fun findByUuids(uuids: List<String>): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
     abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_sync_status <> 1 AND last_playback_interaction_date IS NOT NULL ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun findEpisodesForHistorySync(): List<PodcastEpisode>
-
-    @Query("SELECT * FROM podcast_episodes")
-    abstract fun findAll(): DataSource.Factory<Int, PodcastEpisode>
-
-    @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND podcast_id = :podcastUuid")
-    abstract fun findByEpisodePlayingStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND archived = :archived AND podcast_id = :podcastUuid")
     abstract fun findByEpisodePlayingAndArchiveStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus, archived: Boolean): List<PodcastEpisode>
@@ -160,9 +145,6 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
     abstract fun observeByPodcastOrderDurationDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid AND playing_status != :playingStatus")
-    abstract fun findByPodcastAndNotPlayingStatus(podcastUuid: String, playingStatus: Int): List<PodcastEpisode>
-
     @Query("UPDATE podcast_episodes SET downloaded_error_details = NULL, episode_status = :episodeStatusNotDownloaded WHERE episode_status = :episodeStatusFailed")
     abstract fun clearAllDownloadErrors(episodeStatusNotDownloaded: EpisodeStatusEnum, episodeStatusFailed: EpisodeStatusEnum)
 
@@ -207,9 +189,6 @@ abstract class EpisodeDao {
     @Query("DELETE FROM podcast_episodes")
     abstract suspend fun deleteAll()
 
-    @Query("DELETE FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun deleteByUuid(uuid: String)
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insert(episode: PodcastEpisode)
 
@@ -239,9 +218,6 @@ abstract class EpisodeDao {
 
     @Query("UPDATE podcast_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
-
-    @Query("UPDATE podcast_episodes SET thumbnail_status = :thumbnailStatus WHERE uuid = :uuid")
-    abstract fun updateThumbnailStatus(thumbnailStatus: Int, uuid: String)
 
     @Query("UPDATE podcast_episodes SET play_error_details = :playErrorDetails WHERE uuid = :uuid")
     abstract fun updatePlayErrorDetails(playErrorDetails: String?, uuid: String)
