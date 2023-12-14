@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -85,6 +86,12 @@ private fun buildAndShowNotification(
         buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK, bookmarkUuid)
     )
 
+    val deleteAction = NotificationCompat.Action(
+        IR.drawable.ic_delete,
+        context.getString(LR.string.bookmark_notification_action_delete_title),
+        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid,)
+    )
+
     val notification = NotificationCompat.Builder(
         context,
         Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id
@@ -103,6 +110,7 @@ private fun buildAndShowNotification(
             )
         )
         .addAction(changeTitleAction)
+        .addAction(deleteAction)
         .build()
     if (ActivityCompat.checkSelfPermission(
             context,

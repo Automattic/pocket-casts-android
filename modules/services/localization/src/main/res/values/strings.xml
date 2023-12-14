@@ -1768,7 +1768,7 @@
     <string name="bookmarks_delete_plural">Delete bookmarks</string>
     <string name="bookmarks_delete_singular">Delete bookmark</string>
     <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
-    <string name="bookmarks_deleted_singular">1 bookmark deleted</string>
+    <string name="bookmarks_deleted_singular">Bookmark deleted</string>
     <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
     <string name="bookmark_not_found">Bookmark not found</string>
@@ -1781,6 +1781,7 @@
     <string name="bookmark_notification_title_added">Bookmark added</string>
     <string name="bookmark_notification_content_tap_to_view">Tap to view</string>
     <string name="bookmark_notification_action_change_title">Change title</string>
+    <string name="bookmark_notification_action_delete_title" translatable="false">@string/delete</string>
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
 

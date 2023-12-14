@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -54,6 +57,7 @@ class MainActivityViewModel
     private val feature: FeatureWrapper,
     private val featureFlag: FeatureFlagWrapper,
     private val releaseVersion: ReleaseVersionWrapper,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
@@ -191,6 +195,22 @@ class MainActivityViewModel
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun deleteBookmark(bookmarkUuid: String) {
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(bookmarkUuid)
+            if (bookmark == null) {
+                _snackbarMessage.emit(LR.string.bookmark_not_found)
+            } else {
+                _snackbarMessage.emit(LR.string.bookmarks_deleted_singular)
+                bookmarkManager.deleteToSync(bookmarkUuid)
+                analyticsTracker.track(
+                    AnalyticsEvent.BOOKMARK_DELETED,
+                    mapOf("source" to SourceView.NOTIFICATION_BOOKMARK.analyticsValue)
+                )
             }
         }
     }

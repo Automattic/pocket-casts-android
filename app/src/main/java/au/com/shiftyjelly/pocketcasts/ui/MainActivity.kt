@@ -820,6 +820,15 @@ class MainActivity :
             }
         }
 
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.snackbarMessage.collect { messageResId ->
+                    Snackbar.make(snackBarView(), getString(messageResId), Snackbar.LENGTH_LONG)
+                        .show()
+                }
+            }
+        }
+
         bottomNavHideManager =
             BottomNavHideManager(findViewById(R.id.root), binding.bottomNavigation)
         frameBottomSheetBehavior.setBottomSheetCallback(object :
@@ -1162,6 +1171,10 @@ class MainActivity :
             } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {
                 intent.getStringExtra(BOOKMARK_UUID)?.let {
                     viewModel.viewBookmark(it)
+                }
+            } else if (action == Settings.INTENT_OPEN_APP_DELETE_BOOKMARK) {
+                intent.getStringExtra(BOOKMARK_UUID)?.let {
+                    viewModel.deleteBookmark(it)
                 }
             }
             // new episode notification tapped
