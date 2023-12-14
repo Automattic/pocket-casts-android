@@ -60,7 +60,14 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun deleteEpisode(episode: UserEpisode, deleteState: DeleteState) {
-        CloudDeleteHelper.deleteEpisode(episode, deleteState, playbackManager, episodeManager, userEpisodeManager)
+        CloudDeleteHelper.deleteEpisode(
+            episode = episode,
+            deleteState = deleteState,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            userEpisodeManager = userEpisodeManager,
+            applicationScope = applicationScope,
+        )
         analyticsTracker.track(AnalyticsEvent.USER_FILE_DELETED)
         episodeAnalytics.trackEvent(
             event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD else AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
