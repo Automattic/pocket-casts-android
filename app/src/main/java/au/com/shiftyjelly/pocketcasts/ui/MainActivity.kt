@@ -1165,7 +1165,7 @@ class MainActivity :
                 closeToRoot()
                 addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
             } else if (action == Settings.INTENT_OPEN_APP_ADD_BOOKMARK) {
-                viewModel.buildBookmarkArguments { args ->
+                viewModel.buildBookmarkArguments(intent.getStringExtra(BOOKMARK_UUID)) { args ->
                     bookmarkActivityLauncher.launch(args.getIntent(this))
                 }
             } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {

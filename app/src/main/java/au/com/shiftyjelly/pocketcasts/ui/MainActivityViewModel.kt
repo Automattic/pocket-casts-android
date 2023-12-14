@@ -148,16 +148,13 @@ class MainActivityViewModel
         multiSelectBookmarksHelper.closeMultiSelect()
     }
 
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
+    fun buildBookmarkArguments(bookmarkUuid: String?, onSuccess: (BookmarkArguments) -> Unit) {
         viewModelScope.launch {
-            val episode = playbackManager.getCurrentEpisode() ?: return@launch
-            val timeInSecs = playbackManager.getCurrentTimeMs(episode) / 1000
-
             // load the existing bookmark
-            val bookmark = bookmarkManager.findByEpisodeTime(
-                episode = episode,
-                timeSecs = timeInSecs
-            )
+            val bookmark = bookmarkUuid?.let { bookmarkManager.findBookmark(it) }
+            val currentEpisode = playbackManager.getCurrentEpisode()
+            val episodeUuid = bookmark?.episodeUuid ?: currentEpisode?.uuid ?: return@launch
+            val timeInSecs = bookmark?.timeSecs ?: currentEpisode?.let { playbackManager.getCurrentTimeMs(currentEpisode) / 1000 } ?: 0
 
             val podcast =
                 bookmark?.let { podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) }
@@ -168,7 +165,7 @@ class MainActivityViewModel
 
             val arguments = BookmarkArguments(
                 bookmarkUuid = bookmark?.uuid,
-                episodeUuid = episode.uuid,
+                episodeUuid = episodeUuid,
                 timeSecs = timeInSecs,
                 backgroundColor = backgroundColor,
                 tintColor = tintColor,
