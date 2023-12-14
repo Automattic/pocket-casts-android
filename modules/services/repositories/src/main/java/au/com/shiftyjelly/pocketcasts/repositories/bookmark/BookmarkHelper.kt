@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.R
 
 class BookmarkHelper @Inject constructor(
     private val playbackManager: PlaybackManager,
@@ -87,7 +88,7 @@ private fun buildAndShowNotification(
     )
 
     val deleteAction = NotificationCompat.Action(
-        IR.drawable.ic_delete,
+        R.drawable.ic_delete_black,
         context.getString(LR.string.bookmark_notification_action_delete_title),
         buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid,)
     )
