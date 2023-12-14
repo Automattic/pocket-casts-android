@@ -113,6 +113,8 @@ interface Settings {
         const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
 
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
+
+        const val BOOKMARK_UUID = "bookmark_uuid"
     }
 
     enum class NotificationChannel(val id: String) {
