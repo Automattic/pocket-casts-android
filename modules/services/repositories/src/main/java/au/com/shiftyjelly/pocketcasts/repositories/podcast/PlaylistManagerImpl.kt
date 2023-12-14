@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
@@ -39,6 +40,7 @@ class PlaylistManagerImpl @Inject constructor(
     private val playlistUpdateAnalytics: PlaylistUpdateAnalytics,
     private val syncManager: SyncManager,
     @ApplicationContext private val context: Context,
+    @ForApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase
 ) : PlaylistManager, CoroutineScope {
 
@@ -198,7 +200,12 @@ class PlaylistManagerImpl @Inject constructor(
     override fun create(playlist: Playlist): Long {
         val id = playlistDao.insert(playlist)
         if (countPlaylists() == 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(this, true, context)
+            PocketCastsShortcuts.update(
+                playlistManager = this,
+                force = true,
+                coroutineScope = applicationScope,
+                context = context
+            )
         }
         return id
     }
@@ -298,7 +305,12 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.updateSortPositions(playlists)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(this, true, context)
+            PocketCastsShortcuts.update(
+                playlistManager = this,
+                force = true,
+                coroutineScope = applicationScope,
+                context = context
+            )
         }
     }
 

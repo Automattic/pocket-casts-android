@@ -496,7 +496,12 @@ class MainActivity :
             doRefresh()
         }
 
-        PocketCastsShortcuts.update(playlistManager, true, this)
+        PocketCastsShortcuts.update(
+            playlistManager = playlistManager,
+            force = true,
+            coroutineScope = applicationScope,
+            context = this
+        )
 
         subscriptionManager.refreshPurchases()
 
@@ -508,7 +513,7 @@ class MainActivity :
     private suspend fun refreshAppAndWait() = withContext(Dispatchers.Main) {
         val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Running refresh from refresh and wait")
-        RefreshPodcastsTask.runNowSync(application)
+        RefreshPodcastsTask.runNowSync(application, applicationScope)
 
         UiUtil.hideProgressDialog(dialog)
     }

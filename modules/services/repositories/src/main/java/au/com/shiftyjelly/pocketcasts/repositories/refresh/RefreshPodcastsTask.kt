@@ -9,13 +9,13 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ForApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -26,13 +26,18 @@ import java.util.concurrent.TimeUnit
 @HiltWorker
 class RefreshPodcastsTask @AssistedInject constructor(
     @Assisted val context: Context,
-    @Assisted val params: WorkerParameters
+    @Assisted val params: WorkerParameters,
+    @ForApplicationScope private val applicationScope: CoroutineScope,
 ) : Worker(context, params) {
     private var refreshRunnable: RefreshPodcastsThread? = null
 
     override fun doWork(): Result {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - Start")
-        val refresh = RefreshPodcastsThread(context = this.applicationContext, runNow = false)
+        val refresh = RefreshPodcastsThread(
+            context = this.applicationContext,
+            applicationScope = applicationScope,
+            runNow = false,
+        )
         this.refreshRunnable = refresh
         val result = refresh.run()
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - Finished $result")
@@ -75,16 +80,15 @@ class RefreshPodcastsTask @AssistedInject constructor(
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Set up periodic refresh")
         }
 
-        @OptIn(DelicateCoroutinesApi::class)
-        fun runNow(context: Context) {
-            GlobalScope.launch {
-                runNowSync(context)
+        fun runNow(context: Context, applicationScope: CoroutineScope) {
+            applicationScope.launch {
+                runNowSync(context, applicationScope)
             }
         }
 
         private val refreshMutex = Mutex()
         private var refreshJob: Deferred<Result>? = null
-        suspend fun runNowSync(context: Context) = withContext(Dispatchers.Default) {
+        suspend fun runNowSync(context: Context, applicationScope: CoroutineScope) = withContext(Dispatchers.Default) {
             refreshMutex.withLock {
                 if (refreshJob != null) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - runNow - Already running, joining.")
@@ -94,7 +98,11 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 }
 
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - runNow - Start")
-                val refreshThread = RefreshPodcastsThread(context = context.applicationContext, runNow = true)
+                val refreshThread = RefreshPodcastsThread(
+                    context = context.applicationContext,
+                    applicationScope = applicationScope,
+                    runNow = true,
+                )
                 if (!refreshThread.isAllowedToRun(runNow = true)) {
                     return@withContext
                 }
