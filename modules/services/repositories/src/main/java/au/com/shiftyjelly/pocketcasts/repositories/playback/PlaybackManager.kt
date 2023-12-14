@@ -610,24 +610,8 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun pause(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
-        if (!transientLoss) {
-            focusManager.giveUpAudioFocus()
-            playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(playbackState.copy(transientLoss = false))
-            }
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
-            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE, sourceView)
-        } else {
-            playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(playbackState.copy(transientLoss = true))
-            }
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Transient")
-        }
-
-        cancelUpdateTimer()
-
         launch {
-            player?.pause()
+            pauseSuspend(transientLoss, sourceView)
         }
     }
 
