@@ -148,10 +148,14 @@ class MainActivityViewModel
         multiSelectBookmarksHelper.closeMultiSelect()
     }
 
-    fun buildBookmarkArguments(bookmarkUuid: String?, onSuccess: (BookmarkArguments) -> Unit) {
+    fun buildBookmarkArguments(bookmarkUuid: String? = null, onSuccess: (BookmarkArguments) -> Unit) {
         viewModelScope.launch {
             // load the existing bookmark
             val bookmark = bookmarkUuid?.let { bookmarkManager.findBookmark(it) }
+            if (bookmarkUuid != null && bookmark == null) {
+                _snackbarMessage.emit(LR.string.bookmark_not_found)
+                return@launch
+            }
             val currentEpisode = playbackManager.getCurrentEpisode()
             val episodeUuid = bookmark?.episodeUuid ?: currentEpisode?.uuid ?: return@launch
             val timeInSecs = bookmark?.timeSecs ?: currentEpisode?.let { playbackManager.getCurrentTimeMs(currentEpisode) / 1000 } ?: 0

@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -85,7 +86,7 @@ private fun buildAndShowNotification(
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK, bookmarkUuid)
+        buildPendingIntent(context, INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE, bookmarkUuid)
     )
 
     val deleteAction = NotificationCompat.Action(
