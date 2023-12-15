@@ -575,17 +575,6 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.insert(podcast)
     }
 
-    override fun getPodcastEpisodesListOrderBy(podcast: Podcast): String {
-        return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> "UPPER(title) ASC"
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> "UPPER(title) DESC"
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> "published_date ASC"
-            EpisodesSortType.EPISODES_SORT_BY_DATE_DESC -> "published_date DESC"
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> "duration ASC"
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> "duration DESC"
-        }
-    }
-
     override fun updatePodcast(podcast: Podcast) {
         podcastDao.update(podcast)
     }
