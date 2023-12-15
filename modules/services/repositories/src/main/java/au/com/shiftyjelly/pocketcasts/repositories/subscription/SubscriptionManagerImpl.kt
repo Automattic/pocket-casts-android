@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -45,9 +46,8 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -61,6 +61,7 @@ import javax.inject.Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
+    @ApplicationScope private val applicationScope: CoroutineScope
 ) : SubscriptionManager,
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {
@@ -199,7 +200,6 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             for (purchase in purchases) {
@@ -209,7 +209,7 @@ class SubscriptionManagerImpl @Inject constructor(
             purchaseEvents.accept(PurchaseEvent.Cancelled(billingResult.responseCode))
         } else {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                GlobalScope.launch {
+                applicationScope.launch {
                     val purchasesResult = getPurchases()
                     if (purchasesResult == null) {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to update purchase because billing result returned null purchases")
@@ -255,12 +255,11 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             Timber.d("Purchase: ${purchase.purchaseToken}")
             // Grant entitlement to the user.
-            GlobalScope.launch {
+            applicationScope.launch {
                 try {
                     sendPurchaseToServer(purchase)
                     // Acknowledge the purchase if it hasn't already been acknowledged.
@@ -339,9 +338,8 @@ class SubscriptionManagerImpl @Inject constructor(
         return billingClient.queryPurchasesAsync(params = queryPurchasesParams)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String) {
-        GlobalScope.launch {
+        applicationScope.launch {
             val productDetailsParams =
                 BillingFlowParams.ProductDetailsParams.newBuilder()
                     .setProductDetails(productDetails)

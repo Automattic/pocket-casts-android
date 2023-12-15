@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
@@ -57,7 +58,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -87,6 +87,7 @@ class PlayerViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -478,7 +479,16 @@ class PlayerViewModel @Inject constructor(
                 .setOnConfirm { archiveConfirmed(episode) }
         } else if (episode is UserEpisode) {
             val deleteState = CloudDeleteHelper.getDeleteState(episode)
-            val deleteFunction: (UserEpisode, DeleteState) -> Unit = { ep, delState -> CloudDeleteHelper.deleteEpisode(ep, delState, playbackManager, episodeManager, userEpisodeManager) }
+            val deleteFunction: (UserEpisode, DeleteState) -> Unit = { ep, delState ->
+                CloudDeleteHelper.deleteEpisode(
+                    episode = ep,
+                    deleteState = delState,
+                    playbackManager = playbackManager,
+                    episodeManager = episodeManager,
+                    userEpisodeManager = userEpisodeManager,
+                    applicationScope = applicationScope,
+                )
+            }
             return CloudDeleteHelper.getDeleteDialog(episode, deleteState, deleteFunction, resources)
         }
 

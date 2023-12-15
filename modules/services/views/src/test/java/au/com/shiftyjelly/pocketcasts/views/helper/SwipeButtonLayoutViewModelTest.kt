@@ -8,6 +8,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
@@ -46,6 +48,7 @@ class SwipeButtonLayoutViewModelTest {
             playbackManager = playbackManager,
             podcastManager = mock(),
             userEpisodeManager = mock(),
+            applicationScope = CoroutineScope(Dispatchers.Default)
         )
     }
 
