@@ -1771,6 +1771,7 @@
     <string name="bookmarks_deleted_singular">1 bookmark deleted</string>
     <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
+    <string name="bookmark_not_found">Bookmark not found</string>
     <string name="bookmarks_select_option">Select bookmarks</string>
     <string name="bookmarks_search">Search bookmark</string>
     <string name="bookmarks_sort_option" translatable="false">@string/sort_by</string>

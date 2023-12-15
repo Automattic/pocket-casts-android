@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -12,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
@@ -25,17 +28,21 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class MainActivityViewModel
 @Inject constructor(
+    private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     userManager: UserManager,
     private val settings: Settings,
@@ -50,6 +57,12 @@ class MainActivityViewModel
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
+
+    private val _snackbarMessage = MutableSharedFlow<Int>()
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
+
+    private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
+    val navigationState = _navigationState.asSharedFlow()
 
     var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
@@ -160,7 +173,35 @@ class MainActivityViewModel
         }
     }
 
+    fun viewBookmark(bookmarkUuid: String) {
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(bookmarkUuid)
+            if (bookmark == null) {
+                _snackbarMessage.emit(LR.string.bookmark_not_found)
+            } else {
+                val currentEpisode = playbackManager.getCurrentEpisode()
+                val isBookmarkForCurrentlyPlayingEpisode = bookmark.episodeUuid == currentEpisode?.uuid
+                if (isBookmarkForCurrentlyPlayingEpisode) {
+                    _navigationState.emit(NavigationState.BookmarksForCurrentlyPlaying)
+                } else {
+                    episodeManager.findEpisodeByUuid(bookmark.episodeUuid)?.let {
+                        when (it) {
+                            is PodcastEpisode -> _navigationState.emit(NavigationState.BookmarksForPodcastEpisode(it))
+                            is UserEpisode -> _navigationState.emit(NavigationState.BookmarksForUserEpisode(it))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     data class State(
         val shouldShowWhatsNew: Boolean = false,
     )
+
+    sealed class NavigationState {
+        object BookmarksForCurrentlyPlaying : NavigationState()
+        data class BookmarksForPodcastEpisode(val episode: PodcastEpisode) : NavigationState()
+        data class BookmarksForUserEpisode(val episode: UserEpisode) : NavigationState()
+    }
 }

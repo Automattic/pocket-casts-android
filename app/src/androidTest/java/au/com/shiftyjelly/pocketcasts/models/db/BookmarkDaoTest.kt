@@ -48,7 +48,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(FakeBookmarksGenerator.create(uuid))
             assertNotNull(
                 "Inserted bookmark should be able to be found",
-                bookmarkDao.findByUuid(uuid)
+                bookmarkDao.findByUuid(uuid, false)
             )
         }
     }
@@ -60,8 +60,7 @@ class BookmarkDaoTest {
             val bookmark = FakeBookmarksGenerator.create(uuid)
             bookmarkDao.insert(bookmark)
 
-            val createdBookmark = bookmarkDao.findByUuid(uuid)
-            assert(createdBookmark?.deleted == false)
+            val createdBookmark = bookmarkDao.findByUuid(uuid, false)
             assert(createdBookmark?.syncStatus == SyncStatus.NOT_SYNCED)
 
             bookmark.deleted = true
@@ -69,8 +68,7 @@ class BookmarkDaoTest {
 
             bookmarkDao.update(bookmark)
 
-            val updatedBookmark = bookmarkDao.findByUuid(uuid)
-            assert(updatedBookmark?.deleted == true)
+            val updatedBookmark = bookmarkDao.findByUuid(uuid, deleted = true)
             assert(updatedBookmark?.syncStatus == SyncStatus.SYNCED)
         }
     }
@@ -81,9 +79,9 @@ class BookmarkDaoTest {
             val uuid = UUID.randomUUID().toString()
             val bookmark = FakeBookmarksGenerator.create(uuid)
             bookmarkDao.insert(bookmark)
-            assertNotNull(bookmarkDao.findByUuid(uuid))
+            assertNotNull(bookmarkDao.findByUuid(uuid, false))
             bookmarkDao.delete(bookmark)
-            assertNull(bookmarkDao.findByUuid(uuid))
+            assertNull(bookmarkDao.findByUuid(uuid, true))
         }
     }
 

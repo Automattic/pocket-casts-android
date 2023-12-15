@@ -83,8 +83,11 @@ class BookmarkManagerImpl @Inject constructor(
     /**
      * Find the bookmark by its UUID.
      */
-    override suspend fun findBookmark(bookmarkUuid: String): Bookmark? {
-        return bookmarkDao.findByUuid(bookmarkUuid)
+    override suspend fun findBookmark(
+        bookmarkUuid: String,
+        deleted: Boolean,
+    ): Bookmark? {
+        return bookmarkDao.findByUuid(bookmarkUuid, deleted)
     }
 
     /**

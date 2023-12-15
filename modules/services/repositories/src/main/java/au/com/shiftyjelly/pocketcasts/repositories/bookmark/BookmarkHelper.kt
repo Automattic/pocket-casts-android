@@ -48,13 +48,13 @@ class BookmarkHelper @Inject constructor(
             val timeInSecs = playbackManager.getCurrentTimeMs(episode) / 1000
 
             // Load existing bookmark
-            val bookmark = bookmarkManager.findByEpisodeTime(
+            var bookmark = bookmarkManager.findByEpisodeTime(
                 episode = episode,
                 timeSecs = timeInSecs
             )
 
             if (bookmark == null) {
-                bookmarkManager.add(
+                bookmark = bookmarkManager.add(
                     episode = episode,
                     timeSecs = timeInSecs,
                     title = context.getString(LR.string.bookmark),
@@ -66,7 +66,7 @@ class BookmarkHelper @Inject constructor(
                 playbackManager.playTone()
             }
 
-            buildAndShowNotification(context)
+            buildAndShowNotification(context, bookmark.uuid)
         }
     }
 
@@ -77,11 +77,12 @@ class BookmarkHelper @Inject constructor(
 
 private fun buildAndShowNotification(
     context: Context,
+    bookmarkUuid: String,
 ) {
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK)
+        buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK, bookmarkUuid)
     )
 
     val notification = NotificationCompat.Builder(
@@ -94,7 +95,13 @@ private fun buildAndShowNotification(
         .setSmallIcon(IR.drawable.notification)
         .setAutoCancel(true)
         .setOnlyAlertOnce(true)
-        .setContentIntent(buildPendingIntent(context, INTENT_OPEN_APP_VIEW_BOOKMARKS))
+        .setContentIntent(
+            buildPendingIntent(
+                context,
+                INTENT_OPEN_APP_VIEW_BOOKMARKS,
+                bookmarkUuid,
+            )
+        )
         .addAction(changeTitleAction)
         .build()
     if (ActivityCompat.checkSelfPermission(
@@ -109,10 +116,17 @@ private fun buildAndShowNotification(
     }
 }
 
-private fun buildPendingIntent(context: Context, actionKey: String): PendingIntent {
+private fun buildPendingIntent(
+    context: Context,
+    actionKey: String,
+    bookmarkUuid: String,
+): PendingIntent {
     val appIntent = context.packageManager
         .getLaunchIntentForPackage(context.packageName)
-        ?.apply { action = actionKey }
+        ?.apply {
+            action = actionKey
+            putExtra(Settings.BOOKMARK_UUID, bookmarkUuid)
+        }
 
     return PendingIntent.getActivity(
         context,

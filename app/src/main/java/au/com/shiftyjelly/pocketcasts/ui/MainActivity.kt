@@ -67,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
@@ -75,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -105,6 +107,7 @@ import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
+import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -784,6 +787,39 @@ class MainActivity :
             }
         }
 
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.snackbarMessage.collect { messageResId ->
+                    Snackbar.make(snackBarView(), getString(messageResId), Snackbar.LENGTH_LONG)
+                        .show()
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationState.collect { navigationState ->
+                    when (navigationState) {
+                        is NavigationState.BookmarksForCurrentlyPlaying -> showPlayerBookmarks()
+                        is NavigationState.BookmarksForPodcastEpisode -> {
+                            // Once episode container fragment is shown, bookmarks tab is shown from inside it based on the new source
+                            openEpisodeDialog(
+                                episodeUuid = navigationState.episode.uuid,
+                                source = EpisodeViewSource.NOTIFICATION_BOOKMARK,
+                                podcastUuid = navigationState.episode.podcastUuid,
+                                forceDark = false
+                            )
+                        }
+                        is NavigationState.BookmarksForUserEpisode -> {
+                            // Bookmarks container is directly shown for user episode
+                            val fragment = BookmarksContainerFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
+                            fragment.show(supportFragmentManager, "bookmarks_container")
+                        }
+                    }
+                }
+            }
+        }
+
         bottomNavHideManager =
             BottomNavHideManager(findViewById(R.id.root), binding.bottomNavigation)
         frameBottomSheetBehavior.setBottomSheetCallback(object :
@@ -1124,7 +1160,9 @@ class MainActivity :
                     bookmarkActivityLauncher.launch(args.getIntent(this))
                 }
             } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {
-                showPlayerBookmarks()
+                intent.getStringExtra(BOOKMARK_UUID)?.let {
+                    viewModel.viewBookmark(it)
+                }
             }
             // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
