@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.app.Activity
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
 
 interface NotificationHelper {
@@ -15,4 +16,5 @@ interface NotificationHelper {
     fun bookmarkChannelBuilder(): NotificationCompat.Builder
     fun openEpisodeNotificationSettings(activity: Activity?)
     fun isShowing(notificationId: Int): Boolean
+    fun removeNotification(intentExtras: Bundle?, notificationId: Int)
 }

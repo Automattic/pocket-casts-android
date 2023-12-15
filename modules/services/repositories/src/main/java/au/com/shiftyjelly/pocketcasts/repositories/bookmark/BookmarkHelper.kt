@@ -10,8 +10,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
+import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
@@ -82,7 +86,13 @@ private fun buildAndShowNotification(
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK, bookmarkUuid)
+        buildPendingIntent(context, INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE, bookmarkUuid)
+    )
+
+    val deleteAction = NotificationCompat.Action(
+        R.drawable.ic_delete_black,
+        context.getString(LR.string.bookmark_notification_action_delete_title),
+        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid,)
     )
 
     val notification = NotificationCompat.Builder(
@@ -103,6 +113,7 @@ private fun buildAndShowNotification(
             )
         )
         .addAction(changeTitleAction)
+        .addAction(deleteAction)
         .build()
     if (ActivityCompat.checkSelfPermission(
             context,
@@ -126,6 +137,7 @@ private fun buildPendingIntent(
         ?.apply {
             action = actionKey
             putExtra(Settings.BOOKMARK_UUID, bookmarkUuid)
+            putExtra(INTENT_EXTRA_NOTIFICATION_TAG, "${Settings.BOOKMARK_UUID}_$bookmarkUuid")
         }
 
     return PendingIntent.getActivity(

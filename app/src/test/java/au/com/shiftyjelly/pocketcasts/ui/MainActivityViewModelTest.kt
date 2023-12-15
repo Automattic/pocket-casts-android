@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -42,9 +44,12 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 private const val TEST_EPISODE_UUID = "test_episode_uuid"
+private const val TEST_BOOKMARK_UUID = "test_bookmark_uuid"
+
 @RunWith(MockitoJUnitRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainActivityViewModelTest {
@@ -83,6 +88,9 @@ class MainActivityViewModelTest {
 
     @Mock
     lateinit var episode: BaseEpisode
+
+    @Mock
+    lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var viewModel: MainActivityViewModel
 
@@ -207,6 +215,38 @@ class MainActivityViewModelTest {
         }
     }
 
+    @Test
+    fun `given bookmark exists, when delete tapped from bookmark added notification, then bookmark is deleted`() = runTest {
+        whenever(bookmarkManager.findBookmark(TEST_BOOKMARK_UUID)).thenReturn(mock())
+        initViewModel()
+
+        viewModel.deleteBookmark(TEST_BOOKMARK_UUID)
+
+        verify(bookmarkManager).deleteToSync(anyString())
+    }
+
+    @Test
+    fun `given bookmark exists, when delete tapped from bookmark added notification, then bookmark deleted message shown`() = runTest {
+        whenever(bookmarkManager.findBookmark(TEST_BOOKMARK_UUID)).thenReturn(mock())
+        initViewModel()
+
+        viewModel.snackbarMessage.test {
+            viewModel.deleteBookmark(TEST_BOOKMARK_UUID)
+            assertTrue(awaitItem() == R.string.bookmarks_deleted_singular)
+        }
+    }
+
+    @Test
+    fun `given bookmark does not exists, when delete tapped from bookmark added notification, then bookmark not found message shown`() = runTest {
+        whenever(bookmarkManager.findBookmark(TEST_BOOKMARK_UUID)).thenReturn(null)
+        initViewModel()
+
+        viewModel.snackbarMessage.test {
+            viewModel.deleteBookmark(TEST_BOOKMARK_UUID)
+            assertTrue(awaitItem() == R.string.bookmark_not_found)
+        }
+    }
+
     private fun initViewModel(
         isUserEntitled: Boolean = true,
         currentRelease: ReleaseVersion = productionFullAccessRelease,
@@ -250,7 +290,8 @@ class MainActivityViewModelTest {
             theme = theme,
             feature = feature,
             featureFlag = featureFlag,
-            releaseVersion = releaseVersion
+            releaseVersion = releaseVersion,
+            analyticsTracker = analyticsTracker,
         )
     }
 }
