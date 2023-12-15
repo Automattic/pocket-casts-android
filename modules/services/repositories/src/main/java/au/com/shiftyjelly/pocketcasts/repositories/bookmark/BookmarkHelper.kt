@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
@@ -135,6 +136,7 @@ private fun buildPendingIntent(
         ?.apply {
             action = actionKey
             putExtra(Settings.BOOKMARK_UUID, bookmarkUuid)
+            putExtra(INTENT_EXTRA_NOTIFICATION_TAG, "${Settings.BOOKMARK_UUID}_$bookmarkUuid")
         }
 
     return PendingIntent.getActivity(

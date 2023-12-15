@@ -7,8 +7,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -124,5 +126,13 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.packageName)
         intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
         activity.startActivity(intent)
+    }
+
+    override fun removeNotification(intentExtras: Bundle?, notificationId: Int) {
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationTag = intentExtras?.getString(INTENT_EXTRA_NOTIFICATION_TAG, null)
+        if (!notificationTag.isNullOrBlank()) {
+            manager.cancel(notificationId)
+        }
     }
 }

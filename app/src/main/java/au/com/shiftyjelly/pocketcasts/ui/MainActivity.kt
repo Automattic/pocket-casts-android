@@ -85,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -190,6 +191,7 @@ class MainActivity :
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var watchSync: WatchSync
+    @Inject lateinit var notificationHelper: NotificationHelper
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -1168,6 +1170,7 @@ class MainActivity :
                 viewModel.buildBookmarkArguments(intent.getStringExtra(BOOKMARK_UUID)) { args ->
                     bookmarkActivityLauncher.launch(args.getIntent(this))
                 }
+                notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
             } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {
                 intent.getStringExtra(BOOKMARK_UUID)?.let {
                     viewModel.viewBookmark(it)
@@ -1176,6 +1179,7 @@ class MainActivity :
                 intent.getStringExtra(BOOKMARK_UUID)?.let {
                     viewModel.deleteBookmark(it)
                 }
+                notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
             }
             // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
