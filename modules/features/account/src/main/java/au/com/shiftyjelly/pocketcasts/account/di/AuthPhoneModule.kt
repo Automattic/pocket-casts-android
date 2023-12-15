@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.di
 
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthDataSerializer
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
 import com.google.android.horologist.auth.data.phone.tokenshare.impl.TokenBundleRepositoryImpl
@@ -11,7 +12,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Qualifier
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -21,7 +21,7 @@ object AuthPhoneModule {
     @Provides
     fun providesTokenBundleRepository(
         wearDataLayerRegistry: WearDataLayerRegistry,
-        @ForApplicationScope coroutineScope: CoroutineScope,
+        @ApplicationScope coroutineScope: CoroutineScope,
     ): TokenBundleRepository<WatchSyncAuthData?> {
         return TokenBundleRepositoryImpl(
             registry = wearDataLayerRegistry,
@@ -30,7 +30,3 @@ object AuthPhoneModule {
         )
     }
 }
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class ForApplicationScope

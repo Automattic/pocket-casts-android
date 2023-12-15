@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultRelease
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,6 +63,7 @@ class AppLifecycleObserverTest {
             firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
             packageUtil = packageUtil,
             settings = settings,
+            applicationScope = CoroutineScope(Dispatchers.Default),
         )
     }
 

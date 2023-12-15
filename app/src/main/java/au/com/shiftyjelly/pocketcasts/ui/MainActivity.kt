@@ -82,6 +82,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -132,9 +133,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -187,6 +186,7 @@ class MainActivity :
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var watchSync: WatchSync
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -494,7 +494,12 @@ class MainActivity :
             doRefresh()
         }
 
-        PocketCastsShortcuts.update(playlistManager, true, this)
+        PocketCastsShortcuts.update(
+            playlistManager = playlistManager,
+            force = true,
+            coroutineScope = applicationScope,
+            context = this
+        )
 
         subscriptionManager.refreshPurchases()
 
@@ -506,7 +511,7 @@ class MainActivity :
     private suspend fun refreshAppAndWait() = withContext(Dispatchers.Main) {
         val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Running refresh from refresh and wait")
-        RefreshPodcastsTask.runNowSync(application)
+        RefreshPodcastsTask.runNowSync(application, applicationScope)
 
         UiUtil.hideProgressDialog(dialog)
     }
@@ -679,7 +684,6 @@ class MainActivity :
             .show(supportFragmentManager, "stories_dialog")
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     @Suppress("DEPRECATION")
     private fun setupPlayerViews(showMiniPlayerImmediately: Boolean) {
         binding.playerBottomSheet.listener = this
@@ -757,7 +761,7 @@ class MainActivity :
                     }
                 }
             } else {
-                GlobalScope.launch { userEpisodeManager.removeCloudStatusFromFiles(playbackManager) }
+                applicationScope.launch { userEpisodeManager.removeCloudStatusFromFiles(playbackManager) }
             }
 
             if (viewModel.shouldShowTrialFinished(signinState)) {
