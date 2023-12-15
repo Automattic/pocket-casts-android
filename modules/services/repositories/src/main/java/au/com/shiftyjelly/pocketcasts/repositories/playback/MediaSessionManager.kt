@@ -655,7 +655,6 @@ class MediaSessionManager(
         override fun onCustomAction(action: String?, extras: Bundle?) {
             action ?: return
 
-            // FIXME enqueue these?
             when (action) {
                 APP_ACTION_SKIP_BACK -> enqueueCommand("custom action: skip back") {
                     playbackManager.skipBackwardSuspend()
