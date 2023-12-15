@@ -122,7 +122,7 @@ class MediaSessionManager(
                     if (added) {
                         Timber.i("Added command to queue: $tag")
                     } else {
-                        Timber.e("Failed to add command to queue: $tag")
+                        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                     }
                 },
             )
