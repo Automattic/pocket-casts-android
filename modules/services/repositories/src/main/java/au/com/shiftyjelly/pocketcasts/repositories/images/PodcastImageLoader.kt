@@ -11,10 +11,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import coil.imageLoader
 import coil.request.CachePolicy
+import coil.request.ErrorResult
 import coil.request.ImageRequest
+import coil.request.SuccessResult
 import coil.size.Size
 import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -117,11 +121,37 @@ open class PodcastImageLoader(
         return loadCoil(podcast?.uuid, onComplete = onComplete)
     }
 
+    fun loadEpisodeArtworkInto(
+        imageView: ImageView,
+        episode: PodcastEpisode,
+        coroutineScope: CoroutineScope,
+    ) {
+        if (episode.imageUrl != null) {
+            val episodeImageRequest = ImageRequest.Builder(context)
+                .data(episode.imageUrl)
+                .target(imageView)
+                .build()
+            val disposable = episodeImageRequest.context.imageLoader.enqueue(episodeImageRequest)
+            coroutineScope.launch {
+                val imageResult = disposable.job.await()
+                when (imageResult) {
+                    is SuccessResult -> { /* do nothing */ }
+                    is ErrorResult -> {
+                        // If episode artwork image fails, try podcast image
+                        loadPodcastImageForEpisode(episode).into(imageView)
+                    }
+                }
+            }
+        } else {
+            loadPodcastImageForEpisode(episode).into(imageView)
+        }
+    }
+
     fun loadPodcastUuid(podcastUuid: String?): ImageRequest.Builder {
         return loadCoil(podcastUuid)
     }
 
-    fun load(episode: PodcastEpisode): ImageRequest.Builder {
+    fun loadPodcastImageForEpisode(episode: PodcastEpisode): ImageRequest.Builder {
         return loadCoil(episode.podcastUuid)
     }
 
@@ -140,7 +170,7 @@ open class PodcastImageLoader(
     fun load(episode: BaseEpisode): ImageRequest.Builder {
         return when (episode) {
             is PodcastEpisode -> {
-                load(episode)
+                loadPodcastImageForEpisode(episode)
             }
             is UserEpisode -> {
                 load(episode)

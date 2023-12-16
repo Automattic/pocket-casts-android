@@ -52,6 +52,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.Date
@@ -60,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class RefreshPodcastsThread(
     private val context: Context,
+    private val applicationScope: CoroutineScope,
     private val runNow: Boolean
 ) {
 
@@ -241,6 +243,7 @@ class RefreshPodcastsThread(
 
         val sync = PodcastSyncProcess(
             context = context,
+            applicationScope = applicationScope,
             settings = entryPoint.settings(),
             episodeManager = entryPoint.episodeManager(),
             podcastManager = entryPoint.podcastManager(),

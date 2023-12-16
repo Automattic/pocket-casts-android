@@ -51,7 +51,7 @@ class BookmarksViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
-    private val multiSelectHelper: MultiSelectBookmarksHelper,
+    val multiSelectHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
@@ -271,13 +271,9 @@ class BookmarksViewModel
     }
 
     private fun SourceView.mapToBookmarksSortTypeUserSetting() =
-        when (sourceView) {
-            SourceView.FILES,
-            SourceView.EPISODE_DETAILS,
-            -> settings.episodeBookmarksSortType
-
+        when (this) {
             SourceView.PLAYER -> settings.playerBookmarksSortType
-            else -> throw IllegalAccessException("Bookmarks sort accessed in unknown source view: $this")
+            else -> settings.episodeBookmarksSortType
         }
 
     sealed class UiState {

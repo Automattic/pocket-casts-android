@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -27,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainer
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -38,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
 import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -54,7 +55,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
     @Inject lateinit var settings: Settings
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    @Inject lateinit var multiSelectHelper: MultiSelectBookmarksHelper
+    private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
     lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -71,13 +72,11 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        multiSelectHelper.context = null
+        bookmarksViewModel.multiSelectHelper.context = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
         val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
@@ -114,12 +113,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         })
 
         val viewPager = binding.viewPager
-        viewPager.adapter = adapter
-        viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
-
-        TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
-            tab.setText(adapter.pageTitle(position))
-        }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             private var previousPosition: Int = INVALID_TAB_POSITION
@@ -128,7 +121,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 if (state == SCROLL_STATE_IDLE) {
                     (activity as? FragmentHostListener)?.updatePlayerView()
                 }
-                viewPager.isUserInputEnabled = !multiSelectHelper.isMultiSelecting
+                viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
             }
 
             override fun onPageSelected(position: Int) {
@@ -161,10 +154,17 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val hasChapters = !it.chapters.isEmpty
             val hasNotes = !it.podcastHeader.isUserEpisode
-
-            val updated = adapter.update(hasNotes, hasChapters)
-            if (updated) {
-                adapter.notifyDataSetChanged()
+            if (::adapter.isInitialized) {
+                val updated = adapter.update(hasNotes, hasChapters)
+                if (updated) adapter.notifyDataSetChanged()
+            } else {
+                adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+                adapter.update(hasNotes, hasChapters)
+                viewPager.adapter = adapter
+                viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
+                TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
+                    tab.setText(adapter.pageTitle(position))
+                }.attach()
             }
 
             val upNextCount = it.upNextEpisodes.size
@@ -196,14 +196,14 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             }
         }
 
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+        bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             binding.multiSelectToolbar.isVisible = isMultiSelecting
             binding.multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
         }
-        multiSelectHelper.context = context
+        bookmarksViewModel.multiSelectHelper.context = context
         binding.multiSelectToolbar.setup(
             lifecycleOwner = viewLifecycleOwner,
-            multiSelectHelper = multiSelectHelper,
+            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
             fragmentManager = parentFragmentManager,
         )
@@ -274,7 +274,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     override fun getBackstackCount(): Int {
         return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
-            multiSelectHelper.isMultiSelecting
+            bookmarksViewModel.multiSelectHelper.isMultiSelecting
         ) 1 else 0
     }
 
@@ -284,8 +284,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 true
             }
-            multiSelectHelper.isMultiSelecting -> {
-                multiSelectHelper.closeMultiSelect()
+            bookmarksViewModel.multiSelectHelper.isMultiSelecting -> {
+                bookmarksViewModel.multiSelectHelper.closeMultiSelect()
                 binding?.viewPager?.isUserInputEnabled = true
                 true
             }

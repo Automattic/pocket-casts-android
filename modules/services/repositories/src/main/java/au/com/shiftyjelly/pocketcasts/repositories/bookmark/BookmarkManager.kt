@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface BookmarkManager {
     suspend fun add(episode: BaseEpisode, timeSecs: Int, title: String, creationSource: CreationSource): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)
-    suspend fun findBookmark(bookmarkUuid: String): Bookmark?
+    suspend fun findBookmark(bookmarkUuid: String, deleted: Boolean = false): Bookmark?
     suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark?
     suspend fun findEpisodeBookmarksFlow(
         episode: BaseEpisode,

@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultRelease
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +36,7 @@ class AppLifecycleObserverTest {
     @Mock @ApplicationContext private lateinit var context: Context
     @Mock private lateinit var settings: Settings
     @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
+    @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
     @Mock private lateinit var packageUtil: PackageUtil
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
@@ -47,6 +50,7 @@ class AppLifecycleObserverTest {
     @Before
     fun setUp() {
         whenever(settings.autoPlayNextEpisodeOnEmpty).thenReturn(autoPlayNextEpisodeSetting)
+        whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
 
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
 
@@ -59,6 +63,7 @@ class AppLifecycleObserverTest {
             firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
             packageUtil = packageUtil,
             settings = settings,
+            applicationScope = CoroutineScope(Dispatchers.Default),
         )
     }
 
@@ -75,6 +80,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting).set(true)
+        verify(useUpNextDarkThemeSetting).set(false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -91,6 +97,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
+        verify(useUpNextDarkThemeSetting).set(false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -106,6 +113,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
+        verify(useUpNextDarkThemeSetting).set(false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -122,5 +130,6 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
+        verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any())
     }
 }

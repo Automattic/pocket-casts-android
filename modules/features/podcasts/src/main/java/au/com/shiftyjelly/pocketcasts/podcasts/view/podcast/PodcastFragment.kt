@@ -76,8 +76,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -129,8 +127,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var bookmarkManager: BookmarkManager
-    @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
-    @Inject lateinit var multiSelectBookmarksHelper: MultiSelectBookmarksHelper
     @Inject lateinit var coilManager: CoilManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
@@ -214,17 +210,17 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun <T> onRowLongPress(): (entity: T) -> Unit = {
         when (it) {
             is PodcastEpisode -> {
-                if (multiSelectEpisodesHelper.listener == null) {
+                if (viewModel.multiSelectEpisodesHelper.listener == null) {
                     binding?.setupMultiSelect()
                 }
-                multiSelectEpisodesHelper
+                viewModel.multiSelectEpisodesHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
             }
             is Bookmark -> {
-                if (multiSelectBookmarksHelper.listener == null) {
+                if (viewModel.multiSelectBookmarksHelper.listener == null) {
                     binding?.setupMultiSelect()
                 }
-                multiSelectBookmarksHelper
+                viewModel.multiSelectBookmarksHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
             }
         }
@@ -435,8 +431,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             )
             dialog.show()
         }
-        multiSelectEpisodesHelper.isMultiSelecting = false
-        multiSelectBookmarksHelper.isMultiSelecting = false
+        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }
 
     private val onNotificationsClicked: () -> Unit = {
@@ -448,8 +444,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val onSettingsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SETTINGS_TAPPED)
         (activity as FragmentHostListener).addFragment(PodcastSettingsFragment.newInstance(viewModel.podcastUuid))
-        multiSelectEpisodesHelper.isMultiSelecting = false
-        multiSelectBookmarksHelper.isMultiSelecting = false
+        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }
 
     private val onSearchFocus: () -> Unit = {
@@ -520,8 +516,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onPause() {
         super.onPause()
-        multiSelectEpisodesHelper.isMultiSelecting = false
-        multiSelectBookmarksHelper.isMultiSelecting = false
+        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }
 
     override fun onStop() {
@@ -601,8 +597,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 onSearchQueryChanged = onSearchQueryChanged,
                 onSearchFocus = onSearchFocus,
                 onShowArchivedClicked = onShowArchivedClicked,
-                multiSelectEpisodesHelper = multiSelectEpisodesHelper,
-                multiSelectBookmarksHelper = multiSelectBookmarksHelper,
+                multiSelectEpisodesHelper = viewModel.multiSelectEpisodesHelper,
+                multiSelectBookmarksHelper = viewModel.multiSelectBookmarksHelper,
                 onArtworkLongClicked = onArtworkLongClicked,
                 onTabClicked = onTabClicked,
                 onBookmarkPlayClicked = onBookmarkPlayClicked,
@@ -656,7 +652,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    multiSelectBookmarksHelper.showEditBookmarkPage
+                    viewModel.multiSelectBookmarksHelper.showEditBookmarkPage
                         .collect { show ->
                             if (show) onEditBookmarkClick()
                         }
@@ -672,9 +668,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun FragmentPodcastBinding.setupMultiSelect() {
-        multiSelectEpisodesHelper.setUp(multiSelectEpisodesToolbar)
+        viewModel.multiSelectEpisodesHelper.setUp(multiSelectEpisodesToolbar)
         if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
+            viewModel.multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
         }
     }
 
@@ -860,9 +856,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.episodesRecyclerView?.adapter = null
         itemTouchHelper = null
 
-        multiSelectEpisodesHelper.cleanup()
+        viewModel.multiSelectEpisodesHelper.cleanup()
         if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            multiSelectBookmarksHelper.cleanup()
+            viewModel.multiSelectBookmarksHelper.cleanup()
         }
 
         super.onDestroyView()
@@ -916,18 +912,18 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         dialog?.show(parentFragmentManager, "download_confirm")
     }
 
-    override fun onBackPressed() = if (multiSelectEpisodesHelper.isMultiSelecting) {
-        multiSelectEpisodesHelper.isMultiSelecting = false
+    override fun onBackPressed() = if (viewModel.multiSelectEpisodesHelper.isMultiSelecting) {
+        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
         true
-    } else if (multiSelectBookmarksHelper.isMultiSelecting) {
-        multiSelectBookmarksHelper.isMultiSelecting = false
+    } else if (viewModel.multiSelectBookmarksHelper.isMultiSelecting) {
+        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
         true
     } else {
         super.onBackPressed()
     }
 
     override fun getBackstackCount() = super.getBackstackCount() +
-        if (multiSelectEpisodesHelper.isMultiSelecting || multiSelectBookmarksHelper.isMultiSelecting) {
+        if (viewModel.multiSelectEpisodesHelper.isMultiSelecting || viewModel.multiSelectBookmarksHelper.isMultiSelecting) {
             1
         } else {
             0

@@ -17,6 +17,7 @@ data class PlaybackState(
     val podcast: Podcast? = null,
     val fileMetadata: EpisodeFileMetadata? = null,
     val embeddedArtworkPath: String? = null,
+    val showNotesImageUrl: String? = null,
     val chapters: Chapters = Chapters(),
     val lastChangeFrom: String? = null,
     val lastErrorMessage: String? = null,

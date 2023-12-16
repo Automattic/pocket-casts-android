@@ -16,6 +16,7 @@ enum class SourceView(val analyticsValue: String) {
     MINIPLAYER("miniplayer"),
     PLAYER("player"),
     NOTIFICATION("notification"),
+    NOTIFICATION_BOOKMARK("notification_bookmark"),
     FULL_SCREEN_VIDEO("full_screen_video"),
     UP_NEXT("up_next"),
     MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),

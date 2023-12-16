@@ -4,6 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -12,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
@@ -25,17 +31,21 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class MainActivityViewModel
 @Inject constructor(
+    private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     userManager: UserManager,
     private val settings: Settings,
@@ -47,9 +57,16 @@ class MainActivityViewModel
     private val feature: FeatureWrapper,
     private val featureFlag: FeatureFlagWrapper,
     private val releaseVersion: ReleaseVersionWrapper,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
+
+    private val _snackbarMessage = MutableSharedFlow<Int>()
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
+
+    private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
+    val navigationState = _navigationState.asSharedFlow()
 
     var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
@@ -131,16 +148,17 @@ class MainActivityViewModel
         multiSelectBookmarksHelper.closeMultiSelect()
     }
 
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
+    fun buildBookmarkArguments(bookmarkUuid: String? = null, onSuccess: (BookmarkArguments) -> Unit) {
         viewModelScope.launch {
-            val episode = playbackManager.getCurrentEpisode() ?: return@launch
-            val timeInSecs = playbackManager.getCurrentTimeMs(episode) / 1000
-
             // load the existing bookmark
-            val bookmark = bookmarkManager.findByEpisodeTime(
-                episode = episode,
-                timeSecs = timeInSecs
-            )
+            val bookmark = bookmarkUuid?.let { bookmarkManager.findBookmark(it) }
+            if (bookmarkUuid != null && bookmark == null) {
+                _snackbarMessage.emit(LR.string.bookmark_not_found)
+                return@launch
+            }
+            val currentEpisode = playbackManager.getCurrentEpisode()
+            val episodeUuid = bookmark?.episodeUuid ?: currentEpisode?.uuid ?: return@launch
+            val timeInSecs = bookmark?.timeSecs ?: currentEpisode?.let { playbackManager.getCurrentTimeMs(currentEpisode) / 1000 } ?: 0
 
             val podcast =
                 bookmark?.let { podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) }
@@ -151,7 +169,7 @@ class MainActivityViewModel
 
             val arguments = BookmarkArguments(
                 bookmarkUuid = bookmark?.uuid,
-                episodeUuid = episode.uuid,
+                episodeUuid = episodeUuid,
                 timeSecs = timeInSecs,
                 backgroundColor = backgroundColor,
                 tintColor = tintColor,
@@ -160,7 +178,51 @@ class MainActivityViewModel
         }
     }
 
+    fun viewBookmark(bookmarkUuid: String) {
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(bookmarkUuid)
+            if (bookmark == null) {
+                _snackbarMessage.emit(LR.string.bookmark_not_found)
+            } else {
+                val currentEpisode = playbackManager.getCurrentEpisode()
+                val isBookmarkForCurrentlyPlayingEpisode = bookmark.episodeUuid == currentEpisode?.uuid
+                if (isBookmarkForCurrentlyPlayingEpisode) {
+                    _navigationState.emit(NavigationState.BookmarksForCurrentlyPlaying)
+                } else {
+                    episodeManager.findEpisodeByUuid(bookmark.episodeUuid)?.let {
+                        when (it) {
+                            is PodcastEpisode -> _navigationState.emit(NavigationState.BookmarksForPodcastEpisode(it))
+                            is UserEpisode -> _navigationState.emit(NavigationState.BookmarksForUserEpisode(it))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteBookmark(bookmarkUuid: String) {
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(bookmarkUuid)
+            if (bookmark == null) {
+                _snackbarMessage.emit(LR.string.bookmark_not_found)
+            } else {
+                _snackbarMessage.emit(LR.string.bookmarks_deleted_singular)
+                bookmarkManager.deleteToSync(bookmarkUuid)
+                analyticsTracker.track(
+                    AnalyticsEvent.BOOKMARK_DELETED,
+                    mapOf("source" to SourceView.NOTIFICATION_BOOKMARK.analyticsValue)
+                )
+            }
+        }
+    }
+
     data class State(
         val shouldShowWhatsNew: Boolean = false,
     )
+
+    sealed class NavigationState {
+        object BookmarksForCurrentlyPlaying : NavigationState()
+        data class BookmarksForPodcastEpisode(val episode: PodcastEpisode) : NavigationState()
+        data class BookmarksForUserEpisode(val episode: UserEpisode) : NavigationState()
+    }
 }

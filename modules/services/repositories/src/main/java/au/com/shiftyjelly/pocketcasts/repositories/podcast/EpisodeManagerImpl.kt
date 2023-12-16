@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
-import androidx.paging.PagedList
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -14,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndComplet
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -42,10 +39,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +55,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.Date
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -123,30 +117,9 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? =
         episodeDao.findFirstBySearchQuery(query)
 
-    @Suppress("DEPRECATION")
-    override fun findAll(rowParser: (PodcastEpisode) -> Boolean) {
-        val pagingConfig = PagedList.Config.Builder()
-            .setPageSize(100)
-            .setEnablePlaceholders(false)
-            .build()
-        val episodes = episodeDao.findAll().create()
-        val pagedList = PagedList.Builder(episodes, pagingConfig)
-            .setFetchExecutor(Executors.newSingleThreadExecutor())
-            .setNotifyExecutor(Executors.newSingleThreadExecutor())
-            .build()
-        for (episode in pagedList) {
-            if (!rowParser(episode)) {
-                break
-            }
-        }
-    }
-
     /**
      * Find a podcast episodes
      */
-    override fun findEpisodesByPodcast(podcast: Podcast): Single<List<PodcastEpisode>> {
-        return Single.fromCallable { episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid) }
-    }
 
     override fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode> {
         return episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid)
@@ -184,10 +157,6 @@ class EpisodeManagerImpl @Inject constructor(
             EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescSuspend(podcastUuid = podcast.uuid)
             else -> episodeDao.findByPodcastOrderPublishedDateDescSuspend(podcastUuid = podcast.uuid)
         }
-    }
-
-    override fun findEpisodesByPodcastOrderedRx(podcast: Podcast): Single<List<PodcastEpisode>> {
-        return Single.fromCallable { findEpisodesByPodcastOrdered(podcast) }
     }
 
     override fun observeEpisodesByPodcastOrderedRx(podcast: Podcast): Flowable<List<PodcastEpisode>> {
@@ -242,27 +211,10 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findPlaybackHistoryEpisodes()
     }
 
-    override fun observeDownloadingEpisodes(): LiveData<List<PodcastEpisode>> {
-        return episodeDao.observeDownloadingEpisodes()
-    }
-
     @Suppress("USELESS_CAST")
     override fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>> {
         return episodeDao.observeDownloadingEpisodesRx().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
     }
-
-    override fun findEpisodesByUuids(uuids: Array<String>, ordered: Boolean): List<PodcastEpisode> =
-        if (uuids.isEmpty()) {
-            emptyList()
-        } else if (ordered) {
-            uuids.mapNotNull {
-                runBlocking {
-                    findByUuid(it)
-                }
-            }
-        } else {
-            findEpisodesWhere("uuid IN " + QueryHelper.convertStringArrayToInStatement(uuids))
-        }
 
     override fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
         if (playedUpTo < 0 || episode == null) {
@@ -363,6 +315,21 @@ class EpisodeManagerImpl @Inject constructor(
             episodeDao.updatePlayingStatus(status, System.currentTimeMillis(), episode.uuid)
         } else {
             userEpisodeDao.updatePlayingStatus(status, System.currentTimeMillis(), episode.uuid)
+        }
+    }
+
+    override suspend fun updateImageUrls(updates: List<ImageUrlUpdate>) {
+        appDatabase.withTransaction {
+            updates.forEach { updateImageUrl(it.episodeUuid, it.imageUrl) }
+        }
+    }
+
+    private suspend fun updateImageUrl(episodeUuid: String, imageUrl: String) {
+        findByUuid(episodeUuid)?.let { episode ->
+            if (episode.imageUrl != imageUrl) {
+                episode.imageUrl = imageUrl
+                update(episode)
+            }
         }
     }
 
@@ -525,7 +492,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (episode is UserEpisode) {
             launch {
-                userEpisodeManager.deletePlayedEpisodeIfReq(episode, playbackManager)
+                userEpisodeManager.markAsPlayed(episode, playbackManager)
             }
         }
     }
@@ -605,14 +572,6 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.countWhere(queryAfterWhere, appDatabase)
     }
 
-    override fun deleteCustomFolderEpisode(episode: PodcastEpisode?, playbackManager: PlaybackManager) {
-        episode ?: return
-
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
-
-        episodeDao.delete(episode)
-    }
-
     override fun add(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean {
         val episodes = ArrayList<PodcastEpisode>()
         episodes.add(episode)
@@ -623,12 +582,6 @@ class EpisodeManagerImpl @Inject constructor(
     override fun update(episode: PodcastEpisode?) {
         episode ?: return
         episodeDao.update(episode)
-    }
-
-    override fun setEpisodeThumbnailStatus(episode: PodcastEpisode?, thumbnailStatus: Int) {
-        episode ?: return
-        episode.thumbnailStatus = thumbnailStatus
-        episodeDao.updateThumbnailStatus(thumbnailStatus, episode.uuid)
     }
 
     override fun setDownloadFailed(episode: BaseEpisode, errorMessage: String) {
@@ -812,38 +765,8 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun deleteFinishedEpisodes(playbackManager: PlaybackManager) {
-        val episodes = findEpisodesWhere("episode_status = " + EpisodeStatusEnum.DOWNLOADED.ordinal + " AND playing_status = " + EpisodePlayingStatus.COMPLETED.ordinal)
-        if (episodes.isEmpty()) return
-
-        runBlocking {
-            for (episode in episodes) {
-                deleteEpisodeFile(episode, playbackManager, true, true)
-            }
-        }
-    }
-
     override suspend fun deleteAll() {
         episodeDao.deleteAll()
-    }
-
-    override fun deleteDownloadedEpisodeFiles() {
-        // remove all the files off the disk, ignore any errors and continue
-        try {
-            fileStorage.removeDirectoryFiles(fileStorage.podcastDirectory)
-            fileStorage.removeDirectoryFiles(fileStorage.tempPodcastDirectory)
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-
-        val episodes = findEpisodesWhere("episode_status = " + EpisodeStatusEnum.DOWNLOADED.ordinal)
-        if (episodes.isEmpty()) return
-
-        for (episode in episodes) {
-            runBlocking {
-                updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
-            }
-        }
     }
 
     override fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
@@ -876,29 +799,9 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findStarredEpisodes()
     }
 
-    override fun exists(episodeUuid: String): Boolean {
-        return episodeDao.exists(episodeUuid)
-    }
-
-    override fun markAsNotPlayedRx(episode: PodcastEpisode): Single<PodcastEpisode> {
-        return Single.fromCallable {
-            markAsNotPlayed(episode)
-            episode
-        }
-    }
-
-    override fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable {
-        return Completable.fromAction { markAsPlayed(episode, playbackManager, podcastManager) }
-    }
-
     override fun findEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): List<PodcastEpisode> {
         val sql = buildEpisodeStatusWhere(queued, waitingForPower, waitingForWifi, downloading)
         return findEpisodesWhere(sql)
-    }
-
-    override fun countEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): Int {
-        val sql = buildEpisodeStatusWhere(queued, waitingForPower, waitingForWifi, downloading)
-        return countEpisodesWhere(sql)
     }
 
     private fun buildEpisodeStatusWhere(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): String {
@@ -985,12 +888,6 @@ class EpisodeManagerImpl @Inject constructor(
                     }
                 }
             }
-        }
-    }
-
-    override fun unarchiveAllInListAsync(episodes: List<PodcastEpisode>) {
-        launch {
-            unarchiveAllInList(episodes)
         }
     }
 

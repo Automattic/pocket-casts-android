@@ -1,19 +1,39 @@
-7.55
+7.56
 -----
 *   Bug Fixes:
     *   Fix play button local file getting set to pause after episode completion
         ([#397](https://github.com/Automattic/pocket-casts-android/pull/1627))
+7.55
+-----
+
+*   Updates:
+    *   Save selected tab on Player screen after screen rotation
+        ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
 7.54
 -----
 
+*   New Features
+    *   Display episode artwork from podcast feed on full-screen player and episode screens
+        ([#1599](https://github.com/Automattic/pocket-casts-android/pull/1599))
 *   Bug Fixes:
     *   Fix user files not getting deleted after marking an episode as played
         ([#1548](https://github.com/Automattic/pocket-casts-android/pull/1548))
     *   Fix crash when database emits unexpected null value
         ([#1596](https://github.com/Automattic/pocket-casts-android/pull/1596))
+    *   Fix text being cut off in discover search bar at high zoom 
+        ([#1601](https://github.com/Automattic/pocket-casts-android/pull/1601))
+    *   Fix issues where multi-select on one screen would affect another screen
+        ([#1579](https://github.com/Automattic/pocket-casts-android/pull/1579),
+         [#1580](https://github.com/Automattic/pocket-casts-android/pull/1580))
+    *   Fix skip forward/backward commands from Pixel Buds
+        ([#1620](https://github.com/Automattic/pocket-casts-android/pull/1620))
+    *   Fix tap to view action from bookmark added notification
+        ([#1614](https://github.com/Automattic/pocket-casts-android/pull/1614))
 *   Updates:
     *   Display dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
+    *   Add theme support to Up Next screen
+        ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))
 
 7.53
 -----

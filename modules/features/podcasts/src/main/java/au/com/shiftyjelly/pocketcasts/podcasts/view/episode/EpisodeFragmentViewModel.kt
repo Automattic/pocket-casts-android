@@ -21,8 +21,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -48,11 +48,11 @@ class EpisodeFragmentViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val podcastManager: PodcastManager,
     val theme: Theme,
-    val serverShowNotesManager: ServerShowNotesManager,
     val downloadManager: DownloadManager,
     val serverManager: ServerManager,
     val playbackManager: PlaybackManager,
     val settings: Settings,
+    private val showNotesManager: ShowNotesManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics
 ) : ViewModel(), CoroutineScope {
@@ -115,7 +115,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 return@flatMapPublisher Flowable.combineLatest(
                     episodeManager.observeByUuid(episodeUuid).asFlowable(),
                     podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
-                    serverShowNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
+                    showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
                     progressUpdatesObservable,
                     zipper
                 )
