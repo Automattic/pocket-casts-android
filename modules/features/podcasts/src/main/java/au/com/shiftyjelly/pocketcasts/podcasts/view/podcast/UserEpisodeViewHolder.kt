@@ -187,7 +187,7 @@ class UserEpisodeViewHolder(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnTerminate { UploadProgressManager.stopObservingUpload(episode.uuid, uploadConsumer) }
             .doOnNext { (_, playbackState, isInUpNext) ->
-                episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
+                episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid && !episode.isFinished
                 binding.playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.inUpNext = isInUpNext
 
