@@ -1,3 +1,8 @@
+7.55
+-----
+*   Bug Fixes:
+    *   Fix play button local file getting set to pause after episode completion
+        ([#397](https://github.com/Automattic/pocket-casts-android/pull/1627))
 7.54
 -----
 
