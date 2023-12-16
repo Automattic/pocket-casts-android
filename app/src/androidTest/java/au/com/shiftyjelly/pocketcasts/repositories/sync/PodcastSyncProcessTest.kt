@@ -239,7 +239,7 @@ class PodcastSyncProcessTest {
             assertEquals("Bookmark Added", newBookmark?.title)
             assertEquals(875, newBookmark?.timeSecs)
             // check deleted bookmarks are removed
-            assertNull("Bookmark should of been deleted", bookmarkManager.findBookmark(bookmarkToDelete.uuid))
+            assertNull("Bookmark should have been deleted", bookmarkManager.findBookmark(bookmarkToDelete.uuid, deleted = true))
         }
     }
 }

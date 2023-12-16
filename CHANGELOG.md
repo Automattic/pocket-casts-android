@@ -21,6 +21,10 @@
     *   Fix issues where multi-select on one screen would affect another screen
         ([#1579](https://github.com/Automattic/pocket-casts-android/pull/1579),
          [#1580](https://github.com/Automattic/pocket-casts-android/pull/1580))
+    *   Fix skip forward/backward commands from Pixel Buds
+        ([#1620](https://github.com/Automattic/pocket-casts-android/pull/1620))
+    *   Fix tap to view action from bookmark added notification
+        ([#1614](https://github.com/Automattic/pocket-casts-android/pull/1614))
 *   Updates:
     *   Display dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))

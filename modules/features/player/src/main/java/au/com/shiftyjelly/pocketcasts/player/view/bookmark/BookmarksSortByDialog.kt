@@ -33,24 +33,13 @@ class BookmarksSortByDialog(
     }
 
     private fun SourceView.mapToBookmarksSortType(): BookmarksSortType = when (this) {
-        SourceView.FILES,
-        SourceView.EPISODE_DETAILS,
-        -> settings.episodeBookmarksSortType.flow.value
-
         SourceView.PLAYER -> settings.playerBookmarksSortType.flow.value
         SourceView.PODCAST_SCREEN -> settings.podcastBookmarksSortType.flow.value
-        else -> throw IllegalAccessError("$UNKNOWN_SOURCE_MESSAGE $this")
+        else -> settings.episodeBookmarksSortType.flow.value
     }
 
     private fun getValuesToShow(): List<BookmarksSortType> = when (sourceView) {
-        SourceView.FILES,
-        SourceView.EPISODE_DETAILS,
-        SourceView.PLAYER -> BookmarksSortTypeDefault.values().toList()
         SourceView.PODCAST_SCREEN -> BookmarksSortTypeForPodcast.values().toList()
-        else -> throw IllegalAccessError("$UNKNOWN_SOURCE_MESSAGE $sourceView")
-    }
-
-    companion object {
-        private const val UNKNOWN_SOURCE_MESSAGE = "Bookmarks sort accessed in unknown source view:"
+        else -> BookmarksSortTypeDefault.values().toList()
     }
 }

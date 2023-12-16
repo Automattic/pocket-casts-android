@@ -103,6 +103,8 @@ interface Settings {
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
         const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
+        const val INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
+        const val INTENT_OPEN_APP_DELETE_BOOKMARK = "INTENT_OPEN_APP_DELETE_BOOKMARK"
         const val INTENT_OPEN_APP_VIEW_BOOKMARKS = "INTENT_OPEN_APP_VIEW_BOOKMARKS"
         const val INTENT_LINK_CLOUD_FILES = "pktc://cloudfiles"
         const val INTENT_LINK_UPGRADE = "pktc://upgrade"
@@ -113,6 +115,8 @@ interface Settings {
         const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
 
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
+
+        const val BOOKMARK_UUID = "bookmark_uuid"
     }
 
     enum class NotificationChannel(val id: String) {

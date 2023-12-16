@@ -10,8 +10,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
+import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
@@ -48,13 +52,13 @@ class BookmarkHelper @Inject constructor(
             val timeInSecs = playbackManager.getCurrentTimeMs(episode) / 1000
 
             // Load existing bookmark
-            val bookmark = bookmarkManager.findByEpisodeTime(
+            var bookmark = bookmarkManager.findByEpisodeTime(
                 episode = episode,
                 timeSecs = timeInSecs
             )
 
             if (bookmark == null) {
-                bookmarkManager.add(
+                bookmark = bookmarkManager.add(
                     episode = episode,
                     timeSecs = timeInSecs,
                     title = context.getString(LR.string.bookmark),
@@ -66,7 +70,7 @@ class BookmarkHelper @Inject constructor(
                 playbackManager.playTone()
             }
 
-            buildAndShowNotification(context)
+            buildAndShowNotification(context, bookmark.uuid)
         }
     }
 
@@ -77,11 +81,18 @@ class BookmarkHelper @Inject constructor(
 
 private fun buildAndShowNotification(
     context: Context,
+    bookmarkUuid: String,
 ) {
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_ADD_BOOKMARK)
+        buildPendingIntent(context, INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE, bookmarkUuid)
+    )
+
+    val deleteAction = NotificationCompat.Action(
+        R.drawable.ic_delete_black,
+        context.getString(LR.string.bookmark_notification_action_delete_title),
+        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid,)
     )
 
     val notification = NotificationCompat.Builder(
@@ -94,8 +105,15 @@ private fun buildAndShowNotification(
         .setSmallIcon(IR.drawable.notification)
         .setAutoCancel(true)
         .setOnlyAlertOnce(true)
-        .setContentIntent(buildPendingIntent(context, INTENT_OPEN_APP_VIEW_BOOKMARKS))
+        .setContentIntent(
+            buildPendingIntent(
+                context,
+                INTENT_OPEN_APP_VIEW_BOOKMARKS,
+                bookmarkUuid,
+            )
+        )
         .addAction(changeTitleAction)
+        .addAction(deleteAction)
         .build()
     if (ActivityCompat.checkSelfPermission(
             context,
@@ -109,10 +127,18 @@ private fun buildAndShowNotification(
     }
 }
 
-private fun buildPendingIntent(context: Context, actionKey: String): PendingIntent {
+private fun buildPendingIntent(
+    context: Context,
+    actionKey: String,
+    bookmarkUuid: String,
+): PendingIntent {
     val appIntent = context.packageManager
         .getLaunchIntentForPackage(context.packageName)
-        ?.apply { action = actionKey }
+        ?.apply {
+            action = actionKey
+            putExtra(Settings.BOOKMARK_UUID, bookmarkUuid)
+            putExtra(INTENT_EXTRA_NOTIFICATION_TAG, "${Settings.BOOKMARK_UUID}_$bookmarkUuid")
+        }
 
     return PendingIntent.getActivity(
         context,
