@@ -27,11 +27,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
+import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import coil.ImageLoader
@@ -78,8 +80,9 @@ class EpisodeViewModel @Inject constructor(
     private val showNotesManager: ShowNotesManager,
     theme: Theme,
     @ApplicationContext appContext: Context,
-    @ApplicationScope private val coroutineScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
+    private val userEpisodeManager: UserEpisodeManager,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
     private val sourceView = SourceView.EPISODE_DETAILS
@@ -303,12 +306,26 @@ class EpisodeViewModel @Inject constructor(
     fun deleteDownloadedEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            episodeManager.deleteEpisodeFile(
-                episode,
-                playbackManager,
-                disableAutoDownload = true,
-                removeFromUpNext = true
-            )
+            when (episode) {
+                is PodcastEpisode -> {
+                    episodeManager.deleteEpisodeFile(
+                        episode,
+                        playbackManager,
+                        disableAutoDownload = true,
+                        removeFromUpNext = true
+                    )
+                }
+                is UserEpisode -> {
+                    CloudDeleteHelper.deleteEpisode(
+                        episode = episode,
+                        playbackManager = playbackManager,
+                        episodeManager = episodeManager,
+                        userEpisodeManager = userEpisodeManager,
+                        applicationScope = applicationScope
+                    )
+                }
+            }
+
             episodeAnalytics.trackEvent(
                 event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
                 source = sourceView,
@@ -323,7 +340,7 @@ class EpisodeViewModel @Inject constructor(
         } else {
             playAttempt?.cancel()
 
-            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
@@ -332,7 +349,7 @@ class EpisodeViewModel @Inject constructor(
         if (confirmedStreaming && !playbackManager.isPlaying()) {
             playAttempt?.cancel()
 
-            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
