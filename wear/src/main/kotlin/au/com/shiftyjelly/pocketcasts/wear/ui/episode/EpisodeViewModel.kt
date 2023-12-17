@@ -471,7 +471,7 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color? =
+    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color =
         userEpisode.artworkUrl?.let { artworkUrl ->
             val context = getApplication<Application>()
             val loader = ImageLoader(context)
@@ -480,8 +480,11 @@ class EpisodeViewModel @Inject constructor(
                 .allowHardware(false) // Disable hardware bitmaps.
                 .build()
 
-            val result = (loader.execute(request) as SuccessResult).drawable
-            val bitmap = (result as BitmapDrawable).bitmap
+            val successResult = loader.execute(request) as? SuccessResult
+                ?: return@let null
+            val resultDrawable = successResult.drawable as? BitmapDrawable
+                ?: return@let null
+            val bitmap = resultDrawable.bitmap
 
             // Set a timeout to make sure the user isn't blocked for too long just
             // because we're trying to extract a tint color.
@@ -497,5 +500,5 @@ class EpisodeViewModel @Inject constructor(
                     }
                 }
             }
-        }
+        } ?: Color.White
 }
