@@ -5,7 +5,7 @@ common_params:
     - automattic/bash-cache#2.11.0
 
 agents:
-  queue: "android"
+  queue: "android-staging"
 
 steps:
   - label: "Gradle Wrapper Validation"
