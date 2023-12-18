@@ -69,7 +69,6 @@ android {
         jvmTarget = "1.8"
         // Allow for widescale experimental APIs in Alpha libraries we build upon
         freeCompilerArgs += "-opt-in=com.google.android.horologist.annotations.ExperimentalHorologistApi"
-        freeCompilerArgs += "-opt-in=com.google.android.horologist.media.ui.ExperimentalHorologistMediaUiApi"
     }
 }
 
