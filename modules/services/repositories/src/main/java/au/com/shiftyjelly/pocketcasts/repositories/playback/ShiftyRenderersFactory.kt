@@ -44,7 +44,6 @@ class ShiftyRenderersFactory(context: Context?, statsManager: StatsManager, priv
     override fun buildAudioSink(context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean): AudioSink {
         processorChain = ShiftyAudioProcessorChain(customAudio)
         return DefaultAudioSink.Builder(context)
-            .setAudioCapabilities(AudioCapabilities.getCapabilities(context))
             .setAudioProcessorChain(processorChain!!)
             .setEnableFloatOutput(enableFloatOutput)
             .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
