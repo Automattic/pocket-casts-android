@@ -24,7 +24,7 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults as Founda
  */
 @ExperimentalHorologistApi
 fun ScalingLazyColumnDefaults.responsive(
-    firstItemIsFullWidth: Boolean = true,
+    firstItemIsFullWidth: Boolean,
     verticalArrangement: Arrangement.Vertical =
         Arrangement.spacedBy(
             space = 4.dp,

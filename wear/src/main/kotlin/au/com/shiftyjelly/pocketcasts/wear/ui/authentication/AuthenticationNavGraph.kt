@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
+import au.com.shiftyjelly.pocketcasts.wear.extensions.responsive
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
 
@@ -22,7 +24,10 @@ fun NavGraphBuilder.authenticationNavGraph(
 ) {
     navigation(startDestination = AuthenticationNavRoutes.loginScreen, route = authenticationSubGraph) {
 
-        scrollable(AuthenticationNavRoutes.loginScreen) {
+        scrollable(
+            route = AuthenticationNavRoutes.loginScreen,
+            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+        ) {
             LoginScreen(
                 columnState = it.columnState,
                 onLoginWithGoogleClick = {
@@ -34,7 +39,10 @@ fun NavGraphBuilder.authenticationNavGraph(
             )
         }
 
-        scrollable(AuthenticationNavRoutes.loginWithPhone) {
+        scrollable(
+            route = AuthenticationNavRoutes.loginWithPhone,
+            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+        ) {
             LoginWithPhoneScreen(
                 columnState = it.columnState,
                 onDone = { navController.popBackStack() },
