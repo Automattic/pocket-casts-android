@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -16,7 +15,6 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import com.google.android.horologist.compose.material.util.adjustChipHeightToFontScale
 import com.google.android.horologist.compose.material.Chip as StandardChip
 
 @Composable
@@ -82,8 +80,7 @@ fun WatchListChip(
             )
         },
         onClick = onClick,
-        modifier = modifier
-            .adjustChipHeightToFontScale(LocalConfiguration.current.fontScale),
+        modifier = modifier,
         icon = icon,
         secondaryLabel = {
             if (secondaryLabel != null) {
