@@ -43,7 +43,7 @@ fun NavGraphBuilder.settingsRoutes(navController: NavController) {
 
     scrollable(
         route = HelpScreen.route,
-        columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+        columnStateFactory = ScalingLazyColumnDefaults.responsive(),
     ) {
         HelpScreen(columnState = it.columnState)
     }

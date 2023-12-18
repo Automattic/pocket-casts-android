@@ -26,7 +26,7 @@ fun NavGraphBuilder.authenticationNavGraph(
 
         scrollable(
             route = AuthenticationNavRoutes.loginScreen,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+            columnStateFactory = ScalingLazyColumnDefaults.responsive(),
         ) {
             LoginScreen(
                 columnState = it.columnState,
@@ -41,7 +41,7 @@ fun NavGraphBuilder.authenticationNavGraph(
 
         scrollable(
             route = AuthenticationNavRoutes.loginWithPhone,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+            columnStateFactory = ScalingLazyColumnDefaults.responsive(),
         ) {
             LoginWithPhoneScreen(
                 columnState = it.columnState,

@@ -112,7 +112,7 @@ object EpisodeScreenFlow {
 
             scrollable(
                 route = upNextOptionsScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+                columnStateFactory = ScalingLazyColumnDefaults.responsive(),
             ) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 val episodeScreenBackStackEntry = remember(it.backStackEntry) {

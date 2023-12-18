@@ -144,7 +144,7 @@ fun WearApp(
 
         scrollable(
             route = WatchListScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+            columnStateFactory = ScalingLazyColumnDefaults.responsive(),
         ) {
             val pagerState = rememberPagerState { NowPlayingPager.pageCount }
             val coroutineScope = rememberCoroutineScope()

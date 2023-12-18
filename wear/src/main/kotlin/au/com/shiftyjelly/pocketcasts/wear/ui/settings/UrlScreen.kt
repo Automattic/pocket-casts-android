@@ -34,7 +34,7 @@ object UrlScreenRoutes {
 fun NavGraphBuilder.settingsUrlScreens() {
     scrollable(
         route = UrlScreenRoutes.termsOfService,
-        columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+        columnStateFactory = ScalingLazyColumnDefaults.responsive(),
     ) {
         UrlScreen(
             title = stringResource(LR.string.settings_about_terms_of_serivce),
@@ -46,7 +46,7 @@ fun NavGraphBuilder.settingsUrlScreens() {
 
     scrollable(
         route = UrlScreenRoutes.privacy,
-        columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = true),
+        columnStateFactory = ScalingLazyColumnDefaults.responsive(),
     ) {
         UrlScreen(
             title = stringResource(id = LR.string.settings_about_privacy_policy),
