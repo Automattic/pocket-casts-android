@@ -82,6 +82,7 @@ sentry {
 dependencies {
     implementation(libs.wear.input)
     implementation(libs.wear.remote.interactions)
+    implementation(libs.wear.tooling.preview)
 
     // General Compose dependencies
     implementation(libs.compose.activity)

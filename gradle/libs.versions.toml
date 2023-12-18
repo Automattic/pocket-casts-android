@@ -282,6 +282,7 @@ uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
 viewpager = "androidx.viewpager2:viewpager2:1.0.0"
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
 wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
+wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 [bundles]
 aboutlibraries = [
