@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import androidx.annotation.OptIn
