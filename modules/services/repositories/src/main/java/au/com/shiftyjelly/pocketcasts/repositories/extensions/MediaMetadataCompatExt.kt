@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.repositories.extensions
 
 import android.graphics.Bitmap
