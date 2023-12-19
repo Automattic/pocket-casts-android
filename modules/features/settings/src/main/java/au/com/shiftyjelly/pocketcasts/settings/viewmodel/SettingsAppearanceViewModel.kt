@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -26,6 +27,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val theme: Theme,
     private val appIcon: AppIcon,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val widgetManager: WidgetManager,
 ) : ViewModel() {
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
@@ -123,6 +125,10 @@ class SettingsAppearanceViewModel @Inject constructor(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
             mapOf("enabled" to value)
         )
+    }
+
+    fun updateWidgetForDynamicColors(value: Boolean) {
+        settings.useDynamicColorsForWidget.set(value)
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {

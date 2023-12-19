@@ -173,6 +173,14 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtDarkUpNext.isChecked = !binding.swtDarkUpNext.isChecked
         }
 
+        binding.swtDynamicColorsForWidget.isChecked = settings.useDynamicColorsForWidget.value
+        binding.swtDynamicColorsForWidget.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateWidgetForDynamicColors(isChecked)
+        }
+        binding.btnUseDynamicColorsForWidget.setOnClickListener {
+            binding.swtDynamicColorsForWidget.isChecked = !binding.swtDynamicColorsForWidget.isChecked
+        }
+
         binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value
         binding.swtShowArtwork.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateShowArtworkOnLockScreen(isChecked)
