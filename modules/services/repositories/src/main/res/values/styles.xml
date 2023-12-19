@@ -1,5 +1,7 @@
 <resources>
-    <style name="PCWidgetTheme" parent="Theme.Material3.DynamicColors.DayNight">
+    <style name="PCWidgetDynamicColorsTheme" parent="PCWidgetDefaultTheme"/>
+
+    <style name="PCWidgetDefaultTheme">
         <item name="colorPrimaryContainer">#66000000</item>
         <item name="colorOnPrimaryContainer">#ffffff</item>
     </style>

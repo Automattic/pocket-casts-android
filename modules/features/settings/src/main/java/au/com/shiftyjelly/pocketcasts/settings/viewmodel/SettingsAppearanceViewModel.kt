@@ -5,10 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
@@ -17,17 +19,20 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsAppearanceViewModel @Inject constructor(
     userManager: UserManager,
     private val settings: Settings,
+    private val playbackManager: PlaybackManager,
     val userEpisodeManager: UserEpisodeManager,
+    private val widgetManager: WidgetManager,
     val theme: Theme,
     private val appIcon: AppIcon,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val widgetManager: WidgetManager,
 ) : ViewModel() {
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
@@ -129,6 +134,9 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     fun updateWidgetForDynamicColors(value: Boolean) {
         settings.useDynamicColorsForWidget.set(value)
+        viewModelScope.launch(Dispatchers.IO) {
+            widgetManager.updateWidgetFromSettings(playbackManager)
+        }
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
