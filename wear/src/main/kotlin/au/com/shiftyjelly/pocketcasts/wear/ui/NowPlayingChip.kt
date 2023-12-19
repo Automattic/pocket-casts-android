@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,8 +55,7 @@ fun NowPlayingChip(
         podcast = podcast,
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
-        onClick = onClick,
-        modifier = Modifier.height(ChipDefaults.Height),
+        onClick = onClick
     )
 }
 
@@ -67,7 +65,6 @@ private fun Content(
     episode: BaseEpisode?,
     isPlaying: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -113,7 +110,7 @@ private fun Content(
             secondaryContentColor = MaterialTheme.colors.onSecondary,
         ),
         onClick = onClick,
-        modifier = modifier.fillMaxWidth() // This is needed for the backgroundImagePainter to work
+        modifier = Modifier.fillMaxWidth() // This is needed for the backgroundImagePainter to work
     )
 }
 
