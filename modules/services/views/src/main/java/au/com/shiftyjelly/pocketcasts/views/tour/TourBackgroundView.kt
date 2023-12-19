@@ -46,9 +46,8 @@ internal class TourBackgroundView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null) // Cutouts seem to only work with software drawing
     }
 
-    override fun draw(canvas: Canvas?) {
+    override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        val canvas = canvas ?: return
 
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
 

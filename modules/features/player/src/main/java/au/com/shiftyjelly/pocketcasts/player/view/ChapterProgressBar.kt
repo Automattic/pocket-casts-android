@@ -64,15 +64,10 @@ class ChapterProgressBar @JvmOverloads constructor(
         clipPath = Path().apply { addRoundRect(backgroundDrawRect, cornerRadius, cornerRadius, Path.Direction.CW) }
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.clipPath(clipPath)
-        canvas?.drawRect(backgroundDrawRect, backgroundPaint)
-        canvas?.drawRect(progressDrawRect, progressPaint)
-    }
-
-    override fun dispatchDraw(canvas: Canvas?) {
-
-        super.dispatchDraw(canvas)
+        canvas.clipPath(clipPath)
+        canvas.drawRect(backgroundDrawRect, backgroundPaint)
+        canvas.drawRect(progressDrawRect, progressPaint)
     }
 }
