@@ -178,6 +178,7 @@ open class PlaybackManager @Inject constructor(
     private var pauseTimerDisposable: Disposable? = null
     private var syncTimerDisposable: Disposable? = null
     private var lastWarnedPlayedEpisodeUuid: String? = null
+    private var lastSwitchToStreamWarningEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
 
     private val resumptionHelper = ResumptionHelper(settings)
@@ -365,9 +366,23 @@ open class PlaybackManager @Inject constructor(
         return player?.supportsVolumeBoost() ?: false
     }
 
+    fun onMeteredConnection() {
+        val episodeUUID = upNextQueue.currentEpisode?.uuid ?: return
+        if (shouldWarnWhenSwitchingToMeteredConnection(episodeUUID)) {
+            getCurrentEpisode()?.let { episode ->
+                sendDataWarningNotification(episode)
+                lastSwitchToStreamWarningEpisodeUuid = episodeUUID
+            }
+        }
+    }
+
     fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
         return settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
     }
+
+    private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
+        settings.warnOnMeteredNetwork.value &&
+            lastSwitchToStreamWarningEpisodeUuid != episodeUUID
 
     fun getPlaybackSpeed(): Double {
         return playbackStateRelay.blockingFirst().playbackSpeed
