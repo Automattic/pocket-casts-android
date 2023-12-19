@@ -16,7 +16,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import androidx.wear.compose.material.SwipeToDismissBoxState
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
