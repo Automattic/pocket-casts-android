@@ -255,6 +255,7 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun playClickedGetShouldClose(
         warningsHelper: WarningsHelper,
+        showedStreamWarning: Boolean,
         force: Boolean = false,
         fromListUuid: String? = null
     ): Boolean {
@@ -267,7 +268,12 @@ class EpisodeFragmentViewModel @Inject constructor(
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                 }
-                playbackManager.playNow(episode, forceStream = force, sourceView = source)
+                playbackManager.playNow(
+                    episode = episode,
+                    forceStream = force,
+                    showedStreamWarning = showedStreamWarning,
+                    sourceView = source
+                )
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                 return true
             }

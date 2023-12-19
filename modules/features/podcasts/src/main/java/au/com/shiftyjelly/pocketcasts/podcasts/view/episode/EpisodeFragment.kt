@@ -349,9 +349,10 @@ class EpisodeFragment : BaseFragment() {
                             val shouldClose = if (viewModel.shouldShowStreamingWarning(context)) {
                                 warningsHelper.streamingWarningDialog(onConfirm = {
                                     val shouldCloseAfterWarning = viewModel.playClickedGetShouldClose(
-                                        warningsHelper,
+                                        warningsHelper = warningsHelper,
+                                        showedStreamWarning = true,
                                         force = true,
-                                        fromListUuid = fromListUuid
+                                        fromListUuid = fromListUuid,
                                     )
                                     if (shouldCloseAfterWarning) {
                                         (parentFragment as? BaseDialogFragment)?.dismiss()
@@ -359,7 +360,11 @@ class EpisodeFragment : BaseFragment() {
                                 }).show(parentFragmentManager, "stream warning")
                                 false
                             } else {
-                                viewModel.playClickedGetShouldClose(warningsHelper, fromListUuid = fromListUuid)
+                                viewModel.playClickedGetShouldClose(
+                                    warningsHelper = warningsHelper,
+                                    showedStreamWarning = false,
+                                    fromListUuid = fromListUuid,
+                                )
                             }
 
                             if (shouldClose) {

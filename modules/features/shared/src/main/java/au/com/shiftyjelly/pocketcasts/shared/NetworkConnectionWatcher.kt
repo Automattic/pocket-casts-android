@@ -20,7 +20,7 @@ class NetworkConnectionWatcher @Inject constructor(
         set(value) {
             val changedToMetered = !field && value
             if (changedToMetered) {
-                playbackManager.onMeteredConnection()
+                playbackManager.onSwitchedToMeteredConnection()
             }
             field = value
         }
