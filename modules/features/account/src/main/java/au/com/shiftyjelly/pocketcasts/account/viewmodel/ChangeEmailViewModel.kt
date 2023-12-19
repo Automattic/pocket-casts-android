@@ -80,9 +80,8 @@ class ChangeEmailViewModel
                         _changeEmailState.value = ChangeEmailState.Failure(errors, response.message)
                     }
                 }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 _changeEmailState.value = ChangeEmailState.Failure(mutableSetOf(ChangeEmailError.SERVER), e.message)
-
             }
         }
     }
