@@ -137,6 +137,10 @@ class SettingsAppearanceViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             widgetManager.updateWidgetFromSettings(playbackManager)
         }
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED,
+            mapOf("enabled" to value)
+        )
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
