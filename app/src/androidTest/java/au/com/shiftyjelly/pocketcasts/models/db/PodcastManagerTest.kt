@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -70,8 +72,30 @@ class PodcastManagerTest {
         val refreshServerManager = mock<RefreshServerManager> {}
         val subscribeManager = SubscribeManager(appDatabase, podcastCacheServer, staticServerManager, syncManagerSignedOut, application, settings)
         podcastDao = appDatabase.podcastDao()
-        podcastManagerSignedOut = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncManagerSignedOut, appDatabase)
-        podcastManagerSignedIn = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncManagerSignedIn, appDatabase)
+        podcastManagerSignedOut = PodcastManagerImpl(
+            episodeManager = episodeManager,
+            playlistManager = playlistManager,
+            settings = settings,
+            context = application,
+            subscribeManager = subscribeManager,
+            cacheServerManager = podcastCacheServer,
+            refreshServerManager = refreshServerManager,
+            syncManager = syncManagerSignedOut,
+            appDatabase = appDatabase,
+            applicationScope = CoroutineScope(Dispatchers.Default),
+        )
+        podcastManagerSignedIn = PodcastManagerImpl(
+            episodeManager = episodeManager,
+            playlistManager = playlistManager,
+            settings = settings,
+            context = application,
+            subscribeManager = subscribeManager,
+            cacheServerManager = podcastCacheServer,
+            refreshServerManager = refreshServerManager,
+            syncManager = syncManagerSignedIn,
+            applicationScope = CoroutineScope(Dispatchers.Default),
+            appDatabase = appDatabase
+        )
     }
 
     @After

@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -15,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultRelease
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 class AppLifecycleObserver constructor(
@@ -26,6 +29,7 @@ class AppLifecycleObserver constructor(
     private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
     private val packageUtil: PackageUtil,
     private val settings: Settings,
+    private val applicationScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     @Inject
@@ -37,6 +41,7 @@ class AppLifecycleObserver constructor(
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
         packageUtil: PackageUtil,
         settings: Settings,
+        @ApplicationScope applicationScope: CoroutineScope,
     ) : this(
         appContext = appContext,
         appLifecycleAnalytics = appLifecycleAnalytics,
@@ -45,7 +50,8 @@ class AppLifecycleObserver constructor(
         defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
         firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
         packageUtil = packageUtil,
-        settings = settings
+        settings = settings,
+        applicationScope = applicationScope,
     )
 
     fun setup() {
@@ -63,6 +69,11 @@ class AppLifecycleObserver constructor(
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         appLifecycleAnalytics.onApplicationEnterBackground()
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        applicationScope.cancel("Application onTerminate")
+        super.onDestroy(owner)
     }
 
     private fun setupFeatureFlags() {

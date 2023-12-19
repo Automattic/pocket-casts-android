@@ -78,8 +78,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
-
         val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
 
@@ -115,12 +113,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         })
 
         val viewPager = binding.viewPager
-        viewPager.adapter = adapter
-        viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
-
-        TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
-            tab.setText(adapter.pageTitle(position))
-        }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             private var previousPosition: Int = INVALID_TAB_POSITION
@@ -162,10 +154,17 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val hasChapters = !it.chapters.isEmpty
             val hasNotes = !it.podcastHeader.isUserEpisode
-
-            val updated = adapter.update(hasNotes, hasChapters)
-            if (updated) {
-                adapter.notifyDataSetChanged()
+            if (::adapter.isInitialized) {
+                val updated = adapter.update(hasNotes, hasChapters)
+                if (updated) adapter.notifyDataSetChanged()
+            } else {
+                adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+                adapter.update(hasNotes, hasChapters)
+                viewPager.adapter = adapter
+                viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
+                TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
+                    tab.setText(adapter.pageTitle(position))
+                }.attach()
             }
 
             val upNextCount = it.upNextEpisodes.size

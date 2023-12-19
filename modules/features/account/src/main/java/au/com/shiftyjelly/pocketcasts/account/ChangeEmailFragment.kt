@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.DoneViewModel
@@ -27,8 +26,7 @@ class ChangeEmailFragment : BaseFragment() {
             return ChangeEmailFragment()
         }
     }
-
-    private val viewModel: ChangeEmailViewModel by viewModels()
+    private val viewModel: ChangeEmailViewModel by activityViewModels()
     private val doneViewModel: DoneViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -87,5 +85,6 @@ class ChangeEmailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.clearValues()
+        viewModel.clearServerError()
     }
 }

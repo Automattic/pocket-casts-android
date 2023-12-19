@@ -10,6 +10,7 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -28,6 +29,7 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.android.core.SentryAndroid
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -49,6 +51,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()
@@ -77,7 +80,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
-                RefreshPodcastsTask.runNow(this@AutomotiveApplication)
+                RefreshPodcastsTask.runNow(this@AutomotiveApplication, applicationScope)
             }
         }
 
