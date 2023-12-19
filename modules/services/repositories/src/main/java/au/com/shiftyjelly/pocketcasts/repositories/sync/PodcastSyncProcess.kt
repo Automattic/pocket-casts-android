@@ -56,6 +56,7 @@ import kotlin.coroutines.CoroutineContext
 
 class PodcastSyncProcess(
     val context: Context,
+    val applicationScope: CoroutineScope,
     var settings: Settings,
     var episodeManager: EpisodeManager,
     var podcastManager: PodcastManager,
@@ -606,7 +607,7 @@ class PodcastSyncProcess(
     private fun updateShortcuts(playlists: List<Playlist>): Completable {
         // if any playlists have changed update the launcher shortcuts
         if (playlists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(playlistManager, true, context)
+            PocketCastsShortcuts.update(playlistManager, true, applicationScope, context)
         }
         return Completable.complete()
     }

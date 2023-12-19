@@ -49,7 +49,6 @@ mockito-android = "4.6.1"
 moshi = "1.13.0"
 navigation = "2.5.1"
 okhttp = "4.9.3"
-paging = "3.1.1"
 protobuf = "3.23.4"
 retrofit = "2.9.0"
 room = "2.5.1"
@@ -183,10 +182,6 @@ navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okHttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 okHttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
-
-# Paging
-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
-paging-rxjava2 = { module = "androidx.paging:paging-rxjava2", version.ref = "paging" }
 
 # Protobuf
 # For Android users, it's recommended to use protobuf Java Lite runtime because of its smaller code size.
@@ -393,11 +388,6 @@ okhttp = [
     "okHttp-logging"
 ]
 
-paging = [
-    "paging-runtime",
-    "paging-rxjava2"
-]
-
 protobuf = [
     "protobuf-kotlin-lite",
     "protobuf-javalite"
@@ -454,5 +444,6 @@ kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+measure-builds = "com.automattic.android.measure-builds:2.0.3"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:6.2.2"

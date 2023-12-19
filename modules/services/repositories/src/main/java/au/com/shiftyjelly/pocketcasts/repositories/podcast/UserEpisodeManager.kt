@@ -98,6 +98,7 @@ interface UserEpisodeManager {
     suspend fun updateServerStatus(userEpisode: UserEpisode, serverStatus: UserEpisodeServerStatus)
     fun monitorUploads(context: Context)
     suspend fun removeCloudStatusFromFiles(playbackManager: PlaybackManager)
+    suspend fun markAsPlayed(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun markAllAsUnplayed(episodes: List<UserEpisode>)
 }
@@ -595,11 +596,15 @@ class UserEpisodeManagerImpl @Inject constructor(
         return@withContext // Need this to satisfy the type for implicit return (which is dumb)
     }
 
+    override suspend fun markAsPlayed(episode: UserEpisode, playbackManager: PlaybackManager) {
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        deletePlayedEpisodeIfReq(episode, playbackManager)
+    }
+
     override suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.updateAllPlayingStatus(it, System.currentTimeMillis(), EpisodePlayingStatus.COMPLETED) }
         episodes.forEach {
-            playbackManager.removeEpisode(it, source = SourceView.UNKNOWN, userInitiated = false)
-            deletePlayedEpisodeIfReq(it, playbackManager)
+            markAsPlayed(it, playbackManager)
         }
     }
 
