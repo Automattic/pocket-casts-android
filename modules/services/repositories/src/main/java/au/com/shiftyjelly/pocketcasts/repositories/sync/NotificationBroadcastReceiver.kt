@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -97,17 +96,13 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     private fun playNow(episodeUuid: String, forceStream: Boolean, showedStreamWarning: Boolean = false) {
         launch {
-            if (playbackManager.isPlaying()) {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Not starting playback because playbackManager was already playing")
-            } else {
-                episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                    playbackManager.playNow(
-                        episode = episode,
-                        showedStreamWarning = showedStreamWarning,
-                        forceStream = forceStream,
-                        sourceView = source
-                    )
-                }
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
+                playbackManager.playNow(
+                    episode = episode,
+                    showedStreamWarning = showedStreamWarning,
+                    forceStream = forceStream,
+                    sourceView = source
+                )
             }
         }
     }

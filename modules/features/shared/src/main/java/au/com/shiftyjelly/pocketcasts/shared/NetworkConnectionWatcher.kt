@@ -5,12 +5,16 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.utils.Network as PCNetworkUtils
 
 class NetworkConnectionWatcher @Inject constructor(
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
     private val playbackManager: PlaybackManager,
 ) {
@@ -20,7 +24,9 @@ class NetworkConnectionWatcher @Inject constructor(
         set(value) {
             val changedToMetered = !field && value
             if (changedToMetered) {
-                playbackManager.onSwitchedToMeteredConnection()
+                applicationScope.launch {
+                    playbackManager.onSwitchedToMeteredConnection()
+                }
             }
             field = value
         }

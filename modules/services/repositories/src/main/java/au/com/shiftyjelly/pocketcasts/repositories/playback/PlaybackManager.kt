@@ -365,14 +365,15 @@ open class PlaybackManager @Inject constructor(
         return player?.supportsVolumeBoost() ?: false
     }
 
-    fun onSwitchedToMeteredConnection() {
-        val episodeUUID = upNextQueue.currentEpisode?.uuid ?: return
-        if (shouldWarnWhenSwitchingToMeteredConnection(episodeUUID)) {
-            getCurrentEpisode()?.let { episode ->
-                sendDataWarningNotification(episode)
-                lastWarnedPlayedEpisodeUuid = episodeUUID
-            }
-        }
+    suspend fun onSwitchedToMeteredConnection() {
+
+        val episode = getCurrentEpisode() ?: return
+
+        if (!shouldWarnWhenSwitchingToMeteredConnection(episode.uuid)) return
+
+        sendDataWarningNotification(episode)
+        lastWarnedPlayedEpisodeUuid = episode.uuid
+        pauseSuspend(sourceView = SourceView.METERED_NETWORK_CHANGE)
     }
 
     fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
@@ -522,6 +523,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.STATS,
             SourceView.WHATS_NEW,
             SourceView.NOTIFICATION_BOOKMARK,
+            SourceView.METERED_NETWORK_CHANGE,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
