@@ -383,6 +383,7 @@ open class PlaybackManager @Inject constructor(
     private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
         settings.warnOnMeteredNetwork.value &&
             lastWarnedPlayedEpisodeUuid != episodeUUID &&
+            (player is LocalPlayer) && // don't warn if chromecasting
             isStreaming() &&
             isPlaying()
 
