@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,23 +22,12 @@ class NetworkConnectionWatcher @Inject constructor(
 
     // Default to true so we do not detect a change to being metered when the class is initialized
     private var connectionIsMetered: Boolean = true
-        set(value) {
-            val changedToMetered = !field && value
-            if (changedToMetered) {
-                applicationScope.launch {
-                    playbackManager.onSwitchedToMeteredConnection()
-                }
-            }
-            field = value
-        }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-
-        override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities,
-        ) {
-            connectionIsMetered = networkCapabilities.isMetered()
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+            applicationScope.launch {
+                this@NetworkConnectionWatcher.onCapabilitiesChanged(networkCapabilities)
+            }
             super.onCapabilitiesChanged(network, networkCapabilities)
         }
     }
@@ -56,6 +46,16 @@ class NetworkConnectionWatcher @Inject constructor(
     fun stopWatching() {
         PCNetworkUtils.getConnectivityManager(context)
             .unregisterNetworkCallback(networkCallback)
+    }
+
+    @VisibleForTesting
+    internal suspend fun onCapabilitiesChanged(networkCapabilities: NetworkCapabilities) {
+        val newConnectionIsMetered = networkCapabilities.isMetered()
+        val changedToMetered = !connectionIsMetered && newConnectionIsMetered
+        if (changedToMetered) {
+            playbackManager.onSwitchedToMeteredConnection()
+        }
+        connectionIsMetered = newConnectionIsMetered
     }
 }
 
