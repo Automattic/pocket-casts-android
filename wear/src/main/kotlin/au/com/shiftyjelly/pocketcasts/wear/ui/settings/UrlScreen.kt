@@ -13,11 +13,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.wear.compose.material.Text
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.wear.extensions.responsive
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.navscaffold.scrollable
 import kotlinx.coroutines.guava.await
@@ -32,10 +30,7 @@ object UrlScreenRoutes {
 }
 
 fun NavGraphBuilder.settingsUrlScreens() {
-    scrollable(
-        route = UrlScreenRoutes.termsOfService,
-        columnStateFactory = ScalingLazyColumnDefaults.responsive(),
-    ) {
+    scrollable(UrlScreenRoutes.termsOfService) {
         UrlScreen(
             title = stringResource(LR.string.settings_about_terms_of_serivce),
             message = stringResource(LR.string.settings_about_terms_of_service_available_at, Settings.INFO_TOS_URL),
@@ -44,10 +39,7 @@ fun NavGraphBuilder.settingsUrlScreens() {
         )
     }
 
-    scrollable(
-        route = UrlScreenRoutes.privacy,
-        columnStateFactory = ScalingLazyColumnDefaults.responsive(),
-    ) {
+    scrollable(UrlScreenRoutes.privacy) {
         UrlScreen(
             title = stringResource(id = LR.string.settings_about_privacy_policy),
             message = stringResource(LR.string.settings_about_privacy_policy_available_at, Settings.INFO_PRIVACY_URL),

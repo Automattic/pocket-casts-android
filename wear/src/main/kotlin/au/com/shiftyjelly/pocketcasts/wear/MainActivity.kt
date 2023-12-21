@@ -29,7 +29,6 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.wear.extensions.responsive
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
@@ -51,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.settings.settingsRoutes
-import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
@@ -131,10 +129,7 @@ fun WearApp(
         state = navState,
     ) {
 
-        scrollable(
-            route = RequirePlusScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
-        ) {
+        scrollable(RequirePlusScreen.route) {
             ScrollToTop.handle(navController, it.scrollableState)
             RequirePlusScreen(
                 columnState = it.columnState,
@@ -144,7 +139,6 @@ fun WearApp(
 
         scrollable(
             route = WatchListScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(),
         ) {
             val pagerState = rememberPagerState { NowPlayingPager.pageCount }
             val coroutineScope = rememberCoroutineScope()
@@ -169,7 +163,9 @@ fun WearApp(
             }
         }
 
-        composable(PCVolumeScreen.route) {
+        composable(
+            route = PCVolumeScreen.route,
+        ) {
             it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
             PCVolumeScreen()
         }
@@ -190,7 +186,6 @@ fun WearApp(
 
         scrollable(
             route = PodcastsScreen.routeHomeFolder,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
         ) {
             PodcastsScreenContent(
                 navController = navController,
@@ -201,7 +196,6 @@ fun WearApp(
 
         scrollable(
             route = PodcastsScreen.routeFolder,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
             arguments = listOf(
                 navArgument(PodcastsScreen.argumentFolderUuid) {
                     type = NavType.StringType
@@ -217,7 +211,6 @@ fun WearApp(
 
         scrollable(
             route = PodcastScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
             arguments = listOf(
                 navArgument(PodcastScreen.argument) {
                     type = NavType.StringType
@@ -247,10 +240,7 @@ fun WearApp(
             swipeToDismissState = swipeToDismissState,
         )
 
-        scrollable(
-            route = FiltersScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
-        ) {
+        scrollable(FiltersScreen.route) {
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
@@ -267,7 +257,6 @@ fun WearApp(
 
         scrollable(
             route = FilterScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
             arguments = listOf(
                 navArgument(FilterScreen.argumentFilterUuid) {
                     type = NavType.StringType
@@ -288,10 +277,7 @@ fun WearApp(
             }
         }
 
-        scrollable(
-            route = DownloadsScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
-        ) {
+        scrollable(DownloadsScreen.route) {
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
@@ -307,10 +293,7 @@ fun WearApp(
             }
         }
 
-        scrollable(
-            route = FilesScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
-        ) {
+        scrollable(FilesScreen.route) {
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
@@ -368,10 +351,7 @@ fun WearApp(
             PCVolumeScreen()
         }
 
-        scrollable(
-            route = EffectsScreen.route,
-            columnStateFactory = ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false),
-        ) {
+        scrollable(EffectsScreen.route,) {
             EffectsScreen(
                 columnState = it.columnState,
             )

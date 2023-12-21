@@ -58,8 +58,7 @@ object EpisodeScreenFlow {
         ) {
             scrollable(
                 route = episodeScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.responsive(
-                    firstItemIsFullWidth = false,
+                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
                     verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top)
                 )
             ) {
@@ -109,10 +108,7 @@ object EpisodeScreenFlow {
                 }
             }
 
-            scrollable(
-                route = upNextOptionsScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.responsive(),
-            ) {
+            scrollable(upNextOptionsScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 val episodeScreenBackStackEntry = remember(it.backStackEntry) {
                     navController.getBackStackEntry(episodeScreen)

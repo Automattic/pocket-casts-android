@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
-import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
@@ -109,9 +108,7 @@ fun NowPlayingPager(
                     navigateToEpisode = { episodeUuid ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                     },
-                    columnState = rememberColumnState(
-                        ScalingLazyColumnDefaults.responsive(firstItemIsFullWidth = false)
-                    ),
+                    columnState = rememberColumnState(),
                 )
             }
         }
