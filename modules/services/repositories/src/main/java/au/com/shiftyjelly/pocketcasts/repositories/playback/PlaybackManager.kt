@@ -383,6 +383,7 @@ open class PlaybackManager @Inject constructor(
     private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
         settings.warnOnMeteredNetwork.value &&
             lastWarnedPlayedEpisodeUuid != episodeUUID &&
+            isStreaming() &&
             isPlaying()
 
     fun getPlaybackSpeed(): Double {
