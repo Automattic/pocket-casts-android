@@ -4,6 +4,8 @@
 *   Updates:
     *   Save selected tab on Player screen after screen rotation
         ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
+    *   Warn when switching to metered network if warn before using data setting is enabled
+        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
 
 7.54
 -----
