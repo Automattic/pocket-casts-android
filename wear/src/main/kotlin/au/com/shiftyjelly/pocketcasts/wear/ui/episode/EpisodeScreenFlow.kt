@@ -17,6 +17,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import au.com.shiftyjelly.pocketcasts.wear.extensions.responsive
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
@@ -58,7 +59,8 @@ object EpisodeScreenFlow {
         ) {
             scrollable(
                 route = episodeScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
+                columnStateFactory = ScalingLazyColumnDefaults.responsive(
+                    firstItemIsFullWidth = false,
                     verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top)
                 )
             ) {
@@ -108,7 +110,10 @@ object EpisodeScreenFlow {
                 }
             }
 
-            scrollable(upNextOptionsScreen) {
+            scrollable(
+                route = upNextOptionsScreen,
+                columnStateFactory = ScalingLazyColumnDefaults.responsive(),
+            ) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 val episodeScreenBackStackEntry = remember(it.backStackEntry) {
                     navController.getBackStackEntry(episodeScreen)
