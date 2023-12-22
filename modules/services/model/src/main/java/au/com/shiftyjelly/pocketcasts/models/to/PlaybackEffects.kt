@@ -14,4 +14,20 @@ class PlaybackEffects {
     override fun toString(): String {
         return String.format(Locale.ENGLISH, "Speed: %f Trim: %d Boost: %s", playbackSpeed, trimMode.ordinal, isVolumeBoosted)
     }
+
+    fun toData() = PlaybackEffectsData(playbackSpeed, trimMode, isVolumeBoosted)
+}
+
+// This class can be useful when you need things like a well-behaved equals()
+// method, or a "copy" method.
+data class PlaybackEffectsData(
+    val playbackSpeed: Double,
+    val trimMode: TrimMode,
+    val isVolumeBoosted: Boolean,
+) {
+    fun toEffects() = PlaybackEffects().apply {
+        playbackSpeed = this@PlaybackEffectsData.playbackSpeed
+        trimMode = this@PlaybackEffectsData.trimMode
+        isVolumeBoosted = this@PlaybackEffectsData.isVolumeBoosted
+    }
 }
