@@ -25,7 +25,6 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
-import androidx.media3.ui.WearUnsuitableOutputPlaybackSuppressionResolverListener
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -194,10 +193,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             .setLoadControl(loadControl)
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
-            .setSuppressPlaybackOnUnsuitableOutput(true)
-            .build().apply {
-                addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
-            }
+            .build()
 
         renderer.onAudioSessionId(player.audioSessionId)
 
