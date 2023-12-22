@@ -17,17 +17,3 @@ class PlaybackEffects {
 
     fun toData() = PlaybackEffectsData(playbackSpeed, trimMode, isVolumeBoosted)
 }
-
-// This class can be useful when you need things like a well-behaved equals()
-// method, or a "copy" method.
-data class PlaybackEffectsData(
-    val playbackSpeed: Double,
-    val trimMode: TrimMode,
-    val isVolumeBoosted: Boolean,
-) {
-    fun toEffects() = PlaybackEffects().apply {
-        playbackSpeed = this@PlaybackEffectsData.playbackSpeed
-        trimMode = this@PlaybackEffectsData.trimMode
-        isVolumeBoosted = this@PlaybackEffectsData.isVolumeBoosted
-    }
-}
