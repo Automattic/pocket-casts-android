@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 import kotlin.math.round
 
@@ -25,11 +24,8 @@ class EffectsViewModel
 ) : ViewModel() {
 
     val state: StateFlow<State> =
-        playbackManager.playbackStateRelay
-            .asFlow()
-            .map {
-                State.Loaded(settings.globalPlaybackEffects.value.toData())
-            }
+        settings.globalPlaybackEffects.flow
+            .map { State.Loaded(it.toData()) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
