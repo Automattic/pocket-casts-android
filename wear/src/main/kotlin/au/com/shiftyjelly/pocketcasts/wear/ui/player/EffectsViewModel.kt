@@ -49,7 +49,7 @@ class EffectsViewModel
     private fun changePlaybackSpeed(speed: Double) {
         val currentState = state.value as? State.Loaded ?: return
         val effects = currentState.playbackEffects
-        val clippedToRangeSpeed = speed.clipToRange(0.5, 3.0)
+        val clippedToRangeSpeed = speed.clipToRange(0.5, 5.0)
         // to stop the issue 1.2000000000000002
         val roundedSpeed = round(clippedToRangeSpeed * 10.0) / 10.0
         effects.playbackSpeed = roundedSpeed

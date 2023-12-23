@@ -89,7 +89,7 @@ class PodcastEffectsViewModel
 
     private fun changePlaybackSpeed(speed: Double) {
         val podcast = this.podcast.value ?: return
-        val clippedToRangeSpeed = speed.clipToRange(0.5, 3.0)
+        val clippedToRangeSpeed = speed.clipToRange(0.5, 5.0)
         // to stop the issue 1.2000000000000002
         val roundedSpeed = round(clippedToRangeSpeed * 10.0) / 10.0
         podcastManager.updatePlaybackSpeed(podcast, roundedSpeed)
