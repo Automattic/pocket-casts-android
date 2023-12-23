@@ -1,3 +1,6 @@
+*   Updates:
+    *   Increase the maximum playback speed to 5.0
+
 7.55
 -----
 

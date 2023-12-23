@@ -159,7 +159,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         val binding = binding ?: return
 
         // val speed = (amount.clipToRange(0.5, 3.0) * 10.0).toInt() / 10.0
-        val speed = round(amount.clipToRange(0.5, 3.0) * 10.0) / 10.0
+        val speed = round(amount.clipToRange(0.5, 5.0) * 10.0) / 10.0
         effects.playbackSpeed = speed
         updatedSpeed = speed
         binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
