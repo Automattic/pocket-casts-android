@@ -14,10 +14,10 @@ enum class Feature(
     END_OF_YEAR_ENABLED(
         key = "end_of_year_enabled",
         title = "End of Year",
-        defaultValue = true,
+        defaultValue = false,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
     ),
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",
