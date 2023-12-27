@@ -11,6 +11,9 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -35,6 +38,8 @@ import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -49,6 +54,8 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
     private var chipLayoutStartY: Float = 0f
     private var scrollToChip: View? = null
 
+    private val episodeAdapter = SimpleEpisodeListAdapter()
+
     companion object {
         fun newInstance(): CreateFilterChipFragment {
             return CreateFilterChipFragment()
@@ -62,131 +69,11 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val episodeAdapter = SimpleEpisodeListAdapter()
-
         binding.recyclerView.adapter = episodeAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.addItemDecoration(DividerItemDecoration(view.context, RecyclerView.VERTICAL))
 
-        viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
-            val color = playlist.getColor(context)
-
-            val chipPodcasts = binding.chipPodcasts
-            if (playlist.allPodcasts) {
-                chipPodcasts.text = getString(LR.string.filters_chip_all_your_podcasts)
-                chipPodcasts.setInactiveColors(theme.activeTheme, color)
-            } else {
-                chipPodcasts.text = resources.getStringPluralPodcasts(playlist.podcastUuidList.count())
-                chipPodcasts.setActiveColors(theme.activeTheme, color)
-            }
-            chipPodcasts.setOnClickListener {
-                openOptionPageFrom(it, PodcastOptionsFragment.newInstance(playlist))
-            }
-
-            val chipEpisodes = binding.chipEpisodes
-            val episodeOptions = playlist.episodeOptionStringIds
-            if ((playlist.unplayed && playlist.partiallyPlayed && playlist.finished) || episodeOptions.isEmpty()) {
-                chipEpisodes.text = getString(LR.string.filters_chip_episode_status)
-                chipEpisodes.setInactiveColors(theme.activeTheme, color)
-            } else {
-                when {
-                    episodeOptions.count() > 1 -> chipEpisodes.text = episodeOptions.joinToString { getString(it) }
-                    episodeOptions.isNotEmpty() -> chipEpisodes.setText(episodeOptions.first())
-                    else -> chipEpisodes.text = getString(LR.string.filters_chip_episode_status)
-                }
-                chipEpisodes.setActiveColors(theme.activeTheme, color)
-            }
-            chipEpisodes.setOnClickListener {
-                openOptionPageFrom(it, EpisodeOptionsFragment.newInstance(playlist))
-            }
-
-            val chipTime = binding.chipTime
-            chipTime.setText(playlist.stringForFilterHours)
-            if (playlist.filterHours == 0) {
-                chipTime.setInactiveColors(theme.activeTheme, color)
-            } else {
-                chipTime.setActiveColors(theme.activeTheme, color)
-            }
-            chipTime.setOnClickListener {
-                openOptionPageFrom(it, TimeOptionsFragment.newInstance(playlist, TimeOptionsFragment.OptionsType.Time))
-            }
-
-            val chipDuration = binding.chipDuration
-            chipDuration.text = playlist.getStringForDuration(context)
-            if (playlist.filterDuration) {
-                chipDuration.setActiveColors(theme.activeTheme, color)
-            } else {
-                chipDuration.setInactiveColors(theme.activeTheme, color)
-            }
-            chipDuration.setOnClickListener {
-                openOptionPageFrom(it, DurationOptionsFragment.newInstance(playlist))
-            }
-
-            val chipDownload = binding.chipDownload
-            val downloadOptions = playlist.downloadOptionStrings
-            if (downloadOptions.isEmpty()) {
-                chipDownload.setInactiveColors(theme.activeTheme, color)
-                chipDownload.text = getString(LR.string.filters_chip_download_status)
-            } else {
-                chipDownload.text = downloadOptions.joinToString { getString(it) }
-                chipDownload.setActiveColors(theme.activeTheme, color)
-            }
-            chipDownload.setOnClickListener {
-                openOptionPageFrom(it, TimeOptionsFragment.newInstance(playlist, TimeOptionsFragment.OptionsType.Downloaded))
-            }
-
-            val chipAudioVideo = binding.chipAudioVideo
-            val audioOptions = playlist.audioOptionStrings
-            if (audioOptions.isEmpty()) {
-                chipAudioVideo.setInactiveColors(theme.activeTheme, color)
-                chipAudioVideo.text = getString(LR.string.filters_chip_media_type)
-            } else {
-                chipAudioVideo.text = audioOptions.joinToString { getString(it) }
-                chipAudioVideo.setActiveColors(theme.activeTheme, color)
-            }
-            chipAudioVideo.setOnClickListener {
-                openOptionPageFrom(it, TimeOptionsFragment.newInstance(playlist, TimeOptionsFragment.OptionsType.AudioVideo))
-            }
-
-            val chipStarred = binding.chipStarred
-            val starred = playlist.starred
-            chipStarred.text = getString(LR.string.filters_chip_starred)
-            if (starred) {
-                chipStarred.setActiveColors(theme.activeTheme, color)
-            } else {
-                chipStarred.setInactiveColors(theme.activeTheme, color)
-            }
-            chipStarred.setOnClickListener {
-                viewModel.starredChipTapped(isCreatingFilter = true)
-                scrollToChip = it
-            }
-
-            if (!playlist.isAllEpisodes) {
-                val chipBox = binding.chipBox
-                if (chipBox.childCount != 0) {
-                    val chips = chipBox.children.toList()
-                    chipBox.removeAllViews()
-                    chips.forEach { binding.chipLinearLayout.addView(it) }
-
-                    binding.lblAddMore.isVisible = true
-                    binding.lblSelectFilters.isVisible = false
-
-                    binding.chipLinearLayout.doOnLayout {
-                        val x = scrollToChip?.x ?: 0f
-                        binding.chipScrollView.smoothScrollTo(x.toInt(), 0)
-                    }
-                }
-
-                binding.lblPreview.isVisible = true
-                binding.previewDivider.isVisible = true
-                viewModel.observeFilter(playlist).observe(viewLifecycleOwner) {
-                    binding.recyclerView.isVisible = it.isNotEmpty()
-                    binding.emptyLayout.root.isVisible = it.isEmpty()
-                    episodeAdapter.submitList(it)
-                }
-            }
-        }
+        observePlaylist()
 
         // Setup sticky header for horizontal scroll view
         binding.rootScrollView.doOnLayout { chipLayoutStartY = binding.chipScrollView.y }
@@ -210,7 +97,132 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
     private fun openOptionPageFrom(optionView: View, fragment: Fragment) {
         (activity as FragmentHostListener).showModal(fragment)
         scrollToChip = optionView
-        viewModel.lockedToFirstPage.value = false
+        viewModel.onOptionPageOpen()
+    }
+
+    private fun observePlaylist() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playlist.mapNotNull { it }.collect { playlist ->
+                    val color = playlist.getColor(context)
+
+                    val chipPodcasts = binding.chipPodcasts
+                    if (playlist.allPodcasts) {
+                        chipPodcasts.text = getString(LR.string.filters_chip_all_your_podcasts)
+                        chipPodcasts.setInactiveColors(theme.activeTheme, color)
+                    } else {
+                        chipPodcasts.text = resources.getStringPluralPodcasts(playlist.podcastUuidList.count())
+                        chipPodcasts.setActiveColors(theme.activeTheme, color)
+                    }
+                    chipPodcasts.setOnClickListener {
+                        openOptionPageFrom(it, PodcastOptionsFragment.newInstance(playlist))
+                    }
+
+                    val chipEpisodes = binding.chipEpisodes
+                    val episodeOptions = playlist.episodeOptionStringIds
+                    if ((playlist.unplayed && playlist.partiallyPlayed && playlist.finished) || episodeOptions.isEmpty()) {
+                        chipEpisodes.text = getString(LR.string.filters_chip_episode_status)
+                        chipEpisodes.setInactiveColors(theme.activeTheme, color)
+                    } else {
+                        when {
+                            episodeOptions.count() > 1 -> chipEpisodes.text = episodeOptions.joinToString { getString(it) }
+                            episodeOptions.isNotEmpty() -> chipEpisodes.setText(episodeOptions.first())
+                            else -> chipEpisodes.text = getString(LR.string.filters_chip_episode_status)
+                        }
+                        chipEpisodes.setActiveColors(theme.activeTheme, color)
+                    }
+                    chipEpisodes.setOnClickListener {
+                        openOptionPageFrom(it, EpisodeOptionsFragment.newInstance(playlist))
+                    }
+
+                    val chipTime = binding.chipTime
+                    chipTime.setText(playlist.stringForFilterHours)
+                    if (playlist.filterHours == 0) {
+                        chipTime.setInactiveColors(theme.activeTheme, color)
+                    } else {
+                        chipTime.setActiveColors(theme.activeTheme, color)
+                    }
+                    chipTime.setOnClickListener {
+                        openOptionPageFrom(it, TimeOptionsFragment.newInstance(playlist, TimeOptionsFragment.OptionsType.Time))
+                    }
+
+                    val chipDuration = binding.chipDuration
+                    chipDuration.text = playlist.getStringForDuration(context)
+                    if (playlist.filterDuration) {
+                        chipDuration.setActiveColors(theme.activeTheme, color)
+                    } else {
+                        chipDuration.setInactiveColors(theme.activeTheme, color)
+                    }
+                    chipDuration.setOnClickListener {
+                        openOptionPageFrom(it, DurationOptionsFragment.newInstance(playlist))
+                    }
+
+                    val chipDownload = binding.chipDownload
+                    val downloadOptions = playlist.downloadOptionStrings
+                    if (downloadOptions.isEmpty()) {
+                        chipDownload.setInactiveColors(theme.activeTheme, color)
+                        chipDownload.text = getString(LR.string.filters_chip_download_status)
+                    } else {
+                        chipDownload.text = downloadOptions.joinToString { getString(it) }
+                        chipDownload.setActiveColors(theme.activeTheme, color)
+                    }
+                    chipDownload.setOnClickListener {
+                        openOptionPageFrom(it, TimeOptionsFragment.newInstance(playlist, TimeOptionsFragment.OptionsType.Downloaded))
+                    }
+
+                    val chipAudioVideo = binding.chipAudioVideo
+                    val audioOptions = playlist.audioOptionStrings
+                    if (audioOptions.isEmpty()) {
+                        chipAudioVideo.setInactiveColors(theme.activeTheme, color)
+                        chipAudioVideo.text = getString(LR.string.filters_chip_media_type)
+                    } else {
+                        chipAudioVideo.text = audioOptions.joinToString { getString(it) }
+                        chipAudioVideo.setActiveColors(theme.activeTheme, color)
+                    }
+                    chipAudioVideo.setOnClickListener {
+                        openOptionPageFrom(it, TimeOptionsFragment.newInstance(playlist, TimeOptionsFragment.OptionsType.AudioVideo))
+                    }
+
+                    val chipStarred = binding.chipStarred
+                    val starred = playlist.starred
+                    chipStarred.text = getString(LR.string.filters_chip_starred)
+                    if (starred) {
+                        chipStarred.setActiveColors(theme.activeTheme, color)
+                    } else {
+                        chipStarred.setInactiveColors(theme.activeTheme, color)
+                    }
+                    chipStarred.setOnClickListener {
+                        viewModel.starredChipTapped(isCreatingFilter = true)
+                        scrollToChip = it
+                    }
+
+                    if (!playlist.isAllEpisodes) {
+                        val chipBox = binding.chipBox
+                        if (chipBox.childCount != 0) {
+                            val chips = chipBox.children.toList()
+                            chipBox.removeAllViews()
+                            chips.forEach { binding.chipLinearLayout.addView(it) }
+
+                            binding.lblAddMore.isVisible = true
+                            binding.lblSelectFilters.isVisible = false
+
+                            binding.chipLinearLayout.doOnLayout {
+                                val x = scrollToChip?.x ?: 0f
+                                binding.chipScrollView.smoothScrollTo(x.toInt(), 0)
+                            }
+                        }
+
+                        binding.lblPreview.isVisible = true
+                        binding.previewDivider.isVisible = true
+                        viewModel.observeFilter(playlist).observe(viewLifecycleOwner) {
+                            binding.recyclerView.isVisible = it.isNotEmpty()
+                            binding.emptyLayout.root.isVisible = it.isEmpty()
+                            episodeAdapter.submitList(it)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
