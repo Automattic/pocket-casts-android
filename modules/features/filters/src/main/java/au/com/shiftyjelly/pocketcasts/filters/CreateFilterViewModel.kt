@@ -58,7 +58,7 @@ class CreateFilterViewModel @Inject constructor(
     val lockedToFirstPage get() = _lockedToFirstPage.asStateFlow()
 
     var playlist: StateFlow<Playlist?> = MutableStateFlow<Playlist?>(null)
-    private set
+        private set
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) =
         withContext(Dispatchers.IO) { playlistManager.createPlaylist(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true) }
