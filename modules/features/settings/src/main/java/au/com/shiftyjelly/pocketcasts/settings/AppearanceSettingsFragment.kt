@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -173,6 +174,14 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtDarkUpNext.isChecked = !binding.swtDarkUpNext.isChecked
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            binding.dividerViewWidget.isVisible = true
+            binding.lblWidget.isVisible = true
+            binding.lblUseDynamicColorsForWidget.isVisible = true
+            binding.lblDynamicColorsForWidgetDetails.isVisible = true
+            binding.swtDynamicColorsForWidget.isVisible = true
+            binding.btnUseDynamicColorsForWidget.isVisible = true
+        }
         binding.swtDynamicColorsForWidget.isChecked = settings.useDynamicColorsForWidget.value
         binding.swtDynamicColorsForWidget.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateWidgetForDynamicColors(isChecked)
