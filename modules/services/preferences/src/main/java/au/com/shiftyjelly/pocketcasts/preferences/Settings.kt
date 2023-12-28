@@ -423,4 +423,6 @@ interface Settings {
     fun getReviewRequestedDates(): List<String>
 
     val useDarkUpNextTheme: UserSetting<Boolean>
+
+    val useDynamicColorsForWidget: UserSetting<Boolean>
 }
