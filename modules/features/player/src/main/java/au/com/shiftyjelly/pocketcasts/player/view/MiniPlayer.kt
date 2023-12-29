@@ -142,9 +142,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     fun setUpNext(upNextState: UpNextQueue.State, theme: Theme) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            if (binding.episode?.uuid != upNextState.episode.uuid) {
-                loadArtwork(upNextState.podcast, upNextState.episode)
-            }
+            loadArtwork(upNextState.podcast, upNextState.episode)
 
             binding.episode = upNextState.episode
             binding.podcast = upNextState.podcast
@@ -254,6 +252,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         val imageView = binding.artwork
         imageLoader.smallPlaceholder().loadPodcastUuid(podcast.uuid).into(imageView)
         loadedPodcastUuid = podcast.uuid
+        loadedEpisodeArtwork = null
     }
 
     private var loadedEpisodeArtwork: Artwork? = null
@@ -274,6 +273,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             )
         }
         loadedEpisodeArtwork = artwork
+        loadedPodcastUuid = null
         return when (artwork) {
             is Artwork.Path -> {
                 imageView.load(data = File(artwork.path), builder = imageBuilder)
