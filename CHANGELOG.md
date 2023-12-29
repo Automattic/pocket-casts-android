@@ -1,6 +1,9 @@
 7.55
 -----
 
+*   Updates:
+    *   Save selected tab on Player screen after screen rotation
+        ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
 
 7.54
 -----
@@ -23,7 +26,7 @@
     *   Fix tap to view action from bookmark added notification
         ([#1614](https://github.com/Automattic/pocket-casts-android/pull/1614))
 *   Updates:
-    *   Display dynamic colors for widget
+    *   Support dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
     *   Add theme support to Up Next screen
         ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))

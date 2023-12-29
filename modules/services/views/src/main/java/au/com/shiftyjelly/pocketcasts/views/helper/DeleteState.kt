@@ -9,9 +9,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -34,9 +33,15 @@ object CloudDeleteHelper {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun deleteEpisode(episode: UserEpisode, deleteState: DeleteState, playbackManager: PlaybackManager, episodeManager: EpisodeManager, userEpisodeManager: UserEpisodeManager) {
-        GlobalScope.launch(Dispatchers.Default) {
+    fun deleteEpisode(
+        episode: UserEpisode,
+        deleteState: DeleteState,
+        playbackManager: PlaybackManager,
+        episodeManager: EpisodeManager,
+        userEpisodeManager: UserEpisodeManager,
+        applicationScope: CoroutineScope,
+    ) {
+        applicationScope.launch(Dispatchers.Default) {
             when (deleteState) {
                 is DeleteState.DeviceOnly -> {
                     if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
