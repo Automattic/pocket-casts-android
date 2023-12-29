@@ -132,7 +132,9 @@ object AutoConverter {
     }
 
     fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context): Uri? {
-        val url = if (episode is UserEpisode) {
+        val url = if (episode is PodcastEpisode && (!episode.imageUrl.isNullOrBlank())) {
+            episode.imageUrl
+        } else if (episode is UserEpisode) {
             // the artwork for user uploaded episodes are stored on each episode
             episode.artworkUrl
         } else {
