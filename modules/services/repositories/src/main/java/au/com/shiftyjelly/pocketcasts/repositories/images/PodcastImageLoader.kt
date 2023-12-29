@@ -122,28 +122,37 @@ open class PodcastImageLoader(
     }
 
     fun loadEpisodeArtworkInto(
-        imageView: ImageView,
+        imageView: ImageView?,
+        target: coil.target.Target? = null,
+        size: Int? = null,
         episode: PodcastEpisode,
         coroutineScope: CoroutineScope,
     ) {
+        val loadPodcastImage: () -> Unit = {
+            // If episode artwork image fails, try podcast image
+            val imageRequest = loadPodcastImageForEpisode(episode)
+            if (size != null) imageRequest.size(size)
+            if (target != null) imageRequest.target(target).build()
+            else imageRequest.into(imageView!!)
+        }
+
         if (episode.imageUrl != null) {
-            val episodeImageRequest = ImageRequest.Builder(context)
-                .data(episode.imageUrl)
-                .target(imageView)
-                .build()
-            val disposable = episodeImageRequest.context.imageLoader.enqueue(episodeImageRequest)
+            val imageBuilder = ImageRequest.Builder(context).data(episode.imageUrl)
+            if (size != null) imageBuilder.size(size)
+            if (target != null) imageBuilder.target(target)
+            val imageRequest = imageBuilder.build()
+
+            val disposable = imageRequest.context.imageLoader.enqueue(imageRequest)
             coroutineScope.launch {
-                val imageResult = disposable.job.await()
-                when (imageResult) {
+                when (disposable.job.await()) {
                     is SuccessResult -> { /* do nothing */ }
                     is ErrorResult -> {
-                        // If episode artwork image fails, try podcast image
-                        loadPodcastImageForEpisode(episode).into(imageView)
+                        loadPodcastImage()
                     }
                 }
             }
         } else {
-            loadPodcastImageForEpisode(episode).into(imageView)
+            loadPodcastImage()
         }
     }
 
