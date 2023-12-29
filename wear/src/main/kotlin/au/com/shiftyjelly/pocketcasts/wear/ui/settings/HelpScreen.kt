@@ -69,10 +69,6 @@ private fun ScalingLazyListScope.phoneAvailableContent(
             onClick = onEmailLogsToSupport,
         )
     }
-
-    item {
-        Spacer(Modifier.height(8.dp))
-    }
 }
 
 private fun ScalingLazyListScope.noPhoneAvailableContent() {
