@@ -4,6 +4,8 @@
 *   Updates:
     *   Warn when switching to metered network if warn before using data setting is enabled
         ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
+    *   Display episode artwork from podcast feed on Mini-player, Notification & Widget.
+        ([#1599](https://github.com/Automattic/pocket-casts-android/pull/1599))
 *   Bug Fixes:
     *   Fixed starring episode from full-screen player does not prevent episode from being archived
         ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
