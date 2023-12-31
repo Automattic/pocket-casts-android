@@ -1,10 +1,14 @@
+7.56
+-----
+*   Bug Fixes:
+    *   Fix play button local file getting set to pause after episode completion
+        ([#397](https://github.com/Automattic/pocket-casts-android/pull/1627))
 7.55
 -----
 
 *   Updates:
     *   Save selected tab on Player screen after screen rotation
         ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
-
 7.54
 -----
 
