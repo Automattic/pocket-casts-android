@@ -14,4 +14,6 @@ class PlaybackEffects {
     override fun toString(): String {
         return String.format(Locale.ENGLISH, "Speed: %f Trim: %d Boost: %s", playbackSpeed, trimMode.ordinal, isVolumeBoosted)
     }
+
+    fun toData() = PlaybackEffectsData(playbackSpeed, trimMode, isVolumeBoosted)
 }
