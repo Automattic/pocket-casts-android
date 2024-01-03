@@ -823,7 +823,6 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed) {
             podcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
             podcast.isSubscribed = true
-            podcast.isSubscribed = podcastSync.subscribed
             podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
             podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
             podcastSync.sortPosition?.let { podcast.sortPosition = it }
