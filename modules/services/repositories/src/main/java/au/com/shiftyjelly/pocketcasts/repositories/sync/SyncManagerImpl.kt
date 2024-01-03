@@ -79,15 +79,16 @@ class SyncManagerImpl @Inject constructor(
 
 // Account
 
-    override fun emailChange(newEmail: String, password: String): Single<UserChangeResponse> =
-        getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun emailChange(newEmail: String, password: String): UserChangeResponse {
+        val result = getCacheTokenOrLogin { token ->
             syncServerManager.emailChange(newEmail, password, token)
-        }.doOnSuccess {
-            if (it.success == true) {
-                syncAccountManager.setEmail(newEmail)
-                analyticsTracker.track(AnalyticsEvent.USER_EMAIL_UPDATED)
-            }
         }
+        if (result.success == true) {
+            syncAccountManager.setEmail(newEmail)
+            analyticsTracker.track(AnalyticsEvent.USER_EMAIL_UPDATED)
+        }
+        return result
+    }
 
     override fun deleteAccount(): Single<UserChangeResponse> =
         getCacheTokenOrLoginRxSingle { token ->
