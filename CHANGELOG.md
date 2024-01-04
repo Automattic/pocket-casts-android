@@ -7,7 +7,8 @@
 *   Bug Fixes:
     *   Improve handling of user files on watch
         ([#1638](https://github.com/Automattic/pocket-casts-android/pull/1638))
-
+    *   Fixed an issue with a missing accessibility label for the 'Up Next' screen
+        ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
 7.54
 -----
 
