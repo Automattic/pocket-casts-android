@@ -140,6 +140,7 @@ open class PodcastImageLoader(
             val imageBuilder = ImageRequest.Builder(context).data(episode.imageUrl)
             if (size != null) imageBuilder.size(size)
             if (target != null) imageBuilder.target(target)
+            if (imageView != null) imageBuilder.into(imageView)
             val imageRequest = imageBuilder.build()
 
             val disposable = imageRequest.context.imageLoader.enqueue(imageRequest)
