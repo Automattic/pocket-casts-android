@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.buttons
 
+import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,13 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class ToggleButtonOption(
     val imageId: Int,
     val descriptionId: Int,
     val click: () -> Unit,
     val isOn: () -> Boolean
-)
+) : Parcelable
 
 @Composable
 fun ToggleButtonGroup(options: List<ToggleButtonOption>?) {
