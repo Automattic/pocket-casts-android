@@ -132,7 +132,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!isCreate) {
-            lifecycleScope.launch { viewModel.setup(playlistUUID) }
+            runBlocking { viewModel.setup(playlistUUID) }
         }
 
         val colors = Playlist.getColors(context)
@@ -279,35 +279,31 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     }
 
     private fun observePlaylist() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.playlist.mapNotNull { it }.collect { filter ->
-                    if (binding == null) return@collect
+        viewModel.playlist.observe(viewLifecycleOwner) { filter ->
+            if (binding == null) return@observe
 
-                    if (filter.title.isEmpty()) {
-                        binding!!.txtName.setHint(LR.string.filters_filter_name)
-                    } else {
-                        txtNameInitialized = false
-                        binding!!.txtName.setText(filter.title)
-                    }
-                    txtNameInitialized = true
-
-                    colorAdapter.setSelectedIndex(filter.colorIndex, fromUserInteraction = false)
-
-                    selectedIconIndexInitialized = false
-                    selectedIconIndex = filter.drawableIndex
-                    selectedIconIndexInitialized = true
-
-                    tintColor = filter.getColor(context)
-                    updateIconViews()
-
-                    binding!!.switchAutoDownload.isChecked = filter.autoDownload
-                    viewModel.isAutoDownloadSwitchInitialized = true
-
-                    binding!!.layoutDownloadLimit.isVisible = filter.autoDownload && !isCreate
-                    binding!!.lblDownloadLimit.text = getString(LR.string.filters_auto_download_limit, filter.autodownloadLimit)
-                }
+            if (filter.title.isEmpty()) {
+                binding!!.txtName.setHint(LR.string.filters_filter_name)
+            } else {
+                txtNameInitialized = false
+                binding!!.txtName.setText(filter.title)
             }
+            txtNameInitialized = true
+
+            colorAdapter.setSelectedIndex(filter.colorIndex, fromUserInteraction = false)
+
+            selectedIconIndexInitialized = false
+            selectedIconIndex = filter.drawableIndex
+            selectedIconIndexInitialized = true
+
+            tintColor = filter.getColor(context)
+            updateIconViews()
+
+            binding!!.switchAutoDownload.isChecked = filter.autoDownload
+            viewModel.isAutoDownloadSwitchInitialized = true
+
+            binding!!.layoutDownloadLimit.isVisible = filter.autoDownload && !isCreate
+            binding!!.lblDownloadLimit.text = getString(LR.string.filters_auto_download_limit, filter.autodownloadLimit)
         }
     }
 

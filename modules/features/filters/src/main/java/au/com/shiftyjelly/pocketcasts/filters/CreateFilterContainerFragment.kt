@@ -124,12 +124,8 @@ class CreateFilterContainerFragment : BaseFragment() {
     }
 
     private fun observePlaylist(adapter: CreatePagerAdapter) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.playlist.collect {
-                    binding.btnCreate.isEnabled = !adapter.lockedToFirstPage
-                }
-            }
+        viewModel.playlist.observe(viewLifecycleOwner) {
+            binding.btnCreate.isEnabled = !adapter.lockedToFirstPage
         }
     }
 

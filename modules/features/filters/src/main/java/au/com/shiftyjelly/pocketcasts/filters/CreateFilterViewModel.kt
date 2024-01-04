@@ -57,8 +57,7 @@ class CreateFilterViewModel @Inject constructor(
     private val _lockedToFirstPage = MutableStateFlow(true)
     val lockedToFirstPage get() = _lockedToFirstPage.asStateFlow()
 
-    var playlist: StateFlow<Playlist?> = MutableStateFlow<Playlist?>(null)
-        private set
+    lateinit var playlist: LiveData<Playlist>
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) =
         withContext(Dispatchers.IO) { playlistManager.createPlaylist(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true) }
@@ -145,12 +144,10 @@ class CreateFilterViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toFlowable()
-                .asFlow()
-                .stateIn(this)
         } else {
             val newFilter = createFilter("", 0, 0)
-            playlistManager.observeByUuid(newFilter.uuid).asFlow().stateIn(this)
-        }
+            playlistManager.observeByUuid(newFilter.uuid)
+        }.toLiveData()
 
         hasBeenInitialised = true
     }
