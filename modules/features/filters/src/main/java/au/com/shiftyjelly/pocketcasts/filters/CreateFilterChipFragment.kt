@@ -102,7 +102,7 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
 
     private fun observePlaylist() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.playlist.mapNotNull { it }.collect { playlist ->
                     val color = playlist.getColor(context)
 

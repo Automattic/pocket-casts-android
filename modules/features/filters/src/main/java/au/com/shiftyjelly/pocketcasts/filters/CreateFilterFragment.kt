@@ -132,7 +132,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!isCreate) {
-            runBlocking { viewModel.setup(playlistUUID) }
+            lifecycleScope.launch { viewModel.setup(playlistUUID) }
         }
 
         val colors = Playlist.getColors(context)
@@ -280,7 +280,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
 
     private fun observePlaylist() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.playlist.mapNotNull { it }.collect { filter ->
                     if (binding == null) return@collect
 
@@ -313,7 +313,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
 
     private fun observeColorIndex() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.colorIndex.collect {
                     if (binding == null) return@collect
                     val colorResId = Playlist.themeColors.getOrNull(it) ?: 0
