@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class StorageSettingsViewModel
 @Inject constructor(
-    private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
     private val fileUtil: FileUtilWrapper,
@@ -343,7 +341,6 @@ class StorageSettingsViewModel
             fileStorage.moveStorage(
                 File(oldDirectory),
                 File(newDirectory),
-                podcastManager,
                 episodeManager
             )
             mutableProgressDialog.emit(false)

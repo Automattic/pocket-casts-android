@@ -18,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode;
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum;
 import au.com.shiftyjelly.pocketcasts.preferences.Settings;
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager;
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager;
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil;
 import au.com.shiftyjelly.pocketcasts.utils.StringUtil;
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer;
@@ -226,7 +225,7 @@ public class FileStorage {
 		}
 	}
 
-	public void moveStorage(File oldDirectory, File newDirectory, PodcastManager podcastManager, EpisodeManager episodeManager) {
+	public void moveStorage(File oldDirectory, File newDirectory, EpisodeManager episodeManager) {
 		try {
 			final File pocketCastsDir = new File(oldDirectory, "PocketCasts");
 	 	   	if (pocketCastsDir.exists() && pocketCastsDir.isDirectory()) {

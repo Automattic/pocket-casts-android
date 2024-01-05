@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -44,9 +43,6 @@ class StorageSettingsViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     @Mock
-    private lateinit var podcastManager: PodcastManager
-
-    @Mock
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
@@ -79,7 +75,6 @@ class StorageSettingsViewModelTest {
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.empty())
         viewModel = StorageSettingsViewModel(
-            podcastManager,
             episodeManager,
             fileStorage,
             fileUtil,
