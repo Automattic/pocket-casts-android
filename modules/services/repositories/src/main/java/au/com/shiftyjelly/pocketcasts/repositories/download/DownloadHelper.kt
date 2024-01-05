@@ -43,7 +43,7 @@ object DownloadHelper {
     @Throws(StorageException::class)
     fun pathForEpisode(episode: BaseEpisode, fileStorage: FileStorage): String? {
         val file = fileStorage.getPodcastEpisodeFile(episode)
-        return file.absolutePath
+        return file?.absolutePath
     }
 
     @Throws(StorageException::class)

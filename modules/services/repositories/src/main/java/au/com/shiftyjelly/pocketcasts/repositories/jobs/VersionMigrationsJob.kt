@@ -157,8 +157,7 @@ class VersionMigrationsJob : JobService() {
 
     private fun removeOldTempPodcastDirectory() {
         try {
-            val oldTempDirectory = fileStorage.oldTempPodcastDirectory
-            FileUtil.deleteDirectoryContents(oldTempDirectory.absolutePath)
+            fileStorage.getOldTempPodcastDirectory()?.absolutePath?.let(FileUtil::deleteDirectoryContents)
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clear old podcast temp directory")
         }
@@ -192,11 +191,11 @@ class VersionMigrationsJob : JobService() {
     private fun deletePodcastImages() {
         try {
             val thumbnailsFolder = fileStorage.getOrCreateDirectory("podcast_thumbnails")
-            if (thumbnailsFolder.exists()) {
+            if (thumbnailsFolder != null && thumbnailsFolder.exists()) {
                 thumbnailsFolder.delete()
             }
             val imageFolder = fileStorage.getOrCreateDirectory("images")
-            if (imageFolder.exists()) {
+            if (imageFolder != null && imageFolder.exists()) {
                 imageFolder.delete()
             }
         } catch (e: Exception) {
