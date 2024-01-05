@@ -61,14 +61,7 @@ public class FileStorage {
 
 	@Nullable
 	public File getCloudFileImage(String uuid) {
-    	String fileName = uuid + "_imagefile";
-		try {
-			return new File(getCloudFilesFolder(), fileName);
-		}
-		catch(StorageException e) {
-			Timber.e(e);
-			return null;
-		}
+    	return delegate.getCloudFileImage(uuid);
 	}
 
     public File getCloudFilesFolder() throws StorageException {

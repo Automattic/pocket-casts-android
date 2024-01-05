@@ -13,6 +13,14 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getCloudFileImage(uuid: String): File? = try {
+        val fileName = uuid + "_imagefile"
+        getCloudFilesFolder()?.let { dir -> File(dir, fileName) }
+    } catch (e: StorageException) {
+        Timber.e(e)
+        null
+    }
+
     fun getCloudFilesFolder(): File? = getOrCreateDirectory(DIR_CLOUD_FILES)
 
     fun getOpmlFileFolder(): File? = getOrCreateDirectory(DIR_OPML_FOLDER)
