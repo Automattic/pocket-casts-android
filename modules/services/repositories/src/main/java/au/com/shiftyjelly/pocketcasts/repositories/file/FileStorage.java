@@ -28,7 +28,6 @@ public class FileStorage {
 	public static final String DIR_CUSTOM_FILES = "custom_episodes";
 	public static final String DIR_NETWORK_IMAGES = "network_images";
 	public static final String DIR_EPISODES = "podcasts";
-	public static final String DIR_CLOUD_FILES = "cloud_files";
 
 	private Settings settings;
 	private Context context;
@@ -73,7 +72,7 @@ public class FileStorage {
 	}
 
     public File getCloudFilesFolder() throws StorageException {
-    	return getOrCreateDirectory(DIR_CLOUD_FILES);
+    	return delegate.getCloudFilesFolder();
 	}
 
 	public File getOpmlFileFolder() throws StorageException {
