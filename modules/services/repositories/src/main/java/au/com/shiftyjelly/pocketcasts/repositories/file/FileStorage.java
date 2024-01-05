@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.file;
 
 import android.content.Context;
-import android.os.Environment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,12 +13,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager;
-import au.com.shiftyjelly.pocketcasts.preferences.Settings;
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum;
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode;
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode;
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode;
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum;
+import au.com.shiftyjelly.pocketcasts.preferences.Settings;
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager;
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager;
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil;
 import au.com.shiftyjelly.pocketcasts.utils.StringUtil;
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer;
@@ -29,15 +28,11 @@ import timber.log.Timber;
 @Singleton
 public class FileStorage {
 
-	private static final String FOLDER_POCKETCASTS = "PocketCasts";
 	private static final String FOLDER_TEMP_EPISODES = "downloadTmp";
 
 	public static final String DIR_OPML_FOLDER = "opml_import";
 	public static final String DIR_CUSTOM_FILES = "custom_episodes";
-	public static final String DIR_PODCAST_THUMBNAILS = "thumbnails";
 	public static final String DIR_NETWORK_IMAGES = "network_images";
-	public static final String DIR_WEB_CACHE = "web_cache";
-	public static final String DIR_PODCAST_IMAGES = "images";
 	public static final String DIR_EPISODES = "podcasts";
 	public static final String DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator;
 	public static final String DIR_CLOUD_FILES = "cloud_files";
@@ -180,11 +175,6 @@ public class FileStorage {
 		}
 	}
 	
-	public final static boolean isExternalStorageAvailable() {
-		String state = Environment.getExternalStorageState();
-		return Environment.MEDIA_MOUNTED.equals(state);
-	}
-	
 	// confirms that all the folders we want to hide from the user have .nomedia files in them
 	public void checkNoMediaDirs(){
 		// we can do this by getting all the folders
@@ -196,68 +186,6 @@ public class FileStorage {
 		} 
 		catch (Exception e) {
 			Timber.e(e);
-		}
-	}
-
-    public void clearNoMediaFiles() {
-        try {
-            File storageDir = getStorageDirectory();
-            enableNoMediaFile(storageDir, false);
-        }
-        catch (Exception e) {
-			Timber.e(e);
-        }
-    }
-
-    public void addNoMediaFiles() {
-        try {
-            File storageDir = getStorageDirectory();
-            enableNoMediaFile(storageDir, true);
-        }
-        catch (Exception e) {
-			Timber.e(e);
-        }
-    }
-
-    private void enableNoMediaFile(File dir, boolean enable) {
-        try {
-            File noMediaFile = new File(dir, ".nomedia");
-            if (enable) {
-                if (!noMediaFile.exists()) {
-                    noMediaFile.createNewFile();
-                }
-            }
-            else {
-                if (noMediaFile.exists()) {
-                    noMediaFile.delete();
-                }
-            }
-
-            File[] files = dir.listFiles();
-            if (files == null || files.length == 0) return;
-            for (int i=0; i<files.length; i++) {
-                File file = files[i];
-                if (file.isDirectory()) {
-                    enableNoMediaFile(file, enable);
-                }
-            }
-        }
-        catch (Exception e) {
-			Timber.e(e);
-        }
-    }
-
-	public void removeDirectoryFiles(File directory) {
-		if (directory == null || !directory.exists() || !directory.isDirectory()) return;
-		
-		File[] files = directory.listFiles();
-		if (files == null || files.length == 0) return;
-		
-		for (File file : files) {
-			if (file.getName() == null || file.getName().startsWith(".")) {
-				continue;
-			}
-			file.delete();
 		}
 	}
 
@@ -378,26 +306,6 @@ public class FileStorage {
 		}
 	}
 
-    public static boolean moveFile(String oldPath, String newPath) {
-		if (StringUtil.isBlank(oldPath) || StringUtil.isBlank(newPath))  return false;
-		
-		File oldFile = new File(oldPath);
-		File newFile = new File(newPath);
-		if (!oldFile.exists()) return false;
-		
-		try {
-			FileUtil.copyFile(oldFile, newFile);
-			oldFile.delete();
-			
-			return true;
-		} 
-		catch (IOException e) {
-			Timber.e(e,"Problems moving a file to a new location. from: "+oldFile.getAbsolutePath()+" to: "+newFile.getAbsolutePath());
-		}
-		
-		return false;
-	}
-
 	public void fixBrokenFiles(EpisodeManager episodeManager) {
 		try {
 			// get all possible locations
@@ -410,8 +318,6 @@ public class FileStorage {
 			if (StringUtil.isPresent(customFolder) && !folderPaths.contains(customFolder) && new File(customFolder).exists()) {
 				folderPaths.add(customFolder);
 			}
-
-			boolean foundEpisodes = false;
 
 			// search each folder for missing files
 			for (String folderPath : folderPaths) {
@@ -452,7 +358,6 @@ public class FileStorage {
 						episode.setEpisodeStatus(EpisodeStatusEnum.DOWNLOADED);
 						episode.setDownloadedFilePath(file.getAbsolutePath());
 						episodeManager.update(episode);
-						foundEpisodes = true;
 					}
 				}
 			}
