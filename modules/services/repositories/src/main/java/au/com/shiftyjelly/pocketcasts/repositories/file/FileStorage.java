@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +58,8 @@ public class FileStorage {
 	}
 
 	@NonNull
-	public File getTempPodcastEpsisodeFile(BaseEpisode episode) throws StorageException {
-		String fileName = episode.getUuid() + episode.getFileExtension();		
+	public File getTempPodcastEpisodeFile(BaseEpisode episode) throws StorageException {
+		String fileName = episode.getUuid() + episode.getFileExtension();
 		return new File(getTempPodcastDirectory(), fileName);
 	}
 
@@ -125,7 +124,7 @@ public class FileStorage {
 	public File getStorageDirectory() throws StorageException {
 		File dir = new File(getBaseStorageDirectory(), "PocketCasts" + File.separator);
 		createDirectory(dir);
-		return dir; 
+		return dir;
 	}
 	
 	public File getBaseStorageDirectory() throws StorageException {
@@ -151,12 +150,12 @@ public class FileStorage {
 			return new File(choice);
 		}
 	}
-	
+
 	private final static File createDirectory(File dir) {
 		dir.mkdirs();
 		return dir;
 	}
-	
+
 	private final static void addNoMediaFile(File folder) {
 		if (folder == null || !folder.exists()) {
 			return;
@@ -165,7 +164,7 @@ public class FileStorage {
 		if (!file.exists()){
 			try {
 				file.createNewFile();
-			} 
+			}
 			catch (Exception e) {
 				Timber.e(e);
 			}
@@ -180,7 +179,7 @@ public class FileStorage {
 			getNetworkImageDirectory();
 			getPodcastGroupImageDirectory();
 			getTempPodcastDirectory();
-		} 
+		}
 		catch (Exception e) {
 			Timber.e(e);
 		}
@@ -216,7 +215,7 @@ public class FileStorage {
 		if (fromDirectory == null || !fromDirectory.exists() || !fromDirectory.isDirectory() || toDirectory == null) {
 			return;
 		}
-		
+
 		try {
 			FileUtil.copyDirectory(fromDirectory, toDirectory);
 			fromDirectory.delete();
