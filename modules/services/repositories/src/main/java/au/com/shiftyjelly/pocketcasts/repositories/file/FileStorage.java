@@ -55,8 +55,7 @@ public class FileStorage {
 
 	@NonNull
 	public File getTempPodcastEpisodeFile(BaseEpisode episode) throws StorageException {
-		String fileName = episode.getUuid() + episode.getFileExtension();
-		return new File(getTempPodcastDirectory(), fileName);
+		return delegate.getTempPodcastEpisodeFile(episode);
 	}
 
 	@Nullable
