@@ -117,16 +117,7 @@ public class FileStorage {
 	
 	// confirms that all the folders we want to hide from the user have .nomedia files in them
 	public void checkNoMediaDirs(){
-		// we can do this by getting all the folders
-		try {
-            addNoMediaFile(getStorageDirectory());
-			getNetworkImageDirectory();
-			getPodcastGroupImageDirectory();
-			getTempPodcastDirectory();
-		}
-		catch (Exception e) {
-			Timber.e(e);
-		}
+		delegate.checkNoMediaDirs();
 	}
 
 	private String moveFileToDirectory(String filePath, File directory) {

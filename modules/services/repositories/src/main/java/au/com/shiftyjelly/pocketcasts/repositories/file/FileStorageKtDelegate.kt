@@ -103,6 +103,21 @@ class FileStorageKtDelegate @Inject constructor(
         }
     }
 
+    /**
+     * Confirms that all the directories we want to hide from the user have .nomedia files in them
+     */
+    fun checkNoMediaDirs() {
+        // Getting a directory also adds .nomedia file to that dir
+        try {
+            getStorageDirectory()?.let(::addNoMediaFile)
+            getNetworkImageDirectory()
+            getPodcastGroupImageDirectory()
+            getTempPodcastDirectory()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
     private companion object {
         const val DIR_CLOUD_FILES = "cloud_files"
         const val DIR_OPML_FOLDER = "opml_import"
