@@ -14,6 +14,9 @@ class FileStorageKtDelegate @Inject constructor(
     @ApplicationContext val context: Context,
 ) {
     // TODO: Make private after migration
+    fun createDirectory(dir: File): File = dir.also(File::mkdirs)
+
+    // TODO: Make private after migration
     fun addNoMediaFile(folder: File) {
         if (!folder.exists()) {
             return

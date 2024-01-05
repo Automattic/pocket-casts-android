@@ -153,9 +153,8 @@ public class FileStorage {
 		}
 	}
 
-	private final static File createDirectory(File dir) {
-		dir.mkdirs();
-		return dir;
+	private File createDirectory(File dir) {
+		return delegate.createDirectory(dir);
 	}
 
 	private void addNoMediaFile(File folder) {
