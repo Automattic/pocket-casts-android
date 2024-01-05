@@ -82,7 +82,7 @@ public class FileStorage {
 	}
 
 	public  File getNetworkImageDirectory() throws StorageException {
-		return getOrCreateDirectory(DIR_NETWORK_IMAGES);
+		return delegate.getNetworkImageDirectory();
 	}
 	
 	public  File getPodcastDirectory() throws StorageException {
