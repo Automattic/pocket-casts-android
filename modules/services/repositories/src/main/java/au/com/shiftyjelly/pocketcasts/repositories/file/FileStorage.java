@@ -158,19 +158,8 @@ public class FileStorage {
 		return dir;
 	}
 
-	private final static void addNoMediaFile(File folder) {
-		if (folder == null || !folder.exists()) {
-			return;
-		}
-		File file = new File(folder, ".nomedia");
-		if (!file.exists()){
-			try {
-				file.createNewFile();
-			}
-			catch (Exception e) {
-				Timber.e(e);
-			}
-		}
+	private void addNoMediaFile(File folder) {
+		delegate.addNoMediaFile(folder);
 	}
 	
 	// confirms that all the folders we want to hide from the user have .nomedia files in them
