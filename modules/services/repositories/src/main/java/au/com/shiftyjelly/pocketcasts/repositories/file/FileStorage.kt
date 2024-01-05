@@ -45,15 +45,15 @@ class FileStorage @Inject constructor(
 
     fun getCloudFilesFolder(): File? = getOrCreateDirectory(DIR_CLOUD_FILES)
 
-    fun getOpmlFileFolder(): File? = getOrCreateDirectory(DIR_OPML_FOLDER)
+    fun getOpmlFileFolder(): File? = getOrCreateDirectory(DIR_OPML_FILES)
 
     fun getNetworkImageDirectory(): File? = getOrCreateDirectory(DIR_NETWORK_IMAGES)
 
     fun getPodcastDirectory(): File? = getOrCreateDirectory(DIR_EPISODES)
 
-    fun getTempPodcastDirectory(): File = getOrCreateCacheDirectory(FOLDER_TEMP_EPISODES)
+    fun getTempPodcastDirectory(): File = getOrCreateCacheDirectory(DIR_TEMP_EPISODES)
 
-    fun getOldTempPodcastDirectory(): File? = getOrCreateDirectory(FOLDER_TEMP_EPISODES)
+    fun getOldTempPodcastDirectory(): File? = getOrCreateDirectory(DIR_TEMP_EPISODES)
 
     fun getPodcastGroupImageDirectory(): File? = getOrCreateDirectory(DIR_PODCAST_GROUP_IMAGES)
 
@@ -207,8 +207,8 @@ class FileStorage @Inject constructor(
                     }
                 }
 
-                val oldCustomFilesDir = getOrCreateDirectory(oldPocketCastsDir, DIR_CUSTOM_FILES)
-                val newCustomFilesDir = getOrCreateDirectory(newPocketCastsDir, DIR_CUSTOM_FILES)
+                val oldCustomFilesDir = getOrCreateDirectory(oldPocketCastsDir, DIR_CUSTOM_EPISODES)
+                val newCustomFilesDir = getOrCreateDirectory(newPocketCastsDir, DIR_CUSTOM_EPISODES)
                 if (oldCustomFilesDir.exists()) {
                     moveDirectory(oldCustomFilesDir, newCustomFilesDir)
                 }
@@ -284,12 +284,12 @@ class FileStorage @Inject constructor(
     }
 
     private companion object {
-        const val DIR_CUSTOM_FILES = "custom_episodes"
-        const val DIR_CLOUD_FILES = "cloud_files"
-        const val DIR_OPML_FOLDER = "opml_import"
-        const val DIR_NETWORK_IMAGES = "network_images"
         const val DIR_EPISODES = "podcasts"
-        const val FOLDER_TEMP_EPISODES = "downloadTmp"
+        const val DIR_CUSTOM_EPISODES = "custom_episodes"
+        const val DIR_TEMP_EPISODES = "downloadTmp"
+        const val DIR_NETWORK_IMAGES = "network_images"
         val DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator
+        const val DIR_CLOUD_FILES = "cloud_files"
+        const val DIR_OPML_FILES = "opml_import"
     }
 }
