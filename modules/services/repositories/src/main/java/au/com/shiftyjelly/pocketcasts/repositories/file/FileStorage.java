@@ -130,27 +130,11 @@ public class FileStorage {
 	}
 	
 	public File getBaseStorageDirectory() throws StorageException {
-		return getBaseStorageDirectory(settings.getStorageChoice());
+		return delegate.getBaseStorageDirectory();
 	}
 	
 	public File getBaseStorageDirectory(String choice) throws StorageException {
-		if (choice.equals(Settings.STORAGE_ON_CUSTOM_FOLDER)) {
-			String path = settings.getStorageCustomFolder();
-			if (StringUtil.isBlank(path)) {
-				throw new StorageException("Ooops, please set the Custom Folder Location in the settings.");
-			}
-			File folder = new File(path);
-			if (!folder.exists()) {
-				boolean success = folder.mkdirs();
-				if (!success && !folder.exists()) {
-					throw new StorageException("Storage custom folder unavailable.");
-				}
-			}
-			return folder;
-		}
-		else {
-			return new File(choice);
-		}
+		return delegate.getBaseStorageDirectory(choice);
 	}
 
 	private File createDirectory(File dir) {

@@ -13,6 +13,23 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getBaseStorageDirectory(): File? = settings.getStorageChoice()?.let(::getBaseStorageDirectory)
+
+    // TODO: Make private after migration
+    fun getBaseStorageDirectory(choice: String): File = if (choice == Settings.STORAGE_ON_CUSTOM_FOLDER) {
+        val path = settings.getStorageCustomFolder()
+        if (path.isBlank()) {
+            throw StorageException("Ooops, please set the Custom Folder Location in the settings.")
+        }
+        val folder = File(path)
+        if (!folder.exists() && !folder.mkdirs()) {
+            throw StorageException("Storage custom folder unavailable.")
+        }
+        folder
+    } else {
+        File(choice)
+    }
+
     // TODO: Make private after migration
     fun createDirectory(dir: File): File = dir.also(File::mkdirs)
 
