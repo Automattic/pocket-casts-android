@@ -63,8 +63,7 @@ class FileStorage @Inject constructor(
         getOrCreateDirectory(dir, name)
     }
 
-    // TODO: Make private after migration
-    fun getOrCreateDirectory(parentDir: File, name: String): File = File(parentDir, name + File.separator).also { dir ->
+    private fun getOrCreateDirectory(parentDir: File, name: String): File = File(parentDir, name + File.separator).also { dir ->
         createDirectory(dir)
         addNoMediaFile(dir)
     }
@@ -75,8 +74,7 @@ class FileStorage @Inject constructor(
 
     fun getBaseStorageDirectory(): File? = settings.getStorageChoice()?.let(::getBaseStorageDirectory)
 
-    // TODO: Make private after migration
-    fun getBaseStorageDirectory(choice: String): File = if (choice == Settings.STORAGE_ON_CUSTOM_FOLDER) {
+    private fun getBaseStorageDirectory(choice: String): File = if (choice == Settings.STORAGE_ON_CUSTOM_FOLDER) {
         val path = settings.getStorageCustomFolder()
         if (path.isBlank()) {
             throw StorageException("Ooops, please set the Custom Folder Location in the settings.")
@@ -90,11 +88,9 @@ class FileStorage @Inject constructor(
         File(choice)
     }
 
-    // TODO: Make private after migration
-    fun createDirectory(dir: File): File = dir.also(File::mkdirs)
+    private fun createDirectory(dir: File): File = dir.also(File::mkdirs)
 
-    // TODO: Make private after migration
-    fun addNoMediaFile(folder: File) {
+    private fun addNoMediaFile(folder: File) {
         if (!folder.exists()) {
             return
         }
@@ -123,8 +119,7 @@ class FileStorage @Inject constructor(
         }
     }
 
-    // TODO: Make private after migration
-    fun moveFileToDirectory(filePath: String?, directory: File): String? {
+    private fun moveFileToDirectory(filePath: String?, directory: File): String? {
         // Validate the path, check PocketCasts is in the path so we don't delete something important
         if (filePath.isNullOrBlank() || "/PocketCasts" !in filePath) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's blank or not PocketCasts")
@@ -152,8 +147,7 @@ class FileStorage @Inject constructor(
         return newFile.absolutePath
     }
 
-    // TODO: Make private after migration
-    fun moveDirectory(fromDirectory: File, toDirectory: File) {
+    private fun moveDirectory(fromDirectory: File, toDirectory: File) {
         if (fromDirectory.exists() && fromDirectory.isDirectory) {
             try {
                 FileUtil.copyDirectory(fromDirectory, toDirectory)
