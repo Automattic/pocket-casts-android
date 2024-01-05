@@ -13,6 +13,8 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getPodcastDirectory(): File? = getOrCreateDirectory(DIR_EPISODES)
+
     fun getTempPodcastDirectory(): File = getOrCreateCacheDirectory(FOLDER_TEMP_EPISODES)
 
     fun getOldTempPodcastDirectory(): File? = getOrCreateDirectory(FOLDER_TEMP_EPISODES)
@@ -71,6 +73,7 @@ class FileStorageKtDelegate @Inject constructor(
     }
 
     private companion object {
+        const val DIR_EPISODES = "podcasts"
         const val FOLDER_TEMP_EPISODES = "downloadTmp"
         val DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator
     }
