@@ -25,9 +25,6 @@ import timber.log.Timber;
 
 @Singleton
 public class FileStorage {
-
-	private static final String FOLDER_TEMP_EPISODES = "downloadTmp";
-
 	public static final String DIR_OPML_FOLDER = "opml_import";
 	public static final String DIR_CUSTOM_FILES = "custom_episodes";
 	public static final String DIR_NETWORK_IMAGES = "network_images";
@@ -93,7 +90,7 @@ public class FileStorage {
 	}
 	
 	public  File getTempPodcastDirectory() throws StorageException {
-		return getOrCreateCacheDirectory(FOLDER_TEMP_EPISODES);
+		return delegate.getTempPodcastDirectory();
 	}
 
 	public File getOldTempPodcastDirectory() throws StorageException {

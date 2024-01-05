@@ -13,6 +13,8 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getTempPodcastDirectory(): File = getOrCreateCacheDirectory(FOLDER_TEMP_EPISODES)
+
     fun getOldTempPodcastDirectory(): File? = getOrCreateDirectory(FOLDER_TEMP_EPISODES)
 
     fun getPodcastGroupImageDirectory(): File? = getOrCreateDirectory(DIR_PODCAST_GROUP_IMAGES)
