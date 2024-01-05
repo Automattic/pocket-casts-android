@@ -104,7 +104,7 @@ public class FileStorage {
 	public  File getPodcastGroupImageDirectory() throws StorageException {
 		File dir = new File(getStorageDirectory().getAbsolutePath() + File.separator + DIR_PODCAST_GROUP_IMAGES);
 		createDirectory(dir);
-        addNoMediaFile(dir, settings);
+        addNoMediaFile(dir);
 		return dir;
 	}
 
@@ -119,7 +119,7 @@ public class FileStorage {
 	private File getOrCreateDirectory(File parentDir, String name) throws StorageException {
 		File dir = new File(parentDir, name + File.separator);
 		createDirectory(dir);
-        addNoMediaFile(dir, settings);
+        addNoMediaFile(dir);
 		return dir;
 	}
 	
@@ -160,7 +160,7 @@ public class FileStorage {
 		return dir;
 	}
 	
-	private final static void addNoMediaFile(File folder, Settings settings) {
+	private final static void addNoMediaFile(File folder) {
 		if (folder == null || !folder.exists()) {
 			return;
 		}
@@ -179,7 +179,7 @@ public class FileStorage {
 	public void checkNoMediaDirs(){
 		// we can do this by getting all the folders
 		try {
-            addNoMediaFile(getStorageDirectory(), settings);
+            addNoMediaFile(getStorageDirectory());
 			getNetworkImageDirectory();
 			getPodcastGroupImageDirectory();
 			getTempPodcastDirectory();
