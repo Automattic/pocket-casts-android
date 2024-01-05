@@ -1,14 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.ui.images
 
-import android.widget.ImageView
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.size.Size
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.max
 
 @Singleton
 class CoilManager @Inject constructor(val imageLoader: ImageLoader) {
@@ -28,14 +25,5 @@ class CoilManager @Inject constructor(val imageLoader: ImageLoader) {
     fun clearAll() {
         imageLoader.memoryCache?.clear()
         imageLoader.diskCache?.clear()
-    }
-
-    companion object {
-        private const val MAX_IMAGE_SIZE_IN_PX = 2500
-
-        fun getMaxImageSize(imageView: ImageView) = Size(
-            max(imageView.width, MAX_IMAGE_SIZE_IN_PX),
-            max(imageView.height, MAX_IMAGE_SIZE_IN_PX)
-        )
     }
 }

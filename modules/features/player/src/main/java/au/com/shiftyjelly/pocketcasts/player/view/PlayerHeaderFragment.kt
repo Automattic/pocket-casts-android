@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -440,7 +439,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val imageBuilder: ImageRequest.Builder.() -> Unit = {
                 error(IR.drawable.defaultartwork_dark)
                 scale(Scale.FIT)
-                size(CoilManager.getMaxImageSize(imageView))
                 transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
             }
 
