@@ -17,7 +17,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FileStorage @Inject constructor(
+open class FileStorage @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
