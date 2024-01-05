@@ -132,10 +132,10 @@ public class FileStorage {
 	public File getBaseStorageDirectory() throws StorageException {
 		if (context == null) throw new StorageException("Context is null");
 		
-		return getBaseStorageDirectory(settings.getStorageChoice(), context);
+		return getBaseStorageDirectory(settings.getStorageChoice());
 	}
 	
-	public File getBaseStorageDirectory(String choice, Context context) throws StorageException {
+	public File getBaseStorageDirectory(String choice) throws StorageException {
 		if (choice.equals(Settings.STORAGE_ON_CUSTOM_FOLDER)) {
 			String path = settings.getStorageCustomFolder();
 			if (StringUtil.isBlank(path)) {
