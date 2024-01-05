@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-13 14:54:03+0000
+Translation-Revision-Date: 2023-12-20 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="bookmark_not_found">Lesezeichen nicht gefunden</string>
+    <string name="settings_use_dark_up_next_details">Wenn das dunkle Theme aktiviert ist, wird es in „Up Next“ immer verwendet. Wenn es deaktiviert ist, wird „Up Next“ an das aktuelle Theme angepasst</string>
+    <string name="settings_use_dark_up_next">Dunkles „Up Next“-Theme verwenden</string>
     <string name="end_of_year_stories_completion_rate_share_text">Meine Abschlussquote 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Abonniere Plus und vergleiche dein diesjähriges Audioerlebnis mit dem in 2022 und nutze weitere unterhaltsame Statistiken sowie Premium-Funktionen wie Lesezeichen und Ordner.</string>
     <string name="end_of_year_stories_theres_more">Es gibt noch mehr!</string>
@@ -88,7 +91,7 @@ Language: de
     <string name="bookmarks_select_option">Lesezeichen auswählen</string>
     <string name="bookmarks_delete_summary_singular">Dieses Lesezeichen wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="bookmarks_delete_summary_plural">%d Lesezeichen werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</string>
-    <string name="bookmarks_deleted_singular">1 Lesezeichen gelöscht</string>
+    <string name="bookmarks_deleted_singular">Lesezeichen gelöscht</string>
     <string name="bookmarks_deleted_plural">%1$d Lesezeichen gelöscht</string>
     <string name="bookmarks_delete_singular">Lesezeichen löschen</string>
     <string name="bookmarks_delete_plural">Lesezeichen löschen</string>

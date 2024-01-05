@@ -41,7 +41,6 @@ Language: en_GB
     <string name="bookmarks_sort_timestamp">Timestamp</string>
     <string name="bookmarks_select_option">Select bookmarks</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
-    <string name="bookmarks_deleted_singular">1 bookmark deleted</string>
     <string name="bookmarks_delete_singular">Delete bookmark</string>
     <string name="bookmarks_delete_plural">Delete bookmarks</string>
     <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 09:54:04+0000
+Translation-Revision-Date: 2023-12-19 10:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="bookmark_not_found">북마크를 찾을 수 없음</string>
+    <string name="settings_use_dark_up_next_details">활성화되면 다음 에피소드에 항상 어두운 테마를 사용하고 비활성화되면 현재와 일치하는 테마를 사용합니다.</string>
+    <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
     <string name="end_of_year_stories_completion_rate_share_text">나의 2023년 완료율</string>
     <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독하며 2022년과 비교한 청취 수준, 기타 재미있는 통계, 북마크 및 폴더와 같은 프리미엄 기능을 알아보세요.</string>
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
@@ -88,7 +91,7 @@ Language: ko_KR
     <string name="bookmarks_select_option">북마크 선택</string>
     <string name="bookmarks_delete_summary_singular">이 북마크가 삭제됩니다. 실행하면 취소할 수 없습니다.</string>
     <string name="bookmarks_delete_summary_plural">북마크 %d개가 삭제됩니다. 실행하면 취소할 수 없습니다.</string>
-    <string name="bookmarks_deleted_singular">북마크 1개 삭제됨</string>
+    <string name="bookmarks_deleted_singular">북마크 삭제됨</string>
     <string name="bookmarks_deleted_plural">북마크 %1$d개 삭제됨</string>
     <string name="bookmarks_delete_singular">북마크 삭제</string>
     <string name="bookmarks_delete_plural">북마크 삭제</string>
