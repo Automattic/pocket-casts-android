@@ -5,9 +5,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -116,6 +119,35 @@ class FileStorageKtDelegate @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e)
         }
+    }
+
+    // TODO: Make private after migration
+    fun moveFileToDirectory(filePath: String?, directory: File): String? {
+        // Validate the path, check PocketCasts is in the path so we don't delete something important
+        if (filePath.isNullOrBlank() || "/PocketCasts" !in filePath) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's blank or not PocketCasts")
+            return filePath
+        }
+
+        val file = File(filePath)
+        // Check we aren't copying to the same directory
+        if (file.parentFile == directory) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's the same directory")
+            return filePath
+        }
+
+        val newFile = File(directory, file.name)
+        if (file.exists() && file.isFile) {
+            try {
+                FileUtil.copyFile(file, newFile)
+                val wasDeleted = file.delete()
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Moved ${file.absolutePath} to ${newFile.absolutePath} wasDeleted: $wasDeleted")
+            } catch (e: IOException) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Problems moving a file to a new location. from: ${file.absolutePath} to: ${newFile.absolutePath}")
+            }
+        }
+
+        return newFile.absolutePath
     }
 
     private companion object {

@@ -121,29 +121,7 @@ public class FileStorage {
 	}
 
 	private String moveFileToDirectory(String filePath, File directory) {
-		// validate the path, check PocketCasts is in the path so we don't delete something important
-		if (StringUtil.isBlank(filePath) || filePath.indexOf("/PocketCasts") == -1) {
-			LogBuffer.INSTANCE.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's blank or not PocketCasts");
-			return filePath;
-		}
-
-		File file = new File(filePath);
-        // check we aren't copying to the same directory
-        if (file.getParentFile().equals(directory)) {
-			LogBuffer.INSTANCE.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's the same directory");
-            return filePath;
-        }
-		File newFile = new File(directory, file.getName());
-		if (file.exists() && file.isFile()) {
-			try {
-				FileUtil.copyFile(file, newFile);
-				boolean wasDeleted = file.delete();
-				LogBuffer.INSTANCE.i(LogBuffer.TAG_BACKGROUND_TASKS, "Moved " + file.getAbsolutePath() + " to " + newFile.getAbsolutePath() + " wasDeleted: " + wasDeleted);
-			} catch (IOException e) {
-				LogBuffer.INSTANCE.e(LogBuffer.TAG_BACKGROUND_TASKS, e,"Problems moving a file to a new location. from: "+file.getAbsolutePath()+" to: "+newFile.getAbsolutePath());
-			}
-		}
-		return newFile.getAbsolutePath();
+		return delegate.moveFileToDirectory(filePath,directory);
 	}
 	
 	private void moveDirectory(File fromDirectory, File toDirectory) {
