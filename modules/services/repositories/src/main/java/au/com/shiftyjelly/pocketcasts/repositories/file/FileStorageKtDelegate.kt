@@ -13,6 +13,10 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getStorageDirectory(): File? = getBaseStorageDirectory()?.let { dir ->
+        File(dir, "PocketCasts" + File.separator).also(::createDirectory)
+    }
+
     fun getBaseStorageDirectory(): File? = settings.getStorageChoice()?.let(::getBaseStorageDirectory)
 
     // TODO: Make private after migration

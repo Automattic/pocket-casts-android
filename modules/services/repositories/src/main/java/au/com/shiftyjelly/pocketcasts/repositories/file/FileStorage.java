@@ -124,9 +124,7 @@ public class FileStorage {
 	}
 	
 	public File getStorageDirectory() throws StorageException {
-		File dir = new File(getBaseStorageDirectory(), "PocketCasts" + File.separator);
-		createDirectory(dir);
-		return dir;
+		return delegate.getStorageDirectory();
 	}
 	
 	public File getBaseStorageDirectory() throws StorageException {
