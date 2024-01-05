@@ -119,9 +119,9 @@ class FileStorage @Inject constructor(
         }
     }
 
-    private fun moveFileToDirectory(filePath: String?, directory: File): String? {
+    private fun moveFileToDirectory(filePath: String, directory: File): String? {
         // Validate the path, check PocketCasts is in the path so we don't delete something important
-        if (filePath.isNullOrBlank() || "/PocketCasts" !in filePath) {
+        if (filePath.isBlank() || "/PocketCasts" !in filePath) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's blank or not PocketCasts")
             return filePath
         }
