@@ -13,6 +13,8 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getOpmlFileFolder(): File? = getOrCreateDirectory(DIR_OPML_FOLDER)
+
     fun getNetworkImageDirectory(): File? = getOrCreateDirectory(DIR_NETWORK_IMAGES)
 
     fun getPodcastDirectory(): File? = getOrCreateDirectory(DIR_EPISODES)
@@ -75,6 +77,7 @@ class FileStorageKtDelegate @Inject constructor(
     }
 
     private companion object {
+        const val DIR_OPML_FOLDER = "opml_import"
         const val DIR_NETWORK_IMAGES = "network_images"
         const val DIR_EPISODES = "podcasts"
         const val FOLDER_TEMP_EPISODES = "downloadTmp"

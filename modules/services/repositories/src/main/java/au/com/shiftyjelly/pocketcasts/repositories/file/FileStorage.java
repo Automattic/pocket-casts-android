@@ -25,7 +25,6 @@ import timber.log.Timber;
 
 @Singleton
 public class FileStorage {
-	public static final String DIR_OPML_FOLDER = "opml_import";
 	public static final String DIR_CUSTOM_FILES = "custom_episodes";
 	public static final String DIR_NETWORK_IMAGES = "network_images";
 	public static final String DIR_EPISODES = "podcasts";
@@ -78,7 +77,7 @@ public class FileStorage {
 	}
 
 	public File getOpmlFileFolder() throws StorageException {
-		return getOrCreateDirectory(DIR_OPML_FOLDER);
+		return delegate.getOpmlFileFolder();
 	}
 
 	public  File getNetworkImageDirectory() throws StorageException {
