@@ -1299,4 +1299,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = true, // This default is overridden for new installs
         sharedPrefs = sharedPreferences,
     )
+
+    override val useDynamicColorsForWidget: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "useDynamicColorsForWidget",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 }
