@@ -25,16 +25,10 @@ import timber.log.Timber;
 
 @Singleton
 public class FileStorage {
-	public static final String DIR_EPISODES = "podcasts";
-
-	private Settings settings;
-	private Context context;
 	private final FileStorageKtDelegate delegate;
 
 	@Inject
     public FileStorage(Settings settings, @ApplicationContext  Context context) {
-        this.settings = settings;
-		this.context = context;
 		delegate = new FileStorageKtDelegate(settings, context);
     }
 
@@ -131,63 +125,6 @@ public class FileStorage {
 	}
 
 	public void fixBrokenFiles(EpisodeManager episodeManager) {
-		try {
-			// get all possible locations
-			List<String> folderPaths = new ArrayList<>();
-			for (FolderLocation location : new StorageOptions().getFolderLocations(context)) {
-				folderPaths.add(location.getFilePath());
-			}
-			folderPaths.add(context.getFilesDir().getAbsolutePath());
-			String customFolder = settings.getStorageCustomFolder();
-			if (StringUtil.isPresent(customFolder) && !folderPaths.contains(customFolder) && new File(customFolder).exists()) {
-				folderPaths.add(customFolder);
-			}
-
-			// search each folder for missing files
-			for (String folderPath : folderPaths) {
-				File folder = new File(folderPath);
-				if (!folder.exists() || !folder.canRead()) {
-					continue;
-				}
-				File pocketcastsFolder = new File(folder, "PocketCasts");
-				if (!pocketcastsFolder.exists() || !pocketcastsFolder.canRead()) {
-					continue;
-				}
-				File episodesFolder = new File(pocketcastsFolder, DIR_EPISODES);
-				if (!episodesFolder.exists() || !episodesFolder.canRead()) {
-					continue;
-				}
-				File[] files = episodesFolder.listFiles();
-				for (int i=0; i<files.length; i++) {
-					File file = files[i];
-					String filename = file.getName();
-					int dotPosition = filename.lastIndexOf(".");
-					if (dotPosition < 1) {
-						continue;
-					}
-					String uuid = filename.substring(0, dotPosition);
-					if (uuid.length() != 36) {
-						continue;
-					}
-					//noinspection deprecation
-					PodcastEpisode episode = episodeManager.findByUuidSync(uuid);
-					if (episode != null) {
-						if (episode.getDownloadedFilePath() != null && new File(episode.getDownloadedFilePath()).exists() && episode.isDownloaded()) {
-							// skip as the episode download already exists
-							continue;
-						}
-
-						LogBuffer.INSTANCE.i(LogBuffer.TAG_BACKGROUND_TASKS, "Restoring downloaded file for " + episode.getTitle() + " from " + file.getAbsolutePath());
-						// link to the found episode
-						episode.setEpisodeStatus(EpisodeStatusEnum.DOWNLOADED);
-						episode.setDownloadedFilePath(file.getAbsolutePath());
-						episodeManager.update(episode);
-					}
-				}
-			}
-		}
-		catch (Exception e) {
-			Timber.e(e);
-		}
+		delegate.fixBrokenFiles(episodeManager);
 	}
 }

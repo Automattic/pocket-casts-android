@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -228,6 +229,63 @@ class FileStorageKtDelegate @Inject constructor(
             }
         } catch (e: StorageException) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Unable to move storage to new location")
+        }
+    }
+
+    fun fixBrokenFiles(episodeManager: EpisodeManager) {
+        try {
+            // Get all possible locations
+            val folderPaths = buildSet {
+                addAll(StorageOptions().getFolderLocations(context).map(FolderLocation::filePath))
+                add(context.filesDir.absolutePath)
+                val customFolder = settings.getStorageCustomFolder()
+                if (customFolder.isNotBlank() && File(customFolder).exists()) {
+                    add(customFolder)
+                }
+            }
+
+            // Search each folder for missing files
+            folderPaths.forEach folderIteration@{ folderPath ->
+                val folder = File(folderPath)
+                if (!folder.exists() || !folder.canRead()) {
+                    return@folderIteration
+                }
+                val pocketCastsFolder = File(folder, "PocketCasts")
+                if (!pocketCastsFolder.exists() || !pocketCastsFolder.canRead()) {
+                    return@folderIteration
+                }
+                val episodesFolder = File(pocketCastsFolder, DIR_EPISODES)
+                if (!episodesFolder.exists() || !episodesFolder.canRead()) {
+                    return@folderIteration
+                }
+                episodesFolder.listFiles()?.forEach fileIteration@{ file ->
+                    val fileName = file.name
+                    val dotPosition = fileName.lastIndexOf('.')
+                    if (dotPosition < 1) {
+                        return@fileIteration
+                    }
+                    val uuid = fileName.substring(0, dotPosition)
+                    if (uuid.length != 36) {
+                        return@fileIteration
+                    }
+
+                    @Suppress("DEPRECATION")
+                    episodeManager.findByUuidSync(uuid)?.let { episode ->
+                        val downloadedFilePath = episode.downloadedFilePath
+                        if (downloadedFilePath != null && File(downloadedFilePath).exists() && episode.isDownloaded) {
+                            return@fileIteration
+                        }
+
+                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Restoring downloaded file for ${episode.title} from ${file.absolutePath}")
+                        // Link to the found episode
+                        episode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
+                        episode.downloadedFilePath = file.absolutePath
+                        episodeManager.update(episode)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 
