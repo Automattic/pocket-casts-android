@@ -42,15 +42,7 @@ public class FileStorage {
 
 	@NonNull
 	public File getPodcastEpisodeFile(BaseEpisode episode) throws StorageException {
-		String fileName = episode.getUuid() + episode.getFileExtension();
-		File directory;
-		if (episode instanceof PodcastEpisode) {
-			directory = getPodcastDirectory();
-		} else {
-			directory = getCloudFilesFolder();
-		}
-
-		return new File(directory, fileName);
+		return delegate.getPodcastEpisodeFile(episode);
 	}
 
 	@NonNull

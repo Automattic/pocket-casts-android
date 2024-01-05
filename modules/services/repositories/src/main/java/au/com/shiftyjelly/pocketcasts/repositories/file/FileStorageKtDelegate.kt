@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.file
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
@@ -14,6 +16,15 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getPodcastEpisodeFile(episode: BaseEpisode): File? {
+        val fileName = episode.uuid + episode.getFileExtension()
+        val episodeDir = when (episode) {
+            is PodcastEpisode -> getPodcastDirectory()
+            is UserEpisode -> getCloudFilesFolder()
+        }
+        return episodeDir?.let { dir -> File(dir, fileName) }
+    }
+
     fun getTempPodcastEpisodeFile(episode: BaseEpisode): File {
         val fileName = episode.uuid + episode.getFileExtension()
         return File(getTempPodcastDirectory(), fileName)
