@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -162,7 +163,76 @@ class FileStorageKtDelegate @Inject constructor(
         }
     }
 
+    fun moveStorage(oldDir: File, newDir: File, episodesManager: EpisodeManager) {
+        try {
+            val oldPocketCastsDir = File(oldDir, "PocketCasts")
+            if (oldPocketCastsDir.exists() && oldPocketCastsDir.isDirectory) {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Pocket casts directory exists")
+
+                newDir.mkdirs()
+                val newPocketCastsDir = File(newDir, "PocketCasts")
+                val episodesDir = getOrCreateDirectory(newPocketCastsDir, DIR_EPISODES)
+
+                // Check existing media and mark those episodes as downloaded
+                if (episodesDir.exists()) {
+                    episodesDir.listFiles()?.forEach { file ->
+                        val fileName = FileUtil.getFileNameWithoutExtension(file)
+                        if (fileName.length < 36) {
+                            return@forEach
+                        }
+
+                        @Suppress("DEPRECATION")
+                        episodesManager.findByUuidSync(fileName)?.let { episode ->
+                            // Delete original file if it is already there
+                            episode.downloadedFilePath?.takeIf(String::isNotBlank)?.let { downloadedFilePath ->
+                                val originalFile = File(downloadedFilePath)
+                                if (originalFile.exists()) {
+                                    originalFile.delete()
+                                }
+                            }
+
+                            episodesManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
+                        }
+                    }
+                }
+
+                // Move episodes
+                episodesManager.observeDownloadedEpisodes().blockingFirst().forEach { episode ->
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}")
+                    val downloadedFilePath = episode.downloadedFilePath?.takeIf(String::isNotBlank)
+                    if (downloadedFilePath == null) {
+                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode had not file path")
+                        return@forEach
+                    }
+                    val file = File(downloadedFilePath)
+                    if (file.exists() && file.isFile) {
+                        moveFileToDirectory(downloadedFilePath, episodesDir)?.let { updatedPath ->
+                            episodesManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
+                        }
+                    }
+                }
+
+                val oldCustomFilesDir = getOrCreateDirectory(oldPocketCastsDir, DIR_CUSTOM_FILES)
+                val newCustomFilesDir = getOrCreateDirectory(newPocketCastsDir, DIR_CUSTOM_FILES)
+                if (oldCustomFilesDir.exists()) {
+                    moveDirectory(oldCustomFilesDir, newCustomFilesDir)
+                }
+
+                val oldNetworkImageDir = getOrCreateDirectory(oldPocketCastsDir, DIR_NETWORK_IMAGES)
+                val newNetworkImageDir = getOrCreateDirectory(newPocketCastsDir, DIR_NETWORK_IMAGES)
+                if (newNetworkImageDir.exists()) {
+                    moveDirectory(oldNetworkImageDir, newNetworkImageDir)
+                }
+            } else {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Old directory did not exist")
+            }
+        } catch (e: StorageException) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Unable to move storage to new location")
+        }
+    }
+
     private companion object {
+        const val DIR_CUSTOM_FILES = "custom_episodes"
         const val DIR_CLOUD_FILES = "cloud_files"
         const val DIR_OPML_FOLDER = "opml_import"
         const val DIR_NETWORK_IMAGES = "network_images"

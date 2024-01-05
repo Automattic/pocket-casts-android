@@ -25,8 +25,6 @@ import timber.log.Timber;
 
 @Singleton
 public class FileStorage {
-	public static final String DIR_CUSTOM_FILES = "custom_episodes";
-	public static final String DIR_NETWORK_IMAGES = "network_images";
 	public static final String DIR_EPISODES = "podcasts";
 
 	private Settings settings;
@@ -129,81 +127,7 @@ public class FileStorage {
 	}
 
 	public void moveStorage(File oldDirectory, File newDirectory, EpisodeManager episodeManager) {
-		try {
-			final File pocketCastsDir = new File(oldDirectory, "PocketCasts");
-	 	   	if (pocketCastsDir.exists() && pocketCastsDir.isDirectory()) {
-				LogBuffer.INSTANCE.i(LogBuffer.TAG_BACKGROUND_TASKS, "Pocket casts directory exists");
-				
-	 	   		newDirectory.mkdirs();
-	 	   		final File newPocketCastsDir = new File(newDirectory, "PocketCasts");
-
-				boolean folderAlreadyExisted = newPocketCastsDir.exists();
-
-				// check existing media and mark those episodes as downloaded
-				final File episodeDirectory = getOrCreateDirectory(newPocketCastsDir, DIR_EPISODES);
-				if (folderAlreadyExisted) {
-					boolean foundMedia = false;
-					File[] files = episodeDirectory.listFiles();
-					if (files != null) {
-						for (File file : files) {
-							String fileName = FileUtil.getFileNameWithoutExtension(file);
-							if (fileName.length() < 36) {
-								continue;
-							}
-							//noinspection deprecation
-							PodcastEpisode episode = episodeManager.findByUuidSync(fileName);
-							if (episode != null) {
-								// Delete the original file if it is already there
-								if (!StringUtil.isBlank(episode.getDownloadedFilePath())) {
-									File originalFile = new File(episode.getDownloadedFilePath());
-									if (originalFile.exists()) {
-										originalFile.delete();
-									}
-								}
-								episodeManager.updateDownloadFilePath(episode, file.getAbsolutePath(), true);
-
-								foundMedia = true;
-							}
-						}
-					}
-				}
-
-				// move episodes
-				List<PodcastEpisode> episodes = episodeManager.observeDownloadedEpisodes().blockingFirst();
-				for (PodcastEpisode episode : episodes) {
-					LogBuffer.INSTANCE.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode " + episode.getTitle());
-					String episodeFilePath = episode.getDownloadedFilePath();
-					if (StringUtil.isBlank(episodeFilePath)) {
-						LogBuffer.INSTANCE.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode had no file path");
-						continue;
-					}
-					File file = new File(episodeFilePath);
-					if (file.exists() && file.isFile()) {
-						episode.setDownloadedFilePath(moveFileToDirectory(episodeFilePath, episodeDirectory));
-						episodeManager.updateDownloadFilePath(episode, episode.getDownloadedFilePath(), false);
-					}
-				}
-
-                // move custom folders
-                File customFilesDirectory = getOrCreateDirectory(pocketCastsDir, DIR_CUSTOM_FILES);
-                File newCustomFilesDirectory = getOrCreateDirectory(newPocketCastsDir, DIR_CUSTOM_FILES);
-                if (customFilesDirectory.exists()) {
-                    moveDirectory(customFilesDirectory, newCustomFilesDirectory);
-                }
-	 	   	    
-	 	   	    // move network and group images
-		 	   	File networkImageDirectory = getOrCreateDirectory(pocketCastsDir, DIR_NETWORK_IMAGES);
-	 	   	    File newNetworkImageDirectory = getOrCreateDirectory(newPocketCastsDir, DIR_NETWORK_IMAGES);
-	 	   	    if (networkImageDirectory.exists()) {
-	 	   	    	moveDirectory(networkImageDirectory, newNetworkImageDirectory);
-	 	   	    }
-	 	   	} else {
-	 	   		LogBuffer.INSTANCE.e(LogBuffer.TAG_BACKGROUND_TASKS, "Old directory did not exist");
-			}
-		}
-		catch(StorageException e) {
-			LogBuffer.INSTANCE.e(LogBuffer.TAG_BACKGROUND_TASKS, e,"Unable to move storage to new location.");
-		}
+		delegate.moveStorage(oldDirectory, newDirectory, episodeManager);
 	}
 
 	public void fixBrokenFiles(EpisodeManager episodeManager) {
