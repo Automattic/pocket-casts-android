@@ -37,11 +37,13 @@ public class FileStorage {
 
 	private Settings settings;
 	private Context context;
+	private final FileStorageKtDelegate delegate;
 
 	@Inject
     public FileStorage(Settings settings, @ApplicationContext  Context context) {
         this.settings = settings;
 		this.context = context;
+		delegate = new FileStorageKtDelegate(settings, context);
     }
 
 	@NonNull
