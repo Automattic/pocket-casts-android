@@ -13,6 +13,8 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getPodcastGroupImageDirectory(): File? = getOrCreateDirectory(DIR_PODCAST_GROUP_IMAGES)
+
     fun getOrCreateCacheDirectory(name: String): File = getOrCreateDirectory(context.cacheDir, name)
 
     fun getOrCreateDirectory(name: String): File? = getStorageDirectory()?.let { dir ->
@@ -62,5 +64,9 @@ class FileStorageKtDelegate @Inject constructor(
                 Timber.e(e)
             }
         }
+    }
+
+    private companion object {
+        val DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator
     }
 }

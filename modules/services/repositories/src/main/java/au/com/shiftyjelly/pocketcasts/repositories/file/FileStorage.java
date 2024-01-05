@@ -32,7 +32,6 @@ public class FileStorage {
 	public static final String DIR_CUSTOM_FILES = "custom_episodes";
 	public static final String DIR_NETWORK_IMAGES = "network_images";
 	public static final String DIR_EPISODES = "podcasts";
-	public static final String DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator;
 	public static final String DIR_CLOUD_FILES = "cloud_files";
 
 	private Settings settings;
@@ -102,10 +101,7 @@ public class FileStorage {
 	}
 
 	public  File getPodcastGroupImageDirectory() throws StorageException {
-		File dir = new File(getStorageDirectory().getAbsolutePath() + File.separator + DIR_PODCAST_GROUP_IMAGES);
-		createDirectory(dir);
-        addNoMediaFile(dir);
-		return dir;
+		return delegate.getPodcastGroupImageDirectory();
 	}
 
 	public File getOrCreateCacheDirectory(String name) throws StorageException {
