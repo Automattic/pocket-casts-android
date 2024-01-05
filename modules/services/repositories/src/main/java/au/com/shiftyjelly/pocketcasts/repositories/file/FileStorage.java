@@ -113,14 +113,11 @@ public class FileStorage {
 	}
 
     public File getOrCreateDirectory(String name) throws StorageException {
-		return getOrCreateDirectory(getStorageDirectory(), name);
+		return delegate.getOrCreateDirectory(name);
 	}
 	
 	private File getOrCreateDirectory(File parentDir, String name) throws StorageException {
-		File dir = new File(parentDir, name + File.separator);
-		createDirectory(dir);
-        addNoMediaFile(dir);
-		return dir;
+		return delegate.getOrCreateDirectory(parentDir, name);
 	}
 	
 	public File getStorageDirectory() throws StorageException {
