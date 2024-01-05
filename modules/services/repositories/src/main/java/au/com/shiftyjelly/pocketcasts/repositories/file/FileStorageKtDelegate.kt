@@ -150,6 +150,18 @@ class FileStorageKtDelegate @Inject constructor(
         return newFile.absolutePath
     }
 
+    // TODO: Make private after migration
+    fun moveDirectory(fromDirectory: File, toDirectory: File) {
+        if (fromDirectory.exists() && fromDirectory.isDirectory) {
+            try {
+                FileUtil.copyDirectory(fromDirectory, toDirectory)
+                fromDirectory.delete()
+            } catch (e: IOException) {
+                Timber.e(e, "Problems moving a  directory to a new location. from: ${fromDirectory.absolutePath} to: ${toDirectory.absolutePath}")
+            }
+        }
+    }
+
     private companion object {
         const val DIR_CLOUD_FILES = "cloud_files"
         const val DIR_OPML_FOLDER = "opml_import"

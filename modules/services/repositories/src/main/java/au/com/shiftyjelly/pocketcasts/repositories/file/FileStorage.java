@@ -125,16 +125,7 @@ public class FileStorage {
 	}
 	
 	private void moveDirectory(File fromDirectory, File toDirectory) {
-		if (fromDirectory == null || !fromDirectory.exists() || !fromDirectory.isDirectory() || toDirectory == null) {
-			return;
-		}
-
-		try {
-			FileUtil.copyDirectory(fromDirectory, toDirectory);
-			fromDirectory.delete();
-		} catch (IOException e) {
-			Timber.e(e,"Problems moving a directory to a new location. from: "+fromDirectory.getAbsolutePath()+" to: "+toDirectory.getAbsolutePath());
-		}
+		delegate.moveDirectory(fromDirectory, toDirectory);
 	}
 
 	public void moveStorage(File oldDirectory, File newDirectory, EpisodeManager episodeManager) {
