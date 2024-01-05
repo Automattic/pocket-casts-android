@@ -21,80 +21,80 @@ class FileStorage @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
-    fun getPodcastEpisodeFile(episode: BaseEpisode): File? {
+    fun getOrCreatePodcastEpisodeFile(episode: BaseEpisode): File? {
         val fileName = episode.uuid + episode.getFileExtension()
         val episodeDir = when (episode) {
-            is PodcastEpisode -> getPodcastDirectory()
-            is UserEpisode -> getCloudFilesFolder()
+            is PodcastEpisode -> getOrCreateEpisodesDir()
+            is UserEpisode -> getOrCreateCloudDir()
         }
         return episodeDir?.let { dir -> File(dir, fileName) }
     }
 
-    fun getTempPodcastEpisodeFile(episode: BaseEpisode): File {
+    fun getOrCreatePodcastEpisodeTempFile(episode: BaseEpisode): File {
         val fileName = episode.uuid + episode.getFileExtension()
-        return File(getTempPodcastDirectory(), fileName)
+        return File(getOrCreateEpisodesTempDir(), fileName)
     }
 
-    fun getCloudFileImage(uuid: String): File? = try {
+    fun getOrCreateCloudFileImage(uuid: String): File? = try {
         val fileName = uuid + "_imagefile"
-        getCloudFilesFolder()?.let { dir -> File(dir, fileName) }
+        getOrCreateCloudDir()?.let { dir -> File(dir, fileName) }
     } catch (e: StorageException) {
         Timber.e(e)
         null
     }
 
-    fun getCloudFilesFolder(): File? = getOrCreateDirectory(DIR_CLOUD_FILES)
+    fun getOrCreateCloudDir(): File? = getOrCreateDir(DIR_CLOUD_FILES)
 
-    fun getOpmlFileFolder(): File? = getOrCreateDirectory(DIR_OPML_FILES)
+    fun getOrCreateOpmlDir(): File? = getOrCreateDir(DIR_OPML_FILES)
 
-    fun getNetworkImageDirectory(): File? = getOrCreateDirectory(DIR_NETWORK_IMAGES)
+    fun getOrCreateNetworkImagesDir(): File? = getOrCreateDir(DIR_NETWORK_IMAGES)
 
-    fun getPodcastDirectory(): File? = getOrCreateDirectory(DIR_EPISODES)
+    fun getOrCreateEpisodesDir(): File? = getOrCreateDir(DIR_EPISODES)
 
-    fun getTempPodcastDirectory(): File = getOrCreateCacheDirectory(DIR_TEMP_EPISODES)
+    fun getOrCreateEpisodesTempDir(): File = getOrCreateCacheDir(DIR_TEMP_EPISODES)
 
-    fun getOldTempPodcastDirectory(): File? = getOrCreateDirectory(DIR_TEMP_EPISODES)
+    fun getOrCreateEpisodesOldTempDir(): File? = getOrCreateDir(DIR_TEMP_EPISODES)
 
-    fun getPodcastGroupImageDirectory(): File? = getOrCreateDirectory(DIR_PODCAST_GROUP_IMAGES)
+    fun getOrCreatePodcastGroupImagesDir(): File? = getOrCreateDir(DIR_PODCAST_GROUP_IMAGES)
 
-    fun getOrCreateCacheDirectory(name: String): File = getOrCreateDirectory(context.cacheDir, name)
+    fun getOrCreateCacheDir(name: String): File = getOrCreateDir(context.cacheDir, name)
 
-    fun getOrCreateDirectory(name: String): File? = getStorageDirectory()?.let { dir ->
-        getOrCreateDirectory(dir, name)
+    fun getOrCreateDir(name: String): File? = getOrCreateStorageDir()?.let { dir ->
+        getOrCreateDir(dir, name)
     }
 
-    private fun getOrCreateDirectory(parentDir: File, name: String): File = File(parentDir, name + File.separator).also { dir ->
-        createDirectory(dir)
+    private fun getOrCreateDir(parentDir: File, name: String): File = File(parentDir, name + File.separator).also { dir ->
+        createDir(dir)
         addNoMediaFile(dir)
     }
 
-    fun getStorageDirectory(): File? = getBaseStorageDirectory()?.let { dir ->
-        File(dir, "PocketCasts" + File.separator).also(::createDirectory)
+    fun getOrCreateStorageDir(): File? = getOrCreateBaseStorageDir()?.let { dir ->
+        File(dir, "PocketCasts" + File.separator).also(::createDir)
     }
 
-    fun getBaseStorageDirectory(): File? = settings.getStorageChoice()?.let(::getBaseStorageDirectory)
+    fun getOrCreateBaseStorageDir(): File? = settings.getStorageChoice()?.let(::getOrCreateBaseStorageDir)
 
-    private fun getBaseStorageDirectory(choice: String): File = if (choice == Settings.STORAGE_ON_CUSTOM_FOLDER) {
+    private fun getOrCreateBaseStorageDir(choice: String): File = if (choice == Settings.STORAGE_ON_CUSTOM_FOLDER) {
         val path = settings.getStorageCustomFolder()
         if (path.isBlank()) {
             throw StorageException("Ooops, please set the Custom Folder Location in the settings.")
         }
-        val folder = File(path)
-        if (!folder.exists() && !folder.mkdirs()) {
+        val storageCustomDir = File(path)
+        if (!storageCustomDir.exists() && !storageCustomDir.mkdirs()) {
             throw StorageException("Storage custom folder unavailable.")
         }
-        folder
+        storageCustomDir
     } else {
         File(choice)
     }
 
-    private fun createDirectory(dir: File): File = dir.also(File::mkdirs)
+    private fun createDir(dir: File): File = dir.also(File::mkdirs)
 
-    private fun addNoMediaFile(folder: File) {
-        if (!folder.exists()) {
+    private fun addNoMediaFile(dir: File) {
+        if (!dir.exists()) {
             return
         }
-        val noMediaFile = File(folder, ".nomedia")
+        val noMediaFile = File(dir, ".nomedia")
         if (!noMediaFile.exists()) {
             try {
                 noMediaFile.createNewFile()
@@ -110,16 +110,16 @@ class FileStorage @Inject constructor(
     fun checkNoMediaDirs() {
         // Getting a directory also adds .nomedia file to that dir
         try {
-            getStorageDirectory()?.let(::addNoMediaFile)
-            getNetworkImageDirectory()
-            getPodcastGroupImageDirectory()
-            getTempPodcastDirectory()
+            getOrCreateStorageDir()?.let(::addNoMediaFile)
+            getOrCreateNetworkImagesDir()
+            getOrCreatePodcastGroupImagesDir()
+            getOrCreateEpisodesTempDir()
         } catch (e: Exception) {
             Timber.e(e)
         }
     }
 
-    private fun moveFileToDirectory(filePath: String, directory: File): String? {
+    private fun moveFileToDir(filePath: String, dir: File): String? {
         // Validate the path, check PocketCasts is in the path so we don't delete something important
         if (filePath.isBlank() || "/PocketCasts" !in filePath) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's blank or not PocketCasts")
@@ -128,12 +128,12 @@ class FileStorage @Inject constructor(
 
         val file = File(filePath)
         // Check we aren't copying to the same directory
-        if (file.parentFile == directory) {
+        if (file.parentFile == dir) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Not moving because it's the same directory")
             return filePath
         }
 
-        val newFile = File(directory, file.name)
+        val newFile = File(dir, file.name)
         if (file.exists() && file.isFile) {
             try {
                 FileUtil.copyFile(file, newFile)
@@ -147,13 +147,13 @@ class FileStorage @Inject constructor(
         return newFile.absolutePath
     }
 
-    private fun moveDirectory(fromDirectory: File, toDirectory: File) {
-        if (fromDirectory.exists() && fromDirectory.isDirectory) {
+    private fun moveDir(fromDir: File, toDir: File) {
+        if (fromDir.exists() && fromDir.isDirectory) {
             try {
-                FileUtil.copyDirectory(fromDirectory, toDirectory)
-                fromDirectory.delete()
+                FileUtil.copyDirectory(fromDir, toDir)
+                fromDir.delete()
             } catch (e: IOException) {
-                Timber.e(e, "Problems moving a  directory to a new location. from: ${fromDirectory.absolutePath} to: ${toDirectory.absolutePath}")
+                Timber.e(e, "Problems moving a  directory to a new location. from: ${fromDir.absolutePath} to: ${toDir.absolutePath}")
             }
         }
     }
@@ -166,7 +166,7 @@ class FileStorage @Inject constructor(
 
                 newDir.mkdirs()
                 val newPocketCastsDir = File(newDir, "PocketCasts")
-                val episodesDir = getOrCreateDirectory(newPocketCastsDir, DIR_EPISODES)
+                val episodesDir = getOrCreateDir(newPocketCastsDir, DIR_EPISODES)
 
                 // Check existing media and mark those episodes as downloaded
                 if (episodesDir.exists()) {
@@ -201,22 +201,22 @@ class FileStorage @Inject constructor(
                     }
                     val file = File(downloadedFilePath)
                     if (file.exists() && file.isFile) {
-                        moveFileToDirectory(downloadedFilePath, episodesDir)?.let { updatedPath ->
+                        moveFileToDir(downloadedFilePath, episodesDir)?.let { updatedPath ->
                             episodesManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
                         }
                     }
                 }
 
-                val oldCustomFilesDir = getOrCreateDirectory(oldPocketCastsDir, DIR_CUSTOM_EPISODES)
-                val newCustomFilesDir = getOrCreateDirectory(newPocketCastsDir, DIR_CUSTOM_EPISODES)
+                val oldCustomFilesDir = getOrCreateDir(oldPocketCastsDir, DIR_CUSTOM_EPISODES)
+                val newCustomFilesDir = getOrCreateDir(newPocketCastsDir, DIR_CUSTOM_EPISODES)
                 if (oldCustomFilesDir.exists()) {
-                    moveDirectory(oldCustomFilesDir, newCustomFilesDir)
+                    moveDir(oldCustomFilesDir, newCustomFilesDir)
                 }
 
-                val oldNetworkImageDir = getOrCreateDirectory(oldPocketCastsDir, DIR_NETWORK_IMAGES)
-                val newNetworkImageDir = getOrCreateDirectory(newPocketCastsDir, DIR_NETWORK_IMAGES)
+                val oldNetworkImageDir = getOrCreateDir(oldPocketCastsDir, DIR_NETWORK_IMAGES)
+                val newNetworkImageDir = getOrCreateDir(newPocketCastsDir, DIR_NETWORK_IMAGES)
                 if (newNetworkImageDir.exists()) {
-                    moveDirectory(oldNetworkImageDir, newNetworkImageDir)
+                    moveDir(oldNetworkImageDir, newNetworkImageDir)
                 }
             } else {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Old directory did not exist")
@@ -229,30 +229,30 @@ class FileStorage @Inject constructor(
     fun fixBrokenFiles(episodeManager: EpisodeManager) {
         try {
             // Get all possible locations
-            val folderPaths = buildSet {
+            val dirPaths = buildSet {
                 addAll(StorageOptions().getFolderLocations(context).map(FolderLocation::filePath))
                 add(context.filesDir.absolutePath)
-                val customFolder = settings.getStorageCustomFolder()
-                if (customFolder.isNotBlank() && File(customFolder).exists()) {
-                    add(customFolder)
+                val customDir = settings.getStorageCustomFolder()
+                if (customDir.isNotBlank() && File(customDir).exists()) {
+                    add(customDir)
                 }
             }
 
-            // Search each folder for missing files
-            folderPaths.forEach folderIteration@{ folderPath ->
-                val folder = File(folderPath)
-                if (!folder.exists() || !folder.canRead()) {
-                    return@folderIteration
+            // Search each directory for missing files
+            dirPaths.forEach dirIteration@{ dirPath ->
+                val dir = File(dirPath)
+                if (!dir.exists() || !dir.canRead()) {
+                    return@dirIteration
                 }
-                val pocketCastsFolder = File(folder, "PocketCasts")
-                if (!pocketCastsFolder.exists() || !pocketCastsFolder.canRead()) {
-                    return@folderIteration
+                val pocketCastsDir = File(dir, "PocketCasts")
+                if (!pocketCastsDir.exists() || !pocketCastsDir.canRead()) {
+                    return@dirIteration
                 }
-                val episodesFolder = File(pocketCastsFolder, DIR_EPISODES)
-                if (!episodesFolder.exists() || !episodesFolder.canRead()) {
-                    return@folderIteration
+                val episodesDir = File(pocketCastsDir, DIR_EPISODES)
+                if (!episodesDir.exists() || !episodesDir.canRead()) {
+                    return@dirIteration
                 }
-                episodesFolder.listFiles()?.forEach fileIteration@{ file ->
+                episodesDir.listFiles()?.forEach fileIteration@{ file ->
                     val fileName = file.name
                     val dotPosition = fileName.lastIndexOf('.')
                     if (dotPosition < 1) {

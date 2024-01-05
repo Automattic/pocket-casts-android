@@ -201,7 +201,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
                 // create opml import folder
                 try {
-                    fileStorage.getOpmlFileFolder()
+                    fileStorage.getOrCreateOpmlDir()
                 } catch (e: Exception) {
                     Timber.e(e, "Unable to create opml folder.")
                 }

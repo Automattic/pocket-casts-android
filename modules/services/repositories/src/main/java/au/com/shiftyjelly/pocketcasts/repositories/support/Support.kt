@@ -371,7 +371,7 @@ class Support @Inject constructor(
             }
 
             try {
-                val storageFolder = fileStorage.getStorageDirectory()?.absolutePath
+                val storageFolder = fileStorage.getOrCreateStorageDir()?.absolutePath
                 output.append("Storage: ").append(if (settings.usingCustomFolderStorage()) "Custom Folder" else settings.getStorageChoiceName()).append(", ").append(storageFolder).append(eol)
                 output.append("Storage options:").append(eol)
                 val storageOptions = StorageOptions()
@@ -386,9 +386,9 @@ class Support @Inject constructor(
             }
             output.append("Database: " + Util.formattedBytes(context.getDatabasePath("pocketcasts").length(), context = context)).append(eol)
             try {
-                output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.getTempPodcastDirectory()), context)).append(eol)
-                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getPodcastDirectory()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
-                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getNetworkImageDirectory()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
+                output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.getOrCreateEpisodesTempDir()), context)).append(eol)
+                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getOrCreateEpisodesDir()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
+                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getOrCreateNetworkImagesDir()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
             } catch (e: Exception) {
                 Timber.e(e)
             }

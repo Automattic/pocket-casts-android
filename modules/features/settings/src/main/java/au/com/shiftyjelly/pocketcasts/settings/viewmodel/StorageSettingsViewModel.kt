@@ -151,7 +151,7 @@ class StorageSettingsViewModel
 
     fun onClearDownloadCacheClick() {
         viewModelScope.launch {
-            val tempPath = fileStorage.getTempPodcastDirectory()
+            val tempPath = fileStorage.getOrCreateEpisodesTempDir()
             fileUtil.deleteDirectoryContents(tempPath.absolutePath)
             mutableSnackbarMessage.emit(LR.string.settings_storage_clear_cache)
         }
@@ -215,7 +215,7 @@ class StorageSettingsViewModel
     private fun onStorageChoiceChange(folderPathChosen: String?) {
         if (folderPathChosen == Settings.STORAGE_ON_CUSTOM_FOLDER) {
             try {
-                fileStorage.getBaseStorageDirectory()?.absolutePath?.let { basePath ->
+                fileStorage.getOrCreateBaseStorageDir()?.absolutePath?.let { basePath ->
                     settings.setStorageCustomFolder(basePath)
                     updateStorageLabels()
                 }
@@ -282,7 +282,7 @@ class StorageSettingsViewModel
 
             var oldDirectory: File? = null
             try {
-                oldDirectory = fileStorage.getBaseStorageDirectory()
+                oldDirectory = fileStorage.getOrCreateBaseStorageDir()
             } catch (e: StorageException) {
                 // ignore error
             }

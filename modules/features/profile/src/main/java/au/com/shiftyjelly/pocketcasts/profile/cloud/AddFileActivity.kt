@@ -588,7 +588,7 @@ class AddFileActivity :
     private fun saveBitmapToFile(): File? {
         val bitmap = this.bitmap ?: return null
         try {
-            val outImageFile = fileStorage.getCloudFileImage(uuid)
+            val outImageFile = fileStorage.getOrCreateCloudFileImage(uuid)
             FileOutputStream(outImageFile).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)
                 return outImageFile
