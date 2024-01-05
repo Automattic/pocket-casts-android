@@ -13,6 +13,8 @@ class FileStorageKtDelegate @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
 ) {
+    fun getOrCreateCacheDirectory(name: String): File = getOrCreateDirectory(context.cacheDir, name)
+
     fun getOrCreateDirectory(name: String): File? = getStorageDirectory()?.let { dir ->
         getOrCreateDirectory(dir, name)
     }

@@ -109,7 +109,7 @@ public class FileStorage {
 	}
 
 	public File getOrCreateCacheDirectory(String name) throws StorageException {
-    	return getOrCreateDirectory(context.getCacheDir(), name);
+    	return delegate.getOrCreateCacheDirectory(name);
 	}
 
     public File getOrCreateDirectory(String name) throws StorageException {
