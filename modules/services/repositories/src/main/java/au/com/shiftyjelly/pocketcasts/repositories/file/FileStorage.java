@@ -97,7 +97,7 @@ public class FileStorage {
 	}
 
 	public File getOldTempPodcastDirectory() throws StorageException {
-    	return getOrCreateDirectory(FOLDER_TEMP_EPISODES);
+    	return delegate.getOldTempPodcastDirectory();
 	}
 
 	public  File getPodcastGroupImageDirectory() throws StorageException {
