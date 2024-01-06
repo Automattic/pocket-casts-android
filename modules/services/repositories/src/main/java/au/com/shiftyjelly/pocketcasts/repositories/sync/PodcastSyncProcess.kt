@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
+import au.com.shiftyjelly.pocketcasts.models.to.StatsBundleData
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
@@ -45,11 +46,13 @@ import com.google.protobuf.stringValue
 import com.google.protobuf.timestamp
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUserDevice
 import com.pocketcasts.service.api.int32Setting
 import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.syncUpdateRequest
 import com.pocketcasts.service.api.syncUserBookmark
+import com.pocketcasts.service.api.syncUserDevice
 import com.pocketcasts.service.api.syncUserEpisode
 import com.pocketcasts.service.api.syncUserFolder
 import com.pocketcasts.service.api.syncUserPlaylist
@@ -205,6 +208,13 @@ class PodcastSyncProcess(
                 val bookmarkRecords = bookmarkManager.findBookmarksToSync()
                     .map { toRecord(it) }
                 records.addAll(bookmarkRecords)
+
+                getSyncUserDevice()?.let { syncUserDevice ->
+                    val syncUserDeviceRecord = record {
+                        this.device = syncUserDevice
+                    }
+                    records.add(syncUserDeviceRecord)
+                }
             }
         } catch (e: Exception) {
             Timber.e(e, "Unable to upload podcast to sync.")
@@ -475,6 +485,22 @@ class PodcastSyncProcess(
         }
     }
 
+    private fun getSyncUserDevice(): SyncUserDevice? =
+        if (statsManager.isSynced(settings) || statsManager.isEmpty) {
+            null
+        } else {
+            syncUserDevice {
+                deviceId = stringValue { value = settings.getUniqueDeviceId() }
+                deviceType = int32Value { value = ANDROID_DEVICE_TYPE }
+                timeSilenceRemoval = int64Value { value = statsManager.timeSavedSilenceRemovalSecs }
+                timeSkipping = int64Value { value = statsManager.timeSavedSkippingSecs }
+                timeIntroSkipping = int64Value { value = statsManager.timeSavedSkippingIntroSecs }
+                timeVariableSpeed = int64Value { value = statsManager.timeSavedVariableSpeedSecs }
+                timeListened = int64Value { value = statsManager.totalListeningTimeSecs }
+                timesStartedAt = int64Value { value = statsManager.statsStartTimeSecs }
+            }
+        }
+
     @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadStatChanges(records: JSONArray) {
         if (statsManager.isSynced(settings) || statsManager.isEmpty) {
@@ -660,13 +686,13 @@ class PodcastSyncProcess(
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
             .andThen(updateShortcuts(response.playlists))
-            .andThen(cacheStats())
+            .andThen(cacheStats(response.statsBundleData))
             .toSingle { response.lastModified }
     }
 
-    private fun cacheStats(): Completable {
+    private fun cacheStats(statsBundleData: StatsBundleData? = null): Completable {
         return rxCompletable {
-            statsManager.cacheMergedStats()
+            statsManager.cacheMergedStats(statsBundleData)
             statsManager.setSyncStatus(true)
         }
     }
@@ -1104,6 +1130,8 @@ class PodcastSyncProcess(
             }
     }
 }
+
+private const val ANDROID_DEVICE_TYPE = 2
 
 private fun Date.toProtobufTimestamp(): Timestamp =
     timestamp {
