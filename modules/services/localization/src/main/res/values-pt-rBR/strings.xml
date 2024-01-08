@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-13 16:54:03+0000
+Translation-Revision-Date: 2023-12-20 13:54:04+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="bookmark_not_found">Favorito não encontrado</string>
+    <string name="settings_use_dark_up_next_details">Com essa opção ativada, a lista Próximos sempre usará o tema escuro. Quando desativada, a lista usará o tema atual.</string>
+    <string name="settings_use_dark_up_next">Usar tema escuro na fila Próximos</string>
     <string name="end_of_year_stories_completion_rate_share_text">Minha taxa de conclusão em 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Assine o Plus e veja uma comparação do seu streaming neste ano e em 2022, outras estatísticas divertidas e funcionalidades Premium, como favoritos e pastas.</string>
     <string name="end_of_year_stories_theres_more">E tem mais!</string>
@@ -88,7 +91,7 @@ Language: pt_BR
     <string name="bookmarks_select_option">Selecionar favoritos</string>
     <string name="bookmarks_delete_summary_singular">Este favorito será excluído. Essa ação não pode ser desfeita.</string>
     <string name="bookmarks_delete_summary_plural">%d favoritos serão excluídos. Essa ação não pode ser desfeita.</string>
-    <string name="bookmarks_deleted_singular">1 favorito excluído</string>
+    <string name="bookmarks_deleted_singular">Favorito excluído</string>
     <string name="bookmarks_deleted_plural">%1$d favoritos excluídos</string>
     <string name="bookmarks_delete_singular">Excluir favorito</string>
     <string name="bookmarks_delete_plural">Excluir favoritos</string>

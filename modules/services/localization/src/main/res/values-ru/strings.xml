@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 21:54:04+0000
+Translation-Revision-Date: 2023-12-20 09:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="bookmark_not_found">Закладка не найдена</string>
+    <string name="settings_use_dark_up_next_details">При включённом параметре Up Next будет всегда использовать тёмную тему, а при выключенном — соответствовать текущей теме</string>
+    <string name="settings_use_dark_up_next">Использовать тёмную тему Up Next</string>
     <string name="end_of_year_stories_completion_rate_share_text">Мои итоги 2023 года</string>
     <string name="end_of_year_stories_subscribe_to_plus">Оформите подписку Plus и узнайте, как изменились ваши слушательские привычки по сравнению с 2022 г., посмотрите другую любопытную статистику и ознакомьтесь с такими функциями тарифного плана Premium, как закладки и папки.</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
@@ -88,7 +91,7 @@ Language: ru
     <string name="bookmarks_select_option">Выбрать закладки</string>
     <string name="bookmarks_delete_summary_singular">Закладка будет удалена. Это действие нельзя отменить.</string>
     <string name="bookmarks_delete_summary_plural">Закладки (%d) будут удалены. Это действие нельзя отменить.</string>
-    <string name="bookmarks_deleted_singular">1 закладка удалена</string>
+    <string name="bookmarks_deleted_singular">Закладка удалена</string>
     <string name="bookmarks_deleted_plural">Закладок удалено: %1$d</string>
     <string name="bookmarks_delete_singular">Удалить закладку</string>
     <string name="bookmarks_delete_plural">Удалить закладки</string>

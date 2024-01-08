@@ -31,6 +31,8 @@
         ([#1620](https://github.com/Automattic/pocket-casts-android/pull/1620))
     *   Fix tap to view action from bookmark added notification
         ([#1614](https://github.com/Automattic/pocket-casts-android/pull/1614))
+    *   Fix playback effects UI not updating on watch
+        ([#1643](https://github.com/Automattic/pocket-casts-android/pull/1643))
 *   Updates:
     *   Support dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))

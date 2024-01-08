@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-13 18:54:04+0000
+Translation-Revision-Date: 2023-12-20 13:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="bookmark_not_found">No se ha encontrado el marcador.</string>
+    <string name="settings_use_dark_up_next_details">Si está activado, Up Next utilizará siempre el tema oscuro, o coincidirá con el tema actual si está desactivado</string>
+    <string name="settings_use_dark_up_next">Utilizar tema Up Next oscuro</string>
     <string name="end_of_year_stories_completion_rate_share_text">Mi tasa de finalización de 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Suscríbete a Plus y descubre cómo se comparan tus escuchas con las de 2022, otras estadísticas divertidas y funciones Premium como marcadores y carpetas.</string>
     <string name="end_of_year_stories_theres_more">¡Y hay más!</string>
@@ -88,7 +91,7 @@ Language: es
     <string name="bookmarks_select_option">Elegir marcador</string>
     <string name="bookmarks_delete_summary_singular">Este marcador se eliminará. Esta acción no se puede deshacer.</string>
     <string name="bookmarks_delete_summary_plural">Se eliminarán %d marcadores. Esta acción no se puede deshacer.</string>
-    <string name="bookmarks_deleted_singular">Se ha eliminado 1 marcador</string>
+    <string name="bookmarks_deleted_singular">Se ha eliminado el marcador.</string>
     <string name="bookmarks_deleted_plural">Se han eliminado %1$d marcadores</string>
     <string name="bookmarks_delete_singular">Eliminar marcador</string>
     <string name="bookmarks_delete_plural">Eliminar marcadores</string>

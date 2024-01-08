@@ -30,7 +30,7 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffectsData
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
@@ -247,11 +247,11 @@ private fun EffectsScreenDarkPreview() {
         Content(
             columnState = belowTimeTextPreview(),
             state = EffectsViewModel.State.Loaded(
-                playbackEffects = PlaybackEffects().apply {
-                    trimMode = TrimMode.MEDIUM
-                    playbackSpeed = 1.5
-                    isVolumeBoosted = true
-                }
+                playbackEffects = PlaybackEffectsData(
+                    trimMode = TrimMode.MEDIUM,
+                    playbackSpeed = 1.5,
+                    isVolumeBoosted = true,
+                )
             ),
             increasePlaybackSpeed = {},
             decreasePlaybackSpeed = {},

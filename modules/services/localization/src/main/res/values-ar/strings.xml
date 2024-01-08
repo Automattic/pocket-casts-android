@@ -30,7 +30,6 @@ Language: ar
     <string name="bookmarks_delete_plural">حذف الإشارات المرجعية</string>
     <string name="bookmarks_delete_singular">حذف الإشارة المرجعية</string>
     <string name="bookmarks_deleted_plural">تم حذف ⁦%1$d⁩ من الإشارات المرجعية</string>
-    <string name="bookmarks_deleted_singular">تم حذف إشارة مرجعية واحدة</string>
     <string name="bookmarks_delete_summary_plural">سيتم حذف %d من الإشارات المرجعية. يتعذر التراجع عن هذا.</string>
     <string name="bookmarks_delete_summary_singular">سيتم حذف هذه الإشارة المرجعية. يتعذر التراجع عن هذا.</string>
     <string name="deselect_all">إلغاء تحديد الكل</string>
