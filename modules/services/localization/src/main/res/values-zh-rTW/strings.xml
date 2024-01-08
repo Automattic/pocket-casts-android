@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 11:54:03+0000
+Translation-Revision-Date: 2023-12-19 10:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="bookmark_not_found">找不到書籤</string>
+    <string name="settings_use_dark_up_next_details">啟用後，「接下來播放」將永遠使用深色系佈景主題；若停用，系統則將採用與屆時設定相符的主題</string>
+    <string name="settings_use_dark_up_next">使用暗色系「接下來播放」佈景主題</string>
     <string name="end_of_year_stories_completion_rate_share_text">我的 2023 年完成率</string>
     <string name="end_of_year_stories_subscribe_to_plus">訂閱 Plus，了解你的收聽狀況與 2022 年相比如何、其他有趣的統計資料，以及書籤和資料夾等進階版功能。</string>
     <string name="end_of_year_stories_theres_more">還有更多有趣內容！</string>
@@ -88,7 +91,7 @@ Language: zh_TW
     <string name="bookmarks_select_option">選取書籤</string>
     <string name="bookmarks_delete_summary_singular">此書籤將刪除。 此動作無法復原。</string>
     <string name="bookmarks_delete_summary_plural">%d 個書籤將刪除。 此動作無法復原。</string>
-    <string name="bookmarks_deleted_singular">1 個書籤已刪除</string>
+    <string name="bookmarks_deleted_singular">書籤已刪除</string>
     <string name="bookmarks_deleted_plural">%1$d 個書籤已刪除</string>
     <string name="bookmarks_delete_singular">刪除書籤</string>
     <string name="bookmarks_delete_plural">刪除書籤</string>

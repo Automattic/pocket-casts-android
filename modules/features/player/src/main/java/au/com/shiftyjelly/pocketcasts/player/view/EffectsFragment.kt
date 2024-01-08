@@ -26,15 +26,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.clipToRange
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.math.round
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -158,8 +157,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private fun changePlaybackSpeed(effects: PlaybackEffects, podcast: Podcast, amount: Double) {
         val binding = binding ?: return
 
-        // val speed = (amount.clipToRange(0.5, 3.0) * 10.0).toInt() / 10.0
-        val speed = round(amount.clipToRange(0.5, 3.0) * 10.0) / 10.0
+        val speed = amount.roundedSpeed()
         effects.playbackSpeed = speed
         updatedSpeed = speed
         binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)

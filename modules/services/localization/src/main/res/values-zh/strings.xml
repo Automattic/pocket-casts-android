@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 09:54:04+0000
+Translation-Revision-Date: 2023-12-20 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="bookmark_not_found">未找到书签</string>
+    <string name="settings_use_dark_up_next_details">启用后，“下一个”将始终使用深色主题；禁用后，将与当前主题匹配</string>
+    <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
     <string name="end_of_year_stories_completion_rate_share_text">我在 2023 年的完成率</string>
     <string name="end_of_year_stories_subscribe_to_plus">订阅 Plus，了解您的收听情况与 2022 年的收听情况相比如何、其他有趣的统计信息，以及书签和文件夹等高级套餐功能。</string>
     <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
@@ -88,7 +91,7 @@ Language: zh_CN
     <string name="bookmarks_select_option">选择书签</string>
     <string name="bookmarks_delete_summary_singular">此书签将被删除。 此操作无法撤消。</string>
     <string name="bookmarks_delete_summary_plural">%d 个书签将被删除。 此操作无法撤消。</string>
-    <string name="bookmarks_deleted_singular">1 个书签已删除</string>
+    <string name="bookmarks_deleted_singular">书签已删除</string>
     <string name="bookmarks_deleted_plural">%1$d 个书签已删除</string>
     <string name="bookmarks_delete_singular">删除书签</string>
     <string name="bookmarks_delete_plural">删除书签</string>

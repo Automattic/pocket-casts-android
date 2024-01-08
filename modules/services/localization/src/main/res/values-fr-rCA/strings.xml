@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 09:54:04+0000
+Translation-Revision-Date: 2023-12-18 18:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="bookmark_not_found">Impossible de trouver le favori</string>
+    <string name="settings_use_dark_up_next_details">Quand l’option est activée, la File d’attente affichera toujours le thème sombre ou alors elle correspondra au thème actuel si l’option est désactivée</string>
+    <string name="settings_use_dark_up_next">Utiliser le thème File d’attente sombre</string>
     <string name="end_of_year_stories_completion_rate_share_text">Mon taux d’achèvement en 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Abonnez-vous à Plus et découvrez l’évolution de votre écoute par rapport à 2022, d’autres statistiques étonnantes et des fonctionnalités Premium comme les favoris et les dossiers.</string>
     <string name="end_of_year_stories_theres_more">Ce n’est pas tout !</string>
@@ -88,7 +91,7 @@ Language: fr
     <string name="bookmarks_select_option">Sélectionner des favoris</string>
     <string name="bookmarks_delete_summary_singular">Ce favori sera supprimé. Cette action ne peut pas être annulée.</string>
     <string name="bookmarks_delete_summary_plural">%d favoris seront supprimés. Cette action ne peut pas être annulée.</string>
-    <string name="bookmarks_deleted_singular">1 favori supprimé</string>
+    <string name="bookmarks_deleted_singular">Favori supprimé</string>
     <string name="bookmarks_deleted_plural">%1$d favoris supprimés</string>
     <string name="bookmarks_delete_singular">Supprimer le favori</string>
     <string name="bookmarks_delete_plural">Supprimer des favoris</string>

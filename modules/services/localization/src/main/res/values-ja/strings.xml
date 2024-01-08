@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 09:54:04+0000
+Translation-Revision-Date: 2023-12-19 10:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="bookmark_not_found">ブックマークが見つかりません</string>
+    <string name="settings_use_dark_up_next_details">有効にすると、「次のエピソード待機リスト」では常にダークテーマを使用し、無効にすると現在のテーマと一致します</string>
+    <string name="settings_use_dark_up_next">次のエピソード待機リストのダークテーマを使用</string>
     <string name="end_of_year_stories_completion_rate_share_text">My 2023完了率</string>
     <string name="end_of_year_stories_subscribe_to_plus">Plus に登録すると、2022年と比較した視聴内容、その他の楽しい統計、ブックマークやフォルダーなどのプレミアム機能をご利用いただけます。</string>
     <string name="end_of_year_stories_theres_more">その他にもございます !</string>
@@ -88,7 +91,7 @@ Language: ja_JP
     <string name="bookmarks_select_option">ブックマークを選択する</string>
     <string name="bookmarks_delete_summary_singular">このブックマークは削除されます。 この操作は元に戻すことができません。</string>
     <string name="bookmarks_delete_summary_plural">%d件ブックマークが削除されます。 この操作は元に戻すことができません。</string>
-    <string name="bookmarks_deleted_singular">1件のブックマークが削除されました</string>
+    <string name="bookmarks_deleted_singular">ブックマークが削除されました</string>
     <string name="bookmarks_deleted_plural">%1$d件のブックマークが削除されました</string>
     <string name="bookmarks_delete_singular">ブックマークを削除</string>
     <string name="bookmarks_delete_plural">ブックマークを削除</string>

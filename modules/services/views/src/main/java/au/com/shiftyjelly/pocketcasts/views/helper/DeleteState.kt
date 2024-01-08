@@ -35,7 +35,7 @@ object CloudDeleteHelper {
 
     fun deleteEpisode(
         episode: UserEpisode,
-        deleteState: DeleteState,
+        deleteState: DeleteState = getDeleteState(episode),
         playbackManager: PlaybackManager,
         episodeManager: EpisodeManager,
         userEpisodeManager: UserEpisodeManager,

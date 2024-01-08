@@ -29,7 +29,6 @@ Language: nb_NO
     <string name="bookmarks_delete_plural">Slett bokmerker</string>
     <string name="bookmarks_delete_singular">Slett bokmerke</string>
     <string name="bookmarks_deleted_plural">%1$d bokmerker slettet</string>
-    <string name="bookmarks_deleted_singular">1 bokmerke slettet</string>
     <string name="bookmarks_delete_summary_plural">%d bokmerker blir slettet. Dette kan ikke angres.</string>
     <string name="bookmarks_delete_summary_singular">Dette bokmerket blir slettet. Dette kan ikke angres.</string>
     <string name="deselect_all_above">Opphev valg av alle ovenfor</string>

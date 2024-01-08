@@ -1,11 +1,24 @@
+7.56
+-----
+
+*   Updates:
+    *   Warn when switching to metered network if warn before using data setting is enabled
+        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
+
 7.55
 -----
 
 *   Updates:
     *   Save selected tab on Player screen after screen rotation
         ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
-    *   Warn when switching to metered network if warn before using data setting is enabled
-        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
+
+*   Bug Fixes:
+    *   Improve handling of user files on watch
+        ([#1638](https://github.com/Automattic/pocket-casts-android/pull/1638))
+    *   Fixed an issue with a missing accessibility label for the 'Up Next' screen
+        ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
+    *   Fixed an issue with incorrect playback speed shown on the media notification
+        ([#1648](https://github.com/Automattic/pocket-casts-android/pull/1666))
 
 7.54
 -----
@@ -27,8 +40,10 @@
         ([#1620](https://github.com/Automattic/pocket-casts-android/pull/1620))
     *   Fix tap to view action from bookmark added notification
         ([#1614](https://github.com/Automattic/pocket-casts-android/pull/1614))
+    *   Fix playback effects UI not updating on watch
+        ([#1643](https://github.com/Automattic/pocket-casts-android/pull/1643))
 *   Updates:
-    *   Display dynamic colors for widget
+    *   Support dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
     *   Add theme support to Up Next screen
         ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))

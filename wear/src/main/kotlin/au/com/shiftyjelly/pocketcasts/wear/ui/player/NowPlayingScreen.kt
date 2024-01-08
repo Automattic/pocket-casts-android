@@ -197,6 +197,7 @@ fun NowPlayingScreen(
     }
 }
 
+@Suppress("DEPRECATION")
 @Composable
 private fun PodcastColorBackground(
     state: NowPlayingViewModel.State.Loaded,

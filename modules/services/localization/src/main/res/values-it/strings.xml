@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 11:54:03+0000
+Translation-Revision-Date: 2023-12-19 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="bookmark_not_found">Segnalibro non trovato</string>
+    <string name="settings_use_dark_up_next_details">Se attivato, il Successivo utilizzerà sempre il tema scuro, oppure sarà applicato il tema corrente se disattivato</string>
+    <string name="settings_use_dark_up_next">Usa il tema scuro per Successivo</string>
     <string name="end_of_year_stories_completion_rate_share_text">Il mio tasso di completamento del 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Abbonati a Plus per mettere a confronto la tua esperienza di ascolto rispetto al 2022, scoprire altre statistiche divertenti e funzionalità del piano Premium come i segnalibri e le cartelle.</string>
     <string name="end_of_year_stories_theres_more">E c\'è di più.</string>
@@ -88,7 +91,7 @@ Language: it
     <string name="bookmarks_select_option">Seleziona segnalibri</string>
     <string name="bookmarks_delete_summary_singular">Questo segnalibro sarà eliminato. Questa operazione non può essere annullata.</string>
     <string name="bookmarks_delete_summary_plural">%d segnalibri saranno eliminati. Questa operazione non può essere annullata.</string>
-    <string name="bookmarks_deleted_singular">1 segnalibro eliminato</string>
+    <string name="bookmarks_deleted_singular">Segnalibro eliminato</string>
     <string name="bookmarks_deleted_plural">%1$d segnalibri eliminati</string>
     <string name="bookmarks_delete_singular">Elimina segnalibro</string>
     <string name="bookmarks_delete_plural">Elimina segnalibri</string>

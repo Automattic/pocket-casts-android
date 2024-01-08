@@ -24,6 +24,7 @@ fun UserEpisodeImage(
             .build(),
         contentDescription = contentDescription,
         placeholder = painterResource(placeholder),
+        fallback = painterResource(placeholder),
         modifier = modifier,
     )
 }
