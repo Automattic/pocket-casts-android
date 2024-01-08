@@ -66,7 +66,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Currently selected view holder
      */
-    internal /* synthetic access */ var mSelected: ViewHolder? = null
+    internal var mSelected: ViewHolder? = null
 
     /**
      * The reference coordinates for the action start. For drag & drop, this is the time long
@@ -105,7 +105,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * The pointer we are tracking.
      */
-    internal /* synthetic access */ var mActivePointerId = ACTIVE_POINTER_ID_NONE
+    internal var mActivePointerId = ACTIVE_POINTER_ID_NONE
 
     /**
      * Current mode.
@@ -117,7 +117,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * [Callback.getAbsoluteMovementFlags] for the current
      * action state.
      */
-    internal /* synthetic access */ var mSelectedFlags: Int = 0
+    internal var mSelectedFlags: Int = 0
 
     /**
      * When a View is dragged or swiped and needs to go back to where it was, we create a Recover
@@ -136,7 +136,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * When user drags a view to the edge, we start scrolling the LayoutManager as long as View
      * is partially out of bounds.
      */
-    internal/* synthetic access */ val mScrollRunnable: Runnable = object : Runnable {
+    internal val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
             if (mSelected != null && scrollIfNecessary()) {
                 if (mSelected != null) { // it might be lost during scrolling
@@ -169,19 +169,19 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * until view reaches its final position (end of recover animation), we keep a reference so
      * that it can be drawn above other children.
      */
-    internal /* synthetic access */ var mOverdrawChild: View? = null
+    internal var mOverdrawChild: View? = null
 
     /**
      * We cache the position of the overdraw child to avoid recalculating it each time child
      * position callback is called. This value is invalidated whenever a child is attached or
      * detached.
      */
-    internal /* synthetic access */ var mOverdrawChildPosition = -1
+    internal var mOverdrawChildPosition = -1
 
     /**
      * Used to detect long press.
      */
-    internal /* synthetic access */ var mGestureDetector: GestureDetectorCompat? = null
+    internal var mGestureDetector: GestureDetectorCompat? = null
 
     /**
      * Callback for when long press occurs.
@@ -439,7 +439,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * current action, but may not be null if actionState is ACTION_STATE_DRAG.
      * @param actionState The type of action
      */
-    internal /* synthetic access */ fun select(selected: ViewHolder?, actionState: Int) {
+    internal fun select(selected: ViewHolder?, actionState: Int) {
         if (selected === mSelected && actionState == mActionState) {
             return
         }
@@ -576,7 +576,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         mRecyclerView!!.invalidate()
     }
 
-    internal /* synthetic access */ fun postDispatchSwipe(anim: RecoverAnimation, swipeDir: Int) {
+    internal fun postDispatchSwipe(anim: RecoverAnimation, swipeDir: Int) {
         // wait until animations are complete.
         mRecyclerView!!.post(object : Runnable {
             override fun run() {
@@ -605,7 +605,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         })
     }
 
-    internal /* synthetic access */ fun hasRunningRecoverAnim(): Boolean {
+    internal fun hasRunningRecoverAnim(): Boolean {
         val size = mRecoverAnimations.size
         for (i in 0 until size) {
             if (!mRecoverAnimations[i].mEnded) {
@@ -618,7 +618,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * If user drags the view to the edge, trigger a scroll if necessary.
      */
-    internal /* synthetic access */ fun scrollIfNecessary(): Boolean {
+    internal fun scrollIfNecessary(): Boolean {
         if (mSelected == null) {
             mDragScrollStartTimeInMs = java.lang.Long.MIN_VALUE
             return false
@@ -739,7 +739,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Checks if we should swap w/ another view holder.
      */
-    internal /* synthetic access */ fun moveIfNecessary(viewHolder: ViewHolder?) {
+    internal fun moveIfNecessary(viewHolder: ViewHolder?) {
         if (mRecyclerView!!.isLayoutRequested) {
             return
         }
@@ -797,7 +797,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Returns the animation type or 0 if cannot be found.
      */
-    internal /* synthetic access */ fun endRecoverAnimation(
+    internal fun endRecoverAnimation(
         viewHolder: ViewHolder?,
         override: Boolean
     ) {
@@ -824,7 +824,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         outRect.setEmpty()
     }
 
-    internal /* synthetic access */ fun obtainVelocityTracker() {
+    internal fun obtainVelocityTracker() {
         if (mVelocityTracker != null) {
             mVelocityTracker!!.recycle()
         }
@@ -864,7 +864,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Checks whether we should select a View for swiping.
      */
-    internal /* synthetic access */ fun checkSelectForSwipe(
+    internal fun checkSelectForSwipe(
         action: Int,
         motionEvent: MotionEvent,
         pointerIndex: Int
@@ -924,7 +924,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         select(vh, ACTION_STATE_SWIPE)
     }
 
-    internal /* synthetic access */ fun findChildView(event: MotionEvent): View? {
+    internal fun findChildView(event: MotionEvent): View? {
         // first check elevated views, if none, then call RV
         val x = event.x
         val y = event.y
@@ -1039,7 +1039,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         select(viewHolder, ACTION_STATE_SWIPE)
     }
 
-    internal /* synthetic access */ fun findAnimation(event: MotionEvent): RecoverAnimation? {
+    internal fun findAnimation(event: MotionEvent): RecoverAnimation? {
         if (mRecoverAnimations.isEmpty()) {
             return null
         }
@@ -1053,7 +1053,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         return null
     }
 
-    internal /* synthetic access */ fun updateDxDy(
+    internal fun updateDxDy(
         ev: MotionEvent,
         directionFlags: Int,
         pointerIndex: Int
@@ -1216,7 +1216,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         mRecyclerView!!.setChildDrawingOrderCallback(mChildDrawingOrderCallback)
     }
 
-    internal /* synthetic access */ fun removeChildDrawingOrderCallbackIfNecessary(view: View) {
+    internal fun removeChildDrawingOrderCallbackIfNecessary(view: View) {
         if (view === mOverdrawChild) {
             mOverdrawChild = null
             // only remove if we've added

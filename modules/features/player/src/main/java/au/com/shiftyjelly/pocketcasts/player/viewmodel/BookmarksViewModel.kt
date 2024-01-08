@@ -177,8 +177,8 @@ class BookmarksViewModel
                         )
                     }
                 }.stateIn(viewModelScope)
-                    .takeWhile { !isFragmentActive } /* Stop collecting on player close
-                    when viewModelScope is still active but fragment is not. */
+                    // Stop collecting on player close when viewModelScope is still active but fragment is not.
+                    .takeWhile { !isFragmentActive }
             } ?: run { // This shouldn't happen in the ideal world
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
                 _uiState.value = UiState.Empty(sourceView)
