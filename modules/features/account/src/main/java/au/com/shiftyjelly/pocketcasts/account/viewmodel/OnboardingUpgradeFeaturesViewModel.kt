@@ -239,15 +239,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 }
 
 sealed class OnboardingUpgradeFeaturesState {
-    object Loading : OnboardingUpgradeFeaturesState()
+    data object Loading : OnboardingUpgradeFeaturesState()
 
     data class NoSubscriptions(val showNotNow: Boolean) : OnboardingUpgradeFeaturesState()
-
-    data class OldLoaded(
-        private val isTouchExplorationEnabled: Boolean,
-    ) : OnboardingUpgradeFeaturesState() {
-        val scrollAutomatically = !isTouchExplorationEnabled
-    }
 
     data class Loaded(
         val currentFeatureCard: UpgradeFeatureCard,

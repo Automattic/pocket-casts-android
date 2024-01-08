@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -33,7 +31,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -50,9 +46,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,9 +55,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
@@ -71,17 +62,11 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
-import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -142,18 +127,6 @@ internal fun OnboardingUpgradeFeaturesPage(
                 canUpgrade = canUpgrade,
             )
         }
-
-        is OnboardingUpgradeFeaturesState.OldLoaded -> {
-            OldUpgradeLayout(
-                state = state as OnboardingUpgradeFeaturesState.OldLoaded,
-                scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onUpgradePressed = onUpgradePressed,
-                onNotNowPressed = onNotNowPressed,
-                canUpgrade = canUpgrade,
-            )
-        }
-
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
                 showNotNow = (state as OnboardingUpgradeFeaturesState.NoSubscriptions).showNotNow,
@@ -184,8 +157,9 @@ private fun UpgradeLayout(
         BoxWithConstraints(
             Modifier
                 .fillMaxHeight()
-                .background(OnboardingUpgradeHelper.backgroundColor),
+                .background(OnboardingUpgradeHelper.backgroundColor)
         ) {
+
             OnboardingUpgradeHelper.UpgradeBackground(
                 modifier = Modifier.verticalScroll(scrollState),
                 tier = state.currentFeatureCard.subscriptionTier,
@@ -210,7 +184,7 @@ private fun UpgradeLayout(
                             iconColor = Color.White,
                             modifier = Modifier
                                 .height(48.dp)
-                                .width(48.dp),
+                                .width(48.dp)
                         )
                         if (state.showNotNow) {
                             TextH30(
@@ -228,7 +202,7 @@ private fun UpgradeLayout(
                     Column {
                         Box(
                             modifier = Modifier.heightIn(min = 70.dp),
-                            contentAlignment = Alignment.Center,
+                            contentAlignment = Alignment.Center
                         ) {
                             AutoResizeText(
                                 text = stringResource(state.currentFeatureCard.titleRes),
@@ -250,13 +224,13 @@ private fun UpgradeLayout(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 24.dp),
-                            contentAlignment = Alignment.Center,
+                            contentAlignment = Alignment.Center
                         ) {
                             StyledToggle(
                                 items = state.subscriptionFrequencies
                                     .map { stringResource(id = it.localisedLabelRes) },
                                 defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(
-                                    state.currentSubscriptionFrequency,
+                                    state.currentSubscriptionFrequency
                                 ),
                             ) {
                                 val selectedFrequency = state.subscriptionFrequencies[it]
@@ -303,9 +277,7 @@ fun FeatureCards(
             card = featureCardsState.featureCards[index],
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-            } else {
-                Modifier
-            },
+            } else Modifier
         )
     }
 }
@@ -321,16 +293,16 @@ private fun FeatureCard(
         backgroundColor = Color.White,
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(24.dp)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
-                contentAlignment = Alignment.TopStart,
+                contentAlignment = Alignment.TopStart
             ) {
                 SubscriptionBadge(
                     iconRes = card.iconRes,
@@ -348,7 +320,7 @@ private fun FeatureCard(
                 OnboardingUpgradeHelper.PrivacyPolicy(
                     color = Color.Black.copy(alpha = .5f),
                     textAlign = TextAlign.Start,
-                    lineHeight = 18.sp,
+                    lineHeight = 18.sp
                 )
             }
         }
@@ -373,7 +345,7 @@ private fun UpgradeButton(
     }
     Box(
         contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier.fadeBackground(),
+        modifier = Modifier.fadeBackground()
     ) {
         Column {
             UpgradeRowButton(
@@ -388,90 +360,8 @@ private fun UpgradeButton(
             )
             Spacer(
                 modifier = Modifier
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars),
+                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
             )
-        }
-    }
-}
-
-@Composable
-private fun OldUpgradeLayout(
-    state: OnboardingUpgradeFeaturesState.OldLoaded,
-    scrollState: ScrollState,
-    onBackPressed: () -> Unit,
-    onUpgradePressed: () -> Unit,
-    onNotNowPressed: () -> Unit,
-    canUpgrade: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    BoxWithConstraints(
-        modifier
-            .fillMaxHeight()
-            .background(OnboardingUpgradeHelper.backgroundColor),
-    ) {
-        OnboardingUpgradeHelper.OldPlusBackground(Modifier.verticalScroll(scrollState)) {
-            Column(
-                Modifier
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .heightIn(min = this.calculateMinimumHeightWithInsets()),
-            ) {
-                Spacer(Modifier.height(8.dp))
-                NavigationIconButton(
-                    onNavigationClick = onBackPressed,
-                    iconColor = Color.White,
-                    modifier = Modifier
-                        .height(48.dp)
-                        .width(48.dp),
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                IconRow(Modifier.padding(horizontal = 24.dp))
-
-                Spacer(Modifier.height(36.dp))
-
-                TextH10(
-                    text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                TextP30(
-                    text = stringResource(LR.string.onboarding_upgrade_exclusive_features_and_options),
-                    color = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-
-                Spacer(Modifier.height(58.dp))
-
-                FeatureRow(scrollAutomatically = state.scrollAutomatically)
-
-                Spacer(Modifier.weight(1f))
-                Spacer(Modifier.height(36.dp))
-
-                if (canUpgrade) {
-                    PlusRowButton(
-                        text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
-                        onClick = onUpgradePressed,
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                OutlinedRowButton(
-                    text = stringResource(LR.string.not_now),
-                    onClick = onNotNowPressed,
-                    brush = OnboardingUpgradeHelper.plusGradientBrush,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    subscriptionTier = SubscriptionTier.PLUS,
-                )
-
-                Spacer(Modifier.height(16.dp))
-            }
         }
     }
 }
@@ -514,66 +404,6 @@ private fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
 }
 
 @Composable
-private fun FeatureRow(scrollAutomatically: Boolean) {
-    ScrollingRow(
-        scrollAutomatically = scrollAutomatically,
-        rowItems = { FeatureItems() },
-    )
-}
-
-@Composable
-private fun FeatureItems() {
-    OldPlusUpgradeFeatureItem.values().forEach {
-        OldFeatureItem(it)
-    }
-}
-
-@Composable
-private fun OldFeatureItem(
-    content: OldPlusUpgradeFeatureItem,
-    modifier: Modifier = Modifier,
-) {
-    val shape = RoundedCornerShape(16.dp)
-    Column(
-        modifier = modifier
-            .semantics(mergeDescendants = true) {}
-            .border(
-                width = 1.dp,
-                color = Color(0xFF383839),
-                shape = shape,
-            )
-            .background(
-                brush = Brush.verticalGradient(
-                    0f to Color(0xFF2A2A2B),
-                    1f to Color(0xFF252525),
-                ),
-                shape = shape,
-            )
-            .width(156.dp)
-            .fillMaxHeight()
-            .padding(all = 16.dp),
-    ) {
-        Icon(
-            painter = painterResource(content.image),
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(32.dp),
-        )
-        Spacer(Modifier.height(8.dp))
-        TextH40(
-            text = stringResource(content.title),
-            color = Color.White,
-        )
-        Spacer(Modifier.height(4.dp))
-        TextP60(
-            text = stringResource(content.text),
-            color = Color.White,
-            modifier = Modifier.alpha(0.72f),
-        )
-    }
-}
-
-@Composable
 fun NoSubscriptionsLayout(
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
@@ -583,8 +413,9 @@ fun NoSubscriptionsLayout(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .fillMaxWidth(),
+            .fillMaxWidth()
     ) {
+
         Spacer(Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -596,7 +427,7 @@ fun NoSubscriptionsLayout(
                 iconColor = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .height(48.dp)
-                    .width(48.dp),
+                    .width(48.dp)
             )
             if (showNotNow) {
                 TextH30(
@@ -611,10 +442,10 @@ fun NoSubscriptionsLayout(
         Spacer(modifier = Modifier.weight(1f))
         Box(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             TextH30(
-                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found),
+                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found)
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -630,7 +461,7 @@ private fun Modifier.fadeBackground() = this
                 brush = Brush.verticalGradient(
                     listOf(Color.Transparent, Color.Black),
                 ),
-                blendMode = BlendMode.DstIn,
+                blendMode = BlendMode.DstIn
             )
             drawContent()
         }
