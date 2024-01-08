@@ -81,17 +81,10 @@ internal fun OnboardingUpgradeFeaturesPage(
     onBackPressed: () -> Unit,
     onClickSubscribe: () -> Unit,
     onNotNowPressed: () -> Unit,
-    onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
 ) {
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
-
-    @Suppress("NAME_SHADOWING")
-    val onUpgradePressed = {
-        viewModel.onUpgradePressed(flow, source)
-        onUpgradePressed()
-    }
 
     @Suppress("NAME_SHADOWING")
     val onNotNowPressed = {

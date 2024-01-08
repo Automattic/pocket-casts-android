@@ -120,14 +120,6 @@ fun OnboardingUpgradeFlow(
                 OnboardingUpgradeFeaturesPage(
                     flow = flow,
                     source = source,
-                    onUpgradePressed = {
-                        if (isLoggedIn) {
-                            coroutineScope.launch { sheetState.show() }
-                        } else {
-                            onNeedLogin()
-                        }
-                    },
-                    onNotNowPressed = onProceed,
                     onBackPressed = onBackPressed,
                     onClickSubscribe = {
                         if (activity != null) {
@@ -144,6 +136,7 @@ fun OnboardingUpgradeFlow(
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                         }
                     },
+                    onNotNowPressed = onProceed,
                     canUpgrade = hasSubscriptions,
                 )
             }
