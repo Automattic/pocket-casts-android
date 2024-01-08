@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -425,7 +426,7 @@ class MediaSessionManager(
                 MediaNotificationControls.PlayNext -> addCustomAction(stateBuilder, APP_ACTION_PLAY_NEXT, "Play next", com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
                 MediaNotificationControls.PlaybackSpeed -> {
                     if (playbackManager.isAudioEffectsAvailable()) {
-                        val currentSpeed = playbackState.playbackSpeed
+                        val currentSpeed = playbackState.playbackSpeed.roundedSpeed()
                         val drawableId = when {
                             currentSpeed <= 1 -> IR.drawable.auto_1x
                             currentSpeed == 1.1 -> IR.drawable.auto_1_1x
