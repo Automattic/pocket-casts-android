@@ -9,6 +9,8 @@
         ([#1638](https://github.com/Automattic/pocket-casts-android/pull/1638))
     *   Fixed an issue with a missing accessibility label for the 'Up Next' screen
         ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
+    *   Fixed an issue with incorrect playback speed shown on the media notification
+        ([#1648](https://github.com/Automattic/pocket-casts-android/pull/1666))
 7.54
 -----
 

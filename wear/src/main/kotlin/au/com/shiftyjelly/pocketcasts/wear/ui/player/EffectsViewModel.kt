@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffectsData
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.utils.extensions.clipToRange
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.round
 
 @HiltViewModel
 class EffectsViewModel
@@ -45,10 +44,7 @@ class EffectsViewModel
     private fun changePlaybackSpeed(speed: Double) {
         val currentState = state.value as? State.Loaded ?: return
         val effects = currentState.playbackEffects
-        val clippedToRangeSpeed = speed.clipToRange(0.5, 3.0)
-        // to stop the issue 1.2000000000000002
-        val roundedSpeed = round(clippedToRangeSpeed * 10.0) / 10.0
-        val newEffects = effects.copy(playbackSpeed = roundedSpeed)
+        val newEffects = effects.copy(playbackSpeed = speed.roundedSpeed())
         saveEffects(newEffects)
     }
 

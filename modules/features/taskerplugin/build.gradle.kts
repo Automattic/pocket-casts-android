@@ -29,5 +29,6 @@ dependencies {
     implementation(project(":modules:services:views"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:preferences"))
+    implementation(project(":modules:services:utils"))
     implementation("com.joaomgcd:taskerpluginlibrary:0.4.6")
 }
