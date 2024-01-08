@@ -54,13 +54,13 @@ fun PodcastImage(
                 elevation = finalElevation,
                 shape = if (corners == null) RectangleShape else RoundedCornerShape(corners),
                 backgroundColor = Color.Transparent,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 CoilImage(
                     uuid = uuid,
                     title = title,
                     showTitle = showTitle,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         } else {
@@ -69,7 +69,7 @@ fun PodcastImage(
                 title = title,
                 showTitle = showTitle,
                 corners = corners,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }
@@ -84,7 +84,7 @@ private fun CoilImage(uuid: String, title: String, showTitle: Boolean, modifier:
     }
     val painter = rememberAsyncImagePainter(
         model = imageRequest,
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
     )
 
     Box(contentAlignment = Alignment.Center) {
@@ -92,7 +92,7 @@ private fun CoilImage(uuid: String, title: String, showTitle: Boolean, modifier:
             painter = painter,
             contentDescription = title,
             modifier = modifier
-                .clip(if (corners == null) RectangleShape else RoundedCornerShape(corners))
+                .clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
         )
         val state = painter.state
         if (showTitle && state is AsyncImagePainter.State.Error) {
@@ -100,7 +100,7 @@ private fun CoilImage(uuid: String, title: String, showTitle: Boolean, modifier:
                 text = title,
                 textAlign = TextAlign.Center,
                 maxLines = 4,
-                modifier = Modifier.padding(2.dp)
+                modifier = Modifier.padding(2.dp),
             )
         }
     }

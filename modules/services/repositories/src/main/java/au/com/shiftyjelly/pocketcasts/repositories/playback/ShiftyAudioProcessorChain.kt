@@ -16,20 +16,20 @@ class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) :
         this::onSkippedFrames,
         416000,
         291000,
-        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL
+        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
     )
     private val mediumProcessor =
         ShiftyTrimSilenceProcessor(
             this::onSkippedFrames,
             300000,
             225000,
-            ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL
+            ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
         )
     private val highProcessor = ShiftyTrimSilenceProcessor(
         this::onSkippedFrames,
         83000,
         0,
-        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL
+        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
     )
     private val sonicAudioProcessor = SonicAudioProcessor()
 

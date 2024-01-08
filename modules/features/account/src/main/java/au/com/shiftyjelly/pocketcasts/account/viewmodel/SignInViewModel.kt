@@ -9,8 +9,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -18,7 +18,7 @@ class SignInViewModel
 @Inject constructor(
     private val syncManager: SyncManager,
     private val subscriptionManager: SubscriptionManager,
-    private val podcastManager: PodcastManager
+    private val podcastManager: PodcastManager,
 ) : AccountViewModel() {
 
     val signInState = MutableLiveData<SignInState>().apply { value = SignInState.Empty }
@@ -74,7 +74,7 @@ class SignInViewModel
             val result = syncManager.loginWithEmailAndPassword(
                 email = emailString,
                 password = pwdString,
-                signInSource = SignInSource.UserInitiated.SignInViewModel
+                signInSource = SignInSource.UserInitiated.SignInViewModel,
             )
             when (result) {
                 is LoginResult.Success -> {
@@ -94,7 +94,7 @@ class SignInViewModel
 enum class SignInError(@StringRes val message: Int) {
     INVALID_EMAIL(LR.string.error_invalid_email_address),
     INVALID_PASSWORD(LR.string.error_invalid_password_length),
-    SERVER(LR.string.error_server_failed)
+    SERVER(LR.string.error_server_failed),
 }
 
 sealed class SignInState {

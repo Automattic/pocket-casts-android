@@ -102,7 +102,7 @@ object IntentUtil {
                 Toast.makeText(
                     context,
                     context.getString(R.string.error_opening_links_activity_not_found),
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_LONG,
                 ).show()
             }
         }
@@ -118,7 +118,6 @@ object IntentUtil {
 
                 val urlSections = urlFound.split("&".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 if (urlSections.size >= 2) {
-
                     to.addAll(Arrays.asList(*urlSections[0].split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()))
 
                     for (i in 1 until urlSections.size) {

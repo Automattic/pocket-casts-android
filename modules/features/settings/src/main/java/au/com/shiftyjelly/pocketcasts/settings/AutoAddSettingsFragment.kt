@@ -73,12 +73,12 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
                 .addCheckedOption(
                     titleString = getString(LR.string.settings_auto_up_next_top),
                     checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT,
-                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_NEXT) }
+                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_NEXT) },
                 )
                 .addCheckedOption(
                     titleString = getString(LR.string.settings_auto_up_next_bottom),
                     checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_LAST,
-                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_LAST) }
+                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_LAST) },
                 )
                 .show(childFragmentManager, "autoadd_options")
         }
@@ -90,11 +90,12 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
             val limitRow = AutoAddTopSections.Option(
                 IR.drawable.ic_upnext_playlast,
                 getString(
-                    LR.string.settings_auto_up_next_limit
+                    LR.string.settings_auto_up_next_limit,
                 ),
                 getString(
-                    LR.string.episodes_plural, settings.autoAddUpNextLimit.value
-                )
+                    LR.string.episodes_plural,
+                    settings.autoAddUpNextLimit.value,
+                ),
             ) {
                 val currentLimit = settings.autoAddUpNextLimit.value
                 OptionsDialog()
@@ -153,7 +154,7 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
         val fragment = PodcastSelectFragment.newInstance(
             tintColor = ThemeColor.primaryInteractive01(theme.activeTheme),
             showToolbar = true,
-            source = PodcastSelectFragmentSource.AUTO_ADD
+            source = PodcastSelectFragmentSource.AUTO_ADD,
         )
         fragment.listener = this
         (activity as? FragmentHostListener)?.addFragment(fragment)

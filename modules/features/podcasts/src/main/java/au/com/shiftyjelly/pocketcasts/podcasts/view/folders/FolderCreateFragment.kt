@@ -55,7 +55,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                 },
                                 viewModel = viewModel,
                                 settings = settings,
-                                fragmentManager = parentFragmentManager
+                                fragmentManager = parentFragmentManager,
                             )
                         }
                         composable(NavRoutes.name) {
@@ -65,7 +65,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                     viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_COLOR_SHOWN)
                                     navController.navigate(NavRoutes.color)
                                 },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                         composable(NavRoutes.color) {
@@ -81,7 +81,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                         dismiss()
                                     }
                                 },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                     }

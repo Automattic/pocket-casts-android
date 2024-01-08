@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import java.net.HttpURLConnection
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -23,7 +24,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import retrofit2.Retrofit
-import java.net.HttpURLConnection
 
 internal class SyncAccountTest {
 
@@ -86,7 +86,7 @@ internal class SyncAccountTest {
             syncManager.loginWithEmailAndPassword(
                 email = "support+signin@pocketcasts.com",
                 password = "password_signin",
-                signInSource = SignInSource.UserInitiated.Onboarding
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
         }
         assert(result is LoginResult.Success)

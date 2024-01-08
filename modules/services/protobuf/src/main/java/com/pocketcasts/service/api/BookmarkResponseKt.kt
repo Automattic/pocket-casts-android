@@ -3,11 +3,13 @@
 
 // Generated files should ignore deprecation warnings
 @file:Suppress("DEPRECATION")
+
 package com.pocketcasts.service.api
 
 @kotlin.jvm.JvmName("-initializebookmarkResponse")
 public inline fun bookmarkResponse(block: com.pocketcasts.service.api.BookmarkResponseKt.Dsl.() -> kotlin.Unit): com.pocketcasts.service.api.BookmarkResponse =
     com.pocketcasts.service.api.BookmarkResponseKt.Dsl._create(com.pocketcasts.service.api.BookmarkResponse.newBuilder()).apply { block() }._build()
+
 /**
  * Protobuf type `api.BookmarkResponse`
  */
@@ -15,7 +17,7 @@ public object BookmarkResponseKt {
     @kotlin.OptIn(com.google.protobuf.kotlin.OnlyForUseByGeneratedProtoCode::class)
     @com.google.protobuf.kotlin.ProtoDslMarker
     public class Dsl private constructor(
-        private val _builder: com.pocketcasts.service.api.BookmarkResponse.Builder
+        private val _builder: com.pocketcasts.service.api.BookmarkResponse.Builder,
     ) {
         public companion object {
             @kotlin.jvm.JvmSynthetic
@@ -33,10 +35,12 @@ public object BookmarkResponseKt {
         public var bookmarkUuid: kotlin.String
             @JvmName("getBookmarkUuid")
             get() = _builder.getBookmarkUuid()
+
             @JvmName("setBookmarkUuid")
             set(value) {
                 _builder.setBookmarkUuid(value)
             }
+
         /**
          * `string bookmark_uuid = 1;`
          */
@@ -50,10 +54,12 @@ public object BookmarkResponseKt {
         public var podcastUuid: kotlin.String
             @JvmName("getPodcastUuid")
             get() = _builder.getPodcastUuid()
+
             @JvmName("setPodcastUuid")
             set(value) {
                 _builder.setPodcastUuid(value)
             }
+
         /**
          * `string podcast_uuid = 2;`
          */
@@ -67,10 +73,12 @@ public object BookmarkResponseKt {
         public var episodeUuid: kotlin.String
             @JvmName("getEpisodeUuid")
             get() = _builder.getEpisodeUuid()
+
             @JvmName("setEpisodeUuid")
             set(value) {
                 _builder.setEpisodeUuid(value)
             }
+
         /**
          * `string episode_uuid = 3;`
          */
@@ -84,10 +92,12 @@ public object BookmarkResponseKt {
         public var time: kotlin.Int
             @JvmName("getTime")
             get() = _builder.getTime()
+
             @JvmName("setTime")
             set(value) {
                 _builder.setTime(value)
             }
+
         /**
          * `int32 time = 5;`
          */
@@ -101,10 +111,12 @@ public object BookmarkResponseKt {
         public var title: kotlin.String
             @JvmName("getTitle")
             get() = _builder.getTitle()
+
             @JvmName("setTitle")
             set(value) {
                 _builder.setTitle(value)
             }
+
         /**
          * `string title = 6;`
          */
@@ -118,16 +130,19 @@ public object BookmarkResponseKt {
         public var createdAt: com.google.protobuf.Timestamp
             @JvmName("getCreatedAt")
             get() = _builder.getCreatedAt()
+
             @JvmName("setCreatedAt")
             set(value) {
                 _builder.setCreatedAt(value)
             }
+
         /**
          * `.google.protobuf.Timestamp createdAt = 7;`
          */
         public fun clearCreatedAt() {
             _builder.clearCreatedAt()
         }
+
         /**
          * `.google.protobuf.Timestamp createdAt = 7;`
          * @return Whether the createdAt field is set.

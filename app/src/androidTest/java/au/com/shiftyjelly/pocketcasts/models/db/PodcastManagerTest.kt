@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.After
@@ -29,7 +30,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import java.util.UUID
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class PodcastManagerTest {
@@ -94,7 +94,7 @@ class PodcastManagerTest {
             refreshServerManager = refreshServerManager,
             syncManager = syncManagerSignedIn,
             applicationScope = CoroutineScope(Dispatchers.Default),
-            appDatabase = appDatabase
+            appDatabase = appDatabase,
         )
     }
 

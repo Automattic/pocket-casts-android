@@ -36,7 +36,7 @@ fun StoryPrimaryText(
         lineHeight = 31.sp,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp),
     )
 }
 
@@ -55,7 +55,7 @@ fun StorySecondaryText(
         disableScale = disableScale(),
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp),
     )
 }
 

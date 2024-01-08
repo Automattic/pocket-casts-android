@@ -25,7 +25,7 @@ class SelectSortByDialog(val settings: Settings, val changeSortOrder: (PodcastsS
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
-                click = { changeSortOrder(order) }
+                click = { changeSortOrder(order) },
             )
         }
         dialog.show(fragmentManager, "select_podcasts_sort_dialog")

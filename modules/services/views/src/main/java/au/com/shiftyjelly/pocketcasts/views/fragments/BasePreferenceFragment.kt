@@ -17,7 +17,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val root = super.onCreateView(inflater, container, savedInstanceState) as ViewGroup
         progressBar = createProgressBar()
@@ -45,7 +45,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat() {
             isIndeterminate = true
             layoutParams = FrameLayout.LayoutParams(
                 24.dpToPx(requireContext()),
-                24.dpToPx(requireContext())
+                24.dpToPx(requireContext()),
             ).apply {
                 gravity = Gravity.CENTER
             }

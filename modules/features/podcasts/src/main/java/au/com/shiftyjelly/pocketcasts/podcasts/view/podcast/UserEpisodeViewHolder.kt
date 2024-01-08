@@ -110,7 +110,7 @@ class UserEpisodeViewHolder(
 
                 listOf(
                     EpisodeItemTouchHelper.IconWithBackground(addToUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_04)),
-                    EpisodeItemTouchHelper.IconWithBackground(secondaryUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_03))
+                    EpisodeItemTouchHelper.IconWithBackground(secondaryUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_03)),
                 )
             }
         }
@@ -118,8 +118,8 @@ class UserEpisodeViewHolder(
         listOf(
             EpisodeItemTouchHelper.IconWithBackground(
                 iconRes = VR.drawable.ic_delete,
-                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_05)
-            )
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_05),
+            ),
         )
 
     fun setup(
@@ -279,5 +279,5 @@ class UserEpisodeViewHolder(
 
 private data class EpisodeStreamProgress(
     val downloadProgress: Float,
-    val uploadProgress: Float
+    val uploadProgress: Float,
 )

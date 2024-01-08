@@ -21,19 +21,25 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.OpmlExporter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ExportSettingsFragment : PreferenceFragmentCompat() {
 
     @Inject lateinit var serverManager: ServerManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var syncManager: SyncManager
-    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null

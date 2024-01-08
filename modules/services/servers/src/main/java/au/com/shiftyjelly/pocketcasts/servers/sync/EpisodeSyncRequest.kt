@@ -9,7 +9,7 @@ data class EpisodeSyncRequest(
     @field:Json(name = "podcast") val podcast: String,
     @field:Json(name = "position") val position: Long,
     @field:Json(name = "duration") val duration: Long,
-    @field:Json(name = "status") val status: Int
+    @field:Json(name = "status") val status: Int,
 ) {
     companion object {
         const val STATUS_UNPLAYED = 1

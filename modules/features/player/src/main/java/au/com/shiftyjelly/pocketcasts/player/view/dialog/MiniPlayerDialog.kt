@@ -39,7 +39,7 @@ class MiniPlayerDialog(
                     isOptionClicked = true
                     analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to MARK_PLAYED))
                     markAsPlayed()
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.player_end_playback_clear_up_next,
@@ -50,7 +50,7 @@ class MiniPlayerDialog(
                     isOptionClicked = true
                     analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to CLOSE_AND_CLEAR_UP_NEXT))
                     endPlaybackAndClearUpNext(context)
-                }
+                },
             )
             .setOnDismiss {
                 if (!isOptionClicked) {
@@ -66,7 +66,7 @@ class MiniPlayerDialog(
             removeNowPlaying = true,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
-            context = context
+            context = context,
         )
         dialog.showOrClear(fragmentManager)
     }

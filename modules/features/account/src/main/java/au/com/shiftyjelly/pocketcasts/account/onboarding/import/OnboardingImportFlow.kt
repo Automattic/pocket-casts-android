@@ -68,7 +68,7 @@ object OnboardingImportFlow {
                             function()
                         }
                     },
-                    onBackPressed = { navController.popBackStack() }
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
 
@@ -82,7 +82,7 @@ object OnboardingImportFlow {
                         stringResource(LR.string.onboarding_import_from_other_apps_step_1),
                         stringResource(LR.string.onboarding_import_from_other_apps_step_2),
                     ),
-                    onBackPressed = { navController.popBackStack() }
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
         }

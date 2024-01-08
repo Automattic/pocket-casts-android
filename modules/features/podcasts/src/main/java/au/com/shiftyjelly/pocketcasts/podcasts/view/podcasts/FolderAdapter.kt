@@ -40,7 +40,7 @@ class FolderAdapter(
     val clickListener: ClickListener,
     val settings: Settings,
     val context: Context,
-    val theme: Theme
+    val theme: Theme,
 ) : ListAdapter<FolderItem, RecyclerView.ViewHolder>(FolderItemDiffCallback()) {
 
     var badgeType = BadgeType.OFF
@@ -81,7 +81,7 @@ class FolderAdapter(
                     theme = theme,
                     gridWidthDp = gridWidthDp,
                     podcastsLayout = podcastsLayout,
-                    onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) }
+                    onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) },
                 )
             }
             else -> throw Exception("Unknown view type $viewType")
@@ -153,7 +153,7 @@ class FolderAdapter(
         val view: View,
         private val imageLoader: PodcastImageLoader,
         podcastGridLayout: PodcastGridLayoutType,
-        val theme: Theme
+        val theme: Theme,
     ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
 
         val button: View = view.findViewById(R.id.button)

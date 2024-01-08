@@ -54,7 +54,7 @@ class BookmarkHelper @Inject constructor(
             // Load existing bookmark
             var bookmark = bookmarkManager.findByEpisodeTime(
                 episode = episode,
-                timeSecs = timeInSecs
+                timeSecs = timeInSecs,
             )
 
             if (bookmark == null) {
@@ -86,18 +86,18 @@ private fun buildAndShowNotification(
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE, bookmarkUuid)
+        buildPendingIntent(context, INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE, bookmarkUuid),
     )
 
     val deleteAction = NotificationCompat.Action(
         R.drawable.ic_delete_black,
         context.getString(LR.string.bookmark_notification_action_delete_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid,)
+        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid),
     )
 
     val notification = NotificationCompat.Builder(
         context,
-        Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id
+        Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id,
     )
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setContentTitle(context.getString(LR.string.bookmark_notification_title_added))
@@ -110,14 +110,14 @@ private fun buildAndShowNotification(
                 context,
                 INTENT_OPEN_APP_VIEW_BOOKMARKS,
                 bookmarkUuid,
-            )
+            ),
         )
         .addAction(changeTitleAction)
         .addAction(deleteAction)
         .build()
     if (ActivityCompat.checkSelfPermission(
             context,
-            Manifest.permission.POST_NOTIFICATIONS
+            Manifest.permission.POST_NOTIFICATIONS,
         ) == PackageManager.PERMISSION_GRANTED
     ) {
         NotificationManagerCompat.from(context)
@@ -144,6 +144,6 @@ private fun buildPendingIntent(
         context,
         0,
         appIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
     )
 }

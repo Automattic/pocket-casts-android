@@ -14,7 +14,7 @@ fun NavGraphBuilder.settingsRoutes(navController: NavController) {
             signInClick = { navController.navigate(authenticationSubGraph) },
             navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
             navigateToAbout = { navController.navigate(WearAboutScreen.route) },
-            navigateToHelp = { navController.navigate(HelpScreen.route) }
+            navigateToHelp = { navController.navigate(HelpScreen.route) },
         )
     }
 
@@ -26,7 +26,7 @@ fun NavGraphBuilder.settingsRoutes(navController: NavController) {
         WearAboutScreen(
             columnState = it.columnState,
             onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.termsOfService) },
-            onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) }
+            onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) },
         )
     }
 

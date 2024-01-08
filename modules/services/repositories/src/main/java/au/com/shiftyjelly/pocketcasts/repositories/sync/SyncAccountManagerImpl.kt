@@ -14,15 +14,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Singleton
 open class SyncAccountManagerImpl @Inject constructor(
     private val tokenErrorNotification: TokenErrorNotification,
-    private val accountManager: AccountManager
+    private val accountManager: AccountManager,
 ) : TokenHandler, SyncAccountManager {
 
     override fun getAccount(): Account? {
@@ -67,7 +67,7 @@ open class SyncAccountManagerImpl @Inject constructor(
                     Bundle(),
                     false,
                     null,
-                    null
+                    null,
                 )
                 val bundle: Bundle = resultFuture.result // This call will block until the result is available.
                 val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
@@ -105,7 +105,7 @@ open class SyncAccountManagerImpl @Inject constructor(
         val userData = bundleOf(
             AccountConstants.UUID to uuid,
             AccountConstants.SIGN_IN_TYPE_KEY to AccountConstants.SignInType.Tokens.value,
-            AccountConstants.LOGIN_IDENTITY to loginIdentity.value
+            AccountConstants.LOGIN_IDENTITY to loginIdentity.value,
         )
         val accountAdded = accountManager.addAccountExplicitly(account, refreshToken.value, userData)
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)

@@ -38,7 +38,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun FolderEditColorPage(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
-    viewModel: FolderEditViewModel
+    viewModel: FolderEditViewModel,
 ) {
     val state: FolderEditViewModel.State by viewModel.state.collectAsState()
     val colorId: Int by viewModel.colorId.collectAsState()
@@ -55,7 +55,7 @@ fun FolderEditColorPage(
         gridImageWidthDp = gridImageWidthDp,
         onBackClick = onBackClick,
         onSaveClick = onSaveClick,
-        onColorChange = { viewModel.changeColor(it) }
+        onColorChange = { viewModel.changeColor(it) },
     )
 }
 
@@ -67,7 +67,7 @@ private fun FolderEditColorForm(
     gridImageWidthDp: Int,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
-    onColorChange: (Int) -> Unit
+    onColorChange: (Int) -> Unit,
 ) {
     BoxWithConstraints {
         val maxHeight = this.maxHeight
@@ -75,30 +75,30 @@ private fun FolderEditColorForm(
             BottomSheetAppBar(
                 title = stringResource(LR.string.folder_choose_a_color),
                 navigationButton = NavigationButton.Back,
-                onNavigationClick = { onBackClick() }
+                onNavigationClick = { onBackClick() },
             )
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 TextC70(
                     text = stringResource(LR.string.color),
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, end = 16.dp, start = 16.dp)
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, end = 16.dp, start = 16.dp),
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 FolderColorPicker(
                     selectedId = colorId,
-                    onClick = { colorId -> onColorChange(colorId) }
+                    onClick = { colorId -> onColorChange(colorId) },
                 )
                 TextP60(
                     text = stringResource(LR.string.folder_background_color_summary),
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
+                    modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
                 )
                 TextC70(
                     text = stringResource(LR.string.preview),
-                    modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp, bottom = 8.dp),
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 FolderPreview(
@@ -106,14 +106,14 @@ private fun FolderEditColorForm(
                     name = folderName.ifBlank { stringResource(LR.string.new_folder_title) },
                     colorId = colorId,
                     podcastUuids = state.selectedUuids.toList(),
-                    gridImageWidthDp = gridImageWidthDp
+                    gridImageWidthDp = gridImageWidthDp,
                 )
             }
             // only elevate the bottom button if the content will go under it
             Card(elevation = if (maxHeight > 600.dp) 0.dp else 6.dp) {
                 RowButton(
                     text = stringResource(LR.string.save_folder),
-                    onClick = { onSaveClick() }
+                    onClick = { onSaveClick() },
                 )
             }
         }
@@ -130,19 +130,19 @@ private fun FolderPreview(layout: PodcastGridLayoutType, name: String, colorId: 
                 name = name,
                 podcastUuids = podcastUuids,
                 onClick = null,
-                modifier = modifier.padding(vertical = 8.dp)
+                modifier = modifier.padding(vertical = 8.dp),
             )
         }
         else -> {
             Card(
                 modifier = modifier.padding(all = 16.dp),
-                elevation = 4.dp
+                elevation = 4.dp,
             ) {
                 FolderImage(
                     name = name,
                     color = backgroundColor,
                     podcastUuids = podcastUuids,
-                    modifier = Modifier.size(gridImageWidthDp.dp)
+                    modifier = Modifier.size(gridImageWidthDp.dp),
                 )
             }
         }
@@ -177,7 +177,7 @@ private fun FolderEditColorFormPreview(themeType: Theme.ThemeType = Theme.ThemeT
             gridImageWidthDp = 100,
             onBackClick = {},
             onSaveClick = {},
-            onColorChange = {}
+            onColorChange = {},
         )
     }
 }

@@ -41,6 +41,9 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,9 +65,6 @@ import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -151,7 +151,7 @@ class EpisodeViewModel @Inject constructor(
 
         val downloadProgressFlow = combine(
             episodeFlow,
-            downloadManager.progressUpdateRelay.asFlow()
+            downloadManager.progressUpdateRelay.asFlow(),
         ) { episode, downloadProgressUpdate ->
             (episode to downloadProgressUpdate)
         }.filter { (episode, downloadProgressUpdate) ->
@@ -180,7 +180,7 @@ class EpisodeViewModel @Inject constructor(
             isPlayingEpisodeFlow.onStart { emit(false) },
             inUpNextFlow,
             downloadProgressFlow.onStart<Float?> { emit(null) },
-            showNotesFlow
+            showNotesFlow,
         ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesState ->
 
             State.Loaded(
@@ -227,7 +227,7 @@ class EpisodeViewModel @Inject constructor(
             State.Loaded.ErrorData(
                 errorTitleRes = it,
                 errorIconRes = errorIconRes ?: IR.drawable.ic_failedwarning,
-                errorDescription = errorDescription
+                errorDescription = errorDescription,
             )
         }
     }
@@ -278,7 +278,7 @@ class EpisodeViewModel @Inject constructor(
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
                     source = sourceView,
-                    uuid = episode.uuid
+                    uuid = episode.uuid,
                 )
             } else if (!episode.isDownloaded) {
                 episode.autoDownloadStatus =
@@ -288,7 +288,7 @@ class EpisodeViewModel @Inject constructor(
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
                     source = sourceView,
-                    uuid = episode.uuid
+                    uuid = episode.uuid,
                 )
             }
         }
@@ -312,7 +312,7 @@ class EpisodeViewModel @Inject constructor(
                         episode,
                         playbackManager,
                         disableAutoDownload = true,
-                        removeFromUpNext = true
+                        removeFromUpNext = true,
                     )
                 }
                 is UserEpisode -> {
@@ -321,7 +321,7 @@ class EpisodeViewModel @Inject constructor(
                         playbackManager = playbackManager,
                         episodeManager = episodeManager,
                         userEpisodeManager = userEpisodeManager,
-                        applicationScope = applicationScope
+                        applicationScope = applicationScope,
                     )
                 }
             }
@@ -386,7 +386,7 @@ class EpisodeViewModel @Inject constructor(
             playbackManager.play(
                 upNextPosition = upNextPosition,
                 episode = state.episode,
-                source = sourceView
+                source = sourceView,
             )
         }
     }
@@ -395,13 +395,13 @@ class EpisodeViewModel @Inject constructor(
         val state = stateFlow.value as? State.Loaded ?: return
         playbackManager.removeEpisode(
             episodeToRemove = state.episode,
-            source = SourceView.EPISODE_DETAILS
+            source = SourceView.EPISODE_DETAILS,
         )
     }
 
     fun onUpNextClicked(
         onRemoveFromUpNext: () -> Unit,
-        navigateToUpNextOptions: () -> Unit
+        navigateToUpNextOptions: () -> Unit,
     ) {
         val state = stateFlow.value as? State.Loaded ?: return
 
@@ -430,14 +430,14 @@ class EpisodeViewModel @Inject constructor(
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_UNARCHIVED,
                     sourceView,
-                    episode.uuid
+                    episode.uuid,
                 )
             } else {
                 episodeManager.archive(episode, playbackManager)
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_ARCHIVED,
                     sourceView,
-                    episode.uuid
+                    episode.uuid,
                 )
             }
         }
@@ -495,7 +495,7 @@ class EpisodeViewModel @Inject constructor(
                         continuation.resume(
                             lightVibrantHsl?.let { hsl ->
                                 Color.hsl(hsl[0], hsl[1], hsl[2])
-                            }
+                            },
                         )
                     }
                 }

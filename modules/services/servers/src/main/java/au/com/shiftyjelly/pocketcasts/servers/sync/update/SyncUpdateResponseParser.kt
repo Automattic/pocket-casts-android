@@ -20,12 +20,12 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import java.util.Date
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
-import java.util.Date
 
 class SyncUpdateResponseParser(
     private val featureFlagWrapper: FeatureFlagWrapper,
@@ -221,7 +221,7 @@ class SyncUpdateResponseParser(
                 sortPosition = sortPosition,
                 podcastsSortType = podcastsSortType,
                 deleted = deleted,
-                syncModified = 0
+                syncModified = 0,
             )
             response.folders.add(folder)
         }
@@ -259,7 +259,7 @@ class SyncUpdateResponseParser(
                 title = title,
                 deleted = deleted ?: false,
                 createdAt = createdAt,
-                syncStatus = SyncStatus.SYNCED
+                syncStatus = SyncStatus.SYNCED,
             )
             response.bookmarks.add(bookmark)
         }

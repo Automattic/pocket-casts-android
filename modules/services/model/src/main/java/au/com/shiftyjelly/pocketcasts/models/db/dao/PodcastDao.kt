@@ -16,8 +16,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PodcastDao {
@@ -361,7 +361,7 @@ abstract class PodcastDao {
             GROUP BY podcast_id
             ORDER BY totalPlayedTime DESC, numberOfPlayedEpisodes DESC
             LIMIT :limit
-        """
+        """,
     )
     abstract suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 

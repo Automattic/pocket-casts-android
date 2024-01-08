@@ -66,7 +66,7 @@ class EpisodeContainerFragment :
             overridePodcastLink = overridePodcastLink,
             podcastUuid = episode.podcastUuid,
             fromListUuid = fromListUuid,
-            forceDark = forceDark
+            forceDark = forceDark,
         )
 
         fun newInstance(
@@ -83,7 +83,7 @@ class EpisodeContainerFragment :
                 ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                 ARG_PODCAST_UUID to podcastUuid,
                 ARG_FROMLIST_UUID to fromListUuid,
-                ARG_FORCE_DARK to forceDark
+                ARG_FORCE_DARK to forceDark,
             )
         }
     }
@@ -92,7 +92,7 @@ class EpisodeContainerFragment :
         get() = StatusBarColor.Custom(
             context?.getThemeColor(UR.attr.primary_ui_01)
                 ?: Color.WHITE,
-            theme.isDarkTheme
+            theme.isDarkTheme,
         )
 
     var binding: FragmentEpisodeContainerBinding? = null
@@ -154,7 +154,7 @@ class EpisodeContainerFragment :
                     }
                     dismiss()
                 }
-            }
+            },
         )
         bottomSheetDialog?.behavior?.apply {
             isFitToContents = false
@@ -191,7 +191,7 @@ class EpisodeContainerFragment :
             overridePodcastLink = overridePodcastLink,
             podcastUuid = podcastUuid,
             fromListUuid = fromListUuid,
-            forceDarkTheme = forceDarkTheme
+            forceDarkTheme = forceDarkTheme,
         )
 
         viewPager.adapter = adapter
@@ -296,13 +296,13 @@ class EpisodeContainerFragment :
                     overridePodcastLink = overridePodcastLink,
                     podcastUuid = podcastUuid,
                     fromListUuid = fromListUuid,
-                    forceDark = forceDarkTheme
+                    forceDark = forceDarkTheme,
                 )
 
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
                     episodeUuid = requireNotNull(episodeUUID),
-                    forceDarkTheme = forceDarkTheme
+                    forceDarkTheme = forceDarkTheme,
                 )
             }
         }

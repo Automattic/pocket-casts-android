@@ -43,7 +43,7 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
     override fun onSwiped(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
-        direction: Int
+        direction: Int,
     ): Boolean {
         val episodeViewHolder = viewHolder as? RowSwipeable
             ?: return false
@@ -62,7 +62,7 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
                     setOnClickListener {
                         episodeViewHolder.swipeButtonLayout.rightPrimary().onClick(
                             episode,
-                            rowIndex
+                            rowIndex,
                         )
                         clearView(recyclerView, viewHolder)
                     }
@@ -72,7 +72,7 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
                     setOnClickListener {
                         episodeViewHolder.swipeButtonLayout.rightSecondary()?.onClick?.invoke(
                             episode,
-                            rowIndex
+                            rowIndex,
                         )
                         clearView(recyclerView, viewHolder)
                     }
@@ -90,7 +90,7 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
                     setOnClickListener {
                         episodeViewHolder.swipeButtonLayout.leftPrimary().onClick(
                             episode,
-                            rowIndex
+                            rowIndex,
                         )
                         clearView(recyclerView, viewHolder)
                     }
@@ -129,7 +129,7 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
 
     data class IconWithBackground(
         @DrawableRes val iconRes: Int,
-        @ColorInt val backgroundColor: Int
+        @ColorInt val backgroundColor: Int,
     )
 
     fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder?) {
@@ -149,7 +149,7 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
         DELETE("delete"),
         UNARCHIVE("unarchive"),
         ARCHIVE("archive"),
-        SHARE("share")
+        SHARE("share"),
     }
 
     enum class SwipeSource(val analyticsValue: String) {
@@ -235,7 +235,6 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-
         val episodeViewHolder = viewHolder as? RowSwipeable
             ?: return
 
@@ -243,7 +242,9 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
             (swipeDirection ?: 0) > 0 && dX <= 0 ||
             (swipeDirection ?: 0) < 0 && dX >= 0 ||
             episodeViewHolder.isMultiSelecting
-        ) return
+        ) {
+            return
+        }
 
         val foregroundView = episodeViewHolder.episodeRow
         val rightToLeftLayout = episodeViewHolder.rightToLeftSwipeLayout
@@ -264,7 +265,7 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
                 leftToRightLayout = leftToRightLayout,
                 button1 = episodeViewHolder.swipeButtonLayout.rightPrimary(),
                 button2 = episodeViewHolder.swipeButtonLayout.rightSecondary(),
-                episodeViewHolder = episodeViewHolder
+                episodeViewHolder = episodeViewHolder,
             )
         } else {
             handleSwipeFromLeft(
@@ -273,7 +274,7 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
                 leftToRightLayout = leftToRightLayout,
                 button1 = episodeViewHolder.swipeButtonLayout.leftPrimary(),
                 button2 = episodeViewHolder.swipeButtonLayout.leftSecondary(),
-                episodeViewHolder = episodeViewHolder
+                episodeViewHolder = episodeViewHolder,
             )
         }
     }
@@ -401,7 +402,7 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
     private fun defaultDrawWithoutTranslation(
         recyclerView: RecyclerView,
         view: View,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
         if (Build.VERSION.SDK_INT >= 21) {
             if (isCurrentlyActive) {

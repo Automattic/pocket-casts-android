@@ -26,8 +26,8 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -49,12 +49,12 @@ class FilterSelectFragment private constructor() : BaseFragment() {
 
         fun newInstance(
             source: Source,
-            shouldFilterPlaylistsWithAllPodcasts: Boolean = false
+            shouldFilterPlaylistsWithAllPodcasts: Boolean = false,
         ): Fragment =
             FilterSelectFragment().apply {
                 arguments = bundleOf(
                     ARG_FILTER_ALL_PODCAST_FILTERS to shouldFilterPlaylistsWithAllPodcasts,
-                    ARG_FILTER_SOURCE to source
+                    ARG_FILTER_SOURCE to source,
                 )
             }
     }
@@ -128,7 +128,7 @@ class FilterSelectFragment private constructor() : BaseFragment() {
                     }
 
                     this.adapter = adapter
-                }
+                },
             )
             .addTo(disposables)
     }

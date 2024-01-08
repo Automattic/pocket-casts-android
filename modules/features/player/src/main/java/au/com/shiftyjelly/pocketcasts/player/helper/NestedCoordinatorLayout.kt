@@ -14,7 +14,7 @@ class NestedCoordinatorLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     @AttrRes
     @SuppressLint("PrivateResource")
-    defStyleAttr: Int = androidx.coordinatorlayout.R.attr.coordinatorLayoutStyle
+    defStyleAttr: Int = androidx.coordinatorlayout.R.attr.coordinatorLayoutStyle,
 ) : CoordinatorLayout(context, attrs, defStyleAttr), NestedScrollingChild3 {
 
     private val helper = NestedScrollingChildHelper(this)
@@ -73,7 +73,7 @@ class NestedCoordinatorLayout @JvmOverloads constructor(
         dyConsumed: Int,
         dxUnconsumed: Int,
         dyUnconsumed: Int,
-        type: Int
+        type: Int,
     ) {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
         dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, null, type)
@@ -126,7 +126,7 @@ class NestedCoordinatorLayout @JvmOverloads constructor(
         dxUnconsumed: Int,
         dyUnconsumed: Int,
         offsetInWindow: IntArray?,
-        type: Int
+        type: Int,
     ): Boolean = helper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow, type)
 
     override fun dispatchNestedScroll(
@@ -134,7 +134,7 @@ class NestedCoordinatorLayout @JvmOverloads constructor(
         dyConsumed: Int,
         dxUnconsumed: Int,
         dyUnconsumed: Int,
-        offsetInWindow: IntArray?
+        offsetInWindow: IntArray?,
     ): Boolean = helper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
     override fun dispatchNestedPreScroll(
@@ -142,7 +142,7 @@ class NestedCoordinatorLayout @JvmOverloads constructor(
         dy: Int,
         consumed: IntArray?,
         offsetInWindow: IntArray?,
-        type: Int
+        type: Int,
     ): Boolean = helper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type)
 
     override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?): Boolean =

@@ -35,7 +35,7 @@ fun PodcastSelectGrid(
     onPodcastUnselected: (Podcast) -> Unit,
     onSelectAll: () -> Unit,
     onSelectNone: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
     val imageMinSize = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 120.dp else 80.dp
@@ -45,14 +45,14 @@ fun PodcastSelectGrid(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
         ) {
             items(items = podcasts) { podcast ->
                 PodcastSelectImage(
                     podcast = podcast,
                     selected = selectedPodcasts.contains(podcast),
                     onPodcastSelected = { onPodcastSelected(podcast) },
-                    onPodcastUnselected = { onPodcastUnselected(podcast) }
+                    onPodcastUnselected = { onPodcastUnselected(podcast) },
                 )
             }
         }
@@ -60,7 +60,7 @@ fun PodcastSelectGrid(
             podcasts = podcasts,
             selectedPodcasts = selectedPodcasts,
             onSelectAll = onSelectAll,
-            onSelectNone = onSelectNone
+            onSelectNone = onSelectNone,
         )
     }
 }
@@ -71,7 +71,7 @@ private fun SelectGridFooter(
     selectedPodcasts: Set<Podcast>,
     onSelectAll: () -> Unit,
     onSelectNone: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier.padding(top = 4.dp, start = 16.dp, bottom = 4.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         val amountSelected = when (selectedPodcasts.size) {
@@ -92,7 +92,7 @@ private fun SelectGridFooter(
                     onSelectAll()
                 }
             },
-            modifier = modifier.padding(8.dp)
+            modifier = modifier.padding(8.dp),
         )
     }
 }
@@ -108,7 +108,7 @@ private fun PodcastSelectListPreview() {
                 onPodcastSelected = {},
                 onPodcastUnselected = {},
                 onSelectAll = {},
-                onSelectNone = {}
+                onSelectNone = {},
             )
         }
     }

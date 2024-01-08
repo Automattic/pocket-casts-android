@@ -39,9 +39,9 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -50,6 +50,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
     private var items = emptyList<Any>()
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var settings: Settings
 
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -182,8 +183,8 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
                     AnalyticsProp.Key.ACTION to title,
                     AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
                     AnalyticsProp.Key.MOVED_FROM to movedFrom,
-                    AnalyticsProp.Key.MOVED_TO to movedTo
-                )
+                    AnalyticsProp.Key.MOVED_TO to movedTo,
+                ),
             )
             dragStartPosition = null
         }

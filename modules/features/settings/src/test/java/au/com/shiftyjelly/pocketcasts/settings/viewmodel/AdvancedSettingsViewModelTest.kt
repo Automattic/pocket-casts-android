@@ -41,7 +41,7 @@ class AdvancedSettingsViewModelTest {
         viewModel = AdvancedSettingsViewModel(
             settings,
             analyticsTracker,
-            context
+            context,
         )
     }
 

@@ -37,7 +37,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon0,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher,
-            aliasName = ".ui.MainActivity_0"
+            aliasName = ".ui.MainActivity_0",
         ),
         DARK(
             setting = AppIconSetting.DARK,
@@ -45,7 +45,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon1,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_1,
-            aliasName = ".ui.MainActivity_1"
+            aliasName = ".ui.MainActivity_1",
         ),
         ROUND_LIGHT(
             setting = AppIconSetting.ROUND_LIGHT,
@@ -53,7 +53,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon2,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_2,
-            aliasName = ".ui.MainActivity_2"
+            aliasName = ".ui.MainActivity_2",
         ),
         ROUND_DARK(
             setting = AppIconSetting.ROUND_DARK,
@@ -61,7 +61,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon3,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_3,
-            aliasName = ".ui.MainActivity_3"
+            aliasName = ".ui.MainActivity_3",
         ),
         INDIGO(
             setting = AppIconSetting.INDIGO,
@@ -69,7 +69,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon_indigo,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_indigo,
-            aliasName = ".ui.MainActivity_9"
+            aliasName = ".ui.MainActivity_9",
         ),
         ROSE(
             setting = AppIconSetting.ROSE,
@@ -77,7 +77,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_rose,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_rose,
-            aliasName = ".ui.MainActivity_12"
+            aliasName = ".ui.MainActivity_12",
         ),
         CAT(
             setting = AppIconSetting.CAT,
@@ -85,7 +85,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon_pocket_cats,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_cat,
-            aliasName = ".ui.MainActivity_10"
+            aliasName = ".ui.MainActivity_10",
         ),
         REDVELVET(
             setting = AppIconSetting.REDVELVET,
@@ -93,7 +93,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_red_velvet,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_redvelvet,
-            aliasName = ".ui.MainActivity_11"
+            aliasName = ".ui.MainActivity_11",
         ),
         PRIDE_2023(
             setting = AppIconSetting.PRIDE_2023,
@@ -101,7 +101,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_pride_2023,
             tier = SubscriptionTier.NONE,
             launcherIcon = IR.mipmap.ic_launcher_pride_2023,
-            aliasName = ".ui.MainActivity_18"
+            aliasName = ".ui.MainActivity_18",
         ),
         PLUS(
             setting = AppIconSetting.PLUS,
@@ -109,7 +109,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon4,
             tier = SubscriptionTier.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_4,
-            aliasName = ".ui.MainActivity_4"
+            aliasName = ".ui.MainActivity_4",
         ),
         CLASSIC(
             setting = AppIconSetting.CLASSIC,
@@ -117,7 +117,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon5,
             tier = SubscriptionTier.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_5,
-            aliasName = ".ui.MainActivity_5"
+            aliasName = ".ui.MainActivity_5",
         ),
         ELECTRIC_BLUE(
             setting = AppIconSetting.ELECTRIC_BLUE,
@@ -125,7 +125,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon6,
             tier = SubscriptionTier.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_6,
-            aliasName = ".ui.MainActivity_6"
+            aliasName = ".ui.MainActivity_6",
         ),
         ELECTRIC_PINK(
             setting = AppIconSetting.ELECTRIC_PINK,
@@ -133,7 +133,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon7,
             tier = SubscriptionTier.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_7,
-            aliasName = ".ui.MainActivity_7"
+            aliasName = ".ui.MainActivity_7",
         ),
         RADIOACTIVE(
             setting = AppIconSetting.RADIOACTIVE,
@@ -141,7 +141,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_radioactive,
             tier = SubscriptionTier.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_radioactive,
-            aliasName = ".ui.MainActivity_8"
+            aliasName = ".ui.MainActivity_8",
         ),
         HALLOWEEN(
             setting = AppIconSetting.HALLOWEEN,
@@ -149,7 +149,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_halloween,
             tier = SubscriptionTier.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_halloween,
-            aliasName = ".ui.MainActivity_13"
+            aliasName = ".ui.MainActivity_13",
         ),
         PATRON_CHROME(
             setting = AppIconSetting.PATRON_CHROME,
@@ -157,7 +157,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_patron_chrome,
             tier = SubscriptionTier.PATRON,
             launcherIcon = IR.mipmap.ic_launcher_patron_chrome,
-            aliasName = ".ui.MainActivity_14"
+            aliasName = ".ui.MainActivity_14",
         ),
         PATRON_ROUND(
             setting = AppIconSetting.PATRON_ROUND,
@@ -165,7 +165,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_patron_round,
             tier = SubscriptionTier.PATRON,
             launcherIcon = IR.mipmap.ic_launcher_patron_round,
-            aliasName = ".ui.MainActivity_15"
+            aliasName = ".ui.MainActivity_15",
         ),
         PATRON_GLOW(
             setting = AppIconSetting.PATRON_GLOW,
@@ -173,7 +173,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_patron_glow,
             tier = SubscriptionTier.PATRON,
             launcherIcon = IR.mipmap.ic_launcher_patron_glow,
-            aliasName = ".ui.MainActivity_16"
+            aliasName = ".ui.MainActivity_16",
         ),
         PATRON_DARK(
             setting = AppIconSetting.PATRON_DARK,
@@ -181,8 +181,9 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.appicon_patron_dark,
             tier = SubscriptionTier.PATRON,
             launcherIcon = IR.mipmap.ic_launcher_patron_dark,
-            aliasName = ".ui.MainActivity_17"
-        );
+            aliasName = ".ui.MainActivity_17",
+        ),
+        ;
 
         companion object {
             fun fromSetting(setting: AppIconSetting) = when (setting) {
@@ -229,7 +230,7 @@ class AppIcon @Inject constructor(
             context.packageManager.setComponentEnabledSetting(
                 componentName,
                 enabledFlag,
-                PackageManager.DONT_KILL_APP
+                PackageManager.DONT_KILL_APP,
             )
         }
     }

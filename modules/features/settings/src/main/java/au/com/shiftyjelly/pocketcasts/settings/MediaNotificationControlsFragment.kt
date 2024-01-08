@@ -48,10 +48,10 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -62,6 +62,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
 
     @Inject
     lateinit var settings: Settings
+
     @Inject
     lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
@@ -75,7 +76,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN)
         binding = FragmentMediaNotificationControlsBinding.inflate(inflater, container, false)
@@ -105,7 +106,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         view.setBackgroundColor(backgroundColor)
         adapter.selectedBackground = ColorUtils.calculateCombinedColor(
             backgroundColor,
-            view.context.getThemeColor(UR.attr.primary_ui_02_selected)
+            view.context.getThemeColor(UR.attr.primary_ui_02_selected),
         )
 
         val recyclerView = binding.recyclerView
@@ -140,7 +141,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                         onShowCustomMediaActionsToggled = { showCustomActions ->
                             settings.customMediaActionsVisibility.set(showCustomActions)
                             updateMediaActionsVisibility(showCustomActions)
-                        }
+                        },
                     )
                 }
             }
@@ -150,7 +151,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     @Composable
     private fun ShowCustomMediaActionsSettingsRow(
         shouldShowCustomMediaActions: Boolean,
-        onShowCustomMediaActionsToggled: (Boolean) -> Unit
+        onShowCustomMediaActionsToggled: (Boolean) -> Unit,
     ) {
         Column {
             SettingRow(
@@ -162,14 +163,14 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                     .padding(top = 8.dp)
                     .toggleable(
                         value = shouldShowCustomMediaActions,
-                        role = Role.Switch
+                        role = Role.Switch,
                     ) {
                         analyticsTracker.track(
                             AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED,
-                            mapOf("enabled" to it)
+                            mapOf("enabled" to it),
                         )
                         onShowCustomMediaActionsToggled(it)
-                    }
+                    },
             )
         }
     }
@@ -183,7 +184,6 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     }
 
     override fun onMediaActionItemMove(fromPosition: Int, toPosition: Int) {
-
         val updatedItems = items.toMutableList()
 
         if (fromPosition < toPosition) {
@@ -205,7 +205,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         updateMediaActionMove(
             fromPosition = fromPosition,
             originalItems = items,
-            updatedItems = updatedItems
+            updatedItems = updatedItems,
         )
         adapter.submitList(updatedItems)
         items = updatedItems.toList()
@@ -214,7 +214,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     private fun updateMediaActionMove(
         fromPosition: Int,
         originalItems: List<Any>,
-        updatedItems: List<Any>
+        updatedItems: List<Any>,
     ) {
         mediaActionMove = mediaActionMove.let { mediaActionMove ->
             when (mediaActionMove) {
@@ -228,7 +228,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                         MediaActionMove(
                             item = movedControl,
                             fromPosition = positionOfControl(originalItems, movedControl),
-                            toPosition = positionOfControl(updatedItems, movedControl)
+                            toPosition = positionOfControl(updatedItems, movedControl),
                         )
                     }
                 }
@@ -236,7 +236,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                 else -> {
                     // Update end position
                     mediaActionMove.copy(
-                        toPosition = positionOfControl(updatedItems, mediaActionMove.item)
+                        toPosition = positionOfControl(updatedItems, mediaActionMove.item),
                     )
                 }
             }
@@ -262,7 +262,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                     },
                     "previous_position" to mediaActionMove.fromPosition,
                     "updated_position" to mediaActionMove.toPosition,
-                )
+                ),
             )
         } ?: Timber.e("Attempted to track move but mediaActionMove was null")
     }

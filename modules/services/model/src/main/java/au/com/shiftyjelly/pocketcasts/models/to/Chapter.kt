@@ -9,7 +9,7 @@ data class Chapter(
     val url: HttpUrl? = null,
     val imagePath: String? = null,
     val mimeType: String? = null,
-    var index: Int = 0
+    var index: Int = 0,
 ) {
 
     val isImagePresent: Boolean

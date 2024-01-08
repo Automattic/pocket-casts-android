@@ -17,7 +17,7 @@ data class PodcastResponse(
     @field:Json(name = "has_seasons") val hasSeasons: Boolean,
     @field:Json(name = "season_count") val seasonCount: Int,
     @field:Json(name = "refresh_allowed") val refreshAllowed: Boolean?,
-    @field:Json(name = "podcast") val podcastInfo: PodcastInfo
+    @field:Json(name = "podcast") val podcastInfo: PodcastInfo,
 ) {
 
     // for the moshi code generation to attach a helper
@@ -72,7 +72,7 @@ data class EpisodeInfo(
     @field:Json(name = "file_type") val fileType: String?,
     @field:Json(name = "file_size") val fileSize: Long?,
     @field:Json(name = "duration") val duration: Double?,
-    @field:Json(name = "published") val published: String
+    @field:Json(name = "published") val published: String,
 ) {
 
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
@@ -90,7 +90,7 @@ data class EpisodeInfo(
             addedDate = Date(),
             season = season,
             number = number,
-            type = type
+            type = type,
         )
     }
 }

@@ -53,14 +53,17 @@ fun ChapterRow(
 ) {
     val chapter = state.chapter
     val textColor =
-        if (state is ChaptersViewModel.ChapterState.Played) MaterialTheme.theme.colors.playerContrast04
-        else MaterialTheme.theme.colors.playerContrast01
+        if (state is ChaptersViewModel.ChapterState.Played) {
+            MaterialTheme.theme.colors.playerContrast04
+        } else {
+            MaterialTheme.theme.colors.playerContrast01
+        }
     Box(
         modifier = modifier
             // use intrinsic height so the progress bar fills the height of the row
             .height(IntrinsicSize.Max)
             .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp)),
     ) {
         if (state is ChaptersViewModel.ChapterState.Playing) {
             ChapterProgressBar(progress = state.progress)
@@ -70,11 +73,11 @@ fun ChapterRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onClick() }
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 12.dp),
         ) {
             TextH50(
                 text = chapter.index.toString(),
-                color = textColor
+                color = textColor,
             )
             Spacer(Modifier.width(8.dp))
             TextH50(
@@ -83,13 +86,13 @@ fun ChapterRow(
                 maxLines = 2,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 16.dp),
             )
             Spacer(Modifier.width(4.dp))
             if (chapter.url != null) {
                 LinkButton(
                     textColor = textColor,
-                    onClick = onUrlClick
+                    onClick = onUrlClick,
                 )
                 Spacer(Modifier.width(8.dp))
             }
@@ -99,7 +102,7 @@ fun ChapterRow(
                 text = duration,
                 color = textColor,
                 textAlign = TextAlign.End,
-                modifier = Modifier.widthIn(min = 60.dp)
+                modifier = Modifier.widthIn(min = 60.dp),
             )
         }
     }
@@ -110,13 +113,13 @@ private fun ChapterProgressBar(progress: Float, modifier: Modifier = Modifier) {
     Box(
         modifier
             .fillMaxSize()
-            .background(MaterialTheme.theme.colors.playerContrast06)
+            .background(MaterialTheme.theme.colors.playerContrast06),
     ) {
         Box(
             Modifier
                 .fillMaxWidth(fraction = progress)
                 .fillMaxHeight()
-                .background(MaterialTheme.theme.colors.playerContrast05)
+                .background(MaterialTheme.theme.colors.playerContrast05),
         )
     }
 }
@@ -129,13 +132,13 @@ private fun LinkButton(textColor: Color, onClick: () -> Unit, modifier: Modifier
             .padding(4.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.theme.colors.playerContrast05)
-            .size(24.dp)
+            .size(24.dp),
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_link),
             tint = textColor,
             contentDescription = stringResource(LR.string.player_chapter_url),
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(16.dp),
         )
     }
 }
@@ -151,24 +154,24 @@ fun ChapterRowPreview() {
         url = "https://pocketcasts.com".toHttpUrlOrNull(),
         imagePath = null,
         mimeType = null,
-        index = 1
+        index = 1,
     )
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         Column {
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Played(chapter = chapter),
                 onClick = {},
-                onUrlClick = {}
+                onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Playing(chapter = chapter, progress = 0.5f),
                 onClick = {},
-                onUrlClick = {}
+                onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter),
                 onClick = {},
-                onUrlClick = {}
+                onUrlClick = {},
             )
         }
     }

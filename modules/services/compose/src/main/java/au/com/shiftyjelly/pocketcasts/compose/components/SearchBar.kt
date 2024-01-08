@@ -43,7 +43,7 @@ fun SearchBar(
     onTextChanged: (String) -> Unit,
     placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
@@ -60,7 +60,7 @@ fun SearchBar(
             trailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
             backgroundColor = MaterialTheme.theme.colors.primaryField01,
             focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent
+            unfocusedBorderColor = Color.Transparent,
         ),
         shape = RoundedCornerShape(10.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -68,13 +68,13 @@ fun SearchBar(
             onSearch = {
                 onSearch()
                 focusManager.clearFocus()
-            }
+            },
         ),
         maxLines = 1,
         leadingIcon = {
             Icon(
                 painter = painterResource(IR.drawable.ic_search),
-                contentDescription = null
+                contentDescription = null,
             )
         },
         trailingIcon = {
@@ -83,11 +83,11 @@ fun SearchBar(
                     onClick = {
                         onTextChanged("")
                         focusManager.clearFocus()
-                    }
+                    },
                 ) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_cancel),
-                        contentDescription = stringResource(LR.string.cancel)
+                        contentDescription = stringResource(LR.string.cancel),
                     )
                 }
             }
@@ -100,7 +100,7 @@ fun SearchBar(
             } else {
                 false
             }
-        }
+        },
     )
 }
 
@@ -119,19 +119,19 @@ fun SearchBarButton(
                     onClick()
                     true
                 }
-            }
+            },
     ) {
         SearchBar(
             text = "",
             placeholder = text,
             onTextChanged = {},
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Box(
             Modifier
                 .matchParentSize() // cover SearchBar
-                .clickable { onClick() } // handle click events
+                .clickable { onClick() }, // handle click events
         )
     }
 }

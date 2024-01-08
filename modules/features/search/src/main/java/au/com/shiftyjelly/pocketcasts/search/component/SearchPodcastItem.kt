@@ -31,7 +31,7 @@ fun SearchPodcastItem(
             .semantics(mergeDescendants = true) {}
             .width(PodcastItemIconSize + 16.dp)
             .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
-            .padding(8.dp)
+            .padding(8.dp),
     ) {
         PodcastSubscribeImage(
             podcastUuid = podcast.uuid,
@@ -44,7 +44,7 @@ fun SearchPodcastItem(
             },
             subscribeButtonSize = 32.dp,
             shadowSize = 0.dp,
-            subscribeOnPodcastTap = false
+            subscribeOnPodcastTap = false,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -56,7 +56,7 @@ fun SearchPodcastItem(
         TextH50(
             text = podcast.author,
             maxLines = 1,
-            color = MaterialTheme.theme.colors.primaryText02
+            color = MaterialTheme.theme.colors.primaryText02,
         )
     }
 }

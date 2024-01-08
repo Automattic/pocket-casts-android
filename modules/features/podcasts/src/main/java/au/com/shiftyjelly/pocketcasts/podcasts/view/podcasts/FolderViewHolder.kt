@@ -26,7 +26,7 @@ class FolderViewHolder(
     val theme: Theme,
     val gridWidthDp: Int,
     val podcastsLayout: PodcastGridLayoutType,
-    val onFolderClick: (Folder) -> Unit
+    val onFolderClick: (Folder) -> Unit,
 ) : RecyclerView.ViewHolder(composeView) {
 
     fun bind(folder: Folder, podcasts: List<Podcast>, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>) {
@@ -44,7 +44,7 @@ class FolderViewHolder(
                             podcastUuids = podcastUuids,
                             badgeCount = badgeCount,
                             badgeType = badgeType,
-                            onClick = { onFolderClick(folder) }
+                            onClick = { onFolderClick(folder) },
                         )
                     }
                     else -> {
@@ -55,7 +55,7 @@ class FolderViewHolder(
                             badgeCount = badgeCount,
                             badgeType = badgeType,
                             onClick = { onFolderClick(folder) },
-                            modifier = Modifier.size(gridWidthDp.dp)
+                            modifier = Modifier.size(gridWidthDp.dp),
                         )
                     }
                 }
@@ -84,7 +84,7 @@ private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<Str
         podcastUuids = podcastUuids,
         badgeCount = badgeCount,
         badgeType = badgeType,
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 
@@ -98,7 +98,7 @@ private fun FolderListAdapter(color: Color, name: String, podcastUuids: List<Str
             badgeCount = badgeCount,
             badgeType = badgeType,
             modifier = modifier,
-            onClick = onClick
+            onClick = onClick,
         )
         HorizontalDivider()
     }

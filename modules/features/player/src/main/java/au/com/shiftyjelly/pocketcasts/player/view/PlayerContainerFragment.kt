@@ -45,8 +45,8 @@ import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 @AndroidEntryPoint
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
@@ -275,7 +276,11 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     override fun getBackstackCount(): Int {
         return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
             bookmarksViewModel.multiSelectHelper.isMultiSelecting
-        ) 1 else 0
+        ) {
+            1
+        } else {
+            0
+        }
     }
 
     override fun onBackPressed(): Boolean {
@@ -384,27 +389,27 @@ private val step1 = TourStep(
     "We’ve made lots of improvements to the player in this update. To make sure you get the most out of this update, we prepared a quick tour.",
     "Take a quick tour",
     null,
-    Gravity.BOTTOM
+    Gravity.BOTTOM,
 )
 private val step2 = TourStep(
     "Tabbed Layout",
     "You can now swipe between Now Playing, Notes and Chapters (if available).",
     "Next",
     TourViewTag.ViewId(R.id.tabLayout),
-    Gravity.BOTTOM
+    Gravity.BOTTOM,
 )
 private val step3 = TourStep(
     "Up Next",
     "As well as swiping up to access Up Next, you can now see how many you have queued here.",
     "Next",
     TourViewTag.ViewId(R.id.upNextButton),
-    Gravity.BOTTOM
+    Gravity.BOTTOM,
 )
 private val step4 = TourStep(
     "More Actions",
     "You can now easily access more actions, as well as customise which actions appear in the player menu.",
     "Finish",
     TourViewTag.ViewId(R.id.playerActions),
-    Gravity.TOP
+    Gravity.TOP,
 )
 private val tour = listOf(step1, step2, step3, step4)

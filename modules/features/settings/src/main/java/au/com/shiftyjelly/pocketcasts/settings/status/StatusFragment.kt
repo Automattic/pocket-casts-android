@@ -55,7 +55,7 @@ class StatusFragment : BaseFragment() {
                 AppThemeWithBackground(theme.activeTheme) {
                     StatusPage(
                         viewModel = viewModel,
-                        onBackPressed = { closeFragment() }
+                        onBackPressed = { closeFragment() },
                     )
                 }
             }
@@ -72,7 +72,7 @@ fun StatusPage(viewModel: StatusViewModel, onBackPressed: () -> Unit) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_status_page),
-            onNavigationClick = onBackPressed
+            onNavigationClick = onBackPressed,
         )
         StatusPageContent(viewModel = viewModel)
     }
@@ -85,13 +85,13 @@ fun StatusPageContent(viewModel: StatusViewModel) {
         modifier = Modifier
             .verticalScroll(scrollState)
             .padding(16.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         Text(
             text = stringResource(LR.string.settings_status_description),
             color = MaterialTheme.theme.colors.primaryText01,
             style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
         when (val state = viewModel.uiState.collectAsState().value) {
             is StatusUiState.Welcome -> StatusWelcomePage(viewModel = viewModel)
@@ -104,10 +104,10 @@ fun StatusPageContent(viewModel: StatusViewModel) {
 fun StatusWelcomePage(viewModel: StatusViewModel) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         Button(
-            onClick = { viewModel.run() }
+            onClick = { viewModel.run() },
         ) {
             Text(stringResource(LR.string.settings_status_run))
         }
@@ -123,7 +123,7 @@ fun StatusServicesPage(state: StatusUiState.ListServices, viewModel: StatusViewM
                 title = stringResource(service.title),
                 summary = stringResource(service.summary),
                 help = service.helpString(context),
-                status = service.status
+                status = service.status,
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -131,18 +131,18 @@ fun StatusServicesPage(state: StatusUiState.ListServices, viewModel: StatusViewM
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             Button(
                 onClick = { viewModel.run() },
-                enabled = !state.running
+                enabled = !state.running,
             ) {
                 Text(stringResource(LR.string.settings_status_retry))
             }
             Spacer(modifier = Modifier.width(24.dp))
             Button(
                 onClick = { viewModel.sendReport(context) },
-                enabled = !state.running
+                enabled = !state.running,
             ) {
                 Text(stringResource(LR.string.settings_status_send_report))
             }
@@ -155,7 +155,7 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
     Row(
         modifier = Modifier
             .padding(vertical = 16.dp)
-            .padding(end = 16.dp)
+            .padding(end = 16.dp),
     ) {
         Box(modifier = Modifier.padding(top = 3.dp)) {
             when (status) {
@@ -163,14 +163,14 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
                     Icon(
                         imageVector = Icons.Default.Done,
                         contentDescription = null,
-                        tint = MaterialTheme.theme.colors.support02
+                        tint = MaterialTheme.theme.colors.support02,
                     )
                 }
                 is ServiceStatus.Failed -> {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = null,
-                        tint = MaterialTheme.theme.colors.support05
+                        tint = MaterialTheme.theme.colors.support05,
                     )
                 }
                 is ServiceStatus.Running -> {
@@ -178,13 +178,13 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
                         modifier = Modifier
                             .width(24.dp)
                             .height(24.dp),
-                        strokeWidth = 2.dp
+                        strokeWidth = 2.dp,
                     )
                 }
                 else -> Spacer(
                     modifier = Modifier
                         .width(24.dp)
-                        .height(24.dp)
+                        .height(24.dp),
                 )
             }
         }
@@ -193,26 +193,26 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
             Text(
                 text = title,
                 style = MaterialTheme.typography.h6,
-                color = MaterialTheme.theme.colors.primaryText01
+                color = MaterialTheme.theme.colors.primaryText01,
             )
             if (status is ServiceStatus.Failed) {
                 if (status.userMessage != null) {
                     Text(
                         text = status.userMessage,
                         color = MaterialTheme.theme.colors.support05,
-                        style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp)
+                        style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
                     )
                 }
                 Text(
                     text = help,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp)
+                    style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
                 )
             } else {
                 Text(
                     text = summary,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp)
+                    style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
                 )
             }
         }
@@ -227,7 +227,7 @@ private fun PreviewServiceStatusRow() {
             title = stringResource(LR.string.settings_status_service_internet),
             summary = "test",
             help = "Ouch",
-            status = ServiceStatus.Running
+            status = ServiceStatus.Running,
         )
     }
 }

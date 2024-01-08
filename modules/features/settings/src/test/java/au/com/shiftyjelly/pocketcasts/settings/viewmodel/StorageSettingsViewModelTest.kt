@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
+import java.io.File
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -31,7 +32,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 private const val CUSTOM_FOLDER_LABEL = "CustomFolder"
 private const val CUSTOM_FOLDER_NEW_PATH = "custom_folder_new_path"
@@ -85,7 +85,7 @@ class StorageSettingsViewModelTest {
             fileUtil,
             settings,
             analyticsTracker,
-            context
+            context,
         )
     }
 
@@ -139,7 +139,7 @@ class StorageSettingsViewModelTest {
         val alertDialogResult = mutableListOf<StorageSettingsViewModel.AlertDialogState>()
         testCustomFolderChangeMovePodcastAlert(
             alertDialogResult,
-            permissionGranted = true
+            permissionGranted = true,
         ) {
             viewModel.state.value.storageFolderState.onStateChange(CUSTOM_FOLDER_NEW_PATH)
 
@@ -152,7 +152,7 @@ class StorageSettingsViewModelTest {
         val alertDialogResult = mutableListOf<StorageSettingsViewModel.AlertDialogState>()
         testCustomFolderChangeMovePodcastAlert(
             alertDialogResult,
-            permissionGranted = false
+            permissionGranted = false,
         ) {
             viewModel.state.value.storageFolderState.onStateChange(CUSTOM_FOLDER_NEW_PATH)
 
@@ -168,7 +168,7 @@ class StorageSettingsViewModelTest {
         viewModel.start(
             folderLocations = { folderLocations },
             permissionGranted = { permissionGranted },
-            sdkVersion = sdkVersion
+            sdkVersion = sdkVersion,
         )
         viewModel.onFragmentResume()
     }
@@ -177,13 +177,13 @@ class StorageSettingsViewModelTest {
     private fun testCustomFolderChangeMovePodcastAlert(
         alertDialogResult: MutableList<StorageSettingsViewModel.AlertDialogState>,
         permissionGranted: Boolean,
-        testBody: () -> Unit
+        testBody: () -> Unit,
     ) = runTest {
         val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL, "")
         startViewModelAndResumeFragment(
             folderLocations = listOf(folderLocation),
             sdkVersion = 28,
-            permissionGranted = permissionGranted
+            permissionGranted = permissionGranted,
         )
         val oldFile = File(folderLocation.filePath)
         whenever(fileStorage.baseStorageDirectory).thenReturn(oldFile)

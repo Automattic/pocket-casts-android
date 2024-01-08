@@ -40,7 +40,7 @@ private fun SearchEpisodeResultsView(
     LazyColumn {
         items(
             items = state.episodes,
-            key = { it.uuid }
+            key = { it.uuid },
         ) {
             SearchEpisodeItem(
                 episode = it,

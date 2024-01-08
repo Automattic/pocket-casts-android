@@ -9,7 +9,7 @@ import androidx.wear.compose.material.MaterialTheme
 
 @Composable
 fun WearAppTheme(
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val typography = MaterialTheme.typography
 
@@ -25,38 +25,38 @@ fun WearAppTheme(
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
                 lineHeight = 20.sp,
-                letterSpacing = 0.2.sp
+                letterSpacing = 0.2.sp,
             ),
             title3 = typography.title3.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 lineHeight = 18.sp,
-                letterSpacing = 0.sp
+                letterSpacing = 0.sp,
             ),
             body1 = typography.body1.copy(
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
                 lineHeight = 18.sp,
-                letterSpacing = 0.sp
+                letterSpacing = 0.sp,
             ),
             body2 = typography.body2.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
-                letterSpacing = 0.sp
+                letterSpacing = 0.sp,
             ),
             button = typography.button.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 lineHeight = 18.sp,
-                letterSpacing = 0.sp
+                letterSpacing = 0.sp,
             ),
             caption1 = typography.caption1,
             caption2 = typography.caption2,
-            caption3 = typography.caption3
+            caption3 = typography.caption3,
         ),
         colors = buildWearMaterialColors(),
-        content = content
+        content = content,
     )
 }
 

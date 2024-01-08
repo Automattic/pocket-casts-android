@@ -43,14 +43,16 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import coil.load
 import coil.transform.CircleCropTransformation
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     companion object {
@@ -143,14 +145,14 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid),
             )
         }
         val fragment = EpisodeContainerFragment.newInstance(
             episodeUuid = episode.uuid,
             source = EpisodeViewSource.DISCOVER,
             podcastUuid = episode.podcast_uuid,
-            fromListUuid = listUuid
+            fromListUuid = listUuid,
         )
         fragment.show(parentFragmentManager, "episode_card")
     }
@@ -188,7 +190,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
         bodyTextView: TextView,
         linkView: ConstraintLayout,
         linkTextView: TextView,
-        toolbar: Toolbar
+        toolbar: Toolbar,
     ) {
         toolbar.title = listFeed.subtitle?.tryToLocalise(resources)
         toolbar.menu.findItem(R.id.share_list)?.isVisible = curated

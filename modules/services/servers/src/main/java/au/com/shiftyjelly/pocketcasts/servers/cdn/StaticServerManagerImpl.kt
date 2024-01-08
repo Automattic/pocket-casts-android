@@ -5,8 +5,8 @@ import au.com.shiftyjelly.pocketcasts.servers.di.StaticServerRetrofit
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Observable
 import io.reactivex.Single
-import retrofit2.Retrofit
 import javax.inject.Inject
+import retrofit2.Retrofit
 
 class StaticServerManagerImpl @Inject constructor(@StaticServerRetrofit retrofit: Retrofit) : StaticServerManager {
 

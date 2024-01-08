@@ -10,12 +10,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class SearchHistoryViewModel @Inject constructor(
@@ -30,7 +30,7 @@ class SearchHistoryViewModel @Inject constructor(
     private var source: SourceView = SourceView.UNKNOWN
 
     private val mutableState = MutableStateFlow(
-        State(entries = emptyList())
+        State(entries = emptyList()),
     )
     val state: StateFlow<State> = mutableState
 
@@ -57,7 +57,7 @@ class SearchHistoryViewModel @Inject constructor(
 
     private suspend fun loadSearchHistory() {
         val entries = searchHistoryManager.findAll(
-            showFolders = isSignedInAsPlusOrPatron && !onlySearchRemote
+            showFolders = isSignedInAsPlusOrPatron && !onlySearchRemote,
         )
         mutableState.value = mutableState.value.copy(entries = entries)
     }
@@ -82,7 +82,7 @@ class SearchHistoryViewModel @Inject constructor(
             loadSearchHistory()
             analyticsTracker.track(
                 AnalyticsEvent.SEARCH_HISTORY_CLEARED,
-                AnalyticsProp.sourceMap(source = source)
+                AnalyticsProp.sourceMap(source = source),
             )
         }
     }
@@ -94,8 +94,8 @@ class SearchHistoryViewModel @Inject constructor(
             AnalyticsProp.searchHistoryEntryMap(
                 source = source,
                 type = type,
-                uuid = entry.uuid()
-            )
+                uuid = entry.uuid(),
+            ),
         )
     }
 

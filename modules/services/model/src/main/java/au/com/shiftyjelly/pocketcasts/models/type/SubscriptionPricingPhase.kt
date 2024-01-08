@@ -42,7 +42,9 @@ sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
 
 sealed interface SubscriptionPricingPhase {
     val pricingPhase: ProductDetails.PricingPhase
+
     @get:StringRes val periodResSingular: Int
+
     @get:StringRes val periodResPlural: Int
     val periodValue: Int
     fun periodValuePlural(res: Resources): String =
@@ -65,7 +67,7 @@ sealed interface SubscriptionPricingPhase {
 
     class Years(
         override val pricingPhase: ProductDetails.PricingPhase,
-        private val period: Period
+        private val period: Period,
     ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
         override val periodValue = period.years
         override val chronoUnit = ChronoUnit.YEARS
@@ -87,7 +89,7 @@ sealed interface SubscriptionPricingPhase {
 
     class Months(
         override val pricingPhase: ProductDetails.PricingPhase,
-        private val period: Period
+        private val period: Period,
     ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
 
         override val periodResSingular = R.string.plus_month
@@ -110,7 +112,7 @@ sealed interface SubscriptionPricingPhase {
 
     class Days(
         override val pricingPhase: ProductDetails.PricingPhase,
-        private val period: Period
+        private val period: Period,
     ) : TrialSubscriptionPricingPhase {
         override val periodResSingular = R.string.plus_day
         override val periodResPlural = R.string.days_plural

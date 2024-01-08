@@ -7,12 +7,12 @@ import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 /**
  * The podcast widget.
@@ -22,6 +22,7 @@ import kotlin.coroutines.CoroutineContext
 class PodcastWidget : AppWidgetProvider(), CoroutineScope {
 
     @Inject lateinit var widgetManager: WidgetManager
+
     @Inject lateinit var playbackManager: PlaybackManager
 
     override val coroutineContext: CoroutineContext

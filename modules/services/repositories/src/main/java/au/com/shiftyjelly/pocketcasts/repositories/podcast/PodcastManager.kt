@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 interface PodcastManager {
 

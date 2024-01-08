@@ -109,7 +109,7 @@ class EpisodeViewHolder constructor(
 
                 listOf(
                     EpisodeItemTouchHelper.IconWithBackground(addToUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_04)),
-                    EpisodeItemTouchHelper.IconWithBackground(secondaryUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_03))
+                    EpisodeItemTouchHelper.IconWithBackground(secondaryUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_03)),
                 )
             }
         }
@@ -122,12 +122,12 @@ class EpisodeViewHolder constructor(
                 } else {
                     IR.drawable.ic_archive
                 },
-                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_06)
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_06),
             )
 
             val shareItem = EpisodeItemTouchHelper.IconWithBackground(
                 iconRes = IR.drawable.ic_share,
-                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_01)
+                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_01),
             )
 
             return listOf(archiveItem, shareItem)
@@ -201,7 +201,7 @@ class EpisodeViewHolder constructor(
             downloadUpdates,
             playbackStateForThisEpisode,
             isInUpNextObservable,
-            bookmarksObservable
+            bookmarksObservable,
         ) { downloadProgress, playbackState, isInUpNext, bookmarks ->
             CombinedData(downloadProgress, playbackState, isInUpNext, bookmarks)
         }
@@ -328,9 +328,13 @@ class EpisodeViewHolder constructor(
         date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = dateTintColor, showDuration = false, context = date.context)
         date.setTextColor(dateTextColor)
 
-        val textColor = if (episodeGreyedOut) ColorUtils.colorWithAlpha(context.getThemeColor(UR.attr.primary_text_01), 128) else context.getThemeColor(
-            UR.attr.primary_text_01
-        )
+        val textColor = if (episodeGreyedOut) {
+            ColorUtils.colorWithAlpha(context.getThemeColor(UR.attr.primary_text_01), 128)
+        } else {
+            context.getThemeColor(
+                UR.attr.primary_text_01,
+            )
+        }
         title.setTextColor(textColor)
 
         val statusColor = if (episodeGreyedOut) alphaCaptionColor else context.getThemeColor(UR.attr.primary_text_02)
@@ -345,7 +349,7 @@ class EpisodeViewHolder constructor(
                 lblStatus.contentDescription.toString()
             } else {
                 lblStatus.text.toString()
-            }
+            },
         )
         if (episode.isInProgress) {
             attributes.add(context.getString(LR.string.in_progress))

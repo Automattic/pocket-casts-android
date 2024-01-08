@@ -19,7 +19,7 @@ class UploadEpisodeTask @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted params: WorkerParameters,
     var userEpisodeManager: UserEpisodeManager,
-    var playbackManager: PlaybackManager
+    var playbackManager: PlaybackManager,
 ) : RxWorker(context, params) {
 
     companion object {

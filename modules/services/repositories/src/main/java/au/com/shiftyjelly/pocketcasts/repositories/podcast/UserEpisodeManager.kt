@@ -41,6 +41,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.io.File
+import java.net.HttpURLConnection
+import java.util.Date
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -51,14 +59,6 @@ import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
-import java.io.File
-import java.net.HttpURLConnection
-import java.util.Date
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.roundToInt
 
 interface UserEpisodeManager {
     suspend fun add(episode: UserEpisode, playbackManager: PlaybackManager)
@@ -127,7 +127,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     val subscriptionManager: SubscriptionManager,
     val downloadManager: DownloadManager,
     @ApplicationContext val context: Context,
-    val episodeAnalytics: EpisodeAnalytics
+    val episodeAnalytics: EpisodeAnalytics,
 ) : UserEpisodeManager, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
@@ -456,7 +456,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             .andThen(userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, null))
             .andThen(syncManager.uploadFileToServer(userEpisode))
             .andThen(
-                userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
+                userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED),
             )
             .andThen(imageUploadTask)
             // let the file upload report to upload to the api server
@@ -476,12 +476,12 @@ class UserEpisodeManagerImpl @Inject constructor(
                             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FAILED, uuid = userEpisode.uuid)
                             userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, "Upload failed")
                         }
-                    }
+                    },
             )
             .andThen(
                 rxCompletable { syncFiles(playbackManager) }
                     .doOnError { Timber.e(it) }
-                    .onErrorComplete()
+                    .onErrorComplete(),
             )
     }
 
@@ -503,7 +503,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             .subscribeBy(
                 onError = {
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not upload file ${userEpisode.uuid} - ${userEpisode.title}")
-                }
+                },
             )
     }
 
@@ -621,7 +621,7 @@ fun UserEpisode.toServerPostFile(): FilePost {
         playedUpTo = this.playedUpTo.roundToInt(),
         playingStatus = this.playingStatus.ordinal + 1,
         duration = this.duration.roundToInt(),
-        hasCustomImage = this.hasCustomImage
+        hasCustomImage = this.hasCustomImage,
     )
 }
 
@@ -633,7 +633,7 @@ fun UserEpisode.toUploadData(): FileUploadData {
         title = this.title,
         colour = this.tintColorIndex,
         duration = this.duration.roundToInt(),
-        contentType = "${fileType ?: "audio/mp3"}"
+        contentType = "${fileType ?: "audio/mp3"}",
     )
 }
 
@@ -653,6 +653,6 @@ fun ServerFile.toUserEpisode(): UserEpisode {
         serverStatus = UserEpisodeServerStatus.UPLOADED,
         hasCustomImage = this.hasCustomImage,
         tintColorIndex = this.colour,
-        addedDate = this.publishedDate
+        addedDate = this.publishedDate,
     )
 }

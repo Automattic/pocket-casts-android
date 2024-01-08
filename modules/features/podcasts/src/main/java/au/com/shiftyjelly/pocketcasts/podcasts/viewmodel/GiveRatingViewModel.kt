@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -61,15 +61,13 @@ class GiveRatingViewModel @Inject constructor(
     fun checkIfUserCanRatePodcast(
         podcastUuid: String,
         onUserSignedOut: () -> Unit,
-        onFailure: (String) -> Unit
+        onFailure: (String) -> Unit,
     ) {
         _state.value = State.Loading
 
         viewModelScope.launch {
-
             val signInState = userManager.getSignInState().blockingFirst()
             when (signInState) {
-
                 SignInState.SignedOut -> {
                     onUserSignedOut()
                 }
@@ -122,7 +120,7 @@ class GiveRatingViewModel @Inject constructor(
             Toast.makeText(
                 context,
                 context.getString(LR.string.podcast_submit_rating_no_internet),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_LONG,
             ).show()
             return
         }

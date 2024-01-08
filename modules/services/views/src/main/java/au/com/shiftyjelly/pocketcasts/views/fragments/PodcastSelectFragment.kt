@@ -32,9 +32,9 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -45,7 +45,7 @@ class PodcastSelectFragment : BaseFragment() {
         fun newInstance(
             @ColorInt tintColor: Int? = null,
             showToolbar: Boolean = false,
-            source: PodcastSelectFragmentSource
+            source: PodcastSelectFragmentSource,
         ): PodcastSelectFragment =
             PodcastSelectFragment().apply {
                 arguments = Bundle().apply {
@@ -55,7 +55,7 @@ class PodcastSelectFragment : BaseFragment() {
                             tintColor = tintColor,
                             showToolbar = showToolbar,
                             source = source,
-                        )
+                        ),
                     )
                 }
             }
@@ -77,6 +77,7 @@ class PodcastSelectFragment : BaseFragment() {
     private var userChanged = false
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val disposables = CompositeDisposable()
 
@@ -152,7 +153,7 @@ class PodcastSelectFragment : BaseFragment() {
                     }
 
                     this.adapter = adapter
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -181,7 +182,6 @@ class PodcastSelectFragment : BaseFragment() {
                 }
             }
             when (source) {
-
                 PodcastSelectFragmentSource.AUTO_ADD -> {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED, props)
                 }

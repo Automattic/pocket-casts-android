@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Locale
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,8 +27,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
-import java.util.Locale
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -54,7 +54,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         companion object {
             val EMPTY = State(
                 sections = emptyList(),
-                showLoadingSpinner = true
+                showLoadingSpinner = true,
             )
         }
     }
@@ -72,7 +72,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     private data class SectionInternal(
         val title: String,
         val sectionId: SectionId,
-        val podcasts: List<DiscoverPodcast>
+        val podcasts: List<DiscoverPodcast>,
     )
 
     data class Section(
@@ -146,7 +146,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             // Update list with the correct region substituted in where appropriate
             val replacements = mapOf(
                 feed.regionCodeToken to region.code,
-                feed.regionNameToken to region.name
+                feed.regionNameToken to region.name,
             )
             val updatedList = feed.layout.transformWithRegion(region, replacements, getApplication<Application>().resources)
 
@@ -175,7 +175,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                     } else {
                         it
                     }
-                }
+                },
             )
         }
     }
@@ -188,7 +188,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             analyticsTracker.track(
                 AnalyticsEvent.RECOMMENDATIONS_DISMISSED,
-                mapOf(AnalyticsProp.SUBSCRIPTIONS to podcastManager.countSubscribed())
+                mapOf(AnalyticsProp.SUBSCRIPTIONS to podcastManager.countSubscribed()),
             )
         }
     }
@@ -205,7 +205,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             analyticsTracker.track(
                 AnalyticsEvent.RECOMMENDATIONS_CONTINUE_TAPPED,
-                mapOf(AnalyticsProp.SUBSCRIPTIONS to podcastManager.countSubscribed())
+                mapOf(AnalyticsProp.SUBSCRIPTIONS to podcastManager.countSubscribed()),
             )
         }
     }
@@ -232,9 +232,9 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                             } else {
                                 podcastInList
                             }
-                        }
+                        },
                     )
-                }
+                },
             )
         }
     }
@@ -242,7 +242,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     private suspend fun updateFlowWith(
         id: String,
         sectionsFlow: MutableStateFlow<List<SectionInternal>>,
-        updatedList: List<DiscoverRow>
+        updatedList: List<DiscoverRow>,
     ) {
         val listItem = updatedList.find { it.id == id }
         if (listItem == null) {
@@ -268,15 +268,15 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             sectionsFlow.value + SectionInternal(
                 title = title,
                 sectionId = SectionId(id),
-                podcasts = podcasts
-            )
+                podcasts = podcasts,
+            ),
         )
     }
 
     private suspend fun updateFlowWithCategories(
         sectionsFlow: MutableStateFlow<List<SectionInternal>>,
         updatedList: List<DiscoverRow>,
-        replacements: Map<String, String>
+        replacements: Map<String, String>,
     ) {
         val categories = updatedList
             .find { it.type is ListType.Categories }
@@ -288,7 +288,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                         .map {
                             it.transformWithReplacements(
                                 replacements,
-                                getApplication<Application>().resources
+                                getApplication<Application>().resources,
                             )
                         }
                 } catch (e: Exception) {
@@ -307,8 +307,8 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                         sectionsFlow.value + SectionInternal(
                             title = category.title.tryToLocalise(getApplication<Application>().resources),
                             sectionId = SectionId(category.title),
-                            podcasts = podcasts
-                        )
+                            podcasts = podcasts,
+                        ),
                     )
                 }
         }

@@ -53,7 +53,7 @@ class AutomotiveAboutFragment : Fragment() {
                     AboutPage(
                         onOpenLicenses = { openLicenses() },
                         onOpenLogs = { onOpenLogs() },
-                        onOpenUrl = { openUrl(it) }
+                        onOpenUrl = { openUrl(it) },
                     )
                 }
             }
@@ -73,51 +73,51 @@ class AutomotiveAboutFragment : Fragment() {
 private fun AboutPage(
     onOpenLicenses: () -> Unit,
     onOpenLogs: () -> Unit,
-    onOpenUrl: (String) -> Unit
+    onOpenUrl: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.verticalScroll(scrollState)
+        modifier = Modifier.verticalScroll(scrollState),
     ) {
         Image(
             painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
             contentDescription = stringResource(LR.string.settings_app_icon),
             modifier = Modifier
                 .padding(top = 56.dp)
-                .size(width = 220.dp, height = 132.dp)
+                .size(width = 220.dp, height = 132.dp),
         )
         Text(
             text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
             fontSize = 24.sp,
             modifier = Modifier.padding(top = 16.dp),
-            color = MaterialTheme.theme.colors.primaryText02
+            color = MaterialTheme.theme.colors.primaryText02,
         )
         HorizontalDivider(
-            modifier = Modifier.padding(top = 56.dp, bottom = 16.dp)
+            modifier = Modifier.padding(top = 56.dp, bottom = 16.dp),
         )
         SubTitle(stringResource(LR.string.settings_about_legal))
         TextLinkButton(
             text = stringResource(LR.string.settings_about_terms_of_serivce),
-            onClick = { onOpenUrl(Settings.INFO_TOS_URL) }
+            onClick = { onOpenUrl(Settings.INFO_TOS_URL) },
         )
         TextLinkButton(
             text = stringResource(LR.string.settings_about_privacy_policy),
-            onClick = { onOpenUrl(Settings.INFO_PRIVACY_URL) }
+            onClick = { onOpenUrl(Settings.INFO_PRIVACY_URL) },
         )
         TextLinkButton(
             text = stringResource(LR.string.settings_about_acknowledgements),
-            onClick = { onOpenLicenses() }
+            onClick = { onOpenLicenses() },
         )
         SubTitle(stringResource(LR.string.support))
         TextLinkButton(
             text = stringResource(LR.string.settings_title_help),
-            onClick = { onOpenUrl(Settings.INFO_FAQ_URL) }
+            onClick = { onOpenUrl(Settings.INFO_FAQ_URL) },
         )
         TextLinkButton(
             text = stringResource(LR.string.settings_logs),
-            onClick = { onOpenLogs() }
+            onClick = { onOpenLogs() },
         )
         Spacer(Modifier.height(15.dp))
     }
@@ -133,7 +133,7 @@ private fun SubTitle(title: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.theme.colors.primaryInteractive01,
         modifier = modifier
             .padding(horizontal = 48.dp, vertical = 16.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     )
 }
 
@@ -144,12 +144,12 @@ private fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier
             .clickable { onClick() }
             .padding(horizontal = 48.dp, vertical = 24.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = text,
             fontSize = 32.sp,
-            color = MaterialTheme.theme.colors.primaryText01
+            color = MaterialTheme.theme.colors.primaryText01,
         )
     }
 }

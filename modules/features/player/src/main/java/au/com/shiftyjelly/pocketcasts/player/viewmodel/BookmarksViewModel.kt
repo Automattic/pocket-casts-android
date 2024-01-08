@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
@@ -42,7 +43,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class BookmarksViewModel
@@ -122,8 +122,8 @@ class BookmarksViewModel
                     multiSelectHelper.selectAllInList(
                         bookmarks.subList(
                             startIndex,
-                            bookmarks.size
-                        )
+                            bookmarks.size,
+                        ),
                     )
                 }
             }
@@ -220,7 +220,7 @@ class BookmarksViewModel
             mapOf(
                 "sort_order" to order.key,
                 "source" to sourceView.analyticsValue,
-            )
+            ),
         )
     }
 
@@ -262,7 +262,7 @@ class BookmarksViewModel
                         episodeUuid = episodeUuid,
                         timeSecs = bookmark.timeSecs,
                         backgroundColor = backgroundColor,
-                        tintColor = tintColor
+                        tintColor = tintColor,
                     )
                     onSuccess(arguments)
                 }

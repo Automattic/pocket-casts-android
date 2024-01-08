@@ -43,6 +43,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
+import java.util.Date
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -51,8 +53,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
-import java.util.Date
-import kotlin.coroutines.CoroutineContext
 
 class PodcastSyncProcess(
     val context: Context,
@@ -70,7 +70,7 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
-    var featureFlagWrapper: FeatureFlagWrapper
+    var featureFlagWrapper: FeatureFlagWrapper,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -108,7 +108,7 @@ class PodcastSyncProcess(
                     Completable.complete()
                 } else {
                     syncPlayHistory()
-                }
+                },
             )
         return syncUpNextObservable
             .doOnError { throwable ->
@@ -182,7 +182,8 @@ class PodcastSyncProcess(
                     Observable.just(uuid)
                         .subscribeOn(Schedulers.io())
                         .flatMapMaybe { importPodcast(serverPodcastsMap[it]) }
-                }, 5
+                },
+                5,
             )
             .ignoreElements()
         // update existing podcasts
@@ -252,7 +253,7 @@ class PodcastSyncProcess(
             skipLastSecs = podcastResponse.autoSkipLast ?: podcast.skipLastSecs,
             folderUuid = podcastResponse.folderUuid,
             sortPosition = podcastResponse.sortPosition ?: podcast.sortPosition,
-            addedDate = addedDate
+            addedDate = addedDate,
         )
     }
 
@@ -423,7 +424,6 @@ class PodcastSyncProcess(
         try {
             val podcasts = podcastManager.findPodcastsToSync()
             for (podcast in podcasts) {
-
                 try {
                     val fields = JSONObject().apply {
                         put("uuid", podcast.uuid)
@@ -620,7 +620,7 @@ class PodcastSyncProcess(
                         .subscribeOn(Schedulers.computation())
                         .flatMap { importPodcast(it).toObservable() }
                 },
-                10
+                10,
             )
             .ignoreElements()
     }

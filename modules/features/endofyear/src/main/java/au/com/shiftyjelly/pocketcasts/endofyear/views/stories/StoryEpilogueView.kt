@@ -55,13 +55,13 @@ fun StoryEpilogueView(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(story.backgroundColor)
+            .background(story.backgroundColor),
     ) {
         val context = LocalView.current.context
         StoryBlurredBackground(
             offset = Offset(
                 -maxWidth.value.toInt().dpToPx(context) * 0.4f,
-                -maxHeight.value.toInt().dpToPx(context) * 0.4f
+                -maxHeight.value.toInt().dpToPx(context) * 0.4f,
             ),
             style = blurredBackgroundStyle(userTier),
         )
@@ -70,7 +70,7 @@ fun StoryEpilogueView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.weight(1f))
 
@@ -106,15 +106,15 @@ private fun PulsatingHeart(
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(500),
-            repeatMode = RepeatMode.Reverse
-        )
+            repeatMode = RepeatMode.Reverse,
+        ),
     )
     Box(modifier = Modifier.scale(scale)) {
         Image(
             painter = painterResource(id = R.drawable.heart_rainbow),
             contentDescription = null,
             modifier = modifier
-                .size(HeartImageSize)
+                .size(HeartImageSize),
         )
     }
 }
@@ -147,7 +147,7 @@ private fun ReplayButton(
         onClick = onClick,
         textIcon = IR.drawable.ic_retry,
         modifier = modifier
-            .fillMaxSize(.75f)
+            .fillMaxSize(.75f),
     )
 }
 
@@ -158,7 +158,7 @@ fun EpilogueFreeUserPreview() {
         StoryEpilogueView(
             StoryEpilogue(),
             userTier = UserTier.Free,
-            onReplayClicked = {}
+            onReplayClicked = {},
         )
     }
 }
@@ -170,7 +170,7 @@ fun EpiloguePaidUserPreview() {
         StoryEpilogueView(
             StoryEpilogue(),
             userTier = UserTier.Plus,
-            onReplayClicked = {}
+            onReplayClicked = {},
         )
     }
 }

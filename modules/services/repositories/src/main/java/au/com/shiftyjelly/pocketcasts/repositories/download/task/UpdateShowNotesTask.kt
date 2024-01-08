@@ -25,7 +25,7 @@ import retrofit2.HttpException
 class UpdateShowNotesTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val showNotesManager: ShowNotesManager
+    private val showNotesManager: ShowNotesManager,
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TASK_NAME = "UpdateShowNotesTask"
