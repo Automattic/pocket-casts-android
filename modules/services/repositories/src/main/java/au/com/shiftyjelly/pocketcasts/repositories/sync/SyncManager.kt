@@ -51,7 +51,7 @@ interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken
     fun getRefreshToken(): RefreshToken?
-    fun emailChange(newEmail: String, password: String): Single<UserChangeResponse>
+    suspend fun emailChange(newEmail: String, password: String): UserChangeResponse
     fun deleteAccount(): Single<UserChangeResponse>
     suspend fun updatePassword(newPassword: String, oldPassword: String)
 

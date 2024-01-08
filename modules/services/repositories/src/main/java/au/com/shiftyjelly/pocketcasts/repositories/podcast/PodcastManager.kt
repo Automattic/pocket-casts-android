@@ -129,7 +129,6 @@ interface PodcastManager {
     fun reloadFoldersFromServer()
 
     fun checkForEpisodesToDownload(episodeUuidsAdded: List<String>, downloadManager: DownloadManager)
-    fun getPodcastEpisodesListOrderBy(podcast: Podcast): String
 
     fun countEpisodesInPodcastWithStatus(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int
     fun updateGroupingForAll(grouping: PodcastGrouping)

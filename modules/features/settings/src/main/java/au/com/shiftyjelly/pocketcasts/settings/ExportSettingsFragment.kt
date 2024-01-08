@@ -9,6 +9,7 @@ import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -20,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.OpmlExporter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -31,6 +33,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var theme: Theme
     @Inject lateinit var syncManager: SyncManager
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null
@@ -73,7 +76,15 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("exportSendEmail")?.setOnPreferenceClickListener {
             viewModel.onExportByEmail()
-            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, syncManager, activity, viewModel.analyticsTracker).apply {
+            exporter = OpmlExporter(
+                fragment = this@ExportSettingsFragment,
+                serverManager = serverManager,
+                podcastManager = podcastManager,
+                syncManager = syncManager,
+                context = activity,
+                analyticsTracker = viewModel.analyticsTracker,
+                applicationScope = applicationScope,
+            ).apply {
                 sendEmail()
             }
             true
@@ -81,7 +92,15 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("exportSaveFile")?.setOnPreferenceClickListener {
             viewModel.onExportFile()
-            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, syncManager, activity, viewModel.analyticsTracker).apply {
+            exporter = OpmlExporter(
+                fragment = this@ExportSettingsFragment,
+                serverManager = serverManager,
+                podcastManager = podcastManager,
+                syncManager = syncManager,
+                context = activity,
+                analyticsTracker = viewModel.analyticsTracker,
+                applicationScope = applicationScope,
+            ).apply {
                 saveFile()
             }
             true

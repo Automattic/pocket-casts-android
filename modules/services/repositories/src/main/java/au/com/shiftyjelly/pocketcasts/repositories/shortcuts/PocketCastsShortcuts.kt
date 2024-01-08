@@ -9,9 +9,8 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -27,14 +26,18 @@ object PocketCastsShortcuts {
      * - Up Next
      * - Top Filter
      */
-    @OptIn(DelicateCoroutinesApi::class)
     @TargetApi(Build.VERSION_CODES.N_MR1)
-    fun update(playlistManager: PlaylistManager, force: Boolean, context: Context) {
+    fun update(
+        playlistManager: PlaylistManager,
+        force: Boolean,
+        coroutineScope: CoroutineScope,
+        context: Context,
+    ) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
             return
         }
 
-        GlobalScope.launch(Dispatchers.Main) {
+        coroutineScope.launch(Dispatchers.Main) {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return@launch
 
             val topPlaylist = withContext(Dispatchers.Default) { playlistManager.findAll().firstOrNull() }

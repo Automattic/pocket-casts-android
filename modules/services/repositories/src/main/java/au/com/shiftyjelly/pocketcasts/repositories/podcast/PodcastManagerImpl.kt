@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
@@ -57,6 +58,7 @@ class PodcastManagerImpl @Inject constructor(
     private val cacheServerManager: PodcastCacheServerManager,
     private val refreshServerManager: RefreshServerManager,
     private val syncManager: SyncManager,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase
 ) : PodcastManager, CoroutineScope {
 
@@ -188,7 +190,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun refreshPodcasts(fromLog: String) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Running refresh from $fromLog")
-        RefreshPodcastsTask.runNow(context)
+        RefreshPodcastsTask.runNow(context, applicationScope)
     }
 
     override suspend fun refreshPodcastsAfterSignIn() {
@@ -571,17 +573,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun addFolderPodcast(podcast: Podcast) {
         podcastDao.insert(podcast)
-    }
-
-    override fun getPodcastEpisodesListOrderBy(podcast: Podcast): String {
-        return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> "UPPER(title) ASC"
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> "UPPER(title) DESC"
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> "published_date ASC"
-            EpisodesSortType.EPISODES_SORT_BY_DATE_DESC -> "published_date DESC"
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> "duration ASC"
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> "duration DESC"
-        }
     }
 
     override fun updatePodcast(podcast: Podcast) {

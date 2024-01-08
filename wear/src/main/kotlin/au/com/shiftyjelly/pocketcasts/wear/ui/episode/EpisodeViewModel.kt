@@ -20,18 +20,20 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
-import au.com.shiftyjelly.pocketcasts.wear.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import coil.ImageLoader
@@ -78,8 +80,9 @@ class EpisodeViewModel @Inject constructor(
     private val showNotesManager: ShowNotesManager,
     theme: Theme,
     @ApplicationContext appContext: Context,
-    @ForApplicationScope private val coroutineScope: CoroutineScope,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
+    private val userEpisodeManager: UserEpisodeManager,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
     private val sourceView = SourceView.EPISODE_DETAILS
@@ -303,12 +306,26 @@ class EpisodeViewModel @Inject constructor(
     fun deleteDownloadedEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            episodeManager.deleteEpisodeFile(
-                episode,
-                playbackManager,
-                disableAutoDownload = true,
-                removeFromUpNext = true
-            )
+            when (episode) {
+                is PodcastEpisode -> {
+                    episodeManager.deleteEpisodeFile(
+                        episode,
+                        playbackManager,
+                        disableAutoDownload = true,
+                        removeFromUpNext = true
+                    )
+                }
+                is UserEpisode -> {
+                    CloudDeleteHelper.deleteEpisode(
+                        episode = episode,
+                        playbackManager = playbackManager,
+                        episodeManager = episodeManager,
+                        userEpisodeManager = userEpisodeManager,
+                        applicationScope = applicationScope
+                    )
+                }
+            }
+
             episodeAnalytics.trackEvent(
                 event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
                 source = sourceView,
@@ -323,7 +340,7 @@ class EpisodeViewModel @Inject constructor(
         } else {
             playAttempt?.cancel()
 
-            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
@@ -332,7 +349,7 @@ class EpisodeViewModel @Inject constructor(
         if (confirmedStreaming && !playbackManager.isPlaying()) {
             playAttempt?.cancel()
 
-            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
@@ -454,7 +471,7 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color? =
+    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color =
         userEpisode.artworkUrl?.let { artworkUrl ->
             val context = getApplication<Application>()
             val loader = ImageLoader(context)
@@ -463,8 +480,11 @@ class EpisodeViewModel @Inject constructor(
                 .allowHardware(false) // Disable hardware bitmaps.
                 .build()
 
-            val result = (loader.execute(request) as SuccessResult).drawable
-            val bitmap = (result as BitmapDrawable).bitmap
+            val successResult = loader.execute(request) as? SuccessResult
+                ?: return@let null
+            val resultDrawable = successResult.drawable as? BitmapDrawable
+                ?: return@let null
+            val bitmap = resultDrawable.bitmap
 
             // Set a timeout to make sure the user isn't blocked for too long just
             // because we're trying to extract a tint color.
@@ -480,5 +500,5 @@ class EpisodeViewModel @Inject constructor(
                     }
                 }
             }
-        }
+        } ?: Color.White
 }

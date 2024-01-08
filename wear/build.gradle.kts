@@ -106,6 +106,7 @@ dependencies {
     implementation(project(":modules:services:servers"))
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
+    implementation(project(":modules:services:views"))
     testImplementation(project(":modules:services:sharedtest"))
 
     implementation(project(":modules:features:account"))

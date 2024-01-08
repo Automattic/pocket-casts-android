@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -29,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import io.reactivex.BackpressureStrategy
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,7 +50,8 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val downloadManager: DownloadManager,
     val analyticsTracker: AnalyticsTrackerWrapper,
     val settings: Settings,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
@@ -391,7 +394,14 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val deleteFunction: (List<UserEpisode>, DeleteState) -> Unit = { episodesToDelete, state ->
             episodesToDelete.forEach {
                 Timber.d("Deleting $it")
-                CloudDeleteHelper.deleteEpisode(it, state, playbackManager, episodeManager, userEpisodeManager)
+                CloudDeleteHelper.deleteEpisode(
+                    episode = it,
+                    deleteState = state,
+                    playbackManager = playbackManager,
+                    episodeManager = episodeManager,
+                    userEpisodeManager = userEpisodeManager,
+                    applicationScope = applicationScope,
+                )
             }
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED, source, episodesToDelete.size)
 

@@ -1,7 +1,14 @@
 7.55
 -----
 
-
+*   Updates:
+    *   Save selected tab on Player screen after screen rotation
+        ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
+*   Bug Fixes:
+    *   Improve handling of user files on watch
+        ([#1638](https://github.com/Automattic/pocket-casts-android/pull/1638))
+    *   Fixed an issue with a missing accessibility label for the 'Up Next' screen
+        ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
 7.54
 -----
 
@@ -25,7 +32,7 @@
     *   Fix playback effects UI not updating on watch
         ([#1643](https://github.com/Automattic/pocket-casts-android/pull/1643))
 *   Updates:
-    *   Display dynamic colors for widget
+    *   Support dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
     *   Add theme support to Up Next screen
         ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))

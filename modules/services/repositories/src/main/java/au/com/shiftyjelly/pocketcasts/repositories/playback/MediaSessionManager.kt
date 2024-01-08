@@ -49,9 +49,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -72,6 +70,7 @@ class MediaSessionManager(
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
+    applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
@@ -146,8 +145,7 @@ class MediaSessionManager(
 
         connect()
 
-        @OptIn(DelicateCoroutinesApi::class)
-        GlobalScope.launch {
+        applicationScope.launch {
             commandQueue.collect { (tag, command) ->
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Executing queued command: $tag")
                 command()
