@@ -103,7 +103,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     }
 
     val scrollState = rememberScrollState()
-    setStatusBarBackground(scrollState)
+    SetStatusBarBackground(scrollState)
 
     when (state) {
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
@@ -360,7 +360,7 @@ private fun UpgradeButton(
 }
 
 @Composable
-private fun setStatusBarBackground(scrollState: ScrollState) {
+private fun SetStatusBarBackground(scrollState: ScrollState) {
     val systemUiController = rememberSystemUiController()
     val hasScrolled = scrollState.value > 0
 
