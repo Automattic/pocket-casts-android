@@ -242,7 +242,6 @@ Language: zh_TW
     <string name="settings_media_actions_customise">自訂媒體動作</string>
     <string name="settings_media_actions_prioritize_subtitle">你將可使用你的常用動作。</string>
     <string name="settings_media_actions_prioritize_title">為你的自訂媒體動作排定優先順序</string>
-    <string name="plus_take_your_podcasting_to_next_level">運用專屬功能和自訂選項，讓你的 Podcast 體驗更上一層樓。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">篩選 ID 或標題</string>
     <string name="filter_title">篩選標題</string>

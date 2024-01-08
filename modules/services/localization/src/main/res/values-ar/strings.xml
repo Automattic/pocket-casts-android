@@ -178,7 +178,6 @@ Language: ar
     <string name="settings_media_actions_customise">تخصيص إجراءات الوسائط</string>
     <string name="settings_media_actions_show_title">عرض إجراءات الوسائط المخصصة</string>
     <string name="settings_media_actions_show_subtitle">اعرض إجراءات الوسائط المخصصة في تنبيهات الوسائط ضمن Android 13 وAndroid Auto.</string>
-    <string name="plus_take_your_podcasting_to_next_level">انقل تجربتك المتعلقة بالبث الصوتي إلى المستوى التالي مع وصول استثنائي إلى الميزات وخيارات التخصيص.</string>
     <string name="onboarding_recommendations_more">مزيد من %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">يمكن الإلغاء في أي وقت.</string>
     <string name="pocket_casts_query_podcasts">الاستعلام عن البودكاست في Pocket Casts</string>

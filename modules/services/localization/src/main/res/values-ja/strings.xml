@@ -242,7 +242,6 @@ Language: ja_JP
     <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
     <string name="settings_media_actions_prioritize_subtitle">上位のアクションを利用できます。</string>
     <string name="settings_media_actions_prioritize_title">カスタムメディアアクションに優先順位を設定</string>
-    <string name="plus_take_your_podcasting_to_next_level">専用の機能やカスタマイズオプションを使用して、あなたのポッドキャスト体験をさらなるレベルに引き上げることができます。</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>

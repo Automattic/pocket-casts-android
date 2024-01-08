@@ -242,7 +242,6 @@ Language: sv_SE
     <string name="settings_media_actions_customise">Anpassa mediaåtgärder</string>
     <string name="settings_media_actions_prioritize_subtitle">Dina vanligaste åtgärder kommer att vara tillgängliga.</string>
     <string name="settings_media_actions_prioritize_title">Prioritera dina anpassade mediaåtgärder</string>
-    <string name="plus_take_your_podcasting_to_next_level">Ta din podcastupplevelse till nästa nivå med exklusiv tillgång till funktioner och anpassningsalternativ.</string>
     <string name="onboarding_recommendations_more">Mer %s</string>
     <string name="filter_id_or_title">Filter-ID eller -titel</string>
     <string name="filter_title">Filtertitel</string>

@@ -191,7 +191,6 @@ Language: en_GB
     <string name="settings_media_actions_prioritize_title">Prioritise your custom media actions</string>
     <string name="settings_media_actions_customise">Customise media actions</string>
     <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customisation options.</string>
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="podcast_url">Podcast URL</string>
     <string name="author">Author</string>

@@ -242,7 +242,6 @@ Language: ru
     <string name="settings_media_actions_customise">Настройте действия с медиафайлами</string>
     <string name="settings_media_actions_prioritize_subtitle">Будут отображаться основные действия.</string>
     <string name="settings_media_actions_prioritize_title">Расставьте действия с медиафайлами в приоритетном порядке</string>
-    <string name="plus_take_your_podcasting_to_next_level">Получите доступ к эксклюзивным функциям и опциям настройки и выйдите на новый уровень прослушивания подкастов.</string>
     <string name="onboarding_recommendations_more">Другие %s</string>
     <string name="filter_id_or_title">ID или название фильтра</string>
     <string name="filter_title">Название фильтра</string>

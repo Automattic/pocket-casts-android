@@ -242,7 +242,6 @@ Language: zh_CN
     <string name="settings_media_actions_customise">自定义媒体操作</string>
     <string name="settings_media_actions_prioritize_subtitle">您的顶部操作将可以使用。</string>
     <string name="settings_media_actions_prioritize_title">优先您的自定义媒体操作</string>
-    <string name="plus_take_your_podcasting_to_next_level">通过专享功能和自定义选项，将您的播客体验提升到新的水平。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">筛选 ID 或标题</string>
     <string name="filter_title">筛选标题</string>

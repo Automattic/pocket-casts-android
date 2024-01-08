@@ -242,7 +242,6 @@ Language: es
     <string name="settings_media_actions_customise">Personalizar acciones de medios</string>
     <string name="settings_media_actions_prioritize_subtitle">Tus acciones principales estarán disponibles.</string>
     <string name="settings_media_actions_prioritize_title">Dar prioridad a las acciones de medios personalizadas</string>
-    <string name="plus_take_your_podcasting_to_next_level">Lleva tu experiencia con los pódcast al siguiente nivel con acceso exclusivo a funciones y opciones de personalización.</string>
     <string name="onboarding_recommendations_more">Más %s</string>
     <string name="filter_id_or_title">Título o ID del filtro</string>
     <string name="filter_title">Título del filtro</string>

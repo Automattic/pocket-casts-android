@@ -242,7 +242,6 @@ Language: ko_KR
     <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
     <string name="settings_media_actions_prioritize_subtitle">상위 작업이 제공됩니다.</string>
     <string name="settings_media_actions_prioritize_title">사용자 정의 미디어 작업 우선순위 지정</string>
-    <string name="plus_take_your_podcasting_to_next_level">기능과 사용자 정의 옵션에 접근하는 독점 권한으로 팟캐스팅 환경의 수준을 높이세요.</string>
     <string name="onboarding_recommendations_more">%s 추가</string>
     <string name="filter_id_or_title">필터 ID 또는 제목</string>
     <string name="filter_title">필터 제목</string>

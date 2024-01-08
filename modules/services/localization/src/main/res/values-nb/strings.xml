@@ -177,7 +177,6 @@ Language: nb_NO
     <string name="settings_media_actions_customise">Tilpass mediehandlinger</string>
     <string name="settings_media_actions_show_title">Vis tilpassede mediehandlinger</string>
     <string name="settings_media_actions_show_subtitle">Vis tilpassede mediehandlinger i Android 13-medievarsler og Android Auto.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Løft podcastingopplevelsen til neste nivå med eksklusiv tilgang til funksjoner og alternativer for tilpassing.</string>
     <string name="onboarding_recommendations_more">Mer %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Kan kanselleres når som helst.</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts-søk etter podcaster</string>
