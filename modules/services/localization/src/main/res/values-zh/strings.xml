@@ -337,8 +337,6 @@ Language: zh_CN
     <string name="onboarding_plus_feature_folders_title">文件夹</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
     <string name="onboarding_plus_feature_desktop_apps_title">桌面应用程序</string>
-    <string name="onboarding_upgrade_unlock_all_features">解锁所有功能</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">访问专享功能和定制选项</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
     <string name="onboarding_recommendations_import">导入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">选择您喜欢的播客，或从其他播客播放器导入播客，定制您的 Pocket Casts。 您可以稍后完成此操作。</string>

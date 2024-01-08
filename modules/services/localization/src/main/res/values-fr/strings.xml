@@ -337,8 +337,6 @@ Language: fr
     <string name="onboarding_plus_feature_folders_title">Dossiers</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Écoutez vos podcasts partout grâce à nos applications Windows, macOS et Web.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Applications de bureau</string>
-    <string name="onboarding_upgrade_unlock_all_features">Profiter de toutes les fonctionnalités</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Accéder à des options de personnalisation et des fonctionnalités exclusives</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tout ce que vous aimez chez Pocket Casts, et bien plus encore</string>
     <string name="onboarding_recommendations_import">Importer</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Personnalisez Pocket Casts en sélectionnant vos podcasts préférés ou en les important à partir d’un autre lecteur de podcast. Vous pouvez toujours le faire plus tard.</string>

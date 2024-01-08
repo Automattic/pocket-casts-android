@@ -337,8 +337,6 @@ Language: de
     <string name="onboarding_plus_feature_folders_title">Ordner</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Mit unseren Windows-, macOS- und Web-Apps kannst du deine Inhalte auf beliebigen Geräten anhören.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop-Apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Alle Funktionen nutzen</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Erhalte Zugriff auf exklusive Funktionen und Anpassungsoptionen</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
     <string name="onboarding_recommendations_import">Importieren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Wähle deine Lieblings-Podcasts aus oder importiere sie aus einem anderen Podcast Player und gestalte Pocket Casts ganz individuell. Das kannst du auch jederzeit später erledigen.</string>

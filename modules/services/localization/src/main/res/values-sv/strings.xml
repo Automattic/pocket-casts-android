@@ -337,8 +337,6 @@ Language: sv_SE
     <string name="onboarding_plus_feature_folders_title">Mappar</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Dator-appar</string>
-    <string name="onboarding_upgrade_unlock_all_features">Lås upp alla funktioner</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Få tillgång till exklusiva funktioner och anpassningsalternativ</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>

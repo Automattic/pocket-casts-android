@@ -285,8 +285,6 @@ Language: en_GB
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customisation options</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favourite podcasts or import them from another podcast player. You can always do this later.</string>

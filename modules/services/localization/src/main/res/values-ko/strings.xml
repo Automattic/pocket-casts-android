@@ -337,8 +337,6 @@ Language: ko_KR
     <string name="onboarding_plus_feature_folders_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">데스크톱 앱</string>
-    <string name="onboarding_upgrade_unlock_all_features">모든 기능 잠금 해제</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">독점 기능 및 사용자 정의 옵션 접근 권한 받기</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
