@@ -150,9 +150,8 @@ private fun UpgradeLayout(
         BoxWithConstraints(
             Modifier
                 .fillMaxHeight()
-                .background(OnboardingUpgradeHelper.backgroundColor)
+                .background(OnboardingUpgradeHelper.backgroundColor),
         ) {
-
             OnboardingUpgradeHelper.UpgradeBackground(
                 modifier = Modifier.verticalScroll(scrollState),
                 tier = state.currentFeatureCard.subscriptionTier,
@@ -177,7 +176,7 @@ private fun UpgradeLayout(
                             iconColor = Color.White,
                             modifier = Modifier
                                 .height(48.dp)
-                                .width(48.dp)
+                                .width(48.dp),
                         )
                         if (state.showNotNow) {
                             TextH30(
@@ -195,7 +194,7 @@ private fun UpgradeLayout(
                     Column {
                         Box(
                             modifier = Modifier.heightIn(min = 70.dp),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
                                 text = stringResource(state.currentFeatureCard.titleRes),
@@ -217,13 +216,13 @@ private fun UpgradeLayout(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 24.dp),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             StyledToggle(
                                 items = state.subscriptionFrequencies
                                     .map { stringResource(id = it.localisedLabelRes) },
                                 defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(
-                                    state.currentSubscriptionFrequency
+                                    state.currentSubscriptionFrequency,
                                 ),
                             ) {
                                 val selectedFrequency = state.subscriptionFrequencies[it]
@@ -270,7 +269,9 @@ fun FeatureCards(
             card = featureCardsState.featureCards[index],
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-            } else Modifier
+            } else {
+                Modifier
+            },
         )
     }
 }
@@ -286,16 +287,16 @@ private fun FeatureCard(
         backgroundColor = Color.White,
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
-                contentAlignment = Alignment.TopStart
+                contentAlignment = Alignment.TopStart,
             ) {
                 SubscriptionBadge(
                     iconRes = card.iconRes,
@@ -313,7 +314,7 @@ private fun FeatureCard(
                 OnboardingUpgradeHelper.PrivacyPolicy(
                     color = Color.Black.copy(alpha = .5f),
                     textAlign = TextAlign.Start,
-                    lineHeight = 18.sp
+                    lineHeight = 18.sp,
                 )
             }
         }
@@ -338,7 +339,7 @@ private fun UpgradeButton(
     }
     Box(
         contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier.fadeBackground()
+        modifier = Modifier.fadeBackground(),
     ) {
         Column {
             UpgradeRowButton(
@@ -353,7 +354,7 @@ private fun UpgradeButton(
             )
             Spacer(
                 modifier = Modifier
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                    .windowInsetsBottomHeight(WindowInsets.navigationBars),
             )
         }
     }
@@ -406,9 +407,8 @@ fun NoSubscriptionsLayout(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
-
         Spacer(Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -420,7 +420,7 @@ fun NoSubscriptionsLayout(
                 iconColor = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .height(48.dp)
-                    .width(48.dp)
+                    .width(48.dp),
             )
             if (showNotNow) {
                 TextH30(
@@ -435,10 +435,10 @@ fun NoSubscriptionsLayout(
         Spacer(modifier = Modifier.weight(1f))
         Box(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             TextH30(
-                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found)
+                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found),
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -454,7 +454,7 @@ private fun Modifier.fadeBackground() = this
                 brush = Brush.verticalGradient(
                     listOf(Color.Transparent, Color.Black),
                 ),
-                blendMode = BlendMode.DstIn
+                blendMode = BlendMode.DstIn,
             )
             drawContent()
         }

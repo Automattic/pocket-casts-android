@@ -18,13 +18,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class ProfileUpgradeBannerViewModel @Inject constructor(
@@ -129,7 +127,8 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
 
             null,
             SubscriptionTier.NONE,
-            SubscriptionTier.PLUS -> Subscription.SubscriptionTier.PLUS
+            SubscriptionTier.PLUS,
+            -> Subscription.SubscriptionTier.PLUS
         },
         frequency = getSubscriptionFrequency(cachedSubscriptionStatus),
     )
@@ -145,7 +144,8 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
             }
 
             null,
-            is SubscriptionStatus.Free -> SubscriptionFrequency.YEARLY
+            is SubscriptionStatus.Free,
+            -> SubscriptionFrequency.YEARLY
         }
 
     private fun getPlanType(

@@ -172,26 +172,3 @@ private fun AmountView(
         },
     )
 }
-
-@Composable
-private fun FeatureItemComposable(
-    item: OldPlusUpgradeFeatureItem,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        Icon(
-            painter = painterResource(item.image),
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(32.dp),
-        )
-        Spacer(Modifier.width(12.dp))
-        TextH60(
-            text = stringResource(item.title),
-            color = Color.White,
-        )
-    }
-}
