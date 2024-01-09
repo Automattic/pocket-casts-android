@@ -169,27 +169,12 @@ open class FileStorage @Inject constructor(
                 val episodesDir = getOrCreateDir(newPocketCastsDir, DIR_EPISODES)
 
                 // Check existing media and mark those episodes as downloaded
-                if (episodesDir.exists()) {
-                    episodesDir.listFiles()?.forEach { file ->
-                        val fileName = FileUtil.getFileNameWithoutExtension(file)
-                        if (fileName.length < 36) {
-                            return@forEach
-                        }
-
-                        @Suppress("DEPRECATION")
-                        episodesManager.findByUuidSync(fileName)?.let { episode ->
-                            // Delete original file if it is already there
-                            episode.downloadedFilePath?.takeIf(String::isNotBlank)?.let { downloadedFilePath ->
-                                val originalFile = File(downloadedFilePath)
-                                if (originalFile.exists()) {
-                                    originalFile.delete()
-                                }
-                            }
-
-                            episodesManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
-                        }
-                    }
-                }
+                episodesDir.takeIf(File::exists)?.listFiles().orEmpty()
+                    .matchWithFileNames()
+                    .filterInvalidFileNames()
+                    .findMatchingEpisodes(episodesManager)
+                    .deleteExistingFiles()
+                    .updateEpisodesWithNewFilePaths(episodesManager)
 
                 // Move episodes
                 episodesManager.observeDownloadedEpisodes().blockingFirst().forEach { episode ->
@@ -224,6 +209,28 @@ open class FileStorage @Inject constructor(
         } catch (e: StorageException) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Unable to move storage to new location")
         }
+    }
+
+    private fun Array<out File>.matchWithFileNames() = map { file -> file to FileUtil.getFileNameWithoutExtension(file) }
+
+    private fun List<Pair<File, String>>.filterInvalidFileNames() = filter { (_, fileName) -> fileName.length >= UUID_LENGTH }
+
+    @Suppress("DEPRECATION")
+    private fun List<Pair<File, String>>.findMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, fileName) ->
+        episodeManager.findByUuidSync(fileName)?.let { episode -> file to episode }
+    }
+
+    private fun List<Pair<File, PodcastEpisode>>.deleteExistingFiles() = onEach { (_, episode) ->
+        episode.downloadedFilePath?.takeIf(String::isNotBlank)?.let { downloadedFilePath ->
+            val originalFile = File(downloadedFilePath)
+            if (originalFile.exists()) {
+                originalFile.delete()
+            }
+        }
+    }
+
+    private fun List<Pair<File, PodcastEpisode>>.updateEpisodesWithNewFilePaths(episodeManager: EpisodeManager) = forEach { (file, episode) ->
+        episodeManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
     }
 
     fun fixBrokenFiles(episodeManager: EpisodeManager) {
@@ -291,5 +298,7 @@ open class FileStorage @Inject constructor(
         val DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator
         const val DIR_CLOUD_FILES = "cloud_files"
         const val DIR_OPML_FILES = "opml_import"
+
+        const val UUID_LENGTH = 36
     }
 }
