@@ -123,6 +123,7 @@ open class PlaybackManager @Inject constructor(
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
+    private val playbackManagerNetworkWatcher: PlaybackManagerNetworkWatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
@@ -230,6 +231,9 @@ open class PlaybackManager @Inject constructor(
                 }
             })
         }
+        playbackManagerNetworkWatcher.initialize(
+            onSwitchToMeteredConnection = ::onSwitchedToMeteredConnection
+        )
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
@@ -368,7 +372,7 @@ open class PlaybackManager @Inject constructor(
         return player?.supportsVolumeBoost() ?: false
     }
 
-    suspend fun onSwitchedToMeteredConnection() {
+    private suspend fun onSwitchedToMeteredConnection() {
 
         val episode = getCurrentEpisode() ?: return
 

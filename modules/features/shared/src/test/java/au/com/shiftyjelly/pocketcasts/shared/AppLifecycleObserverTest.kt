@@ -44,7 +44,7 @@ class AppLifecycleObserverTest {
     @Mock private lateinit var firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
     @Mock private lateinit var appLifecycleOwner: LifecycleOwner
     @Mock private lateinit var appLifecycle: Lifecycle
-    @Mock private lateinit var networkConnectionWatcher: NetworkConnectionWatcher
+    @Mock private lateinit var networkConnectionWatcher: NetworkConnectionWatcherImpl
 
     lateinit var appLifecycleObserver: AppLifecycleObserver
 

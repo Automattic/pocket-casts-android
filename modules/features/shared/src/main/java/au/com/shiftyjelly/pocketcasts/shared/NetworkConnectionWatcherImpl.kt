@@ -7,27 +7,27 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.utils.Network as PCNetworkUtils
 
-class NetworkConnectionWatcher @Inject constructor(
+@Singleton
+class NetworkConnectionWatcherImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
-    private val playbackManager: PlaybackManager,
-) {
+) : NetworkConnectionWatcher {
 
-    // Default to true so we do not detect a change to being metered when the class is initialized
-    private var connectionIsMetered: Boolean = true
+    private val _networkCapabilities = MutableStateFlow<NetworkCapabilities?>(null)
+    override val networkCapabilities: StateFlow<NetworkCapabilities?> = _networkCapabilities
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-            applicationScope.launch {
-                this@NetworkConnectionWatcher.onCapabilitiesChanged(networkCapabilities)
-            }
+            this@NetworkConnectionWatcherImpl.onCapabilitiesChanged(networkCapabilities)
             super.onCapabilitiesChanged(network, networkCapabilities)
         }
     }
@@ -49,15 +49,7 @@ class NetworkConnectionWatcher @Inject constructor(
     }
 
     @VisibleForTesting
-    internal suspend fun onCapabilitiesChanged(networkCapabilities: NetworkCapabilities) {
-        val newConnectionIsMetered = networkCapabilities.isMetered()
-        val changedToMetered = !connectionIsMetered && newConnectionIsMetered
-        if (changedToMetered) {
-            playbackManager.onSwitchedToMeteredConnection()
-        }
-        connectionIsMetered = newConnectionIsMetered
+    internal fun onCapabilitiesChanged(networkCapabilities: NetworkCapabilities) {
+        _networkCapabilities.value = networkCapabilities
     }
 }
-
-private fun NetworkCapabilities.isMetered() =
-    !hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
