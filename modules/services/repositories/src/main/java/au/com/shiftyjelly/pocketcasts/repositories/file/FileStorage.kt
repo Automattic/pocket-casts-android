@@ -14,6 +14,8 @@ import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 
 @Singleton
@@ -177,7 +179,7 @@ open class FileStorage @Inject constructor(
                     .updateEpisodesWithNewFilePaths(episodesManager)
 
                 // Move episodes
-                episodesManager.observeDownloadedEpisodes().blockingFirst()
+                episodesManager.observeDownloadedEpisodes().asFlow().first()
                     .onEach { episode -> LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}") }
                     .matchWithDownloadedFilePaths()
                     .filterNotExistingFiles()
