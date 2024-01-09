@@ -185,15 +185,11 @@ open class FileStorage @Inject constructor(
 
                 val oldCustomFilesDir = getOrCreateDir(oldPocketCastsDir, DIR_CUSTOM_EPISODES)
                 val newCustomFilesDir = getOrCreateDir(newPocketCastsDir, DIR_CUSTOM_EPISODES)
-                if (oldCustomFilesDir.exists()) {
-                    moveDir(oldCustomFilesDir, newCustomFilesDir)
-                }
+                moveDir(oldCustomFilesDir, newCustomFilesDir)
 
                 val oldNetworkImageDir = getOrCreateDir(oldPocketCastsDir, DIR_NETWORK_IMAGES)
                 val newNetworkImageDir = getOrCreateDir(newPocketCastsDir, DIR_NETWORK_IMAGES)
-                if (newNetworkImageDir.exists()) {
-                    moveDir(oldNetworkImageDir, newNetworkImageDir)
-                }
+                moveDir(oldNetworkImageDir, newNetworkImageDir)
             } else {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Old directory did not exist")
             }
