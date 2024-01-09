@@ -14,7 +14,11 @@ import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 
@@ -237,7 +241,7 @@ open class FileStorage @Inject constructor(
         }
     }
 
-    fun fixBrokenFiles(episodeManager: EpisodeManager) {
+    suspend fun fixBrokenFiles(episodeManager: EpisodeManager) {
         try {
             // Get all possible locations
             val dirPaths = buildSet {
@@ -256,6 +260,7 @@ open class FileStorage @Inject constructor(
                 .listFiles()
                 .matchWithFileNameDotPosition()
                 .toFileNameUuids()
+                .asFlow()
                 .toMatchingEpisodes(episodeManager)
                 .filterDownloadedEpisodes()
                 .restoreDownloadedFilePaths(episodeManager)
@@ -282,17 +287,16 @@ open class FileStorage @Inject constructor(
         file.name.substring(0, dotPosition).takeIf { it.length != UUID_LENGTH }?.let { uuid -> file to uuid }
     }
 
-    private fun Sequence<Pair<File, String>>.toMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, uuid) ->
-        @Suppress("DEPRECATION")
-        episodeManager.findByUuidSync(uuid)?.let { episode -> file to episode }
+    private fun Flow<Pair<File, String>>.toMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, uuid) ->
+        episodeManager.findByUuid(uuid)?.let { episode -> file to episode }
     }
 
-    private fun Sequence<Pair<File, PodcastEpisode>>.filterDownloadedEpisodes() = filter { (_, episode) ->
+    private fun Flow<Pair<File, PodcastEpisode>>.filterDownloadedEpisodes() = filter { (_, episode) ->
         val downloadedFilePath = episode.downloadedFilePath
         downloadedFilePath == null || !File(downloadedFilePath).exists() || !episode.isDownloaded
     }
 
-    private fun Sequence<Pair<File, PodcastEpisode>>.restoreDownloadedFilePaths(episodeManager: EpisodeManager) = forEach { (file, episode) ->
+    private suspend fun Flow<Pair<File, PodcastEpisode>>.restoreDownloadedFilePaths(episodeManager: EpisodeManager) = collect { (file, episode) ->
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Restoring downloaded file for ${episode.title} from ${file.absolutePath}")
         // Link to the found episode
         episode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
