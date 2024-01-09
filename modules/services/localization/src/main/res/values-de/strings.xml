@@ -960,13 +960,9 @@ Language: de
     <string name="plus_lifetime_member">Lebenslange Mitgliedschaft</string>
     <string name="plus_learn_more_button">Weitere Informationen</string>
     <string name="plus_learn_more_about_plus">Weitere Informationen zu Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Mit unseren Windows-, macOS- und Web-Apps hast du deine Podcasts immer parat.</string>
     <string name="plus_desktop_apps">Desktop-Apps</string>
-    <string name="plus_description_title">Erweiterte Funktionen für Vielhörer</string>
-    <string name="plus_description_body">Persönlich und überall verfügbar: Lade deine persönlichen Audiodateien auf unsere Cloudserver hoch, greife über unseren Webplayer auf dein Konto zu und passe die App ganz an deine Bedürfnisse an.</string>
     <string name="plus_create_marketing_features"> Alles</string>
     <string name="plus_cloud_storage_limit">%d GB Cloud-Speicher</string>
-    <string name="plus_cloud_storage_body">Verkürze deine Wiedergaben und hör dir schneller noch mehr an. Stelle deine Podcasts selbst zusammen.</string>
     <string name="plus_cloud_storage">Cloud-Speicher</string>
     <string name="profile_expiry_date_unknown">Unbekannt</string>
     <string name="profile_yearly">Jährlich</string>
@@ -974,7 +970,6 @@ Language: de
     <string name="profile_welcome_to_plus">Willkommen bei Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Willkommen bei Pocket Casts!</string>
     <string name="profile_web_player">Webplayer</string>
-    <string name="profile_upgrade_to_plus">Upgrade auf Plus</string>
     <string name="profile_updates_ends">Aktualisierungen enden: %s</string>
     <string name="profile_updates_ended">Aktualisierungen beendet: %s</string>
     <string name="profile_time_free">%s frei</string>

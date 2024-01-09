@@ -960,13 +960,9 @@ Language: ru
     <string name="plus_lifetime_member">Пожизненное членство</string>
     <string name="plus_learn_more_button">Подробнее</string>
     <string name="plus_learn_more_about_plus">Подробнее о Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">С нашими приложениями для Windows, macOS и веб-клиентами вы сможете слушать свои подкасты где угодно.</string>
     <string name="plus_desktop_apps">Приложения для настольных систем</string>
-    <string name="plus_description_title">Расширенные возможности для продвинутых слушателей</string>
-    <string name="plus_description_body">Личное пространство в открытом мире. Загрузите свои личные аудиофайлы на наши облачные серверы, зайдите в свою учетную запись через веб-плеер и пользуйтесь приложением.</string>
     <string name="plus_create_marketing_features"> Все</string>
     <string name="plus_cloud_storage_limit">Облачное хранилище %d ГБ</string>
-    <string name="plus_cloud_storage_body">Ускорьте свои лекции. Быстро прослушивайте другое содержимое. Станьте диджеем собственного подкаста.</string>
     <string name="plus_cloud_storage">Облачное хранилище</string>
     <string name="profile_expiry_date_unknown">Неизвестно</string>
     <string name="profile_yearly">Ежегодно</string>
@@ -974,7 +970,6 @@ Language: ru
     <string name="profile_welcome_to_plus">Добро пожаловать в Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Добро пожаловать в Pocket Casts!</string>
     <string name="profile_web_player">Веб-плеер</string>
-    <string name="profile_upgrade_to_plus">Перейти на Plus</string>
     <string name="profile_updates_ends">Обновления завершаются: %s</string>
     <string name="profile_updates_ended">Обновления завершены: %s</string>
     <string name="profile_time_free">%s бесплатно</string>

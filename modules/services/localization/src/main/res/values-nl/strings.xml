@@ -960,13 +960,9 @@ Language: nl
     <string name="plus_lifetime_member">Levenslang lid</string>
     <string name="plus_learn_more_button">Meer weten</string>
     <string name="plus_learn_more_about_plus">Bekijk meer informatie over Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Neem je podcasts altijd met je mee met onze apps voor Windows en macOS en de online apps.</string>
     <string name="plus_desktop_apps">Desktop-apps</string>
-    <string name="plus_description_title">Verbeterde functies voor geavanceerde luisteraars</string>
-    <string name="plus_description_body">Tegelijkertijd persoonlijk zijn en gedeeld worden. Upload je persoonlijke audiobestanden naar onze cloudservers, krijg toegang tot je account via onze online speler en pas de app naar je eigen voorkeuren aan.</string>
     <string name="plus_create_marketing_features"> Alles</string>
     <string name="plus_cloud_storage_limit">%dGB cloud-opslagruimte</string>
-    <string name="plus_cloud_storage_body">Versnel je lezingen. Haast je door andere content heen. Word je eigen podcast-DJ.</string>
     <string name="plus_cloud_storage">Opslag in de cloud</string>
     <string name="profile_expiry_date_unknown">Onbekend</string>
     <string name="profile_yearly">Jaarlijks</string>
@@ -974,7 +970,6 @@ Language: nl
     <string name="profile_welcome_to_plus">Welkom bij Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Welkom bij Pocket Casts!</string>
     <string name="profile_web_player">Online speler</string>
-    <string name="profile_upgrade_to_plus">Upgraden naar Plus</string>
     <string name="profile_updates_ends">Updates beëindigen: %s</string>
     <string name="profile_updates_ended">Updates beëindigd: %s</string>
     <string name="profile_time_free">%s gratis</string>

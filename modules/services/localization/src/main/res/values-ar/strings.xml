@@ -883,14 +883,10 @@ Language: ar
     <string name="plus_lifetime_member">عضو مدى الحياة</string>
     <string name="plus_learn_more_button">أعرف أكثر</string>
     <string name="plus_learn_more_about_plus">معرفة المزيد حول Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">انقل بثك الصوتي إلى أماكن أخرى باستخدام تطبيقات Windows وmacOS وتطبيقات الويب الخاصة بنا.</string>
     <string name="plus_desktop_apps">تطبيقات سطح المكتب</string>
-    <string name="plus_description_title">ميزات مُحسَّنة للمستمعين المتقدمين</string>
-    <string name="plus_description_body">احصل على المعلومات الشخصية وتوزيعها كل ذلك مرة واحدة. ارفع ملفات الصوت الشخصية الخاصة بك إلى خوادمنا السحابية، واوصل إلى حسابك من خلال مُشغِّل الويب الخاص بنا، واجعل التطبيق خاص بك.</string>
     <string name="plus_create_marketing_features"> كل شيء</string>
     <string name="settings_logs">السجلات</string>
     <string name="plus_cloud_storage_limit">%d جيجابايت من مساحة التخزين السحابي</string>
-    <string name="plus_cloud_storage_body">قم بتسريع محاضراتك. تخلَّص من المحتوى الآخر. كن Podcast DJ الخاص بك.</string>
     <string name="plus_cloud_storage">التخزين السحابي</string>
     <string name="profile_expiry_date_unknown">غير معروف</string>
     <string name="profile_yearly">سنوي</string>
@@ -898,7 +894,6 @@ Language: ar
     <string name="profile_welcome_to_plus">مرحبًا بك في Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">مرحبًا بك في Pocket Casts!</string>
     <string name="profile_web_player">مُشغِّل الويب</string>
-    <string name="profile_upgrade_to_plus">الترقية إلى Plus</string>
     <string name="profile_updates_ends">تنتهي التحديثات: %s</string>
     <string name="profile_updates_ended">انتهت التحديثات: %s</string>
     <string name="profile_time_free">%s مجانًا</string>

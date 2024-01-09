@@ -532,11 +532,6 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_SOUND_CHANGED("settings_notifications_sound_changed"),
     SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED("settings_notifications_vibration_changed"),
 
-    /* Settings - Plus */
-    SETTINGS_PLUS_SHOWN("settings_plus_shown"),
-    SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
-    SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
-
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),
     SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE("settings_storage_clear_download_cache"),

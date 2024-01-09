@@ -960,13 +960,9 @@ Language: sv_SE
     <string name="plus_lifetime_member">Livstidsmedlem</string>
     <string name="plus_learn_more_button">Lär dig mer</string>
     <string name="plus_learn_more_about_plus">Läs mer om Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Ta dina podcasts till fler platser med våra appar för Windows, macOS och webben.</string>
     <string name="plus_desktop_apps">Dator-appar</string>
-    <string name="plus_description_title">Förbättrade funktioner för avancerade lyssnare</string>
-    <string name="plus_description_body">Bli personlig och distribuerad, allt på samma gång. Ladda upp dina personliga ljudfiler till våra molnservrar, kom åt ditt konto via vår webbspelare och gör appen till din egen.</string>
     <string name="plus_create_marketing_features"> Allt</string>
     <string name="plus_cloud_storage_limit">%d GB molnlagring</string>
-    <string name="plus_cloud_storage_body">Snabba upp dina föreläsningar. Ta del av annat innehåll. Bli din egen podcast-DJ.</string>
     <string name="plus_cloud_storage">Molnlagring</string>
     <string name="profile_expiry_date_unknown">Okänd</string>
     <string name="profile_yearly">Årligen</string>
@@ -974,7 +970,6 @@ Language: sv_SE
     <string name="profile_welcome_to_plus">Välkommen till Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Välkommen till Pocket Casts!</string>
     <string name="profile_web_player">Webbspelare</string>
-    <string name="profile_upgrade_to_plus">Uppgradera till Plus</string>
     <string name="profile_updates_ends">Uppdateringar slutar: %s</string>
     <string name="profile_updates_ended">Uppdateringar slutade: %s</string>
     <string name="profile_time_free">%s gratis</string>

@@ -960,13 +960,9 @@ Language: zh_CN
     <string name="plus_lifetime_member">终身会员</string>
     <string name="plus_learn_more_button">了解更多</string>
     <string name="plus_learn_more_about_plus">了解有关 Pocket Casts Plus 的更多信息</string>
-    <string name="plus_desktop_apps_body">借助我们的 Windows、macOS 和 Web 应用程序，将播客传播到更多位置。</string>
     <string name="plus_desktop_apps">桌面应用程序</string>
-    <string name="plus_description_title">高级侦听器的增强功能</string>
-    <string name="plus_description_body">同时进行个性化设计并分发。 将您的个人音频文件上传到我们的云服务器，通过我们的 Web 播放器访问您的账户，并将应用程序设置为您的应用程序。</string>
     <string name="plus_create_marketing_features"> 所有内容</string>
     <string name="plus_cloud_storage_limit">%dGB 云存储</string>
-    <string name="plus_cloud_storage_body">加快您的讲座速度。 刻录其他内容。 成为您自己的播客 DJ。</string>
     <string name="plus_cloud_storage">云存储</string>
     <string name="profile_expiry_date_unknown">未知</string>
     <string name="profile_yearly">每年</string>
@@ -974,7 +970,6 @@ Language: zh_CN
     <string name="profile_welcome_to_plus">欢迎使用 Pocket Casts Plus！</string>
     <string name="profile_welcome_to_free">欢迎使用 Pocket Casts！</string>
     <string name="profile_web_player">Web 播放器</string>
-    <string name="profile_upgrade_to_plus">升级到 Plus</string>
     <string name="profile_updates_ends">更新结束：%s</string>
     <string name="profile_updates_ended">更新已结束：%s</string>
     <string name="profile_time_free">%s 免费</string>

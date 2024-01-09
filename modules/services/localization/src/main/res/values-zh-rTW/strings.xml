@@ -960,13 +960,9 @@ Language: zh_TW
     <string name="plus_lifetime_member">終身會員</string>
     <string name="plus_learn_more_button">進一步了解</string>
     <string name="plus_learn_more_about_plus">深入了解 Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">透過我們的 Windows、macOS 和網頁應用程式，隨時隨地都能聆聽 Podcast 節目 。</string>
     <string name="plus_desktop_apps">桌上型電腦應用程式</string>
-    <string name="plus_description_title">進階聽眾的進階功能</string>
-    <string name="plus_description_body">個人化設定和內容發表，全部一次搞定。上傳個人音訊檔案到雲端伺服器、透過網頁播放器使用帳號，還可將 App 打造成你的專屬天地。</string>
     <string name="plus_create_marketing_features"> 所有內容</string>
     <string name="plus_cloud_storage_limit">%d GB 雲端儲存空間</string>
-    <string name="plus_cloud_storage_body">加速課程進度。 探索其他內容。成為你自己的 Podcast DJ。</string>
     <string name="plus_cloud_storage">雲端儲存空間</string>
     <string name="profile_expiry_date_unknown">未知</string>
     <string name="profile_yearly">每年</string>
@@ -974,7 +970,6 @@ Language: zh_TW
     <string name="profile_welcome_to_plus">歡迎使用 Pocket Casts Plus！</string>
     <string name="profile_welcome_to_free">歡迎使用 Pocket Casts！</string>
     <string name="profile_web_player">網頁播放器</string>
-    <string name="profile_upgrade_to_plus">升級到 Plus</string>
     <string name="profile_updates_ends">更新預估結束時間：%s</string>
     <string name="profile_updates_ended">更新結束時間：%s</string>
     <string name="profile_time_free">%s 免費</string>
