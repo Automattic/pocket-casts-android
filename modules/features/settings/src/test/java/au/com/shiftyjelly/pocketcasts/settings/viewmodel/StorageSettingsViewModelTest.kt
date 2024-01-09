@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -44,9 +43,6 @@ class StorageSettingsViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     @Mock
-    private lateinit var podcastManager: PodcastManager
-
-    @Mock
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
@@ -79,7 +75,6 @@ class StorageSettingsViewModelTest {
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.empty())
         viewModel = StorageSettingsViewModel(
-            podcastManager,
             episodeManager,
             fileStorage,
             fileUtil,
@@ -112,7 +107,7 @@ class StorageSettingsViewModelTest {
         val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL, "")
         startViewModelAndResumeFragment(folderLocations = listOf(folderLocation), sdkVersion = 28)
         val file = File(folderLocation.filePath)
-        whenever(fileStorage.baseStorageDirectory).thenReturn(file)
+        whenever(fileStorage.getOrCreateBaseStorageDir()).thenReturn(file)
         whenever(settings.usingCustomFolderStorage()).thenReturn(true)
 
         viewModel.state.value.storageChoiceState.onStateChange(folderLocation)
@@ -186,7 +181,7 @@ class StorageSettingsViewModelTest {
             permissionGranted = permissionGranted,
         )
         val oldFile = File(folderLocation.filePath)
-        whenever(fileStorage.baseStorageDirectory).thenReturn(oldFile)
+        whenever(fileStorage.getOrCreateBaseStorageDir()).thenReturn(oldFile)
         whenever(settings.usingCustomFolderStorage()).thenReturn(true)
         createNewTemporaryCustomFolder()
         val collectJob = launch(UnconfinedTestDispatcher()) {

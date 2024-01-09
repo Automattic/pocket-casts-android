@@ -42,13 +42,13 @@ object DownloadHelper {
 
     @Throws(StorageException::class)
     fun pathForEpisode(episode: BaseEpisode, fileStorage: FileStorage): String? {
-        val file = fileStorage.getPodcastEpisodeFile(episode)
-        return file.absolutePath
+        val file = fileStorage.getOrCreatePodcastEpisodeFile(episode)
+        return file?.absolutePath
     }
 
     @Throws(StorageException::class)
     fun tempPathForEpisode(episode: BaseEpisode, fileStorage: FileStorage): String {
-        val file = fileStorage.getTempPodcastEpsisodeFile(episode)
+        val file = fileStorage.getOrCreatePodcastEpisodeTempFile(episode)
         return file.absolutePath
     }
 }

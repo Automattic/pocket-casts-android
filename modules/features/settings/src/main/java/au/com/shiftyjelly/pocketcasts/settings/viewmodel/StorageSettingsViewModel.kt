@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class StorageSettingsViewModel
 @Inject constructor(
-    private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
     private val fileUtil: FileUtilWrapper,
@@ -153,7 +151,7 @@ class StorageSettingsViewModel
 
     fun onClearDownloadCacheClick() {
         viewModelScope.launch {
-            val tempPath = fileStorage.tempPodcastDirectory
+            val tempPath = fileStorage.getOrCreateEpisodesTempDir()
             fileUtil.deleteDirectoryContents(tempPath.absolutePath)
             mutableSnackbarMessage.emit(LR.string.settings_storage_clear_cache)
         }
@@ -217,8 +215,7 @@ class StorageSettingsViewModel
     private fun onStorageChoiceChange(folderPathChosen: String?) {
         if (folderPathChosen == Settings.STORAGE_ON_CUSTOM_FOLDER) {
             try {
-                val baseDirectory = fileStorage.baseStorageDirectory
-                baseDirectory?.absolutePath?.let { basePath ->
+                fileStorage.getOrCreateBaseStorageDir()?.absolutePath?.let { basePath ->
                     settings.setStorageCustomFolder(basePath)
                     updateStorageLabels()
                 }
@@ -285,7 +282,7 @@ class StorageSettingsViewModel
 
             var oldDirectory: File? = null
             try {
-                oldDirectory = fileStorage.baseStorageDirectory
+                oldDirectory = fileStorage.getOrCreateBaseStorageDir()
             } catch (e: StorageException) {
                 // ignore error
             }
@@ -343,7 +340,6 @@ class StorageSettingsViewModel
             fileStorage.moveStorage(
                 File(oldDirectory),
                 File(newDirectory),
-                podcastManager,
                 episodeManager,
             )
             mutableProgressDialog.emit(false)
