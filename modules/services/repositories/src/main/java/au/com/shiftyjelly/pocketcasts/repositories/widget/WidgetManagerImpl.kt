@@ -24,8 +24,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingI
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
