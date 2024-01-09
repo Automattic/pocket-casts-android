@@ -158,7 +158,7 @@ open class FileStorage @Inject constructor(
         }
     }
 
-    fun moveStorage(oldDir: File, newDir: File, episodesManager: EpisodeManager) {
+    suspend fun moveStorage(oldDir: File, newDir: File, episodesManager: EpisodeManager) {
         try {
             val oldPocketCastsDir = File(oldDir, "PocketCasts")
             if (oldPocketCastsDir.exists() && oldPocketCastsDir.isDirectory) {
@@ -202,9 +202,8 @@ open class FileStorage @Inject constructor(
 
     private fun List<Pair<File, String>>.filterInvalidFileNames() = filter { (_, fileName) -> fileName.length >= UUID_LENGTH }
 
-    @Suppress("DEPRECATION")
-    private fun List<Pair<File, String>>.findMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, fileName) ->
-        episodeManager.findByUuidSync(fileName)?.let { episode -> file to episode }
+    private suspend fun List<Pair<File, String>>.findMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, fileName) ->
+        episodeManager.findByUuid(fileName)?.let { episode -> file to episode }
     }
 
     private fun List<Pair<File, PodcastEpisode>>.deleteExistingFiles() = onEach { (_, episode) ->
