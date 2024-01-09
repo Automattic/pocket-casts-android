@@ -33,16 +33,27 @@ private const val VERSION_CODE_AFTER_SECOND_INSTALL = 2
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleObserverTest {
 
-    @Mock @ApplicationContext private lateinit var context: Context
+    @Mock @ApplicationContext
+    private lateinit var context: Context
+
     @Mock private lateinit var settings: Settings
+
     @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
+
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
+
     @Mock private lateinit var packageUtil: PackageUtil
+
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
+
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
+
     @Mock private lateinit var defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider
+
     @Mock private lateinit var firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
+
     @Mock private lateinit var appLifecycleOwner: LifecycleOwner
+
     @Mock private lateinit var appLifecycle: Lifecycle
 
     lateinit var appLifecycleObserver: AppLifecycleObserver

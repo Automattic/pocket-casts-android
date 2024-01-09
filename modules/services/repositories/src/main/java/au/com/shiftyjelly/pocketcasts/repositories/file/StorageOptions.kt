@@ -32,10 +32,10 @@ class StorageOptions {
 
     private fun testAndCleanMountsList(confirmedMountPoints: ArrayList<String>) {
         /*
-		 * Now that we have a cleaned list of mount paths Test each one to make
-		 * sure it's a valid and available path. If it is not, remove it from
-		 * the list.
-		 */
+         * Now that we have a cleaned list of mount paths Test each one to make
+         * sure it's a valid and available path. If it is not, remove it from
+         * the list.
+         */
         val iterator = confirmedMountPoints.iterator()
         while (iterator.hasNext()) {
             val mount = iterator.next()
@@ -48,7 +48,7 @@ class StorageOptions {
 
     private fun determineFolderLocations(
         confirmedMountPoints: ArrayList<String>,
-        context: Context
+        context: Context,
     ) {
         if (confirmedMountPoints.isEmpty()) return
 
@@ -68,7 +68,7 @@ class StorageOptions {
                     filePath = firstMountPoint,
                     label = resources.getString(R.string.settings_storage_phone),
                     analyticsLabel = "phone",
-                )
+                ),
             )
         } else {
             requireNotNull(folderLocations) {
@@ -77,8 +77,8 @@ class StorageOptions {
                 FolderLocation(
                     filePath = firstMountPoint,
                     label = resources.getString(R.string.settings_storage_sd_card),
-                    analyticsLabel = "sd_card"
-                )
+                    analyticsLabel = "sd_card",
+                ),
             )
             externalSDCardCount++
         }
@@ -90,7 +90,7 @@ class StorageOptions {
             } else {
                 resources.getString(
                     R.string.settings_storage_sd_card_number,
-                    externalSDCardCount.toString()
+                    externalSDCardCount.toString(),
                 )
             }
             requireNotNull(folderLocations) {
@@ -99,8 +99,8 @@ class StorageOptions {
                 FolderLocation(
                     filePath = mountPoint,
                     label = label,
-                    analyticsLabel = "sd_card"
-                )
+                    analyticsLabel = "sd_card",
+                ),
             )
             externalSDCardCount++
         }

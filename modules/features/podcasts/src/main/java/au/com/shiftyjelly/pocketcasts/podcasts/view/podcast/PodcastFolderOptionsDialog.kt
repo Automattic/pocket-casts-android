@@ -11,7 +11,7 @@ class PodcastFolderOptionsDialog(
     val onRemoveFolder: () -> Unit,
     val onChangeFolder: () -> Unit,
     val onOpenFolder: () -> Unit,
-    val activity: FragmentActivity?
+    val activity: FragmentActivity?,
 ) {
 
     private var showDialog: OptionsDialog? = null
@@ -25,7 +25,7 @@ class PodcastFolderOptionsDialog(
                 click = {
                     onRemoveFolder()
                     dismiss()
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.change_folder,
@@ -33,7 +33,7 @@ class PodcastFolderOptionsDialog(
                 click = {
                     onChangeFolder()
                     dismiss()
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.go_to_folder,
@@ -41,7 +41,7 @@ class PodcastFolderOptionsDialog(
                 click = {
                     onOpenFolder()
                     dismiss()
-                }
+                },
             )
         activity?.supportFragmentManager?.let {
             dialog.show(it, "podcast_folder_options_dialog")

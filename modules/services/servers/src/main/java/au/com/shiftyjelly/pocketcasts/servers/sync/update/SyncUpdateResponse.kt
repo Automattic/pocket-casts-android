@@ -13,7 +13,7 @@ data class SyncUpdateResponse(
     val episodes: MutableList<EpisodeSync> = mutableListOf(),
     val podcasts: MutableList<PodcastSync> = mutableListOf(),
     val folders: MutableList<Folder> = mutableListOf(),
-    val bookmarks: MutableList<Bookmark> = mutableListOf()
+    val bookmarks: MutableList<Bookmark> = mutableListOf(),
 ) {
 
     data class PodcastSync(
@@ -24,7 +24,7 @@ data class SyncUpdateResponse(
         var skipLastSecs: Int? = null,
         var folderUuid: String? = null,
         var sortPosition: Int? = null,
-        var dateAdded: Date? = null
+        var dateAdded: Date? = null,
     )
 
     data class EpisodeSync(
@@ -33,6 +33,6 @@ data class SyncUpdateResponse(
         var starred: Boolean? = null,
         var playedUpTo: Double? = null,
         var duration: Double? = null,
-        var playingStatus: EpisodePlayingStatus? = null
+        var playingStatus: EpisodePlayingStatus? = null,
     )
 }

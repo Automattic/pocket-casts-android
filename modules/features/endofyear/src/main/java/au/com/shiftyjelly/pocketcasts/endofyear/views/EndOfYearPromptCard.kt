@@ -47,7 +47,7 @@ fun EndOfYearPromptCard(
 ) {
     Box(
         modifier = modifier
-            .background(color = MaterialTheme.theme.colors.primaryUi02)
+            .background(color = MaterialTheme.theme.colors.primaryUi02),
     ) {
         Row(
             modifier = modifier
@@ -55,29 +55,29 @@ fun EndOfYearPromptCard(
                 .clip(RoundedCornerShape(PromptCardCornerSize))
                 .background(
                     color = colorResource(
-                        if (MaterialTheme.theme.isLight) LightThemeBackgroundColor else DarkThemeBackgroundColor
-                    )
+                        if (MaterialTheme.theme.isLight) LightThemeBackgroundColor else DarkThemeBackgroundColor,
+                    ),
                 )
                 .clickable { onClick.invoke() },
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = modifier
                     .weight(1f)
                     .padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 12.dp),
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 TextH20(
                     text = stringResource(LR.string.end_of_year_prompt_card_title),
                     color = MaterialTheme.theme.colors.contrast01,
                     modifier = modifier
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = 8.dp),
                 )
                 TextH70(
                     text = stringResource(LR.string.end_of_year_prompt_card_summary),
                     color = MaterialTheme.theme.colors.contrast02,
                     fontWeight = FontWeight.W600,
-                    modifier = modifier.alpha(PromptCardSummaryTextAlpha)
+                    modifier = modifier.alpha(PromptCardSummaryTextAlpha),
                 )
             }
             Image(

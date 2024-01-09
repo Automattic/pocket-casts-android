@@ -11,18 +11,19 @@ enum class PlayOverNotificationSetting(
     NEVER(
         titleRes = LR.string.settings_notification_play_over_never,
         preferenceInt = 2,
-        analyticsString = "never"
+        analyticsString = "never",
     ),
     DUCK(
         titleRes = LR.string.settings_notification_play_over_duck,
         preferenceInt = 1,
-        analyticsString = "duck"
+        analyticsString = "duck",
     ),
     ALWAYS(
         titleRes = LR.string.settings_notification_play_over_always,
         preferenceInt = 0,
-        analyticsString = "always"
-    );
+        analyticsString = "always",
+    ),
+    ;
 
     companion object {
         fun fromPreferenceString(stringValue: String): PlayOverNotificationSetting {

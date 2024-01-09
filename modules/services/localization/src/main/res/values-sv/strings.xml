@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 11:54:03+0000
+Translation-Revision-Date: 2023-12-18 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="bookmark_not_found">Bokmärke hittades inte</string>
+    <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
+    <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
     <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad för 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Prenumerera på Plus och ta reda på hur du lyssnar jämfört med 2022, annan rolig statistik och Premium-funktioner som bokmärken och mappar.</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
@@ -88,7 +91,7 @@ Language: sv_SE
     <string name="bookmarks_select_option">Välj bokmärken</string>
     <string name="bookmarks_delete_summary_singular">Detta bokmärke kommer att tas bort. Det här går inte att ångra.</string>
     <string name="bookmarks_delete_summary_plural">%d bokmärken kommer att tas bort. Det här går inte att ångra.</string>
-    <string name="bookmarks_deleted_singular">1 bokmärke har tagits bort</string>
+    <string name="bookmarks_deleted_singular">Bokmärke borttaget</string>
     <string name="bookmarks_deleted_plural">%1$d bokmärken har tagits bort</string>
     <string name="bookmarks_delete_singular">Ta bort bokmärke</string>
     <string name="bookmarks_delete_plural">Ta bort bokmärken</string>

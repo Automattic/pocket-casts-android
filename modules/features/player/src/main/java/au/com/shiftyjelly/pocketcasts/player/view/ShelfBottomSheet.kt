@@ -28,14 +28,17 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
+
     @Inject lateinit var playbackManager: PlaybackManager
 
     override val statusBarColor: StatusBarColor? = null
@@ -171,7 +174,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         }
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue)
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue),
         )
         dismiss()
     }

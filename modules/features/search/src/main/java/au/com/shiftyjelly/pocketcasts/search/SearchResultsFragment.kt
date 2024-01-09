@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
 private const val ARG_TYPE = "arg_type"
+
 @AndroidEntryPoint
 class SearchResultsFragment : BaseFragment() {
     private val viewModel by viewModels<SearchViewModel>({ requireParentFragment() })
@@ -68,7 +69,7 @@ class SearchResultsFragment : BaseFragment() {
                         SearchEpisodeResultsPage(
                             viewModel = viewModel,
                             onBackClick = ::onBackClick,
-                            onEpisodeClick = ::onEpisodeClick
+                            onEpisodeClick = ::onEpisodeClick,
                         )
                     }
 
@@ -96,7 +97,7 @@ class SearchResultsFragment : BaseFragment() {
         listener?.onSearchEpisodeClick(
             episodeUuid = episode.uuid,
             podcastUuid = episode.podcastUuid,
-            source = EpisodeViewSource.SEARCH
+            source = EpisodeViewSource.SEARCH,
         )
     }
 
@@ -118,7 +119,7 @@ class SearchResultsFragment : BaseFragment() {
                 SearchViewModel.SearchResultType.PODCAST_REMOTE_RESULT
             } else {
                 SearchViewModel.SearchResultType.PODCAST_LOCAL_RESULT
-            }
+            },
         )
         searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
         listener?.onSearchPodcastClick(podcast.uuid)
@@ -132,7 +133,8 @@ class SearchResultsFragment : BaseFragment() {
         enum class ResultsType(val value: String) {
             PODCASTS("podcasts"),
             EPISODES("episodes"),
-            UNKNOWN("unknown");
+            UNKNOWN("unknown"),
+            ;
 
             companion object {
                 fun fromString(value: String?) =
@@ -143,7 +145,7 @@ class SearchResultsFragment : BaseFragment() {
         fun newInstance(
             type: ResultsType,
             onlySearchRemote: Boolean = false,
-            source: SourceView
+            source: SourceView,
         ): SearchResultsFragment {
             val fragment = SearchResultsFragment()
             val arguments = Bundle().apply {

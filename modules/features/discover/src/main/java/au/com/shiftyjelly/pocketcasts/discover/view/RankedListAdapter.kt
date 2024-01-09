@@ -15,7 +15,7 @@ class RankedListAdapter(
     val onPodcastClick: (DiscoverPodcast) -> Unit,
     val onPodcastSubscribe: (String) -> Unit,
     val taglineText: String?,
-    val theme: Theme
+    val theme: Theme,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
     class RankedPodcastViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val podcastRow: PodcastRow = itemView.findViewById(R.id.podcastRow)

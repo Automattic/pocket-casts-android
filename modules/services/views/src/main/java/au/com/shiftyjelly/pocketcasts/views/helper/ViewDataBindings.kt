@@ -89,7 +89,7 @@ object ViewDataBindings {
                 currentTimeMs = episode.playedUpToMs,
                 durationMs = episode.durationMs.toLong(),
                 inProgress = episode.isInProgress,
-                context = textView.context
+                context = textView.context,
             )
             textView.text = timeLeft.text
             textView.contentDescription = timeLeft.description
@@ -109,7 +109,7 @@ object ViewDataBindings {
             currentTimeMs = 0,
             durationMs = time.toLong(),
             inProgress = false,
-            context = textView.context
+            context = textView.context,
         )
         textView.text = timeLeft.text
         textView.contentDescription = timeLeft.description

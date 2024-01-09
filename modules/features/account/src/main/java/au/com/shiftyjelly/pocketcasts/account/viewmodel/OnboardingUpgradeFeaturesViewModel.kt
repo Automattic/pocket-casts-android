@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -36,7 +37,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingUpgradeFeaturesViewModel @Inject constructor(
@@ -67,8 +67,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                                 Subscription.fromProductDetails(
                                     productDetails = productDetailsState,
                                     isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
-                                    )
+                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                    ),
                                 )
                             }
                         } ?: emptyList()
@@ -104,7 +104,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             subscriptions = updatedSubscriptions,
             tier = if (showPatronOnly) Subscription.SubscriptionTier.PATRON else lastSelectedTier,
-            frequency = lastSelectedFrequency
+            frequency = lastSelectedFrequency,
         )
 
         val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS
@@ -122,7 +122,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     currentSubscription = selectedSubscription,
                     currentFeatureCard = currentFeatureCard,
                     currentSubscriptionFrequency = currentSubscriptionFrequency,
-                    showNotNow = showNotNow
+                    showNotNow = showNotNow,
                 )
             }
         } ?: _state.update { // In ideal world, we should never get here
@@ -152,14 +152,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 .getDefaultSubscription(
                     subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
-                    frequency = frequency
+                    frequency = frequency,
                 )
             settings.setLastSelectedSubscriptionFrequency(frequency)
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
                         currentSubscription = currentSubscription,
-                        currentSubscriptionFrequency = frequency
+                        currentSubscriptionFrequency = frequency,
                     )
                 }
             }
@@ -172,14 +172,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 .getDefaultSubscription(
                     subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = upgradeFeatureCard.subscriptionTier,
-                    frequency = loadedState.currentSubscriptionFrequency
+                    frequency = loadedState.currentSubscriptionFrequency,
                 )
             settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
                         currentSubscription = currentSubscription,
-                        currentFeatureCard = upgradeFeatureCard
+                        currentFeatureCard = upgradeFeatureCard,
                     )
                 }
             }
@@ -197,13 +197,13 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 .getDefaultSubscription(
                     subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
-                    frequency = loadedState.currentSubscriptionFrequency
+                    frequency = loadedState.currentSubscriptionFrequency,
                 )
 
             currentSubscription?.let { subscription ->
                 analyticsTracker.track(
                     AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                    mapOf(OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue, OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId)
+                    mapOf(OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue, OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId),
                 )
 
                 viewModelScope.launch {
@@ -234,14 +234,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                         CreateAccountViewModel.trackPurchaseEvent(
                             subscription,
                             purchaseEvent,
-                            analyticsTracker
+                            analyticsTracker,
                         )
                     }
                 }
                 subscriptionManager.launchBillingFlow(
                     activity,
                     subscription.productDetails,
-                    subscription.offerToken
+                    subscription.offerToken,
                 )
             }
         }

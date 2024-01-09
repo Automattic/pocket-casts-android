@@ -36,7 +36,7 @@ class CloudSettingsViewModel @Inject constructor(
         settings.cloudAddToUpNext.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
@@ -44,7 +44,7 @@ class CloudSettingsViewModel @Inject constructor(
         settings.deleteLocalFileAfterPlaying.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
@@ -52,7 +52,7 @@ class CloudSettingsViewModel @Inject constructor(
         settings.deleteCloudFileAfterPlaying.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
@@ -60,7 +60,7 @@ class CloudSettingsViewModel @Inject constructor(
         settings.cloudAutoUpload.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_UPLOAD_TO_CLOUD_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
@@ -68,7 +68,7 @@ class CloudSettingsViewModel @Inject constructor(
         settings.cloudAutoDownload.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_DOWNLOAD_FROM_CLOUD_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
@@ -76,7 +76,7 @@ class CloudSettingsViewModel @Inject constructor(
         settings.cloudDownloadOnlyOnWifi.set(enabled)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 }

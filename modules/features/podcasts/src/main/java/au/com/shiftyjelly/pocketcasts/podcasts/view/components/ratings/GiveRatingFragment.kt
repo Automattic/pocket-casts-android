@@ -17,9 +17,9 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_PODCAST_UUID = "podcastUuid"
@@ -29,7 +29,7 @@ class GiveRatingFragment : BaseDialogFragment() {
     companion object {
         fun newInstance(podcastUuid: String) = GiveRatingFragment().apply {
             arguments = bundleOf(
-                ARG_PODCAST_UUID to podcastUuid
+                ARG_PODCAST_UUID to podcastUuid,
             )
         }
     }
@@ -37,9 +37,8 @@ class GiveRatingFragment : BaseDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
-
         val podcastUuid = arguments?.getString(ARG_PODCAST_UUID)
         if (podcastUuid == null) {
             exitWithError("${this@GiveRatingFragment::class.simpleName} is missing podcastUuid argument")
@@ -48,7 +47,6 @@ class GiveRatingFragment : BaseDialogFragment() {
 
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
-
                 val viewModel = hiltViewModel<GiveRatingViewModel>()
 
                 val coroutineScope = rememberCoroutineScope()
@@ -66,7 +64,7 @@ class GiveRatingFragment : BaseDialogFragment() {
                                 dismiss()
                             }
                         },
-                        onFailure = ::exitWithError
+                        onFailure = ::exitWithError,
                     )
                 }
 

@@ -16,7 +16,6 @@ fun LoginScreen(
     onLoginWithGoogleClick: () -> Unit,
     onLoginWithPhoneClick: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<LoginViewModel>()
 
     CallOnce {

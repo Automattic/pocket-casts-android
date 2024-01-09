@@ -19,7 +19,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
     override fun onInterceptTouchEvent(
         parent: CoordinatorLayout,
         child: V,
-        event: MotionEvent
+        event: MotionEvent,
     ): Boolean {
         return if (swipeEnabled) {
             super.onInterceptTouchEvent(parent, child, event)
@@ -42,7 +42,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         directTargetChild: View,
         target: View,
         axes: Int,
-        type: Int
+        type: Int,
     ): Boolean {
         return if (swipeEnabled) {
             super.onStartNestedScroll(
@@ -51,7 +51,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
                 directTargetChild,
                 target,
                 axes,
-                type
+                type,
             )
         } else {
             false
@@ -65,7 +65,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         dx: Int,
         dy: Int,
         consumed: IntArray,
-        type: Int
+        type: Int,
     ) {
         if (swipeEnabled) {
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
@@ -76,7 +76,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         coordinatorLayout: CoordinatorLayout,
         child: V,
         target: View,
-        type: Int
+        type: Int,
     ) {
         if (swipeEnabled) {
             super.onStopNestedScroll(coordinatorLayout, child, target, type)
@@ -88,7 +88,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         child: V,
         target: View,
         velocityX: Float,
-        velocityY: Float
+        velocityY: Float,
     ): Boolean {
         return if (swipeEnabled) {
             super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY)

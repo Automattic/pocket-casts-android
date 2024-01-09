@@ -18,7 +18,7 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
         @field:Json(name = "expiry") val expiry: Date? = null,
         @field:Json(name = "giftDays") val giftDays: Int = 0,
         @field:Json(name = "platform") val platform: SubscriptionPlatform = SubscriptionPlatform.NONE,
-        @field:Json(name = "subscriptions") val subscriptionList: List<Subscription> = emptyList()
+        @field:Json(name = "subscriptions") val subscriptionList: List<Subscription> = emptyList(),
     ) : SubscriptionStatus(expiry, subscriptionList)
 
     @JsonClass(generateAdapter = true)
@@ -31,7 +31,7 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
         @field:Json(name = "subscriptions") val subscriptionList: List<Subscription> = emptyList(),
         @field:Json(name = "type") val type: SubscriptionType,
         @field:Json(name = "tier") val tier: SubscriptionTier,
-        @field:Json(name = "index") val index: Int
+        @field:Json(name = "index") val index: Int,
     ) : SubscriptionStatus(expiry, subscriptionList) {
         val isExpiring: Boolean
             get() = expiry.before(Date(Date().time + 30.days())) && !autoRenew
@@ -45,7 +45,7 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
         @field:Json(name = "expiryDate") val expiryDate: Date?,
         @field:Json(name = "autoRenewing") val autoRenewing: Boolean,
         @field:Json(name = "updateUrl") val updateUrl: String?,
-        @field:Json(name = "isPrimarySubscription") var isPrimarySubscription: Boolean = false // Server marks this one as the main subscription
+        @field:Json(name = "isPrimarySubscription") var isPrimarySubscription: Boolean = false, // Server marks this one as the main subscription
     ) {
         val isExpired: Boolean
             get() = !autoRenewing && expiryDate?.before(Date()) ?: false

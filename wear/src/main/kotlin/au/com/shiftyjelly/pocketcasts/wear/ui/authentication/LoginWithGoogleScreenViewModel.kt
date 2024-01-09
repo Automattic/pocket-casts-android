@@ -11,10 +11,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.horologist.auth.data.googlesignin.GoogleSignInEventListener
 import com.google.android.horologist.auth.ui.googlesignin.signin.GoogleSignInViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @HiltViewModel
 class LoginWithGoogleScreenViewModel @Inject constructor(
@@ -30,14 +30,14 @@ class LoginWithGoogleScreenViewModel @Inject constructor(
     val googleSignInViewModel = GoogleSignInViewModel(googleSignInClient, this)
 
     private val _state = MutableStateFlow(
-        State(googleSignInAccount = null)
+        State(googleSignInAccount = null),
     )
     val state = _state.asStateFlow()
 
     override suspend fun onSignedIn(account: GoogleSignInAccount) {
         _state.update {
             it.copy(
-                googleSignInAccount = account
+                googleSignInAccount = account,
             )
         }
 

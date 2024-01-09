@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -48,6 +49,9 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.Timer
+import java.util.TimerTask
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -56,9 +60,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Timer
-import java.util.TimerTask
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class MediaSessionManager(
@@ -124,7 +125,7 @@ class MediaSessionManager(
                         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                     }
                 },
-            )
+            ),
         )
 
         if (!Util.isAutomotive(context)) { // We can't start activities on automotive
@@ -140,7 +141,7 @@ class MediaSessionManager(
         bookmarkHelper = BookmarkHelper(
             playbackManager,
             bookmarkManager,
-            settings
+            settings,
         )
 
         connect()
@@ -327,7 +328,7 @@ class MediaSessionManager(
             // ignore the playback progress updates as the media session can calculate this without being sent it every second
             "updateCurrentPosition",
             // ignore the user seeking as the event onBufferingStateChanged will update the buffering state
-            "onUserSeeking"
+            "onUserSeeking",
         )
 
         var previousEpisode: BaseEpisode? = null
@@ -364,7 +365,7 @@ class MediaSessionManager(
             .subscribeBy(
                 onError = { throwable ->
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
-                }
+                },
             ).addTo(disposables)
     }
 
@@ -425,7 +426,7 @@ class MediaSessionManager(
                 MediaNotificationControls.PlayNext -> addCustomAction(stateBuilder, APP_ACTION_PLAY_NEXT, "Play next", com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
                 MediaNotificationControls.PlaybackSpeed -> {
                     if (playbackManager.isAudioEffectsAvailable()) {
-                        val currentSpeed = playbackState.playbackSpeed
+                        val currentSpeed = playbackState.playbackSpeed.roundedSpeed()
                         val drawableId = when {
                             currentSpeed <= 1 -> IR.drawable.auto_1x
                             currentSpeed == 1.1 -> IR.drawable.auto_1_1x
@@ -546,7 +547,7 @@ class MediaSessionManager(
                                 playPauseTimer = null
                             }
                         },
-                        600
+                        600,
                     )
                 }
             } else {
@@ -572,7 +573,8 @@ class MediaSessionManager(
                 HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
                 HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
                 HeadphoneAction.NEXT_CHAPTER,
-                HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
+                HeadphoneAction.PREVIOUS_CHAPTER,
+                -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 

@@ -53,7 +53,6 @@ fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
@@ -66,7 +65,7 @@ fun SwipeableStars(
     val desiredStopPoint = getDesiredStopPoint(
         touchX = touchX,
         stopPoints = stopPoints,
-        stopPointType = stopPointType
+        stopPointType = stopPointType,
     )
     onStarsChanged(getStarsDouble(stopPoints, desiredStopPoint))
 
@@ -78,7 +77,7 @@ fun SwipeableStars(
             ChangeType.Immediate -> sliderPosition.snapTo(touchX)
             ChangeType.Animated -> sliderPosition.animateTo(
                 targetValue = desiredStopPoint,
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
             )
         }
     }
@@ -116,9 +115,9 @@ fun SwipeableStars(
                         stopPointType = StopPointType.FullStars
                         changeType = ChangeType.Animated
                         touchX = it.x
-                    }
+                    },
                 )
-            }
+            },
     ) {
         Stars(filled = false)
 
@@ -135,7 +134,7 @@ fun SwipeableStars(
                         color = Color.Transparent,
                         blendMode = BlendMode.SrcOut,
                     )
-                }
+                },
         ) {
             Stars(
                 filled = true,
@@ -163,9 +162,11 @@ fun SwipeableStars(
                                         contentDescription = "${index + 1} Stars"
                                         role = Role.Button
                                     }
-                            } else Modifier
+                            } else {
+                                Modifier
+                            },
                         )
-                }
+                },
             )
         }
     }
@@ -198,10 +199,9 @@ private fun stopPointsFromIconPositions(positions: List<Position>) =
 private fun getDesiredStopPoint(
     touchX: Float,
     stopPoints: List<Double>,
-    stopPointType: StopPointType
+    stopPointType: StopPointType,
 ) = remember(stopPoints, touchX, stopPointType) {
     when (stopPointType) {
-
         StopPointType.None -> touchX // ignore stop points
 
         StopPointType.FullAndHalfStars ->
@@ -211,7 +211,6 @@ private fun getDesiredStopPoint(
                 ?: 0f
 
         StopPointType.FullStars -> {
-
             // These stop points are used to determine which star to fill based on the
             // the touch point. For that reason, these stop points are in the middle of the stars.
             val touchStopPoints = buildList {
@@ -273,7 +272,7 @@ fun Stars(
                 contentDescription = null,
                 modifier = modifier(index)
                     .fillMaxHeight()
-                    .aspectRatio(1f)
+                    .aspectRatio(1f),
             )
         }
     }
@@ -296,7 +295,7 @@ private fun Modifier.drawWithLayer(block: ContentDrawScope.() -> Unit) = this.th
             block()
             restoreToCount(checkPoint)
         }
-    }
+    },
 )
 
 private data class Position(
@@ -324,6 +323,6 @@ private fun SwipeableStarsPreview() {
         modifier = Modifier.size(
             height = 30.dp,
             width = 150.dp,
-        )
+        ),
     )
 }

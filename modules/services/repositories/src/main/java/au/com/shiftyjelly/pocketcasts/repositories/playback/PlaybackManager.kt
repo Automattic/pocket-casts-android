@@ -76,6 +76,15 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
+import java.io.File
+import java.io.FileInputStream
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -90,15 +99,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileInputStream
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.abs
-import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -301,7 +301,7 @@ open class PlaybackManager @Inject constructor(
             .subscribeBy(
                 onNext = {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Synced episode progress")
-                }
+                },
             )
     }
 
@@ -317,7 +317,7 @@ open class PlaybackManager @Inject constructor(
                 episode.podcastUuid,
                 playbackState.positionMs / 1000L,
                 playbackState.durationMs / 1000L,
-                EpisodeSyncRequest.STATUS_IN_PROGRESS
+                EpisodeSyncRequest.STATUS_IN_PROGRESS,
             )
             return syncManager.episodeSync(request)
         } else if (episode is UserEpisode && episode.isUploaded) {
@@ -429,7 +429,7 @@ open class PlaybackManager @Inject constructor(
                     launch {
                         loadCurrentEpisode(play = true, forceStream = forceStream, sourceView = sourceView)
                     }
-                }
+                },
             )
 
             if (episode is PodcastEpisode) {
@@ -495,7 +495,7 @@ open class PlaybackManager @Inject constructor(
         upNextPosition: UpNextPosition,
         episode: BaseEpisode,
         source: SourceView,
-        userInitiated: Boolean = true
+        userInitiated: Boolean = true,
     ) {
         when (upNextPosition) {
             UpNextPosition.NEXT -> playNext(episode, source, userInitiated)
@@ -509,7 +509,7 @@ open class PlaybackManager @Inject constructor(
     suspend fun playNext(
         episode: BaseEpisode,
         source: SourceView,
-        userInitiated: Boolean = true
+        userInitiated: Boolean = true,
     ) = withContext(Dispatchers.Default) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNext(episode, downloadManager, null)
@@ -524,7 +524,7 @@ open class PlaybackManager @Inject constructor(
     suspend fun playLast(
         episode: BaseEpisode,
         source: SourceView,
-        userInitiated: Boolean = true
+        userInitiated: Boolean = true,
     ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, downloadManager, null)
@@ -572,7 +572,7 @@ open class PlaybackManager @Inject constructor(
                 event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
                 count = episodes.size,
                 toTop = false,
-                source = source
+                source = source,
             )
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
@@ -593,7 +593,7 @@ open class PlaybackManager @Inject constructor(
                 event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
                 count = episodes.size,
                 toTop = true,
-                source = source
+                source = source,
             )
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
@@ -666,8 +666,8 @@ open class PlaybackManager @Inject constructor(
                 it.copy(
                     state = PlaybackState.State.STOPPED,
                     isPrepared = false,
-                    lastChangeFrom = "stop"
-                )
+                    lastChangeFrom = "stop",
+                ),
             )
         }
     }
@@ -868,8 +868,8 @@ open class PlaybackManager @Inject constructor(
                             playbackSpeed = effects.playbackSpeed,
                             isVolumeBoosted = effects.isVolumeBoosted,
                             trimMode = effects.trimMode,
-                            lastChangeFrom = "effectsChanged"
-                        )
+                            lastChangeFrom = "effectsChanged",
+                        ),
                     )
                 }
             }
@@ -1019,7 +1019,7 @@ open class PlaybackManager @Inject constructor(
                     episode?.uuid?.let { scope.setTag("episodeUuid", it) }
                     SentryHelper.recordException(
                         message = "Illegal playback state encountered",
-                        throwable = event.error ?: IllegalStateException(event.message)
+                        throwable = event.error ?: IllegalStateException(event.message),
                     )
                 }
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = "onPlayerError"))
@@ -1040,8 +1040,8 @@ open class PlaybackManager @Inject constructor(
                         playbackState.copy(
                             isBuffering = isBuffering,
                             bufferedMs = bufferedMs,
-                            lastChangeFrom = "onBufferingStateChanged"
-                        )
+                            lastChangeFrom = "onBufferingStateChanged",
+                        ),
                     )
                 }
             }
@@ -1166,7 +1166,7 @@ open class PlaybackManager @Inject constructor(
                             episode.podcastUuid,
                             episode.durationMs.toLong() / 1000,
                             episode.durationMs.toLong() / 1000,
-                            EpisodeSyncRequest.STATUS_COMPLETE
+                            EpisodeSyncRequest.STATUS_COMPLETE,
                         )
                     syncManager.episodeSync(syncRequest)
                         .subscribeOn(Schedulers.io())
@@ -1212,7 +1212,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         val allEpisodes: List<BaseEpisode> = when (lastPodcastOrFilterUuid) {
-
             AutomaticUpNextSource.Companion.Predefined.downloads ->
                 episodeManager.observeDownloadEpisodes().asFlow().firstOrNull()
 
@@ -1249,7 +1248,8 @@ open class PlaybackManager @Inject constructor(
             AppPlatform.Automotive -> episodeManager.findLatestEpisodeToPlay()
 
             AppPlatform.Phone,
-            AppPlatform.WearOs -> null
+            AppPlatform.WearOs,
+            -> null
         }
     }
 
@@ -1260,14 +1260,17 @@ open class PlaybackManager @Inject constructor(
         val modifiedEpisodes = when (podcast.podcastGrouping) {
             PodcastGrouping.None,
             PodcastGrouping.Season,
-            PodcastGrouping.Starred -> episodes
+            PodcastGrouping.Starred,
+            -> episodes
 
             // Move just played episode back to downloaded group for purposes of finding the next episode to play
             PodcastGrouping.Downloaded ->
                 episodes.map {
                     if (it.uuid == lastPlayedEpisodeUuid) {
                         it.copy(episodeStatus = EpisodeStatusEnum.DOWNLOADED)
-                    } else it
+                    } else {
+                        it
+                    }
                 }
 
             // Move just played episode back to unplayed group for purposes of finding the next episode to play
@@ -1275,7 +1278,9 @@ open class PlaybackManager @Inject constructor(
                 episodes.map {
                     if (it.uuid == lastPlayedEpisodeUuid) {
                         it.copy(playingStatus = EpisodePlayingStatus.NOT_PLAYED)
-                    } else it
+                    } else {
+                        it
+                    }
                 }
         }
 
@@ -1344,7 +1349,7 @@ open class PlaybackManager @Inject constructor(
                     "is_downloaded" to episode.isDownloaded,
                     "episode_uuid" to episode.uuid,
                     "podcast_uuid" to episode.podcastOrSubstituteUuid,
-                )
+                ),
             )
         }
 
@@ -1366,8 +1371,8 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(
                 it.copy(
                     positionMs = positionMs,
-                    lastChangeFrom = "onSeekComplete"
-                )
+                    lastChangeFrom = "onSeekComplete",
+                ),
             )
         }
         updateCurrentPositionInDatabase()
@@ -1385,8 +1390,8 @@ open class PlaybackManager @Inject constructor(
                 playbackState.copy(
                     chapters = chapters,
                     embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
-                    lastChangeFrom = "onMetadataAvailable"
-                )
+                    lastChangeFrom = "onMetadataAvailable",
+                ),
             )
         }
     }
@@ -1479,11 +1484,13 @@ open class PlaybackManager @Inject constructor(
         val playbackOnDevice = !chromeCastConnected
         return if (!sameEpisode) {
             playbackOnDevice
-        } else episode.isDownloaded &&
-            playbackOnDevice &&
-            episode.downloadedFilePath != null &&
-            player != null &&
-            episode.downloadedFilePath != player?.filePath
+        } else {
+            episode.isDownloaded &&
+                playbackOnDevice &&
+                episode.downloadedFilePath != null &&
+                player != null &&
+                episode.downloadedFilePath != player?.filePath
+        }
 
         // if the player has a different media file path then it is changing
     }
@@ -1590,7 +1597,7 @@ open class PlaybackManager @Inject constructor(
                     podcast = podcast,
                     chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
                     embeddedArtworkPath = if (sameEpisode) previousPlaybackState?.embeddedArtworkPath else null,
-                    lastChangeFrom = "loadCurrentEpisode data warning"
+                    lastChangeFrom = "loadCurrentEpisode data warning",
                 )
                 withContext(Dispatchers.Main) {
                     playbackStateRelay.accept(playbackState)
@@ -1628,7 +1635,7 @@ open class PlaybackManager @Inject constructor(
                             onError = {
                                 Timber.e(it, "Error observing episode")
                                 Sentry.captureException(it)
-                            }
+                            },
                         )
                 }
             }
@@ -1656,7 +1663,6 @@ open class PlaybackManager @Inject constructor(
         ) {
             // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
-
                 Timber.d("Resetting player")
                 val playerPositionMs = player?.getCurrentPositionMs()
 
@@ -1706,7 +1712,7 @@ open class PlaybackManager @Inject constructor(
             playbackSpeed = playbackEffects.playbackSpeed,
             trimMode = playbackEffects.trimMode,
             isVolumeBoosted = playbackEffects.isVolumeBoosted,
-            lastChangeFrom = "loadCurrentEpisode"
+            lastChangeFrom = "loadCurrentEpisode",
         )
         withContext(Dispatchers.Main) {
             playbackStateRelay.accept(playbackState)
@@ -2147,7 +2153,7 @@ open class PlaybackManager @Inject constructor(
                 podcast = podcast,
                 embeddedArtworkPath = if (sameEpisode) previousPlaybackState?.embeddedArtworkPath else null,
                 chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-                lastChangeFrom = "updatePausedPlaybackState"
+                lastChangeFrom = "updatePausedPlaybackState",
             )
             playbackStateRelay.accept(playbackState)
         }
@@ -2172,7 +2178,7 @@ open class PlaybackManager @Inject constructor(
 
     fun trackPlaybackSeek(
         positionMs: Int,
-        sourceView: SourceView
+        sourceView: SourceView,
     ) {
         val episode = getCurrentEpisode()
         episode?.let {
@@ -2186,8 +2192,8 @@ open class PlaybackManager @Inject constructor(
                 mapOf(
                     SOURCE_KEY to sourceView.analyticsValue,
                     SEEK_FROM_PERCENT_KEY to seekFromPercent,
-                    SEEK_TO_PERCENT_KEY to seekToPercent
-                )
+                    SEEK_TO_PERCENT_KEY to seekToPercent,
+                ),
             )
         }
     }
@@ -2195,7 +2201,7 @@ open class PlaybackManager @Inject constructor(
     fun trackPlaybackEffectsEvent(
         event: AnalyticsEvent,
         props: Map<String, Any> = emptyMap(),
-        sourceView: SourceView
+        sourceView: SourceView,
     ) {
         val properties = HashMap<String, Any>()
         properties[SOURCE_KEY] = sourceView.analyticsValue

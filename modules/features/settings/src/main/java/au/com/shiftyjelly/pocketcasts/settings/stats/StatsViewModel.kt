@@ -17,6 +17,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,9 +27,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
@@ -89,7 +89,7 @@ class StatsViewModel @Inject constructor(
                     autoSkipping = autoSkipping,
                     totalSaved = skipping + variableSpeed + trimSilence + autoSkipping,
                     funnyText = funnyText,
-                    startedAt = serverStats?.startedAt
+                    startedAt = serverStats?.startedAt,
                 )
                 if (featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)) {
                     withContext(ioDispatcher) {
@@ -132,7 +132,7 @@ class StatsViewModel @Inject constructor(
             inAppReviewHelper.launchReviewDialog(
                 activity = activity,
                 delayInMs = IN_APP_REVIEW_LAUNCH_DELAY_IN_MS,
-                sourceView = SourceView.STATS
+                sourceView = SourceView.STATS,
             )
         }
     }

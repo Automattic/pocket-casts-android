@@ -28,7 +28,6 @@ fun FilesScreen(
     columnState: ScalingLazyColumnState,
     navigateToEpisode: (episodeUuid: String) -> Unit,
 ) {
-
     val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
@@ -41,15 +40,14 @@ fun FilesScreen(
 
         else -> {
             ScalingLazyColumn(
-                columnState = columnState
+                columnState = columnState,
             ) {
-
                 item { ScreenHeaderChip(LR.string.profile_navigation_files) }
 
                 items(userEpisodes) { episode ->
                     EpisodeChip(
                         episode = episode,
-                        onClick = { navigateToEpisode(episode.uuid) }
+                        onClick = { navigateToEpisode(episode.uuid) },
                     )
                 }
             }
@@ -62,7 +60,7 @@ private fun EmptyState() {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Text(
             text = stringResource(LR.string.profile_cloud_no_files_uploaded),

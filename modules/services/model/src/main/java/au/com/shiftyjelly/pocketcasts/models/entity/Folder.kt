@@ -17,7 +17,7 @@ data class Folder(
     // order of the podcasts in the folder. A to Z, episode release date, date added, drag and drop
     @ColumnInfo(name = "podcasts_sort_type") var podcastsSortType: PodcastsSortType,
     @ColumnInfo(name = "deleted") var deleted: Boolean,
-    @ColumnInfo(name = "sync_modified") var syncModified: Long
+    @ColumnInfo(name = "sync_modified") var syncModified: Long,
 ) {
 
     companion object {

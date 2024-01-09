@@ -5,7 +5,8 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 enum class SubscriptionTier(val label: String) {
     NONE("none"),
     PLUS("plus"),
-    PATRON("patron");
+    PATRON("patron"),
+    ;
     override fun toString() = label
 
     fun toUserTier() =

@@ -11,6 +11,11 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -25,11 +30,6 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
-import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -147,13 +147,13 @@ class StatsViewModelTest {
         whenever(statsManager.getServerStats()).thenReturn(
             StatsBundle(
                 values = emptyMap(),
-                startedAt = Date.from(statsStartedAt.atZone(ZoneId.systemDefault()).toInstant())
-            )
+                startedAt = Date.from(statsStartedAt.atZone(ZoneId.systemDefault()).toInstant()),
+            ),
         )
 
         whenever(episodeManager.calculatePlayedUptoSumInSecsWithinDays(7))
             .thenReturn(
-                TimeUnit.HOURS.toSeconds(playedUpToSumInHours.toLong()).toDouble()
+                TimeUnit.HOURS.toSeconds(playedUpToSumInHours.toLong()).toDouble(),
             )
 
         viewModel = StatsViewModel(
@@ -164,7 +164,7 @@ class StatsViewModelTest {
             application = application,
             ioDispatcher = UnconfinedTestDispatcher(),
             inAppReviewHelper = inAppReviewHelper,
-            featureFlag = featureFlag
+            featureFlag = featureFlag,
         )
     }
 }

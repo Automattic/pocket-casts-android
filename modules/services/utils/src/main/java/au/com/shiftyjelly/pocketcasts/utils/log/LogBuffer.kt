@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.utils.log
 
 import android.util.Log
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
-import timber.log.Timber
-import timber.log.Timber.Forest.tag
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -12,6 +10,8 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
+import timber.log.Timber
+import timber.log.Timber.Forest.tag
 
 object LogBuffer {
 

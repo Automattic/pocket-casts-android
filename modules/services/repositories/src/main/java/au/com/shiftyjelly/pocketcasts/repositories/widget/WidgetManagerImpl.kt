@@ -22,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class WidgetManagerImpl @Inject constructor(
@@ -37,7 +37,8 @@ class WidgetManagerImpl @Inject constructor(
     override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?) {
         when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive,
-            AppPlatform.WearOs -> { /* do nothing */ }
+            AppPlatform.WearOs,
+            -> { /* do nothing */ }
             AppPlatform.Phone -> {
                 try {
                     val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -176,7 +177,7 @@ class WidgetManagerImpl @Inject constructor(
             context,
             widgetName,
             views,
-            R.id.widget_artwork
+            R.id.widget_artwork,
         )
         val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
         if (playingEpisode is UserEpisode) {

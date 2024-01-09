@@ -40,7 +40,7 @@ class BookmarkHeaderViewHolder(
             AppTheme(theme.activeTheme) {
                 Column(
                     modifier = Modifier
-                        .background(MaterialTheme.theme.colors.primaryUi02)
+                        .background(MaterialTheme.theme.colors.primaryUi02),
                 ) {
                     SearchHeader(bookmarkHeader)
                     Divider(color = MaterialTheme.theme.colors.primaryUi05)
@@ -51,25 +51,26 @@ class BookmarkHeaderViewHolder(
             }
         }
     }
+
     @Composable
     private fun SearchHeader(bookmarkHeader: BookmarkHeader) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
-                .padding(start = 16.dp, top = 4.dp, bottom = 12.dp)
+                .padding(start = 16.dp, top = 4.dp, bottom = 12.dp),
         ) {
             Box(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 SearchView(
                     bookmarkHeader = bookmarkHeader,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
             IconButton(
                 onClick = { bookmarkHeader.onOptionsClicked() },
-                modifier = Modifier
+                modifier = Modifier,
             ) {
                 Icon(
                     painter = painterResource(IR.drawable.ic_more_vert_black_24dp),
@@ -79,6 +80,7 @@ class BookmarkHeaderViewHolder(
             }
         }
     }
+
     @Composable
     fun SearchView(
         bookmarkHeader: BookmarkHeader,
@@ -100,6 +102,7 @@ class BookmarkHeaderViewHolder(
             },
         )
     }
+
     @Composable
     private fun BookmarksCountView(bookmarkHeader: BookmarkHeader) {
         TextP60(
@@ -111,7 +114,7 @@ class BookmarkHeaderViewHolder(
             color = MaterialTheme.theme.colors.primaryText02,
             modifier = Modifier
                 .padding(start = 16.dp)
-                .padding(vertical = 14.dp)
+                .padding(vertical = 14.dp),
         )
     }
 }

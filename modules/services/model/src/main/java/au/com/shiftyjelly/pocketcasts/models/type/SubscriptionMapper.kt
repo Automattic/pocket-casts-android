@@ -12,7 +12,6 @@ import java.time.format.DateTimeParseException
 
 object SubscriptionMapper {
     fun map(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
-
         val matchingSubscriptionOfferDetails = if (isFreeTrialEligible) {
             productDetails
                 .subscriptionOfferDetails
@@ -40,7 +39,7 @@ object SubscriptionMapper {
                         tier = mapProductIdToTier(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
                         productDetails = productDetails,
-                        offerToken = relevantSubscriptionOfferDetails.offerToken
+                        offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
                 } else {
                     Subscription.WithTrial(
@@ -48,7 +47,7 @@ object SubscriptionMapper {
                         recurringPricingPhase = recurringPricingPhase,
                         trialPricingPhase = trialPricingPhase,
                         productDetails = productDetails,
-                        offerToken = relevantSubscriptionOfferDetails.offerToken
+                        offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
                 }
             }
@@ -60,7 +59,7 @@ object SubscriptionMapper {
                 0 -> {
                     LogBuffer.e(
                         LogBuffer.TAG_SUBSCRIPTIONS,
-                        "ProductDetails did not have any infinite recurring pricing phases. Current implementation expects 1."
+                        "ProductDetails did not have any infinite recurring pricing phases. Current implementation expects 1.",
                     )
                     null
                 }
@@ -68,7 +67,7 @@ object SubscriptionMapper {
                 else -> {
                     LogBuffer.e(
                         LogBuffer.TAG_SUBSCRIPTIONS,
-                        "ProductDetails had $size infinite recurring pricing phases. Current implementation only properly handles 1."
+                        "ProductDetails had $size infinite recurring pricing phases. Current implementation only properly handles 1.",
                     )
                     first()
                 }
@@ -83,7 +82,7 @@ object SubscriptionMapper {
                 else -> {
                     LogBuffer.e(
                         LogBuffer.TAG_SUBSCRIPTIONS,
-                        "ProductDetails had $size finite recurring pricing phase. Current implementation only properly handles 1."
+                        "ProductDetails had $size finite recurring pricing phase. Current implementation only properly handles 1.",
                     )
                     first()
                 }
@@ -97,7 +96,7 @@ object SubscriptionMapper {
         subscriptionPricingPhases<TrialSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.TRIAL)
 
     private inline fun <reified T : SubscriptionPricingPhase> ProductDetails.SubscriptionOfferDetails.subscriptionPricingPhases(
-        phaseType: SubscriptionPricingPhase.Type
+        phaseType: SubscriptionPricingPhase.Type,
     ) =
         pricingPhases
             .pricingPhaseList
@@ -117,7 +116,7 @@ object SubscriptionMapper {
         } catch (_: DateTimeParseException) {
             LogBuffer.e(
                 LogBuffer.TAG_SUBSCRIPTIONS,
-                "Unable to parse billingPeriod: $billingPeriod"
+                "Unable to parse billingPeriod: $billingPeriod",
             )
             null
         }

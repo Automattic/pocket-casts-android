@@ -43,9 +43,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class PlusSettingsFragment : BaseFragment() {
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var syncManager: SyncManager
 
     private var binding: FragmentPlusSettingsBinding? = null
@@ -69,8 +73,8 @@ class PlusSettingsFragment : BaseFragment() {
                         Subscription.fromProductDetails(
                             productDetails = it,
                             isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                SubscriptionMapper.mapProductIdToTier(it.productId)
-                            )
+                                SubscriptionMapper.mapProductIdToTier(it.productId),
+                            ),
                         )
                     }
                 }
@@ -90,7 +94,7 @@ class PlusSettingsFragment : BaseFragment() {
                             OnboardingFlow.PlusAccountUpgradeNeedsLogin
                         }
                         OnboardingLauncher.openOnboardingFlow(activity, flow)
-                    }
+                    },
                 )
                 val link = PlusSection.LinkBlock(
                     icon = theme.verticalPlusLogoRes(),
@@ -103,7 +107,7 @@ class PlusSettingsFragment : BaseFragment() {
                                 WebViewActivity.newInstance(context, "Learn More", Settings.INFO_LEARN_MORE_URL)
                             context.startActivity(intent)
                         }
-                    }
+                    },
                 )
 
                 val sections = listOf(
@@ -117,7 +121,7 @@ class PlusSettingsFragment : BaseFragment() {
                     feature4,
                     PlusSection.Divider,
                     link,
-                    upgrade
+                    upgrade,
                 )
 
                 val adapter = PlusAdapter()
@@ -157,7 +161,7 @@ private sealed class PlusSection {
         @DrawableRes val icon: Int,
         @StringRes val body: Int,
         @StringRes val linkText: Int,
-        val onClick: () -> Unit
+        val onClick: () -> Unit,
     ) : PlusSection()
     object Divider : PlusSection()
 }
@@ -199,7 +203,7 @@ private class PlusAdapter : ListAdapter<PlusSection, RecyclerView.ViewHolder>(SE
                         LR.string.profile_upgrade_to_plus
                     } else {
                         LR.string.profile_start_free_trial
-                    }
+                    },
                 )
 
                 lblSubtitle.text = when (trials.size) {
@@ -213,7 +217,7 @@ private class PlusAdapter : ListAdapter<PlusSection, RecyclerView.ViewHolder>(SE
                             root.resources.getString(
                                 LR.string.plus_month_year_price,
                                 monthlySub.recurringPricingPhase.formattedPrice,
-                                yearlySub.recurringPricingPhase.formattedPrice
+                                yearlySub.recurringPricingPhase.formattedPrice,
                             )
                         } else {
                             null

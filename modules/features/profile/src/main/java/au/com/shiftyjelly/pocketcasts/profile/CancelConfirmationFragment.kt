@@ -95,7 +95,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
         WebViewActivity.show(
             context,
             resources.getString(LR.string.profile_cancel_subscription),
-            Settings.INFO_CANCEL_URL
+            Settings.INFO_CANCEL_URL,
         )
     }
 
@@ -121,7 +121,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
                 rows = rows,
                 onStayClicked = onStayClicked,
                 onCancelClicked = onCancelClicked,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -142,7 +142,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
         Card(elevation = 8.dp) {
             Buttons(
                 onStayClicked = onStayClicked,
-                onCancelClicked = onCancelClicked
+                onCancelClicked = onCancelClicked,
             )
         }
     }
@@ -161,20 +161,20 @@ class CancelConfirmationFragment : BaseDialogFragment() {
                 colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
                 modifier = modifier
                     .size(100.dp)
-                    .clearAndSetSemantics { }
+                    .clearAndSetSemantics { },
             )
             TextH20(
                 text = stringResource(LR.string.profile_cancel_subscription),
                 textAlign = TextAlign.Center,
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 8.dp),
             )
             TextH40(
                 text = stringResource(id = LR.string.profile_cancel_confirm_subtitle),
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
-                modifier = modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth(),
             )
         }
     }
@@ -188,14 +188,14 @@ class CancelConfirmationFragment : BaseDialogFragment() {
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .padding(vertical = 8.dp)
-                .semantics(mergeDescendants = true) {}
+                .semantics(mergeDescendants = true) {},
         ) {
             Image(
                 painter = painterResource(id = row.iconResId),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
                 modifier = modifier
-                    .padding(end = 16.dp)
+                    .padding(end = 16.dp),
             )
             TextH40(text = row.text)
         }
@@ -221,7 +221,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
                 onClick = onCancelClicked,
                 includePadding = false,
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp),
             )
         }
     }
@@ -233,25 +233,25 @@ class CancelConfirmationFragment : BaseDialogFragment() {
             text = stringResource(
                 LR.string.profile_cancel_confirm_sub_expiry,
                 viewModel.expirationDate ?: stringResource(
-                    id = LR.string.profile_cancel_confirm_sub_expiry_date_fallback
-                )
-            )
+                    id = LR.string.profile_cancel_confirm_sub_expiry_date_fallback,
+                ),
+            ),
         ),
         Row(
             iconResId = R.drawable.ic_locked_large,
-            text = stringResource(LR.string.profile_cancel_confirm_item_plus)
+            text = stringResource(LR.string.profile_cancel_confirm_item_plus),
         ),
         Row(
             iconResId = IR.drawable.folder_lock_dark,
-            text = stringResource(LR.string.profile_cancel_confirm_item_folders)
+            text = stringResource(LR.string.profile_cancel_confirm_item_folders),
         ),
         Row(
             iconResId = R.drawable.ic_upload___remove_from_cloud___menu,
-            text = stringResource(LR.string.profile_cancel_confirm_item_uploads)
+            text = stringResource(LR.string.profile_cancel_confirm_item_uploads),
         ),
         Row(
             iconResId = IR.drawable.ic_website,
-            text = stringResource(LR.string.profile_cancel_confirm_item_web_player)
+            text = stringResource(LR.string.profile_cancel_confirm_item_web_player),
         ),
     )
 
@@ -270,11 +270,11 @@ class CancelConfirmationFragment : BaseDialogFragment() {
                 rows = listOf(
                     Row(
                         iconResId = R.drawable.ic_locked_large,
-                        text = stringResource(LR.string.profile_cancel_confirm_item_plus)
+                        text = stringResource(LR.string.profile_cancel_confirm_item_plus),
                     ),
                     Row(
                         iconResId = IR.drawable.folder_lock_dark,
-                        text = stringResource(LR.string.profile_cancel_confirm_item_folders)
+                        text = stringResource(LR.string.profile_cancel_confirm_item_folders),
                     ),
                 ),
                 onStayClicked = {},

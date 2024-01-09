@@ -16,6 +16,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.IOException
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,9 +28,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
-import java.io.IOException
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 private const val MAX_STARS = 5
 
@@ -80,7 +80,7 @@ class PodcastRatingsViewModel
     ) {
         analyticsTracker.track(
             AnalyticsEvent.RATING_STARS_TAPPED,
-            AnalyticsProp.ratingStarsTapped(podcastUuid)
+            AnalyticsProp.ratingStarsTapped(podcastUuid),
         )
         if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
             val fragment = GiveRatingFragment.newInstance(podcastUuid)

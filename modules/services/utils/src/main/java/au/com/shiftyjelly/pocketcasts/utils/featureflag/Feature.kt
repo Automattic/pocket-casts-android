@@ -14,10 +14,10 @@ enum class Feature(
     END_OF_YEAR_ENABLED(
         key = "end_of_year_enabled",
         title = "End of Year",
-        defaultValue = true,
+        defaultValue = false,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
     ),
     ADD_PATRON_ENABLED(
         key = "add_patron_enabled",
@@ -32,7 +32,7 @@ enum class Feature(
         title = "Bookmarks",
         defaultValue = true,
         tier = FeatureTier.Plus(
-            patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52)
+            patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52),
         ),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -51,11 +51,12 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
-        hasDevToggle = true
-    );
+        hasDevToggle = true,
+    ),
+    ;
 
     fun isCurrentlyExclusiveToPatron(
-        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper()
+        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
     ): Boolean {
         val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
         val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
@@ -64,7 +65,8 @@ enum class Feature(
         return when (relativeToEarlyAccessState) {
             null -> false
             EarlyAccessState.Before,
-            EarlyAccessState.During -> !isReleaseCandidate
+            EarlyAccessState.During,
+            -> !isReleaseCandidate
             EarlyAccessState.After -> false
         }
     }
@@ -76,18 +78,16 @@ enum class Feature(
             userTier: UserTier,
             releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
         ) = when (userTier) {
-
             // Patron users can use all features
             UserTier.Patron -> when (feature.tier) {
                 FeatureTier.Patron,
                 is FeatureTier.Plus,
-                FeatureTier.Free -> true
+                FeatureTier.Free,
+                -> true
             }
 
             UserTier.Plus -> {
-
                 when (feature.tier) {
-
                     // Patron features can only be used by Patrons
                     FeatureTier.Patron -> false
 
@@ -100,7 +100,8 @@ enum class Feature(
                         when (relativeToEarlyAccess) {
                             null -> true // no early access release
                             EarlyAccessState.Before,
-                            EarlyAccessState.During -> isReleaseCandidate
+                            EarlyAccessState.During,
+                            -> isReleaseCandidate
                             EarlyAccessState.After -> true
                         }
                     }

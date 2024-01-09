@@ -14,20 +14,25 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
 class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
 
     private val source = SourceView.NOTIFICATION

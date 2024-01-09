@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ViewModelConfigQueryFilters @Inject constructor(
-    application: Application
+    application: Application,
 ) : ViewModelBase<InputQueryFilters, Array<OutputQueryFilters>, ActionHelperQueryFilters>(application), TaskerPluginConfig<InputQueryFilters> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputQueryFilters>) = ActionHelperQueryFilters(pluginConfig)
 }

@@ -124,7 +124,7 @@ class BookmarksFragment : BaseFragment() {
                                     addFragment(SettingsFragment())
                                     addFragment(fragment)
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -162,7 +162,7 @@ class BookmarksFragment : BaseFragment() {
                     imageId = IR.drawable.ic_multiselect,
                     click = {
                         bookmarksViewModel.multiSelectHelper.isMultiSelecting = true
-                    }
+                    },
                 )
                 .addTextOption(
                     titleId = LR.string.bookmarks_sort_option,
@@ -176,9 +176,9 @@ class BookmarksFragment : BaseFragment() {
                             forceDarkTheme = true,
                         ).show(
                             context = requireContext(),
-                            fragmentManager = it
+                            fragmentManager = it,
                         )
-                    }
+                    },
                 ).show(it, "bookmarks_options_dialog")
         }
     }

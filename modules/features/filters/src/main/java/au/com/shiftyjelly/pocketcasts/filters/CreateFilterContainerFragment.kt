@@ -107,12 +107,12 @@ class CreateFilterContainerFragment : BaseFragment() {
                 val stateList = ColorStateList(
                     arrayOf(
                         intArrayOf(android.R.attr.state_enabled),
-                        intArrayOf()
+                        intArrayOf(),
                     ),
                     intArrayOf(
                         tintColor,
-                        ColorUtils.colorWithAlpha(tintColor, 76)
-                    )
+                        ColorUtils.colorWithAlpha(tintColor, 76),
+                    ),
                 )
                 binding.btnCreate.backgroundTintList = stateList
 

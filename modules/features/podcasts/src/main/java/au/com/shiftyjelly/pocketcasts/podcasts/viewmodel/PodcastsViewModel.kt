@@ -22,6 +22,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Flowable.combineLatest
+import java.util.Collections
+import java.util.Optional
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
@@ -29,10 +33,6 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import java.util.Collections
-import java.util.Optional
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class PodcastsViewModel
@@ -42,7 +42,7 @@ class PodcastsViewModel
     private val folderManager: FolderManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    userManager: UserManager
+    userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
     override val coroutineContext: CoroutineContext
@@ -53,7 +53,7 @@ class PodcastsViewModel
     data class FolderState(
         val folder: Folder?,
         val items: List<FolderItem>,
-        val isSignedInAsPlusOrPatron: Boolean
+        val isSignedInAsPlusOrPatron: Boolean,
     )
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
@@ -74,7 +74,7 @@ class PodcastsViewModel
                             .map { podcasts ->
                                 FolderItem.Folder(
                                     folder = folder,
-                                    podcasts = podcasts
+                                    podcasts = podcasts,
                                 )
                             }
                     }
@@ -88,20 +88,20 @@ class PodcastsViewModel
         // monitor the home folder sort order
         settings.podcastsSortType.flow.asObservable(coroutineContext).toFlowable(BackpressureStrategy.LATEST),
         // show folders for Plus users
-        userManager.getSignInState()
+        userManager.getSignInState(),
     ) { podcasts, folders, folderUuidOptional, podcastSortOrder, signInState ->
         val folderUuid = folderUuidOptional.orElse(null)
         if (!signInState.isSignedInAsPlusOrPatron) {
             FolderState(
                 items = buildPodcastItems(podcasts, podcastSortOrder),
                 folder = null,
-                isSignedInAsPlusOrPatron = false
+                isSignedInAsPlusOrPatron = false,
             )
         } else if (folderUuid == null) {
             FolderState(
                 items = buildHomeFolderItems(podcasts, folders, podcastSortOrder),
                 folder = null,
-                isSignedInAsPlusOrPatron = true
+                isSignedInAsPlusOrPatron = true,
             )
         } else {
             val openFolder = folders.firstOrNull { it.uuid == folderUuid }
@@ -109,13 +109,13 @@ class PodcastsViewModel
                 FolderState(
                     items = emptyList(),
                     folder = null,
-                    isSignedInAsPlusOrPatron = true
+                    isSignedInAsPlusOrPatron = true,
                 )
             } else {
                 FolderState(
                     items = openFolder.podcasts.map { FolderItem.Podcast(it) },
                     folder = openFolder.folder,
-                    isSignedInAsPlusOrPatron = true
+                    isSignedInAsPlusOrPatron = true,
                 )
             }
         }
@@ -226,7 +226,7 @@ class PodcastsViewModel
     fun refreshPodcasts() {
         analyticsTracker.track(
             AnalyticsEvent.PULLED_TO_REFRESH,
-            mapOf("source" to "podcasts_list")
+            mapOf("source" to "podcasts_list"),
         )
         podcastManager.refreshPodcasts("Pull down")
     }

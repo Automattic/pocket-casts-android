@@ -18,8 +18,8 @@ import java.util.Date
     indices = [
         Index(name = "episode_last_download_attempt_date", value = arrayOf("last_download_attempt_date")),
         Index(name = "episode_podcast_id", value = arrayOf("podcast_id")),
-        Index(name = "episode_published_date", value = arrayOf("published_date"))
-    ]
+        Index(name = "episode_published_date", value = arrayOf("published_date")),
+    ],
 )
 data class PodcastEpisode(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") override var uuid: String,
@@ -139,6 +139,7 @@ data class PodcastEpisode(
     // temporary variables
     @Ignore
     override var playing: Boolean = false
+
     @Ignore
     var hasBookmark: Boolean = false
 

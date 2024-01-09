@@ -19,6 +19,6 @@ sealed class MultiSelectAction(
         R.id.menu_select_all,
         LR.string.select_all,
         IR.drawable.ic_selectall_up,
-        "select_all"
+        "select_all",
     )
 }

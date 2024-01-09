@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateEpisodeTask
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -23,8 +25,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.util.Date
-import java.util.UUID
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class UpdateEpisodeTaskTest {
@@ -43,7 +43,7 @@ class UpdateEpisodeTaskTest {
         testDownloadUrl(
             deviceUrl = "https://www.pocketcasts.com/old_url.mp3",
             serverUrl = "https://www.pocketcasts.com/new_url.mp3",
-            shouldUpdate = true
+            shouldUpdate = true,
         )
     }
 
@@ -55,7 +55,7 @@ class UpdateEpisodeTaskTest {
         testDownloadUrl(
             deviceUrl = "https://www.pocketcasts.com/url.mp3",
             serverUrl = "https://www.pocketcasts.com/url.mp3",
-            shouldUpdate = false
+            shouldUpdate = false,
         )
     }
 
@@ -66,13 +66,13 @@ class UpdateEpisodeTaskTest {
             uuid = episodeUuid,
             publishedDate = Date(),
             podcastUuid = podcastUuid,
-            downloadUrl = deviceUrl
+            downloadUrl = deviceUrl,
         )
         val serverEpisode = PodcastEpisode(
             uuid = episodeUuid,
             publishedDate = Date(),
             podcastUuid = podcastUuid,
-            downloadUrl = serverUrl
+            downloadUrl = serverUrl,
         )
         val serverPodcast = Podcast(uuid = podcastUuid).apply {
             episodes.add(serverEpisode)
@@ -112,7 +112,7 @@ class UpdateEpisodeTaskTest {
                 context = context,
                 params = workerParameters,
                 podcastCacheServerManager = podcastCacheServerManager,
-                appDatabase = appDatabase
+                appDatabase = appDatabase,
             )
         }
     }

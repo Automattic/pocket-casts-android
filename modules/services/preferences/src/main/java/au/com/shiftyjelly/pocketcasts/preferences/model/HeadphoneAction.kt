@@ -42,7 +42,7 @@ class HeadphoneActionUserSetting(
             nextAction
         }
     },
-    toInt = { it.ordinal }
+    toInt = { it.ordinal },
 ) {
 
     // Even though this coroutine scope never gets cancelled explicitly, it should

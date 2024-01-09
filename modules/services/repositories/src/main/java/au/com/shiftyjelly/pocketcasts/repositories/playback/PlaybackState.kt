@@ -25,7 +25,7 @@ data class PlaybackState(
     val trimMode: TrimMode = TrimMode.OFF,
     val isVolumeBoosted: Boolean = false,
     // when transientLoss is true the foreground service won't be stopped
-    val transientLoss: Boolean = false
+    val transientLoss: Boolean = false,
 ) {
 
     enum class State {

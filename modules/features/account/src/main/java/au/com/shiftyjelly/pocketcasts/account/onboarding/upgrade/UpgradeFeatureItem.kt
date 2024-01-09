@@ -7,7 +7,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 interface UpgradeFeatureItem {
     @get:DrawableRes val image: Int
+
     @get:StringRes val title: Int
+
     @get:StringRes val text: Int?
 }
 

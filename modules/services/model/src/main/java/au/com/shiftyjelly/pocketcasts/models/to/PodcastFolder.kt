@@ -5,5 +5,5 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
 data class PodcastFolder(
     val podcast: Podcast,
-    val folder: Folder? = null
+    val folder: Folder? = null,
 )

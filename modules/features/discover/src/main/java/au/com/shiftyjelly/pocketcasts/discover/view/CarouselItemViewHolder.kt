@@ -68,7 +68,7 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
                 btnSubscribe.updateSubscribeButtonIcon(
                     subscribed = value.isSubscribed,
                     colorSubscribed = UR.attr.contrast_02,
-                    colorUnsubscribed = UR.attr.contrast_02
+                    colorUnsubscribed = UR.attr.contrast_02,
                 )
             } else {
                 reset()

@@ -42,7 +42,6 @@ fun UpNextScreen(
     val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
 
     when (queueState) {
-
         null -> { /* Show nothing while loading */ }
 
         UpNextQueue.State.Empty -> EmptyQueueState()
@@ -53,13 +52,12 @@ fun UpNextScreen(
                 EmptyQueueState()
             } else {
                 Scaffold(
-                    positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) }
+                    positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) },
                 ) {
                     ScalingLazyColumn(
                         columnState = columnState,
                         modifier = modifier.fillMaxWidth(),
                     ) {
-
                         item { ScreenHeaderChip(LR.string.up_next) }
 
                         items(list) { episode ->
@@ -83,7 +81,7 @@ private fun EmptyQueueState() {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
     ) {
         Text(
             text = stringResource(LR.string.player_up_next_empty),

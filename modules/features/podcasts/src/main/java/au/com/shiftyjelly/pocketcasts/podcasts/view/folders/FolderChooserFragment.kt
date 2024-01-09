@@ -24,6 +24,7 @@ import javax.inject.Inject
 class FolderChooserFragment : BaseDialogFragment() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: FolderEditViewModel by viewModels()
     private var navHostController: NavHostController? = null
@@ -42,7 +43,7 @@ class FolderChooserFragment : BaseDialogFragment() {
         fun newInstance(podcastUuid: String): FolderChooserFragment {
             return FolderChooserFragment().apply {
                 arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+                    ARG_PODCAST_UUID to podcastUuid,
                 )
             }
         }
@@ -85,14 +86,14 @@ class FolderChooserFragment : BaseDialogFragment() {
                                 onNextClick = { navController.navigate(NavRoutes.name) },
                                 viewModel = viewModel,
                                 settings = settings,
-                                fragmentManager = parentFragmentManager
+                                fragmentManager = parentFragmentManager,
                             )
                         }
                         composable(NavRoutes.name) {
                             FolderEditNamePage(
                                 onBackClick = { navController.popBackStack() },
                                 onNextClick = { navController.navigate(NavRoutes.color) },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                         composable(NavRoutes.color) {
@@ -103,7 +104,7 @@ class FolderChooserFragment : BaseDialogFragment() {
                                         dismiss()
                                     }
                                 },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                     }

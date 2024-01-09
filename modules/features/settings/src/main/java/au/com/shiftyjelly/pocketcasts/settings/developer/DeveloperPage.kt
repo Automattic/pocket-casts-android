@@ -31,9 +31,8 @@ fun DeveloperPage(
     onTriggerNotificationClick: () -> Unit,
     onDeleteFirstEpisodeClick: () -> Unit,
     onTriggerUpdateEpisodeDetails: () -> Unit,
-    onTriggerResetEoYModalProfileBadge: () -> Unit
+    onTriggerResetEoYModalProfileBadge: () -> Unit,
 ) {
-
     Column(modifier = modifier) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_developer),
@@ -58,7 +57,7 @@ private fun ShowkaseSetting(
         primaryText = "Showkase",
         secondaryText = "Compose components",
         icon = rememberVectorPainter(Icons.Outlined.HomeRepairService),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 
@@ -71,7 +70,7 @@ private fun ForceRefreshSetting(
         primaryText = "Force refresh",
         secondaryText = "Refresh podcasts and sync data",
         icon = rememberVectorPainter(Icons.Default.Refresh),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 
@@ -85,7 +84,7 @@ private fun SendCrashSetting(
         icon = rememberVectorPainter(Icons.Outlined.BugReport),
         modifier = modifier.clickable {
             Sentry.captureException(Exception("Test crash"))
-        }
+        },
     )
 }
 
@@ -98,7 +97,7 @@ private fun TriggerNotificationSetting(
         primaryText = "Trigger new episode notification",
         secondaryText = "Test the notifications work",
         icon = rememberVectorPainter(Icons.Outlined.Notifications),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 
@@ -111,7 +110,7 @@ private fun DeleteFirstEpisodeSetting(
         primaryText = "Delete first episodes",
         secondaryText = "Testing the podcast page can find missing episodes",
         icon = rememberVectorPainter(Icons.Outlined.Delete),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 
@@ -124,7 +123,7 @@ private fun TriggerUpdateEpisodeDetails(
         primaryText = "Trigger update episode details",
         secondaryText = "Test the update episode details task with 5 random episodes",
         icon = rememberVectorPainter(Icons.Outlined.Downloading),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 
@@ -137,7 +136,7 @@ private fun EndOfYear(
         primaryText = "Reset modal/profile badge",
         secondaryText = "Reset modal and profile badge for end of year",
         icon = rememberVectorPainter(Icons.Outlined.EditCalendar),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { onClick() },
     )
 }
 

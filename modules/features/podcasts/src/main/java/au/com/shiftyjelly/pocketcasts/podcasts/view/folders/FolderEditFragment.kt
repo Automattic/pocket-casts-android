@@ -34,7 +34,7 @@ class FolderEditFragment : BaseDialogFragment() {
         fun newInstance(folderUuid: String): FolderEditFragment {
             return FolderEditFragment().apply {
                 arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid
+                    ARG_FOLDER_UUID to folderUuid,
                 )
             }
         }
@@ -55,7 +55,7 @@ class FolderEditFragment : BaseDialogFragment() {
                     FolderEditPage(
                         viewModel = viewModel,
                         onDeleteClick = { confirmFolderDelete() },
-                        onBackClick = { dismiss() }
+                        onBackClick = { dismiss() },
                     )
                 }
             }
@@ -85,8 +85,8 @@ class FolderEditFragment : BaseDialogFragment() {
             AnalyticsEvent.FOLDER_EDIT_DISMISSED,
             mapOf(
                 DID_CHANGE_NAME_KEY to viewModel.isNameChanged,
-                DID_CHANGE_COLOR_KEY to viewModel.isColorIdChanged
-            )
+                DID_CHANGE_COLOR_KEY to viewModel.isColorIdChanged,
+            ),
         )
         super.onDismiss(dialog)
     }

@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class ShareListIncomingAdapter(
     private val clickListener: ClickListener,
-    private val context: Context
+    private val context: Context,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {

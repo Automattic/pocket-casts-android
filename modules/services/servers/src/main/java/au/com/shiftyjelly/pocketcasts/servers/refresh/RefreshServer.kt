@@ -6,7 +6,9 @@ import retrofit2.http.POST
 
 interface RefreshServer {
 
-    @POST("import/opml") suspend fun importOpml(@Body request: ImportOpmlRequest): Response<StatusResponse<ImportOpmlResponse>>
+    @POST("import/opml")
+    suspend fun importOpml(@Body request: ImportOpmlRequest): Response<StatusResponse<ImportOpmlResponse>>
 
-    @POST("podcasts/refresh") suspend fun refreshPodcastFeed(@Body request: RefreshPodcastFeedRequest): Response<StatusResponse<BasicResponse>>
+    @POST("podcasts/refresh")
+    suspend fun refreshPodcastFeed(@Body request: RefreshPodcastFeedRequest): Response<StatusResponse<BasicResponse>>
 }

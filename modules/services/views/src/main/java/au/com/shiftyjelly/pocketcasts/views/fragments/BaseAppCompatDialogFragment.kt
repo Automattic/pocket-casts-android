@@ -9,10 +9,10 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -39,7 +39,7 @@ open class BaseAppCompatDialogFragment : AppCompatDialogFragment(), CoroutineSco
             theme.updateWindowStatusBar(
                 window = activity.window,
                 statusBarColor = statusBarColor,
-                context = activity
+                context = activity,
             )
         }
     }

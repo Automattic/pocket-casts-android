@@ -79,11 +79,11 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -111,23 +111,34 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 arguments = bundleOf(
                     ARG_PODCAST_UUID to podcastUuid,
                     ARG_LIST_UUID to fromListUuid,
-                    ARG_FEATURED_PODCAST to featuredPodcast
+                    ARG_FEATURED_PODCAST to featuredPodcast,
                 )
             }
         }
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var serverManager: ServerManager
+
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var bookmarkManager: BookmarkManager
+
     @Inject lateinit var coilManager: CoilManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: PodcastViewModel by viewModels()
@@ -162,7 +173,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         if (userInitiated) {
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY,
-                mapOf(IS_EXPANDED_KEY to expanded)
+                mapOf(IS_EXPANDED_KEY to expanded),
             )
         }
     }
@@ -245,14 +256,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid)
+                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid),
             )
         }
         val episodeCard = EpisodeContainerFragment.newInstance(
             episode = episode,
             source = EpisodeViewSource.PODCAST_SCREEN,
             overridePodcastLink = true,
-            fromListUuid = fromListUuid
+            fromListUuid = fromListUuid,
         )
         episodeCard.show(parentFragmentManager, EPISODE_CARD)
     }
@@ -286,22 +297,22 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             .addCheckedOption(
                 titleId = LR.string.episode_sort_newest_to_oldest,
                 checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
-                click = sortEpisodesNewestToOldest
+                click = sortEpisodesNewestToOldest,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_oldest_to_newest,
                 checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC,
-                click = sortEpisodesOldestToNewest
+                click = sortEpisodesOldestToNewest,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_short_to_long,
                 checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC,
-                click = sortEpisodesLengthShortToLong
+                click = sortEpisodesLengthShortToLong,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_long_to_short,
                 checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC,
-                click = sortEpisodesLengthLongToShort
+                click = sortEpisodesLengthLongToShort,
             )
         activity?.supportFragmentManager?.let {
             dialog.show(it, "episodes_sort_options_dialog")
@@ -326,10 +337,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             BookmarksSortByDialog(
                 settings = settings,
                 changeSortOrder = viewModel::changeSortOrder,
-                sourceView = SourceView.PODCAST_SCREEN
+                sourceView = SourceView.PODCAST_SCREEN,
             ).show(
                 context = requireContext(),
-                fragmentManager = it
+                fragmentManager = it,
             )
         }
     }
@@ -341,25 +352,25 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 titleId = LR.string.podcast_sort_episodes,
                 imageId = IR.drawable.ic_sort,
                 valueId = selectedSortOrderStringId(),
-                click = showEpisodeSortOptions
+                click = showEpisodeSortOptions,
             )
             .addTextOption(
                 titleId = LR.string.podcast_group_episodes,
                 imageId = R.drawable.ic_group,
                 valueId = selectedGroupStringId(),
-                click = showGroupingOptions
+                click = showGroupingOptions,
             )
             .addTextOption(
                 LR.string.podcast_download_all,
                 imageId = IR.drawable.ic_download,
-                click = { downloadAll() }
+                click = { downloadAll() },
             )
 
         if (viewModel.shouldShowArchiveAll()) {
             optionsDialog = optionsDialog.addTextOption(
                 titleId = LR.string.podcast_archive_all,
                 imageId = R.drawable.ic_archive_all,
-                click = onArchiveAllClicked
+                click = onArchiveAllClicked,
             )
         }
 
@@ -367,7 +378,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             optionsDialog = optionsDialog.addTextOption(
                 LR.string.podcast_archive_all_played,
                 imageId = R.drawable.ic_archive_all,
-                click = this::archiveAllPlayed
+                click = this::archiveAllPlayed,
             )
         }
 
@@ -375,7 +386,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             optionsDialog = optionsDialog.addTextOption(
                 titleId = LR.string.unarchive_all,
                 imageId = IR.drawable.ic_unarchive,
-                click = viewModel::onUnarchiveClicked
+                click = viewModel::onUnarchiveClicked,
             )
         }
 
@@ -427,7 +438,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     val fragment = PodcastsFragment.newInstance(folderUuid = folder.uuid)
                     (activity as FragmentHostListener).addFragment(fragment)
                 },
-                activity = activity
+                activity = activity,
             )
             dialog.show()
         }
@@ -464,7 +475,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 click = {
                     coilManager.clearCache(viewModel.podcastUuid)
                     successCallback()
-                }
+                },
             )
 
         activity?.supportFragmentManager?.let {
@@ -615,7 +626,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 sourceView = SourceView.PODCAST_SCREEN,
                 podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                     podcastUuid = podcastUuid,
-                    sortType = settings.podcastBookmarksSortType.flow.value
+                    sortType = settings.podcastBookmarksSortType.flow.value,
                 ).asObservable(),
                 fragmentManager = parentFragmentManager,
             )
@@ -772,7 +783,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 updateStatusBar()
 
                 binding.executePendingBindings()
-            }
+            },
         )
 
         viewModel.tintColor.observe(viewLifecycleOwner) { tintColor ->
@@ -796,14 +807,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                                 episodeLimit = state.episodeLimit,
                                 episodeLimitIndex = state.episodeLimitIndex,
                                 podcast = state.podcast,
-                                context = requireContext()
+                                context = requireContext(),
                             )
                         }
                         PodcastTab.BOOKMARKS -> {
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
                                 searchTerm = state.searchBookmarkTerm,
-                                context = requireContext()
+                                context = requireContext(),
                             )
 
                             adapter?.notifyDataSetChanged()
@@ -899,7 +910,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 context,
                 SharePodcastHelper.ShareType.PODCAST,
                 SourceView.PODCAST_SCREEN,
-                analyticsTracker
+                analyticsTracker,
             ).showShareDialogDirect()
         }
     }

@@ -49,6 +49,7 @@ private const val SEARCH_RESULTS_TAG = "search_results"
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var settings: Settings
 
     interface Listener {
@@ -61,7 +62,7 @@ class SearchFragment : BaseFragment() {
         fun newInstance(
             floating: Boolean = false,
             onlySearchRemote: Boolean = false,
-            source: SourceView
+            source: SourceView,
         ): SearchFragment {
             val fragment = SearchFragment()
             val arguments = Bundle().apply {
@@ -129,7 +130,7 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Episode -> listener?.onSearchEpisodeClick(
                 episodeUuid = entry.uuid,
                 podcastUuid = entry.podcastUuid,
-                source = EpisodeViewSource.SEARCH_HISTORY
+                source = EpisodeViewSource.SEARCH_HISTORY,
             )
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
@@ -221,10 +222,10 @@ class SearchFragment : BaseFragment() {
                         onShowClearAllConfirmation = {
                             SearchHistoryClearAllConfirmationDialog(
                                 context = this@SearchFragment.requireContext(),
-                                onConfirm = { searchHistoryViewModel.clearAll() }
+                                onConfirm = { searchHistoryViewModel.clearAll() },
                             ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
                         },
-                        onScroll = { UiUtil.hideKeyboard(searchView) }
+                        onScroll = { UiUtil.hideKeyboard(searchView) },
                     )
                     if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
                         binding.searchHistoryPanel.show()
@@ -261,7 +262,7 @@ class SearchFragment : BaseFragment() {
         listener?.onSearchEpisodeClick(
             episodeUuid = episode.uuid,
             podcastUuid = episode.podcastUuid,
-            source = EpisodeViewSource.SEARCH
+            source = EpisodeViewSource.SEARCH,
         )
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
@@ -274,7 +275,7 @@ class SearchFragment : BaseFragment() {
                 SearchResultType.PODCAST_REMOTE_RESULT
             } else {
                 SearchResultType.PODCAST_LOCAL_RESULT
-            }
+            },
         )
         searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
         listener?.onSearchPodcastClick(podcast.uuid)

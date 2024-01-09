@@ -28,8 +28,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -71,7 +71,7 @@ class ChaptersFragment : BaseFragment() {
                         chapters = uiState.chapters,
                         onChapterClick = ::onChapterClick,
                         onUrlClick = ::onUrlClick,
-                        backgroundColor = uiState.backgroundColor
+                        backgroundColor = uiState.backgroundColor,
                     )
                 }
             }

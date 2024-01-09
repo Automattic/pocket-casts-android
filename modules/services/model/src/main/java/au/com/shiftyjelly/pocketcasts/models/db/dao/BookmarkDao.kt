@@ -44,7 +44,7 @@ abstract class BookmarkDao {
         "SELECT * FROM bookmarks WHERE podcast_uuid = :podcastUuid AND episode_uuid = :episodeUuid AND deleted = :deleted " +
             "ORDER BY " +
             "CASE WHEN :isAsc = 1 THEN created_at END ASC, " +
-            "CASE WHEN :isAsc = 0 THEN created_at END DESC"
+            "CASE WHEN :isAsc = 0 THEN created_at END DESC",
     )
     abstract fun findByEpisodeOrderCreatedAtFlow(
         podcastUuid: String,
@@ -67,7 +67,7 @@ abstract class BookmarkDao {
             WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
             ORDER BY 
             CASE WHEN :isAsc = 1 THEN created_at END ASC, 
-            CASE WHEN :isAsc = 0 THEN created_at END DESC"""
+            CASE WHEN :isAsc = 0 THEN created_at END DESC""",
     )
     abstract fun findByPodcastOrderCreatedAtFlow(
         podcastUuid: String,
@@ -80,7 +80,7 @@ abstract class BookmarkDao {
             FROM bookmarks
             JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
             WHERE podcast_uuid = :podcastUuid AND deleted = :deleted
-            ORDER BY publishedDate DESC, time ASC"""
+            ORDER BY publishedDate DESC, time ASC""",
     )
     abstract fun findByPodcastOrderEpisodeAndTimeFlow(
         podcastUuid: String,
@@ -90,7 +90,7 @@ abstract class BookmarkDao {
     @Query(
         """SELECT *
             FROM bookmarks
-            WHERE deleted = :deleted"""
+            WHERE deleted = :deleted""",
     )
     abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 
@@ -100,7 +100,7 @@ abstract class BookmarkDao {
             LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
             WHERE bookmarks.podcast_uuid = :podcastUuid 
             AND (UPPER(bookmarks.title) LIKE UPPER(:title) OR UPPER(podcast_episodes.title) LIKE UPPER(:title))
-            AND deleted = :deleted"""
+            AND deleted = :deleted""",
     )
     abstract suspend fun searchInPodcastByTitle(
         podcastUuid: String,
@@ -121,7 +121,7 @@ abstract class BookmarkDao {
         """SELECT bookmarks.*
             FROM bookmarks
             JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
-            AND deleted = :deleted"""
+            AND deleted = :deleted""",
     )
     abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 }

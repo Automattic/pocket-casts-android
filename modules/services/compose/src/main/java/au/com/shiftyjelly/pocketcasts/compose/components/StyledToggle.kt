@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 private val CornerRadiusInDp = 24.dp
+
 @Composable
 fun StyledToggle(
     items: List<String>,
@@ -42,7 +43,7 @@ fun StyledToggle(
                     shape = RoundedCornerShape(cornerRadius),
                     border = null,
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (selectedIndex == index) Color.White else Color.Transparent
+                        backgroundColor = if (selectedIndex == index) Color.White else Color.Transparent,
                     ),
                     onClick = {
                         selectedIndex = index
@@ -64,6 +65,6 @@ fun StyledToggle(
 private fun OnboardingPatonFeatureCardPreview() {
     StyledToggle(
         items = listOf("Yearly", "Monthly"),
-        onItemSelected = {}
+        onItemSelected = {},
     )
 }

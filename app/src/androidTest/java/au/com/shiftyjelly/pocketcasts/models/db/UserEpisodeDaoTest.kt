@@ -5,14 +5,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.Date
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class UserEpisodeDaoTest {

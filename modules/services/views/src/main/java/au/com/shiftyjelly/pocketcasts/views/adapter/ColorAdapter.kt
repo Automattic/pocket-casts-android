@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class ColorAdapter(
     private val colorList: IntArray,
     readOnly: Boolean,
-    private val onSelectedChange: (index: Int, fromUserInteraction: Boolean) -> Unit
+    private val onSelectedChange: (index: Int, fromUserInteraction: Boolean) -> Unit,
 ) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -89,7 +89,7 @@ class ColorAdapter(
 class IconView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
     init {

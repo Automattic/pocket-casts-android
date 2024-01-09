@@ -48,14 +48,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.rx2.rxSingle
-import retrofit2.HttpException
-import retrofit2.Response
-import timber.log.Timber
 import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.rx2.rxSingle
+import retrofit2.HttpException
+import retrofit2.Response
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
@@ -182,7 +182,7 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun loginWithEmailAndPassword(
         email: String,
         password: String,
-        signInSource: SignInSource
+        signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, LoginIdentity.PocketCasts) {
         syncServerManager.login(email = email, password = password)
     }
@@ -273,7 +273,7 @@ class SyncManagerImpl @Inject constructor(
 
     override fun uploadImageToServer(
         episode: UserEpisode,
-        imageFile: File
+        imageFile: File,
     ): Completable =
         getCacheTokenOrLoginRxSingle { token ->
             val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
@@ -432,7 +432,6 @@ class SyncManagerImpl @Inject constructor(
         when (loginResult) {
             is LoginResult.Success -> {
                 when (signInSource) {
-
                     SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN_WATCH_FROM_PHONE)
 
@@ -446,20 +445,19 @@ class SyncManagerImpl @Inject constructor(
                             properties = mapOf(
                                 TRACKS_KEY_SOURCE to source,
                                 TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
-                            )
+                            ),
                         )
                 }
             }
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 when (signInSource) {
-
                     SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(
                             AnalyticsEvent.USER_SIGNIN_WATCH_FROM_PHONE_FAILED,
                             mapOf(
                                 TRACKS_KEY_ERROR_CODE to errorCodeValue,
-                            )
+                            ),
                         )
 
                     is SignInSource.UserInitiated ->
@@ -469,7 +467,7 @@ class SyncManagerImpl @Inject constructor(
                                 TRACKS_KEY_SOURCE to source,
                                 TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
                                 TRACKS_KEY_ERROR_CODE to errorCodeValue,
-                            )
+                            ),
                         )
                 }
             }
@@ -481,7 +479,7 @@ class SyncManagerImpl @Inject constructor(
             is LoginResult.Success -> {
                 analyticsTracker.track(
                     AnalyticsEvent.USER_ACCOUNT_CREATED,
-                    mapOf(TRACKS_KEY_SOURCE to "password") // This method is only used when creating an account with a password
+                    mapOf(TRACKS_KEY_SOURCE to "password"), // This method is only used when creating an account with a password
                 )
             }
             is LoginResult.Failed -> {
@@ -489,8 +487,8 @@ class SyncManagerImpl @Inject constructor(
                 analyticsTracker.track(
                     AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED,
                     mapOf(
-                        TRACKS_KEY_ERROR_CODE to errorCodeValue
-                    )
+                        TRACKS_KEY_ERROR_CODE to errorCodeValue,
+                    ),
                 )
             }
         }
@@ -499,7 +497,7 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun downloadTokens(
         email: String,
         refreshToken: RefreshToken,
-        signInType: AccountConstants.SignInType
+        signInType: AccountConstants.SignInType,
     ): LoginTokenResponse =
         when (signInType) {
             AccountConstants.SignInType.Password -> syncServerManager.login(email = email, password = refreshToken.value)
@@ -584,7 +582,7 @@ class SyncManagerImpl @Inject constructor(
             uuid = response.uuid,
             refreshToken = response.refreshToken,
             accessToken = response.accessToken,
-            loginIdentity = loginIdentity
+            loginIdentity = loginIdentity,
         )
         isLoggedInObservable.accept(true)
 

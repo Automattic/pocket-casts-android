@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 class AccountActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: CreateAccountViewModel by viewModels()
     private lateinit var binding: AccountActivityBinding

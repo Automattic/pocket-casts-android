@@ -13,7 +13,7 @@ private val filterThemeColors = listOf(
     R.attr.filter_05,
     R.attr.filter_04,
     R.attr.filter_06,
-    R.attr.filter_03
+    R.attr.filter_03,
 )
 
 fun Playlist.getStringForDuration(context: Context?): String {

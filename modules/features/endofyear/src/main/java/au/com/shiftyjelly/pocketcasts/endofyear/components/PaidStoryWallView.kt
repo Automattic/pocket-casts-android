@@ -43,7 +43,7 @@ fun PaidStoryWallView(
             .fillMaxSize()
             .fadeBackground()
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 40.dp)
+            .padding(vertical = 40.dp),
     ) {
         Spacer(modifier = modifier.weight(0.2f))
 
@@ -96,10 +96,10 @@ private fun UpsellButton(
     StoryButton(
         text = UpsellButtonTitle(
             tier = freeTrial.subscriptionTier,
-            hasFreeTrial = freeTrial.exists
+            hasFreeTrial = freeTrial.exists,
         ),
         onClick = onUpsellClicked,
-        modifier = modifier.fillMaxSize(.75f)
+        modifier = modifier.fillMaxSize(.75f),
     )
 }
 
@@ -112,9 +112,9 @@ private fun Modifier.fadeBackground() = this
                     0.00f to Color.Black,
                     1.00f to Color.Black.copy(alpha = 0f),
                     start = Offset(0.5f * size.width, 0.24f * size.height),
-                    end = Offset(0.5f * size.width, 1.04f * size.height)
+                    end = Offset(0.5f * size.width, 1.04f * size.height),
                 ),
-                blendMode = BlendMode.DstIn
+                blendMode = BlendMode.DstIn,
             )
             drawContent()
         }
@@ -129,7 +129,7 @@ fun PaidStoryWallViewFreeTrialPreview() {
                 subscriptionTier = SubscriptionTier.PLUS,
                 exists = true,
             ),
-            onUpsellClicked = {}
+            onUpsellClicked = {},
         )
     }
 }
@@ -143,7 +143,7 @@ fun PaidStoryWallViewNoFreeTrialPreview() {
                 subscriptionTier = SubscriptionTier.PLUS,
                 exists = false,
             ),
-            onUpsellClicked = {}
+            onUpsellClicked = {},
         )
     }
 }

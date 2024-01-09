@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class ChangeEmailViewModel
@@ -90,7 +90,7 @@ class ChangeEmailViewModel
 enum class ChangeEmailError {
     INVALID_EMAIL,
     INVALID_PASSWORD,
-    SERVER
+    SERVER,
 }
 
 sealed class ChangeEmailState {

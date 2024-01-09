@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import android.util.Patterns
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
 
 abstract class AccountViewModel : ViewModel(), CoroutineScope {
 

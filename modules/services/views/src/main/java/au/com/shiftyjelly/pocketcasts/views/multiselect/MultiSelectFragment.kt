@@ -19,15 +19,17 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
-import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHelperAdapter {
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
     private val source: String
         get() = arguments?.getString(ARG_SOURCE) ?: SourceView.UNKNOWN.analyticsValue
@@ -64,7 +66,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
                 (activity as? FragmentHostListener)?.closeModal(this)
             },
             activity = activity,
-            theme = theme
+            theme = theme,
         )
 
         val recyclerView = binding.recyclerView
@@ -137,7 +139,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     private fun trackRearrangeFinishedEvent() {
         analyticsTracker.track(
             AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_FINISHED,
-            mapOf(AnalyticsProp.Key.SOURCE to source)
+            mapOf(AnalyticsProp.Key.SOURCE to source),
         )
     }
 
@@ -160,7 +162,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
                     AnalyticsProp.Key.MOVED_FROM to movedFrom,
                     AnalyticsProp.Key.MOVED_TO to movedTo,
                     AnalyticsProp.Key.SOURCE to source,
-                )
+                ),
             )
             dragStartPosition = null
         }

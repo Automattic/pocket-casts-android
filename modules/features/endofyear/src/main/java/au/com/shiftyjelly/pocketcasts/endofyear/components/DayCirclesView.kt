@@ -50,7 +50,7 @@ fun DayCirclesView(
         Modifier
             .timeCircleBackground(
                 missingDaysOverlayXOffset = ((numberOfBallsPerLine - missingDays) * ballFinalWidth).toFloat(),
-                missingDaysOverlaySize = Size(missingDaysWidth.toFloat(), ballFinalWidth.toFloat())
+                missingDaysOverlaySize = Size(missingDaysWidth.toFloat(), ballFinalWidth.toFloat()),
             ),
     ) {
         repeat(numberOfLines.toInt()) {
@@ -59,7 +59,7 @@ fun DayCirclesView(
                     Box(
                         modifier = Modifier
                             .size(ballFinalWidth.toInt().pxToDp(context).dp)
-                            .padding(ballPadding.toInt().pxToDp(context).dp)
+                            .padding(ballPadding.toInt().pxToDp(context).dp),
                     ) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
                             drawCircle(color = Color.White)
@@ -86,7 +86,7 @@ private fun Modifier.timeCircleBackground(
 
                 drawRect(
                     brush = brush,
-                    blendMode = BlendMode.SrcAtop
+                    blendMode = BlendMode.SrcAtop,
                 )
 
                 // Missing days overlay
@@ -94,7 +94,7 @@ private fun Modifier.timeCircleBackground(
                     color = Color(MissingDaysOverlayColor),
                     topLeft = Offset(missingDaysOverlayXOffset, size.height - missingDaysOverlaySize.height),
                     size = missingDaysOverlaySize,
-                    blendMode = BlendMode.SrcAtop
+                    blendMode = BlendMode.SrcAtop,
                 )
             }
         }

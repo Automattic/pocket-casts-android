@@ -20,12 +20,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Locale
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import java.util.Locale
-import javax.inject.Inject
 
 @HiltViewModel
 class ProfileUpgradeBannerViewModel @Inject constructor(
@@ -61,11 +61,11 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                         ?.productDetails
                         ?.mapNotNull { details ->
                             val isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                SubscriptionMapper.mapProductIdToTier(details.productId)
+                                SubscriptionMapper.mapProductIdToTier(details.productId),
                             )
                             Subscription.fromProductDetails(
                                 productDetails = details,
-                                isFreeTrialEligible = isFreeTrialEligible
+                                isFreeTrialEligible = isFreeTrialEligible,
                             )
                         } ?: emptyList()
 
@@ -92,13 +92,13 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                                     subscriptionManager.getDefaultSubscription(
                                         subscriptions = filteredSubscriptions,
                                         tier = productTier,
-                                        frequency = getSubscriptionFrequency(cachedSubscriptionStatus)
+                                        frequency = getSubscriptionFrequency(cachedSubscriptionStatus),
                                     )?.toUpgradeButton(
                                         planType = getPlanType(
                                             productTier = productTier,
                                             cachedTier = cachedTier,
                                             cachedSubscriptionStatus = cachedSubscriptionStatus,
-                                        )
+                                        ),
                                     )
                                 }
 
@@ -108,9 +108,9 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                             _state.value = State.Loaded(
                                 featureCardsState = FeatureCardsState(
                                     subscriptions = filteredSubscriptions,
-                                    currentFeatureCard = currentTier.toUpgradeFeatureCard()
+                                    currentFeatureCard = currentTier.toUpgradeFeatureCard(),
                                 ),
-                                upgradeButtons = upgradeButtons
+                                upgradeButtons = upgradeButtons,
                             )
                         }
                     } else {
@@ -120,7 +120,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                             null
                         }
                         _state.value = State.OldLoaded(
-                            numPeriodFree = numPeriodFree?.uppercase(Locale.getDefault())
+                            numPeriodFree = numPeriodFree?.uppercase(Locale.getDefault()),
                         )
                     }
                 }
@@ -145,9 +145,10 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
 
             null,
             SubscriptionTier.NONE,
-            SubscriptionTier.PLUS -> Subscription.SubscriptionTier.PLUS
+            SubscriptionTier.PLUS,
+            -> Subscription.SubscriptionTier.PLUS
         },
-        frequency = getSubscriptionFrequency(cachedSubscriptionStatus)
+        frequency = getSubscriptionFrequency(cachedSubscriptionStatus),
     )
 
     private fun getSubscriptionFrequency(cachedSubscriptionStatus: SubscriptionStatus?) =
@@ -161,7 +162,8 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
             }
 
             null,
-            is SubscriptionStatus.Free -> SubscriptionFrequency.YEARLY
+            is SubscriptionStatus.Free,
+            -> SubscriptionFrequency.YEARLY
         }
 
     private fun getPlanType(

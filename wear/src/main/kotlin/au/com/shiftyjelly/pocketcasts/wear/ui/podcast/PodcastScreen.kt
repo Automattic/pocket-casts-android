@@ -70,7 +70,7 @@ private fun Content(
         PodcastColorBackground(
             podcast = podcast,
             theme = state.theme,
-            modifier = modifier
+            modifier = modifier,
         )
 
         ScalingLazyColumn(
@@ -81,7 +81,7 @@ private fun Content(
             item {
                 PodcastImage(
                     uuid = podcast.uuid,
-                    modifier = Modifier.size(PodcastScreen.podcastImageSize)
+                    modifier = Modifier.size(PodcastScreen.podcastImageSize),
                 )
                 Spacer(Modifier.height(4.dp))
             }
@@ -92,7 +92,7 @@ private fun Content(
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colors.onPrimary,
                         text = podcast.title,
-                        style = MaterialTheme.typography.button
+                        style = MaterialTheme.typography.button,
                     )
                     Text(
                         modifier = modifier
@@ -109,8 +109,8 @@ private fun Content(
                                         includeFontPadding = false,
                                     ),
                                 )
-                                )
-                        )
+                                ),
+                        ),
                     )
                 }
             }
@@ -144,9 +144,9 @@ private fun PodcastColorBackground(
                 Brush.verticalGradient(
                     listOf(
                         color.copy(alpha = 0.3f),
-                        Color.Transparent
-                    )
-                )
-            )
+                        Color.Transparent,
+                    ),
+                ),
+            ),
     )
 }

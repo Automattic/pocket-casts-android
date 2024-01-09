@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.helper.search
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import io.reactivex.Observable
-import kotlinx.coroutines.rx2.rxSingle
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.rx2.rxSingle
 
 @Singleton
 class BookmarkSearchHandler @Inject constructor(
