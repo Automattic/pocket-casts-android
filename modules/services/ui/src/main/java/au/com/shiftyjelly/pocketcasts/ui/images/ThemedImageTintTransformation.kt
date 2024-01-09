@@ -17,8 +17,8 @@ import coil.size.Size
 import coil.transform.Transformation
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-import timber.log.Timber
 import java.security.MessageDigest
+import timber.log.Timber
 
 class ThemedImageTintTransformation(context: Context) : BitmapTransformation(), Transformation {
     private val isActive = Theme.isImageTintEnabled(context)

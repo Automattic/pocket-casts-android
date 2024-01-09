@@ -35,11 +35,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jaredrummler.android.device.DeviceName
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -52,6 +47,11 @@ import java.util.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 class Support @Inject constructor(
@@ -64,7 +64,7 @@ class Support @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val systemBatteryRestrictions: SystemBatteryRestrictions,
     private val syncManager: SyncManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -90,7 +90,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
             )
 
             // try to attach the debug information
@@ -115,8 +115,8 @@ class Support @Inject constructor(
                             Intent.EXTRA_TEXT,
                             HtmlCompat.fromHtml(
                                 "$intro<br/><br/>",
-                                HtmlCompat.FROM_HTML_MODE_COMPACT
-                            )
+                                HtmlCompat.FROM_HTML_MODE_COMPACT,
+                            ),
                         )
                     }
                 }
@@ -130,7 +130,7 @@ class Support @Inject constructor(
 
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
-                    HtmlCompat.fromHtml(debugStr.toString(), HtmlCompat.FROM_HTML_MODE_COMPACT)
+                    HtmlCompat.fromHtml(debugStr.toString(), HtmlCompat.FROM_HTML_MODE_COMPACT),
                 )
             }
         }
@@ -148,7 +148,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
             )
 
             try {
@@ -178,7 +178,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
             )
 
             try {
@@ -194,8 +194,8 @@ class Support @Inject constructor(
                     Intent.EXTRA_TEXT,
                     HtmlCompat.fromHtml(
                         "$intro<br/><br/>",
-                        HtmlCompat.FROM_HTML_MODE_COMPACT
-                    )
+                        HtmlCompat.FROM_HTML_MODE_COMPACT,
+                    ),
                 )
             } catch (e: Exception) {
                 Timber.e(e)

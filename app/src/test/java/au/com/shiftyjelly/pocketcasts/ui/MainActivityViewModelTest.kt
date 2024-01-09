@@ -259,9 +259,9 @@ class MainActivityViewModelTest {
             Flowable.just(
                 SignInState.SignedIn(
                     email = "",
-                    subscriptionStatus = mock<SubscriptionStatus>()
-                )
-            )
+                    subscriptionStatus = mock<SubscriptionStatus>(),
+                ),
+            ),
         )
 
         val releaseVersion = mock<ReleaseVersionWrapper>().apply {

@@ -57,7 +57,6 @@ fun EpisodeScreen(
     navigateToStreamingConfirmation: () -> Unit,
     navigateToNowPlaying: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<EpisodeViewModel>()
     val state = viewModel.stateFlow.collectAsState().value
     if (state !is EpisodeViewModel.State.Loaded) return
@@ -72,9 +71,8 @@ fun EpisodeScreen(
     ScalingLazyColumn(
         columnState = columnState,
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
-
         val headingLineHeight = 14.sp
         item {
             Text(
@@ -85,7 +83,7 @@ fun EpisodeScreen(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onPrimary,
                 style = MaterialTheme.typography.title3,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
             )
         }
 
@@ -102,7 +100,7 @@ fun EpisodeScreen(
                         .padding(horizontal = 8.dp)
                         .clickable {
                             navigateToPodcast(podcast.uuid)
-                        }
+                        },
                 )
             }
         }
@@ -113,7 +111,7 @@ fun EpisodeScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(vertical = 12.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 val downloadSize = Util.formattedBytes(episode.sizeInBytes, context)
                     .replace("-", stringResource(LR.string.podcasts_download_download))
@@ -131,21 +129,22 @@ fun EpisodeScreen(
                     },
                     downloadButtonState = when (episode.episodeStatus) {
                         EpisodeStatusEnum.NOT_DOWNLOADED -> DownloadButtonState.NotDownloaded(
-                            downloadSize
+                            downloadSize,
                         )
 
                         EpisodeStatusEnum.QUEUED,
                         EpisodeStatusEnum.WAITING_FOR_WIFI,
-                        EpisodeStatusEnum.WAITING_FOR_POWER -> DownloadButtonState.Queued
+                        EpisodeStatusEnum.WAITING_FOR_POWER,
+                        -> DownloadButtonState.Queued
 
                         EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(
-                            state.downloadProgress ?: 0f
+                            state.downloadProgress ?: 0f,
                         )
 
                         EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
                         EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButtonState.Errored
                     },
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
 
                 PlayButton(
@@ -166,9 +165,9 @@ fun EpisodeScreen(
                     onClick = {
                         viewModel.onUpNextClicked(
                             onRemoveFromUpNext = navigateToRemoveFromUpNextNotification,
-                            navigateToUpNextOptions = navigateToUpNextOptions
+                            navigateToUpNextOptions = navigateToUpNextOptions,
                         )
-                    }
+                    },
                 )
             }
         }
@@ -184,7 +183,7 @@ fun EpisodeScreen(
                 episode = episode,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp)
+                    .padding(bottom = 12.dp),
             )
         }
 
@@ -215,7 +214,7 @@ fun EpisodeScreen(
                         },
                         modifier = Modifier
                             .padding(horizontal = 5.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -239,7 +238,9 @@ fun EpisodeScreen(
                         },
                         onClick = viewModel::onArchiveClicked,
                     )
-                } else null,
+                } else {
+                    null
+                },
                 if (episode is PodcastEpisode) {
                     EpisodeScreenItem(
                         title = if (episode.isStarred) {
@@ -254,7 +255,9 @@ fun EpisodeScreen(
                         },
                         onClick = viewModel::onStarClicked,
                     )
-                } else null,
+                } else {
+                    null
+                },
                 EpisodeScreenItem(
                     title = if (episodeIsMarkedPlayed) {
                         LR.string.mark_unplayed
@@ -274,9 +277,11 @@ fun EpisodeScreen(
                         iconRes = IR.drawable.ic_goto_32,
                         onClick = { navigateToPodcast(podcast.uuid) },
                     )
-                } else null,
+                } else {
+                    null
+                },
             )
-                .filterNotNull()
+                .filterNotNull(),
         ) {
             EpisodeListChip(it)
         }
@@ -291,7 +296,7 @@ private fun EpisodeListChip(episodeScreenItem: EpisodeScreenItem) {
         onClick = episodeScreenItem.onClick,
         modifier = Modifier
             .padding(bottom = 4.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     )
 }
 
@@ -305,14 +310,14 @@ private fun EpisodeErrorDetails(
             .padding(start = padding, end = padding, bottom = padding)
             .background(
                 color = MaterialTheme.colors.secondary,
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
             ),
     ) {
         Box(modifier = Modifier.padding(start = padding, top = 10.dp)) {
             Icon(
                 painter = painterResource(errorData.errorIconRes),
                 contentDescription = null,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
             )
         }
 
@@ -321,14 +326,14 @@ private fun EpisodeErrorDetails(
                 text = stringResource(errorData.errorTitleRes),
                 color = MaterialTheme.colors.onSecondary,
                 style = MaterialTheme.typography.caption2,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
             )
         } else {
             Text(
                 text = errorData.errorDescription,
                 color = MaterialTheme.colors.onSecondary,
                 style = MaterialTheme.typography.caption3,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
             )
         }
     }

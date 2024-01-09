@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
 class ShelfTouchCallback(
-    private val listener: ItemTouchHelperAdapter
+    private val listener: ItemTouchHelperAdapter,
 ) : ItemTouchHelper.Callback() {
     interface ItemTouchHelperAdapter {
         fun onShelfItemMove(fromPosition: Int, toPosition: Int)

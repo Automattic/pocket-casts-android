@@ -14,12 +14,12 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class UpsellViewModel @Inject constructor(
@@ -67,7 +67,7 @@ class UpsellViewModel @Inject constructor(
     fun onClick(sourceView: SourceView) {
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_UPGRADE_BUTTON_TAPPED,
-            mapOf("source" to sourceView.analyticsValue)
+            mapOf("source" to sourceView.analyticsValue),
         )
     }
 

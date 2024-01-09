@@ -8,14 +8,14 @@ import au.com.shiftyjelly.pocketcasts.shared.WatchMessageSendState
 import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication
 import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunicationState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel

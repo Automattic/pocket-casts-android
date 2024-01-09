@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DoneViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     val title = MutableLiveData<String>()

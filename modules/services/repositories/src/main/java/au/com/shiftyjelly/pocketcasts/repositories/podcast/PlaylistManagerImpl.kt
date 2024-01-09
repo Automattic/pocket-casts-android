@@ -19,16 +19,16 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val NEWRELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
 private const val INPROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
@@ -41,7 +41,7 @@ class PlaylistManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
 ) : PlaylistManager, CoroutineScope {
 
     private val playlistDao = appDatabase.playlistDao()
@@ -174,9 +174,9 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     private fun getPlaylistOrderByString(playlist: Playlist): String? = when (playlist.sortOrder()) {
-
         Playlist.SortOrder.NEWEST_TO_OLDEST,
-        Playlist.SortOrder.OLDEST_TO_NEWEST -> {
+        Playlist.SortOrder.OLDEST_TO_NEWEST,
+        -> {
             "published_date " +
                 (if (playlist.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC") +
                 ", added_date " +
@@ -184,7 +184,8 @@ class PlaylistManagerImpl @Inject constructor(
         }
 
         Playlist.SortOrder.SHORTEST_TO_LONGEST,
-        Playlist.SortOrder.LONGEST_TO_SHORTEST -> {
+        Playlist.SortOrder.LONGEST_TO_SHORTEST,
+        -> {
             "duration " +
                 (if (playlist.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST) "ASC" else "DESC") +
                 ", added_date DESC"
@@ -204,7 +205,7 @@ class PlaylistManagerImpl @Inject constructor(
                 playlistManager = this,
                 force = true,
                 coroutineScope = applicationScope,
-                context = context
+                context = context,
             )
         }
         return id
@@ -216,7 +217,7 @@ class PlaylistManagerImpl @Inject constructor(
     override fun update(
         playlist: Playlist,
         userPlaylistUpdate: UserPlaylistUpdate?,
-        isCreatingFilter: Boolean
+        isCreatingFilter: Boolean,
     ) {
         playlistDao.update(playlist)
         playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
@@ -250,7 +251,7 @@ class PlaylistManagerImpl @Inject constructor(
             sortPosition = countPlaylists() + 1,
             manual = false,
             iconId = iconId,
-            draft = draft
+            draft = draft,
         )
 
         Timber.d("Creating playlist ${playlist.uuid}")
@@ -309,7 +310,7 @@ class PlaylistManagerImpl @Inject constructor(
                 playlistManager = this,
                 force = true,
                 coroutineScope = applicationScope,
-                context = context
+                context = context,
             )
         }
     }
@@ -543,7 +544,7 @@ class PlaylistManagerImpl @Inject constructor(
             audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL,
             allPodcasts = true,
             autoDownload = false,
-            sortId = Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE.value
+            sortId = Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE.value,
         )
     }
 

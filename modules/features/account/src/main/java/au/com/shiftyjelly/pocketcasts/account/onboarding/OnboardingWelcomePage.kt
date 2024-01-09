@@ -116,7 +116,7 @@ fun OnboardingWelcomePage(
             viewModel.onDismiss(flow, persistNewsletter = true)
             onDone()
         },
-        onNewsletterCheckedChanged = viewModel::updateNewsletter
+        onNewsletterCheckedChanged = viewModel::updateNewsletter,
     )
 
     if (state.showConfetti) {
@@ -138,7 +138,7 @@ private fun Content(
         Modifier
             .padding(horizontal = 24.dp)
             .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
         Spacer(Modifier.weight(1f))
@@ -156,9 +156,9 @@ private fun Content(
                     LR.string.onboarding_welcome_get_you_listening_plus
                 } else {
                     LR.string.onboarding_welcome_get_you_listening
-                }
+                },
             ),
-            modifier = Modifier.padding(end = 8.dp)
+            modifier = Modifier.padding(end = 8.dp),
         )
 
         Spacer(Modifier.height(24.dp))
@@ -167,7 +167,7 @@ private fun Content(
             descriptionRes = LR.string.onboarding_import_podcasts_text,
             actionRes = LR.string.onboarding_import_podcasts_button,
             iconRes = IR.drawable.pc_bw_import,
-            onClick = onImportTapped
+            onClick = onImportTapped,
         )
 
         if (showDiscover) {
@@ -177,7 +177,7 @@ private fun Content(
                 descriptionRes = LR.string.onboarding_welcome_recommendations_text,
                 actionRes = LR.string.onboarding_welcome_recommendations_button,
                 iconRes = IR.drawable.circle_star,
-                onClick = onContinueToDiscover
+                onClick = onContinueToDiscover,
             )
         }
 
@@ -186,7 +186,7 @@ private fun Content(
 
         NewsletterSwitch(
             checked = state.newsletter,
-            onCheckedChange = onNewsletterCheckedChanged
+            onCheckedChange = onNewsletterCheckedChanged,
         )
 
         Spacer(Modifier.height(16.dp))
@@ -200,7 +200,7 @@ private fun Content(
         Spacer(
             Modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
-                .height(16.dp)
+                .height(16.dp),
         )
     }
 }
@@ -211,7 +211,7 @@ private fun CardSection(
     @StringRes descriptionRes: Int,
     @StringRes actionRes: Int,
     @DrawableRes iconRes: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -221,12 +221,12 @@ private fun CardSection(
         ),
         modifier = Modifier.clickable {
             onClick()
-        }
+        },
     ) {
         Column(Modifier.padding(vertical = 16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             ) {
                 Column(
                     // This column needs a weight modifier so that it is measured after
@@ -247,18 +247,18 @@ private fun CardSection(
                     painter = painterResource(iconRes),
                     contentDescription = null,
                     tint = MaterialTheme.theme.colors.primaryInteractive01,
-                    modifier = Modifier.width(56.dp)
+                    modifier = Modifier.width(56.dp),
                 )
             }
             Divider(
                 thickness = 1.dp,
                 color = MaterialTheme.theme.colors.primaryUi05,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp),
             )
             TextH40(
                 text = stringResource(actionRes),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
     }
@@ -271,12 +271,12 @@ private fun NewsletterSwitch(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable { onCheckedChange(!checked) }
+        modifier = Modifier.clickable { onCheckedChange(!checked) },
     ) {
         Column(
             modifier = Modifier
                 .padding(end = 16.dp)
-                .weight(1f)
+                .weight(1f),
         ) {
             TextH40(stringResource(LR.string.onboarding_get_the_newsletter))
             TextP60(
@@ -291,7 +291,7 @@ private fun NewsletterSwitch(
             colors = SwitchDefaults.colors(
                 uncheckedThumbColor = Color.Gray,
                 uncheckedTrackColor = Color.Gray,
-            )
+            ),
         )
     }
 }
@@ -307,7 +307,7 @@ private fun PersonCheckmark(
 ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(64.dp),
     ) {
         val personModifier = Modifier.offset(x = 9.dp, y = 9.dp).let { modifier ->
             personBrush?.let {
@@ -318,7 +318,7 @@ private fun PersonCheckmark(
             painter = painterResource(id = IR.drawable.person_outline),
             contentDescription = null,
             tint = MaterialTheme.theme.colors.primaryInteractive01,
-            modifier = personModifier
+            modifier = personModifier,
         )
 
         Icon(
@@ -329,9 +329,9 @@ private fun PersonCheckmark(
                 .brush(
                     Brush.horizontalGradient(
                         0f to Color(0xFF78D549),
-                        1F to Color(0xFF9BE45E)
-                    )
-                )
+                        1F to Color(0xFF9BE45E),
+                    ),
+                ),
         )
     }
 }

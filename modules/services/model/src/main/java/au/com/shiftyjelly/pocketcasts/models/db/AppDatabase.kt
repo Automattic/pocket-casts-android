@@ -61,10 +61,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextChange::class,
         UpNextEpisode::class,
         UserEpisode::class,
-        PodcastRatings::class
+        PodcastRatings::class,
     ],
     version = 79,
-    exportSchema = true
+    exportSchema = true,
 )
 @TypeConverters(
     AnonymousBumpStat.CustomEventPropsTypeConverter::class,
@@ -371,7 +371,7 @@ abstract class AppDatabase : RoomDatabase() {
                     sync_modified INTEGER NOT NULL,
                     PRIMARY KEY(uuid)
                 );
-                """.trimIndent()
+                """.trimIndent(),
             )
             val podcastColumnNames = getColumnNames(database, "podcasts")
             if (!podcastColumnNames.contains("folder_uuid")) {
@@ -388,7 +388,7 @@ abstract class AppDatabase : RoomDatabase() {
                       custom_event_props TEXT NOT NULL,
                       PRIMARY KEY(name, event_time, custom_event_props)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -413,7 +413,7 @@ abstract class AppDatabase : RoomDatabase() {
                         episode_podcastTitle TEXT, 
                         episode_artworkUrl TEXT
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_term` ON search_history (`term`)")
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_podcast_uuid` ON search_history (`podcast_uuid`);")
@@ -430,7 +430,7 @@ abstract class AppDatabase : RoomDatabase() {
                         total INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -454,7 +454,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `sync_status` INTEGER NOT NULL, 
                         PRIMARY KEY(`uuid`)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
             database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
         }
@@ -469,7 +469,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `total` INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     )
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             database.execSQL(
@@ -477,7 +477,7 @@ abstract class AppDatabase : RoomDatabase() {
                     INSERT INTO `temp_podcast_ratings` (`podcast_uuid`, `average`, `total`)
                     SELECT `podcast_uuid`, `average`, `total` 
                     FROM `podcast_ratings`
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             database.execSQL("DROP TABLE `podcast_ratings`;")
@@ -489,7 +489,7 @@ abstract class AppDatabase : RoomDatabase() {
                 """
                     ALTER TABLE podcast_episodes
                     ADD COLUMN image_url TEXT
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -533,8 +533,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 0,
                             "syncStatus" to 1,
                             "sortPosition" to 1,
-                            "filterHours" to 336
-                        )
+                            "filterHours" to 336,
+                        ),
                     )
                     // In Progress
                     database.insert(
@@ -560,8 +560,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 0,
                             "syncStatus" to 1,
                             "sortPosition" to 2,
-                            "filterHours" to 0
-                        )
+                            "filterHours" to 0,
+                        ),
                     )
                     // Starred
                     database.insert(
@@ -587,8 +587,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 1,
                             "syncStatus" to 1,
                             "sortPosition" to 3,
-                            "filterHours" to 0
-                        )
+                            "filterHours" to 0,
+                        ),
                     )
                 },
                 addMigration(9, 10) { database ->
@@ -598,7 +598,7 @@ abstract class AppDatabase : RoomDatabase() {
                             "playlist_id INTEGER," +
                             "episode_uuid VARCHAR," +
                             "position INTEGER" +
-                            ")"
+                            ")",
                     )
                     database.execSQL("ALTER TABLE podcast ADD COLUMN is_deleted INTEGER DEFAULT 0")
                     database.execSQL("ALTER TABLE podcast ADD COLUMN sync_status INTEGER DEFAULT 0")

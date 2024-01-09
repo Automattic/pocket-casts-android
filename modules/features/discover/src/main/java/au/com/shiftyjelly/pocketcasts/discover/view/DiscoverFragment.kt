@@ -39,7 +39,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     override var statusBarColor: StatusBarColor = StatusBarColor.Dark
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var staticServerManager: StaticServerManagerImpl
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: DiscoverViewModel by viewModels()
@@ -64,7 +66,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.subscribeToPodcast(podcast)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
-            mapOf(SOURCE_KEY to SourceView.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid)
+            mapOf(SOURCE_KEY to SourceView.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid),
         )
     }
 
@@ -98,7 +100,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             episodeUuid = episode.uuid,
             source = EpisodeViewSource.DISCOVER,
             podcastUuid = episode.podcast_uuid,
-            fromListUuid = listUuid
+            fromListUuid = listUuid,
         )
         fragment.show(parentFragmentManager, "episode_card")
     }
@@ -117,7 +119,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val searchFragment = SearchFragment.newInstance(
             floating = true,
             onlySearchRemote = true,
-            source = SourceView.DISCOVER
+            source = SourceView.DISCOVER,
         )
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         binding?.recyclerView?.smoothScrollToPosition(0)
@@ -153,7 +155,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                 theme = theme,
                 loadPodcastList = viewModel::loadPodcastList,
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
-                analyticsTracker = analyticsTracker
+                analyticsTracker = analyticsTracker,
             )
         }
         recyclerView.adapter = adapter
@@ -192,7 +194,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         binding.loading.isVisible = true
                     }
                 }
-            }
+            },
         )
     }
 

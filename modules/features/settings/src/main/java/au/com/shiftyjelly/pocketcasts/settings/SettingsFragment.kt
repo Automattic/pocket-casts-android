@@ -33,12 +33,11 @@ class SettingsFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View =
         ComposeView(requireContext()).apply {
             setContent {
                 AppThemeWithBackground(theme.activeTheme) {
-
                     var isUnrestrictedBattery by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
                     DisposableEffect(this) {
                         val observer = LifecycleEventObserver { _, event ->
@@ -69,7 +68,7 @@ class SettingsFragment : BaseFragment() {
                                 isUnrestrictedBattery = isUnrestrictedBattery,
                                 openFragment = { fragment ->
                                     (activity as? FragmentHostListener)?.addFragment(fragment)
-                                }
+                                },
                             )
                         }
                 }

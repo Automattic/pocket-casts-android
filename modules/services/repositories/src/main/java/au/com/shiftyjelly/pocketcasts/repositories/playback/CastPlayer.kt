@@ -226,7 +226,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         this.episode = episode
         this.episodeLocation =
             EpisodeLocation.Stream(
-                episode.downloadUrl
+                episode.downloadUrl,
             )
 
         localEpisodeUuid = episode.uuid

@@ -7,7 +7,7 @@ data class ServerResponse(
     var polling: Boolean = false,
     var data: String? = null,
     var errorCode: Int = ERROR_CODE_NO_ERROR_CODE,
-    var token: String? = null
+    var token: String? = null,
 ) {
 
     companion object {

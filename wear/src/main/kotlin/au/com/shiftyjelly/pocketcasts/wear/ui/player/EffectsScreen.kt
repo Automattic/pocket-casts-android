@@ -72,7 +72,7 @@ fun Content(
 ) {
     ScalingLazyColumn(
         columnState = columnState,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         item {
             ScreenHeaderChip(text = LR.string.effects)
@@ -146,20 +146,20 @@ private fun SpeedChip(
                     Icon(
                         painter = painterResource(IR.drawable.ic_speed),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Text(
                         text = stringResource(id = LR.string.player_effects_speed),
                         modifier = Modifier.padding(start = 8.dp),
                         style = MaterialTheme.typography.button.copy(
-                            color = Color.White
+                            color = Color.White,
                         ),
                     )
                 }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     IconButton(onClick = onMinusClicked) {
                         Icon(
@@ -200,13 +200,13 @@ fun TrimSilenceSlider(
                 contentDescription = stringResource(id = LR.string.player_effects_trim_silence),
                 modifier = Modifier
                     .padding(start = 24.dp)
-                    .size(20.dp)
+                    .size(20.dp),
             )
             TextH50(
                 text = stringResource(id = LR.string.player_effects_trim_silence),
                 fontWeight = FontWeight.W700,
                 color = MaterialTheme.colors.onPrimary,
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(start = 8.dp),
             )
         }
 
@@ -216,21 +216,21 @@ fun TrimSilenceSlider(
             increaseIcon = {
                 Icon(
                     InlineSliderDefaults.Increase,
-                    stringResource(LR.string.player_effects_trim_level_up)
+                    stringResource(LR.string.player_effects_trim_level_up),
                 )
             },
             decreaseIcon = {
                 Icon(
                     InlineSliderDefaults.Decrease,
-                    stringResource(LR.string.player_effects_trim_level_down)
+                    stringResource(LR.string.player_effects_trim_level_down),
                 )
             },
             valueRange = 0f..3f,
             steps = 2,
             segmented = true,
             colors = InlineSliderDefaults.colors(
-                selectedBarColor = MaterialTheme.colors.onSurface
-            )
+                selectedBarColor = MaterialTheme.colors.onSurface,
+            ),
         )
     }
 }
@@ -239,7 +239,7 @@ fun TrimSilenceSlider(
     device = WearDevices.LARGE_ROUND,
     showSystemUi = true,
     backgroundColor = 0xff000000,
-    showBackground = true
+    showBackground = true,
 )
 @Composable
 private fun EffectsScreenDarkPreview() {
@@ -251,7 +251,7 @@ private fun EffectsScreenDarkPreview() {
                     trimMode = TrimMode.MEDIUM,
                     playbackSpeed = 1.5,
                     isVolumeBoosted = true,
-                )
+                ),
             ),
             increasePlaybackSpeed = {},
             decreasePlaybackSpeed = {},

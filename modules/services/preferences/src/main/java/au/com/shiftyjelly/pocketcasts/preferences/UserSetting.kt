@@ -87,7 +87,7 @@ abstract class UserSetting<T>(
         defaultValue = defaultValue,
         sharedPrefs = sharedPrefs,
         fromInt = { it },
-        toInt = { it }
+        toInt = { it },
     )
 
     class StringPref(
@@ -220,7 +220,7 @@ abstract class UserSetting<T>(
             sharedPrefs.edit().run {
                 val commaSeparatedString = value.joinToString(
                     separator = ",",
-                    transform = toString
+                    transform = toString,
                 )
                 putString(sharedPrefKey, commaSeparatedString)
                 if (commit) {
@@ -252,7 +252,7 @@ abstract class UserSetting<T>(
         toString = { value ->
             val intValue = if (value <= 0) defaultValue else value
             intValue.toString()
-        }
+        },
     )
 
     // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow

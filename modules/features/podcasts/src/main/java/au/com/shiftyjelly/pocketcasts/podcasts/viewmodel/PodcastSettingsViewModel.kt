@@ -19,12 +19,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class PodcastSettingsViewModel @Inject constructor(
@@ -32,7 +32,7 @@ class PodcastSettingsViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val playlistManager: PlaylistManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    settings: Settings
+    settings: Settings,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -120,7 +120,7 @@ class PodcastSettingsViewModel @Inject constructor(
             podcastManager.unsubscribe(podcast.uuid, playbackManager)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                AnalyticsProp.podcastUnsubscribed(SourceView.PODCAST_SETTINGS, podcast.uuid)
+                AnalyticsProp.podcastUnsubscribed(SourceView.PODCAST_SETTINGS, podcast.uuid),
             )
         }
     }
@@ -148,7 +148,7 @@ class PodcastSettingsViewModel @Inject constructor(
                         playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
                         val userPlaylistUpdate = UserPlaylistUpdate(
                             listOf(PlaylistProperty.Podcasts),
-                            PlaylistUpdateSource.PODCAST_SETTINGS
+                            PlaylistUpdateSource.PODCAST_SETTINGS,
                         )
                         playlistManager.update(playlist, userPlaylistUpdate)
                     }

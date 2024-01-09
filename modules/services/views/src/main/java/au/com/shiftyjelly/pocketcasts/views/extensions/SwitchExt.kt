@@ -14,12 +14,12 @@ fun Switch.updateTint(@ColorInt tintColor: Int, @ColorInt disabledColor: Int) {
         val thumbColorList = ColorStateList(
             arrayOf(
                 intArrayOf(R.attr.state_checked), // Enabled
-                intArrayOf()
+                intArrayOf(),
             ),
             intArrayOf(
                 tintColor,
-                disabledColor
-            )
+                disabledColor,
+            ),
         )
 
         thumbTintList = thumbColorList
@@ -28,13 +28,13 @@ fun Switch.updateTint(@ColorInt tintColor: Int, @ColorInt disabledColor: Int) {
             arrayOf(
                 intArrayOf(-android.R.attr.state_enabled),
                 intArrayOf(android.R.attr.state_checked), // Enabled
-                intArrayOf()
+                intArrayOf(),
             ),
             intArrayOf(
                 tintColor,
                 tintColor,
-                ColorUtils.colorWithAlpha(tintColor, 128)
-            )
+                ColorUtils.colorWithAlpha(tintColor, 128),
+            ),
         )
         trackTintList = trackColorList
     }
@@ -46,12 +46,12 @@ fun SwitchCompat.updateTint(@ColorInt tintColor: Int, @ColorInt disabledColor: I
         val thumbColorList = ColorStateList(
             arrayOf(
                 intArrayOf(R.attr.state_checked), // Enabled
-                intArrayOf()
+                intArrayOf(),
             ),
             intArrayOf(
                 tintColor,
-                disabledColor
-            )
+                disabledColor,
+            ),
         )
 
         thumbTintList = thumbColorList
@@ -60,13 +60,13 @@ fun SwitchCompat.updateTint(@ColorInt tintColor: Int, @ColorInt disabledColor: I
             arrayOf(
                 intArrayOf(-android.R.attr.state_enabled),
                 intArrayOf(android.R.attr.state_checked), // Enabled
-                intArrayOf()
+                intArrayOf(),
             ),
             intArrayOf(
                 tintColor,
                 tintColor,
-                ColorUtils.colorWithAlpha(tintColor, 128)
-            )
+                ColorUtils.colorWithAlpha(tintColor, 128),
+            ),
         )
         trackTintList = trackColorList
     }

@@ -98,7 +98,7 @@ fun TimePlayButton(
         modifier = modifier
             .semantics {
                 contentDescription = description
-            }
+            },
     ) {
         TextH40(
             text = timeText,
@@ -111,7 +111,7 @@ fun TimePlayButton(
             painter = painterResource(IR.drawable.ic_play),
             contentDescription = null,
             tint = colors.textColor(),
-            modifier = Modifier.size(10.dp, 13.dp)
+            modifier = Modifier.size(10.dp, 13.dp),
         )
     }
 }
@@ -120,7 +120,7 @@ fun TimePlayButton(
     name = "TimePlayButton",
     group = "Button",
     styleName = "Outline - Light",
-    defaultStyle = true
+    defaultStyle = true,
 )
 @Preview(name = "Light")
 @Composable
@@ -148,7 +148,7 @@ private fun TimePlayButtonPreview(themeType: Theme.ThemeType) {
         TimePlayButton(
             timeSecs = 121,
             contentDescriptionId = R.string.bookmark_play,
-            onClick = {}
+            onClick = {},
         )
     }
 }
@@ -162,10 +162,10 @@ fun TimePlayButtonFilledPreview() {
             timeSecs = 121,
             contentDescriptionId = R.string.bookmark_play,
             colors = TimePlayButtonColors.Player(
-                textColor = Color.Black
+                textColor = Color.Black,
             ),
             buttonStyle = TimePlayButtonStyle.Solid,
-            onClick = {}
+            onClick = {},
         )
     }
 }

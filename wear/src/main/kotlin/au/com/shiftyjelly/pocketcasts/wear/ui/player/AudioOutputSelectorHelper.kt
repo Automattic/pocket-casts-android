@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.player
 import com.google.android.horologist.audio.SystemAudioRepository
 import com.google.android.horologist.media3.audio.AudioOutputSelector
 import com.google.android.horologist.media3.rules.PlaybackRules
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Singleton
 class AudioOutputSelectorHelper @Inject constructor(

@@ -26,6 +26,12 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.io.InputStream
+import java.io.StringReader
+import java.net.URL
+import java.util.Scanner
+import java.util.regex.Pattern
+import javax.xml.parsers.SAXParserFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -37,12 +43,6 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
 import org.xml.sax.helpers.DefaultHandler
-import java.io.InputStream
-import java.io.StringReader
-import java.net.URL
-import java.util.Scanner
-import java.util.regex.Pattern
-import javax.xml.parsers.SAXParserFactory
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -99,7 +99,7 @@ class OpmlImportTask @AssistedInject constructor(
                         uri: String?,
                         localName: String?,
                         qName: String?,
-                        attributes: Attributes?
+                        attributes: Attributes?,
                     ) {
                         if (localName.equals("outline", ignoreCase = true)) {
                             val url = attributes?.getValue("xmlUrl")
@@ -108,7 +108,7 @@ class OpmlImportTask @AssistedInject constructor(
                             }
                         }
                     }
-                }
+                },
             )
             return urls
         }
@@ -139,7 +139,7 @@ class OpmlImportTask @AssistedInject constructor(
                     override fun characters(charArray: CharArray, start: Int, length: Int) {
                         decodedUrl.append(String(charArray, start, length))
                     }
-                }
+                },
             )
             return decodedUrl.toString()
         }
@@ -174,14 +174,14 @@ class OpmlImportTask @AssistedInject constructor(
     private fun trackProcessed(numberParsed: Int) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FINISHED,
-            mapOf("number" to numberParsed)
+            mapOf("number" to numberParsed),
         )
     }
 
     fun trackFailure(reason: String) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FAILED,
-            mapOf("reason" to reason)
+            mapOf("reason" to reason),
         )
     }
 

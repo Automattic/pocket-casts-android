@@ -27,6 +27,7 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var playbackManager: PlaybackManager
     private val sourceView = SourceView.PLAYER_BROADCAST_ACTION
 

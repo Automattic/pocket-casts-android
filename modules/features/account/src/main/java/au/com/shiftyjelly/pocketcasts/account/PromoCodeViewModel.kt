@@ -16,13 +16,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
-import retrofit2.HttpException
 import javax.inject.Inject
+import retrofit2.HttpException
 
 @HiltViewModel
 class PromoCodeViewModel @Inject constructor(
     private val syncManager: SyncManager,
-    private val subscriptionManager: SubscriptionManager
+    private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
     sealed class ViewState {
         object Loading : ViewState()

@@ -20,6 +20,12 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
+import java.util.Timer
+import javax.inject.Inject
+import kotlin.concurrent.fixedRateTimer
+import kotlin.math.max
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,12 +33,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
-import java.util.Timer
-import javax.inject.Inject
-import kotlin.concurrent.fixedRateTimer
-import kotlin.math.max
-import kotlin.math.roundToInt
 
 @HiltViewModel
 class StoriesViewModel @Inject constructor(
@@ -83,7 +83,7 @@ class StoriesViewModel @Inject constructor(
             }
             combine(
                 subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS),
-                settings.cachedSubscriptionStatus.flow
+                settings.cachedSubscriptionStatus.flow,
             ) { freeTrial, _ ->
                 val currentUserTier = settings.userTier
                 val lastUserTier = (state.value as? State.Loaded)?.userTier
@@ -94,7 +94,7 @@ class StoriesViewModel @Inject constructor(
 
                 updateState(
                     freeTrial = freeTrial,
-                    currentUserTier = currentUserTier
+                    currentUserTier = currentUserTier,
                 )
                 if (state.value is State.Loaded) start()
             }.stateIn(this)
@@ -192,7 +192,7 @@ class StoriesViewModel @Inject constructor(
         currentIndex = index
         mutableState.value = (state.value as State.Loaded).copy(
             currentStory = stories.value[index],
-            paused = false
+            paused = false,
         )
     }
 
@@ -217,7 +217,7 @@ class StoriesViewModel @Inject constructor(
                 onCaptureBitmap.invoke(),
                 context,
                 EOY_STORY_SAVE_FOLDER_NAME,
-                EOY_STORY_SAVE_FILE_NAME
+                EOY_STORY_SAVE_FILE_NAME,
             )
 
             mutableState.value = currentState.copy(preparingShareText = true)
@@ -329,7 +329,7 @@ class StoriesViewModel @Inject constructor(
         }
         analyticsTracker.track(
             event,
-            AnalyticsProp.storyShown(currentStory.identifier)
+            AnalyticsProp.storyShown(currentStory.identifier),
         )
     }
 
@@ -339,8 +339,8 @@ class StoriesViewModel @Inject constructor(
             AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
             AnalyticsProp.storyShared(
                 currentState?.currentStory?.identifier ?: "",
-                shareableTextProvider.chosenActivity ?: ""
-            )
+                shareableTextProvider.chosenActivity ?: "",
+            ),
         )
     }
 

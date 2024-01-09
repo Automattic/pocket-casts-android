@@ -38,11 +38,11 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
@@ -51,7 +51,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.Listener, HasBackstack {
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var preferenceFeedIssueDetected: Preference? = null
@@ -79,7 +81,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         fun newInstance(podcastUuid: String): PodcastSettingsFragment {
             return PodcastSettingsFragment().apply {
                 arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+                    ARG_PODCAST_UUID to podcastUuid,
                 )
             }
         }
@@ -158,7 +160,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             theme.updateWindowStatusBar(
                 window = requireActivity().window,
                 statusBarColor = StatusBarColor.Custom(colors.backgroundColor, isWhiteIcons = theme.activeTheme.defaultLightIcons),
-                context = context
+                context = context,
             )
 
             preferenceNotifications?.isChecked = podcast.isShowNotifications
@@ -228,7 +230,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                                 AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED
                             } else {
                                 AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED
-                            }
+                            },
                         )
                         FirebaseAnalyticsTracker.podcastFeedRefreshed()
                         showFeedUpdateQueued(success = success)
@@ -255,9 +257,9 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         val dialog = ConfirmationDialog().setButtonType(
             ConfirmationDialog.ButtonType.Normal(
                 getString(
-                    LR.string.ok
-                )
-            )
+                    LR.string.ok,
+                ),
+            ),
         )
             .setTitle(getString(title))
             .setSummary(getString(summary))
@@ -291,7 +293,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                 val secs = stringValue.toInt()
                 analyticsTracker.track(
                     AnalyticsEvent.PODCAST_SETTINGS_SKIP_FIRST_CHANGED,
-                    mapOf("value" to secs)
+                    mapOf("value" to secs),
                 )
                 viewModel.updateStartFrom(secs)
             } catch (e: NumberFormatException) {
@@ -311,7 +313,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                 val secs = stringValue.toInt()
                 analyticsTracker.track(
                     AnalyticsEvent.PODCAST_SETTINGS_SKIP_LAST_CHANGED,
-                    mapOf("value" to secs)
+                    mapOf("value" to secs),
                 )
                 viewModel.updateSkipLast(secs)
             } catch (e: java.lang.NumberFormatException) {
@@ -325,7 +327,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceNotifications?.setOnPreferenceChangeListener { _, newValue ->
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED,
-                mapOf("enabled" to (newValue as Boolean))
+                mapOf("enabled" to (newValue as Boolean)),
             )
             viewModel.showNotifications(newValue)
             true
@@ -345,7 +347,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceFilters?.setOnPreferenceClickListener {
             val fragment = FilterSelectFragment.newInstance(
                 source = FilterSelectFragment.Source.PODCAST_SETTINGS,
-                shouldFilterPlaylistsWithAllPodcasts = true
+                shouldFilterPlaylistsWithAllPodcasts = true,
             )
             childFragmentManager.beginTransaction()
                 .replace(UR.id.frameChildFragment, fragment)
@@ -368,9 +370,9 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                 val dialog = ConfirmationDialog().setButtonType(
                     ConfirmationDialog.ButtonType.Danger(
                         resources.getString(
-                            LR.string.unsubscribe
-                        )
-                    )
+                            LR.string.unsubscribe,
+                        ),
+                    ),
                 )
                     .setTitle(title)
                     .setSummary(resources.getString(LR.string.podcast_unsubscribe_warning))
@@ -391,7 +393,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             listOf(
                 getString(LR.string.podcast_effects_summary_speed, podcast.playbackSpeed.toString()),
                 getString(if (podcast.isSilenceRemoved) LR.string.podcast_effects_summary_trim_silence_on else LR.string.podcast_effects_summary_trim_silence_off),
-                getString(if (podcast.isVolumeBoosted) LR.string.podcast_effects_summary_volume_boost_on else LR.string.podcast_effects_summary_volume_boost_off)
+                getString(if (podcast.isVolumeBoosted) LR.string.podcast_effects_summary_volume_boost_on else LR.string.podcast_effects_summary_volume_boost_off),
             ).joinToString()
         } else {
             getString(LR.string.podcast_effects_summary_default)
@@ -410,7 +412,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             setOnPreferenceChangeListener { _, isOn ->
                 analyticsTracker.track(
                     AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED,
-                    mapOf("enabled" to isOn as Boolean)
+                    mapOf("enabled" to isOn as Boolean),
                 )
                 viewModel.updateAutoAddToUpNext(isOn)
                 true
@@ -421,8 +423,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             entries = arrayOf(
                 getString(LR.string.play_last),
                 getString(
-                    LR.string.play_next
-                )
+                    LR.string.play_next,
+                ),
             )
             entryValues = arrayOf("1", "2")
             setOnPreferenceChangeListener { _, newValue ->
@@ -437,7 +439,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                     viewModel.updateAutoAddToUpNextOrder(value)
                     analyticsTracker.track(
                         AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
-                        mapOf("value" to value.analyticsValue)
+                        mapOf("value" to value.analyticsValue),
                     )
                 }
                 true
@@ -447,7 +449,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceAutoDownload?.setOnPreferenceChangeListener { _, newValue ->
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
-                mapOf("enabled" to newValue as Boolean)
+                mapOf("enabled" to newValue as Boolean),
             )
             viewModel.setAutoDownloadEpisodes(newValue)
             true

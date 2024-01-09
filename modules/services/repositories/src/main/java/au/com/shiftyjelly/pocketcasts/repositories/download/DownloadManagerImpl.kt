@@ -41,6 +41,10 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.subjects.Subject
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -50,10 +54,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class DownloadManagerImpl @Inject constructor(
@@ -61,7 +61,7 @@ class DownloadManagerImpl @Inject constructor(
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
     @ApplicationContext private val context: Context,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : DownloadManager, CoroutineScope {
 
     companion object {
@@ -199,7 +199,8 @@ class DownloadManagerImpl @Inject constructor(
                                 }
 
                                 val wasCancelled = workInfo.outputData.getBoolean(
-                                    DownloadEpisodeTask.OUTPUT_CANCELLED, false
+                                    DownloadEpisodeTask.OUTPUT_CANCELLED,
+                                    false,
                                 )
                                 if (!wasCancelled) {
                                     episodeDidDownload(DownloadResult.successResult(workInfo.id, episodeUUID))
@@ -275,7 +276,7 @@ class DownloadManagerImpl @Inject constructor(
                         "Attempted to add episode to downloads from $from but it was rejected. " +
                             "isDownloaded: ${updatedEpisode.isDownloaded} " +
                             "pendingQueueContains: ${pendingQueue.containsKey(episode.uuid)} " +
-                            "episodeTaskId: ${updatedEpisode.downloadTaskId}"
+                            "episodeTaskId: ${updatedEpisode.downloadTaskId}",
                     )
                     return@launch
                 }
@@ -337,13 +338,11 @@ class DownloadManagerImpl @Inject constructor(
             val workManager = WorkManager.getInstance(context)
 
             when (episode) {
-
                 is UserEpisode -> {
                     workManager.enqueue(downloadTask)
                 }
 
                 is PodcastEpisode -> {
-
                     UpdateShowNotesTask.enqueue(episode, constraints, context)
 
                     val updateEpisodeTask = OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
@@ -421,7 +420,7 @@ class DownloadManagerImpl @Inject constructor(
                 episodeManager.setDownloadFailed(
                     episode,
                     result.errorMessage?.split(":")?.last()
-                        ?: "Download failed"
+                        ?: "Download failed",
                 )
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, uuid = episode.uuid)
             }
@@ -475,7 +474,9 @@ class DownloadManagerImpl @Inject constructor(
             // user said yes to warning dialog
             return if (episode.isManualDownloadOverridingWifiSettings || !settings.warnOnMeteredNetwork.value) {
                 NetworkRequirements.runImmediately()
-            } else NetworkRequirements.needsUnmetered()
+            } else {
+                NetworkRequirements.needsUnmetered()
+            }
         } else if (episode is UserEpisode) {
             // UserEpisodes have their own auto download setting
             return if (settings.cloudDownloadOnlyOnWifi.value) {
@@ -494,7 +495,6 @@ class DownloadManagerImpl @Inject constructor(
     }
 
     private fun updateNotification() {
-
         // Don't show these notifications on wear os
         if (Util.isWearOs(context)) return
 
@@ -583,7 +583,9 @@ class DownloadManagerImpl @Inject constructor(
         }
         return if (value.length <= length) {
             value
-        } else value.substring(0, length - 1) + ".."
+        } else {
+            value.substring(0, length - 1) + ".."
+        }
     }
 
     private fun openDownloadingPageIntent(): PendingIntent {

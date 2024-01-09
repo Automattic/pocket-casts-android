@@ -17,7 +17,7 @@ private const val DRAW_EMPTY = 2
 class ProgressCircleView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
     private var drawState = DRAW_FULL

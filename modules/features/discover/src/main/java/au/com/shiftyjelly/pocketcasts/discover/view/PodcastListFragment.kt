@@ -121,7 +121,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             bodyTextView = binding.lblBody,
             linkView = binding.linkLayout,
             linkTextView = binding.lblLinkTitle,
-            toolbar = binding.toolbar
+            toolbar = binding.toolbar,
         )
     }
 
@@ -141,7 +141,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             toolbar = toolbar,
             title = "",
             menu = R.menu.discover_share,
-            navigationIcon = BackArrow
+            navigationIcon = BackArrow,
         )
         toolbar.setOnMenuItemClickListener(this)
 

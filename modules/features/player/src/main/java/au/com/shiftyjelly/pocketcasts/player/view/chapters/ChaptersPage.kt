@@ -30,7 +30,7 @@ fun ChaptersPage(
         modifier = modifier
             .background(backgroundColor)
             .fillMaxSize()
-            .padding(top = 16.dp)
+            .padding(top = 16.dp),
     ) {
         itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->
             ChapterRow(
@@ -42,7 +42,7 @@ fun ChaptersPage(
                 Divider(
                     color = MaterialTheme.theme.colors.playerContrast06,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier.padding(horizontal = 20.dp),
                 )
             }
         }

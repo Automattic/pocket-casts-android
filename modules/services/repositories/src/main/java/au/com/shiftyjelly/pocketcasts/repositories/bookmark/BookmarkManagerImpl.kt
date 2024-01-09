@@ -9,16 +9,16 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import java.util.Date
+import java.util.UUID
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import java.util.Date
-import java.util.UUID
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
@@ -39,7 +39,7 @@ class BookmarkManagerImpl @Inject constructor(
         episode: BaseEpisode,
         timeSecs: Int,
         title: String,
-        creationSource: BookmarkManager.CreationSource
+        creationSource: BookmarkManager.CreationSource,
     ): Bookmark {
         // Prevent adding more than one bookmark at the same place
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
@@ -62,7 +62,7 @@ class BookmarkManagerImpl @Inject constructor(
         bookmarkDao.insert(bookmark)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARK_CREATED,
-            mapOf("source" to creationSource.analyticsValue)
+            mapOf("source" to creationSource.analyticsValue),
         )
         return bookmark
     }
@@ -72,11 +72,11 @@ class BookmarkManagerImpl @Inject constructor(
             bookmarkUuid = bookmarkUuid,
             title = title,
             titleModified = System.currentTimeMillis(),
-            syncStatus = SyncStatus.NOT_SYNCED
+            syncStatus = SyncStatus.NOT_SYNCED,
         )
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARK_UPDATE_TITLE,
-            mapOf("source" to sourceView.analyticsValue)
+            mapOf("source" to sourceView.analyticsValue),
         )
     }
 
@@ -166,7 +166,7 @@ class BookmarkManagerImpl @Inject constructor(
             uuid = bookmarkUuid,
             deleted = true,
             deletedModified = System.currentTimeMillis(),
-            syncStatus = SyncStatus.NOT_SYNCED
+            syncStatus = SyncStatus.NOT_SYNCED,
         )
     }
 

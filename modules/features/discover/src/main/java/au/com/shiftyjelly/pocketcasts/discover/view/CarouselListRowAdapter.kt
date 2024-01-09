@@ -60,13 +60,13 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                     FirebaseAnalyticsTracker.podcastTappedFromList(listId, podcast.uuid)
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
-                        AnalyticsProp.sponsoredPodcastTapped(listId, podcast.uuid)
+                        AnalyticsProp.sponsoredPodcastTapped(listId, podcast.uuid),
                     )
                 } else {
                     FirebaseAnalyticsTracker.openedFeaturedPodcast()
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED,
-                        AnalyticsProp.featuredPodcastTapped(podcast.uuid)
+                        AnalyticsProp.featuredPodcastTapped(podcast.uuid),
                     )
                 }
             }
@@ -79,7 +79,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                     FirebaseAnalyticsTracker.podcastSubscribedFromList(listId, podcast.uuid)
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
-                        AnalyticsProp.sponsoredPodcastSubscribed(listId, podcast.uuid)
+                        AnalyticsProp.sponsoredPodcastSubscribed(listId, podcast.uuid),
                     )
                 } else {
                     FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()

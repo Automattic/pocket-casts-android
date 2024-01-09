@@ -64,16 +64,27 @@ class AccountDetailsFragment : BaseFragment() {
     }
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var folderManager: FolderManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var searchHistoryManager: SearchHistoryManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var syncManager: SyncManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
@@ -133,7 +144,7 @@ class AccountDetailsFragment : BaseFragment() {
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
                                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
                                 },
-                                modifier = Modifier.padding(top = 16.dp)
+                                modifier = Modifier.padding(top = 16.dp),
                             )
                         }
                     }
@@ -299,7 +310,7 @@ class AccountDetailsFragment : BaseFragment() {
             folderManager = folderManager,
             searchHistoryManager = searchHistoryManager,
             episodeManager = episodeManager,
-            wasInitiatedByUser = true
+            wasInitiatedByUser = true,
         )
         activity?.finish()
     }

@@ -31,7 +31,7 @@ fun RowTextButton(
         textIcon = textIcon,
         fontSize = fontSize,
         tintIcon = tintIcon,
-        onClick = onClick
+        onClick = onClick,
     )
 }
 

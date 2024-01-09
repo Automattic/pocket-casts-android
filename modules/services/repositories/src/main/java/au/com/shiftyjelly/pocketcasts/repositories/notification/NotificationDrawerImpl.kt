@@ -23,8 +23,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,7 +33,7 @@ class NotificationDrawerImpl @Inject constructor(
     private val notificationHelper: NotificationHelper,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : NotificationDrawer {
 
     private val playAction = NotificationCompat.Action(IR.drawable.notification_play, context.getString(LR.string.play), MediaButtonReceiver.buildMediaButtonPendingIntent(context, ACTION_PLAY))
@@ -108,7 +108,7 @@ class NotificationDrawerImpl @Inject constructor(
             episodeUuid = episodeUuid,
             title = podcastTitle,
             text = episode.title,
-            icon = bitmap
+            icon = bitmap,
         )
         notificationData = data
         return data
@@ -118,6 +118,6 @@ class NotificationDrawerImpl @Inject constructor(
         var episodeUuid: String = "",
         var title: String = "",
         var text: String = "",
-        var icon: Bitmap? = null
+        var icon: Bitmap? = null,
     )
 }

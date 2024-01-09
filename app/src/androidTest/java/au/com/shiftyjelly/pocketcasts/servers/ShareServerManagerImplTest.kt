@@ -3,6 +3,11 @@ package au.com.shiftyjelly.pocketcasts.servers
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManagerImpl
 import com.squareup.moshi.Moshi
+import java.net.HttpURLConnection
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
@@ -14,11 +19,6 @@ import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.HttpURLConnection
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
-import java.util.concurrent.TimeUnit
 
 class ShareServerManagerImplTest {
 
@@ -77,9 +77,9 @@ class ShareServerManagerImplTest {
                     podcasts = listOf(
                         Podcast(uuid = "77f1b350-5419-0134-ec2d-0d50f522381b", title = "Heavyweight", author = "Gimlet"),
                         Podcast(uuid = "30817be0-5675-0134-ec37-0d50f522381b", title = "Still Processing", author = "The New York Times"),
-                        Podcast(uuid = "ac371bd0-094f-0134-9ce1-59d98c6b72b8", title = "Revisionist History", author = "Malcolm Gladwell / Panoply")
+                        Podcast(uuid = "ac371bd0-094f-0134-9ce1-59d98c6b72b8", title = "Revisionist History", author = "Malcolm Gladwell / Panoply"),
                     ),
-                    serverSecret = "APP_SERVER_SECRET"
+                    serverSecret = "APP_SERVER_SECRET",
                 )
 
             val request = mockWebServer.takeRequest()
@@ -101,7 +101,7 @@ class ShareServerManagerImplTest {
                     }
                 """.trimIndent(),
                 request.body.readUtf8(),
-                false
+                false,
             )
 
             assertEquals("https://static.pocketcasts.com/share/list/02dcb703-e8b4-4d3d-9cc7-ed7ec8dea2fd.html", url)

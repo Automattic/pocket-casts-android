@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class PodcastsOptionsDialog(
     val fragment: Fragment,
     val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
     private var showDialog: OptionsDialog? = null
     private var sortDialog: OptionsDialog? = null
@@ -36,7 +36,7 @@ class PodcastsOptionsDialog(
                 click = {
                     openSortOptions()
                     trackTapOnModalOption(ModalOption.SORT_BY)
-                }
+                },
             )
             .addToggleOptions(
                 LR.string.podcasts_menu_layout,
@@ -49,7 +49,7 @@ class PodcastsOptionsDialog(
                         settings.podcastGridLayout.set(PodcastGridLayoutType.LARGE_ARTWORK)
                         trackTapOnModalOption(ModalOption.LAYOUT)
                         trackLayoutChanged(PodcastGridLayoutType.LARGE_ARTWORK)
-                    }
+                    },
                 ),
                 ToggleButtonOption(
                     imageId = R.drawable.ic_smallgrid,
@@ -59,7 +59,7 @@ class PodcastsOptionsDialog(
                         settings.podcastGridLayout.set(PodcastGridLayoutType.SMALL_ARTWORK)
                         trackTapOnModalOption(ModalOption.LAYOUT)
                         trackLayoutChanged(PodcastGridLayoutType.SMALL_ARTWORK)
-                    }
+                    },
                 ),
                 ToggleButtonOption(
                     imageId = R.drawable.ic_list,
@@ -69,8 +69,8 @@ class PodcastsOptionsDialog(
                         settings.podcastGridLayout.set(PodcastGridLayoutType.LIST_VIEW)
                         trackTapOnModalOption(ModalOption.LAYOUT)
                         trackLayoutChanged(PodcastGridLayoutType.LIST_VIEW)
-                    }
-                )
+                    },
+                ),
             )
             .addTextOption(
                 titleId = LR.string.podcasts_menu_badges,
@@ -79,7 +79,7 @@ class PodcastsOptionsDialog(
                 click = {
                     openBadgeOptions()
                     trackTapOnModalOption(ModalOption.BADGE)
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.podcasts_menu_share_podcasts,
@@ -87,7 +87,7 @@ class PodcastsOptionsDialog(
                 click = {
                     sharePodcasts()
                     trackTapOnModalOption(ModalOption.SHARE)
-                }
+                },
             )
         fragmentManager?.let {
             dialog.show(it, "podcasts_options_dialog")
@@ -111,7 +111,7 @@ class PodcastsOptionsDialog(
                 click = {
                     settings.podcastsSortType.set(order, needsSync = true)
                     trackSortByChanged(order)
-                }
+                },
             )
         }
         fragmentManager?.let {
@@ -132,7 +132,7 @@ class PodcastsOptionsDialog(
                     val newBadgeType = BadgeType.OFF
                     settings.podcastBadgeType.set(newBadgeType)
                     trackBadgeChanged(newBadgeType)
-                }
+                },
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_all_unfinished,
@@ -141,7 +141,7 @@ class PodcastsOptionsDialog(
                     val newBadgeType = BadgeType.ALL_UNFINISHED
                     settings.podcastBadgeType.set(newBadgeType)
                     trackBadgeChanged(newBadgeType)
-                }
+                },
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_only_latest_episode,
@@ -150,7 +150,7 @@ class PodcastsOptionsDialog(
                     val newBadgeType = BadgeType.LATEST_EPISODE
                     settings.podcastBadgeType.set(newBadgeType)
                     trackBadgeChanged(newBadgeType)
-                }
+                },
             )
         fragmentManager?.let {
             dialog.show(it, "podcasts_badges")

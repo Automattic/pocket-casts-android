@@ -20,19 +20,19 @@ class PocketCastsNetworkingRulesTest {
         assertPrefers(
             input = listOf(Cell, Wifi, BT),
             prefer = listOf(Cell),
-            expectedOutput = Cell
+            expectedOutput = Cell,
         )
 
         assertPrefers(
             input = listOf(Cell, Wifi, BT),
             prefer = listOf(Wifi),
-            expectedOutput = Wifi
+            expectedOutput = Wifi,
         )
 
         assertPrefers(
             input = listOf(Cell, Wifi, BT),
             prefer = listOf(BT),
-            expectedOutput = BT
+            expectedOutput = BT,
         )
     }
 
@@ -41,19 +41,19 @@ class PocketCastsNetworkingRulesTest {
         assertPrefers(
             input = listOf(Wifi, BT),
             prefer = listOf(Cell),
-            expectedOutput = Wifi
+            expectedOutput = Wifi,
         )
 
         assertPrefers(
             input = listOf(BT, Cell),
             prefer = listOf(Wifi),
-            expectedOutput = BT
+            expectedOutput = BT,
         )
 
         assertPrefers(
             input = listOf(Cell, Wifi),
             prefer = listOf(BT),
-            expectedOutput = Cell
+            expectedOutput = Cell,
         )
     }
 
@@ -62,19 +62,19 @@ class PocketCastsNetworkingRulesTest {
         assertPrefers(
             input = listOf(Wifi, BT),
             prefer = listOf(Cell, BT),
-            expectedOutput = BT
+            expectedOutput = BT,
         )
 
         assertPrefers(
             input = listOf(BT, Cell),
             prefer = listOf(Wifi, Cell),
-            expectedOutput = Cell
+            expectedOutput = Cell,
         )
 
         assertPrefers(
             input = listOf(Cell, Wifi),
             prefer = listOf(BT, Cell),
-            expectedOutput = Cell
+            expectedOutput = Cell,
         )
     }
 
@@ -175,7 +175,7 @@ class PocketCastsNetworkingRulesTest {
             }
                 .prefer(*prefer.toTypedArray())
                 ?.networkInfo
-                ?.type
+                ?.type,
         )
     }
 }

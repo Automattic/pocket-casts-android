@@ -39,43 +39,43 @@ fun SearchFolderItem(
     folder: Folder,
     podcasts: List<Podcast>,
     onClick: (() -> Unit)?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val color = MaterialTheme.theme.colors.getFolderColor(folder.color)
     Column(
         modifier = modifier
             .width(FolderImageSize + 16.dp)
             .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
-            .padding(8.dp)
+            .padding(8.dp),
     ) {
         BoxWithConstraints(
             modifier = modifier.aspectRatio(1f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             FolderImageSmall(
                 color = color,
                 podcastUuids = podcasts.map { it.uuid },
                 folderImageSize = FolderImageSize,
-                podcastImageSize = PodcastImageSize
+                podcastImageSize = PodcastImageSize,
             )
 
             val buttonBackgroundColor = Color.Black.copy(alpha = 0.4f)
             Box(
                 contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier.fillMaxSize().padding(8.dp)
+                modifier = Modifier.fillMaxSize().padding(8.dp),
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(SubscribeIconSize)
                         .clip(CircleShape)
-                        .background(buttonBackgroundColor)
+                        .background(buttonBackgroundColor),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_tick),
                         contentDescription = stringResource(LR.string.podcast_subscribed),
                         tint = Color.White,
-                        modifier = Modifier.size(SubscribeIconSize / 1.25f)
+                        modifier = Modifier.size(SubscribeIconSize / 1.25f),
                     )
                 }
             }
@@ -83,7 +83,7 @@ fun SearchFolderItem(
 
         Column(
             modifier = modifier
-                .padding(top = 10.dp)
+                .padding(top = 10.dp),
         ) {
             TextH40(
                 text = folder.name,
@@ -94,14 +94,14 @@ fun SearchFolderItem(
             } else {
                 stringResource(
                     LR.string.podcasts_plural,
-                    podcasts.size
+                    podcasts.size,
                 )
             }
             TextH50(
                 text = podcastCount,
                 maxLines = 1,
                 color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.padding(top = 2.dp)
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
     }

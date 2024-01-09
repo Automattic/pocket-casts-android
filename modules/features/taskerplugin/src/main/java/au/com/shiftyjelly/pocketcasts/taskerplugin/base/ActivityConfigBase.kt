@@ -27,7 +27,7 @@ abstract class ActivityConfigBase<TViewModel : ViewModelBase<*, *, *>> : Compone
                         field.shouldAskForState,
                         { field.value = it },
                         taskerVariables,
-                        field.getPossibleValues()
+                        field.getPossibleValues(),
                     ) {
                         Text(field.getValueDescription(it))
                     }

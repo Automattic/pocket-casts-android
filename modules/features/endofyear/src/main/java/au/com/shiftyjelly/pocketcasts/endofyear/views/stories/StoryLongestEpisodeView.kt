@@ -30,10 +30,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.math.roundToInt
 
 private const val AnimDurationInMs = 1000
 private val animTargetValue = listOf(0.4f, 0.32f, 0.24f, 0.16f, 0.08f, 0f)
@@ -50,9 +50,8 @@ fun StoryLongestEpisodeView(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 30.dp)
+            .padding(vertical = 30.dp),
     ) {
-
         Spacer(modifier = modifier.height(40.dp))
 
         PrimaryText(story)
@@ -104,7 +103,7 @@ private fun PodcastCoverStack(
                         if (!paused) {
                             animOffsetY.animateTo(
                                 targetValue = animTargetValue[i],
-                                animationSpec = animationSpec
+                                animationSpec = animationSpec,
                             )
                         }
                     }
@@ -112,7 +111,7 @@ private fun PodcastCoverStack(
                         if (!paused) {
                             animOffsetX.animateTo(
                                 targetValue = animTargetValue[i],
-                                animationSpec = animationSpec
+                                animationSpec = animationSpec,
                             )
                         }
                     }
@@ -127,7 +126,7 @@ private fun PodcastCoverStack(
                 modifier = Modifier.offset {
                     IntOffset(
                         -(width * animOffsetX.value).roundToInt(),
-                        (width * animOffsetY.value).roundToInt()
+                        (width * animOffsetY.value).roundToInt(),
                     )
                 },
             )
@@ -143,11 +142,11 @@ private fun PrimaryText(
     val context = LocalContext.current
     val timeText = StatsHelper.secondsToFriendlyString(
         story.longestEpisode.duration.toLong(),
-        context.resources
+        context.resources,
     )
     val text = stringResource(
         id = R.string.end_of_year_story_longest_episode_title,
-        timeText
+        timeText,
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
@@ -159,7 +158,8 @@ private fun SecondaryText(
 ) {
     val text = stringResource(
         id = R.string.end_of_year_story_longest_episode_subtitle,
-        story.longestEpisode.title, story.longestEpisode.podcastTitle
+        story.longestEpisode.title,
+        story.longestEpisode.podcastTitle,
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

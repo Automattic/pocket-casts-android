@@ -56,7 +56,6 @@ private const val UNKNOWN_TIER = "unknown_tier"
 fun OnboardingUpgradeBottomSheet(
     onClickSubscribe: () -> Unit,
 ) {
-
     // The keyboard sometimes gets opened when returning from the Google payment flow.
     // This is keeps it closed while on this screen.
     KeepKeyboardClosed()
@@ -76,9 +75,8 @@ fun OnboardingUpgradeBottomSheet(
             .background(Color(0xFF282829))
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
-            .padding(top = 16.dp, bottom = 40.dp)
+            .padding(top = 16.dp, bottom = 40.dp),
     ) {
-
         Pill()
 
         Spacer(Modifier.height(32.dp))
@@ -87,7 +85,7 @@ fun OnboardingUpgradeBottomSheet(
             TextH20(
                 text = stringResource(selectedTier.toSubscribeTitle()),
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = Color.White,
             )
         }
 
@@ -114,7 +112,6 @@ fun OnboardingUpgradeBottomSheet(
                             ?.uppercase(Locale.getDefault())
 
                         Column {
-
                             if (topText == null) {
                                 Spacer(Modifier.height(8.dp))
                             }
@@ -146,7 +143,7 @@ fun OnboardingUpgradeBottomSheet(
                 if (trialPhase != null) {
                     stringResource(
                         LR.string.onboarding_plus_recurring_after_free_trial,
-                        recurringAfterString(trialPhase, resources)
+                        recurringAfterString(trialPhase, resources),
                     )
                 } else {
                     val firstLine = stringResource(state.selectedSubscription.recurringPricingPhase.renews)
@@ -159,7 +156,7 @@ fun OnboardingUpgradeBottomSheet(
                 text = descriptionText,
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             )
 
             AnimatedVisibility(
@@ -177,7 +174,7 @@ fun OnboardingUpgradeBottomSheet(
                     text = stringResource(LR.string.profile_create_subscription_failed),
                     color = Color.Red,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier.padding(top = 16.dp),
                 )
             }
 
@@ -186,7 +183,7 @@ fun OnboardingUpgradeBottomSheet(
                 color = Color(0xFFE4E4E4),
                 modifier = Modifier
                     .padding(vertical = 16.dp)
-                    .alpha(0.24f)
+                    .alpha(0.24f),
             )
 
             UpgradeRowButton(
@@ -195,7 +192,7 @@ fun OnboardingUpgradeBottomSheet(
                         LR.string.onboarding_plus_start_free_trial_and_subscribe
                     } else {
                         LR.string.subscribe
-                    }
+                    },
                 ),
                 backgroundColor = colorResource(state.upgradeButton.backgroundColorRes),
                 textColor = colorResource(state.upgradeButton.textColorRes),
@@ -235,12 +232,12 @@ private fun KeepKeyboardClosed() {
 
 private val animationSpec = tween<IntSize>(
     durationMillis = 600,
-    easing = EaseInOut
+    easing = EaseInOut,
 )
 
 private fun recurringAfterString(
     trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase,
-    res: Resources
+    res: Resources,
 ) = "${trialSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${trialSubscriptionPricingPhase.trialEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {

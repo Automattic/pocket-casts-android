@@ -13,7 +13,7 @@ private val ICON_DRAWABLES = listOf(
     IR.drawable.ic_filters_play,
     IR.drawable.ic_filters_volume,
     IR.drawable.ic_filters_video,
-    IR.drawable.ic_filters_star
+    IR.drawable.ic_filters_star,
 )
 
 private val SHORTCUT_DRAWABLES = listOf(
@@ -24,7 +24,7 @@ private val SHORTCUT_DRAWABLES = listOf(
     IR.drawable.shortcut_play,
     IR.drawable.shortcut_volume,
     IR.drawable.shortcut_video,
-    IR.drawable.shortcut_star
+    IR.drawable.shortcut_star,
 )
 
 private val AUTO_DRAWABLES = arrayOf(
@@ -35,7 +35,7 @@ private val AUTO_DRAWABLES = arrayOf(
     IR.drawable.auto_filter_play,
     IR.drawable.auto_filter_volume,
     IR.drawable.auto_filter_video,
-    IR.drawable.auto_filter_star
+    IR.drawable.auto_filter_star,
 )
 
 private val AUTOMOTIVE_DRAWABLES = arrayOf(
@@ -46,7 +46,7 @@ private val AUTOMOTIVE_DRAWABLES = arrayOf(
     IR.drawable.automotive_filter_play,
     IR.drawable.automotive_filter_volume,
     IR.drawable.automotive_filter_video,
-    IR.drawable.automotive_filter_star
+    IR.drawable.automotive_filter_star,
 )
 
 val Playlist.drawableIndex: Int

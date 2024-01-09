@@ -40,7 +40,7 @@ fun MarqueeTextMediaDisplay(
             modifier = Modifier.fillMaxWidth(0.7f),
             color = MaterialTheme.colors.onBackground,
             style = MaterialTheme.typography.button,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Row(modifier = Modifier.fillMaxWidth(0.8f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             val textStyle = MaterialTheme.typography.caption3
@@ -61,7 +61,7 @@ fun MarqueeTextMediaDisplay(
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                style = textStyle
+                style = textStyle,
             )
         }
     }
@@ -73,6 +73,6 @@ fun MarqueeTextMediaDisplayPreview() {
     MarqueeTextMediaDisplay(
         title = "Title",
         artist = "Artist",
-        isPlaybackError = true
+        isPlaybackError = true,
     )
 }

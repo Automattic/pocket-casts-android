@@ -29,9 +29,8 @@ object OnboardingRecommendationsFlow {
     ) {
         navigation(
             route = this@OnboardingRecommendationsFlow.route,
-            startDestination = start
+            startDestination = start,
         ) {
-
             importFlowGraph(theme, navController, flow)
 
             composable(start) {
@@ -46,7 +45,7 @@ object OnboardingRecommendationsFlow {
                                 Toast.makeText(
                                     this,
                                     this.getString(LR.string.error_check_your_internet_connection),
-                                    Toast.LENGTH_SHORT
+                                    Toast.LENGTH_SHORT,
                                 ).show()
                             }
                         }

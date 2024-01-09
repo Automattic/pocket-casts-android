@@ -36,7 +36,7 @@ private val ButtonPaddingValues = PaddingValues(
     start = ButtonHorizontalPadding,
     top = ButtonVerticalPadding,
     end = ButtonHorizontalPadding,
-    bottom = ButtonVerticalPadding
+    bottom = ButtonVerticalPadding,
 )
 
 data class ButtonTab(
@@ -73,22 +73,22 @@ fun ButtonTabs(
                 onClick = { tab.onClick() },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = backgroundColor
+                    backgroundColor = backgroundColor,
                 ),
                 contentPadding = ButtonPaddingValues,
                 elevation = ButtonDefaults.elevation(
                     defaultElevation = 0.dp,
                     pressedElevation = 0.dp,
-                    focusedElevation = 0.dp
+                    focusedElevation = 0.dp,
                 ),
-                interactionSource = interactionSource
+                interactionSource = interactionSource,
             ) {
                 Text(
                     text = stringResource(tab.labelResId),
                     fontSize = 15.sp,
                     fontWeight = FontWeight(500),
                     letterSpacing = 0.5.sp,
-                    color = textColor
+                    color = textColor,
                 )
             }
             Spacer(Modifier.width(6.dp))
@@ -118,7 +118,7 @@ private fun ButtonTabsPreview(themeType: Theme.ThemeType) {
         ButtonTabs(
             tabs = listOf(episodesTab, bookmarksTab),
             selectedTab = episodesTab,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp),
         )
     }
 }

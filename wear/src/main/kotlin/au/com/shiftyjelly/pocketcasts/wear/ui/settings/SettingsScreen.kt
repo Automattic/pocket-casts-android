@@ -50,7 +50,6 @@ fun SettingsScreen(
     navigateToAbout: () -> Unit,
     navigateToHelp: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<SettingsViewModel>()
     val state by viewModel.state.collectAsState()
 
@@ -82,7 +81,6 @@ private fun Content(
     onHelpClicked: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
-
         item {
             ScreenHeaderChip(LR.string.settings)
         }
@@ -115,7 +113,7 @@ private fun Content(
                 style = MaterialTheme.typography.caption3,
                 color = MaterialTheme.colors.onSecondary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
             )
         }
 
@@ -137,7 +135,7 @@ private fun Content(
                         contentDescription = null,
                         modifier = Modifier.graphicsLayer {
                             rotationZ = rotation.value
-                        }
+                        },
                     )
                 },
                 onClick = onRefreshClicked,
@@ -178,7 +176,7 @@ private fun Content(
             WatchListChip(
                 title = stringResource(LR.string.settings_title_help),
                 iconRes = IR.drawable.ic_help,
-                onClick = onHelpClicked
+                onClick = onHelpClicked,
             )
         }
 
@@ -186,7 +184,7 @@ private fun Content(
             WatchListChip(
                 title = stringResource(LR.string.settings_title_about),
                 iconRes = SR.drawable.settings_about,
-                onClick = onAboutClicked
+                onClick = onAboutClicked,
             )
         }
     }
@@ -201,15 +199,13 @@ private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animat
         }
 
         if (anim.value == 0f && state == RefreshState.Refreshing) {
-
             // We're at 0 and we're refreshing, so start animating
 
             anim.animateTo(
                 targetValue = 360f,
-                animationSpec = tween(durationMillis, easing = LinearEasing)
+                animationSpec = tween(durationMillis, easing = LinearEasing),
             )
         } else if (anim.value != 0f && state != RefreshState.Refreshing) {
-
             // No longer refreshing but we're not at 0 so continue animating until
             // we're back at 0 to keep things smooth (i.e., if a second refresh is
             // later initiated, we won't have a "jump" back to 0)
@@ -220,7 +216,7 @@ private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animat
 
             anim.animateTo(
                 targetValue = 360f,
-                animationSpec = tween(timeLeft, easing = LinearEasing)
+                animationSpec = tween(timeLeft, easing = LinearEasing),
             )
         }
     }

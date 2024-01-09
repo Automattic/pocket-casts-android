@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 class ChapterProgressBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
     var progress: Float = 0.0f

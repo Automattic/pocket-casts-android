@@ -51,7 +51,7 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
                 }
             }
             InputControlPlayback.PlaybackCommand.PlayNextInQueue -> playbackManager.playNextInQueue(
-                SourceView.TASKER
+                SourceView.TASKER,
             )
             InputControlPlayback.PlaybackCommand.SetPlaybackSpeed -> {
                 val speed = input.regular.playbackSpeed?.toDoubleOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_PLAYBACK_SPEED_PROVIDED, context.getString(R.string.playback_speed_not_valid, input.regular.playbackSpeed))

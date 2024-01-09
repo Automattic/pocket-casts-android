@@ -15,13 +15,13 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -112,7 +112,8 @@ class WhatsNewViewModel @Inject constructor(
 
         val showJoinBeta = when (relativeToEarlyPatronAccess) {
             EarlyAccessState.Before,
-            EarlyAccessState.During -> isReleaseCandidate
+            EarlyAccessState.During,
+            -> isReleaseCandidate
             EarlyAccessState.After -> false
             null -> false
         }

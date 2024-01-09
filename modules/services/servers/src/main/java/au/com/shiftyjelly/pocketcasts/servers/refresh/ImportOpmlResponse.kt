@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 data class ImportOpmlResponse(
     @field:Json(name = "uuids") val uuids: List<String>,
     @field:Json(name = "poll_uuids") val pollUuids: List<String>,
-    @field:Json(name = "failed") var failed: Int
+    @field:Json(name = "failed") var failed: Int,
 )

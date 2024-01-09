@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.search.SearchHandler
 import au.com.shiftyjelly.pocketcasts.search.SearchState
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,7 +25,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -40,7 +40,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
             searchQuery = "",
             results = emptyList(),
             loading = false,
-        )
+        ),
     )
     val state: StateFlow<State> = _state
 
@@ -69,7 +69,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
 
             combine(
                 subscribedUuidFlow,
-                searchHandler.searchResults.asFlow()
+                searchHandler.searchResults.asFlow(),
             ) { subscribedUuids, searchState ->
 
                 val podcasts = when (searchState) {
@@ -102,7 +102,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         }
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_SHOWN,
-            mapOf(AnalyticsProp.SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue)
+            mapOf(AnalyticsProp.SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue),
         )
     }
 
@@ -118,7 +118,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
             Toast.makeText(
                 context,
                 context.getString(LR.string.error_check_your_internet_connection),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             ).show()
         }
     }
@@ -143,7 +143,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                     } else {
                         podcast
                     }
-                }
+                },
             )
         }
     }
@@ -151,7 +151,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     fun onBackPressed() {
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_DISMISSED,
-            mapOf(AnalyticsProp.SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue)
+            mapOf(AnalyticsProp.SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS.analyticsValue),
         )
     }
 

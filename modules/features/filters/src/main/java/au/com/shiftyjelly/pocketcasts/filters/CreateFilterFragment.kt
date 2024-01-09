@@ -33,11 +33,11 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.addAfterTextChanged
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -59,7 +59,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         fun newInstance(mode: Mode): CreateFilterFragment {
             return CreateFilterFragment().apply {
                 arguments = bundleOf(
-                    ARG_MODE to mode.string, ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid
+                    ARG_MODE to mode.string, ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid,
                 )
             }
         }
@@ -105,7 +105,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
                 viewModel.saveFilter(
                     iconIndex = selectedIconIndex,
                     colorIndex = colorAdapter.selectedIndex,
-                    isCreatingNewFilter = isCreate
+                    isCreatingNewFilter = isCreate,
                 )
                 viewModel.reset()
             }

@@ -64,12 +64,14 @@ private fun Content(
     val startDestination = when (flow) {
         OnboardingFlow.LoggedOut,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-        OnboardingFlow.InitialOnboarding -> OnboardingNavRoute.logInOrSignUp
+        OnboardingFlow.InitialOnboarding,
+        -> OnboardingNavRoute.logInOrSignUp
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
         is OnboardingFlow.PlusAccountUpgrade,
-        is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
+        is OnboardingFlow.PlusFlow,
+        -> OnboardingNavRoute.PlusUpgrade.route
     }
 
     val onAccountCreated = {
@@ -82,7 +84,6 @@ private fun Content(
     }
 
     NavHost(navController, startDestination) {
-
         importFlowGraph(theme, navController, flow)
 
         onboardingRecommendationsFlowGraph(
@@ -95,7 +96,7 @@ private fun Content(
                         OnboardingNavRoute.welcome
                     } else {
                         OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
-                    }
+                    },
                 )
             },
             navController = navController,
@@ -109,10 +110,12 @@ private fun Content(
                     when (flow) {
                         // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
                         is OnboardingFlow.PlusAccountUpgrade,
-                        is OnboardingFlow.PatronAccountUpgrade -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
+                        is OnboardingFlow.PatronAccountUpgrade,
+                        -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
 
                         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                        is OnboardingFlow.Upsell -> {
+                        is OnboardingFlow.Upsell,
+                        -> {
                             val popped = navController.popBackStack()
                             if (!popped) {
                                 exitOnboarding()
@@ -120,7 +123,8 @@ private fun Content(
                         }
 
                         OnboardingFlow.InitialOnboarding,
-                        OnboardingFlow.LoggedOut -> exitOnboarding()
+                        OnboardingFlow.LoggedOut,
+                        -> exitOnboarding()
                     }
                 },
                 onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
@@ -180,8 +184,8 @@ private fun Content(
                         is OnboardingFlow.Upsell -> flow.showPatronOnly
                         else -> false
                     }
-                }
-            )
+                },
+            ),
         ) { navBackStackEntry ->
 
             val upgradeSource = navBackStackEntry.arguments
@@ -200,7 +204,8 @@ private fun Content(
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.BOOKMARKS,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
-                OnboardingUpgradeSource.END_OF_YEAR -> false
+                OnboardingUpgradeSource.END_OF_YEAR,
+                -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }
@@ -223,7 +228,7 @@ private fun Content(
                     } else {
                         exitOnboarding()
                     }
-                }
+                },
             )
         }
 
@@ -251,17 +256,19 @@ private fun Content(
 private fun onLoginToExistingAccount(
     flow: OnboardingFlow,
     exitOnboarding: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     when (flow) {
         OnboardingFlow.InitialOnboarding,
-        OnboardingFlow.LoggedOut -> exitOnboarding()
+        OnboardingFlow.LoggedOut,
+        -> exitOnboarding()
 
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-        is OnboardingFlow.Upsell -> navController.navigate(
-            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
+        is OnboardingFlow.Upsell,
+        -> navController.navigate(
+            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN),
         ) {
             // clear backstack after successful login
             popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
@@ -283,6 +290,7 @@ object OnboardingNavRoute {
 
         const val sourceArgumentKey = "source"
         const val showPatronOnlyArgumentKey = "show_patron_only"
+
         // The route variable should only be used to navigate to the PlusUpgrade screens
         // when they are the startDestination and the args for these startDestinations are set using default values.
         // They are parsed based on this deep-link-like route by the navigation component.

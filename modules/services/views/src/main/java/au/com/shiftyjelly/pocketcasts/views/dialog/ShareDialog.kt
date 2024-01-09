@@ -18,7 +18,7 @@ class ShareDialog(
     private val context: Context?,
     private val shouldShowPodcast: Boolean = true,
     private val forceDarkTheme: Boolean = false,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
 
     init {
@@ -48,9 +48,9 @@ class ShareDialog(
                         context,
                         ShareType.PODCAST,
                         sourceView,
-                        analyticsTracker
+                        analyticsTracker,
                     ).showShareDialogDirect()
-                }
+                },
             )
         }
         if (episode != null) {
@@ -64,9 +64,9 @@ class ShareDialog(
                         context,
                         ShareType.EPISODE,
                         sourceView,
-                        analyticsTracker
+                        analyticsTracker,
                     ).showShareDialogDirect()
-                }
+                },
             )
             dialog.addCheckedOption(
                 titleId = LR.string.podcast_share_current_position,
@@ -78,9 +78,9 @@ class ShareDialog(
                         context,
                         ShareType.CURRENT_TIME,
                         sourceView,
-                        analyticsTracker
+                        analyticsTracker,
                     ).showShareDialogDirect()
-                }
+                },
             )
             if (episode.isDownloaded) {
                 dialog.addCheckedOption(
@@ -93,9 +93,9 @@ class ShareDialog(
                             context,
                             ShareType.EPISODE_FILE,
                             sourceView,
-                            analyticsTracker
+                            analyticsTracker,
                         ).sendFile()
-                    }
+                    },
                 )
             }
         }

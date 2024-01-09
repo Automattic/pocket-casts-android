@@ -19,6 +19,9 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,9 +29,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
-import java.io.File
-import java.util.*
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -97,7 +97,7 @@ class StorageSettingsViewModel
                 .collect { downloadedEpisodes ->
                     val downloadSize = downloadedEpisodes.sumOf { it.sizeInBytes }
                     mutableState.value = mutableState.value.copy(
-                        downloadedFilesState = mutableState.value.downloadedFilesState.copy(size = downloadSize)
+                        downloadedFilesState = mutableState.value.downloadedFilesState.copy(size = downloadSize),
                     )
                 }
         }
@@ -114,7 +114,7 @@ class StorageSettingsViewModel
                     AnalyticsEvent.SETTINGS_STORAGE_LOCATION,
                     mapOf("location" to folderLocation.analyticsLabel),
                 )
-            }
+            },
         ),
         storageFolderState = State.StorageFolderState(
             isVisible = settings.usingCustomFolderStorage(),
@@ -122,7 +122,7 @@ class StorageSettingsViewModel
             onStateChange = {
                 onStorageFolderChange(it)
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SET_FOLDER_LOCATION)
-            }
+            },
         ),
         backgroundRefreshState = State.BackgroundRefreshState(
             summary = backgroundRefreshSummary,
@@ -131,9 +131,9 @@ class StorageSettingsViewModel
                 onBackgroundRefreshCheckedChange(it)
                 analyticsTracker.track(
                     AnalyticsEvent.SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED,
-                    mapOf("enabled" to it)
+                    mapOf("enabled" to it),
                 )
-            }
+            },
         ),
         storageDataWarningState = State.StorageDataWarningState(
             isChecked = settings.warnOnMeteredNetwork.value,
@@ -141,9 +141,9 @@ class StorageSettingsViewModel
                 onStorageDataWarningCheckedChange(it)
                 analyticsTracker.track(
                     AnalyticsEvent.SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED,
-                    mapOf("enabled" to it)
+                    mapOf("enabled" to it),
                 )
-            }
+            },
         ),
     )
 
@@ -169,7 +169,7 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             storageDataWarningState = mutableState.value.storageDataWarningState.copy(
                 isChecked = settings.warnOnMeteredNetwork.value,
-            )
+            ),
         )
     }
 
@@ -182,8 +182,8 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             backgroundRefreshState = mutableState.value.backgroundRefreshState.copy(
                 isChecked = settings.backgroundRefreshPodcasts.value,
-                summary = backgroundRefreshSummary
-            )
+                summary = backgroundRefreshSummary,
+            ),
         )
     }
 
@@ -199,8 +199,8 @@ class StorageSettingsViewModel
                     FolderLocation(
                         label = context.getString(LR.string.settings_storage_custom_folder),
                         filePath = Settings.STORAGE_ON_CUSTOM_FOLDER,
-                        analyticsLabel = "custom"
-                    )
+                        analyticsLabel = "custom",
+                    ),
                 )
             }
         }
@@ -208,7 +208,7 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
                 choices = choices,
-            )
+            ),
         )
 
         updateStorageLabels()
@@ -228,7 +228,7 @@ class StorageSettingsViewModel
                         createAlertDialogState(
                             title = context.getString(LR.string.settings_storage_folder_change_failed) + " " + e.message,
                             message = LR.string.settings_storage_android_10_custom,
-                        )
+                        ),
                     )
                     return@launch
                 }
@@ -255,15 +255,15 @@ class StorageSettingsViewModel
             val folderPaths = mutableState.value.storageChoiceState.choices.map { it.filePath }
             mutableState.value = mutableState.value.copy(
                 storageChoiceState = mutableState.value.storageChoiceState.copy(
-                    summary = folderPaths.firstOrNull() ?: ""
-                )
+                    summary = folderPaths.firstOrNull() ?: "",
+                ),
             )
             viewModelScope.launch {
                 mutableAlertDialog.emit(
                     createAlertDialogState(
                         title = context.getString(LR.string.settings_storage_folder_write_failed),
                         message = LR.string.settings_storage_android_10_custom,
-                    )
+                    ),
                 )
             }
         }
@@ -324,7 +324,7 @@ class StorageSettingsViewModel
         if (oldDirectory == null || newDirectory != oldDirectory) {
             viewModelScope.launch {
                 mutableAlertDialog.emit(
-                    createStorageMoveLocationAlertDialogState(oldDirectory, newDirectory)
+                    createStorageMoveLocationAlertDialogState(oldDirectory, newDirectory),
                 )
             }
         }
@@ -336,7 +336,7 @@ class StorageSettingsViewModel
         }
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
-            "Moving storage from $oldDirectory to $newDirectory"
+            "Moving storage from $oldDirectory to $newDirectory",
         )
         viewModelScope.launch(Dispatchers.IO) {
             mutableProgressDialog.emit(true)
@@ -344,7 +344,7 @@ class StorageSettingsViewModel
                 File(oldDirectory),
                 File(newDirectory),
                 podcastManager,
-                episodeManager
+                episodeManager,
             )
             mutableProgressDialog.emit(false)
         }
@@ -354,12 +354,12 @@ class StorageSettingsViewModel
     private fun updateStorageLabels() {
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
-                summary = storageChoiceSummary
+                summary = storageChoiceSummary,
             ),
             storageFolderState = mutableState.value.storageFolderState.copy(
                 isVisible = settings.usingCustomFolderStorage(),
-                summary = storageFolderSummary
-            )
+                summary = storageFolderSummary,
+            ),
         )
     }
 
@@ -379,16 +379,16 @@ class StorageSettingsViewModel
         buttons = listOf(
             DialogButtonState(
                 text = context.getString(LR.string.settings_storage_move_cancel).uppercase(
-                    Locale.getDefault()
+                    Locale.getDefault(),
                 ),
-                onClick = {}
+                onClick = {},
 
             ),
             DialogButtonState(
                 text = context.getString(LR.string.settings_storage_move),
                 onClick = { movePodcasts(oldDirectory, newDirectory) },
-            )
-        )
+            ),
+        ),
     )
 
     private fun createAlertDialogState(
@@ -400,15 +400,15 @@ class StorageSettingsViewModel
         buttons = listOf(
             DialogButtonState(
                 text = context.getString(LR.string.cancel).uppercase(
-                    Locale.getDefault()
+                    Locale.getDefault(),
                 ),
-                onClick = {}
+                onClick = {},
             ),
             DialogButtonState(
                 text = context.getString(LR.string.ok),
-                onClick = {}
-            )
-        )
+                onClick = {},
+            ),
+        ),
     )
 
     fun onShown() {
@@ -430,13 +430,13 @@ class StorageSettingsViewModel
             val title: String? = null,
             val summary: String? = null,
             val choices: List<FolderLocation> = emptyList(),
-            val onStateChange: (FolderLocation) -> Unit
+            val onStateChange: (FolderLocation) -> Unit,
         )
 
         data class StorageFolderState(
             val isVisible: Boolean = false,
             val summary: String? = null,
-            val onStateChange: (newPath: String?) -> Unit
+            val onStateChange: (newPath: String?) -> Unit,
         )
 
         data class BackgroundRefreshState(

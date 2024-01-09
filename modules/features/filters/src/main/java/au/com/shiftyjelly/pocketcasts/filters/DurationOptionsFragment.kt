@@ -19,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
@@ -71,14 +71,14 @@ class DurationOptionsFragment : BaseFragment() {
             TimeHelper.getTimeDurationShortString(
                 timeMs = (it.toDouble() * 60000).toLong(),
                 context = context,
-                emptyString = context?.getString(LR.string.time_short_seconds, 0) ?: ""
+                emptyString = context?.getString(LR.string.time_short_seconds, 0) ?: "",
             )
         }
         val voiceOverFormatter: (Int) -> String = {
             TimeHelper.getTimeDurationString(
                 timeMs = (it.toDouble() * 60000).toLong(),
                 context = context,
-                emptyString = context?.getString(LR.string.seconds_plural, 0) ?: ""
+                emptyString = context?.getString(LR.string.seconds_plural, 0) ?: "",
             )
         }
         stepperLongerThan.formatter = formatter
@@ -150,9 +150,11 @@ class DurationOptionsFragment : BaseFragment() {
                     val userPlaylistUpdate = if (userChanged) {
                         UserPlaylistUpdate(
                             listOf(PlaylistProperty.Duration),
-                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST,
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                     playlistManager.update(playlist, userPlaylistUpdate)
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@DurationOptionsFragment) }
                 }

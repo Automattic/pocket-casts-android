@@ -61,7 +61,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             R.attr.filter_09,
             R.attr.filter_10,
             R.attr.filter_11,
-            R.attr.filter_12
+            R.attr.filter_12,
         )
     }
 
@@ -81,7 +81,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme0,
             defaultLightIcons = false,
             darkTheme = false,
-            isPlus = false
+            isPlus = false,
         ),
         DARK(
             themeSetting = ThemeSetting.DARK,
@@ -90,7 +90,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme1,
             defaultLightIcons = true,
             darkTheme = true,
-            isPlus = false
+            isPlus = false,
         ),
         ROSE(
             themeSetting = ThemeSetting.ROSE,
@@ -99,7 +99,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_theme_rose,
             defaultLightIcons = false,
             darkTheme = false,
-            isPlus = false
+            isPlus = false,
         ),
         INDIGO(
             themeSetting = ThemeSetting.INDIGO,
@@ -108,7 +108,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_indigo,
             defaultLightIcons = true,
             darkTheme = false,
-            isPlus = false
+            isPlus = false,
         ),
         EXTRA_DARK(
             themeSetting = ThemeSetting.EXTRA_DARK,
@@ -117,7 +117,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme2,
             defaultLightIcons = true,
             darkTheme = true,
-            isPlus = false
+            isPlus = false,
         ),
         DARK_CONTRAST(
             themeSetting = ThemeSetting.DARK_CONTRAST,
@@ -126,7 +126,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme6,
             defaultLightIcons = true,
             darkTheme = true,
-            isPlus = false
+            isPlus = false,
         ),
         LIGHT_CONTRAST(
             themeSetting = ThemeSetting.LIGHT_CONTRAST,
@@ -135,7 +135,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme7,
             defaultLightIcons = false,
             darkTheme = false,
-            isPlus = false
+            isPlus = false,
         ),
         ELECTRIC(
             themeSetting = ThemeSetting.ELECTRIC,
@@ -144,7 +144,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme5,
             defaultLightIcons = true,
             darkTheme = true,
-            isPlus = true
+            isPlus = true,
         ),
         CLASSIC_LIGHT(
             themeSetting = ThemeSetting.CLASSIC_LIGHT,
@@ -153,7 +153,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_apptheme3,
             defaultLightIcons = true,
             darkTheme = false,
-            isPlus = true
+            isPlus = true,
         ),
         RADIOACTIVE(
             themeSetting = ThemeSetting.RADIOACTIVE,
@@ -162,8 +162,9 @@ class Theme @Inject constructor(private val settings: Settings) {
             iconResourceId = IR.drawable.ic_theme_radioactive,
             defaultLightIcons = true,
             darkTheme = true,
-            isPlus = true
-        );
+            isPlus = true,
+        ),
+        ;
 
         companion object {
             fun fromThemeSetting(themeSetting: ThemeSetting): ThemeType = when (themeSetting) {

@@ -22,7 +22,7 @@ sealed interface Subscription {
         override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val productDetails: ProductDetails,
-        override val offerToken: String
+        override val offerToken: String,
     ) : Subscription {
         override val trialPricingPhase = null
         override fun numFreeThenPricePerPeriod(res: Resources): String? = null
@@ -34,7 +34,7 @@ sealed interface Subscription {
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails,
-        override val offerToken: String
+        override val offerToken: String,
     ) : Subscription {
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
@@ -44,7 +44,7 @@ sealed interface Subscription {
             return res.getString(
                 stringRes,
                 trialPricingPhase.periodValuePlural(res),
-                recurringPricingPhase.formattedPrice
+                recurringPricingPhase.formattedPrice,
             )
         }
 
@@ -56,7 +56,7 @@ sealed interface Subscription {
             return res.getString(
                 stringRes,
                 trialPricingPhase.periodValuePlural(res),
-                recurringPricingPhase.formattedPrice
+                recurringPricingPhase.formattedPrice,
             )
         }
     }
@@ -64,7 +64,8 @@ sealed interface Subscription {
     enum class SubscriptionTier {
         PLUS,
         PATRON,
-        UNKNOWN;
+        UNKNOWN,
+        ;
 
         companion object {
             fun fromUserTier(userTier: UserTier) = when (userTier) {

@@ -107,7 +107,7 @@ sealed interface SwipeButton {
                 episode = episode,
                 swipeSource = swipeSource,
                 fragmentManager = fragmentManager,
-                onDismiss = { onItemModified(episode, rowIndex) }
+                onDismiss = { onItemModified(episode, rowIndex) },
             )
         }
     }

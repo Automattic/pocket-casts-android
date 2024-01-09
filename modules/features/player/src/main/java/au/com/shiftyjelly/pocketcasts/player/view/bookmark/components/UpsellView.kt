@@ -66,13 +66,13 @@ private fun UpsellViewContent(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clearAndSetSemantics { contentDescription = description }
+                    .clearAndSetSemantics { contentDescription = description },
             ) {
                 HorizontalLogoText()
                 Spacer(modifier = Modifier.width(8.dp))
                 SubscriptionBadgeForTier(
                     tier = state.freeTrial.subscriptionTier,
-                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 )
             }
         },
@@ -81,7 +81,7 @@ private fun UpsellViewContent(
         ),
         buttonTitle = UpsellButtonTitle(
             state.freeTrial.subscriptionTier,
-            state.freeTrial.exists
+            state.freeTrial.exists,
         ),
         buttonAction = onClick,
         style = style,
@@ -99,7 +99,7 @@ private fun SubscriptionTier.getContentDescription() = when (this) {
 private fun getMessage(
     showEarlyAccessMessage: Boolean,
 ) = if (showEarlyAccessMessage) {
-    stringResource(LR.string.bookmarks_upsell_instructions_early_access,)
+    stringResource(LR.string.bookmarks_upsell_instructions_early_access)
 } else {
     stringResource(LR.string.bookmarks_upsell_instructions)
 }

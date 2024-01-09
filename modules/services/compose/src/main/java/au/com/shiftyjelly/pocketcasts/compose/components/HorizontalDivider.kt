@@ -16,13 +16,13 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
-    startIndent: Dp = 0.dp
+    startIndent: Dp = 0.dp,
 ) {
     Divider(
         modifier = modifier,
         color = MaterialTheme.theme.colors.primaryUi05,
         thickness = 1.dp,
-        startIndent = startIndent
+        startIndent = startIndent,
     )
 }
 

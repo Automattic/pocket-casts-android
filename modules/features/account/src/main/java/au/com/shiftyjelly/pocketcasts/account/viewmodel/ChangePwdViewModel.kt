@@ -4,14 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class ChangePwdViewModel
 @Inject constructor(
-    private val syncManager: SyncManager
+    private val syncManager: SyncManager,
 ) : AccountViewModel() {
 
     val pwdCurrent = MutableLiveData<String>().apply { postValue("") }
@@ -96,7 +96,7 @@ class ChangePwdViewModel
             try {
                 syncManager.updatePassword(
                     newPassword = pwdNewString,
-                    oldPassword = pwdCurrentString
+                    oldPassword = pwdCurrentString,
                 )
                 changePasswordState.postValue(ChangePasswordState.Success("OK"))
             } catch (ex: Exception) {
@@ -111,7 +111,7 @@ enum class ChangePasswordError {
     INVALID_PASSWORD_CURRENT,
     INVALID_PASSWORD_NEW,
     INVALID_PASSWORD_CONFIRM,
-    SERVER
+    SERVER,
 }
 
 sealed class ChangePasswordState {

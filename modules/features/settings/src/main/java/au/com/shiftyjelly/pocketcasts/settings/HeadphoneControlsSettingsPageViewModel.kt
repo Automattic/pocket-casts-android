@@ -15,13 +15,13 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
@@ -77,7 +77,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     fun onConfirmationSoundChanged(playConfirmationSound: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_CONFIRMATION_SOUND,
-            mapOf("value" to playConfirmationSound)
+            mapOf("value" to playConfirmationSound),
         )
     }
 
@@ -115,10 +115,12 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     private fun HeadphoneAction.canSave() = when (this) {
         HeadphoneAction.SKIP_BACK,
-        HeadphoneAction.SKIP_FORWARD, -> true
+        HeadphoneAction.SKIP_FORWARD,
+        -> true
         HeadphoneAction.ADD_BOOKMARK -> state.value.isAddBookmarkEnabled
         HeadphoneAction.NEXT_CHAPTER,
-        HeadphoneAction.PREVIOUS_CHAPTER -> {
+        HeadphoneAction.PREVIOUS_CHAPTER,
+        -> {
             Timber.e("Headphone action not supported")
             false
         }

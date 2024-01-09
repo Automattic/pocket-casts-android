@@ -8,9 +8,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class AdvancedSettingsViewModel
@@ -33,11 +33,11 @@ class AdvancedSettingsViewModel
                     onSyncOnMeteredCheckedChange(it)
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_ADVANCED_SYNC_ON_METERED,
-                        mapOf("enabled" to it)
+                        mapOf("enabled" to it),
                     )
                 }
-            }
-        )
+            },
+        ),
     )
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
@@ -51,8 +51,8 @@ class AdvancedSettingsViewModel
     private fun updateSyncOnMeteredState() {
         mutableState.value = mutableState.value.copy(
             backgroundSyncOnMeteredState = mutableState.value.backgroundSyncOnMeteredState.copy(
-                isChecked = settings.syncOnMeteredNetwork()
-            )
+                isChecked = settings.syncOnMeteredNetwork(),
+            ),
         )
     }
 
@@ -61,7 +61,7 @@ class AdvancedSettingsViewModel
     }
 
     data class State(
-        val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState
+        val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState,
     ) {
 
         data class BackgroundSyncOnMeteredState(

@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 object NowPlayingPager {
     const val pageCount = 3
 }
+
 /**
  * Pager with three pages:
  *
@@ -41,7 +42,6 @@ fun NowPlayingPager(
     scrollableScaffoldContext: ScrollableScaffoldContext? = null,
     firstPageContent: @Composable () -> Unit,
 ) {
-
     val defaultTimeTextMode = remember { scrollableScaffoldContext?.timeTextMode }
 
     // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
@@ -66,20 +66,17 @@ fun NowPlayingPager(
 
     PagerScreen(
         state = pagerState,
-        modifier = modifier
+        modifier = modifier,
     ) { page ->
         when (page) {
-
             0 -> firstPageContent()
 
             1 -> Column {
-
                 val coroutineScope = rememberCoroutineScope()
 
                 NowPlayingScreen(
                     navigateToEpisode = { episodeUuid ->
                         coroutineScope.launch {
-
                             val alreadyOnEpisodeScreen =
                                 navController.currentDestination?.route == EpisodeScreenFlow.episodeScreen
                             val alreadyOnCorrectEpisode by lazy {

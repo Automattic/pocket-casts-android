@@ -9,10 +9,10 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.google.android.play.core.review.ReviewManager
-import kotlinx.coroutines.delay
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.delay
+import timber.log.Timber
 
 @Singleton
 class InAppReviewHelper @Inject constructor(
@@ -30,7 +30,9 @@ class InAppReviewHelper @Inject constructor(
     ) {
         if (!featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED) ||
             settings.getReviewRequestedDates().isNotEmpty()
-        ) return
+        ) {
+            return
+        }
         delay(delayInMs)
         try {
             val flow = reviewManager.requestReviewFlow()
@@ -38,7 +40,7 @@ class InAppReviewHelper @Inject constructor(
                 if (request.isSuccessful) {
                     analyticsTracker.track(
                         AnalyticsEvent.APP_STORE_REVIEW_REQUESTED,
-                        AnalyticsProp.addSource(sourceView)
+                        AnalyticsProp.addSource(sourceView),
                     )
                     settings.addReviewRequestedDate()
                     reviewManager.launchReviewFlow(activity, request.result)

@@ -23,10 +23,10 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -45,7 +45,7 @@ class WarningsHelper @Inject constructor(
     fun streamingWarningDialog(
         episode: BaseEpisode,
         snackbarParentView: View? = null,
-        sourceView: SourceView
+        sourceView: SourceView,
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             applicationScope.launch {
@@ -132,7 +132,7 @@ class WarningsHelper @Inject constructor(
             val fragmentHostListener = activity as FragmentHostListener
             showBatteryWarningSnackbar(
                 snackbarParentView = snackbarParentView ?: fragmentHostListener.snackBarView(),
-                openFragment = { fragmentHostListener.showBottomSheet(it) }
+                openFragment = { fragmentHostListener.showBottomSheet(it) },
             )
         }
     }
@@ -141,18 +141,18 @@ class WarningsHelper @Inject constructor(
     @SuppressLint("WrongConstant")
     private fun showBatteryWarningSnackbar(
         snackbarParentView: View,
-        openFragment: (Fragment) -> Unit
+        openFragment: (Fragment) -> Unit,
     ) {
         // Setting an extra-long duration since this is such a high-priority notification
         val snackbar = Snackbar.make(
             snackbarParentView,
             LR.string.player_battery_warning_snackbar,
-            EXTRA_LONG_SNACKBAR_DURATION_MS
+            EXTRA_LONG_SNACKBAR_DURATION_MS,
         )
 
         snackbar.setAction(
             snackbarParentView.resources.getString(LR.string.player_battery_warning_snackbar_action)
-                .uppercase(Locale.getDefault())
+                .uppercase(Locale.getDefault()),
         ) {
             val fragment = BatteryRestrictionsSettingsFragment.newInstance(closeButton = true)
             openFragment(fragment)

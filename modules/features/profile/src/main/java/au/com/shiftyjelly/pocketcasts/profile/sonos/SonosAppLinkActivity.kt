@@ -14,12 +14,12 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -38,7 +38,9 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var syncManager: SyncManager
 
     private lateinit var sonosState: String
@@ -61,7 +63,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
             navigationIcon = NavigationIcon.Close,
             onNavigationClick = { finish() },
             activity = this,
-            theme = theme
+            theme = theme,
         )
 
         intent.getStringExtra(SONOS_STATE_EXTRA)?.let {

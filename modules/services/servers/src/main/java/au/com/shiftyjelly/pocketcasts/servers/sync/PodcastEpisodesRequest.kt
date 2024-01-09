@@ -5,5 +5,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PodcastEpisodesRequest(
-    @field:Json(name = "uuid") val podcastUuid: String
+    @field:Json(name = "uuid") val podcastUuid: String,
 )
