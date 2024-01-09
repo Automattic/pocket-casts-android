@@ -1,99 +1,68 @@
-package au.com.shiftyjelly.pocketcasts.repositories.playback;
+package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.media.audiofx.Equalizer;
-import android.media.audiofx.LoudnessEnhancer;
+import android.media.audiofx.Equalizer
+import android.media.audiofx.LoudnessEnhancer
+import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import timber.log.Timber
 
-import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager;
-import timber.log.Timber;
+class ShiftyCustomAudio(
+    private val statsManager: StatsManager,
+) {
+    private var enhancer: LoudnessEnhancer? = null
+    private var equalizer: Equalizer? = null
+    private var boostVolume = false
+    var playbackSpeed = 0f
 
-public class ShiftyCustomAudio {
-    private static final int LOUDNESS_TARGET_GAIN = 1000;
-
-    private boolean boostVolume;
-    private float playbackSpeed = 0;
-
-    private LoudnessEnhancer enhancer;
-    private Equalizer equalizer;
-    private final StatsManager statsManager;
-
-    public ShiftyCustomAudio(StatsManager statsManager) {
-        this.statsManager = statsManager;
+    fun setBoostVolume(boostVolume: Boolean) {
+        this.boostVolume = boostVolume
+        enhancer?.setEnabled(boostVolume)
+        equalizer?.setEnabled(boostVolume)
     }
 
-    public void setPlaybackSpeed(float playbackSpeed) {
-        this.playbackSpeed = playbackSpeed;
-    }
-
-    public float getPlaybackSpeed() {
-        return playbackSpeed;
-    }
-
-    public void setBoostVolume(boolean boostVolume) {
-        this.boostVolume = boostVolume;
-
-        if (enhancer != null) {
-            enhancer.setEnabled(boostVolume);
-        }
-        if (equalizer != null) {
-            equalizer.setEnabled(boostVolume);
-        }
-    }
-
-    public void setupVolumeBoost(int audioSessionId) {
+    fun setupVolumeBoost(audioSessionId: Int) {
         try {
-            enhancer = new LoudnessEnhancer(audioSessionId);
-            enhancer.setTargetGain(LOUDNESS_TARGET_GAIN);
-            enhancer.setEnabled(boostVolume);
-
+            enhancer = LoudnessEnhancer(audioSessionId).apply {
+                setTargetGain(LOUDNESS_TARGET_GAIN)
+                enabled = boostVolume
+            }
+        } catch (e: Exception) {
+            // Some devices don't support the loudness enhancer. They'll throw an exception when you try and create one.
+            // Samsung S5 and LG G3 both do this. Seems to work on the Nexus devices mainly.
+            Timber.e(e, "Failed to create loudness enhancer")
         }
-        catch (Exception e) {
-            //some devices don't support the loudness enhancer, they'll throw an exception when you try and create one
-            //Samsung S5 and LG G3 both do this, seems to work on the Nexus devices mainly
-        }
 
-        //as a fallback, if we can't create a loudness enhancer, create an equilizer which boosts voice
         if (enhancer == null) {
             try {
-                equalizer = new Equalizer(0, audioSessionId);
-                short bands = equalizer.getNumberOfBands();
-
-                for (short band = 0; band < bands; band++) {
-                    int frequency = equalizer.getCenterFreq(band) / 1000;
-
-                    if (frequency < 100) {
-                        equalizer.setBandLevel(band, (short)(-5 * 100));
+                equalizer = Equalizer(0, audioSessionId).apply {
+                    repeat(numberOfBands.toInt()) { intBand ->
+                        val band = intBand.toShort()
+                        when (getCenterFreq(band) / 1000) {
+                            in 0..<100 -> setBandLevel(band, (-5 * 100).toShort())
+                            in 100..<250 -> setBandLevel(band, 0.toShort())
+                            in 250..<1000 -> setBandLevel(band, (10 * 100).toShort())
+                            in 1000..<2000 -> setBandLevel(band, (12 * 100).toShort())
+                            in 2000..<10000 -> setBandLevel(band, (8 * 100).toShort())
+                            else -> setBandLevel(band, 0.toShort())
+                        }
                     }
-                    else if (frequency < 250) {
-                        equalizer.setBandLevel(band, (short)0);
-                    }
-                    else if (frequency < 1000) {
-                        equalizer.setBandLevel(band, (short)(10 * 100));
-                    }
-                    else if (frequency < 2000) {
-                        equalizer.setBandLevel(band, (short)(12 * 100));
-                    }
-                    else if (frequency < 10000) {
-                        equalizer.setBandLevel(band, (short)(8 * 100));
-                    }
-                    else {
-                        equalizer.setBandLevel(band, (short)0);
-                    }
+                    enabled = boostVolume
                 }
-
-                equalizer.setEnabled(boostVolume);
-            }
-            catch (Exception e) {
-                //some devices don't support the equilizer, they'll throw an exception when you try and create one
-                Timber.e(e);
+            } catch (e: Exception) {
+                // Some devices don't support the equalizer. They'll throw an exception when you try and create one.
+                Timber.e(e, "Failed to create equalizer")
             }
         }
     }
 
-    public void addSilenceSkippedTime(long timeUs) {
-        statsManager.addTimeSavedSilenceRemoval(timeUs / 1000);
+    fun addSilenceSkippedTime(timeUs: Long) {
+        statsManager.addTimeSavedSilenceRemoval(timeUs / 1000)
     }
 
-    public void addVariableSpeedTime(long timeUs, float speed) {
-        statsManager.addTimeSavedVariableSpeed((long) (((timeUs * speed) - timeUs) / 1000));
+    fun addVariableSpeedTime(timeUs: Long, speed: Float) {
+        statsManager.addTimeSavedVariableSpeed((((timeUs * speed) - timeUs) / 1000).toLong())
+    }
+
+    private companion object {
+        const val LOUDNESS_TARGET_GAIN = 1000
     }
 }
