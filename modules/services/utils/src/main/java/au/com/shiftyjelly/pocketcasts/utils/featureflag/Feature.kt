@@ -19,14 +19,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
-    ADD_PATRON_ENABLED(
-        key = "add_patron_enabled",
-        title = "Patron",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     BOOKMARKS_ENABLED(
         key = "bookmarks_enabled",
         title = "Bookmarks",
