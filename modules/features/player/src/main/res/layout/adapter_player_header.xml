@@ -36,6 +36,7 @@
                 android:visibility="@{viewModel.isPodcastArtworkVisible()}"
                 android:clickable="true"
                 android:scaleType="fitCenter"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
