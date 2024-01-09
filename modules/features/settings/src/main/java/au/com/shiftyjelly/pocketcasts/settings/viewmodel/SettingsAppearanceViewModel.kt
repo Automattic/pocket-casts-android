@@ -16,8 +16,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -73,18 +71,8 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     fun loadThemesAndIcons() {
         createAccountState.postValue(SettingsAppearanceState.ThemesAndIconsLoading)
-        val appIcons = if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            appIcon.allAppIconTypes.toList()
-        } else {
-            appIcon.allAppIconTypes.toList().filterNot {
-                it in listOf(
-                    AppIcon.AppIconType.PATRON_CHROME,
-                    AppIcon.AppIconType.PATRON_ROUND,
-                    AppIcon.AppIconType.PATRON_GLOW,
-                    AppIcon.AppIconType.PATRON_DARK,
-                )
-            }
-        }
+        val appIcons = appIcon.allAppIconTypes.toList()
+
         createAccountState.postValue(
             SettingsAppearanceState.ThemesAndIconsLoaded(
                 theme.activeTheme,

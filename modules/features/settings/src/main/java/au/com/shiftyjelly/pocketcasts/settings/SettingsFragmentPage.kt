@@ -73,16 +73,12 @@ fun SettingsFragmentPage(
 
             if (!signInState.isSignedIn || signInState.isSignedInAsFree) {
                 PlusRow(onClick = {
-                    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-                        OnboardingLauncher.openOnboardingFlow(
-                            context.getActivity(),
-                            OnboardingFlow.Upsell(
-                                OnboardingUpgradeSource.SETTINGS,
-                            ),
-                        )
-                    } else {
-                        openFragment(PlusSettingsFragment())
-                    }
+                    OnboardingLauncher.openOnboardingFlow(
+                        context.getActivity(),
+                        OnboardingFlow.Upsell(
+                            OnboardingUpgradeSource.SETTINGS,
+                        ),
+                    )
                 })
             }
 
