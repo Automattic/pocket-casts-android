@@ -68,12 +68,12 @@ open class FileStorage @Inject constructor(
     }
 
     private fun getOrCreateDir(parentDir: File, name: String): File = File(parentDir, name + File.separator).also { dir ->
-        createDir(dir)
+        dir.mkdirs()
         addNoMediaFile(dir)
     }
 
     fun getOrCreateStorageDir(): File? = getOrCreateBaseStorageDir()?.let { dir ->
-        File(dir, "PocketCasts" + File.separator).also(::createDir)
+        File(dir, "PocketCasts" + File.separator).also(File::mkdirs)
     }
 
     fun getOrCreateBaseStorageDir(): File? = settings.getStorageChoice()?.let(::getOrCreateBaseStorageDir)
@@ -91,8 +91,6 @@ open class FileStorage @Inject constructor(
     } else {
         File(choice)
     }
-
-    private fun createDir(dir: File): File = dir.also(File::mkdirs)
 
     private fun addNoMediaFile(dir: File) {
         if (!dir.exists()) {
