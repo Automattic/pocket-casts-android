@@ -13,7 +13,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 
-@Singleton
 open class FileStorage @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
