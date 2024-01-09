@@ -128,12 +128,13 @@ open class PodcastImageLoader(
         episode: PodcastEpisode,
         coroutineScope: CoroutineScope,
     ) {
-        val loadPodcastImage: () -> Unit = {
+        val loadPodcastImage: () -> ImageRequest = {
             // If episode artwork image fails, try podcast image
             val imageRequest = loadPodcastImageForEpisode(episode)
             if (size != null) imageRequest.size(size)
-            if (target != null) imageRequest.target(target).build()
+            if (target != null) imageRequest.target(target)
             else imageRequest.into(imageView!!)
+            imageRequest.build()
         }
 
         if (episode.imageUrl != null) {
@@ -148,12 +149,14 @@ open class PodcastImageLoader(
                 when (disposable.job.await()) {
                     is SuccessResult -> { /* do nothing */ }
                     is ErrorResult -> {
-                        loadPodcastImage()
+                        val podcastRequest = loadPodcastImage()
+                        podcastRequest.context.imageLoader.enqueue(podcastRequest)
                     }
                 }
             }
         } else {
-            loadPodcastImage()
+            val podcastRequest = loadPodcastImage()
+            podcastRequest.context.imageLoader.enqueue(podcastRequest)
         }
     }
 
