@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -168,20 +166,18 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             ).apply {
-                if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(PATRON_MONTHLY_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build(),
-                    )
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(PATRON_YEARLY_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build(),
-                    )
-                }
+                add(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PATRON_MONTHLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                )
+                add(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                )
             }
 
         val params = QueryProductDetailsParams.newBuilder()
@@ -458,8 +454,7 @@ private fun shouldAllowUpgradePlan(
 ) = subscribedPlanStatus is SubscriptionStatus.Paid &&
     subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
     subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-    newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) &&
-    FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+    newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)
 
 sealed class ProductDetailsState {
     data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
