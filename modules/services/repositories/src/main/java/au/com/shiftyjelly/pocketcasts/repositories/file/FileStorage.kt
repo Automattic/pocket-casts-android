@@ -177,20 +177,11 @@ open class FileStorage @Inject constructor(
                     .updateEpisodesWithNewFilePaths(episodesManager)
 
                 // Move episodes
-                episodesManager.observeDownloadedEpisodes().blockingFirst().forEach { episode ->
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}")
-                    val downloadedFilePath = episode.downloadedFilePath?.takeIf(String::isNotBlank)
-                    if (downloadedFilePath == null) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode had not file path")
-                        return@forEach
-                    }
-                    val file = File(downloadedFilePath)
-                    if (file.exists() && file.isFile) {
-                        moveFileToDir(downloadedFilePath, episodesDir)?.let { updatedPath ->
-                            episodesManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
-                        }
-                    }
-                }
+                episodesManager.observeDownloadedEpisodes().blockingFirst()
+                    .onEach { episode -> LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}") }
+                    .matchWithDownloadedFilePaths()
+                    .filterNotExistingFiles()
+                    .moveFilesToEpisodesDirAndUpdatePaths(episodesManager, episodesDir)
 
                 val oldCustomFilesDir = getOrCreateDir(oldPocketCastsDir, DIR_CUSTOM_EPISODES)
                 val newCustomFilesDir = getOrCreateDir(newPocketCastsDir, DIR_CUSTOM_EPISODES)
@@ -231,6 +222,22 @@ open class FileStorage @Inject constructor(
 
     private fun List<Pair<File, PodcastEpisode>>.updateEpisodesWithNewFilePaths(episodeManager: EpisodeManager) = forEach { (file, episode) ->
         episodeManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
+    }
+
+    private fun List<PodcastEpisode>.matchWithDownloadedFilePaths() = mapNotNull { episode ->
+        val downloadedFilePath = episode.downloadedFilePath?.takeIf(String::isNotBlank)
+        if (downloadedFilePath == null) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode had not file path")
+        }
+        downloadedFilePath?.let { path -> episode to path }
+    }
+
+    private fun List<Pair<PodcastEpisode, String>>.filterNotExistingFiles() = filter { (_, path) -> File(path).takeIf { it.exists() && it.isFile } != null }
+
+    private fun List<Pair<PodcastEpisode, String>>.moveFilesToEpisodesDirAndUpdatePaths(episodeManager: EpisodeManager, episodesDir: File) = forEach { (episode, path) ->
+        moveFileToDir(path, episodesDir)?.let { updatedPath ->
+            episodeManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
+        }
     }
 
     fun fixBrokenFiles(episodeManager: EpisodeManager) {
