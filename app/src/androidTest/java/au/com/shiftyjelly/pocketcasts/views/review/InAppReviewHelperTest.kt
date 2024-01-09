@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.testing.FakeReviewManager
+import java.util.Date
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +22,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class InAppReviewHelperTest {
@@ -75,7 +75,7 @@ class InAppReviewHelperTest {
         inAppReviewHelper.launchReviewDialog(
             activity = mock(),
             delayInMs = 100,
-            sourceView = SourceView.UNKNOWN
+            sourceView = SourceView.UNKNOWN,
         )
     }
 

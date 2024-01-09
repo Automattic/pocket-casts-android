@@ -4,7 +4,7 @@ import java.util.Date
 
 data class StatsBundle(
     val values: Map<String, Long>,
-    val startedAt: Date?
+    val startedAt: Date?,
 ) {
     companion object {
         const val SERVER_KEY_SILENCE_REMOVAL = "timeSilenceRemoval"

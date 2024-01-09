@@ -33,13 +33,12 @@ class AppLifecycleAnalyticsTest {
 
     @Test
     fun `when app is updated, then updated event fired`() {
-
         val previousVersionCode = 123
         appLifecycleAnalytics.onApplicationUpgrade(previousVersionCode)
 
         verify(analyticsTracker).track(
             AnalyticsEvent.APPLICATION_UPDATED,
-            mapOf(KEY_PREVIOUS_VERSION_CODE to previousVersionCode)
+            mapOf(KEY_PREVIOUS_VERSION_CODE to previousVersionCode),
         )
     }
 
@@ -62,7 +61,7 @@ class AppLifecycleAnalyticsTest {
 
         verify(analyticsTracker).track(
             AnalyticsEvent.APPLICATION_CLOSED,
-            mapOf(KEY_TIME_IN_APP to 1)
+            mapOf(KEY_TIME_IN_APP to 1),
         )
     }
 }

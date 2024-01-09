@@ -71,11 +71,11 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import java.util.Locale
+import kotlin.math.min
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Locale
-import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -94,7 +94,7 @@ internal class DiscoverAdapter(
     val theme: Theme,
     loadPodcastList: (String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?)
@@ -130,7 +130,7 @@ internal class DiscoverAdapter(
             cancelLoading()
             loadingDisposable = single.observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onSuccess = onSuccess,
-                onError = onError
+                onError = onError,
             )
         }
 
@@ -138,7 +138,7 @@ internal class DiscoverAdapter(
             cancelLoading()
             loadingDisposable = flowable.observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onNext = onNext,
-                onError = onError
+                onError = onError,
             )
         }
 
@@ -209,7 +209,7 @@ internal class DiscoverAdapter(
             ScrollingLinearLayoutManager(
                 itemView.context,
                 RecyclerView.HORIZONTAL,
-                false
+                false,
             ).apply {
                 initialPrefetchItemCount = INITIAL_PREFETCH_COUNT
             }
@@ -280,7 +280,7 @@ internal class DiscoverAdapter(
         private fun trackPageChanged(position: Int) {
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED,
-                mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount)
+                mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount),
             )
         }
 
@@ -291,7 +291,7 @@ internal class DiscoverAdapter(
                 FirebaseAnalyticsTracker.listImpression(it)
                 analyticsTracker.track(
                     AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
-                    mapOf(LIST_ID to it)
+                    mapOf(LIST_ID to it),
                 )
                 listIdImpressionTracked.add(it)
             }
@@ -320,7 +320,7 @@ internal class DiscoverAdapter(
                 row?.let {
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_SMALL_LIST_PAGE_CHANGED,
-                        mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId())
+                        mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId()),
                     )
                 }
             }
@@ -420,7 +420,7 @@ internal class DiscoverAdapter(
                         onNext = {
                             holder.adapter.fromListId = row.listUuid
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
-                        }
+                        },
                     )
                     row.listUuid?.let { trackListImpression(it) }
                 }
@@ -456,7 +456,7 @@ internal class DiscoverAdapter(
                             holder.adapter.pillText = row.title.tryToLocalise(resources)
                             holder.adapter.submitList(it) { onRestoreInstanceState(holder) }
                             holder.binding.pageIndicatorView.count = it.count()
-                        }
+                        },
                     )
 
                     holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
@@ -470,7 +470,7 @@ internal class DiscoverAdapter(
                             holder.binding.pageIndicatorView.count = Math.ceil(podcasts.count().toDouble() / SmallListRowAdapter.SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
                             holder.adapter.fromListId = row.listUuid
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
-                        }
+                        },
                     )
                     row.listUuid?.let { trackListImpression(it) }
                 }
@@ -486,7 +486,7 @@ internal class DiscoverAdapter(
                             adapter.submitList(sortedCategories) {
                                 onRestoreInstanceState(holder)
                             }
-                        }
+                        },
                     )
                 }
                 is SinglePodcastViewHolder -> {
@@ -530,7 +530,7 @@ internal class DiscoverAdapter(
                             val textSize = if ((podcastTitle ?: "").length < 15) 18f else 15f
                             holder.binding.lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
                             onRestoreInstanceState(holder)
-                        }
+                        },
                     )
                 }
                 is SingleEpisodeViewHolder -> {
@@ -559,7 +559,6 @@ internal class DiscoverAdapter(
                             binding.publishedDate.text = episode.published?.toLocalizedFormatPattern(pattern = "d MMM")
                             binding.btnPlay.setIconResource(if (episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                             binding.btnPlay.setOnClickListener {
-
                                 row.listUuid?.let { listUuid ->
                                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
                                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid))
@@ -590,14 +589,14 @@ internal class DiscoverAdapter(
                                     FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
                                     analyticsTracker.track(
                                         AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                                        mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+                                        mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid),
                                     )
                                 }
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }
                             onRestoreInstanceState(holder)
                             row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
-                        }
+                        },
                     )
                 }
                 is CollectionListViewHolder -> {
@@ -614,8 +613,8 @@ internal class DiscoverAdapter(
                                 holder.binding.imgPodcast.load(backgroundUrl) {
                                     transformations(
                                         ThemedImageTintTransformation(
-                                            context
-                                        )
+                                            context,
+                                        ),
                                     )
                                 }
                             }
@@ -645,7 +644,7 @@ internal class DiscoverAdapter(
                             onRestoreInstanceState(holder)
 
                             row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
-                        }
+                        },
                     )
                 }
             }

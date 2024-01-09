@@ -47,7 +47,7 @@ fun Modifier.dynamicBackground(
                 startY = if (direction == FadeDirection.BottomToTop) Float.POSITIVE_INFINITY else 0f,
                 endY = if (direction == FadeDirection.BottomToTop) 0f else Float.POSITIVE_INFINITY,
             ),
-            blendMode = BlendMode.DstIn
+            blendMode = BlendMode.DstIn,
         )
         drawContent()
     }
@@ -63,12 +63,12 @@ fun Modifier.textGradient() =
                 drawContent()
                 drawRect(
                     brush = brush,
-                    blendMode = BlendMode.SrcAtop
+                    blendMode = BlendMode.SrcAtop,
                 )
             }
         }
 
 enum class FadeDirection {
     TopToBottom,
-    BottomToTop
+    BottomToTop,
 }

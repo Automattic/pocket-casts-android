@@ -170,7 +170,7 @@ class UpNextEpisodeViewHolder(
     override val leftIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() = listOf(
             EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_movetotop, binding.itemContainer.context.getThemeColor(UR.attr.support_04)),
-            EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_movetobottom, binding.itemContainer.context.getThemeColor(UR.attr.support_03))
+            EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_movetobottom, binding.itemContainer.context.getThemeColor(UR.attr.support_03)),
         )
     override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() = listOf(EpisodeItemTouchHelper.IconWithBackground(R.drawable.ic_upnext_remove, binding.itemContainer.context.getThemeColor(UR.attr.support_05)))

@@ -15,6 +15,6 @@ object FakeFileGenerator {
         sortPosition = 1,
         podcastsSortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
         deleted = false,
-        syncModified = 1L
+        syncModified = 1L,
     )
 }

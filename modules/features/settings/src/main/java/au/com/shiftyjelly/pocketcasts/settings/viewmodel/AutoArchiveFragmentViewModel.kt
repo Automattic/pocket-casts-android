@@ -29,7 +29,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         settings.autoArchiveIncludeStarred.set(newValue)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
-            mapOf("enabled" to newValue)
+            mapOf("enabled" to newValue),
         )
     }
 
@@ -38,7 +38,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         settings.autoArchiveAfterPlaying.set(newValue)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-            mapOf("value" to newValue.analyticsValue)
+            mapOf("value" to newValue.analyticsValue),
         )
     }
 
@@ -47,7 +47,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
         settings.autoArchiveInactive.set(newValue)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-            mapOf("value" to newValue.analyticsValue)
+            mapOf("value" to newValue.analyticsValue),
         )
     }
 

@@ -16,9 +16,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultRelease
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import javax.inject.Inject
 
 class AppLifecycleObserver constructor(
     @ApplicationContext private val appContext: Context,
@@ -87,7 +87,7 @@ class AppLifecycleObserver constructor(
         } else {
             listOf(
                 firebaseRemoteFeatureProvider,
-                defaultReleaseFeatureProvider
+                defaultReleaseFeatureProvider,
             )
         }
         FeatureFlag.initialize(providers)

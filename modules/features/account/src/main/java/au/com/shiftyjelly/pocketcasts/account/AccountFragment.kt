@@ -70,7 +70,7 @@ class AccountFragment : BaseFragment() {
                     binding.btnCreate.text = getString(LR.string.done)
                     binding.btnCreate.setOnClickListener { activity?.finish() }
                 }
-            }
+            },
         )
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -93,7 +93,7 @@ class AccountFragment : BaseFragment() {
                         flow = null,
                         fontSize = dimensionResource(CR.dimen.car_body2_size).value.sp,
                         includePadding = false,
-                        onComplete = { activity?.finish() }
+                        onComplete = { activity?.finish() },
                     )
                 }
             }
@@ -102,7 +102,7 @@ class AccountFragment : BaseFragment() {
         binding.btnCreate.setOnClickListener {
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-                ACCOUNT_SOURCE + mapOf(BUTTON to CREATE_ACCOUNT)
+                ACCOUNT_SOURCE + mapOf(BUTTON to CREATE_ACCOUNT),
             )
             FirebaseAnalyticsTracker.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
@@ -117,7 +117,7 @@ class AccountFragment : BaseFragment() {
         binding.btnSignIn.setOnClickListener {
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-                ACCOUNT_SOURCE + mapOf(BUTTON to SIGN_IN)
+                ACCOUNT_SOURCE + mapOf(BUTTON to SIGN_IN),
             )
             FirebaseAnalyticsTracker.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {

@@ -73,10 +73,11 @@ fun View.expand() {
     visibility = View.VISIBLE
     val animation = object : Animation() {
         override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            layoutParams.height = if (interpolatedTime == 1f)
+            layoutParams.height = if (interpolatedTime == 1f) {
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            else
+            } else {
                 (targtetHeight * interpolatedTime).toInt()
+            }
             requestLayout()
         }
 

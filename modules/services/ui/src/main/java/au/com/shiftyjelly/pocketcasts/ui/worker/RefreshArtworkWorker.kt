@@ -26,7 +26,7 @@ class RefreshArtworkWorker @AssistedInject constructor(
     val settings: Settings,
     val podcastManager: PodcastManager,
     val colorManager: ColorManager,
-    val coilManager: CoilManager
+    val coilManager: CoilManager,
 ) : CoroutineWorker(context, params) {
 
     companion object {

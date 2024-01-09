@@ -90,7 +90,8 @@ fun SubscriptionBadgeForTier(
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
-                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> SubscriptionTierColor.plusGold
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                -> SubscriptionTierColor.plusGold
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
@@ -109,7 +110,8 @@ fun SubscriptionBadgeForTier(
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
-                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> SubscriptionTierColor.patronPurple
+                SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                -> SubscriptionTierColor.patronPurple
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
@@ -139,7 +141,7 @@ object SubscriptionTierColor {
 fun SubscriptionBadgePlusColoredPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
     )
 }
 
@@ -149,7 +151,7 @@ fun SubscriptionBadgePlusColoredPreview() {
 fun SubscriptionBadgePlusBlackPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.Black
+        displayMode = SubscriptionBadgeDisplayMode.Black,
     )
 }
 
@@ -159,7 +161,7 @@ fun SubscriptionBadgePlusBlackPreview() {
 fun SubscriptionBadgePatronColoredPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
     )
 }
 
@@ -169,7 +171,7 @@ fun SubscriptionBadgePatronColoredPreview() {
 fun SubscriptionBadgePatronBlackPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.Black
+        displayMode = SubscriptionBadgeDisplayMode.Black,
     )
 }
 
@@ -179,7 +181,7 @@ fun SubscriptionBadgePatronBlackPreview() {
 fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
     )
 }
 
@@ -189,6 +191,6 @@ fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
 fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground
+        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
     )
 }

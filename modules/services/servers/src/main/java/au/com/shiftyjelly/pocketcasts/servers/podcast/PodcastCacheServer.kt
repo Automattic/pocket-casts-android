@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
+import java.util.Date
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -12,7 +13,6 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class SearchBody(@field:Json(name = "podcastuuid") val podcastuuid: String, @field:Json(name = "searchterm") val searchterm: String)
@@ -45,7 +45,7 @@ data class SearchEpisodeResult(
             duration = duration ?: 0.0,
             publishedAt = publishedAt ?: Date(),
             podcastUuid = podcastUuid,
-            podcastTitle = podcastTitle ?: ""
+            podcastTitle = podcastTitle ?: "",
         )
     }
 }
@@ -58,7 +58,7 @@ data class PodcastRatingsResponse(
     fun toPodcastRatings(podcastUuid: String) = PodcastRatings(
         podcastUuid = podcastUuid,
         average = average ?: 0.0,
-        total = total ?: 0
+        total = total ?: 0,
     )
 }
 

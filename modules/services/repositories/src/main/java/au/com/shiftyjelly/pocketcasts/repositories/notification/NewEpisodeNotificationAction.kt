@@ -15,13 +15,14 @@ enum class NewEpisodeNotificationAction(
     @StringRes val labelId: Int,
     @DrawableRes val drawableId: Int,
     @DrawableRes val largeDrawableId: Int,
-    val notificationAction: String
+    val notificationAction: String,
 ) {
     PLAY(1, LR.string.play, IR.drawable.notification_action_play, IR.drawable.notification_action_play_large, NotificationBroadcastReceiver.INTENT_ACTION_PLAY_EPISODE),
     PLAY_NEXT(2, LR.string.play_next, IR.drawable.notification_action_playnext, IR.drawable.notification_action_playnext_large, NotificationBroadcastReceiver.INTENT_ACTION_PLAY_NEXT),
     PLAY_LAST(3, LR.string.play_last, IR.drawable.notification_action_playlast, IR.drawable.notification_action_playlast_large, NotificationBroadcastReceiver.INTENT_ACTION_PLAY_LAST),
     ARCHIVE(4, LR.string.archive, IR.drawable.notification_action_archive, IR.drawable.notification_action_archive_large, NotificationBroadcastReceiver.INTENT_ACTION_ARCHIVE),
-    DOWNLOAD(5, LR.string.download, IR.drawable.notification_action_download, IR.drawable.notification_action_download_large, NotificationBroadcastReceiver.INTENT_ACTION_DOWNLOAD_EPISODE);
+    DOWNLOAD(5, LR.string.download, IR.drawable.notification_action_download, IR.drawable.notification_action_download_large, NotificationBroadcastReceiver.INTENT_ACTION_DOWNLOAD_EPISODE),
+    ;
 
     fun index(): Int {
         return values().indexOf(this)

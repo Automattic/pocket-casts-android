@@ -28,12 +28,12 @@ fun FolderColorPicker(selectedId: Int, onClick: (Int) -> Unit, modifier: Modifie
                 modifier = Modifier
                     .padding(bottom = 10.dp, end = 10.dp)
                     .size(48.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 ColorSelectCircle(
                     color = color,
                     selected = (id == selectedId),
-                    onClick = { onClick(id) }
+                    onClick = { onClick(id) },
                 )
             }
         }
@@ -51,7 +51,7 @@ private fun ColorSelectCircle(color: Color, selected: Boolean, onClick: () -> Un
         backgroundColor = color,
         onClick = onClick,
         contentDescription = "",
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

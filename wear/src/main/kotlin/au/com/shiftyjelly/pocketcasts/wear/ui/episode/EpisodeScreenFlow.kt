@@ -53,16 +53,15 @@ object EpisodeScreenFlow {
             arguments = listOf(
                 navArgument(episodeUuidArgument) {
                     type = NavType.StringType
-                }
+                },
             ),
         ) {
             scrollable(
                 route = episodeScreen,
                 columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
-                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top)
-                )
+                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+                ),
             ) {
-
                 // Listen for results from streaming confirmation screen
                 navController.currentBackStackEntry?.savedStateHandle
                     ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)

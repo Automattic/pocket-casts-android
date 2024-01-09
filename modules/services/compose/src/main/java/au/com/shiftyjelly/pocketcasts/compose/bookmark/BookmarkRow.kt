@@ -64,6 +64,7 @@ sealed class BookmarkRowColors {
                 Color.Transparent
             }
         }
+
         @Composable
         override fun primaryTextColor() = MaterialTheme.theme.colors.playerContrast01
 
@@ -86,6 +87,7 @@ sealed class BookmarkRowColors {
                 MaterialTheme.theme.colors.primaryUi02
             }
         }
+
         @Composable
         override fun primaryTextColor() = MaterialTheme.theme.colors.primaryText01
 
@@ -107,11 +109,11 @@ fun BookmarkRow(
     showIcon: Boolean,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Divider(
             color = colors.dividerColor(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -121,9 +123,9 @@ fun BookmarkRow(
                 .background(
                     color = colors.backgroundColor(
                         isMultiSelecting = isMultiSelecting,
-                        isSelected = isSelected(bookmark)
-                    )
-                )
+                        isSelected = isSelected(bookmark),
+                    ),
+                ),
         ) {
             val createdAtText = bookmark.createdAt
                 .toLocalizedFormatPattern(bookmark.createdAtDatePattern())
@@ -133,7 +135,7 @@ fun BookmarkRow(
                     checked = isSelected(bookmark),
                     onCheckedChange = null,
                     modifier = Modifier
-                        .padding(start = 16.dp)
+                        .padding(start = 16.dp),
                 )
             }
 
@@ -141,7 +143,7 @@ fun BookmarkRow(
                 Box(modifier = Modifier.padding(start = 16.dp)) {
                     PodcastImage(
                         uuid = bookmark.podcastUuid,
-                        modifier = modifier.size(56.dp)
+                        modifier = modifier.size(56.dp),
                     )
                 }
             }
@@ -149,7 +151,7 @@ fun BookmarkRow(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             ) {
                 if (bookmark.episodeTitle.isNotEmpty()) {
                     TextH70(
@@ -162,8 +164,8 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp
-                    )
+                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp,
+                    ),
                 )
 
                 TextH40(
@@ -181,8 +183,8 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp
-                    )
+                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp,
+                    ),
                 )
             }
 
@@ -230,7 +232,7 @@ private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
                 episodeTitle = "Episode Title",
                 timeSecs = 10,
                 title = "Bookmark Title",
-                createdAt = Date()
+                createdAt = Date(),
             ),
             isMultiSelecting = { false },
             isSelected = { false },
@@ -256,7 +258,7 @@ fun BookmarkRowPlayerPreview() {
                 episodeTitle = "Episode Title",
                 timeSecs = 10,
                 title = "Bookmark Title",
-                createdAt = Date()
+                createdAt = Date(),
             ),
             isMultiSelecting = { false },
             isSelected = { false },

@@ -36,7 +36,7 @@ class PlainListAdapter(
     val onPromotionClick: (DiscoverPromotion) -> Unit,
     val onEpisodeClick: (DiscoverEpisode) -> Unit,
     val onEpisodePlayClick: (DiscoverEpisode) -> Unit,
-    val onEpisodeStopClick: () -> Unit
+    val onEpisodeStopClick: () -> Unit,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(differ) {
 
     var listTintColor: Int? = null

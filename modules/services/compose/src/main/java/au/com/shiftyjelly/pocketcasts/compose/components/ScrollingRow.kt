@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import java.lang.Long.max
+import kotlinx.coroutines.delay
 
 private const val MAX_ITEMS = 500
 
@@ -30,7 +30,6 @@ fun ScrollingRow(
     paused: Boolean = false,
     rowItems: @Composable () -> Unit,
 ) {
-
     // Not using rememberLazyListState() because we want to reset
     // the scroll state on orientation changes so that the hardcoded column
     // is redisplayed, which insures the height is correctly calculated. For that
@@ -82,7 +81,7 @@ fun NestedRow(
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacedBy),
         modifier = Modifier
-            .height(IntrinsicSize.Max)
+            .height(IntrinsicSize.Max),
     ) {
         rowItems()
     }
@@ -110,5 +109,5 @@ private tailrec suspend fun autoScroll(
 
 enum class ScrollDirection {
     LEFT,
-    RIGHT
+    RIGHT,
 }

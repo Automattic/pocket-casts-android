@@ -25,14 +25,14 @@ fun CircleIconButton(
     backgroundColor: Color,
     modifier: Modifier = Modifier,
     iconColor: Color = Color.White,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     CircleButton(
         size = size,
         onClick = onClick,
         backgroundColor = backgroundColor,
         contentColor = iconColor,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Icon(icon, contentDescription = contentDescription)
     }
@@ -48,14 +48,14 @@ fun CircleIconButton(
     contentDescription: String,
     backgroundColor: Color,
     iconColor: Color = Color.White,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     CircleButton(
         size = size,
         onClick = onClick,
         backgroundColor = backgroundColor,
         contentColor = iconColor,
-        modifier = modifier
+        modifier = modifier,
     ) {
         if (!iconVisible) {
             return@CircleButton
@@ -93,6 +93,6 @@ private fun CircleIconButtonPreview() {
         icon = Icons.Default.Add,
         contentDescription = "Add",
         backgroundColor = MaterialTheme.colors.primary,
-        onClick = {}
+        onClick = {},
     )
 }

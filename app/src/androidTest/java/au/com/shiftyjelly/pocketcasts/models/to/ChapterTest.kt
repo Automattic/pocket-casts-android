@@ -10,7 +10,7 @@ class ChapterTest {
         val chapter = Chapter(
             title = "",
             startTime = 5000,
-            endTime = 70000
+            endTime = 70000,
         )
 
         assertEquals("1m", chapter.remainingTime(5000))
@@ -24,7 +24,7 @@ class ChapterTest {
         val chapter = Chapter(
             title = "",
             startTime = 5000,
-            endTime = 10000
+            endTime = 10000,
         )
 
         assertEquals(0f, chapter.calculateProgress(1))

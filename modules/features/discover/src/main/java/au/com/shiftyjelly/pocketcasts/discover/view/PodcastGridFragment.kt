@@ -47,10 +47,8 @@ class PodcastGridFragment : PodcastGridListFragment() {
                 when (state) {
                     is PodcastListViewState.Loading -> {}
                     is PodcastListViewState.ListLoaded -> {
-
                         feed = state.feed
                         feed?.let {
-
                             if (displayStyle.toString() != DisplayStyle.CollectionList().toString()) {
                                 binding.headerLayout.visibility = View.GONE
                             } else {
@@ -66,7 +64,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
                                     bodyTextView = binding.lblBody,
                                     linkView = binding.linkLayout,
                                     linkTextView = binding.lblLinkTitle,
-                                    toolbar = binding.toolbar
+                                    toolbar = binding.toolbar,
                                 )
                             }
                         }
@@ -77,7 +75,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
                         Timber.e("Could not load feed ${state.error.message}")
                     }
                 }
-            }
+            },
         )
 
         return binding?.root
@@ -100,7 +98,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
             toolbar = toolbar,
             title = title,
             menu = R.menu.discover_share,
-            navigationIcon = BackArrow
+            navigationIcon = BackArrow,
         )
         toolbar.setOnMenuItemClickListener(this)
 

@@ -25,17 +25,25 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
 
     object Downloaded : PodcastGrouping(LR.string.podcast_group_downloaded, { if (it.isDownloaded || it.isDownloading || it.isQueued) 0 else 1 }) {
         override fun groupTitles(index: Int, context: Context): String {
-            return if (index == 0) context.getString(LR.string.podcast_group_downloaded) else context.getString(
-                LR.string.podcast_group_not_downloaded
-            )
+            return if (index == 0) {
+                context.getString(LR.string.podcast_group_downloaded)
+            } else {
+                context.getString(
+                    LR.string.podcast_group_not_downloaded,
+                )
+            }
         }
     }
 
     object Unplayed : PodcastGrouping(LR.string.podcast_group_unplayed, { if (it.isUnplayed || it.isInProgress) 0 else 1 }) {
         override fun groupTitles(index: Int, context: Context): String {
-            return if (index == 0) context.getString(LR.string.podcast_group_unplayed) else context.getString(
-                LR.string.podcast_group_played
-            )
+            return if (index == 0) {
+                context.getString(LR.string.podcast_group_unplayed)
+            } else {
+                context.getString(
+                    LR.string.podcast_group_played,
+                )
+            }
         }
     }
 
@@ -71,9 +79,13 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
 
     object Starred : PodcastGrouping(LR.string.profile_navigation_starred, { if (it.isStarred) 0 else 1 }) {
         override fun groupTitles(index: Int, context: Context): String {
-            return if (index == 0) context.getString(LR.string.profile_navigation_starred) else context.getString(
-                LR.string.podcast_group_not_starred
-            )
+            return if (index == 0) {
+                context.getString(LR.string.profile_navigation_starred)
+            } else {
+                context.getString(
+                    LR.string.podcast_group_not_starred,
+                )
+            }
         }
     }
 

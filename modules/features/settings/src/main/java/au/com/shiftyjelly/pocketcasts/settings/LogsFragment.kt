@@ -57,7 +57,7 @@ class LogsFragment : BaseFragment() {
                 UiUtil.hideKeyboard(LocalView.current)
                 AppThemeWithBackground(theme.activeTheme) {
                     LogsPage(
-                        onBackPressed = ::closeFragment
+                        onBackPressed = ::closeFragment,
                     )
                 }
             }
@@ -83,7 +83,7 @@ private fun LogsPage(
         onCopyToClipboard = { logs?.let { clipboardManager.setText(AnnotatedString(it)) } },
         onShareLogs = { viewModel.shareLogs(context) },
         includeAppBar = !Util.isAutomotive(context),
-        logs = logs
+        logs = logs,
     )
 }
 
@@ -93,7 +93,7 @@ private fun LogsContent(
     onCopyToClipboard: () -> Unit,
     onShareLogs: () -> Unit,
     logs: String?,
-    includeAppBar: Boolean
+    includeAppBar: Boolean,
 ) {
     val logScrollState = rememberScrollState(0)
     Column {
@@ -120,7 +120,7 @@ private fun LogsContent(
             modifier = Modifier
                 .verticalScroll(logScrollState)
                 .padding(16.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             if (logs == null) {
                 LoadingView()
@@ -145,7 +145,7 @@ private fun AppBarWithShare(
     onScrollToTop: () -> Unit,
     onScrollToBottom: () -> Unit,
     logsAvailable: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ThemedTopAppBar(
         title = stringResource(LR.string.settings_logs),
@@ -157,7 +157,7 @@ private fun AppBarWithShare(
             ) {
                 Icon(
                     imageVector = Icons.Default.VerticalAlignTop,
-                    contentDescription = stringResource(LR.string.go_to_top)
+                    contentDescription = stringResource(LR.string.go_to_top),
                 )
             }
             IconButton(
@@ -166,29 +166,29 @@ private fun AppBarWithShare(
             ) {
                 Icon(
                     imageVector = Icons.Default.VerticalAlignBottom,
-                    contentDescription = stringResource(LR.string.go_to_bottom)
+                    contentDescription = stringResource(LR.string.go_to_bottom),
                 )
             }
             IconButton(
                 onClick = onCopyToClipboard,
-                enabled = logsAvailable
+                enabled = logsAvailable,
             ) {
                 Icon(
                     imageVector = Icons.Default.CopyAll,
-                    contentDescription = stringResource(LR.string.share)
+                    contentDescription = stringResource(LR.string.share),
                 )
             }
             IconButton(
                 onClick = onShareLogs,
-                enabled = logsAvailable
+                enabled = logsAvailable,
             ) {
                 Icon(
                     imageVector = Icons.Default.Share,
-                    contentDescription = stringResource(LR.string.share)
+                    contentDescription = stringResource(LR.string.share),
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -201,10 +201,11 @@ private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::
             onCopyToClipboard = {},
             onShareLogs = {},
             logs = "This is a preview",
-            includeAppBar = true
+            includeAppBar = true,
         )
     }
 }
+
 @Composable
 @Preview
 private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
@@ -214,7 +215,7 @@ private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterPro
             onCopyToClipboard = {},
             onShareLogs = {},
             logs = null,
-            includeAppBar = true
+            includeAppBar = true,
         )
     }
 }

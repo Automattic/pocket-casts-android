@@ -48,11 +48,10 @@ class WhatsNewFragment : BaseFragment() {
             setBackgroundColor(Color.Transparent.toArgb())
             setContent {
                 AppTheme(theme.activeTheme) {
-
                     CallOnce {
                         analyticsTracker.track(
                             AnalyticsEvent.WHATSNEW_SHOWN,
-                            mapOf("version" to Settings.WHATS_NEW_VERSION_CODE)
+                            mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
                         )
                     }
 
@@ -66,7 +65,7 @@ class WhatsNewFragment : BaseFragment() {
                         onConfirm = {
                             analyticsTracker.track(
                                 AnalyticsEvent.WHATSNEW_CONFIRM_BUTTON_TAPPED,
-                                mapOf("version" to Settings.WHATS_NEW_VERSION_CODE)
+                                mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
                             )
                             onClose()
                             performConfirmAction(it)
@@ -75,7 +74,7 @@ class WhatsNewFragment : BaseFragment() {
                         onClose = {
                             analyticsTracker.track(
                                 AnalyticsEvent.WHATSNEW_DISMISSED,
-                                mapOf("version" to Settings.WHATS_NEW_VERSION_CODE)
+                                mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
                             )
                             onClose()
                         },
@@ -119,7 +118,7 @@ class WhatsNewFragment : BaseFragment() {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
             showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron()
+                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }

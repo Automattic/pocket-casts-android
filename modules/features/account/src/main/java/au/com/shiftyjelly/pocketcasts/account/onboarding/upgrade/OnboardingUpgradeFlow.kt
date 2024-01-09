@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
 
 private const val NULL_ACTIVITY_ERROR = "Activity is null when attempting subscription"
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingUpgradeFlow(
@@ -42,7 +43,6 @@ fun OnboardingUpgradeFlow(
     onNeedLogin: () -> Unit,
     onProceed: () -> Unit,
 ) {
-
     val bottomSheetViewModel = hiltViewModel<OnboardingUpgradeBottomSheetViewModel>()
     val mainSheetViewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state = bottomSheetViewModel.state.collectAsState().value
@@ -60,7 +60,7 @@ fun OnboardingUpgradeFlow(
                 mainSheetViewModel.onClickSubscribe(
                     activity = activity,
                     flow = flow,
-                    onComplete = onProceed
+                    onComplete = onProceed,
                 )
             }
         }
@@ -162,7 +162,7 @@ fun OnboardingUpgradeFlow(
                     } else {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                     }
-                }
+                },
             )
         },
     )

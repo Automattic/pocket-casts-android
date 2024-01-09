@@ -48,7 +48,7 @@ sealed class SearchHistoryEntry(
                 podcastUuid = podcastUuid,
                 podcastTitle = podcastTitle,
                 artworkUrl = artworkUrl,
-            )
+            ),
         )
 
         is Folder -> SearchHistoryItem(
@@ -57,8 +57,8 @@ sealed class SearchHistoryEntry(
                 uuid = uuid,
                 title = title,
                 color = color,
-                podcastIds = podcastIds.joinToString(separator = ",")
-            )
+                podcastIds = podcastIds.joinToString(separator = ","),
+            ),
         )
 
         is Podcast -> SearchHistoryItem(
@@ -66,13 +66,13 @@ sealed class SearchHistoryEntry(
             podcast = SearchHistoryItem.Podcast(
                 uuid = uuid,
                 title = title,
-                author = author
-            )
+                author = author,
+            ),
         )
 
         is SearchTerm -> SearchHistoryItem(
             id = id,
-            term = term
+            term = term,
         )
     }
 
@@ -80,27 +80,27 @@ sealed class SearchHistoryEntry(
         fun fromEpisode(
             episode: EpisodeModel,
             podcastTitle: String,
-            artworkUrl: String? = null
+            artworkUrl: String? = null,
         ) = Episode(
             uuid = episode.uuid,
             title = episode.title,
             duration = episode.duration,
             podcastUuid = episode.podcastUuid,
             podcastTitle = podcastTitle,
-            artworkUrl = artworkUrl
+            artworkUrl = artworkUrl,
         )
 
         fun fromFolder(folder: FolderModel, podcastIds: List<String>) = Folder(
             uuid = folder.uuid,
             title = folder.name,
             color = folder.color,
-            podcastIds = podcastIds
+            podcastIds = podcastIds,
         )
 
         fun fromPodcast(podcast: PodcastModel) = Podcast(
             uuid = podcast.uuid,
             title = podcast.title,
-            author = podcast.author
+            author = podcast.author,
         )
 
         fun fromSearchHistoryItem(item: SearchHistoryItem) = when {
@@ -134,7 +134,7 @@ sealed class SearchHistoryEntry(
                     id = item.id,
                     uuid = podcast.uuid,
                     title = podcast.title,
-                    author = podcast.author
+                    author = podcast.author,
                 )
             }
 

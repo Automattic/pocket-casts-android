@@ -57,30 +57,30 @@ fun RowOutlinedButton(
     Row(
         modifier = modifier
             .then(if (includePadding) Modifier.padding(16.dp) else Modifier)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         OutlinedButton(
             onClick = { onClick() },
             shape = RoundedCornerShape(12.dp),
             border = border,
             colors = colors,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
                 RowOutlinedImage(
                     image = leadingIcon,
                     colors = colors,
-                    tintIcon = tintIcon
+                    tintIcon = tintIcon,
                 )
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     RowOutlinedImage(
                         image = textIcon,
                         colors = colors,
-                        tintIcon = tintIcon
+                        tintIcon = tintIcon,
                     )
                     TextH30(
                         text = text,
@@ -88,7 +88,7 @@ fun RowOutlinedButton(
                         textAlign = TextAlign.Center,
                         fontFamily = fontFamily,
                         fontSize = if (disableScale) fontSize?.value?.nonScaledSp else fontSize,
-                        modifier = Modifier.padding(6.dp)
+                        modifier = Modifier.padding(6.dp),
                     )
                 }
             }
@@ -103,7 +103,7 @@ private fun RowOutlinedImage(image: Painter?, colors: ButtonColors, tintIcon: Bo
         painter = image,
         contentDescription = null,
         colorFilter = if (tintIcon) ColorFilter.tint(colors.contentColor(enabled = true).value) else null,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -115,7 +115,7 @@ fun RowOutlinedButtonLightPreview() {
         RowOutlinedButton(
             text = "Share",
             textIcon = rememberVectorPainter(Icons.Default.Share),
-            onClick = {}
+            onClick = {},
         )
     }
 }
@@ -128,7 +128,7 @@ fun RowOutlinedButtonDarkPreview() {
         RowOutlinedButton(
             text = "Share",
             textIcon = rememberVectorPainter(Icons.Default.Share),
-            onClick = {}
+            onClick = {},
         )
     }
 }
@@ -142,7 +142,7 @@ fun RowOutlinedButtonLeadingIconPreview() {
             text = stringResource(LR.string.onboarding_continue_with_google),
             leadingIcon = painterResource(R.drawable.google_g),
             tintIcon = false,
-            onClick = {}
+            onClick = {},
         )
     }
 }

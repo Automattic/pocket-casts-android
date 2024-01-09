@@ -39,7 +39,7 @@ fun SearchEpisodeItem(
             modifier = modifier
                 .fillMaxWidth()
                 .clickable { onClick(episode) }
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             PodcastImage(
                 uuid = episode.podcastUuid,
@@ -48,7 +48,7 @@ fun SearchEpisodeItem(
             Column(
                 modifier = modifier
                     .padding(start = 12.dp, end = 16.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 TextC50(
                     text = dateFormatter.format(episode.publishedAt),
@@ -61,7 +61,7 @@ fun SearchEpisodeItem(
                 TextH60(
                     text = TimeHelper.getTimeDurationMediumString(durationMs.toInt(), context),
                     maxLines = 1,
-                    color = MaterialTheme.theme.colors.primaryText02
+                    color = MaterialTheme.theme.colors.primaryText02,
                 )
             }
         }

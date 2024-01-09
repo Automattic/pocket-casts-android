@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonWriter
 enum class EpisodePlayingStatus {
     NOT_PLAYED,
     IN_PROGRESS,
-    COMPLETED
+    COMPLETED,
 }
 
 class EpisodePlayingStatusMoshiAdapter : JsonAdapter<EpisodePlayingStatus>() {

@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.ui.theme
 
 // ************ WARNING AUTO GENERATED, DO NOT EDIT ************
+
+@Suppress("ktlint:standard:enum-entry-name-case")
 enum class ThemeStyle {
     primaryUi01,
     primaryUi01Active,
@@ -157,5 +159,5 @@ enum class ThemeStyle {
     category16,
     category17,
     category18,
-    category19
+    category19,
 }

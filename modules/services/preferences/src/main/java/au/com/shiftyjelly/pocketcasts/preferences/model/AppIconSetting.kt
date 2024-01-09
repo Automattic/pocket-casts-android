@@ -19,5 +19,5 @@ enum class AppIconSetting(val id: String) {
     PATRON_CHROME("patron_chrome"),
     PATRON_ROUND("patron_round"),
     PATRON_GLOW("patron_glow"),
-    PATRON_DARK("patron_dark");
+    PATRON_DARK("patron_dark"),
 }

@@ -5,11 +5,11 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class ServiceStatusChecker @Inject constructor(@ApplicationContext val context: Context) {
 

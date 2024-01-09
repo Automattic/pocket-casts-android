@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.net.NetworkCapabilities
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class PlaybackManagerNetworkWatcher @Inject constructor(
     private val networkConnectionWatcher: NetworkConnectionWatcher,

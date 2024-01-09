@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
 class MediaActionTouchCallback(
-    private val listener: ItemTouchHelperAdapter
+    private val listener: ItemTouchHelperAdapter,
 ) : ItemTouchHelper.Callback() {
     interface ItemTouchHelperAdapter {
         fun onMediaActionItemMove(fromPosition: Int, toPosition: Int)

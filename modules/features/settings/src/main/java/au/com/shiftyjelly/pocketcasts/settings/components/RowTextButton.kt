@@ -21,18 +21,18 @@ fun RowTextButton(text: String, modifier: Modifier = Modifier, secondaryText: St
             .clickable { onClick() }
             .fillMaxWidth()
             .padding(all = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = text,
             fontSize = fontSize,
-            color = MaterialTheme.theme.colors.primaryText01
+            color = MaterialTheme.theme.colors.primaryText01,
         )
         if (secondaryText != null) {
             Text(
                 text = secondaryText,
                 fontSize = fontSize,
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
     }

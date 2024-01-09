@@ -44,12 +44,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 data class DialogButtonState(
     val text: String,
     val enabled: Boolean = true,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
 )
 
 enum class DialogButtonOrientation {
     Vertical,
-    Horizontal
+    Horizontal,
 }
 
 @Composable
@@ -58,19 +58,19 @@ fun DialogFrame(
     title: String,
     buttons: List<DialogButtonState>,
     buttonOrientation: DialogButtonOrientation = DialogButtonOrientation.Horizontal,
-    content: @Composable () -> Unit = {}
+    content: @Composable () -> Unit = {},
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
             backgroundColor = MaterialTheme.theme.colors.primaryUi01,
-            elevation = 10.dp
+            elevation = 10.dp,
         ) {
             Column {
                 DialogTitle(title)
                 Box(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
-                        .weight(1f, fill = false)
+                        .weight(1f, fill = false),
                 ) {
                     content()
                 }
@@ -87,9 +87,9 @@ private fun DialogTitle(text: String) {
         modifier = Modifier
             .padding(
                 top = 24.dp,
-                bottom = 12.dp
+                bottom = 12.dp,
             )
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp),
     )
 }
 
@@ -99,7 +99,7 @@ private fun DialogText(text: String) {
         text = text,
         modifier = Modifier
             .padding(bottom = 12.dp)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp),
     )
 }
 
@@ -121,7 +121,7 @@ private fun DialogButtons(
         DialogButtonOrientation.Vertical -> {
             Column(
                 horizontalAlignment = Alignment.End,
-                modifier = modifier
+                modifier = modifier,
             ) {
                 buttons.forEach { DialogButton(it) }
             }
@@ -129,7 +129,7 @@ private fun DialogButtons(
         DialogButtonOrientation.Horizontal -> {
             Row(
                 horizontalArrangement = Arrangement.End,
-                modifier = modifier
+                modifier = modifier,
             ) {
                 buttons.forEach { DialogButton(it) }
             }
@@ -152,15 +152,15 @@ fun <T> RadioDialog(
         buttons = listOf(
             DialogButtonState(
                 text = stringResource(LR.string.cancel),
-                onClick = dismissDialog
+                onClick = dismissDialog,
             ),
             DialogButtonState(
                 text = stringResource(LR.string.ok),
                 onClick = {
                     onSave(selected)
                     dismissDialog()
-                }
-            )
+                },
+            ),
         ),
         onDismissRequest = dismissDialog,
     ) {
@@ -169,7 +169,7 @@ fun <T> RadioDialog(
                 DialogRadioButton(
                     text = itemLabel,
                     selected = selected == item,
-                    onClick = { selected = item }
+                    onClick = { selected = item },
                 )
             }
         }
@@ -180,9 +180,8 @@ fun <T> RadioDialog(
 private fun DialogRadioButton(
     text: String,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -192,7 +191,7 @@ private fun DialogRadioButton(
                 selected = selected,
                 role = Role.RadioButton,
                 onClick = onClick,
-            )
+            ),
     ) {
         Spacer(Modifier.width(24.dp))
         RadioButton(
@@ -202,7 +201,7 @@ private fun DialogRadioButton(
         Spacer(Modifier.width(12.dp))
         TextP40(
             text = text,
-            modifier = Modifier.padding(vertical = 12.dp)
+            modifier = Modifier.padding(vertical = 12.dp),
         )
         Spacer(Modifier.width(24.dp))
     }
@@ -212,9 +211,8 @@ private fun DialogRadioButton(
 private fun DialogButton(button: DialogButtonState) {
     TextButton(
         onClick = button.onClick,
-        enabled = button.enabled
+        enabled = button.enabled,
     ) {
-
         val buttonText =
             if (button.text == stringResource(LR.string.ok)) {
                 button.text.uppercase(Locale.getDefault())
@@ -231,7 +229,7 @@ private fun DialogButton(button: DialogButtonState) {
             } else {
                 MaterialTheme.theme.colors.primaryInteractive01Disabled
             },
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         )
     }
 }
@@ -240,19 +238,19 @@ private fun DialogButton(button: DialogButtonState) {
 fun ProgressDialog(
     text: String,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Dialog(
         onDismissRequest = { onDismiss() },
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
                 .background(
                     color = MaterialTheme.theme.colors.primaryInteractive02,
-                    shape = RoundedCornerShape(8.dp)
-                )
+                    shape = RoundedCornerShape(8.dp),
+                ),
         ) {
             Row(
                 modifier.padding(16.dp),
@@ -261,7 +259,7 @@ fun ProgressDialog(
                 CircularProgressIndicator()
                 TextP40(
                     text = text,
-                    modifier = modifier.padding(start = 16.dp)
+                    modifier = modifier.padding(start = 16.dp),
                 )
             }
         }
@@ -282,7 +280,7 @@ private fun DialogFramePreview(
                 DialogButtonState(text = "yEs", onClick = {}),
             ),
             buttonOrientation = orientation,
-            onDismissRequest = {}
+            onDismissRequest = {},
         ) {
             DialogText("All the information you wanted to know about everything.")
         }
@@ -310,7 +308,7 @@ private fun RadioDialogPreview(theme: Theme.ThemeType) {
             ),
             savedOption = true,
             onSave = {},
-            dismissDialog = {}
+            dismissDialog = {},
         )
     }
 }
@@ -326,12 +324,12 @@ private fun RadioDialogPreview_dark() = RadioDialogPreview(Theme.ThemeType.DARK)
 @Preview(showBackground = true)
 @Composable
 private fun ProgressDialogPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
         ProgressDialog(
             text = "In Progress",
-            onDismiss = {}
+            onDismiss = {},
         )
     }
 }

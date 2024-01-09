@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import java.util.UUID
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +38,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)

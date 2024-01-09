@@ -26,7 +26,7 @@ object AuthPhoneModule {
         return TokenBundleRepositoryImpl(
             registry = wearDataLayerRegistry,
             coroutineScope = coroutineScope,
-            serializer = WatchSyncAuthDataSerializer
+            serializer = WatchSyncAuthDataSerializer,
         )
     }
 }

@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.models.converter
 
 import androidx.room.TypeConverter
 import io.sentry.Sentry
-import timber.log.Timber
 import java.time.Instant
 import java.util.Date
+import timber.log.Timber
 
 class DateTypeConverter {
 

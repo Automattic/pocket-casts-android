@@ -65,13 +65,11 @@ fun OnboardingImportStartPage(
     }
 
     Column {
-
         Column(
             Modifier
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
 
             ThemedTopAppBar(
@@ -81,13 +79,13 @@ fun OnboardingImportStartPage(
             Spacer(Modifier.height(12.dp))
             TextH10(
                 text = stringResource(LR.string.onboarding_bring_your_podcasts),
-                modifier = Modifier.padding(horizontal = 24.dp)
+                modifier = Modifier.padding(horizontal = 24.dp),
             )
 
             Spacer(Modifier.height(8.dp))
             TextP40(
                 text = stringResource(LR.string.onboarding_coming_from_another_app),
-                modifier = Modifier.padding(horizontal = 24.dp)
+                modifier = Modifier.padding(horizontal = 24.dp),
             )
 
             Spacer(Modifier.height(24.dp))
@@ -120,7 +118,7 @@ private fun ImportRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(vertical = 8.dp, horizontal = 24.dp)
+            .padding(vertical = 8.dp, horizontal = 24.dp),
     ) {
         Image(
             painter = painterResource(iconRes),

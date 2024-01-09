@@ -3,15 +3,15 @@ package au.com.shiftyjelly.pocketcasts.servers
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class ServerShowNotesManager @Inject constructor(
-    private val podcastCacheServerManager: PodcastCacheServerManager
+    private val podcastCacheServerManager: PodcastCacheServerManager,
 ) {
 
     /**

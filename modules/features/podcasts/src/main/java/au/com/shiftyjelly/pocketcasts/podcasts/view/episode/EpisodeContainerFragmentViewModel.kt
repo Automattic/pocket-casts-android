@@ -31,8 +31,8 @@ class EpisodeContainerFragmentViewModel @Inject constructor(
                                 "unknown"
                             }
                         }
-                    }
-                )
+                    },
+                ),
             )
         }
         initialized = true

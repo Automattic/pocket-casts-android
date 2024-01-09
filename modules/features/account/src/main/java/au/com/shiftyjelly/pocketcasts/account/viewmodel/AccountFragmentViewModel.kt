@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountFragmentViewModel @Inject constructor(
-    userManager: UserManager
+    userManager: UserManager,
 ) : ViewModel() {
     val signInState = userManager.getSignInState().toLiveData()
 }

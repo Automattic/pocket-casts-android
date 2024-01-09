@@ -16,11 +16,11 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class PlayButtonListener @Inject constructor(
     val downloadManager: DownloadManager,
@@ -29,7 +29,7 @@ class PlayButtonListener @Inject constructor(
     val settings: Settings,
     private val warningsHelper: WarningsHelper,
     @ActivityContext private val activity: Context,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : PlayButton.OnClickListener, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -114,7 +114,7 @@ class PlayButtonListener @Inject constructor(
                     episodeAnalytics.trackEvent(
                         AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
                         source = source,
-                        uuid = episodeUuid
+                        uuid = episodeUuid,
                     )
                     launch {
                         episodeManager.unarchive(it)

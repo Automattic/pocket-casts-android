@@ -13,7 +13,7 @@ import timber.log.Timber
 data class AnonymousBumpStat(
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "event_time") var eventTime: Long = System.currentTimeMillis(),
-    @ColumnInfo(name = "custom_event_props") var customEventProps: Map<String, Any> = emptyMap()
+    @ColumnInfo(name = "custom_event_props") var customEventProps: Map<String, Any> = emptyMap(),
 ) {
 
     init {
@@ -37,7 +37,7 @@ data class AnonymousBumpStat(
             NAME("_en"),
             EVENT_TIME("_ts"),
             UUID("_ui"),
-            USER_TYPE("_ut")
+            USER_TYPE("_ut"),
         }
 
         private val rootJsonKeys = JsonKey.values().map { it.value }
@@ -54,8 +54,8 @@ data class AnonymousBumpStat(
                 Types.newParameterizedType(
                     Map::class.java,
                     String::class.java,
-                    Any::class.java
-                )
+                    Any::class.java,
+                ),
             )
 
         @TypeConverter
@@ -85,7 +85,6 @@ data class AnonymousBumpStat(
 
         @FromJson
         fun fromJson(bumpStatMap: Map<String, Any>): AnonymousBumpStat? {
-
             val eventProps = bumpStatMap.filterKeys { !rootJsonKeys.contains(it) }
 
             val name = bumpStatMap[JsonKey.NAME.value]
@@ -107,7 +106,7 @@ data class AnonymousBumpStat(
             return AnonymousBumpStat(
                 name = name,
                 eventTime = eventTime,
-                customEventProps = eventProps
+                customEventProps = eventProps,
             )
         }
     }

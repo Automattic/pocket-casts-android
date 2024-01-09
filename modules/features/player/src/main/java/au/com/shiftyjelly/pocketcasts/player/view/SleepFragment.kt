@@ -25,9 +25,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 @AndroidEntryPoint
 class SleepFragment : BaseDialogFragment() {
@@ -48,7 +48,7 @@ class SleepFragment : BaseDialogFragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { Timber.e(it) },
-                onNext = { viewModel.updateSleepTimer() }
+                onNext = { viewModel.updateSleepTimer() },
             )
     }
 
@@ -113,7 +113,7 @@ class SleepFragment : BaseDialogFragment() {
                 binding.sleepAnimation.post { // this only works the second time it's called unless it's in a post
                     binding.sleepAnimation.addValueCallback(KeyPath("**"), LottieProperty.COLOR) { tintColor }
                 }
-            }
+            },
         )
 
         (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED

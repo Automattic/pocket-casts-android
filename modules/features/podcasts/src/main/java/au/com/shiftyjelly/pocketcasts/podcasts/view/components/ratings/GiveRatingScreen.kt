@@ -34,13 +34,13 @@ fun GiveRatingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         NavigationIconButton(
             iconColor = MaterialTheme.theme.colors.primaryText01,
             navigationButton = NavigationButton.Close,
             onNavigationClick = onDismiss,
-            modifier = Modifier.align(Alignment.Start)
+            modifier = Modifier.align(Alignment.Start),
         )
 
         Spacer(Modifier.weight(1f))
@@ -48,7 +48,6 @@ fun GiveRatingScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             PodcastCover(
                 uuid = state.podcastUuid,
                 coverWidth = 164.dp,
@@ -59,7 +58,7 @@ fun GiveRatingScreen(
             TextH30(
                 text = stringResource(LR.string.podcast_rate, state.podcastTitle),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
 
             Spacer(Modifier.height(32.dp))
@@ -68,7 +67,7 @@ fun GiveRatingScreen(
                 onStarsChanged = setRating,
                 modifier = Modifier
                     .height(48.dp)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             )
         }
 
@@ -76,7 +75,7 @@ fun GiveRatingScreen(
 
         RowButton(
             text = stringResource(LR.string.submit),
-            onClick = submitRating
+            onClick = submitRating,
         )
     }
 }

@@ -423,8 +423,8 @@ class PodcastAdapter(
                     episodeCount = episodeCount,
                     archivedCount = archivedCount,
                     searchTerm = searchTerm,
-                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null
-                )
+                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null,
+                ),
             )
             addAll(episodesPlusLimit)
         }
@@ -436,16 +436,16 @@ class PodcastAdapter(
                         NoResultsMessage(
                             title = context.getString(LR.string.podcast_no_episodes_found),
                             bodyText = context.getString(LR.string.podcast_no_episodes),
-                            showButton = false
-                        )
+                            showButton = false,
+                        ),
                     )
                 } else {
                     content.add(
                         NoResultsMessage(
                             title = context.getString(LR.string.podcast_no_episodes_found),
                             bodyText = context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount),
-                            showButton = true
-                        )
+                            showButton = true,
+                        ),
                     )
                 }
             } else {
@@ -453,8 +453,8 @@ class PodcastAdapter(
                     NoResultsMessage(
                         title = context.getString(LR.string.podcast_no_episodes_found),
                         bodyText = context.getString(LR.string.podcast_no_episodes_matching),
-                        showButton = false
-                    )
+                        showButton = false,
+                    ),
                 )
             }
         }
@@ -484,15 +484,15 @@ class PodcastAdapter(
                             onSearchFocus = onSearchFocus,
                             onSearchQueryChanged = onSearchQueryChanged,
                             onOptionsClicked = onBookmarksOptionsClicked,
-                        )
+                        ),
                     )
                     if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
                         add(
                             NoResultsMessage(
                                 title = context.getString(LR.string.podcast_no_bookmarks_found),
                                 bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
-                                showButton = false
-                            )
+                                showButton = false,
+                            ),
                         )
                     } else {
                         addAll(
@@ -508,11 +508,11 @@ class PodcastAdapter(
                                     isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
                                     isSelected = { bookmark ->
                                         multiSelectBookmarksHelper.isSelected(
-                                            bookmark
+                                            bookmark,
                                         )
                                     },
                                 )
-                            }
+                            },
                         )
                     }
                 }
@@ -667,7 +667,7 @@ class PodcastAdapter(
                 adapter.onWebsiteLinkClicked(it.context)
             }
             binding.bottom.ratings.setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
             )
         }
 

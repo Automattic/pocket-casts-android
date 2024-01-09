@@ -7,7 +7,7 @@ import androidx.work.NetworkType
 data class NetworkRequirements(
     var requiresPower: Boolean = true,
     var requiresUnmetered: Boolean = true,
-    var runImmediately: Boolean = false
+    var runImmediately: Boolean = false,
 ) {
 
     companion object {

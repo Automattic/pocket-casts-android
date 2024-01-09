@@ -21,7 +21,7 @@ class AppLifecycleAnalytics @Inject constructor(
     fun onApplicationUpgrade(previousVersionCode: Int) {
         analyticsTracker.track(
             AnalyticsEvent.APPLICATION_UPDATED,
-            mapOf(KEY_PREVIOUS_VERSION_CODE to previousVersionCode)
+            mapOf(KEY_PREVIOUS_VERSION_CODE to previousVersionCode),
         )
     }
 

@@ -10,6 +10,9 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,9 +21,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import javax.inject.Inject
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @HiltViewModel
 class NowPlayingViewModel @Inject constructor(
@@ -64,11 +64,13 @@ class NowPlayingViewModel @Inject constructor(
                     percent = with(playbackState) {
                         if (durationMs != 0) {
                             positionMs.toFloat() / durationMs
-                        } else 0f
+                        } else {
+                            0f
+                        }
                     },
                     duration = playbackState.durationMs.toDuration(DurationUnit.MILLISECONDS),
                     position = playbackState.positionMs.toDuration(DurationUnit.MILLISECONDS),
-                    shouldAnimate = true
+                    shouldAnimate = true,
                 )
 
                 State.Loaded(
@@ -90,7 +92,7 @@ class NowPlayingViewModel @Inject constructor(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-            initialValue = State.Loading
+            initialValue = State.Loading,
         )
 
     fun onPlayButtonClick(showStreamingConfirmation: () -> Unit) {

@@ -28,7 +28,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class VideoActivity : AppCompatActivity() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var theme: Theme
 
     private var pipActionsPlaying: List<RemoteAction>? = null

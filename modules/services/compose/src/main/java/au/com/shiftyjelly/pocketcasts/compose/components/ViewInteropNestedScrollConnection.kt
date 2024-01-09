@@ -59,7 +59,7 @@ import kotlin.math.floor
  */
 @Composable
 fun rememberViewInteropNestedScrollConnection(
-    view: View = LocalView.current
+    view: View = LocalView.current,
 ): NestedScrollConnection = remember(view) {
     ViewInteropNestedScrollConnection(view)
 }
@@ -96,7 +96,7 @@ internal class ViewInteropNestedScrollConnection(
                 available.y.ceilAwayFromZero().toInt() * -1, // dy
                 parentConsumed, // consumed
                 null, // offsetInWindow
-                source.toViewType() // type
+                source.toViewType(), // type
             )
 
             // toOffset coerces the parentConsumed values within `available`

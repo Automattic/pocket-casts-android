@@ -49,7 +49,7 @@ class PlaybackManagerNetworkWatcherTest {
         val isMeteredCapabilities = listOf(
             false, true, // first switch to metered
             true, true, true, false, false, true, // second switch to metered
-            true // not a switch to metered because was already metered
+            true, // not a switch to metered because was already metered
         )
         val timesCalled = getSwitchToMeteredCalls(backgroundScope, testScheduler, isMeteredCapabilities)
         assertEquals(2, timesCalled)
@@ -60,7 +60,6 @@ class PlaybackManagerNetworkWatcherTest {
         testScheduler: TestCoroutineScheduler,
         list: List<Boolean>,
     ): Int {
-
         // initialize NetworkConnectionWatcher mock
         val mutableNetworkCapabilitiesFlow = MutableStateFlow<NetworkCapabilities?>(null)
         whenever(networkConnectionWatcher.networkCapabilities)

@@ -104,13 +104,13 @@ object TimeHelper {
         if (!inProgress || currentTimeMs <= 0) {
             return TimeLeft(
                 text = getTimeDurationShortString(durationMs, context),
-                description = getTimeDurationString(durationMs, context)
+                description = getTimeDurationString(durationMs, context),
             )
         }
         val remaining = durationMs - currentTimeMs
         return TimeLeft(
             text = context.getString(R.string.time_left, getTimeDurationShortString(remaining, context, emptyString = "0")),
-            description = context.getString(R.string.time_left, getTimeDurationString(remaining, context, emptyString = "0"))
+            description = context.getString(R.string.time_left, getTimeDurationString(remaining, context, emptyString = "0")),
         )
     }
 

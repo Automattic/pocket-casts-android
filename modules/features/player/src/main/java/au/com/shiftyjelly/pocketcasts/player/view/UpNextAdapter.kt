@@ -179,7 +179,7 @@ class UpNextAdapter(
                 dateFormatter = dateFormatter,
                 tintColor = ThemeColor.primaryText02(theme),
                 showDuration = false,
-                context = binding.date.context
+                context = binding.date.context,
             )
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
             binding.executePendingBindings()
@@ -219,7 +219,7 @@ class UpNextAdapter(
 
 data class UpNextPlaying(
     val episode: BaseEpisode,
-    val progressPercent: Float
+    val progressPercent: Float,
 )
 
 private val UPNEXT_ADAPTER_DIFF = object : DiffUtil.ItemCallback<Any>() {

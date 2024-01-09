@@ -3,11 +3,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.ratings
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class RatingsManagerImpl @Inject constructor(
     private val cacheServerManager: PodcastCacheServerManager,
@@ -28,8 +28,8 @@ class RatingsManagerImpl @Inject constructor(
             PodcastRatings(
                 podcastUuid = podcastUuid,
                 total = ratings.total,
-                average = ratings.average
-            )
+                average = ratings.average,
+            ),
         )
     }
 
@@ -37,7 +37,7 @@ class RatingsManagerImpl @Inject constructor(
         private fun noRatings(podcastUuid: String) = PodcastRatings(
             podcastUuid = podcastUuid,
             average = 0.0,
-            total = 0
+            total = 0,
         )
     }
 }
