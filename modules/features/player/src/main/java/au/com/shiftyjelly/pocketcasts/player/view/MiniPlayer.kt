@@ -32,7 +32,7 @@ import coil.load
 import coil.request.Disposable
 import coil.request.ErrorResult
 import coil.request.ImageRequest
-import coil.size.Size
+import coil.size.Scale
 import coil.transform.RoundedCornersTransformation
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
@@ -263,7 +263,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
         val imageBuilder: ImageRequest.Builder.() -> Unit = {
             error(au.com.shiftyjelly.pocketcasts.images.R.drawable.defaultartwork_dark)
-            size(Size.ORIGINAL)
+            scale(Scale.FIT)
             transformations(
                 RoundedCornersTransformation(imageLoader.radiusPx.toFloat()),
                 ThemedImageTintTransformation(imageView.context)
