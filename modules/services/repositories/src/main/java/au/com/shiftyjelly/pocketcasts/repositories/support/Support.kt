@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jaredrummler.android.device.DeviceName
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -214,14 +212,10 @@ class Support @Inject constructor(
     }
 
     private fun getAccountType(isPaid: Boolean) = if (isPaid) {
-        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
-                SubscriptionTier.PATRON -> "Patron Account"
-                SubscriptionTier.PLUS -> "Plus Account"
-                SubscriptionTier.NONE -> ""
-            }
-        } else {
-            "Plus Account"
+        when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
+            SubscriptionTier.PATRON -> "Patron Account"
+            SubscriptionTier.PLUS -> "Plus Account"
+            SubscriptionTier.NONE -> ""
         }
     } else {
         ""
