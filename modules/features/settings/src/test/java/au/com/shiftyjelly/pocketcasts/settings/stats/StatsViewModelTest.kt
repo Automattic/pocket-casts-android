@@ -146,7 +146,7 @@ class StatsViewModelTest {
             syncManager = syncManager,
             application = application,
             ioDispatcher = UnconfinedTestDispatcher(),
-            inAppReviewHelper = inAppReviewHelper
+            inAppReviewHelper = inAppReviewHelper,
         )
     }
 }
