@@ -38,9 +38,6 @@ abstract class EpisodeDao {
     abstract fun observeCount(query: SupportSQLiteQuery): Flowable<Int>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuidSync(uuid: String): PodcastEpisode?
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")

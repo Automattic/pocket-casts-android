@@ -91,10 +91,6 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.findByUuid(uuid)
 
     @Deprecated("Use findByUuid suspended method instead")
-    override fun findByUuidSync(uuid: String): PodcastEpisode? =
-        episodeDao.findByUuidSync(uuid)
-
-    @Deprecated("Use findByUuid suspended method instead")
     override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =
         episodeDao.findByUuidRx(uuid)
 
