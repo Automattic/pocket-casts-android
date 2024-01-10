@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observer<RefreshState> {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
 
     private lateinit var preferenceAutoPlay: SwitchPreference

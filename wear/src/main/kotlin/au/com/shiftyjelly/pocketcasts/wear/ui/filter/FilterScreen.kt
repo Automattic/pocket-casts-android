@@ -54,7 +54,7 @@ fun FilterScreen(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 state.filter?.let {
                     ScreenHeaderChip(it.title)
@@ -88,7 +88,7 @@ private fun Content(
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        columnState = listState
+        columnState = listState,
     ) {
         item {
             ScreenHeaderChip(state.filter.title)

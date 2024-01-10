@@ -8,12 +8,12 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class EpisodeListBookmarkViewModel
@@ -32,7 +32,7 @@ class EpisodeListBookmarkViewModel
                         val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                         state.copy(
                             isBookmarkFeatureAvailable = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                                Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
+                                Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier),
                         )
                     }
                 }

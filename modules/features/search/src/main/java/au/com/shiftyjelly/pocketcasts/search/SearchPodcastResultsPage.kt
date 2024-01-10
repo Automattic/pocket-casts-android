@@ -47,7 +47,7 @@ private fun SearchPodcastResultsView(
     state: SearchState.Results,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
-    onSubscribeClick: (Podcast) -> Unit
+    onSubscribeClick: (Podcast) -> Unit,
 ) {
     LazyColumn {
         items(
@@ -73,7 +73,7 @@ private fun SearchPodcastResultsView(
                         onClick = { onPodcastClick(folderItem.podcast) },
                         onPlusClick = { onSubscribeClick(folderItem.podcast) },
                         modifier = Modifier
-                            .background(color = MaterialTheme.theme.colors.primaryUi01)
+                            .background(color = MaterialTheme.theme.colors.primaryUi01),
                     )
                 }
             }

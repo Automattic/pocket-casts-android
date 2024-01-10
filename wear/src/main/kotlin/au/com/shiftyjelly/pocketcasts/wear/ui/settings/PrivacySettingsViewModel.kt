@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.privacy.UserAnalyticsSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @HiltViewModel
 class PrivacySettingsViewModel @Inject constructor(
@@ -26,7 +26,7 @@ class PrivacySettingsViewModel @Inject constructor(
             sendAnalytics = settings.collectAnalytics.value,
             sendCrashReports = settings.sendCrashReports.value,
             linkCrashReportsToUser = settings.linkCrashReportsToUser.value,
-        )
+        ),
     )
     val state = _state.asStateFlow()
 

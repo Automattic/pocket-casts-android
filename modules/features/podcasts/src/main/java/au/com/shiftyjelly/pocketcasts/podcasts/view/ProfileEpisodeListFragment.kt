@@ -53,8 +53,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -88,13 +88,21 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var bookmarkManager: BookmarkManager
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
@@ -146,7 +154,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     Mode.History -> EpisodeItemTouchHelper.SwipeSource.LISTENING_HISTORY
                     Mode.Starred -> EpisodeItemTouchHelper.SwipeSource.STARRED
                 },
-            )
+            ),
         )
     }
 
@@ -343,7 +351,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            menu = if (mode.showMenu) R.menu.menu_profile_list else null
+            menu = if (mode.showMenu) R.menu.menu_profile_list else null,
         )
         toolbar.setOnMenuItemClickListener(this)
     }

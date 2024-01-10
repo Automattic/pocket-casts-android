@@ -57,29 +57,33 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class PlaybackSettingsFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     companion object {
         private const val ARG_SCROLL_TO_AUTOPLAY = "scroll_to_autoplay"
 
         fun newInstance(scrollToAutoPlay: Boolean = false): PlaybackSettingsFragment = PlaybackSettingsFragment().apply {
             arguments = bundleOf(
-                ARG_SCROLL_TO_AUTOPLAY to scrollToAutoPlay
+                ARG_SCROLL_TO_AUTOPLAY to scrollToAutoPlay,
             )
         }
     }
@@ -87,7 +91,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
@@ -109,7 +113,6 @@ class PlaybackSettingsFragment : BaseFragment() {
         scrollToAutoPlay: Boolean,
         onBackClick: () -> Unit,
     ) {
-
         LaunchedEffect(Unit) {
             analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_SHOWN)
         }
@@ -135,10 +138,9 @@ class PlaybackSettingsFragment : BaseFragment() {
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.theme.colors.primaryUi02)
-                    .verticalScroll(scrollState)
+                    .verticalScroll(scrollState),
             ) {
                 SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {
-
                     RowAction(
                         saved = settings.streamingMode.flow.collectAsState().value,
                         onSave = {
@@ -148,11 +150,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     "value" to when (it) {
                                         true -> "play"
                                         false -> "download"
-                                    }
-                                )
+                                    },
+                                ),
                             )
                             settings.streamingMode.set(it)
-                        }
+                        },
                     )
 
                     UpNextSwipe(
@@ -164,11 +166,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     "value" to when (it) {
                                         Settings.UpNextAction.PLAY_NEXT -> "play_next"
                                         Settings.UpNextAction.PLAY_LAST -> "play_last"
-                                    }
-                                )
+                                    },
+                                ),
                             )
                             settings.upNextSwipe.set(it)
-                        }
+                        },
                     )
 
                     PodcastEpisodeGrouping(
@@ -183,12 +185,12 @@ class PlaybackSettingsFragment : BaseFragment() {
                                         PodcastGrouping.Season -> "season"
                                         PodcastGrouping.Starred -> "starred"
                                         PodcastGrouping.Unplayed -> "unplayed"
-                                    }
-                                )
+                                    },
+                                ),
                             )
                             settings.podcastGroupingDefault.set(it)
                             showSetAllGroupingDialog(it)
-                        }
+                        },
                     )
 
                     ShowArchived(
@@ -200,12 +202,12 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     "value" to when (it) {
                                         true -> "show"
                                         false -> "hide"
-                                    }
-                                )
+                                    },
+                                ),
                             )
                             settings.showArchivedDefault.set(it)
                             showSetAllArchiveDialog(it)
-                        }
+                        },
                     )
 
                     SettingRow(
@@ -213,12 +215,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                         secondaryText = stringResource(LR.string.settings_customize_buttons_displayed_in_android_13_notification_and_android_auto),
                         modifier = Modifier.clickable {
                             (activity as? FragmentHostListener)?.addFragment(MediaNotificationControlsFragment())
-                        }
+                        },
                     )
                 }
 
                 SettingSection(heading = stringResource(LR.string.settings_general_player)) {
-
                     // Skip forward time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_forward_time),
@@ -228,10 +229,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
-                                mapOf("value" to it)
+                                mapOf("value" to it),
                             )
                             settings.skipForwardInSecs.set(it, needsSync = true)
-                        }
+                        },
                     )
 
                     // Skip back time
@@ -241,10 +242,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_SKIP_BACK_CHANGED,
-                                mapOf("value" to it)
+                                mapOf("value" to it),
                             )
                             settings.skipBackInSecs.set(it, needsSync = true)
-                        }
+                        },
                     )
 
                     KeepScreenAwake(
@@ -252,10 +253,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
-                                mapOf("enabled" to it)
+                                mapOf("enabled" to it),
                             )
                             settings.keepScreenAwake.set(it)
-                        }
+                        },
                     )
 
                     OpenPlayerAutomatically(
@@ -263,10 +264,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
-                                mapOf("enabled" to it)
+                                mapOf("enabled" to it),
                             )
                             settings.openPlayerAutomatically.set(it)
-                        }
+                        },
                     )
 
                     IntelligentPlaybackResumption(
@@ -274,10 +275,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
-                                mapOf("enabled" to it)
+                                mapOf("enabled" to it),
                             )
                             settings.intelligentPlaybackResumption.set(it)
-                        }
+                        },
                     )
 
                     PlayUpNextOnTap(
@@ -285,10 +286,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
-                                mapOf("enabled" to it)
+                                mapOf("enabled" to it),
                             )
                             settings.tapOnUpNextShouldPlay.set(it)
-                        }
+                        },
                     )
 
                     // The [scrollToAutoPlay] fragment argument handling depends on this item being last
@@ -305,10 +306,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             analyticsTracker.track(
                                 AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
-                                mapOf("enabled" to it)
+                                mapOf("enabled" to it),
                             )
                             settings.autoPlayNextEpisodeOnEmpty.set(it)
-                        }
+                        },
                     )
                 }
             }
@@ -318,7 +319,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun RowAction(
         saved: Boolean,
-        onSave: (Boolean) -> Unit
+        onSave: (Boolean) -> Unit,
     ) {
         val savedString = stringResource(rowActionToStringRes(saved)).lowercase(Locale.getDefault())
         val secondaryText = stringResource(LR.string.settings_row_action_summary, savedString)
@@ -341,7 +342,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun UpNextSwipe(
         saved: Settings.UpNextAction,
-        onSave: (Settings.UpNextAction) -> Unit
+        onSave: (Settings.UpNextAction) -> Unit,
     ) {
         val savedString =
             stringResource(upNextActionToStringRes(saved)).lowercase(Locale.getDefault())
@@ -352,7 +353,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             options = listOf(Settings.UpNextAction.PLAY_NEXT, Settings.UpNextAction.PLAY_LAST),
             savedOption = saved,
             optionToLocalisedString = { getString(upNextActionToStringRes(it)) },
-            onSave = onSave
+            onSave = onSave,
         )
     }
 
@@ -365,7 +366,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun PodcastEpisodeGrouping(
         saved: PodcastGrouping,
-        onSave: (PodcastGrouping) -> Unit
+        onSave: (PodcastGrouping) -> Unit,
     ) {
         SettingRadioDialogRow(
             primaryText = stringResource(LR.string.settings_podcast_episode_grouping),
@@ -395,7 +396,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun ShowArchived(
         saved: Boolean,
-        onSave: (Boolean) -> Unit
+        onSave: (Boolean) -> Unit,
     ) = SettingRadioDialogRow(
         primaryText = stringResource(LR.string.settings_show_archived),
         secondaryText = when (saved) {
@@ -417,18 +418,16 @@ class PlaybackSettingsFragment : BaseFragment() {
     private fun SkipTime(
         primaryText: String,
         saved: Int,
-        onSave: (Int) -> Unit
+        onSave: (Int) -> Unit,
     ) {
-
         var showDialog by remember { mutableStateOf(false) }
 
         SettingRow(
             primaryText = primaryText,
             secondaryText = stringResource(LR.string.seconds_plural, saved),
-            modifier = Modifier.clickable { showDialog = true }
+            modifier = Modifier.clickable { showDialog = true },
         ) {
             if (showDialog) {
-
                 val focusRequester = remember { FocusRequester() }
                 LaunchedEffect(Unit) {
                     // delay apparently needed to ensure the soft keyboard opens
@@ -440,8 +439,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                     mutableStateOf(
                         TextFieldValue(
                             text = saved.toString(),
-                            selection = TextRange(0, saved.toString().length)
-                        )
+                            selection = TextRange(0, saved.toString().length),
+                        ),
                     )
                 }
 
@@ -458,17 +457,17 @@ class PlaybackSettingsFragment : BaseFragment() {
                     buttons = listOf(
                         DialogButtonState(
                             text = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.cancel).uppercase(
-                                Locale.getDefault()
+                                Locale.getDefault(),
                             ),
-                            onClick = { showDialog = false }
+                            onClick = { showDialog = false },
                         ),
                         DialogButtonState(
                             text = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.ok),
                             onClick = onFinish,
-                            enabled = value.text.toPositiveNumberOrNull() != null
-                        )
+                            enabled = value.text.toPositiveNumberOrNull() != null,
+                        ),
                     ),
-                    onDismissRequest = { showDialog = false }
+                    onDismissRequest = { showDialog = false },
                 ) {
                     OutlinedTextField(
                         value = value,
@@ -485,7 +484,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                         colors = TextFieldDefaults.textFieldColors(
                             textColor = MaterialTheme.theme.colors.primaryText01,
                             placeholderColor = MaterialTheme.theme.colors.primaryText02,
-                            backgroundColor = MaterialTheme.theme.colors.primaryUi01
+                            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                         ),
                         label = {
                             Text(stringResource(LR.string.seconds_label))
@@ -495,7 +494,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                         keyboardActions = KeyboardActions { onFinish() },
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
-                            .focusRequester(focusRequester)
+                            .focusRequester(focusRequester),
                     )
                 }
             }
@@ -514,7 +513,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             primaryText = stringResource(LR.string.settings_keep_screen_awake),
             secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
 
     @Composable
@@ -523,7 +522,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             primaryText = stringResource(id = LR.string.settings_open_player_automatically),
             secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
 
     @Composable
@@ -532,7 +531,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             primaryText = stringResource(LR.string.settings_playback_resumption),
             secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
 
     @Composable
@@ -541,7 +540,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             primaryText = stringResource(LR.string.settings_up_next_tap),
             secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
 
     @Composable
@@ -555,7 +554,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             secondaryText = stringResource(LR.string.settings_continuous_playback_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             showFlashWithDelay = showFlashWithDelay,
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
 
     private fun showSetAllGroupingDialog(grouping: PodcastGrouping) {
@@ -566,8 +565,8 @@ class PlaybackSettingsFragment : BaseFragment() {
             .setSummary(
                 getString(
                     LR.string.settings_apply_group_by,
-                    getString(grouping.groupName).lowercase()
-                )
+                    getString(grouping.groupName).lowercase(),
+                ),
             )
             .setIconId(R.drawable.ic_podcasts)
             .setOnConfirm {

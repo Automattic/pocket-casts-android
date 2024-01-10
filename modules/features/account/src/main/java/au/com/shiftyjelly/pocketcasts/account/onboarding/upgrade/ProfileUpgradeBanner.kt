@@ -100,7 +100,9 @@ fun ProfileUpgradeBannerView(
             onClick = onClick,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-            } else Modifier
+            } else {
+                Modifier
+            },
         )
     }
 }
@@ -113,7 +115,7 @@ private fun FeatureCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.padding(horizontal = 16.dp)
+        modifier = modifier.padding(horizontal = 16.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -180,10 +182,10 @@ private fun AmountView(
             withStyle(style = SpanStyle(fontWeight = FontWeight.W400)) {
                 append(
                     stringResource(subscription.recurringPricingPhase.perPeriod)
-                        .lowercase(Locale.getDefault())
+                        .lowercase(Locale.getDefault()),
                 )
             }
-        }
+        },
     )
 }
 
@@ -244,13 +246,13 @@ private fun FeatureItemComposable(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Icon(
             painter = painterResource(item.image),
             contentDescription = null,
             tint = Color.White,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(32.dp),
         )
         Spacer(Modifier.width(12.dp))
         TextH60(

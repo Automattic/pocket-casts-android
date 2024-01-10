@@ -52,17 +52,17 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class RefreshPodcastsThread(
     private val context: Context,
     private val applicationScope: CoroutineScope,
-    private val runNow: Boolean
+    private val runNow: Boolean,
 ) {
 
     @EntryPoint
@@ -177,7 +177,7 @@ class RefreshPodcastsThread(
                     userMessage: String?,
                     serverMessageId: String?,
                     serverMessage: String?,
-                    throwable: Throwable?
+                    throwable: Throwable?,
                 ) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
                     if (throwable != null) {
@@ -185,7 +185,7 @@ class RefreshPodcastsThread(
                     }
                     refreshFailedOrCancelled("Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
                 }
-            }
+            },
         )
     }
 
@@ -257,7 +257,7 @@ class RefreshPodcastsThread(
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
-            featureFlagWrapper = entryPoint.featureFlagWrapper()
+            featureFlagWrapper = entryPoint.featureFlagWrapper(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()
@@ -456,9 +456,8 @@ class RefreshPodcastsThread(
             podcastManager: PodcastManager,
             notificationHelper: NotificationHelper,
             settings: Settings,
-            context: Context
+            context: Context,
         ) {
-
             // order by published date on Google Wear devices
             val sortKey = String.format("%04d", episodeIndex)
             var intentId = intentId
@@ -580,7 +579,7 @@ class RefreshPodcastsThread(
             settings: Settings,
             podcastManager: PodcastManager,
             notificationHelper: NotificationHelper,
-            context: Context
+            context: Context,
         ) {
             var intentIndex = intentId
 
@@ -672,9 +671,9 @@ class RefreshPodcastsThread(
                 context.resources.getString(
                     LR.string.podcast_notification_new_episode,
                     if (podcastName == null) "" else TextUtils.htmlEncode(podcastName),
-                    if (episodeName == null) "" else TextUtils.htmlEncode(episodeName)
+                    if (episodeName == null) "" else TextUtils.htmlEncode(episodeName),
                 ),
-                HtmlCompat.FROM_HTML_MODE_COMPACT
+                HtmlCompat.FROM_HTML_MODE_COMPACT,
             )
         }
     }

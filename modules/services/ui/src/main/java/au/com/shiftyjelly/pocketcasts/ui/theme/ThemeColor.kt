@@ -459,6 +459,7 @@ object ThemeColor {
     val secondaryInteractive01ActiveRose = Color.parseColor("#e8415f")
     val secondaryInteractive01ActiveLightContrast = Color.parseColor("#404040")
     val secondaryInteractive01ActiveDarkContrast = Color.parseColor("#c0c0c0")
+
     @ColorInt fun podcastUi01Light(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
 
     @ColorInt fun podcastUi01Dark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#292B2E") }
@@ -1659,6 +1660,7 @@ object ThemeColor {
     val support10Rose = Color.parseColor("#FF4FE2")
     val support10LightContrast = Color.parseColor("#FEB700")
     val support10DarkContrast = Color.parseColor("#F5CA5B")
+
     @ColorInt fun playerBackground01Light(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 51))
     }

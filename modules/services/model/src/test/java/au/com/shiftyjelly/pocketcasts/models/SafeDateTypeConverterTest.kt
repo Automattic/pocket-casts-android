@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.models
 
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
-import junit.framework.TestCase.assertEquals
-import org.junit.Test
 import java.time.Instant
 import java.util.Date
+import junit.framework.TestCase.assertEquals
+import org.junit.Test
 
 class SafeDateTypeConverterTest {
 

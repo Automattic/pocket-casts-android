@@ -8,5 +8,5 @@ import com.squareup.moshi.JsonClass
 data class LoginResponse(
     @field:Json(name = "token") val token: AccessToken,
     @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "email") val email: String?
+    @field:Json(name = "email") val email: String?,
 )

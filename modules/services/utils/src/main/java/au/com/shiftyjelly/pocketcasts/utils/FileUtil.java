@@ -196,7 +196,7 @@ public class FileUtil {
         return FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
     }
 
-    public static long folderSize(File directory) {
+    public static long folderSize(@NonNull File directory) {
         if (!directory.isDirectory()) {
             return 0;
         }

@@ -10,7 +10,7 @@ private val AUTOMOTIVE_DRAWABLES = arrayOf(
     R.drawable.auto_folder_04,
     R.drawable.auto_folder_05,
     R.drawable.auto_folder_06,
-    R.drawable.auto_folder_07
+    R.drawable.auto_folder_07,
 )
 
 val Folder.automotiveDrawableId: Int

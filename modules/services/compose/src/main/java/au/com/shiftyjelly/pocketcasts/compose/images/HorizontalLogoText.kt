@@ -24,7 +24,7 @@ fun HorizontalLogoText(
         painter = painterResource(IR.drawable.logo_pocket_casts),
         contentDescription = contentDescription,
         colorFilter = ColorFilter.tint(logoColor),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

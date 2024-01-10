@@ -60,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val MAX_ITEM_COUNT = 20
+
 @Composable
 fun SearchInlineResultsPage(
     viewModel: SearchViewModel,
@@ -98,7 +99,7 @@ fun SearchInlineResultsPage(
                 contentAlignment = Alignment.Center,
                 modifier = modifier
                     .padding(top = 16.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 CircularProgressIndicator(
                     modifier = modifier.size(24.dp),
@@ -146,7 +147,7 @@ private fun SearchResultsView(
     LazyColumn(
         state = episodesRowState,
         modifier = modifier
-            .nestedScroll(nestedScrollConnection)
+            .nestedScroll(nestedScrollConnection),
     ) {
         if (state.podcasts.isNotEmpty()) {
             item {
@@ -159,18 +160,18 @@ private fun SearchResultsView(
         item {
             LazyRow(
                 state = podcastsRowState,
-                contentPadding = PaddingValues(horizontal = 8.dp)
+                contentPadding = PaddingValues(horizontal = 8.dp),
             ) {
                 items(
                     items = state.podcasts.take(minOf(MAX_ITEM_COUNT, state.podcasts.size)),
-                    key = { it.uuid }
+                    key = { it.uuid },
                 ) { folderItem ->
                     when (folderItem) {
                         is FolderItem.Folder -> {
                             SearchFolderItem(
                                 folder = folderItem.folder,
                                 podcasts = folderItem.podcasts,
-                                onClick = { onFolderClick(folderItem.folder, folderItem.podcasts) }
+                                onClick = { onFolderClick(folderItem.folder, folderItem.podcasts) },
                             )
                         }
 
@@ -182,7 +183,7 @@ private fun SearchResultsView(
                                     { onSubscribeToPodcast(folderItem.podcast) }
                                 } else {
                                     null
-                                }
+                                },
                             )
                         }
                     }
@@ -193,7 +194,7 @@ private fun SearchResultsView(
             item {
                 HorizontalDivider(
                     startIndent = 16.dp,
-                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
+                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp),
                 )
             }
         }
@@ -207,7 +208,7 @@ private fun SearchResultsView(
         }
         items(
             items = state.episodes.take(minOf(MAX_ITEM_COUNT, state.episodes.size)),
-            key = { it.uuid }
+            key = { it.uuid },
         ) {
             SearchEpisodeItem(
                 episode = it,
@@ -227,12 +228,12 @@ private fun SearchResultsHeaderView(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 8.dp, end = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         TextH20(
             text = title,
             color = MaterialTheme.theme.colors.primaryText01,
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
         )
         TextP60(
             text = stringResource(LR.string.search_show_all).uppercase(),
@@ -240,7 +241,7 @@ private fun SearchResultsHeaderView(
             fontWeight = FontWeight.W700,
             modifier = modifier
                 .clickable { onShowAllCLick() }
-                .padding(12.dp)
+                .padding(12.dp),
         )
     }
 }
@@ -280,18 +281,18 @@ private fun MessageView(
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
             modifier = modifier
                 .size(96.dp)
-                .padding(top = 32.dp, bottom = 16.dp)
+                .padding(top = 32.dp, bottom = 16.dp),
         )
         TextH20(
             text = stringResource(titleResId),
             modifier = modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         )
         TextP50(
             text = stringResource(summaryResId),
             modifier = modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.theme.colors.primaryText02
+            color = MaterialTheme.theme.colors.primaryText02,
         )
     }
 }
@@ -316,15 +317,15 @@ private fun SearchResultsViewPreview(
                             syncModified = 0L,
                             sortPosition = 0,
                         ),
-                        podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString()))
+                        podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString())),
                     ),
                     FolderItem.Podcast(
                         podcast = Podcast(
                             uuid = UUID.randomUUID().toString(),
                             title = "Podcast",
-                            author = "Author"
-                        )
-                    )
+                            author = "Author",
+                        ),
+                    ),
                 ),
                 episodes = listOf(
                     EpisodeItem(
@@ -333,12 +334,12 @@ private fun SearchResultsViewPreview(
                         duration = 4004.0,
                         publishedAt = "2022-10-28T03:00:00Z".parseIsoDate() ?: Date(),
                         podcastUuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-                        podcastTitle = "Material"
-                    )
+                        podcastTitle = "Material",
+                    ),
                 ),
                 error = null,
                 loading = false,
-                searchTerm = ""
+                searchTerm = "",
             ),
             onEpisodeClick = {},
             onPodcastClick = {},

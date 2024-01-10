@@ -28,6 +28,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
+import java.net.HttpURLConnection
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
+import javax.inject.Singleton
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Dispatcher
@@ -39,12 +45,6 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.protobuf.ProtoConverterFactory
-import java.io.File
-import java.net.HttpURLConnection
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import javax.inject.Qualifier
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -340,7 +340,7 @@ class ServersModule {
         val platform = if (Util.isAutomotive(context)) "automotive" else "android"
         return ListRepository(
             listWebService,
-            platform
+            platform,
         )
     }
 

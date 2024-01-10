@@ -45,7 +45,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.Date
 import java.util.Locale
@@ -56,13 +55,14 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences,
     @PrivateSharedPreferences private val privatePreferences: SharedPreferences,
     @ApplicationContext private val context: Context,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
-    private val moshi: Moshi
+    private val moshi: Moshi,
 ) : Settings {
 
     companion object {
@@ -211,7 +211,7 @@ class SettingsImpl @Inject constructor(
                     null
                 } ?: NotificationVibrateSetting.DEFAULT
             },
-            toString = { it.intValue.toString() }
+            toString = { it.intValue.toString() },
         )
     }
 
@@ -220,7 +220,7 @@ class SettingsImpl @Inject constructor(
         defaultValue = NotificationSound(context = context),
         sharedPrefs = sharedPreferences,
         fromString = { NotificationSound(it, context) },
-        toString = { it.path }
+        toString = { it.path },
     )
 
     override val notifyRefreshPodcast = UserSetting.BoolPref(
@@ -354,7 +354,7 @@ class SettingsImpl @Inject constructor(
         },
         sharedPrefs = sharedPreferences,
         fromString = { PlayOverNotificationSetting.fromPreferenceString(it) },
-        toString = { it.preferenceInt.toString() }
+        toString = { it.preferenceInt.toString() },
     )
 
     override fun setLastModified(lastModified: String?) {
@@ -400,18 +400,19 @@ class SettingsImpl @Inject constructor(
             val key = keyFactory.generateSecret(PBEKeySpec(SETTINGS_ENCRYPT_SECRET))
             val pbeCipher = Cipher.getInstance("PBEWithMD5AndDES")
             pbeCipher.init(
-                Cipher.ENCRYPT_MODE, key,
+                Cipher.ENCRYPT_MODE,
+                key,
                 PBEParameterSpec(
                     android.provider.Settings.Secure.getString(
                         context.contentResolver,
-                        android.provider.Settings.System.ANDROID_ID
+                        android.provider.Settings.System.ANDROID_ID,
                     ).toByteArray(charset("utf-8")),
-                    20
-                )
+                    20,
+                ),
             )
             return String(
                 Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP),
-                Charset.forName("utf-8")
+                Charset.forName("utf-8"),
             )
         } catch (e: Exception) {
             throw RuntimeException(e)
@@ -478,7 +479,7 @@ class SettingsImpl @Inject constructor(
     override val hideNotificationOnPause = UserSetting.BoolPref(
         sharedPrefKey = "hideNotificationOnPause",
         defaultValue = false,
-        sharedPrefs = sharedPreferences
+        sharedPrefs = sharedPreferences,
     )
 
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
@@ -579,7 +580,7 @@ class SettingsImpl @Inject constructor(
         defaultValue = BadgeType.defaultValue,
         sharedPrefs = sharedPreferences,
         fromInt = { BadgeType.fromPersistedInt(it) },
-        toInt = { it.persistedInt }
+        toInt = { it.persistedInt },
     )
 
     override val podcastGridLayout = UserSetting.PrefFromInt<PodcastGridLayoutType>(
@@ -587,7 +588,7 @@ class SettingsImpl @Inject constructor(
         defaultValue = PodcastGridLayoutType.default,
         sharedPrefs = sharedPreferences,
         fromInt = { PodcastGridLayoutType.fromLayoutId(it) },
-        toInt = { it.id }
+        toInt = { it.id },
     )
 
     override fun getNotificationLastSeen(): Date? {
@@ -801,7 +802,8 @@ class SettingsImpl @Inject constructor(
         defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
             AppPlatform.Phone,
-            AppPlatform.WearOs -> false
+            AppPlatform.WearOs,
+            -> false
         },
         sharedPrefs = sharedPreferences,
     )
@@ -860,7 +862,7 @@ class SettingsImpl @Inject constructor(
         defaultValue = Settings.UpNextAction.PLAY_NEXT,
         sharedPrefs = sharedPreferences,
         fromInt = { Settings.UpNextAction.values()[it] },
-        toInt = { it.ordinal }
+        toInt = { it.ordinal },
     )
 
     override val tapOnUpNextShouldPlay = UserSetting.BoolPref(
@@ -891,7 +893,7 @@ class SettingsImpl @Inject constructor(
                 val str = adapter.toJson(paidSubscriptionStatus)
                 encrypt(str)
             } ?: ""
-        }
+        },
     )
 
     // This is passed to the feature module which cannot access subscription tier to determine feature availability
@@ -929,7 +931,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
         defaultValue = MediaNotificationControls.All,
         fromString = { MediaNotificationControls.itemForId(it) },
-        toString = { it.key }
+        toString = { it.key },
     )
 
     override val podcastGroupingDefault = run {
@@ -939,7 +941,7 @@ class SettingsImpl @Inject constructor(
             defaultValue = default,
             sharedPrefs = sharedPreferences,
             fromInt = { PodcastGrouping.All.getOrNull(it) ?: default },
-            toInt = { PodcastGrouping.All.indexOf(it) }
+            toInt = { PodcastGrouping.All.indexOf(it) },
         )
     }
 
@@ -1082,7 +1084,7 @@ class SettingsImpl @Inject constructor(
                 AutoAddUpNextLimitBehaviour.values().getOrNull(it)
                     ?: default
             },
-            toInt = { it.ordinal }
+            toInt = { it.ordinal },
         )
     }
 
@@ -1111,8 +1113,9 @@ class SettingsImpl @Inject constructor(
         // if we've saved on previously, return that
         val sharedPrefs = context.getSharedPreferences("Global", 0)
         val storedDeviceId = sharedPrefs.getString(DEVICE_ID_KEY, null)
-        if (storedDeviceId != null)
+        if (storedDeviceId != null) {
             return storedDeviceId
+        }
 
         // otherwise create one
         val deviceId = UUID.randomUUID().toString()
@@ -1229,7 +1232,7 @@ class SettingsImpl @Inject constructor(
                 LastPlayedList.None -> ""
                 is LastPlayedList.Uuid -> it.uuid
             }
-        }
+        },
     )
 
     override val theme = ThemeSetting.UserSettingPref(
@@ -1253,7 +1256,7 @@ class SettingsImpl @Inject constructor(
     override val useSystemTheme = UserSetting.BoolPref(
         sharedPrefKey = "useSystemTheme",
         defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q, // Only default on Android 10+
-        sharedPrefs = sharedPreferences
+        sharedPrefs = sharedPreferences,
     )
 
     override val appIcon = UserSetting.PrefFromString(
@@ -1264,7 +1267,7 @@ class SettingsImpl @Inject constructor(
             AppIconSetting.values().find { it.id == str }
                 ?: AppIconSetting.DEFAULT
         },
-        toString = { it.id }
+        toString = { it.id },
     )
 
     override val episodeBookmarksSortType = BookmarksSortTypeDefault.UserSettingPref(

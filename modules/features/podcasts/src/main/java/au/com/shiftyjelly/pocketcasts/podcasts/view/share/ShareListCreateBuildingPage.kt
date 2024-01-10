@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShareListCreateBuildingPage(
     onCloseClick: () -> Unit,
-    viewModel: ShareListCreateViewModel
+    viewModel: ShareListCreateViewModel,
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
 
@@ -48,7 +48,7 @@ fun ShareListCreateBuildingPage(
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_creating_list),
             navigationButton = NavigationButton.Close,
-            onNavigationClick = onCloseClick
+            onNavigationClick = onCloseClick,
         )
 
         CreateBuildingContent(title = state.title, podcasts = state.selectedPodcastsOrdered)
@@ -60,7 +60,7 @@ private fun CreateBuildingContent(title: String, podcasts: List<Podcast>, modifi
     var progress by remember { mutableStateOf(0f) }
     val progressAnimation by animateFloatAsState(
         targetValue = progress,
-        animationSpec = tween(durationMillis = 5000, easing = FastOutSlowInEasing)
+        animationSpec = tween(durationMillis = 5000, easing = FastOutSlowInEasing),
     )
 
     Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxSize()) {
@@ -99,7 +99,7 @@ private fun CreateBuildingContentPreview(@PreviewParameter(ThemePreviewParameter
         Column {
             CreateBuildingContent(
                 title = "Top News Podcasts",
-                podcasts = listOf(Podcast(), Podcast(), Podcast())
+                podcasts = listOf(Podcast(), Podcast(), Podcast()),
             )
         }
     }

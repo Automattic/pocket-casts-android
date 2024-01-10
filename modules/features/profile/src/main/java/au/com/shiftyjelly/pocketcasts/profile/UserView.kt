@@ -43,7 +43,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 open class UserView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
     open val layoutResource = R.layout.view_user
 
@@ -94,18 +94,18 @@ open class UserView @JvmOverloads constructor(
                     percent = percent,
                     plusOnly = signInState.isSignedInAsPlus,
                     isPatron = signInState.isSignedInAsPatron,
-                    gravatarUrl = gravatarUrl
+                    gravatarUrl = gravatarUrl,
                 )
             }
             is SignInState.SignedOut -> imgProfilePicture.setup(
                 percent = 0.0f,
                 plusOnly = false,
-                isPatron = false
+                isPatron = false,
             )
             else -> imgProfilePicture.setup(
                 percent = 0.0f,
                 plusOnly = false,
-                isPatron = false
+                isPatron = false,
             )
         }
     }
@@ -208,7 +208,7 @@ open class UserView @JvmOverloads constructor(
 class ExpandedUserView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : UserView(context, attrs, defStyleAttr) {
     override val layoutResource: Int
         get() = R.layout.view_expanded_user

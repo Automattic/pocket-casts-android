@@ -125,7 +125,10 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.colorIntWithAlpha
 object ThemeColor {\n", mode: 'a')
 File.write(FILE_PATH_STYLES, "package au.com.shiftyjelly.pocketcasts.ui.theme
 
-// ************ WARNING AUTO GENERATED, DO NOT EDIT ************\nenum class ThemeStyle {\n", mode: 'a')
+// ************ WARNING AUTO GENERATED, DO NOT EDIT ************
+
+@Suppress(\"ktlint:standard:enum-entry-name-case\")
+enum class ThemeStyle {\n", mode: 'a')
 
 all_token_names = []
 

@@ -44,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class AutoMediaId(
     val episodeId: String,
-    val sourceId: String?
+    val sourceId: String?,
 ) {
     companion object {
         private const val DIVIDER = "#"
@@ -223,7 +223,7 @@ object AutoConverter {
 
         return bundleOf(
             EXTRA_DOWNLOAD_STATUS to downloadStatus,
-            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus
+            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus,
         )
     }
 }

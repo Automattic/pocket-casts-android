@@ -18,6 +18,7 @@ import org.mockito.kotlin.verify
 class WatchListScreenViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
     @Mock
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 

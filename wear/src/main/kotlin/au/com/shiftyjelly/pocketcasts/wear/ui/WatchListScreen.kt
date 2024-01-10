@@ -34,7 +34,6 @@ fun WatchListScreen(
     navigateToRoute: (String) -> Unit,
     toNowPlaying: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<WatchListScreenViewModel>()
     val state by viewModel.state.collectAsState()
     val upNextState = state.upNextQueue
@@ -47,7 +46,6 @@ fun WatchListScreen(
         columnState = columnState,
         modifier = Modifier.fillMaxWidth(),
     ) {
-
         item {
             // Need this to position the first chip correctly when the screen loads
             Spacer(Modifier)
@@ -69,7 +67,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onPodcastsClicked()
                     navigateToRoute(PodcastsScreen.routeHomeFolder)
-                }
+                },
             )
         }
 
@@ -80,7 +78,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onDownloadsClicked()
                     navigateToRoute(DownloadsScreen.route)
-                }
+                },
             )
         }
 
@@ -91,7 +89,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onFiltersClicked()
                     navigateToRoute(FiltersScreen.route)
-                }
+                },
             )
         }
 
@@ -102,7 +100,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onFilesClicked()
                     navigateToRoute(FilesScreen.route)
-                }
+                },
             )
         }
 
@@ -113,7 +111,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onSettingsClicked()
                     navigateToRoute(SettingsScreen.route)
-                }
+                },
             )
         }
     }
@@ -126,7 +124,7 @@ private fun WatchListPreview() {
         WatchListScreen(
             toNowPlaying = {},
             navigateToRoute = {},
-            columnState = ScalingLazyColumnState()
+            columnState = ScalingLazyColumnState(),
         )
     }
 }

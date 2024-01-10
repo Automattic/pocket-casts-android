@@ -26,6 +26,7 @@ import javax.inject.Inject
 class CreateFrequencyFragment : BaseFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
     private var adapter: CreateFrequencyAdapter? = null
     private val viewModel: CreateAccountViewModel by activityViewModels()
@@ -88,7 +89,7 @@ class CreateFrequencyFragment : BaseFragment() {
                     title = subscription.productDetails.title,
                     price = subscription.recurringPricingPhase.pricingPhase.priceAmountMicros * 1_000_000.0,
                     currency = subscription.recurringPricingPhase.pricingPhase.priceCurrencyCode,
-                    isFreeTrial = subscription is Subscription.WithTrial
+                    isFreeTrial = subscription is Subscription.WithTrial,
                 )
                 it.findNavController().navigate(R.id.action_createFrequencyFragment_to_createTOSFragment)
             }
@@ -100,10 +101,11 @@ class CreateFrequencyFragment : BaseFragment() {
     }
 
     private fun updateForm(cannotFindSubs: Boolean) {
-
         if (cannotFindSubs) {
             UiUtil.displayAlert(
-                activity, "Server Error", "Please check you are logged in to the Google Play Store"
+                activity,
+                "Server Error",
+                "Please check you are logged in to the Google Play Store",
             ) {
                 parentFragmentManager.popBackStack()
             }

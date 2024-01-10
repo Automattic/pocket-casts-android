@@ -69,7 +69,7 @@ class ShiftyRenderersFactory(context: Context?, statsManager: StatsManager, priv
             mediaCodecSelector,
             eventHandler,
             eventListener,
-            audioSink
+            audioSink,
         ).apply {
             customAudio.setBoostVolume(boostVolume)
             customAudio.playbackSpeed = playbackSpeed

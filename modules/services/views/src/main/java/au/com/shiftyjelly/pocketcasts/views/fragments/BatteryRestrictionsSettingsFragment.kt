@@ -72,12 +72,11 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View =
         ComposeView(requireContext()).apply {
             setContent {
                 AppThemeWithBackground(theme.activeTheme) {
-
                     var isUnrestricted by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
                     DisposableEffect(this) {
                         val observer = LifecycleEventObserver { _, event ->
@@ -107,9 +106,9 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                         onClick = { batteryRestrictions.promptToUpdateBatteryRestriction(context) },
                         openUrl = { url ->
                             startActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                Intent(Intent.ACTION_VIEW, Uri.parse(url)),
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -122,14 +121,14 @@ private fun Page(
     navigationButton: NavigationButton,
     onBackPressed: () -> Unit,
     onClick: () -> Unit,
-    openUrl: (String) -> Unit
+    openUrl: (String) -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_battery),
             bottomShadow = true,
             navigationButton = navigationButton,
-            onNavigationClick = onBackPressed
+            onNavigationClick = onBackPressed,
         )
 
         val startPadding = 72.dp
@@ -142,20 +141,20 @@ private fun Page(
                     .toggleable(
                         value = isUnrestricted,
                         onValueChange = { onClick() },
-                        role = Role.Switch
+                        role = Role.Switch,
                     )
-                    .padding(start = startPadding, end = 16.dp)
+                    .padding(start = startPadding, end = 16.dp),
             ) {
                 TextH30(
                     text = stringResource(LR.string.settings_battery_unrestricted),
                     color = MaterialTheme.theme.colors.primaryInteractive02,
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    modifier = Modifier.padding(vertical = 16.dp),
                 )
 
                 Spacer(
                     modifier = Modifier
                         .width(12.dp)
-                        .weight(1f)
+                        .weight(1f),
                 )
 
                 Switch(
@@ -165,10 +164,10 @@ private fun Page(
                         checkedThumbColor = MaterialTheme.theme.colors.primaryInteractive02,
                         checkedTrackColor = MaterialTheme.theme.colors.primaryInteractive02,
                         uncheckedThumbColor = MaterialTheme.theme.colors.primaryInteractive02.copy(
-                            alpha = 0.7f
+                            alpha = 0.7f,
                         ),
                         uncheckedTrackColor = MaterialTheme.theme.colors.primaryInteractive02,
-                    )
+                    ),
                 )
             }
 
@@ -176,15 +175,15 @@ private fun Page(
             Column(
                 Modifier.clickable(
                     onClick = { openUrl(learnMoreUrl) },
-                    onClickLabel = stringResource(LR.string.settings_battery_learn_more)
-                )
+                    onClickLabel = stringResource(LR.string.settings_battery_learn_more),
+                ),
             ) {
                 Row(Modifier.padding(top = 16.dp, end = 16.dp)) {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .width(startPadding)
-                            .align(Alignment.CenterVertically)
+                            .align(Alignment.CenterVertically),
                     ) {
                         GradientIcon(
                             painter = painterResource(VR.drawable.ic_outline_info_24),
@@ -193,9 +192,9 @@ private fun Page(
                             } else {
                                 listOf(
                                     MaterialTheme.theme.colors.gradient03A,
-                                    MaterialTheme.theme.colors.gradient03E
+                                    MaterialTheme.theme.colors.gradient03E,
                                 )
-                            }
+                            },
                         )
                     }
 
@@ -217,7 +216,7 @@ private fun Page(
                     TextP50(
                         text = stringResource(
                             LR.string.settings_battery_update_message,
-                            stringResource(LR.string.settings_battery_unrestricted)
+                            stringResource(LR.string.settings_battery_unrestricted),
                         ),
                         style = MaterialTheme.typography.body1,
                         color = MaterialTheme.theme.colors.primaryText02,
@@ -225,8 +224,8 @@ private fun Page(
                             start = startPadding,
                             end = 16.dp,
                             top = 16.dp,
-                            bottom = 16.dp
-                        )
+                            bottom = 16.dp,
+                        ),
                     )
                 }
             }
@@ -243,7 +242,7 @@ private fun PagePreview_restricted(@PreviewParameter(ThemePreviewParameterProvid
             navigationButton = NavigationButton.Close,
             onBackPressed = {},
             onClick = {},
-            openUrl = {}
+            openUrl = {},
         )
     }
 }
@@ -257,7 +256,7 @@ private fun PagePreview_unrestricted(@PreviewParameter(ThemePreviewParameterProv
             navigationButton = NavigationButton.Back,
             onBackPressed = {},
             onClick = {},
-            openUrl = {}
+            openUrl = {},
         )
     }
 }

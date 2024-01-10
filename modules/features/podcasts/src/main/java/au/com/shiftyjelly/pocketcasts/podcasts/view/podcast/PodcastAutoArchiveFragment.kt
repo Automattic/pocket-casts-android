@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: PodcastAutoArchiveViewModel by viewModels()
@@ -53,7 +54,7 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
         fun newInstance(podcastUuid: String): PodcastAutoArchiveFragment {
             return PodcastAutoArchiveFragment().apply {
                 arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+                    ARG_PODCAST_UUID to podcastUuid,
                 )
             }
         }
@@ -105,7 +106,7 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
         preferenceCustomForPodcast?.setOnPreferenceChangeListener { _, newValue ->
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_TOGGLED,
-                mapOf("enabled" to (newValue as Boolean))
+                mapOf("enabled" to (newValue as Boolean)),
             )
             viewModel.updateGlobalOverride(newValue)
             true
@@ -124,8 +125,8 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
                         3 -> "after_2_days"
                         4 -> "after_1_week"
                         else -> "unknown"
-                    }
-                )
+                    },
+                ),
             )
             viewModel.updateAfterPlaying(index)
             true
@@ -146,8 +147,8 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
                         5 -> "after_30_days"
                         6 -> "after_3_months"
                         else -> "unknown"
-                    }
-                )
+                    },
+                ),
             )
             viewModel.updateInactive(index)
             true
@@ -167,8 +168,8 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
                         3 -> 5
                         4 -> 10
                         else -> "unknown"
-                    }
-                )
+                    },
+                ),
             )
             true
         }

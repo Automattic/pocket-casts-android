@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal class LargeListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
     var fromListId: String? = null
 

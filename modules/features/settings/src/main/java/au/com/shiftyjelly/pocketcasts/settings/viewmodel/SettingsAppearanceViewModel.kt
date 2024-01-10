@@ -19,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingsAppearanceViewModel @Inject constructor(
@@ -66,8 +66,8 @@ class SettingsAppearanceViewModel @Inject constructor(
                     Theme.ThemeType.ELECTRIC -> "electric"
                     Theme.ThemeType.CLASSIC_LIGHT -> "classic"
                     Theme.ThemeType.RADIOACTIVE -> "radioactive"
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -87,9 +87,11 @@ class SettingsAppearanceViewModel @Inject constructor(
         }
         createAccountState.postValue(
             SettingsAppearanceState.ThemesAndIconsLoaded(
-                theme.activeTheme, theme.allThemes.toList(),
-                appIcon.activeAppIcon, appIcons
-            )
+                theme.activeTheme,
+                theme.allThemes.toList(),
+                appIcon.activeAppIcon,
+                appIcons,
+            ),
         )
     }
 
@@ -119,8 +121,8 @@ class SettingsAppearanceViewModel @Inject constructor(
                     AppIcon.AppIconType.PATRON_GLOW -> "patron_glow"
                     AppIcon.AppIconType.PATRON_DARK -> "patron_dark"
                     AppIcon.AppIconType.PRIDE_2023 -> "pride_2023"
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -128,7 +130,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         settings.useDarkUpNextTheme.set(value)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
-            mapOf("enabled" to value)
+            mapOf("enabled" to value),
         )
     }
 
@@ -139,7 +141,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         }
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED,
-            mapOf("enabled" to value)
+            mapOf("enabled" to value),
         )
     }
 
@@ -147,7 +149,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         settings.showArtworkOnLockScreen.set(value)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
-            mapOf("enabled" to value)
+            mapOf("enabled" to value),
         )
     }
 
@@ -155,7 +157,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         settings.useEmbeddedArtwork.set(value)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
-            mapOf("enabled" to value)
+            mapOf("enabled" to value),
         )
     }
 
@@ -171,7 +173,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         theme.setUseSystemTheme(use, activity)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_FOLLOW_SYSTEM_THEME_TOGGLED,
-            mapOf("enabled" to use)
+            mapOf("enabled" to use),
         )
     }
 }
@@ -183,6 +185,6 @@ sealed class SettingsAppearanceState {
         val currentThemeType: Theme.ThemeType,
         val themeList: List<Theme.ThemeType>,
         val currentAppIcon: AppIcon.AppIconType,
-        val iconList: List<AppIcon.AppIconType>
+        val iconList: List<AppIcon.AppIconType>,
     ) : SettingsAppearanceState()
 }

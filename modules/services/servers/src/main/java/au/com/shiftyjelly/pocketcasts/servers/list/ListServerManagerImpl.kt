@@ -5,15 +5,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.ListDownloadServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.di.ListUploadServerRetrofit
 import au.com.shiftyjelly.pocketcasts.utils.extensions.sha1
-import retrofit2.Retrofit
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import retrofit2.Retrofit
 
 class ListServerManagerImpl @Inject constructor(
     @ListUploadServerRetrofit uploadRetrofit: Retrofit,
-    @ListDownloadServerRetrofit downloadRetrofit: Retrofit
+    @ListDownloadServerRetrofit downloadRetrofit: Retrofit,
 ) : ListServerManager {
 
     private val uploadServer: ListUploadServer = uploadRetrofit.create(ListUploadServer::class.java)
@@ -42,7 +42,7 @@ class ListServerManagerImpl @Inject constructor(
             description = description,
             hash = hash ?: "",
             date = dateString,
-            podcasts = podcasts.map { podcast -> ListPodcast.fromPodcast(podcast) }
+            podcasts = podcasts.map { podcast -> ListPodcast.fromPodcast(podcast) },
         )
         val response = uploadServer.createPodcastList(request)
         return response.result?.shareUrl

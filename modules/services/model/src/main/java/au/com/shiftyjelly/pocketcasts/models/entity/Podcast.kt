@@ -78,7 +78,7 @@ data class Podcast(
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
-    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf()
+    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {
 
     constructor() : this(uuid = "")
@@ -86,7 +86,8 @@ data class Podcast(
     enum class AutoAddUpNext(val databaseInt: Int, val analyticsValue: String) {
         OFF(0, "off"),
         PLAY_LAST(1, "add_last"),
-        PLAY_NEXT(2, "add_first");
+        PLAY_NEXT(2, "add_first"),
+        ;
 
         companion object {
             fun fromDatabaseInt(int: Int?) = values().firstOrNull { it.databaseInt == int }
@@ -97,7 +98,7 @@ data class Podcast(
         // A holder of podcast substitutes when needed for UserEpisodes
         val userPodcast = Podcast(
             uuid = "da7aba5e-f11e-f11e-f11e-da7aba5ef11e",
-            title = "Custom Episode"
+            title = "Custom Episode",
         )
 
         const val SYNC_STATUS_NOT_SYNCED = 0

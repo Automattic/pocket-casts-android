@@ -35,14 +35,14 @@ import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -58,9 +58,13 @@ class NotificationsSettingsFragment :
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var notificationHelper: NotificationHelper
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var screen: PreferenceScreen? = null
@@ -116,7 +120,7 @@ class NotificationsSettingsFragment :
             settings.hideNotificationOnPause.set(newBool)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
-                mapOf("enabled" to newBool)
+                mapOf("enabled" to newBool),
             )
             true
         }
@@ -129,7 +133,7 @@ class NotificationsSettingsFragment :
             changeVibrateSummary()
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED,
-                mapOf("value" to (newSetting?.analyticsString ?: "unknown"))
+                mapOf("value" to (newSetting?.analyticsString ?: "unknown")),
             )
             true
         }
@@ -251,7 +255,7 @@ class NotificationsSettingsFragment :
                             }
                             NewEpisodeNotificationAction.saveToSettings(selectedActions, settings)
                             changeActionsSummary()
-                        }
+                        },
                     )
                     negativeButton(res = LR.string.cancel)
                 }
@@ -271,7 +275,7 @@ class NotificationsSettingsFragment :
                 "action_play" to selectedActions.contains(NewEpisodeNotificationAction.PLAY),
                 "action_play_next" to selectedActions.contains(NewEpisodeNotificationAction.PLAY_NEXT),
                 "action_play_last" to selectedActions.contains(NewEpisodeNotificationAction.PLAY_LAST),
-            )
+            ),
         )
     }
 
@@ -347,7 +351,7 @@ class NotificationsSettingsFragment :
                     notificationCount >= podcastCount -> resources.getString(LR.string.settings_podcasts_selected_all)
                     else -> resources.getString(
                         LR.string.settings_podcasts_selected_x,
-                        notificationCount
+                        notificationCount,
                     )
                 }
                 launch(Dispatchers.Main) {
@@ -414,7 +418,7 @@ class NotificationsSettingsFragment :
 
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
-                        mapOf("enabled" to checked)
+                        mapOf("enabled" to checked),
                     )
 
                     lifecycleScope.launch {
@@ -448,7 +452,7 @@ class NotificationsSettingsFragment :
             val options = arrayOf(
                 NotificationVibrateSetting.NewEpisodes,
                 NotificationVibrateSetting.OnlyWhenSilent,
-                NotificationVibrateSetting.Never
+                NotificationVibrateSetting.Never,
             )
             it.entries = options
                 .map { getString(it.summary) }

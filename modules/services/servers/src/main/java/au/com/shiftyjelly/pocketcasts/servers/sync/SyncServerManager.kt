@@ -31,15 +31,15 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import java.io.File
+import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
-import java.io.File
-import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * The only class outside of the server module that should use this class is the
@@ -95,7 +95,7 @@ open class SyncServerManager @Inject constructor(
         val request = EmailChangeRequest(
             newEmail,
             password,
-            SCOPE_MOBILE
+            SCOPE_MOBILE,
         )
         return server.emailChange(addBearer(token), request)
     }
@@ -125,7 +125,7 @@ open class SyncServerManager @Inject constructor(
             "token" to token.value,
             "data" to data,
             "device_utc_time_ms" to System.currentTimeMillis().toString(),
-            "last_modified" to lastModified
+            "last_modified" to lastModified,
         )
         addDeviceFields(fields)
         return server.syncUpdate(fields)
@@ -186,7 +186,7 @@ open class SyncServerManager @Inject constructor(
 
     fun subscriptionPurchase(
         request: SubscriptionPurchaseRequest,
-        token: AccessToken
+        token: AccessToken,
     ): Single<SubscriptionStatusResponse> =
         server.subscriptionPurchase(addBearer(token), request)
 
@@ -226,7 +226,7 @@ open class SyncServerManager @Inject constructor(
                     emitter.tryOnError(e)
                 }
             },
-            BackpressureStrategy.LATEST
+            BackpressureStrategy.LATEST,
         )
     }
 
@@ -265,7 +265,7 @@ open class SyncServerManager @Inject constructor(
     private fun buildBasicRequest(): BasicRequest {
         return BasicRequest(
             model = Settings.SYNC_API_MODEL,
-            version = Settings.SYNC_API_VERSION
+            version = Settings.SYNC_API_VERSION,
         )
     }
 

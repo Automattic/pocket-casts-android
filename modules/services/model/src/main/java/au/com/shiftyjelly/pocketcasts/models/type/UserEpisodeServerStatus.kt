@@ -6,5 +6,5 @@ enum class UserEpisodeServerStatus {
     UPLOADED,
     WAITING_FOR_WIFI,
     QUEUED,
-    MISSING
+    MISSING,
 }

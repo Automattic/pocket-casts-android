@@ -47,7 +47,6 @@ fun AutoPlayHeader() {
             .background(gradientBrush)
             .fillMaxWidth(),
     ) {
-
         var iconIsVisible by remember { mutableStateOf(false) }
         LaunchedEffect(Unit) {
             iconIsVisible = true
@@ -62,7 +61,7 @@ fun AutoPlayHeader() {
 
         AnimatedVisibility(
             visible = iconIsVisible,
-            enter = scaleIn(animationSpec = springAnimation)
+            enter = scaleIn(animationSpec = springAnimation),
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -73,11 +72,10 @@ fun AutoPlayHeader() {
                     .size(95.dp),
 
             ) {
-
                 var rotating by remember { mutableStateOf(false) }
                 val rotation by animateFloatAsState(
                     targetValue = if (rotating) 2 * 360f else 0f,
-                    animationSpec = springAnimation
+                    animationSpec = springAnimation,
                 )
                 LaunchedEffect(Unit) {
                     rotating = true

@@ -31,10 +31,10 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.isVisible
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 @AndroidEntryPoint
 class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs), CoroutineScope {
@@ -177,7 +177,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             valueTo = 0.6f,
             closeStartDelay = 200,
             closeInterpolator = OvershootInterpolator(),
-            disabled = false
+            disabled = false,
         )
         val playButtonScale = BottomSheetAnimation(
             viewId = R.id.largePlayButton,
@@ -189,7 +189,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             valueTo = SCALE_NORMAL,
             openStartDelay = 200,
             openInterpolator = OvershootInterpolator(),
-            disabled = false
+            disabled = false,
         )
         val backgroundScale = BottomSheetAnimation(
             viewId = R.id.container,
@@ -199,7 +199,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             slideOffsetTo = 1f,
             valueFrom = SCALE_NORMAL,
             valueTo = 0.9f,
-            disabled = false
+            disabled = false,
         )
         val playerTranslateY = BottomSheetAnimation(
             viewId = R.id.player,
@@ -209,7 +209,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             slideOffsetTo = 1f,
             valueFrom = resources.getDimension(R.dimen.player_fragment_start_y),
             valueTo = 0f,
-            disabled = false
+            disabled = false,
         )
         animations = arrayOf(miniPlayButtonScale, playButtonScale, backgroundScale, playerTranslateY)
 
@@ -283,7 +283,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
 open class PlayerBottomSheetBehavior<V : View> @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet? = null
+    attrs: AttributeSet? = null,
 ) : PCBottomSheetBehavior<V>(context, attrs) {
     override fun onInterceptTouchEvent(parent: CoordinatorLayout, child: V, event: MotionEvent): Boolean {
         if (!isDragEnabled) return false

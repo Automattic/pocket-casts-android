@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.settings.util
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
-import timber.log.Timber
 import java.util.Random
 import java.util.UnknownFormatConversionException
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class FunnyTimeConverter {
@@ -20,7 +20,7 @@ class FunnyTimeConverter {
         FunnyTimeUnit(LR.string.settings_stats_funny_air_biscuits, 0.0118),
         FunnyTimeUnit(LR.string.settings_stats_funny_laces, 6.0),
         FunnyTimeUnit(LR.string.settings_stats_funny_air_balloon, 0.000051994),
-        FunnyTimeUnit(LR.string.settings_stats_funny_searches, 2276867.0)
+        FunnyTimeUnit(LR.string.settings_stats_funny_searches, 2276867.0),
     )
 
     fun timeSecsToFunnyText(timeSecs: Long, resources: Resources): String {

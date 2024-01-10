@@ -19,7 +19,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         marketingOptIn = settings.marketingOptIn.getSyncValue(),
                         freeGiftAcknowledged = settings.freeGiftAcknowledged.getSyncValue(),
                         gridOrder = settings.podcastsSortType.getSyncValue()?.serverId,
-                    )
+                    ),
                 )
 
                 val response = namedSettingsCall.namedSettings(request)

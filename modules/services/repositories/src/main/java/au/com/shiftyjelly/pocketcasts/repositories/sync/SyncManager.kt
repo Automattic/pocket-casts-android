@@ -31,8 +31,8 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import retrofit2.Response
 import java.io.File
+import retrofit2.Response
 
 interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
 

@@ -64,13 +64,13 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.max
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -81,9 +81,13 @@ private const val UPNEXT_OUTLIER_THRESHOLD = 400.0f // Sometimes we get a random
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var warningsHelper: WarningsHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var imageLoader: PodcastImageLoaderThemed
@@ -344,7 +348,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                     return upNextBottomSheetBehavior.peekHeight != 0
                 }
-            }
+            },
         )
 
         @Suppress("ClickableViewAccessibility")
@@ -365,7 +369,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
 
             when (event.actionMasked) {
-
                 MotionEvent.ACTION_DOWN -> {
                     hasReceivedOnTouchDown = true
                 }
@@ -388,7 +391,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                             if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
                                 (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(
-                                    false
+                                    false,
                                 )
                             }
                         }
@@ -428,7 +431,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         embeddedArtwork: PlayerViewModel.Artwork,
         imageView: ImageView,
     ): Disposable? {
-
         if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return null
 
         var disposable: Disposable? = null
@@ -608,7 +610,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun trackShelfAction(analyticsAction: String) {
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction),
         )
     }
 

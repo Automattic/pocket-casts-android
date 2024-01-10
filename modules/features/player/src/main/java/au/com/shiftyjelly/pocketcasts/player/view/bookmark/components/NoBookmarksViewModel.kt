@@ -9,13 +9,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoBookmarksViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     fun onGoToHeadphoneSettingsClicked(sourceView: SourceView) {
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS,
-            mapOf("source" to sourceView.analyticsValue)
+            mapOf("source" to sourceView.analyticsValue),
         )
     }
 }

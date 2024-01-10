@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
 
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var settings: Settings
 
     private val viewModel: VideoViewModel by viewModels()

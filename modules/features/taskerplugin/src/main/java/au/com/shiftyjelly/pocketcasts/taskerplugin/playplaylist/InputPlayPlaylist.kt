@@ -5,5 +5,5 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot
 
 @TaskerInputRoot
 class InputPlayPlaylist @JvmOverloads constructor(
-    @field:TaskerInputField("title") var title: String? = null
+    @field:TaskerInputField("title") var title: String? = null,
 )

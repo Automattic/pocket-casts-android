@@ -69,7 +69,7 @@ fun BookmarksPage(
             Toast.makeText(
                 context,
                 context.resources.getString(LR.string.playing_bookmark, bookmark.title),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             ).show()
             bookmarksViewModel.play(bookmark)
         },
@@ -105,12 +105,12 @@ private fun Content(
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClicked: () -> Unit,
     onUpgradeClicked: () -> Unit,
-    openFragment: (Fragment) -> Unit
+    openFragment: (Fragment) -> Unit,
 ) {
     Box(
         modifier = Modifier
             .background(color = backgroundColor)
-            .padding(bottom = 28.dp)
+            .padding(bottom = 28.dp),
     ) {
         when (state) {
             is UiState.Loading -> LoadingView()
@@ -128,7 +128,7 @@ private fun Content(
                 sourceView = sourceView,
                 modifier = Modifier
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             )
             is UiState.Upsell -> UpsellView(
                 style = state.colors,
@@ -136,7 +136,7 @@ private fun Content(
                 sourceView = sourceView,
                 modifier = Modifier
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             )
         }
     }
@@ -152,7 +152,7 @@ private fun BookmarksView(
 ) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         item {
             val title = stringResource(
@@ -161,13 +161,13 @@ private fun BookmarksView(
                 } else {
                     LR.string.bookmarks_singular
                 },
-                state.bookmarks.size
+                state.bookmarks.size,
             )
 
             HeaderRow(
                 title = title,
                 onOptionsMenuClicked = onOptionsMenuClicked,
-                style = state.headerRowColors
+                style = state.headerRowColors,
             )
         }
         items(state.bookmarks, key = { it }) { bookmark ->
@@ -180,7 +180,7 @@ private fun BookmarksView(
                     .pointerInput(bookmark.adapterId) {
                         detectTapGestures(
                             onLongPress = { onRowLongPressed(bookmark) },
-                            onTap = { state.onRowClick(bookmark) }
+                            onTap = { state.onRowClick(bookmark) },
                         )
                     },
                 colors = state.bookmarkRowColors,
@@ -189,7 +189,7 @@ private fun BookmarksView(
                     SourceView.PLAYER -> TimePlayButtonColors.Player(textColor = textColor)
                     else -> TimePlayButtonColors.Default
                 },
-                showIcon = false
+                showIcon = false,
             )
         }
     }
@@ -212,12 +212,12 @@ private fun BookmarksPreview(
                         createdAt = Date(),
                         syncStatus = SyncStatus.SYNCED,
                         title = "Funny bit",
-                    )
+                    ),
                 ),
                 isMultiSelecting = false,
                 isSelected = { false },
                 onRowClick = {},
-                sourceView = SourceView.PLAYER
+                sourceView = SourceView.PLAYER,
             ),
             sourceView = SourceView.PLAYER,
             backgroundColor = Color.Black,

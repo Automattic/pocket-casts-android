@@ -51,7 +51,6 @@ fun OnboardingForgotPasswordPage(
     onBackPressed: () -> Unit,
     onCompleted: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingForgotPasswordViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
@@ -65,7 +64,7 @@ fun OnboardingForgotPasswordPage(
             context,
             context.getString(LR.string.profile_reset_password_sent),
             context.getString(LR.string.profile_reset_password_check_email),
-            onComplete = onCompleted
+            onComplete = onCompleted,
         )
     }
 
@@ -92,22 +91,21 @@ fun OnboardingForgotPasswordPage(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .windowInsetsPadding(WindowInsets.ime)
+            .windowInsetsPadding(WindowInsets.ime),
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_reset_password),
             onNavigationClick = {
                 viewModel.onBackPressed()
                 onBackPressed()
-            }
+            },
         )
 
         Column(
             Modifier
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             EmailField(
                 email = state.email,
                 enabled = state.enableSubmissionFields,
@@ -127,7 +125,7 @@ fun OnboardingForgotPasswordPage(
                     color = MaterialTheme.theme.colors.support05,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = 16.dp),
                 )
             }
 

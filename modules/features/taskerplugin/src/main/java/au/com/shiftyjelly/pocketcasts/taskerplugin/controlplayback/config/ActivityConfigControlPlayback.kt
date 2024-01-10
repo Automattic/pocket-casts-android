@@ -32,7 +32,7 @@ private fun ComposableConfigControlPlaybackPreview() {
                     MutableStateFlow(true),
                     {},
                     listOf("%test"),
-                    MutableStateFlow(InputControlPlayback.PlaybackCommand.values().toList())
+                    MutableStateFlow(InputControlPlayback.PlaybackCommand.values().toList()),
                 ),
                 TaskerInputFieldState.Content(
                     MutableStateFlow("60"),
@@ -40,9 +40,9 @@ private fun ComposableConfigControlPlaybackPreview() {
                     RD.drawable.filter_time,
                     MutableStateFlow(true),
                     {},
-                    listOf("%test")
-                )
-            )
+                    listOf("%test"),
+                ),
+            ),
         ) {}
     }
 }

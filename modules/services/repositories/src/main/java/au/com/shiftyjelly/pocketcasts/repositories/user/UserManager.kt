@@ -26,19 +26,19 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
     fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean)
-    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, playlistManager: PlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean,)
+    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, playlistManager: PlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
 }
 
 class UserManagerImpl @Inject constructor(
@@ -119,7 +119,7 @@ class UserManagerImpl @Inject constructor(
 
                 analyticsTracker.track(
                     AnalyticsEvent.USER_SIGNED_OUT,
-                    mapOf(KEY_USER_INITIATED to wasInitiatedByUser)
+                    mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
                 )
                 analyticsTracker.flush()
                 analyticsTracker.clearAllData()
@@ -151,7 +151,6 @@ class UserManagerImpl @Inject constructor(
 
         // Block while clearing data so that users cannot interact with the app until we're done clearing data
         runBlocking(Dispatchers.IO) {
-
             upNextQueue.removeAllIncludingChanges()
 
             playlistManager.resetDb()

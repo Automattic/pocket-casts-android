@@ -12,7 +12,7 @@ object StreamingConfirmationScreen {
 
     enum class Result {
         CONFIRMED,
-        CANCELLED
+        CANCELLED,
     }
 }
 
@@ -23,6 +23,6 @@ fun StreamingConfirmationScreen(
     ObtainConfirmationScreen(
         text = stringResource(LR.string.stream_warning_summary_short),
         onConfirm = { onFinished(Result.CONFIRMED) },
-        onCancel = { onFinished(Result.CANCELLED) }
+        onCancel = { onFinished(Result.CANCELLED) },
     )
 }

@@ -15,6 +15,12 @@ import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
+import java.io.IOException
+import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
@@ -23,17 +29,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import timber.log.Timber
-import java.io.IOException
-import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 @Singleton
 open class ServerManager @Inject constructor(
     @NoCacheTokenedOkHttpClient private val httpClientNoCache: OkHttpClient,
-    private val settings: Settings
+    private val settings: Settings,
 ) {
     companion object {
         private const val LIST_SEPERATOR = ","
@@ -46,12 +46,14 @@ open class ServerManager @Inject constructor(
             return null
         }
         return postToMainServer(
-            "/podcasts/search", Parameters("q", searchTerm), true,
+            "/podcasts/search",
+            Parameters("q", searchTerm),
+            true,
             object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parsePodcastSearch(data = data, searchTerm = searchTerm))
                 }
-            }
+            },
         )
     }
 
@@ -83,7 +85,7 @@ open class ServerManager @Inject constructor(
                             ?: resources.getString(R.string.error_search_failed)
                         continuation.resumeWithException(throwable ?: Exception(message))
                     }
-                }
+                },
             )
         }
     }
@@ -97,23 +99,27 @@ open class ServerManager @Inject constructor(
     fun exportFeedUrls(uuids: List<String>, callback: ServerCallback<Map<String, String>>): Call? {
         val uuidsJoined = TextUtils.join(",", uuids)
         return postToMainServer(
-            "/import/export_feed_urls", Parameters("uuids", uuidsJoined), true,
+            "/import/export_feed_urls",
+            Parameters("uuids", uuidsJoined),
+            true,
             object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseExportFeedUrls(data))
                 }
-            }
+            },
         )
     }
 
     fun getSharedItemDetails(strippedUrl: String, callback: ServerCallback<Share>): Call? {
         return postToMainServer(
-            strippedUrl, null, true,
+            strippedUrl,
+            null,
+            true,
             object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseShareItem(data))
                 }
-            }
+            },
         )
     }
 
@@ -142,12 +148,14 @@ open class ServerManager @Inject constructor(
             .add("push_on", "false")
 
         return postToMainServer(
-            "/user/update", parameters, false,
+            "/user/update",
+            parameters,
+            false,
             object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseRefreshPodcasts(data))
                 }
-            }
+            },
         )
     }
 
@@ -164,7 +172,7 @@ open class ServerManager @Inject constructor(
                 userMessage: String?,
                 serverMessageId: String?,
                 serverMessage: String?,
-                throwable: Throwable?
+                throwable: Throwable?,
             ) {
                 if (emitter.isDisposed) return
                 emitter.onError(throwable ?: UnknownError())
@@ -234,7 +242,7 @@ open class ServerManager @Inject constructor(
                                     userMessage = response.message,
                                     serverMessageId = null,
                                     serverMessage = responseDebug,
-                                    throwable = null
+                                    throwable = null,
                                 )
                             }
                         } else {
@@ -243,7 +251,7 @@ open class ServerManager @Inject constructor(
                                 userMessage = response.message,
                                 serverMessageId = null,
                                 serverMessage = responseDebug,
-                                throwable = null
+                                throwable = null,
                             )
                         }
                     } else {
@@ -271,7 +279,7 @@ open class ServerManager @Inject constructor(
                                     userMessage = if (serverResponse.message == null) NO_INTERNET_CONNECTION_MSG else serverResponse.message,
                                     serverMessageId = serverResponse.serverMessageId,
                                     serverMessage = responseDebug,
-                                    throwable = null
+                                    throwable = null,
                                 )
                             }
                         }
@@ -284,7 +292,7 @@ open class ServerManager @Inject constructor(
                                 userMessage = if (serverResponse.message == null) NO_INTERNET_CONNECTION_MSG else serverResponse.message,
                                 serverMessageId = serverResponse.serverMessageId,
                                 serverMessage = responseDebug,
-                                throwable = null
+                                throwable = null,
                             )
                         }
                     }
@@ -301,7 +309,7 @@ open class ServerManager @Inject constructor(
                             userMessage = NO_INTERNET_CONNECTION_MSG,
                             serverMessageId = null,
                             serverMessage = e.message,
-                            throwable = e
+                            throwable = e,
                         )
                     }
                 } else {
@@ -310,7 +318,7 @@ open class ServerManager @Inject constructor(
                         userMessage = NO_INTERNET_CONNECTION_MSG,
                         serverMessageId = null,
                         serverMessage = e.message,
-                        throwable = e
+                        throwable = e,
                     )
                 }
             }

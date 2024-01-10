@@ -16,7 +16,7 @@ import java.util.UUID
 
 internal data class CommandWithRunnable(
     val command: FragmentTransactionCommand,
-    val runAfterCommit: () -> Unit
+    val runAfterCommit: () -> Unit,
 )
 
 internal sealed class FragmentTransactionCommand {
@@ -33,7 +33,7 @@ internal sealed class FragmentTransactionCommand {
 internal class FragmentTransactionHandler(
     private val fm: FragmentManager,
     @IdRes private val container: Int,
-    @IdRes private val modalContainer: Int
+    @IdRes private val modalContainer: Int,
 ) {
     fun handle(commandWithRunnable: CommandWithRunnable) {
         val (command, runnable) = commandWithRunnable
@@ -46,7 +46,7 @@ internal class FragmentTransactionHandler(
             is ShowAndRemove -> showAndRemoveFragment(
                 command.showTag,
                 command.removeTag,
-                runnable
+                runnable,
             )
             is Clear -> clear(runnable)
             is RemoveAllAndAdd -> removeAllAndAdd(command.remove, command.add.fragment, command.add.tag, runnable)
@@ -63,7 +63,7 @@ internal class FragmentTransactionHandler(
         remove: List<TagStructure>,
         add: Fragment,
         addTag: TagStructure,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         val transaction = fm.beginTransaction()
         for (removeTag in remove) {
@@ -82,7 +82,7 @@ internal class FragmentTransactionHandler(
     private fun removeAllAndShow(
         remove: List<TagStructure>,
         show: TagStructure,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         val transaction = fm.beginTransaction()
         for (removeTag in remove) {
@@ -102,7 +102,7 @@ internal class FragmentTransactionHandler(
     private fun showAndRemoveFragment(
         showTag: TagStructure,
         removeTag: TagStructure,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         val showFragment = fm.findFragmentByTag(showTag.toString())!!
         val removeFragment = fm.findFragmentByTag(removeTag.toString())!!
@@ -117,7 +117,7 @@ internal class FragmentTransactionHandler(
 
     private fun showFragment(
         tag: TagStructure,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         val fragment = fm.findFragmentByTag(tag.toString())!!
         fm.beginTransaction()
@@ -139,7 +139,7 @@ internal class FragmentTransactionHandler(
     private fun addAndShowFragment(
         fragment: Fragment,
         tag: TagStructure,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         fm.beginTransaction()
             .add(containerFor(tag), fragment, tag.toString())
@@ -152,7 +152,7 @@ internal class FragmentTransactionHandler(
     private fun addOnTop(
         fragment: Fragment,
         tag: TagStructure,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         fm.beginTransaction()
             .add(containerFor(tag), fragment, tag.toString())
@@ -186,7 +186,7 @@ internal class FragmentTransactionHandler(
 
     private fun removeUnknown(
         command: FragmentTransactionCommand.RemoveUnknown,
-        runnable: () -> Unit
+        runnable: () -> Unit,
     ) {
         val knownFragments = command.knownFragments
 
@@ -218,7 +218,7 @@ internal data class TagStructure private constructor(
     val className: String?,
     val detachable: Boolean?,
     val uuid: String?,
-    val modal: Boolean?
+    val modal: Boolean?,
 ) {
     constructor(fragment: Fragment, detachable: Boolean, modal: Boolean) :
         this(fragment::class.java.name, detachable, UUID.randomUUID().toString(), modal)
@@ -231,7 +231,7 @@ internal data class TagStructure private constructor(
     override fun toString(): String {
         return StringBuilder()
             .append(
-                OURTAG, SEPARATOR, className, SEPARATOR, if (detachable == true) DETACHABLE else "", SEPARATOR, uuid, SEPARATOR, if (modal == true) MODAL else ""
+                OURTAG, SEPARATOR, className, SEPARATOR, if (detachable == true) DETACHABLE else "", SEPARATOR, uuid, SEPARATOR, if (modal == true) MODAL else "",
             )
             .toString()
     }
@@ -253,8 +253,10 @@ internal data class TagStructure private constructor(
 
             val (ourTag, className, detachable, uuid, modal) = tag.split(SEPARATOR)
 
-            if (ourTag != OURTAG) return TagStructure(null, null, null, null)
-                .apply { isOurFragment = false }
+            if (ourTag != OURTAG) {
+                return TagStructure(null, null, null, null)
+                    .apply { isOurFragment = false }
+            }
 
             return TagStructure(className, DETACHABLE == detachable, uuid, MODAL == modal)
         }

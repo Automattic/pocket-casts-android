@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VideoViewModel @Inject constructor(
-    private val playbackManager: PlaybackManager
+    private val playbackManager: PlaybackManager,
 ) : ViewModel() {
 
     val playbackState: LiveData<PlaybackState> = playbackManager.playbackStateRelay

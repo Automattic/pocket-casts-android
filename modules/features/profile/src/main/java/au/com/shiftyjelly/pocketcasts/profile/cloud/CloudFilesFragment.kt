@@ -51,22 +51,30 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var bookmarkManager: BookmarkManager
 
     private lateinit var imageLoader: PodcastImageLoader
@@ -96,7 +104,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
-            )
+            ),
         )
     }
 
@@ -104,7 +112,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     // when the adapter's constructor includes references to the adapter
     private fun lazyNotifyItemChanged(
         @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
-        index: Int
+        index: Int,
     ) {
         val recyclerView = binding?.recyclerView
         recyclerView?.findViewHolderForAdapterPosition(index)?.let {
@@ -166,7 +174,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             activity = activity,
             theme = theme,
             chromeCastButton = Shown(chromeCastAnalytics),
-            menu = R.menu.menu_cloudfiles
+            menu = R.menu.menu_cloudfiles,
         )
         binding?.toolbar?.setOnMenuItemClickListener(this)
 
@@ -224,7 +232,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 binding.layoutUsage.isVisible = accountOptional.isPresent()
                 binding.layoutUsageLocked.isVisible = !binding.layoutUsage.isVisible
-            }
+            },
         )
 
         viewModel.refreshFiles(userInitiated = false)
@@ -348,18 +356,20 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun showOptionsDialog() {
         val dialog = OptionsDialog()
             .addTextOption(
-                titleId = LR.string.sort_by, imageId = IR.drawable.ic_sort,
+                titleId = LR.string.sort_by,
+                imageId = IR.drawable.ic_sort,
                 click = {
                     analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
                     showSortOptions()
-                }
+                },
             )
             .addTextOption(
-                titleId = LR.string.profile_cloud_settings, imageId = IR.drawable.ic_profile_settings,
+                titleId = LR.string.profile_cloud_settings,
+                imageId = IR.drawable.ic_profile_settings,
                 click = {
                     analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to FILE_SETTINGS))
                     showCloudSettings()
-                }
+                },
             )
         dialog.show(parentFragmentManager, "cloud_options")
     }
@@ -378,10 +388,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     viewModel.changeSort(Settings.CloudSortOrder.NEWEST_OLDEST)
                     analyticsTracker.track(
                         AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.NEWEST_TO_OLDEST.analyticsValue)
+                        mapOf(SORT_BY to SortOrder.NEWEST_TO_OLDEST.analyticsValue),
                     )
                 },
-                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.NEWEST_OLDEST)
+                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.NEWEST_OLDEST),
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_oldest_to_newest,
@@ -389,10 +399,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     viewModel.changeSort(Settings.CloudSortOrder.OLDEST_NEWEST)
                     analyticsTracker.track(
                         AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.OLDEST_TO_NEWEST.analyticsValue)
+                        mapOf(SORT_BY to SortOrder.OLDEST_TO_NEWEST.analyticsValue),
                     )
                 },
-                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.OLDEST_NEWEST)
+                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.OLDEST_NEWEST),
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_sort_by_title,
@@ -400,10 +410,10 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     viewModel.changeSort(Settings.CloudSortOrder.A_TO_Z)
                     analyticsTracker.track(
                         AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.TITLE_A_TO_Z.analyticsValue)
+                        mapOf(SORT_BY to SortOrder.TITLE_A_TO_Z.analyticsValue),
                     )
                 },
-                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z)
+                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z),
             )
         dialog.show(parentFragmentManager, "sort_options")
     }
@@ -420,7 +430,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     enum class SortOrder(val analyticsValue: String) {
         NEWEST_TO_OLDEST("newest_to_oldest"),
         OLDEST_TO_NEWEST("oldest_to_newest"),
-        TITLE_A_TO_Z("title_a_to_z")
+        TITLE_A_TO_Z("title_a_to_z"),
     }
 
     companion object {

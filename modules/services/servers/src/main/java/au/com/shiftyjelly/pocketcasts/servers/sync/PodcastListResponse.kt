@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class PodcastListResponse(
     @field:Json(name = "podcasts") val podcasts: List<PodcastResponse>?,
-    @field:Json(name = "folders") val folders: List<FolderResponse>?
+    @field:Json(name = "folders") val folders: List<FolderResponse>?,
 )
 
 @JsonClass(generateAdapter = true)
@@ -17,5 +17,5 @@ data class PodcastResponse(
     @field:Json(name = "autoSkipLast") val autoSkipLast: Int?,
     @field:Json(name = "folderUuid") val folderUuid: String?,
     @field:Json(name = "sortPosition") val sortPosition: Int?,
-    @field:Json(name = "dateAdded") val dateAdded: String?
+    @field:Json(name = "dateAdded") val dateAdded: String?,
 )

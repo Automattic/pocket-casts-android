@@ -24,21 +24,21 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class UpNextQueueImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val settings: Settings,
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
-    @ApplicationContext private val application: Context
+    @ApplicationContext private val application: Context,
 ) : UpNextQueue, CoroutineScope {
 
     private val upNextDao = appDatabase.upNextDao()

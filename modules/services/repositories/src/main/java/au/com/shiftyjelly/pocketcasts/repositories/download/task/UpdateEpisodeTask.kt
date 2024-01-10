@@ -20,7 +20,7 @@ class UpdateEpisodeTask @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
     val podcastCacheServerManager: PodcastCacheServerManager,
-    val appDatabase: AppDatabase
+    val appDatabase: AppDatabase,
 ) : CoroutineWorker(context, params) {
     companion object {
         const val INPUT_PODCAST_UUID = "podcast_uuid"

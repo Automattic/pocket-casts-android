@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack {
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var theme: Theme
 
     private val viewModel: AutoArchiveFragmentViewModel by viewModels()

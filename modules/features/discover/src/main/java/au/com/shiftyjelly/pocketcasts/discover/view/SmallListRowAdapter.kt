@@ -21,7 +21,7 @@ private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
             .contentDeepEquals(
                 newItem
                     .filterIsInstance(DiscoverPodcast::class.java)
-                    .map { it.uuid }.toTypedArray()
+                    .map { it.uuid }.toTypedArray(),
             ) // Checks if the list is of the same podcasts in the same order
     }
 
@@ -35,7 +35,7 @@ private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
 internal class SmallListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
-    val analyticsTracker: AnalyticsTrackerWrapper
+    val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<List<Any>, SmallListRowAdapter.SmallListViewHolder>(SmallListDiffer) {
     class SmallListViewHolder(val binding: ItemSmallListBinding) : RecyclerView.ViewHolder(binding.root) {
 

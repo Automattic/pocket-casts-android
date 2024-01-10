@@ -33,9 +33,9 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyl
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint

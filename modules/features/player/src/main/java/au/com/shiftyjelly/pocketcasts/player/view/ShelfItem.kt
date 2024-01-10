@@ -41,7 +41,7 @@ sealed class ShelfItem(
     val shownWhen: Shown,
     val tier: SubscriptionTier = SubscriptionTier.NONE,
     val analyticsValue: String,
-    @StringRes val subtitle: Int? = null
+    @StringRes val subtitle: Int? = null,
 ) {
     sealed class Shown {
         object Always : Shown()
@@ -62,7 +62,7 @@ sealed class ShelfItem(
         title = { LR.string.player_sleep_timer },
         iconRes = { R.drawable.ic_sleep },
         shownWhen = Shown.Always,
-        analyticsValue = "sleep_timer"
+        analyticsValue = "sleep_timer",
     )
 
     object Star : ShelfItem(
@@ -80,7 +80,7 @@ sealed class ShelfItem(
         subtitle = LR.string.player_actions_hidden_for_custom,
         iconRes = { IR.drawable.ic_share },
         shownWhen = Shown.EpisodeOnly,
-        analyticsValue = "share_episode"
+        analyticsValue = "share_episode",
     )
 
     object Podcast : ShelfItem(
@@ -88,7 +88,7 @@ sealed class ShelfItem(
         title = { if (it is UserEpisode) LR.string.go_to_files else LR.string.go_to_podcast },
         iconRes = { R.drawable.ic_arrow_goto },
         shownWhen = Shown.Always,
-        analyticsValue = "go_to_podcast"
+        analyticsValue = "go_to_podcast",
     )
 
     object Cast : ShelfItem(
@@ -96,7 +96,7 @@ sealed class ShelfItem(
         title = { LR.string.chromecast },
         iconRes = { com.google.android.gms.cast.framework.R.drawable.quantum_ic_cast_connected_white_24 },
         shownWhen = Shown.Always,
-        analyticsValue = "chromecast"
+        analyticsValue = "chromecast",
     )
 
     object Played : ShelfItem(
@@ -104,7 +104,7 @@ sealed class ShelfItem(
         title = { LR.string.mark_as_played },
         iconRes = { R.drawable.ic_markasplayed },
         shownWhen = Shown.Always,
-        analyticsValue = "mark_as_played"
+        analyticsValue = "mark_as_played",
     )
 
     object Bookmark : ShelfItem(
@@ -113,7 +113,7 @@ sealed class ShelfItem(
         iconRes = { IR.drawable.ic_bookmark },
         shownWhen = Shown.Always,
         tier = SubscriptionTier.PATRON,
-        analyticsValue = "add_bookmark"
+        analyticsValue = "add_bookmark",
     )
 
     object Archive : ShelfItem(
@@ -122,7 +122,7 @@ sealed class ShelfItem(
         subtitle = LR.string.player_actions_show_as_delete_for_custom,
         iconRes = { if (it is UserEpisode) VR.drawable.ic_delete else IR.drawable.ic_archive },
         shownWhen = Shown.Always,
-        analyticsValue = "archive"
+        analyticsValue = "archive",
     )
 
     object Download : ShelfItem(
@@ -147,6 +147,6 @@ sealed class ShelfItem(
         },
         shownWhen = Shown.Always,
         tier = SubscriptionTier.NONE,
-        analyticsValue = "download"
+        analyticsValue = "download",
     )
 }

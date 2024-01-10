@@ -46,7 +46,7 @@ fun AdvancedSettingsPage(
     AdvancedSettingsView(
         state = state,
         onBackPressed = onBackPressed,
-        modifier = modifier
+        modifier = modifier,
     )
 
     CallOnce {
@@ -64,19 +64,19 @@ fun AdvancedSettingsView(
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_advanced),
             bottomShadow = true,
-            onNavigationClick = { onBackPressed() }
+            onNavigationClick = { onBackPressed() },
         )
 
         Column(
             modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
             TextP50(
                 text = stringResource(LR.string.settings_description_advanced),
                 color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.padding(SettingsSection.horizontalPadding)
+                modifier = Modifier.padding(SettingsSection.horizontalPadding),
             )
             SettingSection(
                 heading = stringResource(LR.string.settings_storage_section_heading_mobile_data),
@@ -101,7 +101,7 @@ private fun SyncOnMeteredRow(
         modifier = modifier.toggleable(
             value = state.isChecked,
             role = Role.Switch,
-            onValueChange = { state.onCheckedChange(it) }
+            onValueChange = { state.onCheckedChange(it) },
         ),
     )
 }
@@ -117,10 +117,10 @@ private fun AdvancedSettingsPreview(
                 backgroundSyncOnMeteredState = AdvancedSettingsViewModel.State.BackgroundSyncOnMeteredState(
                     isChecked = true,
                     isEnabled = true,
-                    onCheckedChange = {}
+                    onCheckedChange = {},
                 ),
             ),
-            onBackPressed = {}
+            onBackPressed = {},
         )
     }
 }

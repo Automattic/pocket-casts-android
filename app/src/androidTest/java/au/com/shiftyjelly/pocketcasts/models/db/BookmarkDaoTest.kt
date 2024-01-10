@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -17,8 +19,6 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.Date
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -48,7 +48,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(FakeBookmarksGenerator.create(uuid))
             assertNotNull(
                 "Inserted bookmark should be able to be found",
-                bookmarkDao.findByUuid(uuid, false)
+                bookmarkDao.findByUuid(uuid, false),
             )
         }
     }
@@ -99,7 +99,7 @@ class BookmarkDaoTest {
                 episodeUuid = defaultEpisodeUuid,
                 podcastUuid = defaultPodcastUuid,
                 deleted = false,
-                isAsc = true
+                isAsc = true,
             ).first()
 
             with(result) {
@@ -123,7 +123,7 @@ class BookmarkDaoTest {
                 episodeUuid = defaultEpisodeUuid,
                 podcastUuid = defaultPodcastUuid,
                 deleted = false,
-                isAsc = false
+                isAsc = false,
             ).first()
 
             with(result) {
@@ -304,7 +304,7 @@ class BookmarkDaoTest {
                 createdAt = createdAt,
                 deleted = false,
                 syncStatus = SyncStatus.NOT_SYNCED,
-                title = title
+                title = title,
             )
         }
     }

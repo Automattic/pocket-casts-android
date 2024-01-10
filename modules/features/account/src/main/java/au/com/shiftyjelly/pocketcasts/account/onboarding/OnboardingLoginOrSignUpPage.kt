@@ -73,9 +73,8 @@ internal fun OnboardingLoginOrSignUpPage(
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
-    viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
+    viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel(),
 ) {
-
     val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
@@ -127,7 +126,7 @@ private fun Content(
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val width = maxWidth
@@ -135,28 +134,27 @@ private fun Content(
         Column(
             Modifier
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
 
             Row(
                 Modifier
                     .padding(vertical = 12.dp, horizontal = 16.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Box(Modifier.weight(1f)) {
                     NavigationIconButton(
                         iconColor = MaterialTheme.theme.colors.primaryText01,
                         navigationButton = NavigationButton.Close,
-                        onNavigationClick = onNavigationClick
+                        onNavigationClick = onNavigationClick,
                     )
                 }
 
                 HorizontalLogo(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .height(28.dp)
+                        .height(28.dp),
                 )
 
                 Spacer(Modifier.weight(1f))
@@ -168,11 +166,11 @@ private fun Content(
                 val context = LocalContext.current
                 Artwork(
                     googleSignInShown = GoogleSignInButtonViewModel.showContinueWithGoogleButton(
-                        context
+                        context,
                     ),
                     podcasts = state.randomPodcasts,
                     viewWidth = width,
-                    viewHeight = height
+                    viewHeight = height,
                 )
             }
 
@@ -193,7 +191,7 @@ private fun Content(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             Spacer(Modifier.weight(1f))
@@ -202,7 +200,7 @@ private fun Content(
                 Spacer(Modifier.height(8.dp))
                 ContinueWithGoogleButton(
                     flow = flow,
-                    onComplete = onContinueWithGoogleComplete
+                    onComplete = onContinueWithGoogleComplete,
                 )
             } else {
                 Spacer(Modifier.height(8.dp))
@@ -220,7 +218,7 @@ private fun Artwork(
     googleSignInShown: Boolean,
     podcasts: List<Podcast>,
     viewWidth: Dp,
-    viewHeight: Dp
+    viewHeight: Dp,
 ) {
     val configuration = LocalConfiguration.current
     if (configuration.inLandscape()) {
@@ -237,14 +235,14 @@ private fun Artwork(
         modifier = Modifier
             .height(artworkHeight)
             .fillMaxWidth()
-            .offset(x = artworkWidth * Artwork.getOffsetFactor(googleSignInShown))
+            .offset(x = artworkWidth * Artwork.getOffsetFactor(googleSignInShown)),
     ) {
         Artwork.coverModels.mapIndexed { index, model ->
             val coverWidth = (artworkWidth * model.size).coerceAtMost(artworkHeight / 2f)
             val modifier = Modifier
                 .offset(
                     x = artworkWidth * model.x,
-                    y = artworkHeight * model.y * Artwork.getCoverYOffsetFactor(configuration)
+                    y = artworkHeight * model.y * Artwork.getCoverYOffsetFactor(configuration),
                 )
             val podcast = if (index < podcasts.size) podcasts[index] else null
             podcast?.let {
@@ -252,13 +250,13 @@ private fun Artwork(
                     uuid = it.uuid,
                     coverWidth = coverWidth,
                     cornerRadius = 4.dp,
-                    modifier = modifier
+                    modifier = modifier,
                 )
             } ?: RectangleCover(
                 imageResId = model.imageResId,
                 coverWidth = coverWidth,
                 cornerRadius = 4.dp,
-                modifier = modifier
+                modifier = modifier,
             )
         }
     }
@@ -271,7 +269,7 @@ private fun SignUpButton(onClick: () -> Unit) {
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryText01, contentColor = MaterialTheme.theme.colors.primaryUi01),
         includePadding = false,
         onClick = onClick,
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp),
     )
 }
 
@@ -282,7 +280,7 @@ private fun LogInButton(onClick: () -> Unit) {
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
         includePadding = false,
         onClick = onClick,
-        modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
     )
 }
 

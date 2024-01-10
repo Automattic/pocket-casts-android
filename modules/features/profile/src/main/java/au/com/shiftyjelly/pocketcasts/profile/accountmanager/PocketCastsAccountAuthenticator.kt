@@ -42,7 +42,7 @@ class PocketCastsAccountAuthenticator(
             bundleOf(
                 AccountManager.KEY_ACCOUNT_NAME to account.name,
                 AccountManager.KEY_ACCOUNT_TYPE to account.type,
-                AccountManager.KEY_AUTHTOKEN to accessToken.value
+                AccountManager.KEY_AUTHTOKEN to accessToken.value,
             )
         } catch (e: Exception) {
             // the refresh token is invalid or expired so the user needs to sign in again

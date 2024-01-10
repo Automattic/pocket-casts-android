@@ -78,7 +78,7 @@ class EpisodeListAdapter(
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 imageLoader = imageLoader,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory
+                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
             R.layout.adapter_user_episode -> UserEpisodeViewHolder(
                 binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),

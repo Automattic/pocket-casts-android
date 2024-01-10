@@ -21,7 +21,7 @@ class ProfileViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val statsManager: StatsManager,
     val userManager: UserManager,
-    private val endOfYearManager: EndOfYearManager
+    private val endOfYearManager: EndOfYearManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     val podcastCount: LiveData<Int> = podcastManager.observeCountSubscribed().toLiveData()

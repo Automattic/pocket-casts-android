@@ -28,7 +28,7 @@ private class SettingsDiff : DiffUtil.ItemCallback<SettingsAdapter.Item>() {
 
 class SettingsAdapter(
     private val sections: List<Item>,
-    private val clickListener: (Item) -> Unit
+    private val clickListener: (Item) -> Unit,
 ) : ListAdapter<SettingsAdapter.Item, SettingsAdapter.ViewHolder>(SettingsDiff()) {
 
     init {
@@ -90,6 +90,6 @@ class SettingsAdapter(
         val gradientStartAttr: Int = au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_interactive_01,
         val gradientEndAttr: Int = au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_interactive_01,
         var plusSection: Boolean = false,
-        val id: Long = UUID.randomUUID().hashCode().toLong()
+        val id: Long = UUID.randomUUID().hashCode().toLong(),
     )
 }

@@ -27,11 +27,13 @@ class SensorDataManager(context: Context) : SensorEventListener {
     val data: Channel<SensorData> = Channel(Channel.UNLIMITED)
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event?.sensor?.type == Sensor.TYPE_GRAVITY)
+        if (event?.sensor?.type == Sensor.TYPE_GRAVITY) {
             gravity = event.values
+        }
 
-        if (event?.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD)
+        if (event?.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD) {
             geomagnetic = event.values
+        }
 
         if (gravity != null && geomagnetic != null) {
             val r = FloatArray(9)
@@ -44,8 +46,8 @@ class SensorDataManager(context: Context) : SensorEventListener {
                 data.trySend(
                     SensorData(
                         roll = orientation[2],
-                        pitch = orientation[1]
-                    )
+                        pitch = orientation[1],
+                    ),
                 )
             }
         }
@@ -60,5 +62,5 @@ class SensorDataManager(context: Context) : SensorEventListener {
 
 data class SensorData(
     val roll: Float,
-    val pitch: Float
+    val pitch: Float,
 )

@@ -110,7 +110,7 @@ val ThemeLightColors = ThemeColors(
     category16 = Color(0xFF0059B2),
     category17 = Color(0xFFCC98F0),
     category18 = Color(0xFFD9201C),
-    category19 = Color(0xFF5D31C4)
+    category19 = Color(0xFF5D31C4),
 )
 
 val ThemeDarkColors = ThemeColors(
@@ -220,7 +220,7 @@ val ThemeDarkColors = ThemeColors(
     category16 = Color(0xFF007DD1),
     category17 = Color(0xFFE0C1F6),
     category18 = Color(0xFFE82D27),
-    category19 = Color(0xFF8245DC)
+    category19 = Color(0xFF8245DC),
 )
 
 val ThemeExtraDarkColors = ThemeColors(
@@ -330,7 +330,7 @@ val ThemeExtraDarkColors = ThemeColors(
     category16 = Color(0xFF007DD1),
     category17 = Color(0xFFE0C1F6),
     category18 = Color(0xFFE82D27),
-    category19 = Color(0xFF8245DC)
+    category19 = Color(0xFF8245DC),
 )
 
 val ThemeClassicLightColors = ThemeColors(
@@ -440,7 +440,7 @@ val ThemeClassicLightColors = ThemeColors(
     category16 = Color(0xFF0059B2),
     category17 = Color(0xFFCC98F0),
     category18 = Color(0xFFD9201C),
-    category19 = Color(0xFF5D31C4)
+    category19 = Color(0xFF5D31C4),
 )
 
 val ThemeElectricityColors = ThemeColors(
@@ -550,7 +550,7 @@ val ThemeElectricityColors = ThemeColors(
     category16 = Color(0xFF3FD2E6),
     category17 = Color(0xFF3FD2E6),
     category18 = Color(0xFF3FD2E6),
-    category19 = Color(0xFF3FD2E6)
+    category19 = Color(0xFF3FD2E6),
 )
 
 val ThemeIndigoColors = ThemeColors(
@@ -660,7 +660,7 @@ val ThemeIndigoColors = ThemeColors(
     category16 = Color(0xFF14509C),
     category17 = Color(0xFFC197E5),
     category18 = Color(0xFFB02E2F),
-    category19 = Color(0xFF5036AA)
+    category19 = Color(0xFF5036AA),
 )
 
 val ThemeRadioactiveColors = ThemeColors(
@@ -770,7 +770,7 @@ val ThemeRadioactiveColors = ThemeColors(
     category16 = Color(0xFF74f864),
     category17 = Color(0xFF74f864),
     category18 = Color(0xFF74f864),
-    category19 = Color(0xFF74f864)
+    category19 = Color(0xFF74f864),
 )
 
 val ThemeRoseColors = ThemeColors(
@@ -880,7 +880,7 @@ val ThemeRoseColors = ThemeColors(
     category16 = Color(0xFF14509C),
     category17 = Color(0xFFC197E5),
     category18 = Color(0xFFB02E2F),
-    category19 = Color(0xFF5036AA)
+    category19 = Color(0xFF5036AA),
 )
 
 val ThemeLightContrastColors = ThemeColors(
@@ -990,7 +990,7 @@ val ThemeLightContrastColors = ThemeColors(
     category16 = Color(0xFF0059B2),
     category17 = Color(0xFFCC98F0),
     category18 = Color(0xFFD9201C),
-    category19 = Color(0xFF5D31C4)
+    category19 = Color(0xFF5D31C4),
 )
 
 val ThemeDarkContrastColors = ThemeColors(
@@ -1100,5 +1100,5 @@ val ThemeDarkContrastColors = ThemeColors(
     category16 = Color(0xFF007DD1),
     category17 = Color(0xFFE0C1F6),
     category18 = Color(0xFFE82D27),
-    category19 = Color(0xFF8245DC)
+    category19 = Color(0xFF8245DC),
 )

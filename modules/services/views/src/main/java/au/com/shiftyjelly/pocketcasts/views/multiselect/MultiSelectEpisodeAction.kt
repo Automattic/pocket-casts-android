@@ -23,42 +23,42 @@ sealed class MultiSelectEpisodeAction(
     title,
     iconRes,
     analyticsValue,
-    isVisible
+    isVisible,
 ) {
     object DeleteDownload : MultiSelectEpisodeAction(
         R.id.menu_download,
         UR.id.menu_undownload,
         LR.string.delete_download,
         IR.drawable.ic_undownload,
-        "remove_download"
+        "remove_download",
     )
     object Download : MultiSelectEpisodeAction(
         R.id.menu_download,
         R.id.menu_download,
         LR.string.download,
         IR.drawable.ic_download,
-        "download"
+        "download",
     )
     object Archive : MultiSelectEpisodeAction(
         R.id.menu_archive,
         R.id.menu_archive,
         LR.string.archive,
         IR.drawable.ic_archive,
-        "archive"
+        "archive",
     )
     object Unarchive : MultiSelectEpisodeAction(
         R.id.menu_archive,
         UR.id.menu_unarchive,
         LR.string.unarchive,
         IR.drawable.ic_unarchive,
-        "unarchive"
+        "unarchive",
     )
     object DeleteUserEpisode : MultiSelectEpisodeAction(
         R.id.menu_archive,
         R.id.menu_delete,
         LR.string.delete,
         R.drawable.ic_delete,
-        "delete"
+        "delete",
     )
     object Share : MultiSelectEpisodeAction(
         groupId = R.id.menu_share,
@@ -72,42 +72,42 @@ sealed class MultiSelectEpisodeAction(
         UR.id.menu_markasunplayed,
         LR.string.mark_as_unplayed,
         IR.drawable.ic_markasunplayed,
-        "mark_as_unplayed"
+        "mark_as_unplayed",
     )
     object MarkAsPlayed : MultiSelectEpisodeAction(
         R.id.menu_mark_played,
         R.id.menu_mark_played,
         LR.string.mark_as_played,
         IR.drawable.ic_markasplayed,
-        "mark_as_played"
+        "mark_as_played",
     )
     object PlayNext : MultiSelectEpisodeAction(
         R.id.menu_playnext,
         R.id.menu_playnext,
         LR.string.play_next,
         IR.drawable.ic_upnext_playnext,
-        "play_next"
+        "play_next",
     )
     object PlayLast : MultiSelectEpisodeAction(
         R.id.menu_playlast,
         R.id.menu_playlast,
         LR.string.play_last,
         IR.drawable.ic_upnext_playlast,
-        "play_last"
+        "play_last",
     )
     object Unstar : MultiSelectEpisodeAction(
         R.id.menu_star,
         UR.id.menu_unstar,
         LR.string.unstar,
         IR.drawable.ic_unstar,
-        "unstar"
+        "unstar",
     )
     object Star : MultiSelectEpisodeAction(
         R.id.menu_star,
         R.id.menu_star,
         LR.string.star,
         IR.drawable.ic_star,
-        "star"
+        "star",
     )
 
     companion object {
@@ -166,7 +166,9 @@ sealed class MultiSelectEpisodeAction(
                 R.id.menu_share -> {
                     if (selected.size == 1 &&
                         selected.firstOrNull() is PodcastEpisode
-                    ) return Share
+                    ) {
+                        return Share
+                    }
                 }
             }
 

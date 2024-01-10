@@ -53,13 +53,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
@@ -97,18 +97,31 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var folderManager: FolderManager
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var notificationDrawer: NotificationDrawer
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var serverManager: ServerManager
+
     @Inject lateinit var notificationHelper: NotificationHelper
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var listServerManager: ListServerManager
+
     @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManager
 
     var mediaController: MediaControllerCompat? = null
@@ -193,7 +206,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                     onError = { throwable ->
                         Timber.e(throwable)
                         LogBuffer.e(LogBuffer.TAG_PLAYBACK, throwable, "Playback service error")
-                    }
+                    },
                 )
                 .addTo(disposables)
         }
@@ -249,7 +262,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             // Transition between foreground service running and not with a notification
             when (state) {
                 PlaybackStateCompat.STATE_BUFFERING,
-                PlaybackStateCompat.STATE_PLAYING -> {
+                PlaybackStateCompat.STATE_PLAYING,
+                -> {
                     if (notification != null) {
                         try {
                             startForeground(Settings.NotificationId.PLAYING.value, notification)
@@ -272,7 +286,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_NONE,
                 PlaybackStateCompat.STATE_STOPPED,
                 PlaybackStateCompat.STATE_PAUSED,
-                PlaybackStateCompat.STATE_ERROR -> {
+                PlaybackStateCompat.STATE_ERROR,
+                -> {
                     val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause.value
                     // We have to be careful here to only call notify when moving from PLAY to PAUSE once
                     // or else the notification will come back after being swiped away
@@ -299,7 +314,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.TAG_PLAYBACK,
                             "Playback state error: ${playbackStatusRelay.value?.errorCode
                                 ?: -1} ${playbackStatusRelay.value?.errorMessage
-                                ?: "Unknown error"}"
+                                ?: "Unknown error"}",
                         )
                     }
                 }

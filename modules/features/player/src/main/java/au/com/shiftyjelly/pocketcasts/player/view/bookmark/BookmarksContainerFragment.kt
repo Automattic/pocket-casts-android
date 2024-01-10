@@ -50,7 +50,7 @@ class BookmarksContainerFragment :
         get() = StatusBarColor.Custom(
             context?.getThemeColor(UR.attr.primary_ui_01)
                 ?: Color.WHITE,
-            theme.isDarkTheme
+            theme.isDarkTheme,
         )
 
     var binding: FragmentBookmarksContainerBinding? = null
@@ -78,7 +78,7 @@ class BookmarksContainerFragment :
                     }
                     dismiss()
                 }
-            }
+            },
         )
 
         bottomSheetDialog?.behavior?.apply {
@@ -105,7 +105,7 @@ class BookmarksContainerFragment :
                 BookmarksFragment.newInstance(
                     sourceView = sourceView,
                     episodeUuid = episodeUUID,
-                )
+                ),
             )
             .addToBackStack(null)
             .commit()

@@ -105,7 +105,7 @@ object OnboardingUpgradeHelper {
                         text = it,
                         textAlign = TextAlign.Center,
                         color = textColor,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.padding(top = 4.dp),
                     )
                 }
             }
@@ -128,7 +128,7 @@ object OnboardingUpgradeHelper {
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .background(plusGradientBrush)
+                    .background(plusGradientBrush),
             ) {
                 Text(
                     text = text,
@@ -139,7 +139,7 @@ object OnboardingUpgradeHelper {
                         .padding(8.dp)
                         .align(Alignment.Center),
                     textAlign = TextAlign.Center,
-                    color = Color.Black
+                    color = Color.Black,
                 )
             }
         }
@@ -156,9 +156,7 @@ object OnboardingUpgradeHelper {
         selectedCheckMark: Boolean = false,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
-
         ConstraintLayout(modifier) {
-
             val buttonRef = createRef()
             Button(
                 onClick = onClick,
@@ -171,7 +169,6 @@ object OnboardingUpgradeHelper {
                     bottom.linkTo(parent.bottom)
                 },
             ) {
-
                 Box(Modifier.fillMaxWidth()) {
                     TextH30(
                         text = text,
@@ -179,7 +176,7 @@ object OnboardingUpgradeHelper {
                         modifier = Modifier
                             .brush(brush)
                             .padding(vertical = 6.dp, horizontal = 24.dp)
-                            .align(Alignment.Center)
+                            .align(Alignment.Center),
                     )
                     if (selectedCheckMark) {
                         Icon(
@@ -188,7 +185,7 @@ object OnboardingUpgradeHelper {
                             modifier = Modifier
                                 .brush(brush)
                                 .align(Alignment.CenterEnd)
-                                .width(24.dp)
+                                .width(24.dp),
                         )
                     }
                 }
@@ -199,7 +196,7 @@ object OnboardingUpgradeHelper {
                     buttonRef = buttonRef,
                     topText = it,
                     subscriptionTier = subscriptionTier,
-                    isSelected = true
+                    isSelected = true,
                 )
             }
         }
@@ -215,7 +212,6 @@ object OnboardingUpgradeHelper {
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
         ConstraintLayout(modifier) {
-
             val buttonRef = createRef()
             Button(
                 onClick = onClick,
@@ -234,7 +230,7 @@ object OnboardingUpgradeHelper {
                     color = unselectedColor,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp, horizontal = 24.dp)
+                        .padding(vertical = 6.dp, horizontal = 24.dp),
                 )
             }
 
@@ -270,14 +266,14 @@ object OnboardingUpgradeHelper {
             modifier = if (selected) {
                 modifier.background(
                     brush = brush,
-                    shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(4.dp),
                 )
             } else {
                 modifier.background(
                     color = unselectedColor,
-                    shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(4.dp),
                 )
-            }
+            },
         ) {
             TextP60(
                 text = topText,
@@ -286,7 +282,7 @@ object OnboardingUpgradeHelper {
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(
                     horizontal = 12.dp,
-                    vertical = 2.dp
+                    vertical = 2.dp,
                 ),
             )
         }
@@ -311,7 +307,7 @@ object OnboardingUpgradeHelper {
             topText = topText,
             subscriptionTier = subscriptionTier,
             selected = isSelected,
-            modifier = topTextModifier
+            modifier = topTextModifier,
         )
     }
 
@@ -360,7 +356,7 @@ object OnboardingUpgradeHelper {
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(width * 0.8f)
+                .blur(width * 0.8f),
         ) {
             drawRect(backgroundColor)
 
@@ -383,7 +379,7 @@ object OnboardingUpgradeHelper {
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(width * 0.5f)
+                .blur(width * 0.5f),
         ) {
             drawRect(backgroundColor)
 
@@ -405,9 +401,8 @@ object OnboardingUpgradeHelper {
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(150.dp)
+                .blur(150.dp),
         ) {
-
             // Background
             drawRect(backgroundColor)
 
@@ -439,7 +434,7 @@ object OnboardingUpgradeHelper {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .background(backgroundColor)
-                .matchParentSize()
+                .matchParentSize(),
         )
     }
 
@@ -474,7 +469,7 @@ object OnboardingUpgradeHelper {
         val text = stringResource(
             LR.string.onboarding_plus_continuing_agrees_to,
             privacyPolicyText,
-            termsAndConditionsText
+            termsAndConditionsText,
         )
         val uriHandler = LocalUriHandler.current
         ClickableTextHelper(
@@ -487,13 +482,13 @@ object OnboardingUpgradeHelper {
                     text = privacyPolicyText,
                     onClick = {
                         uriHandler.openUri(Settings.INFO_PRIVACY_URL)
-                    }
+                    },
                 ),
                 Clickable(
                     text = termsAndConditionsText,
                     onClick = {
                         uriHandler.openUri(Settings.INFO_TOS_URL)
-                    }
+                    },
                 ),
             ),
             modifier = modifier,

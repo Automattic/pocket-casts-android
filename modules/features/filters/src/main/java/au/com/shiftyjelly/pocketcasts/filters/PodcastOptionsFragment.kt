@@ -24,13 +24,13 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
@@ -51,6 +51,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
         get() = Dispatchers.Main
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var playlistManager: PlaylistManager
 
     var podcastSelection: List<String> = listOf()
@@ -91,7 +92,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
 
             val fragment = PodcastSelectFragment.newInstance(
                 tintColor = color,
-                source = PodcastSelectFragmentSource.FILTERS
+                source = PodcastSelectFragmentSource.FILTERS,
             )
             childFragmentManager.commit {
                 add(R.id.podcastSelectFrame, fragment)
@@ -135,9 +136,11 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
                     val userPlaylistUpdate = if (userChanged || userChangedChild) {
                         UserPlaylistUpdate(
                             listOf(PlaylistProperty.Podcasts),
-                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST,
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                     playlistManager.update(playlist, userPlaylistUpdate)
 
                     launch(Dispatchers.Main) { (activity as? FragmentHostListener)?.closeModal(this@PodcastOptionsFragment) }

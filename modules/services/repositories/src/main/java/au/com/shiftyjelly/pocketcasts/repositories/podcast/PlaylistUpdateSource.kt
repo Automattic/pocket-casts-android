@@ -7,5 +7,5 @@ enum class PlaylistUpdateSource(val analyticsValue: String) {
     FILTER_EPISODE_LIST("filters"),
     FILTER_OPTIONS("filters"),
 
-    PODCAST_SETTINGS("podcast_settings")
+    PODCAST_SETTINGS("podcast_settings"),
 }

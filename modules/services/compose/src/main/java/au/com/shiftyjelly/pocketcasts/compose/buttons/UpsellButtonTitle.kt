@@ -18,6 +18,6 @@ fun UpsellButtonTitle(
             SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
             SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
             SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
-        }
+        },
     )
 }
