@@ -242,7 +242,6 @@ Language: ko_KR
     <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
     <string name="settings_media_actions_prioritize_subtitle">상위 작업이 제공됩니다.</string>
     <string name="settings_media_actions_prioritize_title">사용자 정의 미디어 작업 우선순위 지정</string>
-    <string name="plus_take_your_podcasting_to_next_level">기능과 사용자 정의 옵션에 접근하는 독점 권한으로 팟캐스팅 환경의 수준을 높이세요.</string>
     <string name="onboarding_recommendations_more">%s 추가</string>
     <string name="filter_id_or_title">필터 ID 또는 제목</string>
     <string name="filter_title">필터 제목</string>
@@ -338,8 +337,6 @@ Language: ko_KR
     <string name="onboarding_plus_feature_folders_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">데스크톱 앱</string>
-    <string name="onboarding_upgrade_unlock_all_features">모든 기능 잠금 해제</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">독점 기능 및 사용자 정의 옵션 접근 권한 받기</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
@@ -963,13 +960,9 @@ Language: ko_KR
     <string name="plus_lifetime_member">평생회원</string>
     <string name="plus_learn_more_button">더 알아보기</string>
     <string name="plus_learn_more_about_plus">Pocket Casts Plus 더 알아보기</string>
-    <string name="plus_desktop_apps_body">Windows, macOS 및 웹 앱을 통해 팟캐스트를 더 많은 곳으로 가져가세요.</string>
     <string name="plus_desktop_apps">데스크톱 앱</string>
-    <string name="plus_description_title">고급 청취자를 위한 향상된 기능</string>
-    <string name="plus_description_body">한꺼번에 개인화하고 배포하세요. 개인 오디오 파일을 클라우드 서버에 업로드하고, 웹 플레이어를 통해 계정에 접근하고, 앱을 나만의 것으로 만드세요.</string>
     <string name="plus_create_marketing_features"> 모든 것</string>
     <string name="plus_cloud_storage_limit">클라우드 저장 공간 %dGB</string>
-    <string name="plus_cloud_storage_body">강의 속도를 높이세요. 다른 콘텐츠를 압도하세요. 고유한 팟캐스트 DJ가 되세요.</string>
     <string name="plus_cloud_storage">클라우드 저장 공간</string>
     <string name="profile_expiry_date_unknown">알 수 없음</string>
     <string name="profile_yearly">매년</string>
@@ -977,7 +970,6 @@ Language: ko_KR
     <string name="profile_welcome_to_plus">Pocket Casts Plus에 오신 것을 환영합니다!</string>
     <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="profile_web_player">웹 플레이어</string>
-    <string name="profile_upgrade_to_plus">Plus로 업그레이드</string>
     <string name="profile_updates_ends">업데이트 종료: %s</string>
     <string name="profile_updates_ended">업데이트 종료됨: %s</string>
     <string name="profile_time_free">%s 무료</string>

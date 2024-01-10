@@ -74,30 +74,3 @@ enum class PatronUpgradeFeatureItem(
         title = LR.string.onboarding_patron_feature_gratitude_title,
     ),
 }
-
-enum class OldPlusUpgradeFeatureItem(
-    override val image: Int,
-    override val title: Int,
-    override val text: Int,
-) : UpgradeFeatureItem {
-    DesktopApps(
-        image = IR.drawable.desktop_apps,
-        title = LR.string.onboarding_plus_feature_desktop_apps_title,
-        text = LR.string.onboarding_plus_feature_desktop_apps_text,
-    ),
-    Folders(
-        image = IR.drawable.folder,
-        title = LR.string.onboarding_plus_feature_folders_title,
-        text = LR.string.onboarding_plus_feature_folders_text,
-    ),
-    CloudStorage(
-        image = IR.drawable.cloud_storage,
-        title = LR.string.onboarding_plus_feature_cloud_storage_title,
-        text = LR.string.onboarding_plus_feature_cloud_storage_text,
-    ),
-    ThemesIcons(
-        image = IR.drawable.themes_icons,
-        title = LR.string.onboarding_plus_feature_themes_icons_title,
-        text = LR.string.onboarding_plus_feature_themes_icons_text,
-    ),
-}

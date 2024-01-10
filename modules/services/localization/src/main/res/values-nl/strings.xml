@@ -242,7 +242,6 @@ Language: nl
     <string name="settings_media_actions_customise">Media-acties aanpassen</string>
     <string name="settings_media_actions_prioritize_subtitle">Uw belangrijkste acties zullen beschikbaar zijn</string>
     <string name="settings_media_actions_prioritize_title">Uw aangepaste media-acties prioriteren</string>
-    <string name="plus_take_your_podcasting_to_next_level">Til je podcast-ervaring naar het volgende niveau met exclusieve toegang tot functies en aanpassingsmogelijkheden.</string>
     <string name="onboarding_recommendations_more">Meer %s</string>
     <string name="filter_id_or_title">Filter-ID of -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -338,8 +337,6 @@ Language: nl
     <string name="onboarding_plus_feature_folders_title">Mappen</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop-apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Ontgrendel alle functies</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Krijg toegang tot exclusieve functies en aanpassingsmogelijkheden</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
     <string name="onboarding_recommendations_import">Importeren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>
@@ -963,13 +960,9 @@ Language: nl
     <string name="plus_lifetime_member">Levenslang lid</string>
     <string name="plus_learn_more_button">Meer weten</string>
     <string name="plus_learn_more_about_plus">Bekijk meer informatie over Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Neem je podcasts altijd met je mee met onze apps voor Windows en macOS en de online apps.</string>
     <string name="plus_desktop_apps">Desktop-apps</string>
-    <string name="plus_description_title">Verbeterde functies voor geavanceerde luisteraars</string>
-    <string name="plus_description_body">Tegelijkertijd persoonlijk zijn en gedeeld worden. Upload je persoonlijke audiobestanden naar onze cloudservers, krijg toegang tot je account via onze online speler en pas de app naar je eigen voorkeuren aan.</string>
     <string name="plus_create_marketing_features"> Alles</string>
     <string name="plus_cloud_storage_limit">%dGB cloud-opslagruimte</string>
-    <string name="plus_cloud_storage_body">Versnel je lezingen. Haast je door andere content heen. Word je eigen podcast-DJ.</string>
     <string name="plus_cloud_storage">Opslag in de cloud</string>
     <string name="profile_expiry_date_unknown">Onbekend</string>
     <string name="profile_yearly">Jaarlijks</string>
@@ -977,7 +970,6 @@ Language: nl
     <string name="profile_welcome_to_plus">Welkom bij Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Welkom bij Pocket Casts!</string>
     <string name="profile_web_player">Online speler</string>
-    <string name="profile_upgrade_to_plus">Upgraden naar Plus</string>
     <string name="profile_updates_ends">Updates beëindigen: %s</string>
     <string name="profile_updates_ended">Updates beëindigd: %s</string>
     <string name="profile_time_free">%s gratis</string>

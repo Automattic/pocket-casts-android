@@ -26,8 +26,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
 
@@ -54,7 +52,7 @@ fun OnboardingUpgradeFlow(
     val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.Upsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
 
-    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) {
+    if (userSignedInOrSignedUpInUpsellFlow) {
         activity?.let {
             LaunchedEffect(Unit) {
                 mainSheetViewModel.onClickSubscribe(
@@ -71,7 +69,7 @@ fun OnboardingUpgradeFlow(
         hasSubscriptions && (
             // The hidden state is shown as the first screen in the Upsell flow, so when we return
             // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            (!FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) ||
+            (userSignedInOrSignedUpInUpsellFlow) ||
                 // User already indicated they want to upgrade, so go straight to purchase modal
                 flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade
@@ -122,14 +120,6 @@ fun OnboardingUpgradeFlow(
                 OnboardingUpgradeFeaturesPage(
                     flow = flow,
                     source = source,
-                    onUpgradePressed = {
-                        if (isLoggedIn) {
-                            coroutineScope.launch { sheetState.show() }
-                        } else {
-                            onNeedLogin()
-                        }
-                    },
-                    onNotNowPressed = onProceed,
                     onBackPressed = onBackPressed,
                     onClickSubscribe = {
                         if (activity != null) {
@@ -146,6 +136,7 @@ fun OnboardingUpgradeFlow(
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                         }
                     },
+                    onNotNowPressed = onProceed,
                     canUpgrade = hasSubscriptions,
                 )
             }

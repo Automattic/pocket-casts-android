@@ -242,7 +242,6 @@ Language: zh_TW
     <string name="settings_media_actions_customise">自訂媒體動作</string>
     <string name="settings_media_actions_prioritize_subtitle">你將可使用你的常用動作。</string>
     <string name="settings_media_actions_prioritize_title">為你的自訂媒體動作排定優先順序</string>
-    <string name="plus_take_your_podcasting_to_next_level">運用專屬功能和自訂選項，讓你的 Podcast 體驗更上一層樓。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">篩選 ID 或標題</string>
     <string name="filter_title">篩選標題</string>
@@ -338,8 +337,6 @@ Language: zh_TW
     <string name="onboarding_plus_feature_folders_title">資料夾</string>
     <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，享受更多元的收聽方式。</string>
     <string name="onboarding_plus_feature_desktop_apps_title">桌面應用程式</string>
-    <string name="onboarding_upgrade_unlock_all_features">使用所有功能</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">使用獨家功能和自訂選項</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">包含所有你喜愛的 Pocket Casts 功能，以及更多好康</string>
     <string name="onboarding_recommendations_import">匯入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">選取你最愛的 Podcast，或從其他 Podcast 播放器匯入，打造你專屬的 Pocket Casts。 你可以稍後進行。</string>
@@ -963,13 +960,9 @@ Language: zh_TW
     <string name="plus_lifetime_member">終身會員</string>
     <string name="plus_learn_more_button">進一步了解</string>
     <string name="plus_learn_more_about_plus">深入了解 Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">透過我們的 Windows、macOS 和網頁應用程式，隨時隨地都能聆聽 Podcast 節目 。</string>
     <string name="plus_desktop_apps">桌上型電腦應用程式</string>
-    <string name="plus_description_title">進階聽眾的進階功能</string>
-    <string name="plus_description_body">個人化設定和內容發表，全部一次搞定。上傳個人音訊檔案到雲端伺服器、透過網頁播放器使用帳號，還可將 App 打造成你的專屬天地。</string>
     <string name="plus_create_marketing_features"> 所有內容</string>
     <string name="plus_cloud_storage_limit">%d GB 雲端儲存空間</string>
-    <string name="plus_cloud_storage_body">加速課程進度。 探索其他內容。成為你自己的 Podcast DJ。</string>
     <string name="plus_cloud_storage">雲端儲存空間</string>
     <string name="profile_expiry_date_unknown">未知</string>
     <string name="profile_yearly">每年</string>
@@ -977,7 +970,6 @@ Language: zh_TW
     <string name="profile_welcome_to_plus">歡迎使用 Pocket Casts Plus！</string>
     <string name="profile_welcome_to_free">歡迎使用 Pocket Casts！</string>
     <string name="profile_web_player">網頁播放器</string>
-    <string name="profile_upgrade_to_plus">升級到 Plus</string>
     <string name="profile_updates_ends">更新預估結束時間：%s</string>
     <string name="profile_updates_ended">更新結束時間：%s</string>
     <string name="profile_time_free">%s 免費</string>

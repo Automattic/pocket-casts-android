@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import android.app.Activity
 import android.app.Application
-import android.content.Context
-import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -25,8 +23,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,36 +50,25 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val showPatronOnly = savedStateHandle.get<Boolean>("show_patron_only")
 
     init {
-        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            viewModelScope.launch {
-                subscriptionManager
-                    .observeProductDetails()
-                    .asFlow()
-                    .stateIn(viewModelScope)
-                    .collect { productDetails ->
-                        val subscriptions = when (productDetails) {
-                            is ProductDetailsState.Error -> null
-                            is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                                Subscription.fromProductDetails(
-                                    productDetails = productDetailsState,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
-                                    ),
-                                )
-                            }
-                        } ?: emptyList()
-                        updateState(subscriptions)
+        viewModelScope.launch {
+            subscriptionManager
+                .observeProductDetails()
+                .asFlow()
+                .stateIn(viewModelScope)
+                .collect { productDetails ->
+                    val subscriptions = when (productDetails) {
+                        is ProductDetailsState.Error -> emptyList()
+                        is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
+                            Subscription.fromProductDetails(
+                                productDetails = productDetailsState,
+                                isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                ),
+                            )
+                        }
                     }
-            }
-        } else {
-            val accessibiltyManager = getApplication<Application>().getSystemService(Context.ACCESSIBILITY_SERVICE)
-                as? AccessibilityManager
-
-            var isTouchExplorationEnabled = accessibiltyManager?.isTouchExplorationEnabled ?: false
-            accessibiltyManager?.addTouchExplorationStateChangeListener {
-                isTouchExplorationEnabled = it
-            }
-            _state.update { OnboardingUpgradeFeaturesState.OldLoaded(isTouchExplorationEnabled) }
+                    updateState(subscriptions)
+                }
         }
     }
 
@@ -140,10 +125,6 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
     fun onNotNow(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow, source))
-    }
-
-    fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
     fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
@@ -254,15 +235,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 }
 
 sealed class OnboardingUpgradeFeaturesState {
-    object Loading : OnboardingUpgradeFeaturesState()
+    data object Loading : OnboardingUpgradeFeaturesState()
 
     data class NoSubscriptions(val showNotNow: Boolean) : OnboardingUpgradeFeaturesState()
-
-    data class OldLoaded(
-        private val isTouchExplorationEnabled: Boolean,
-    ) : OnboardingUpgradeFeaturesState() {
-        val scrollAutomatically = !isTouchExplorationEnabled
-    }
 
     data class Loaded(
         val currentFeatureCard: UpgradeFeatureCard,

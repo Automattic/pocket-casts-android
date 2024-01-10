@@ -242,7 +242,6 @@ Language: ja_JP
     <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
     <string name="settings_media_actions_prioritize_subtitle">上位のアクションを利用できます。</string>
     <string name="settings_media_actions_prioritize_title">カスタムメディアアクションに優先順位を設定</string>
-    <string name="plus_take_your_podcasting_to_next_level">専用の機能やカスタマイズオプションを使用して、あなたのポッドキャスト体験をさらなるレベルに引き上げることができます。</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>
@@ -338,8 +337,6 @@ Language: ja_JP
     <string name="onboarding_plus_feature_folders_title">フォルダー</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
     <string name="onboarding_plus_feature_desktop_apps_title">デスクトップアプリ</string>
-    <string name="onboarding_upgrade_unlock_all_features">すべての機能のロックを解除</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">限定機能とカスタマイズオプションへのアクセス権を取得しましょう</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
     <string name="onboarding_recommendations_import">インポート</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>
@@ -963,13 +960,9 @@ Language: ja_JP
     <string name="plus_lifetime_member">無期限メンバー</string>
     <string name="plus_learn_more_button">もっと詳しく知る</string>
     <string name="plus_learn_more_about_plus">Pocket Casts Plus の詳細</string>
-    <string name="plus_desktop_apps_body">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでポッドキャストの活用範囲を広げましょう。</string>
     <string name="plus_desktop_apps">デスクトップアプリ</string>
-    <string name="plus_description_title">上級リスナー向け強化機能</string>
-    <string name="plus_description_body">パーソナルにいろんな仲間とつながる。 個人的な音声ファイルをクラウドサーバーにアップロード。ウェブプレーヤーからアカウントにアクセスして、アプリを自分好みにカスタマイズしましょう。</string>
     <string name="plus_create_marketing_features"> すべて</string>
     <string name="plus_cloud_storage_limit">%dGB のクラウドストレージ</string>
-    <string name="plus_cloud_storage_body">学びの時間をスピーディに。 コンテンツを次々に切り替えて ポッドキャストの DJ になりましょう。</string>
     <string name="plus_cloud_storage">クラウドストレージ</string>
     <string name="profile_expiry_date_unknown">不明</string>
     <string name="profile_yearly">年払い</string>
@@ -977,7 +970,6 @@ Language: ja_JP
     <string name="profile_welcome_to_plus">Pocket Casts Plus へようこそ !</string>
     <string name="profile_welcome_to_free">Pocket Casts へようこそ !</string>
     <string name="profile_web_player">ウェブプレーヤー</string>
-    <string name="profile_upgrade_to_plus">Plus にアップグレード</string>
     <string name="profile_updates_ends">更新終了予定日: %s</string>
     <string name="profile_updates_ended">更新終了日: %s</string>
     <string name="profile_time_free">%s 無料</string>

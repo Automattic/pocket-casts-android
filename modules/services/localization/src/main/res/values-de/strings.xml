@@ -242,7 +242,6 @@ Language: de
     <string name="settings_media_actions_customise">Medienaktionen anpassen</string>
     <string name="settings_media_actions_prioritize_subtitle">Deine häufigsten Aktionen werden verfügbar sein.</string>
     <string name="settings_media_actions_prioritize_title">Deine individuellen Medienaktionen priorisieren</string>
-    <string name="plus_take_your_podcasting_to_next_level">Bringe dein Podcast-Erlebnis auf die nächste Ebene mit exklusivem Zugriff auf Funktionen und Anpassungsoptionen.</string>
     <string name="onboarding_recommendations_more">Mehr %s</string>
     <string name="filter_id_or_title">Filter-ID oder -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -338,8 +337,6 @@ Language: de
     <string name="onboarding_plus_feature_folders_title">Ordner</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Mit unseren Windows-, macOS- und Web-Apps kannst du deine Inhalte auf beliebigen Geräten anhören.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop-Apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Alle Funktionen nutzen</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Erhalte Zugriff auf exklusive Funktionen und Anpassungsoptionen</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
     <string name="onboarding_recommendations_import">Importieren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Wähle deine Lieblings-Podcasts aus oder importiere sie aus einem anderen Podcast Player und gestalte Pocket Casts ganz individuell. Das kannst du auch jederzeit später erledigen.</string>
@@ -963,13 +960,9 @@ Language: de
     <string name="plus_lifetime_member">Lebenslange Mitgliedschaft</string>
     <string name="plus_learn_more_button">Weitere Informationen</string>
     <string name="plus_learn_more_about_plus">Weitere Informationen zu Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Mit unseren Windows-, macOS- und Web-Apps hast du deine Podcasts immer parat.</string>
     <string name="plus_desktop_apps">Desktop-Apps</string>
-    <string name="plus_description_title">Erweiterte Funktionen für Vielhörer</string>
-    <string name="plus_description_body">Persönlich und überall verfügbar: Lade deine persönlichen Audiodateien auf unsere Cloudserver hoch, greife über unseren Webplayer auf dein Konto zu und passe die App ganz an deine Bedürfnisse an.</string>
     <string name="plus_create_marketing_features"> Alles</string>
     <string name="plus_cloud_storage_limit">%d GB Cloud-Speicher</string>
-    <string name="plus_cloud_storage_body">Verkürze deine Wiedergaben und hör dir schneller noch mehr an. Stelle deine Podcasts selbst zusammen.</string>
     <string name="plus_cloud_storage">Cloud-Speicher</string>
     <string name="profile_expiry_date_unknown">Unbekannt</string>
     <string name="profile_yearly">Jährlich</string>
@@ -977,7 +970,6 @@ Language: de
     <string name="profile_welcome_to_plus">Willkommen bei Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Willkommen bei Pocket Casts!</string>
     <string name="profile_web_player">Webplayer</string>
-    <string name="profile_upgrade_to_plus">Upgrade auf Plus</string>
     <string name="profile_updates_ends">Aktualisierungen enden: %s</string>
     <string name="profile_updates_ended">Aktualisierungen beendet: %s</string>
     <string name="profile_time_free">%s frei</string>
