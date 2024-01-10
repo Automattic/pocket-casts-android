@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.privacy.PrivacyFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -92,9 +90,7 @@ fun SettingsFragmentPage(
             AutoArchiveRow(onClick = { openFragment(AutoArchiveFragment()) })
             AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment.newInstance()) })
             AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                HeadphoneControlsRow(onClick = { openFragment(HeadphoneControlsSettingsFragment()) })
-            }
+            HeadphoneControlsRow(onClick = { openFragment(HeadphoneControlsSettingsFragment()) })
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
             AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
             PrivacyRow(onClick = { openFragment(PrivacyFragment()) })
