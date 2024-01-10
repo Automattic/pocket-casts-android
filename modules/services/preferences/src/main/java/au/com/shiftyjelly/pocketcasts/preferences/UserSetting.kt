@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,24 +12,33 @@ abstract class UserSetting<T>(
     protected val sharedPrefs: SharedPreferences,
 ) {
 
-    private val needsSyncKey = "${sharedPrefKey}NeedsSync"
+    private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
-    var needsSync: Boolean
-        get() = sharedPrefs.getBoolean(needsSyncKey, false)
-        set(value) {
-            sharedPrefs.edit().run {
-                putBoolean(needsSyncKey, value)
-                apply()
-            }
-        }
+    fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
 
-    var modifiedAt: Instant? = null
-    val modifiedAtServerString: String?
-        get() = modifiedAt?.toString()
+    fun getModifiedAt(): Instant? = tryOrNull {
+        getModifiedAtServerString()?.let { Instant.parse(it) }
+    }
+
+    fun doesNotNeedSync() {
+        updateModifiedAtServerString(null)
+    }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
+    fun <U> getSyncSetting(f: (T, String) -> U): U? {
+        val modifiedAtServerString = getModifiedAtServerString()
+        // Only need to sync if modifiedAtServerString is not null
+        return if (modifiedAtServerString != null) {
+            f(value, modifiedAtServerString)
+        } else {
+            null
+        }
+    }
+
+    // Returns the value to sync if sync is needed. Returns null if sync is not needed.
+    @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
     fun getSyncValue(): T? {
-        val needsSync = sharedPrefs.getBoolean(needsSyncKey, false)
+        val needsSync = getModifiedAtServerString() != null
         return if (needsSync) value else null
     }
 
@@ -52,11 +62,28 @@ abstract class UserSetting<T>(
         persist(value, commit)
         _flow.value = value
 
-        // Since this parameter is defaulted to false, let's not let the default overwrite
-        // a previous request to sync.
         if (needsSync) {
-            this.needsSync = true
-            this.modifiedAt = Instant.now()
+            updateModifiedAtServerString()
+        }
+    }
+
+    private fun updateModifiedAtServerString(modifiedAt: String? = Instant.now().toString()) {
+        val valueToPersist = if (modifiedAt == null) {
+            // Allow persisting of nulls
+            null
+        } else {
+            val parsable = tryOrNull { Instant.parse(modifiedAt) } != null
+            if (!parsable) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot set invalid modified at server string: $modifiedAt")
+                return
+            }
+            // Only persist the string if it is parsable
+            modifiedAt
+        }
+
+        sharedPrefs.edit().run {
+            putString(modifiedAtKey, valueToPersist)
+            apply()
         }
     }
 
@@ -274,3 +301,10 @@ abstract class UserSetting<T>(
         override fun persist(value: T, commit: Boolean) {}
     }
 }
+
+private inline fun <T> tryOrNull(f: () -> T): T? =
+    try {
+        f()
+    } catch (e: Exception) {
+        null
+    }

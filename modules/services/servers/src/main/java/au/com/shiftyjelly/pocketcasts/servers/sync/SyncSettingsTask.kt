@@ -22,6 +22,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
                     syncSettings(settings, namedSettingsCall)
                 } else {
+                    @Suppress("DEPRECATION")
                     oldSyncSettings(settings, namedSettingsCall)
                 }
             } catch (e: Exception) {
@@ -36,7 +37,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 settings.skipBackInSecs,
                 settings.skipForwardInSecs,
             ).forEach {
-                it.needsSync = false
+                it.doesNotNeedSync()
             }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 
@@ -55,12 +56,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
             val request = ChangedNamedSettingsRequest(
                 changedSettings = ChangedNamedSettings(
-                    skipForward = settings.skipForwardInSecs.modifiedAtServerString?.let { modifiedAt ->
-                        NamedChangedSettingInt(
-                            value = settings.skipForwardInSecs.value,
-                            modifiedAt = modifiedAt,
-                        )
-                    },
+                    skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
                 ),
             )
             val response = namedSettingsCall.changedNamedSettings(request)
@@ -99,7 +95,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return
             }
 
-            val localModifiedAt = setting.modifiedAt
+            val localModifiedAt = setting.getModifiedAt()
             // Don't exit early if we don't have a local modifiedAt time since
             // we don't know the local value is newew than the server value.
             if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
@@ -113,11 +109,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             )
         }
 
-        // This should be removed when we remove the Feature.SETTINGS_SYNC feature flag
+        @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
         private suspend fun oldSyncSettings(
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
+            @Suppress("DEPRECATION")
             val request = NamedSettingsRequest(
                 settings = NamedSettingsSettings(
                     skipForward = settings.skipForwardInSecs.getSyncValue(),
