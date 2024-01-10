@@ -37,14 +37,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    IN_APP_REVIEW_ENABLED(
-        key = "in_app_review_enabled",
-        title = "In App Review",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     GIVE_RATINGS(
         key = "give_ratings",
         title = "Give Ratings",

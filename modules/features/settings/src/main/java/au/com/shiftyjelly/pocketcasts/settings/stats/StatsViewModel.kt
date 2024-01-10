@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +35,6 @@ class StatsViewModel @Inject constructor(
     val application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val inAppReviewHelper: InAppReviewHelper,
-    private val featureFlag: FeatureFlagWrapper,
 ) : ViewModel() {
 
     sealed class State {
@@ -91,10 +88,8 @@ class StatsViewModel @Inject constructor(
                     funnyText = funnyText,
                     startedAt = serverStats?.startedAt,
                 )
-                if (featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)) {
-                    withContext(ioDispatcher) {
-                        serverStats?.startedAt?.let { showAppReviewDialogIfPossible(it) }
-                    }
+                withContext(ioDispatcher) {
+                    serverStats?.startedAt?.let { showAppReviewDialogIfPossible(it) }
                 }
             } catch (e: Exception) {
                 Timber.e(e)
