@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -20,6 +21,8 @@ abstract class UserSetting<T>(
                 apply()
             }
         }
+
+    var modifiedAt: String? = null
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
     fun getSyncValue(): T? {
@@ -51,6 +54,7 @@ abstract class UserSetting<T>(
         // a previous request to sync.
         if (needsSync) {
             this.needsSync = true
+            this.modifiedAt = Instant.now().toString()
         }
     }
 

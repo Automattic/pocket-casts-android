@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UploadProgressManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toUploadData
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
+import au.com.shiftyjelly.pocketcasts.servers.sync.ChangedNamedSettingsRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.ChangedNamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
@@ -398,6 +400,11 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse =
         getCacheTokenOrLogin { token ->
             syncServerManager.namedSettings(request, token)
+        }
+
+    override suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest): ChangedNamedSettingsResponse =
+        getCacheTokenOrLogin { token ->
+            syncServerManager.changedNamedSettings(request, token)
         }
 
     override fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse> =

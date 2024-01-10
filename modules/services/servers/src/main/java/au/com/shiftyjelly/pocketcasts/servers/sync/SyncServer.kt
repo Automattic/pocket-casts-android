@@ -63,6 +63,12 @@ interface SyncServer {
     @POST("/user/named_settings/update")
     suspend fun namedSettings(@Header("Authorization") authorization: String, @Body request: NamedSettingsRequest): NamedSettingsResponse
 
+    @POST("/user/named_settings/update")
+    suspend fun namedSettings(
+        @Header("Authorization") authorization: String,
+        @Body request: ChangedNamedSettingsRequest,
+    ): ChangedNamedSettingsResponse
+
     @FormUrlEncoded
     @POST("/sync/update")
     fun syncUpdate(@FieldMap fields: Map<String, String>): Single<SyncUpdateResponse>
