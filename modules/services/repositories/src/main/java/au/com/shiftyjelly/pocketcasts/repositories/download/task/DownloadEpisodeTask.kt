@@ -193,7 +193,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             ForegroundInfo(
                 NotificationId.DOWNLOADING.value,
                 notification,
-                FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
             )
         } else {
             ForegroundInfo(NotificationId.DOWNLOADING.value, notification)

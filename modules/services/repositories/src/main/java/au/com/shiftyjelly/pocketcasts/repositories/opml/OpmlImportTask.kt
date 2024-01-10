@@ -276,7 +276,7 @@ class OpmlImportTask @AssistedInject constructor(
             ForegroundInfo(
                 Settings.NotificationId.OPML.value,
                 buildNotification(progress, total),
-                FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
             )
         } else {
             ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
