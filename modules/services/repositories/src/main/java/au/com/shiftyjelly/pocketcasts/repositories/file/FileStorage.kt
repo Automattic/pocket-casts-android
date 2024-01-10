@@ -13,10 +13,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 
-@Singleton
 open class FileStorage @Inject constructor(
     val settings: Settings,
     @ApplicationContext val context: Context,
@@ -64,12 +68,12 @@ open class FileStorage @Inject constructor(
     }
 
     private fun getOrCreateDir(parentDir: File, name: String): File = File(parentDir, name + File.separator).also { dir ->
-        createDir(dir)
+        dir.mkdirs()
         addNoMediaFile(dir)
     }
 
     fun getOrCreateStorageDir(): File? = getOrCreateBaseStorageDir()?.let { dir ->
-        File(dir, "PocketCasts" + File.separator).also(::createDir)
+        File(dir, "PocketCasts" + File.separator).also(File::mkdirs)
     }
 
     fun getOrCreateBaseStorageDir(): File? = settings.getStorageChoice()?.let(::getOrCreateBaseStorageDir)
@@ -87,8 +91,6 @@ open class FileStorage @Inject constructor(
     } else {
         File(choice)
     }
-
-    private fun createDir(dir: File): File = dir.also(File::mkdirs)
 
     private fun addNoMediaFile(dir: File) {
         if (!dir.exists()) {
@@ -158,7 +160,7 @@ open class FileStorage @Inject constructor(
         }
     }
 
-    fun moveStorage(oldDir: File, newDir: File, episodesManager: EpisodeManager) {
+    suspend fun moveStorage(oldDir: File, newDir: File, episodesManager: EpisodeManager) {
         try {
             val oldPocketCastsDir = File(oldDir, "PocketCasts")
             if (oldPocketCastsDir.exists() && oldPocketCastsDir.isDirectory) {
@@ -169,55 +171,27 @@ open class FileStorage @Inject constructor(
                 val episodesDir = getOrCreateDir(newPocketCastsDir, DIR_EPISODES)
 
                 // Check existing media and mark those episodes as downloaded
-                if (episodesDir.exists()) {
-                    episodesDir.listFiles()?.forEach { file ->
-                        val fileName = FileUtil.getFileNameWithoutExtension(file)
-                        if (fileName.length < 36) {
-                            return@forEach
-                        }
-
-                        @Suppress("DEPRECATION")
-                        episodesManager.findByUuidSync(fileName)?.let { episode ->
-                            // Delete original file if it is already there
-                            episode.downloadedFilePath?.takeIf(String::isNotBlank)?.let { downloadedFilePath ->
-                                val originalFile = File(downloadedFilePath)
-                                if (originalFile.exists()) {
-                                    originalFile.delete()
-                                }
-                            }
-
-                            episodesManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
-                        }
-                    }
-                }
+                episodesDir.takeIf(File::exists)?.listFiles().orEmpty()
+                    .matchWithFileNames()
+                    .filterInvalidFileNames()
+                    .findMatchingEpisodes(episodesManager)
+                    .deleteExistingFiles()
+                    .updateEpisodesWithNewFilePaths(episodesManager)
 
                 // Move episodes
-                episodesManager.observeDownloadedEpisodes().blockingFirst().forEach { episode ->
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}")
-                    val downloadedFilePath = episode.downloadedFilePath?.takeIf(String::isNotBlank)
-                    if (downloadedFilePath == null) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode had not file path")
-                        return@forEach
-                    }
-                    val file = File(downloadedFilePath)
-                    if (file.exists() && file.isFile) {
-                        moveFileToDir(downloadedFilePath, episodesDir)?.let { updatedPath ->
-                            episodesManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
-                        }
-                    }
-                }
+                episodesManager.observeDownloadedEpisodes().asFlow().first()
+                    .onEach { episode -> LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}") }
+                    .matchWithDownloadedFilePaths()
+                    .filterNotExistingFiles()
+                    .moveFilesToEpisodesDirAndUpdatePaths(episodesManager, episodesDir)
 
                 val oldCustomFilesDir = getOrCreateDir(oldPocketCastsDir, DIR_CUSTOM_EPISODES)
                 val newCustomFilesDir = getOrCreateDir(newPocketCastsDir, DIR_CUSTOM_EPISODES)
-                if (oldCustomFilesDir.exists()) {
-                    moveDir(oldCustomFilesDir, newCustomFilesDir)
-                }
+                moveDir(oldCustomFilesDir, newCustomFilesDir)
 
                 val oldNetworkImageDir = getOrCreateDir(oldPocketCastsDir, DIR_NETWORK_IMAGES)
                 val newNetworkImageDir = getOrCreateDir(newPocketCastsDir, DIR_NETWORK_IMAGES)
-                if (newNetworkImageDir.exists()) {
-                    moveDir(oldNetworkImageDir, newNetworkImageDir)
-                }
+                moveDir(oldNetworkImageDir, newNetworkImageDir)
             } else {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Old directory did not exist")
             }
@@ -226,7 +200,44 @@ open class FileStorage @Inject constructor(
         }
     }
 
-    fun fixBrokenFiles(episodeManager: EpisodeManager) {
+    private fun Array<out File>.matchWithFileNames() = map { file -> file to FileUtil.getFileNameWithoutExtension(file) }
+
+    private fun List<Pair<File, String>>.filterInvalidFileNames() = filter { (_, fileName) -> fileName.length >= UUID_LENGTH }
+
+    private suspend fun List<Pair<File, String>>.findMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, fileName) ->
+        episodeManager.findByUuid(fileName)?.let { episode -> file to episode }
+    }
+
+    private fun List<Pair<File, PodcastEpisode>>.deleteExistingFiles() = onEach { (_, episode) ->
+        episode.downloadedFilePath?.takeIf(String::isNotBlank)?.let { downloadedFilePath ->
+            val originalFile = File(downloadedFilePath)
+            if (originalFile.exists()) {
+                originalFile.delete()
+            }
+        }
+    }
+
+    private fun List<Pair<File, PodcastEpisode>>.updateEpisodesWithNewFilePaths(episodeManager: EpisodeManager) = forEach { (file, episode) ->
+        episodeManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
+    }
+
+    private fun List<PodcastEpisode>.matchWithDownloadedFilePaths() = mapNotNull { episode ->
+        val downloadedFilePath = episode.downloadedFilePath?.takeIf(String::isNotBlank)
+        if (downloadedFilePath == null) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Episode had not file path")
+        }
+        downloadedFilePath?.let { path -> episode to path }
+    }
+
+    private fun List<Pair<PodcastEpisode, String>>.filterNotExistingFiles() = filter { (_, path) -> File(path).takeIf { it.exists() && it.isFile } != null }
+
+    private fun List<Pair<PodcastEpisode, String>>.moveFilesToEpisodesDirAndUpdatePaths(episodeManager: EpisodeManager, episodesDir: File) = forEach { (episode, path) ->
+        moveFileToDir(path, episodesDir)?.let { updatedPath ->
+            episodeManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
+        }
+    }
+
+    suspend fun fixBrokenFiles(episodeManager: EpisodeManager) {
         try {
             // Get all possible locations
             val dirPaths = buildSet {
@@ -238,49 +249,55 @@ open class FileStorage @Inject constructor(
                 }
             }
 
-            // Search each directory for missing files
-            dirPaths.forEach dirIteration@{ dirPath ->
-                val dir = File(dirPath)
-                if (!dir.exists() || !dir.canRead()) {
-                    return@dirIteration
-                }
-                val pocketCastsDir = File(dir, "PocketCasts")
-                if (!pocketCastsDir.exists() || !pocketCastsDir.canRead()) {
-                    return@dirIteration
-                }
-                val episodesDir = File(pocketCastsDir, DIR_EPISODES)
-                if (!episodesDir.exists() || !episodesDir.canRead()) {
-                    return@dirIteration
-                }
-                episodesDir.listFiles()?.forEach fileIteration@{ file ->
-                    val fileName = file.name
-                    val dotPosition = fileName.lastIndexOf('.')
-                    if (dotPosition < 1) {
-                        return@fileIteration
-                    }
-                    val uuid = fileName.substring(0, dotPosition)
-                    if (uuid.length != 36) {
-                        return@fileIteration
-                    }
-
-                    @Suppress("DEPRECATION")
-                    episodeManager.findByUuidSync(uuid)?.let { episode ->
-                        val downloadedFilePath = episode.downloadedFilePath
-                        if (downloadedFilePath != null && File(downloadedFilePath).exists() && episode.isDownloaded) {
-                            return@fileIteration
-                        }
-
-                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Restoring downloaded file for ${episode.title} from ${file.absolutePath}")
-                        // Link to the found episode
-                        episode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
-                        episode.downloadedFilePath = file.absolutePath
-                        episodeManager.update(episode)
-                    }
-                }
-            }
+            dirPaths.asSequence()
+                .toExistingDirs()
+                .toExistingPocketCastsDirs()
+                .toExistingEpisodesDirs()
+                .listFiles()
+                .matchWithFileNameDotPosition()
+                .toFileNameUuids()
+                .asFlow()
+                .toMatchingEpisodes(episodeManager)
+                .filterDownloadedEpisodes()
+                .restoreDownloadedFilePaths(episodeManager)
         } catch (e: Exception) {
             Timber.e(e)
         }
+    }
+
+    private fun Sequence<String>.toExistingDirs() = mapNotNull { dirPath -> File(dirPath).takeIf(::isFileReadable) }
+
+    private fun Sequence<File>.toExistingPocketCastsDirs() = mapNotNull { parentDir -> File(parentDir, "PocketCasts").takeIf(::isFileReadable) }
+
+    private fun Sequence<File>.toExistingEpisodesDirs() = mapNotNull { parentDir -> File(parentDir, DIR_EPISODES).takeIf(::isFileReadable) }
+
+    private fun isFileReadable(file: File) = file.exists() && file.canRead()
+
+    private fun Sequence<File>.listFiles() = flatMap { it.listFiles().orEmpty().asSequence() }
+
+    private fun Sequence<File>.matchWithFileNameDotPosition() = mapNotNull { file ->
+        file.name.lastIndexOf('.').takeIf { it >= 1 }?.let { dotPosition -> file to dotPosition }
+    }
+
+    private fun Sequence<Pair<File, Int>>.toFileNameUuids() = mapNotNull { (file, dotPosition) ->
+        file.name.substring(0, dotPosition).takeIf { it.length != UUID_LENGTH }?.let { uuid -> file to uuid }
+    }
+
+    private fun Flow<Pair<File, String>>.toMatchingEpisodes(episodeManager: EpisodeManager) = mapNotNull { (file, uuid) ->
+        episodeManager.findByUuid(uuid)?.let { episode -> file to episode }
+    }
+
+    private fun Flow<Pair<File, PodcastEpisode>>.filterDownloadedEpisodes() = filter { (_, episode) ->
+        val downloadedFilePath = episode.downloadedFilePath
+        downloadedFilePath == null || !File(downloadedFilePath).exists() || !episode.isDownloaded
+    }
+
+    private suspend fun Flow<Pair<File, PodcastEpisode>>.restoreDownloadedFilePaths(episodeManager: EpisodeManager) = collect { (file, episode) ->
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Restoring downloaded file for ${episode.title} from ${file.absolutePath}")
+        // Link to the found episode
+        episode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
+        episode.downloadedFilePath = file.absolutePath
+        episodeManager.update(episode)
     }
 
     private companion object {
@@ -291,5 +308,7 @@ open class FileStorage @Inject constructor(
         val DIR_PODCAST_GROUP_IMAGES = "network_images" + File.separator + "groups" + File.separator
         const val DIR_CLOUD_FILES = "cloud_files"
         const val DIR_OPML_FILES = "opml_import"
+
+        const val UUID_LENGTH = 36
     }
 }

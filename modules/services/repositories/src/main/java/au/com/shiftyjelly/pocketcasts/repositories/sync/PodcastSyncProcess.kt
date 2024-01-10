@@ -592,7 +592,7 @@ class PodcastSyncProcess(
         return Completable.fromAction {
             val firstSync = settings.isFirstSyncRun()
             if (firstSync) {
-                fileStorage.fixBrokenFiles(episodeManager)
+                runBlocking { fileStorage.fixBrokenFiles(episodeManager) }
                 settings.setFirstSyncRun(false)
             }
         }

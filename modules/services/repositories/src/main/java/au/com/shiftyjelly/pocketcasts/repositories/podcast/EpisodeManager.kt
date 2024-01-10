@@ -28,9 +28,6 @@ interface EpisodeManager {
     suspend fun findByUuid(uuid: String): PodcastEpisode?
 
     @Deprecated("Use findByUuid suspended function instead")
-    fun findByUuidSync(uuid: String): PodcastEpisode?
-
-    @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
 
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
