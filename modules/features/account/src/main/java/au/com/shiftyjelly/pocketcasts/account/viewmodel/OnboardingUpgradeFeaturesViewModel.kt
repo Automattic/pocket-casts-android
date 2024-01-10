@@ -57,7 +57,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 .stateIn(viewModelScope)
                 .collect { productDetails ->
                     val subscriptions = when (productDetails) {
-                        is ProductDetailsState.Error -> null
+                        is ProductDetailsState.Error -> emptyList()
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                             Subscription.fromProductDetails(
                                 productDetails = productDetailsState,
@@ -66,7 +66,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                                 ),
                             )
                         }
-                    } ?: emptyList()
+                    }
                     updateState(subscriptions)
                 }
         }
