@@ -16,7 +16,7 @@ data class NamedSettingsSettings(
 
 @JsonClass(generateAdapter = true)
 data class ChangedNamedSettings(
-    @field:Json(name = "temporaryPlaceholder") val temporaryPlaceholder: NamedChangedSettingInt? = null,
+    @field:Json(name = "skipForward") val skipForward: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)

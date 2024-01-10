@@ -6,10 +6,13 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.lang.RuntimeException
+import java.time.Instant
+import java.time.format.DateTimeParseException
 import timber.log.Timber
 
 class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
@@ -51,13 +54,63 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             }
 
             val request = ChangedNamedSettingsRequest(
-                changedSettings = ChangedNamedSettings(),
+                changedSettings = ChangedNamedSettings(
+                    skipForward = settings.skipForwardInSecs.modifiedAtServerString?.let { modifiedAt ->
+                        NamedChangedSettingInt(
+                            value = settings.skipForwardInSecs.value,
+                            modifiedAt = modifiedAt,
+                        )
+                    },
+                ),
             )
             val response = namedSettingsCall.changedNamedSettings(request)
             for ((key, value) in response) {
                 when (key) {
+                    "skipForward" -> updateSettingIfPossible(value, settings.skipForwardInSecs) {
+                        (it.value as? Number)?.toInt()
+                    }
                 }
             }
+        }
+
+        private fun <T> updateSettingIfPossible(
+            changedSettingResponse: ChangedSettingResponse,
+            setting: UserSetting<T>,
+            transformToValue: (ChangedSettingResponse) -> T?,
+        ) {
+            val value = transformToValue(changedSettingResponse)
+            if (value == null) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid ${setting.sharedPrefKey} value: ${changedSettingResponse.value}")
+                return
+            }
+
+            if (changedSettingResponse.modifiedAt == null) {
+                Timber.i("Not syncing ${setting.sharedPrefKey} from the server because setting was not modifiedAt on the server")
+                return
+            }
+
+            val serverModifiedAtInstant = try {
+                Instant.parse(changedSettingResponse.modifiedAt)
+            } catch (e: DateTimeParseException) {
+                LogBuffer.e(
+                    LogBuffer.TAG_INVALID_STATE,
+                    "Not syncing ${setting.sharedPrefKey} from the server because server returned modifiedAt value that could not be parsed: ${changedSettingResponse.modifiedAt}",
+                )
+                return
+            }
+
+            val localModifiedAt = setting.modifiedAt
+            // Don't exit early if we don't have a local modifiedAt time since
+            // we don't know the local value is newew than the server value.
+            if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
+                Timber.i("Not syncing ${setting.sharedPrefKey} from the server because setting was modified more recently locally")
+                return
+            }
+
+            setting.set(
+                value = value,
+                needsSync = false,
+            )
         }
 
         // This should be removed when we remove the Feature.SETTINGS_SYNC feature flag
