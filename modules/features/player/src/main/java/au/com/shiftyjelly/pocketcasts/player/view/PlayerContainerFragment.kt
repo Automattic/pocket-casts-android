@@ -36,8 +36,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
@@ -339,17 +337,11 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             newSections.add(Section.Chapters)
         }
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            newSections.add(Section.Bookmarks)
-        }
+        newSections.add(Section.Bookmarks)
 
         this.sections = newSections
 
-        if (hadNotes != hasNotes || hadChapters != hasChapters) {
-            return true
-        }
-
-        return false
+        return hadNotes != hasNotes || hadChapters != hasChapters
     }
 
     override fun getItemId(position: Int): Long {
