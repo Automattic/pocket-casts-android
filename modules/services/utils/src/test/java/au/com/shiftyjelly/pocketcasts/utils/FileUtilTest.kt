@@ -41,4 +41,16 @@ class FileUtilTest {
 
         assertFalse("At least one file still exists", contents.any(File::exists))
     }
+
+    @Test
+    fun `keep nomedia file when deleting directory contents`() {
+        listOf(".nomedia", ".NOMEDIA", ".nOmEdIa").forEach { name ->
+            val dir = tempDir.newFolder()
+            val file = File(dir, name).also(File::createNewFile)
+
+            FileUtil.deleteDirectoryContents(dir.path)
+
+            assertTrue("nomedia file $file does not exist", file.exists())
+        }
+    }
 }
