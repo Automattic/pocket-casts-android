@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.utils
 import java.io.File
 import kotlin.random.Random
 import okio.Buffer
-import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import okio.buffer
 import okio.sink
@@ -93,6 +92,18 @@ class FileUtilTest {
         FileUtil.readFileTo(file, Buffer().outputStream())
 
         assertEquals("Original file content was changed", originalSnapshot, file.snapshot())
+    }
+
+    @Test
+    fun `file is copied using copy function`() {
+        val file1 = tempDir.newFile().also { it.writeRandomBytes(100) }
+        val file2 = tempDir.newFile()
+        val originalSnapshot = file1.snapshot()
+
+        FileUtil.copy(file1, file2)
+
+        assertEquals("Original file has different content", originalSnapshot, file1.snapshot())
+        assertEquals("Files contents differ", file1.snapshot(), file2.snapshot())
     }
 
     private fun File.writeRandomBytes(count: Int) {
