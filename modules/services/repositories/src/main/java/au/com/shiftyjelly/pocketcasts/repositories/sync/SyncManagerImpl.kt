@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
-import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastListResponse
@@ -397,10 +396,13 @@ class SyncManagerImpl @Inject constructor(
             syncServerManager.loadStats(token)
         }
 
-    override suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse =
-        getCacheTokenOrLogin { token ->
-            syncServerManager.namedSettings(request, token)
-        }
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
+    override suspend fun namedSettings(
+        request: au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest,
+    ): NamedSettingsResponse = getCacheTokenOrLogin { token ->
+        syncServerManager.namedSettings(request, token)
+    }
 
     override suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest): ChangedNamedSettingsResponse =
         getCacheTokenOrLogin { token ->

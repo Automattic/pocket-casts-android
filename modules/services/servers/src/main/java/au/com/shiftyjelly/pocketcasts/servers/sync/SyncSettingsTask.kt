@@ -97,9 +97,9 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
             val localModifiedAt = setting.getModifiedAt()
             // Don't exit early if we don't have a local modifiedAt time since
-            // we don't know the local value is newew than the server value.
+            // we don't know the local value is newer than the server value.
             if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
-                Timber.i("Not syncing ${setting.sharedPrefKey} from the server because setting was modified more recently locally")
+                Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
                 return
             }
 
@@ -109,6 +109,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             )
         }
 
+        @Suppress("DEPRECATION")
         @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
         private suspend fun oldSyncSettings(
             settings: Settings,
