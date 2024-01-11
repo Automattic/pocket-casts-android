@@ -4,10 +4,12 @@ import java.io.File
 import kotlin.random.Random
 import okio.Buffer
 import okio.ByteString.Companion.toByteString
+import okio.FileNotFoundException
 import okio.buffer
 import okio.sink
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -162,6 +164,18 @@ class FileUtilTest {
             assertFalse("Original file has no content", srcFile.snapshot().size == 0)
             assertEquals("Files contents differ", srcFile.snapshot(), dstFile.snapshot())
         }
+    }
+
+    @Test
+    fun `fail copying file to a directory using copy function`() {
+        val file = tempDir.newFile()
+        val dir = tempDir.newFolder()
+
+        val exception = assertThrows(FileNotFoundException::class.java) {
+            FileUtil.copy(file, dir)
+        }
+
+        assertEquals("$dir (Is a directory)", exception.message)
     }
 
     private fun File.writeRandomBytes(count: Int) {
