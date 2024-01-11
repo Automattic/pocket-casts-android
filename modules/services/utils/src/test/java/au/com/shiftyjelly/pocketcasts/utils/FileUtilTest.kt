@@ -190,6 +190,18 @@ class FileUtilTest {
         assertEquals("$dir (Is a directory)", exception.message)
     }
 
+    @Test
+    fun `fail copying file to a directory using copyDirectory function`() {
+        val file = tempDir.newFile()
+        val dir = tempDir.newFolder()
+
+        val exception = assertThrows(FileNotFoundException::class.java) {
+            FileUtil.copyDirectory(file, dir)
+        }
+
+        assertEquals("$dir (Is a directory)", exception.message)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
