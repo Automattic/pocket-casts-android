@@ -18,11 +18,21 @@ data class NamedSettingsSettings(
 @JsonClass(generateAdapter = true)
 data class ChangedNamedSettings(
     @field:Json(name = "skipForward") val skipForward: NamedChangedSettingInt? = null,
+    @field:Json(name = "skipBack") val skipBack: NamedChangedSettingInt? = null,
+    @field:Json(name = "gridOrder") val gridOrder: NamedChangedSettingInt? = null,
+    @field:Json(name = "marketingOptIn") val marketingOptIn: NamedChangedSettingBool? = null,
+    @field:Json(name = "freeGiftAcknowledgement") val freeGiftAcknowledgement: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingInt(
     @field:Json(name = "value") val value: Int,
+    @field:Json(name = "modified_at") val modifiedAt: String,
+)
+
+@JsonClass(generateAdapter = true)
+data class NamedChangedSettingBool(
+    @field:Json(name = "value") val value: Boolean,
     @field:Json(name = "modified_at") val modifiedAt: String,
 )
 
