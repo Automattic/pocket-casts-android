@@ -106,6 +106,18 @@ class FileUtilTest {
         assertEquals("Files contents differ", file1.snapshot(), file2.snapshot())
     }
 
+    @Test
+    fun `file is copied using copyFile function`() {
+        val file1 = tempDir.newFile().also { it.writeRandomBytes(100) }
+        val file2 = tempDir.newFile()
+        val originalSnapshot = file1.snapshot()
+
+        FileUtil.copyFile(file1, file2)
+
+        assertEquals("Original file has different content", originalSnapshot, file1.snapshot())
+        assertEquals("Files contents differ", file1.snapshot(), file2.snapshot())
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
