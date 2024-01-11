@@ -8,14 +8,11 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 import timber.log.Timber;
@@ -54,41 +51,6 @@ public class FileUtil {
         } catch (Exception e) {
             Timber.e("Could not delete directory: " + e.getMessage());
         }
-    }
-
-    public static final String readAssetToString(Context context, String filename) throws IOException {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
-            StringBuilder html = new StringBuilder();
-            String line;
-            String newLine = "\n";
-            while((line = reader.readLine()) != null) {
-                html.append(line).append(newLine);
-            }
-            return html.toString();
-        }
-        catch (IOException e) {
-            Timber.e(e);
-            return null;
-        }
-        finally {
-            try { if (reader != null) { reader.close(); } } catch(Exception e) {}
-        }
-    }
-
-    public static final String readFileToString(File file) throws IOException {
-        FileReader fileReader = new FileReader(file);
-        BufferedReader reader = new BufferedReader(fileReader);
-        String line;
-        StringBuilder output = new StringBuilder((int)file.length());
-        String newLine = "\n";
-        while((line = reader.readLine()) != null) {
-            output.append(line).append(newLine);
-        }
-        try { fileReader.close(); } catch(Exception e) {}
-        try { reader.close(); } catch(Exception e) {}
-        return output.toString();
     }
 
     public static void readFileTo(File file, OutputStream out) throws IOException {
@@ -151,16 +113,6 @@ public class FileUtil {
         else {
             copyFile(srcDir, dstDir);
         }
-    }
-
-    public static String getFileExtension(File file) {
-        String fileName = file.getName();
-        if (fileName == null || fileName.length() == 0) return null;
-
-        int dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex < 0) return null; //no dot in file name
-
-        return fileName.substring(dotIndex);
     }
 
     public static String getFileNameWithoutExtension(File file) {
