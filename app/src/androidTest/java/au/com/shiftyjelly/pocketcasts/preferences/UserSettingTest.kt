@@ -68,7 +68,7 @@ class UserSettingTest {
         assertEquals(expected, result)
     }
 
-    fun assertWillNotSync(userSetting: UserSetting.StringPref) {
+    private fun assertWillNotSync(userSetting: UserSetting.StringPref) {
         assertNull(userSetting.getModifiedAtServerString())
         assertNull(userSetting.getModifiedAt())
         val result = userSetting.getSyncSetting { _, _ -> Unit }
