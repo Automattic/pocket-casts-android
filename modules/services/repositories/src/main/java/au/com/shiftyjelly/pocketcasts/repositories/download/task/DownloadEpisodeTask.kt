@@ -439,7 +439,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     tempDownloadMetaDataFile.delete() // at this point we have the file, don't need the metadata about it anymore
                     val fullDownloadFile = File(pathToSaveTo)
                     try {
-                        FileUtil.copyFile(tempDownloadFile, fullDownloadFile)
+                        FileUtil.copy(tempDownloadFile, fullDownloadFile)
                     } catch (exception: IOException) {
                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
 

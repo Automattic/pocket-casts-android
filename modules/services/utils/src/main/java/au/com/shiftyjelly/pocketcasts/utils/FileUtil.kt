@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.OutputStream
+import okio.IOException
 import okio.buffer
 import okio.sink
 import okio.source
@@ -49,15 +50,14 @@ object FileUtil {
         }
     }
 
-    fun copy(src: File, dst: File) {
-        if (src.isDirectory) {
-            copyDirectory(src, dst)
-        } else {
-            copyFile(src, dst)
-        }
+    fun copy(src: File, dst: File) = when {
+        src.isDirectory && dst.isFile -> throw IOException("Can't copy from dir $src to file $dst")
+        src.isFile && dst.isDirectory -> throw IOException("Can't copy from file $src to file $dst")
+        src.isDirectory -> copyDirectory(src, dst)
+        else -> copyFile(src, dst)
     }
 
-    fun copyFile(src: File, dst: File) {
+    private fun copyFile(src: File, dst: File) {
         dst.parentFile?.mkdirs()
         src.source().use { source ->
             dst.sink().buffer().use { sink ->
@@ -66,7 +66,7 @@ object FileUtil {
         }
     }
 
-    fun copyDirectory(src: File, dst: File) {
+    private fun copyDirectory(src: File, dst: File) {
         if (src.isDirectory) {
             if (!dst.exists()) {
                 dst.mkdirs()
