@@ -479,7 +479,7 @@ class RefreshPodcastsThread(
             val phoneActions = mutableListOf<NotificationCompat.Action>()
             val wearActions = mutableListOf<NotificationCompat.Action>()
 
-            for (action in NewEpisodeNotificationAction.values()) {
+            for (action in NewEpisodeNotificationAction.entries) {
                 if (userActions.contains(action)) {
                     intentId++
                     val label = context.resources.getString(action.labelId)

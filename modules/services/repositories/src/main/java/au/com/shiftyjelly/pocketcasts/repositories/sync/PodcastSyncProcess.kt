@@ -705,7 +705,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(sync: SyncUpdateResponse.PodcastSync): Maybe<Podcast> {
         val uuid = sync.uuid
-        if (uuid == null || uuid.isNullOrBlank()) {
+        if (uuid.isNullOrBlank()) {
             return Maybe.empty()
         }
 
