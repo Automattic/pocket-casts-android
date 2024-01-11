@@ -201,7 +201,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         with(binding.castButton) {
             CastButtonFactory.setUpMediaRouteButton(binding.root.context, this)
-            setAlwaysVisible(true)
+            visibility = View.VISIBLE
             updateColor(ThemeColor.playerContrast03(theme.activeTheme))
             setOnClickListener {
                 trackShelfAction(ShelfItem.Cast.analyticsValue)
