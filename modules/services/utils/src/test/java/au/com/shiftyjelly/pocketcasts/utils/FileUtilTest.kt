@@ -118,6 +118,29 @@ class FileUtilTest {
         assertEquals("Files contents differ", file1.snapshot(), file2.snapshot())
     }
 
+    @Test
+    fun `directory is copied using copy function`() {
+        val dir1 = tempDir.newFolder().apply {
+            File(this, "file1").writeRandomBytes(100)
+            File(this, "file2").writeRandomBytes(200)
+            val innerDir = File(this, "inner").also(File::mkdirs)
+            File(innerDir, "file3").writeRandomBytes(300)
+        }
+        val dir2 = tempDir.newFolder()
+
+        FileUtil.copy(dir1, dir2)
+
+        val comparisonPairs = listOf(
+            File(dir1, "file1") to File(dir2, "file1"),
+            File(dir1, "file2") to File(dir2, "file2"),
+            File(File(dir1, "inner"), "file3") to File(File(dir2, "inner"), "file3"),
+        )
+        comparisonPairs.forEach { (srcFile, dstFile) ->
+            assertFalse("Original file has no content", srcFile.snapshot().size == 0)
+            assertEquals("Files contents differ", srcFile.snapshot(), dstFile.snapshot())
+        }
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
