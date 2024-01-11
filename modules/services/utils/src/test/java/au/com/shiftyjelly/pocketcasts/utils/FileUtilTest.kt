@@ -296,6 +296,15 @@ class FileUtilTest {
         assertEquals("hello", dirName)
     }
 
+    @Test
+    fun `compute empty directory size`() {
+        val dir = tempDir.newFolder()
+
+        val size = FileUtil.folderSize(dir)
+
+        assertEquals(0, size)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
