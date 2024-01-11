@@ -260,6 +260,15 @@ class FileUtilTest {
         assertEquals("hello.there.", fileName)
     }
 
+    @Test
+    fun `get file name without extension for a file with no dots`() {
+        val file = tempDir.newFile("hello")
+
+        val fileName = FileUtil.getFileNameWithoutExtension(file)
+
+        assertEquals("hello", fileName)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
