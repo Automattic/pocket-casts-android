@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrDefault
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextStringOrNull
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
@@ -26,9 +25,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 
-class SyncUpdateResponseParser(
-    private val featureFlagWrapper: FeatureFlagWrapper,
-) : JsonAdapter<SyncUpdateResponse>() {
+class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
 
     @ToJson
     override fun toJson(writer: JsonWriter, value: SyncUpdateResponse?) {}
