@@ -1,6 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
 import java.io.File
+import kotlin.random.Random
+import okio.Buffer
+import okio.ByteString
+import okio.ByteString.Companion.toByteString
+import okio.buffer
+import okio.sink
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -67,4 +74,20 @@ class FileUtilTest {
 
         assertFalse("At least one file still exists", contents.any(File::exists))
     }
+
+    @Test
+    fun `read file to output stream`() {
+        val file = tempDir.newFile().also { it.writeRandomBytes(1024) }
+        val outputBuffer = Buffer()
+
+        FileUtil.readFileTo(file, outputBuffer.outputStream())
+
+        assertEquals("File and output stream have different contents", file.snapshot(), outputBuffer.snapshot())
+    }
+
+    private fun File.writeRandomBytes(count: Int) {
+        sink().buffer().use { it.write(Random.nextBytes(count)) }
+    }
+
+    private fun File.snapshot() = readBytes().toByteString()
 }
