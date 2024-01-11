@@ -68,10 +68,6 @@ object FileUtil {
 
     private fun copyDir(src: File, dst: File) {
         if (src.isDirectory) {
-            if (!dst.exists()) {
-                dst.mkdirs()
-            }
-
             src.list()?.forEach { name ->
                 copyDir(File(src, name), File(dst, name))
             }

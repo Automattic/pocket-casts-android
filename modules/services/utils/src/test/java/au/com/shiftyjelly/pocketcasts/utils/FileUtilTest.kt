@@ -142,6 +142,18 @@ class FileUtilTest {
     }
 
     @Test
+    fun `directory is copied is copied when destination directory does not exist`() {
+        val dir1 = tempDir.newFolder().apply {
+            File(this, "file").writeRandomBytes(100)
+        }
+        val dir2 = File(tempDir.newFolder(), "a/b/c/d/dir")
+
+        FileUtil.copy(dir1, dir2)
+
+        assertEquals("Files contents differ", File(dir1, "file").snapshot(), File(dir2, "file").snapshot())
+    }
+
+    @Test
     fun `fail copying file to a directory`() {
         val file = tempDir.newFile()
         val dir = tempDir.newFolder()
