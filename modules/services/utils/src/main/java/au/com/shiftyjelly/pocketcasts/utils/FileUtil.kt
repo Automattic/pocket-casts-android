@@ -94,7 +94,7 @@ object FileUtil {
             size + if (file.isFile) file.length() else dirSize(file)
         }
 
-    fun createUriWithReadPermissions(file: File, context: Context, intent: Intent): Uri {
+    fun createUriWithReadPermissions(context: Context, file: File, intent: Intent): Uri {
         val uri = getUriForFile(context, file)
         context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).forEach { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName

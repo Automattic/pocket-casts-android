@@ -107,7 +107,7 @@ class Support @Inject constructor(
                         out.close()
 
                         val fileUri =
-                            FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                            FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                         intent.putExtra(
                             Intent.EXTRA_TEXT,
@@ -156,7 +156,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
             } catch (e: Exception) {
                 Timber.e(e)
@@ -186,7 +186,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
