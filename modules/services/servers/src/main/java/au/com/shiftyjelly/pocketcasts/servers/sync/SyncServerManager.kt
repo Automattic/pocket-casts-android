@@ -119,6 +119,9 @@ open class SyncServerManager @Inject constructor(
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse =
         server.namedSettings(addBearer(token), request)
 
+    suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest, token: AccessToken): ChangedNamedSettingsResponse =
+        server.namedSettings(addBearer(token), request)
+
     fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<SyncUpdateResponse> {
         val fields = mutableMapOf(
             "email" to email,

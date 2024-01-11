@@ -114,7 +114,7 @@ class UserManagerImpl @Inject constructor(
                 }
 
                 settings.marketingOptIn.set(false)
-                settings.marketingOptIn.needsSync = false
+                settings.marketingOptIn.doesNotNeedSync()
                 settings.setEndOfYearShowModal(true)
 
                 analyticsTracker.track(
