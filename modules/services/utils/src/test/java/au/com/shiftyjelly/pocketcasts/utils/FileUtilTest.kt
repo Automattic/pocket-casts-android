@@ -156,9 +156,9 @@ class FileUtilTest {
         FileUtil.copyDirectory(dir1, dir2)
 
         val comparisonPairs = listOf(
-                File(dir1, "file1") to File(dir2, "file1"),
-                File(dir1, "file2") to File(dir2, "file2"),
-                File(File(dir1, "inner"), "file3") to File(File(dir2, "inner"), "file3"),
+            File(dir1, "file1") to File(dir2, "file1"),
+            File(dir1, "file2") to File(dir2, "file2"),
+            File(File(dir1, "inner"), "file3") to File(File(dir2, "inner"), "file3"),
         )
         comparisonPairs.forEach { (srcFile, dstFile) ->
             assertFalse("Original file has no content", srcFile.snapshot().size == 0)
@@ -200,6 +200,20 @@ class FileUtilTest {
         }
 
         assertEquals("$dir (Is a directory)", exception.message)
+    }
+
+    @Test
+    fun `fail copying directory to a file using copy function`() {
+        val file = tempDir.newFile()
+        val dir = tempDir.newFolder().apply {
+            File(this, "file").writeRandomBytes(100)
+        }
+
+        val exception = assertThrows(FileNotFoundException::class.java) {
+            FileUtil.copy(dir, file)
+        }
+
+        assertEquals("$file/file (Not a directory)", exception.message)
     }
 
     private fun File.writeRandomBytes(count: Int) {
