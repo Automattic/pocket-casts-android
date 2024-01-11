@@ -4,7 +4,6 @@ import java.io.File
 import kotlin.random.Random
 import okio.Buffer
 import okio.ByteString.Companion.toByteString
-import okio.FileNotFoundException
 import okio.IOException
 import okio.buffer
 import okio.sink
@@ -46,7 +45,7 @@ class FileUtilTest {
             File(dir, "test3").also(File::createNewFile),
         )
 
-        FileUtil.deleteDirectoryContents(dir.path)
+        FileUtil.deleteDirContents(dir.path)
 
         assertFalse("At least one file still exists", contents.any(File::exists))
     }
@@ -57,7 +56,7 @@ class FileUtilTest {
             val dir = tempDir.newFolder()
             val file = File(dir, name).also(File::createNewFile)
 
-            FileUtil.deleteDirectoryContents(dir.path)
+            FileUtil.deleteDirContents(dir.path)
 
             assertTrue("nomedia file $file does not exist", file.exists())
         }
@@ -72,7 +71,7 @@ class FileUtilTest {
             File(dir, "test3.nomedia").also(File::createNewFile),
         )
 
-        FileUtil.deleteDirectoryContents(dir.path)
+        FileUtil.deleteDirContents(dir.path)
 
         assertFalse("At least one file still exists", contents.any(File::exists))
     }
@@ -214,7 +213,7 @@ class FileUtilTest {
     fun `compute empty directory size`() {
         val dir = tempDir.newFolder()
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(0, size)
     }
@@ -225,7 +224,7 @@ class FileUtilTest {
             File(this, "file").also(File::createNewFile)
         }
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(0, size)
     }
@@ -236,7 +235,7 @@ class FileUtilTest {
             File(this, "file").writeRandomBytes(100)
         }
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(100, size)
     }
@@ -262,7 +261,7 @@ class FileUtilTest {
             }
         }
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(1111111, size)
     }
@@ -272,7 +271,7 @@ class FileUtilTest {
         val file = tempDir.newFile()
         file.writeRandomBytes(1024)
 
-        val size = FileUtil.folderSize(file)
+        val size = FileUtil.dirSize(file)
 
         assertEquals(0, size)
     }

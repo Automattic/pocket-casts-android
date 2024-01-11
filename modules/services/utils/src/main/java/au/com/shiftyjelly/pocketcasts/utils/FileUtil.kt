@@ -27,7 +27,7 @@ object FileUtil {
         }
     }
 
-    fun deleteDirectoryContents(path: String) {
+    fun deleteDirContents(path: String) {
         try {
             val dir = File(path)
             if (!dir.isDirectory) {
@@ -53,7 +53,7 @@ object FileUtil {
     fun copy(src: File, dst: File) = when {
         src.isDirectory && dst.isFile -> throw IOException("Can't copy from dir $src to file $dst")
         src.isFile && dst.isDirectory -> throw IOException("Can't copy from file $src to file $dst")
-        src.isDirectory -> copyDirectory(src, dst)
+        src.isDirectory -> copyDir(src, dst)
         else -> copyFile(src, dst)
     }
 
@@ -66,14 +66,14 @@ object FileUtil {
         }
     }
 
-    private fun copyDirectory(src: File, dst: File) {
+    private fun copyDir(src: File, dst: File) {
         if (src.isDirectory) {
             if (!dst.exists()) {
                 dst.mkdirs()
             }
 
             src.list()?.forEach { name ->
-                copyDirectory(File(src, name), File(dst, name))
+                copyDir(File(src, name), File(dst, name))
             }
         } else {
             copyFile(src, dst)
@@ -89,9 +89,9 @@ object FileUtil {
         }
     }
 
-    fun folderSize(directory: File): Long = directory.listFiles().orEmpty()
+    fun dirSize(dir: File): Long = dir.listFiles().orEmpty()
         .fold(0L) { size, file ->
-            size + if (file.isFile) file.length() else folderSize(file)
+            size + if (file.isFile) file.length() else dirSize(file)
         }
 
     fun createUriWithReadPermissions(file: File, context: Context, intent: Intent): Uri {

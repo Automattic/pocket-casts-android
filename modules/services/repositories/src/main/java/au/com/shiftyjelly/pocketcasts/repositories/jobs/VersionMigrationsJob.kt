@@ -162,7 +162,7 @@ class VersionMigrationsJob : JobService() {
 
     private fun removeOldTempPodcastDirectory() {
         try {
-            fileStorage.getOrCreateEpisodesOldTempDir()?.absolutePath?.let(FileUtil::deleteDirectoryContents)
+            fileStorage.getOrCreateEpisodesOldTempDir()?.absolutePath?.let(FileUtil::deleteDirContents)
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clear old podcast temp directory")
         }
