@@ -85,6 +85,16 @@ class FileUtilTest {
         assertEquals("File and output stream have different contents", file.snapshot(), outputBuffer.snapshot())
     }
 
+    @Test
+    fun `reading file to output stream does not delete file content`() {
+        val file = tempDir.newFile().also { it.writeRandomBytes(1024) }
+        val originalSnapshot = file.snapshot()
+
+        FileUtil.readFileTo(file, Buffer().outputStream())
+
+        assertEquals("Original file content was changed", originalSnapshot, file.snapshot())
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
