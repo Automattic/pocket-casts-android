@@ -53,4 +53,18 @@ class FileUtilTest {
             assertTrue("nomedia file $file does not exist", file.exists())
         }
     }
+
+    @Test
+    fun `delete files with nomedia extension when deleting directory contests`() {
+        val dir = tempDir.newFolder()
+        val contents = listOf(
+            File(dir, "test1.nomedia").also(File::createNewFile),
+            File(dir, "test2.nomedia").also(File::createNewFile),
+            File(dir, "test3.nomedia").also(File::createNewFile),
+        )
+
+        FileUtil.deleteDirectoryContents(dir.path)
+
+        assertFalse("At least one file still exists", contents.any(File::exists))
+    }
 }
