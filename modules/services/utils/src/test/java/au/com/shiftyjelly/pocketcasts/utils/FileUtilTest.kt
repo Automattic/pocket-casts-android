@@ -353,6 +353,16 @@ class FileUtilTest {
         assertEquals(1111111, size)
     }
 
+    @Test
+    fun `do not compute size of a file`() {
+        val file = tempDir.newFile()
+        file.writeRandomBytes(1024)
+
+        val size = FileUtil.folderSize(file)
+
+        assertEquals(0, size)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
