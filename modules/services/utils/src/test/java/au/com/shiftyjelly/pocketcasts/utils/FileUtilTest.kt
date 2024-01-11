@@ -278,6 +278,15 @@ class FileUtilTest {
         assertEquals("hello", dirName)
     }
 
+    @Test
+    fun `get directory name without extension for a directory with multiple dots`() {
+        val dir = tempDir.newFolder("hello.there..traveller")
+
+        val dirName = FileUtil.getFileNameWithoutExtension(dir)
+
+        assertEquals("hello.there.", dirName)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
