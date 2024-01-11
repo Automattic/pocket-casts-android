@@ -327,6 +327,32 @@ class FileUtilTest {
         assertEquals(100, size)
     }
 
+    @Test
+    fun `compute directory size with complex structure`() {
+        val dir = tempDir.newFolder().apply {
+            File(this, "file1").writeRandomBytes(1)
+            File(this, "file2").writeRandomBytes(10)
+
+            File(this, "inner1").also(File::mkdirs).apply {
+                File(this, "file3").writeRandomBytes(100)
+
+                File(this, "inner2").also(File::mkdirs).apply {
+                    File(this, "file4").writeRandomBytes(1000)
+                    File(this, "file5").writeRandomBytes(10000)
+                }
+            }
+
+            File(this, "inner3").also(File::mkdirs).apply {
+                File(this, "file6").writeRandomBytes(100000)
+                File(this, "file7").writeRandomBytes(1000000)
+            }
+        }
+
+        val size = FileUtil.folderSize(dir)
+
+        assertEquals(1111111, size)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }
