@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrDefault
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextStringOrNull
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
@@ -91,11 +90,7 @@ class SyncUpdateResponseParser(
             "UserFolder" -> readFolder(reader, response)
             "UserPodcast" -> readPodcast(reader, response)
             "UserEpisode" -> readEpisode(reader, response)
-            "UserBookmark" -> if (featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                readBookmark(reader, response)
-            } else {
-                reader.skipValue()
-            }
+            "UserBookmark" -> readBookmark(reader, response)
             null -> throw Exception("No type found for field")
             else -> reader.skipValue()
         }
