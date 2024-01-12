@@ -21,7 +21,6 @@ interface FragmentHostListener {
     fun snackBarView(): View
     fun showAccountUpgradeNow(autoSelectPlus: Boolean)
     fun updateStatusBar()
-    fun updatePlayerView()
     fun getPlayerBottomSheetState(): Int
     fun openEpisodeDialog(episodeUuid: String?, source: EpisodeViewSource, podcastUuid: String?, forceDark: Boolean)
     fun lockPlayerBottomSheet(locked: Boolean)

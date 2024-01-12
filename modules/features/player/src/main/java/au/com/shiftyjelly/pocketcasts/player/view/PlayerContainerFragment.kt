@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -119,9 +118,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             private var previousPosition: Int = INVALID_TAB_POSITION
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
-                if (state == SCROLL_STATE_IDLE) {
-                    (activity as? FragmentHostListener)?.updatePlayerView()
-                }
                 viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
             }
 

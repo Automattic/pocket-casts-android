@@ -113,9 +113,6 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     override fun updateStatusBar() {
     }
 
-    override fun updatePlayerView() {
-    }
-
     override fun getPlayerBottomSheetState(): Int {
         return 0
     }
