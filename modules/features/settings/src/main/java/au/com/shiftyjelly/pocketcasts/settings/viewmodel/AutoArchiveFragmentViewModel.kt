@@ -35,7 +35,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
 
     fun onPlayedEpisodesAfterChanged(newStringValue: String) {
         val newValue = AutoArchiveAfterPlayingSetting.fromString(newStringValue, context)
-        settings.autoArchiveAfterPlaying.set(newValue, needsSync = false)
+        settings.autoArchiveAfterPlaying.set(newValue, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
             mapOf("value" to newValue.analyticsValue),
