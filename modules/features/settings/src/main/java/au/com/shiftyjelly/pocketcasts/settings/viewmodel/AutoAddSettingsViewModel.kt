@@ -73,7 +73,7 @@ class AutoAddSettingsViewModel @Inject constructor(
     }
 
     fun autoAddUpNextLimitChanged(limit: Int) {
-        settings.autoAddUpNextLimit.set(limit)
+        settings.autoAddUpNextLimit.set(limit, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED,
             mapOf("value" to limit),
@@ -81,7 +81,7 @@ class AutoAddSettingsViewModel @Inject constructor(
     }
 
     fun autoAddUpNextLimitBehaviorChanged(behavior: AutoAddUpNextLimitBehaviour) {
-        settings.autoAddUpNextLimitBehaviour.set(behavior)
+        settings.autoAddUpNextLimitBehaviour.set(behavior, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED,
             mapOf(

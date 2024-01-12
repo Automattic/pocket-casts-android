@@ -646,7 +646,7 @@ class MediaSessionManager(
                         playbackManager.playNowSuspend(episode = episode, sourceView = source)
                     }
                     LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
-                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
+                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList, needsSync = false)
                     }
                 }
             }
@@ -752,7 +752,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects)
+            settings.globalPlaybackEffects.set(effects, needsSync = false)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

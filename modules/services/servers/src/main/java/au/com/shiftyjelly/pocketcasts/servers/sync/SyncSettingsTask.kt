@@ -163,17 +163,17 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
                     if (value.value is Number) { // Probably will have to change this when we do other settings, but for now just Number is fine
                         when (key) {
-                            "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt())
-                            "skipBack" -> settings.skipBackInSecs.set(value.value.toInt())
+                            "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt(), needsSync = false)
+                            "skipBack" -> settings.skipBackInSecs.set(value.value.toInt(), needsSync = false)
                             "gridOrder" -> {
                                 val sortType = PodcastsSortType.fromServerId(value.value.toInt())
-                                settings.podcastsSortType.set(sortType)
+                                settings.podcastsSortType.set(sortType, needsSync = false)
                             }
                         }
                     } else if (value.value is Boolean) {
                         when (key) {
-                            "marketingOptIn" -> settings.marketingOptIn.set(value.value)
-                            "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value)
+                            "marketingOptIn" -> settings.marketingOptIn.set(value.value, needsSync = false)
+                            "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value, needsSync = false)
                         }
                     }
                 } else {

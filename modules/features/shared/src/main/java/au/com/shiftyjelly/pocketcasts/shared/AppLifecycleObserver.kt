@@ -98,7 +98,7 @@ class AppLifecycleObserver constructor(
             appLifecycleAnalytics.onNewApplicationInstall()
 
             // new installs default to not forcing up next to use the dark theme
-            settings.useDarkUpNextTheme.set(false)
+            settings.useDarkUpNextTheme.set(false, needsSync = false)
 
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive
@@ -108,7 +108,7 @@ class AppLifecycleObserver constructor(
                 AppPlatform.WearOs -> {}
 
                 // For new users we want to auto play when the queue is empty by default
-                AppPlatform.Phone -> settings.autoPlayNextEpisodeOnEmpty.set(true)
+                AppPlatform.Phone -> settings.autoPlayNextEpisodeOnEmpty.set(true, needsSync = false)
             }
         } else if (previousVersionCode < versionCode) {
             appLifecycleAnalytics.onApplicationUpgrade(previousVersionCode)

@@ -83,7 +83,7 @@ enum class NewEpisodeNotificationAction(
         fun saveToSettings(actions: MutableList<NewEpisodeNotificationAction>, settings: Settings) {
             val stringActions = actionsToString(actions)
             val newSetting = NewEpisodeNotificationActionSetting.ValueOf(stringActions)
-            settings.newEpisodeNotificationActions.set(newSetting)
+            settings.newEpisodeNotificationActions.set(newSetting, needsSync = false)
         }
     }
 }
