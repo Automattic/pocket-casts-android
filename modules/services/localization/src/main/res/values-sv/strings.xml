@@ -334,7 +334,7 @@ Language: sv_SE
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB molnlagring</string>
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
-    <string name="onboarding_plus_feature_folders_title">Mappar</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Dator-appar</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
