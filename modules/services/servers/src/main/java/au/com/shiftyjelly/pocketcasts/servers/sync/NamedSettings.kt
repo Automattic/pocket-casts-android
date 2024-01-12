@@ -23,6 +23,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "marketingOptIn") val marketingOptIn: NamedChangedSettingBool? = null,
     @field:Json(name = "freeGiftAcknowledgement") val freeGiftAcknowledgement: NamedChangedSettingBool? = null,
     @field:Json(name = "autoArchivePlayed") val autoArchiveAfterPlaying: NamedChangedSettingInt? = null,
+    @field:Json(name = "autoArchiveInactive") val autoArchiveInactive: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)

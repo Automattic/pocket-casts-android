@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -69,6 +70,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting { autoArchiveInactiveSetting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = autoArchiveInactiveSetting.toIndex(),
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -109,6 +116,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         newSettingValue = run {
                             val index = (changedSettingResponse.value as? Number)?.toInt()
                             index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
+                        },
+                    )
+                    "autoArchiveInactive" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoArchiveInactive,
+                        newSettingValue = run {
+                            val index = (changedSettingResponse.value as? Number)?.toInt()
+                            index?.let { AutoArchiveInactiveSetting.fromIndex(it) }
                         },
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")

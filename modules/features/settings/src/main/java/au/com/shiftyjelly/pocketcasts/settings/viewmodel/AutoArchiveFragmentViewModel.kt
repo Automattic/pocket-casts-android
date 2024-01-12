@@ -44,7 +44,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
 
     fun onInactiveChanged(newStringValue: String) {
         val newValue = AutoArchiveInactiveSetting.fromString(newStringValue, context)
-        settings.autoArchiveInactive.set(newValue, needsSync = false)
+        settings.autoArchiveInactive.set(newValue, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
             mapOf("value" to newValue.analyticsValue),
