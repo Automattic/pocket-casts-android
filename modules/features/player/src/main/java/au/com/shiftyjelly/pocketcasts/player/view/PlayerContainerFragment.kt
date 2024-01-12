@@ -207,8 +207,12 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun openUpNext() {
-        val upNextFragment = UpNextFragment.newInstance(source = UpNextSource.PLAYER)
-        (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
+        updateUpNextVisibility(true)
+        // Posting is necessary. Otherwise initial switch from gone to visible doesn't occur until the sheet
+        // is fully expanded. This way we make view visible and only after it happens we allow for the animation to happen.
+        binding?.root?.post {
+            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     fun onPlayerOpen() {
