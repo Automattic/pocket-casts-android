@@ -262,10 +262,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun updateUpNextVisibility(show: Boolean) {
-        val bottomSheet = binding?.upNextFrameBottomSheet
-        if (bottomSheet != null && bottomSheet.isVisible != show) {
-            bottomSheet.isVisible = show
-        }
+        binding?.upNextFrameBottomSheet?.isVisible = show
         (activity as? FragmentHostListener)?.lockPlayerBottomSheet(show)
     }
 
