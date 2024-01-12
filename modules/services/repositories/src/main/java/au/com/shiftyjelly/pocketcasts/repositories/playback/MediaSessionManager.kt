@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
@@ -71,6 +72,7 @@ class MediaSessionManager(
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
+    val bookmarkFeature: BookmarkFeatureControl,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
@@ -142,6 +144,7 @@ class MediaSessionManager(
             playbackManager,
             bookmarkManager,
             settings,
+            bookmarkFeature,
         )
 
         connect()

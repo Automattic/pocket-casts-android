@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -123,6 +124,7 @@ open class PlaybackManager @Inject constructor(
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
+    bookmarkFeature: BookmarkFeatureControl,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
@@ -196,6 +198,7 @@ open class PlaybackManager @Inject constructor(
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
+        bookmarkFeature = bookmarkFeature,
     )
     var sleepAfterEpisode: Boolean = false
 

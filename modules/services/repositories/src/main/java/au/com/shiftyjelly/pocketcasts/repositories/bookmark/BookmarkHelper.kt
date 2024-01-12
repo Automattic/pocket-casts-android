@@ -19,8 +19,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastRec
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -30,6 +28,7 @@ class BookmarkHelper @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val bookmarkManager: BookmarkManager,
     private val settings: Settings,
+    private val bookmarkFeature: BookmarkFeatureControl,
 ) {
     suspend fun handleAddBookmarkAction(
         context: Context,
@@ -75,8 +74,7 @@ class BookmarkHelper @Inject constructor(
     }
 
     private fun shouldAllowAddBookmark() =
-        FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-            Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)
+        bookmarkFeature.isAvailable(settings.userTier)
 }
 
 private fun buildAndShowNotification(
