@@ -286,7 +286,7 @@ interface Settings {
     val showArtworkOnLockScreen: UserSetting<Boolean>
     val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
-    val autoArchiveIncludeStarred: UserSetting<Boolean>
+    val autoArchiveIncludesStarred: UserSetting<Boolean>
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
     val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
 

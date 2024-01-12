@@ -76,6 +76,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                autoArchiveIncludesStarred = settings.autoArchiveIncludesStarred.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -125,6 +126,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             val index = (changedSettingResponse.value as? Number)?.toInt()
                             index?.let { AutoArchiveInactiveSetting.fromIndex(it) }
                         },
+                    )
+                    "autoArchiveIncludesStarred" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoArchiveIncludesStarred,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
