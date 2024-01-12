@@ -102,11 +102,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="8dp"
-        app:behavior_peekHeight="0dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        android:clickable="true"
         android:translationZ="200dp"
-        android:visibility="gone" />
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
 
     <au.com.shiftyjelly.pocketcasts.views.tour.TourView
         android:id="@+id/tourView"

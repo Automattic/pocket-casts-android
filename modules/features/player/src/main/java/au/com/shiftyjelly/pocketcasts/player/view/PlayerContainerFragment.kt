@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.doOnLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -83,16 +84,24 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         val binding = binding ?: return
 
+        // UpNext bottom sheet needs to be gone. Otherwise, dragging player bottom sheet doesn't work as
+        // the motion events are intercepted.
+        //
+        // However, we make it gone after it is laid out to speed up initial fling motion to show it.
+        // Having it gone from the beginning adds a small delay before it can be initially shown.
+        binding.upNextFrameBottomSheet.doOnLayout {
+            it.isGone = true
+        }
         upNextBottomSheetBehavior = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
         upNextBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                updateUpNextVisibility(newState != BottomSheetBehavior.STATE_COLLAPSED)
+
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
-                    upNextBottomSheetBehavior.setPeekHeight(0, false)
-                    updateUpNextVisibility(true)
 
                     activity?.let {
                         theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(Theme.ThemeType.DARK))
@@ -104,7 +113,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
-                    updateUpNextVisibility(false)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
                     upNextFragment.onCollapsed()
@@ -208,11 +216,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     fun openUpNext() {
         updateUpNextVisibility(true)
-        // Posting is necessary. Otherwise initial switch from gone to visible doesn't occur until the sheet
-        // is fully expanded. This way we make view visible and only after it happens we allow for the animation to happen.
-        binding?.root?.post {
-            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     fun onPlayerOpen() {
