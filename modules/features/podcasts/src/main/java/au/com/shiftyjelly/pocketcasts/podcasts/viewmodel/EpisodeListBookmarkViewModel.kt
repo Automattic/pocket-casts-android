@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -19,6 +18,7 @@ import kotlinx.coroutines.launch
 class EpisodeListBookmarkViewModel
 @Inject constructor(
     private val settings: Settings,
+    private val bookmarkFeature: BookmarkFeatureControl,
 ) : ViewModel() {
 
     private var _stateFlow: MutableStateFlow<State> = MutableStateFlow(State())
@@ -31,8 +31,7 @@ class EpisodeListBookmarkViewModel
                     _stateFlow.update { state ->
                         val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                         state.copy(
-                            isBookmarkFeatureAvailable = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                                Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier),
+                            isBookmarkFeatureAvailable = bookmarkFeature.isAvailable(userTier),
                         )
                     }
                 }
