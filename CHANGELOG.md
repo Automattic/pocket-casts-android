@@ -1,6 +1,9 @@
 7.56
 -----
 
+*   Updates:
+    *   Use fling motion instead of scroll motion to open UpNext bottom sheet
+        ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
 
 7.55
 -----
