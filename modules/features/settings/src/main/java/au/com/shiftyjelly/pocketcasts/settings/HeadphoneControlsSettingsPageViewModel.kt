@@ -11,8 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -134,18 +132,10 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     )
 
     private val addBookmarkIconId
-        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
-            is FeatureTier.Plus -> R.drawable.ic_plus
-            is FeatureTier.Free -> null
-            else -> null
-        }
+        get() = R.drawable.ic_plus
 
-    private val addBookmarkIconColor
-        get() = when (Feature.BOOKMARKS_ENABLED.tier) {
-            is FeatureTier.Plus -> SubscriptionTierColor.plusGold
-            is FeatureTier.Free -> null
-            else -> null
-        }
+    private val addBookmarkIconColor: Color
+        get() = SubscriptionTierColor.plusGold
 
     enum class UpsellSourceAction {
         PREVIOUS,
