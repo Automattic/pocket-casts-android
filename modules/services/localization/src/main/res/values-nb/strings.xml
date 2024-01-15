@@ -269,7 +269,7 @@ Language: nb_NO
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gjør Pocket Casts til din egen ved å velge favorittpodcaster eller importere dem fra en annen podcastspiller. Du kan alltids gjøre dette senere.</string>
     <string name="onboarding_recommendations_import">Importer</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alt du liker med Pocket Casts, pluss mye mer</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Skrivebordsapper</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Skrivebordsapper</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lytt på flere steder med appene våre for Windows, macOS og nett.</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mapper</string>
     <string name="onboarding_plus_feature_folders_text">Ordne podcastene i mapper og synkroniser dem mellom alle enhetene dine.</string>
