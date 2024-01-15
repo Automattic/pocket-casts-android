@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
-import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase
 import org.junit.Before
 import org.junit.Test
 
@@ -26,6 +26,6 @@ class BookmarkFeatureControlTest {
 
     @Test
     fun shouldNotBeAvailable() {
-        assertFalse(bookmarkFeatureControl.isAvailable(UserTier.Free))
+        TestCase.assertFalse(bookmarkFeatureControl.isAvailable(UserTier.Free))
     }
 }
