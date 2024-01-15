@@ -6,6 +6,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
+@Deprecated("This class can be removed when the sync settings feature flag is removed")
 data class NamedSettingsSettings(
     @field:Json(name = "skipForward") val skipForward: Int? = null,
     @field:Json(name = "skipBack") val skipBack: Int? = null,
@@ -17,6 +18,10 @@ data class NamedSettingsSettings(
 @JsonClass(generateAdapter = true)
 data class ChangedNamedSettings(
     @field:Json(name = "skipForward") val skipForward: NamedChangedSettingInt? = null,
+    @field:Json(name = "skipBack") val skipBack: NamedChangedSettingInt? = null,
+    @field:Json(name = "gridOrder") val gridOrder: NamedChangedSettingInt? = null,
+    @field:Json(name = "marketingOptIn") val marketingOptIn: NamedChangedSettingBool? = null,
+    @field:Json(name = "freeGiftAcknowledgement") val freeGiftAcknowledgement: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -25,6 +30,14 @@ data class NamedChangedSettingInt(
     @field:Json(name = "modified_at") val modifiedAt: String,
 )
 
+@JsonClass(generateAdapter = true)
+data class NamedChangedSettingBool(
+    @field:Json(name = "value") val value: Boolean,
+    @field:Json(name = "modified_at") val modifiedAt: String,
+)
+
+@Suppress("DEPRECATION")
+@Deprecated("This class can be removed when the sync settings feature flag is removed")
 @JsonClass(generateAdapter = true)
 data class NamedSettingsRequest(
     @field:Json(name = "m") val m: String = "Android",
@@ -62,6 +75,9 @@ data class ChangedSettingResponse(
 )
 
 interface NamedSettingsCaller {
-    suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
+    suspend fun namedSettings(
+        @Suppress("DEPRECATION") request: NamedSettingsRequest,
+    ): NamedSettingsResponse
     suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest): ChangedNamedSettingsResponse
 }

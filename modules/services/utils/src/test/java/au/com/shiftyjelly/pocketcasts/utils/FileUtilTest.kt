@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.random.Random
 import okio.Buffer
 import okio.ByteString.Companion.toByteString
-import okio.FileNotFoundException
+import okio.IOException
 import okio.buffer
 import okio.sink
 import org.junit.Assert.assertEquals
@@ -45,7 +45,7 @@ class FileUtilTest {
             File(dir, "test3").also(File::createNewFile),
         )
 
-        FileUtil.deleteDirectoryContents(dir.path)
+        FileUtil.deleteDirContents(dir.path)
 
         assertFalse("At least one file still exists", contents.any(File::exists))
     }
@@ -56,7 +56,7 @@ class FileUtilTest {
             val dir = tempDir.newFolder()
             val file = File(dir, name).also(File::createNewFile)
 
-            FileUtil.deleteDirectoryContents(dir.path)
+            FileUtil.deleteDirContents(dir.path)
 
             assertTrue("nomedia file $file does not exist", file.exists())
         }
@@ -71,7 +71,7 @@ class FileUtilTest {
             File(dir, "test3.nomedia").also(File::createNewFile),
         )
 
-        FileUtil.deleteDirectoryContents(dir.path)
+        FileUtil.deleteDirContents(dir.path)
 
         assertFalse("At least one file still exists", contents.any(File::exists))
     }
@@ -97,7 +97,7 @@ class FileUtilTest {
     }
 
     @Test
-    fun `file is copied using copy function`() {
+    fun `file is copied`() {
         val file1 = tempDir.newFile().also { it.writeRandomBytes(100) }
         val file2 = tempDir.newFile()
         val originalSnapshot = file1.snapshot()
@@ -109,19 +109,17 @@ class FileUtilTest {
     }
 
     @Test
-    fun `file is copied using copyFile function`() {
+    fun `file is copied when destination file directory does not exist`() {
         val file1 = tempDir.newFile().also { it.writeRandomBytes(100) }
-        val file2 = tempDir.newFile()
-        val originalSnapshot = file1.snapshot()
+        val file2 = File(tempDir.newFolder(), "a/b/c/d/file")
 
-        FileUtil.copyFile(file1, file2)
+        FileUtil.copy(file1, file2)
 
-        assertEquals("Original file has different content", originalSnapshot, file1.snapshot())
         assertEquals("Files contents differ", file1.snapshot(), file2.snapshot())
     }
 
     @Test
-    fun `directory is copied using copy function`() {
+    fun `directory is copied`() {
         val dir1 = tempDir.newFolder().apply {
             File(this, "file1").writeRandomBytes(100)
             File(this, "file2").writeRandomBytes(200)
@@ -144,102 +142,39 @@ class FileUtilTest {
     }
 
     @Test
-    fun `directory is copied using copyDirectory function`() {
+    fun `directory is copied is copied when destination directory does not exist`() {
         val dir1 = tempDir.newFolder().apply {
-            File(this, "file1").writeRandomBytes(100)
-            File(this, "file2").writeRandomBytes(200)
-            val innerDir = File(this, "inner").also(File::mkdirs)
-            File(innerDir, "file3").writeRandomBytes(300)
+            File(this, "file").writeRandomBytes(100)
         }
-        val dir2 = tempDir.newFolder()
+        val dir2 = File(tempDir.newFolder(), "a/b/c/d/dir")
 
-        FileUtil.copyDirectory(dir1, dir2)
+        FileUtil.copy(dir1, dir2)
 
-        val comparisonPairs = listOf(
-            File(dir1, "file1") to File(dir2, "file1"),
-            File(dir1, "file2") to File(dir2, "file2"),
-            File(File(dir1, "inner"), "file3") to File(File(dir2, "inner"), "file3"),
-        )
-        comparisonPairs.forEach { (srcFile, dstFile) ->
-            assertFalse("Original file has no content", srcFile.snapshot().size == 0)
-            assertEquals("Files contents differ", srcFile.snapshot(), dstFile.snapshot())
-        }
+        assertEquals("Files contents differ", File(dir1, "file").snapshot(), File(dir2, "file").snapshot())
     }
 
     @Test
-    fun `fail copying file to a directory using copy function`() {
+    fun `fail copying file to a directory`() {
         val file = tempDir.newFile()
         val dir = tempDir.newFolder()
 
-        val exception = assertThrows(FileNotFoundException::class.java) {
+        val exception = assertThrows(IOException::class.java) {
             FileUtil.copy(file, dir)
         }
 
-        assertEquals("$dir (Is a directory)", exception.message)
+        assertEquals("Can't copy from file $file to file $dir", exception.message)
     }
 
     @Test
-    fun `fail copying file to a directory using copyFile function`() {
+    fun `fail copying directory to a file`() {
         val file = tempDir.newFile()
         val dir = tempDir.newFolder()
 
-        val exception = assertThrows(FileNotFoundException::class.java) {
-            FileUtil.copyFile(file, dir)
-        }
-
-        assertEquals("$dir (Is a directory)", exception.message)
-    }
-
-    @Test
-    fun `fail copying file to a directory using copyDirectory function`() {
-        val file = tempDir.newFile()
-        val dir = tempDir.newFolder()
-
-        val exception = assertThrows(FileNotFoundException::class.java) {
-            FileUtil.copyDirectory(file, dir)
-        }
-
-        assertEquals("$dir (Is a directory)", exception.message)
-    }
-
-    @Test
-    fun `fail copying directory to a file using copy function`() {
-        val file = tempDir.newFile()
-        val dir = tempDir.newFolder().apply {
-            File(this, "file").writeRandomBytes(100)
-        }
-
-        val exception = assertThrows(FileNotFoundException::class.java) {
+        val exception = assertThrows(IOException::class.java) {
             FileUtil.copy(dir, file)
         }
 
-        assertEquals("$file/file (Not a directory)", exception.message)
-    }
-
-    @Test
-    fun `fail copying directory to a file using copyFile function`() {
-        val file = tempDir.newFile()
-        val dir = tempDir.newFolder()
-
-        val exception = assertThrows(FileNotFoundException::class.java) {
-            FileUtil.copyFile(dir, file)
-        }
-
-        assertEquals("$dir (Is a directory)", exception.message)
-    }
-
-    @Test
-    fun `fail copying a directory to a file using copyDirectory function`() {
-        val file = tempDir.newFile()
-        val dir = tempDir.newFolder().apply {
-            File(this, "file").writeRandomBytes(100)
-        }
-
-        val exception = assertThrows(FileNotFoundException::class.java) {
-            FileUtil.copyDirectory(dir, file)
-        }
-
-        assertEquals("$file/file (Not a directory)", exception.message)
+        assertEquals("Can't copy from dir $dir to file $file", exception.message)
     }
 
     @Test
@@ -300,7 +235,7 @@ class FileUtilTest {
     fun `compute empty directory size`() {
         val dir = tempDir.newFolder()
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(0, size)
     }
@@ -311,7 +246,7 @@ class FileUtilTest {
             File(this, "file").also(File::createNewFile)
         }
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(0, size)
     }
@@ -322,7 +257,7 @@ class FileUtilTest {
             File(this, "file").writeRandomBytes(100)
         }
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(100, size)
     }
@@ -348,7 +283,7 @@ class FileUtilTest {
             }
         }
 
-        val size = FileUtil.folderSize(dir)
+        val size = FileUtil.dirSize(dir)
 
         assertEquals(1111111, size)
     }
@@ -358,7 +293,7 @@ class FileUtilTest {
         val file = tempDir.newFile()
         file.writeRandomBytes(1024)
 
-        val size = FileUtil.folderSize(file)
+        val size = FileUtil.dirSize(file)
 
         assertEquals(0, size)
     }

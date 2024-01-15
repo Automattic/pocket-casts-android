@@ -150,7 +150,7 @@ class OpmlExporter(
         try {
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/xml"
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
+            val uri = FileUtil.createUriWithReadPermissions(fragment.requireActivity(), file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)
@@ -175,7 +175,7 @@ class OpmlExporter(
 
             intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(LR.string.settings_opml_email_subject))
             intent.putExtra(Intent.EXTRA_TEXT, HtmlCompat.fromHtml(context.getString(LR.string.settings_opml_email_body), HtmlCompat.FROM_HTML_MODE_COMPACT))
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
+            val uri = FileUtil.createUriWithReadPermissions(fragment.requireActivity(), file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)

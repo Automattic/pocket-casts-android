@@ -196,10 +196,10 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     private fun deleteFilesForEpisode(episode: UserEpisode) {
-        FileUtil.deleteFileByPath(episode.downloadedFilePath)
-        if (episode.artworkUrl?.startsWith("/") == true) {
-            FileUtil.deleteFileByPath(episode.artworkUrl)
-        }
+        episode.downloadedFilePath?.let(FileUtil::deleteFileByPath)
+        episode.artworkUrl
+            ?.takeIf { it.startsWith('/') }
+            ?.let(FileUtil::deleteFileByPath)
     }
 
     override suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {

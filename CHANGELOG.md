@@ -4,6 +4,9 @@
 *   Updates:
     *   Use fling motion instead of scroll motion to open UpNext bottom sheet
         ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
+*   Bug Fixes:
+    *   Fixed incorrect podcast loading below the correct one on opening native podcast share url
+        ([#1696](https://github.com/Automattic/pocket-casts-android/pull/1696))
 
 7.55
 -----

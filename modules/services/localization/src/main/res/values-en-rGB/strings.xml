@@ -279,7 +279,7 @@ Language: en_GB
     <string name="plus_trial_duration_free_trial">%s free trial</string>
     <string name="end_of_year_stories_failed">Unable to load your end of year stories, check your internet connection.</string>
     <string name="onboarding_plus_feature_folders_text">Organise your podcasts in folders and keep them in sync across all your devices.</string>
-    <string name="onboarding_plus_feature_folders_title">Folders</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Folders</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colours. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>

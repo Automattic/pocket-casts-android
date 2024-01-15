@@ -116,6 +116,8 @@ open class SyncServerManager @Inject constructor(
     fun validatePromoCode(code: String): Single<PromoCodeResponse> =
         server.validatePromoCode(PromoCodeRequest(code))
 
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse =
         server.namedSettings(addBearer(token), request)
 
