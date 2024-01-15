@@ -54,17 +54,57 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return
             }
 
-            val request = ChangedNamedSettingsRequest(
-                changedSettings = ChangedNamedSettings(
-                    skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
-                ),
-            )
+            val request = changedNamedSettingsRequest(settings)
             val response = namedSettingsCall.changedNamedSettings(request)
-            for ((key, value) in response) {
+            processChangedNameSettingsResponse(response, settings)
+        }
+
+        private fun changedNamedSettingsRequest(settings: Settings) = ChangedNamedSettingsRequest(
+            changedSettings = ChangedNamedSettings(
+                skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
+                skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
+                gridOrder = settings.podcastsSortType.getSyncSetting { podcastSortType, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = podcastSortType.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
+                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(::NamedChangedSettingBool),
+            ),
+        )
+
+        private fun processChangedNameSettingsResponse(response: ChangedNamedSettingsResponse, settings: Settings) {
+            for ((key, changedSettingResponse) in response) {
                 when (key) {
-                    "skipForward" -> updateSettingIfPossible(value, settings.skipForwardInSecs) {
-                        (it.value as? Number)?.toInt()
-                    }
+                    "skipForward" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.skipForwardInSecs,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "skipBack" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.skipBackInSecs,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "gridOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastsSortType,
+                        newSettingValue = run {
+                            val serverId = (changedSettingResponse.value as? Number)?.toInt()
+                            PodcastsSortType.fromServerId(serverId)
+                        },
+                    )
+                    "marketingOptIn" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.marketingOptIn,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.freeGiftAcknowledged,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
                 }
             }
         }
@@ -72,10 +112,9 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
         private fun <T> updateSettingIfPossible(
             changedSettingResponse: ChangedSettingResponse,
             setting: UserSetting<T>,
-            transformToValue: (ChangedSettingResponse) -> T?,
+            newSettingValue: T?,
         ) {
-            val value = transformToValue(changedSettingResponse)
-            if (value == null) {
+            if (newSettingValue == null) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid ${setting.sharedPrefKey} value: ${changedSettingResponse.value}")
                 return
             }
@@ -97,18 +136,19 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
             val localModifiedAt = setting.getModifiedAt()
             // Don't exit early if we don't have a local modifiedAt time since
-            // we don't know the local value is newew than the server value.
+            // we don't know the local value is newer than the server value.
             if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
-                Timber.i("Not syncing ${setting.sharedPrefKey} from the server because setting was modified more recently locally")
+                Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
                 return
             }
 
             setting.set(
-                value = value,
+                value = newSettingValue,
                 needsSync = false,
             )
         }
 
+        @Suppress("DEPRECATION")
         @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
         private suspend fun oldSyncSettings(
             settings: Settings,
