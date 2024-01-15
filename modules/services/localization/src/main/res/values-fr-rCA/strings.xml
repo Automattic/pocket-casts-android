@@ -334,7 +334,7 @@ Language: fr
     <string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 Go de stockage Cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organisez vos podcasts dans des dossiers et synchronisez-les sur tous vos appareils.</string>
-    <string name="onboarding_plus_feature_folders_title">Dossiers</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Dossiers</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Écoutez vos podcasts partout grâce à nos applications Windows, macOS et Web.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Applications de bureau</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tout ce que vous aimez chez Pocket Casts, et bien plus encore</string>

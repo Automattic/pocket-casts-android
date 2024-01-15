@@ -334,7 +334,7 @@ Language: ko_KR
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 20GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
-    <string name="onboarding_plus_feature_folders_title">폴더</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">데스크톱 앱</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
