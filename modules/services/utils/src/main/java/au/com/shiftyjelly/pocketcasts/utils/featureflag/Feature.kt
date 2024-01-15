@@ -19,16 +19,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
-    BOOKMARKS_ENABLED(
-        key = "bookmarks_enabled",
-        title = "Bookmarks",
-        defaultValue = true,
-        tier = FeatureTier.Plus(
-            patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52),
-        ),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     GIVE_RATINGS(
         key = "give_ratings",
         title = "Give Ratings",
@@ -46,22 +36,6 @@ enum class Feature(
         hasDevToggle = true,
     ),
     ;
-
-    fun isCurrentlyExclusiveToPatron(
-        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
-    ): Boolean {
-        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
-        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
-            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-        }
-        return when (relativeToEarlyAccessState) {
-            null -> false
-            EarlyAccessState.Before,
-            EarlyAccessState.During,
-            -> !isReleaseCandidate
-            EarlyAccessState.After -> false
-        }
-    }
 
     companion object {
 
@@ -121,7 +95,7 @@ enum class UserTier {
 }
 
 sealed class FeatureTier {
-    object Patron : FeatureTier()
+    data object Patron : FeatureTier()
     class Plus(val patronExclusiveAccessRelease: ReleaseVersion?) : FeatureTier()
-    object Free : FeatureTier()
+    data object Free : FeatureTier()
 }
