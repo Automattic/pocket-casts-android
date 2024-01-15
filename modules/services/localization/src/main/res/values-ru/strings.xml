@@ -336,7 +336,7 @@ Language: ru
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Папки</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Слушайте подкасты везде: в приложениях для Windows, macOS и веб-приложении.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Приложения для настольных систем</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Приложения для настольных систем</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Всё, что вам нравится в Pocket Casts, и ещё больше</string>
     <string name="onboarding_recommendations_import">Импорт</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Переходите на Pocket Casts. Выберите любимые подкасты или импортируйте их из другого плеера. Вы всегда сможете сделать это позже.</string>

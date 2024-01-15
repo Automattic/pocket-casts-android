@@ -336,7 +336,7 @@ Language: pt_BR
     <string name="onboarding_plus_feature_folders_text">Organize seus podcasts em pastas e mantenha a sincronização em todos os seus dispositivos.</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Pastas</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ouça seus podcasts em mais lugares com os apps para Windows, macOS e Web.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Aplicativos para desktop</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicativos para desktop</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tudo o que você adora no Pocket Casts e muito mais</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Deixe o Pocket Casts com a sua cara. Basta selecionar seus podcasts favoritos ou importá-los de outro reprodutor de podcast. Você pode fazer isso a qualquer momento.</string>
