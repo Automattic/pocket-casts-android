@@ -45,7 +45,6 @@ Language: zh_TW
     <string name="podcast_submit_rating_no_internet">找不到網際網路連線。 若要提交評分，請先連線至網際網路。</string>
     <string name="podcast_rate">為 %s 評分</string>
     <string name="submit">提交</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">加入我們的書籤 Beta 測試！</string>
     <string name="whats_new_bookmarks_try_now_button">立即試試</string>
     <string name="whats_new_bookmarks_title">書籤登場！</string>
     <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>

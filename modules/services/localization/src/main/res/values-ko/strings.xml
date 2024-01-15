@@ -45,7 +45,6 @@ Language: ko_KR
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
     <string name="podcast_rate">%s 평가</string>
     <string name="submit">제출</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">북마크에 대한 베타 테스트에 참여하세요!</string>
     <string name="whats_new_bookmarks_try_now_button">지금 시도</string>
     <string name="whats_new_bookmarks_title">북마크는 여기 있습니다!</string>
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>

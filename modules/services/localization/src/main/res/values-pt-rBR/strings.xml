@@ -45,7 +45,6 @@ Language: pt_BR
     <string name="podcast_submit_rating_no_internet">Sem conexão com a Internet. Conecte-se à Internet para enviar a avaliação.</string>
     <string name="podcast_rate">Avalie o %s</string>
     <string name="submit">Enviar</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Junte-se a nós na versão beta dos favoritos!</string>
     <string name="whats_new_bookmarks_try_now_button">Experimentar agora</string>
     <string name="whats_new_bookmarks_title">Chegaram os favoritos!</string>
     <string name="bookmarks_upsell_instructions_early_access">Obtenha o Pocket Casts Patron para receber acesso antecipado a esta funcionalidade e salvar a data/hora dos seus episódios favoritos. Disponível para assinantes do Plus em breve.</string>
