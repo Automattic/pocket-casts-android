@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.utils.earlyaccess.EarlyAccessStrings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -72,7 +73,7 @@ class WhatsNewViewModel @Inject constructor(
     ): WhatsNewFeature.Bookmarks {
         val currentEpisode = playbackManager.getCurrentEpisode()
         return WhatsNewFeature.Bookmarks(
-            title = LR.string.whats_new_bookmarks_title,
+            title = EarlyAccessStrings.getAppropriateTextResource(LR.string.whats_new_bookmarks_title),
             message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
             confirmButtonTitle = if (currentEpisode == null) LR.string.whats_new_bookmarks_enable_now_button else LR.string.whats_new_bookmarks_try_now_button,
             hasFreeTrial = trialExists,
