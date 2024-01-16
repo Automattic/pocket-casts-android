@@ -7,6 +7,8 @@
 *   Bug Fixes:
     *   Fixed incorrect podcast loading below the correct one on opening native podcast share url
         ([#1696](https://github.com/Automattic/pocket-casts-android/pull/1696))
+    *   Fixed an issue where navigation and status bar could sometimes use incorrect theming with Up Next screen.
+        ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
 
 7.55
 -----
