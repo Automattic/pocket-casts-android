@@ -65,17 +65,13 @@ fun OnboardingUpgradeFlow(
         }
     }
 
-    val startInExpandedState =
-        // Only start with expanded state if there are any subscriptions
+    val startSelectPaymentFrequencyInExpandedState =
+        // Only start with expanded state if there are any subscriptions and payment frequency selection is needed
         hasSubscriptions && (
-            // The hidden state is shown as the first screen in the Upsell flow, so when we return
-            // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            (userSignedInOrSignedUpInUpsellFlow) ||
-                // User already indicated they want to upgrade, so go straight to purchase modal
-                flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
+            flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade
             )
-    val initialValue = if (startInExpandedState) {
+    val initialValue = if (startSelectPaymentFrequencyInExpandedState) {
         ModalBottomSheetValue.Expanded
     } else {
         ModalBottomSheetValue.Hidden
