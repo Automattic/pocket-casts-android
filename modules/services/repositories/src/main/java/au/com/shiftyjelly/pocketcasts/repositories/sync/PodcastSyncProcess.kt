@@ -937,80 +937,85 @@ class PodcastSyncProcess(
             bookmarkManager.upsertSynced(bookmark.copy(syncStatus = SyncStatus.SYNCED))
         }
     }
+
+    companion object {
+
+        @VisibleForTesting
+        internal fun toRecord(podcast: Podcast): Record =
+            record {
+                this.podcast = syncUserPodcast {
+                    podcast.addedDate?.toInstant()?.epochSecond?.let { epochSecond ->
+                        dateAdded = timestamp { seconds = epochSecond }
+                    }
+
+                    folderUuid = stringValue {
+                        val folderUuid = podcast.folderUuid
+                        value = if (folderUuid.isNullOrEmpty()) {
+                            Folder.homeFolderUuid
+                        } else {
+                            folderUuid
+                        }
+                    }
+
+                    isDeleted = boolValue { value = !podcast.isSubscribed }
+                    subscribed = boolValue { value = podcast.isSubscribed }
+
+                    uuid = podcast.uuid
+
+                    settings = podcastSettings {
+                        autoStartFrom = int32Setting {
+                            value = int32Value { value = podcast.startFromSecs }
+                            modifiedAt = timestamp {
+                                seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                            }
+                        }
+                        autoSkipLast = int32Setting {
+                            value = int32Value { value = podcast.skipLastSecs }
+                            modifiedAt = timestamp {
+                                seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                            }
+                        }
+                    }
+
+                    sortPosition = int32Value { value = podcast.sortPosition }
+                }
+            }
+
+        @VisibleForTesting
+        internal fun toRecord(episode: PodcastEpisode): Record =
+            record {
+                this.episode = syncUserEpisode {
+                    uuid = episode.uuid
+                    podcastUuid = episode.podcastUuid
+
+                    episode.playingStatusModified?.let { episodePlayingStatusModified ->
+                        playingStatus = int32Value { value = episode.playingStatus.toInt() }
+                        playingStatusModified = int64Value { value = episodePlayingStatusModified }
+                    }
+
+                    episode.starredModified?.let { episodeStarredModified ->
+                        starred = boolValue { value = episode.isStarred }
+                        starredModified = int64Value { value = episodeStarredModified }
+                    }
+
+                    episode.playedUpToModified?.let { episodePlayedUpToModified ->
+                        playedUpTo = int64Value { value = episode.playedUpTo.toLong() }
+                        playedUpToModified = int64Value { value = episodePlayedUpToModified }
+                    }
+
+                    episode.durationModified?.let { episodeDurationModified ->
+                        val episodeDuration = episode.duration
+                        if (episodeDuration != 0.0) {
+                            duration = int64Value { value = episodeDuration.toLong() }
+                            durationModified = int64Value { value = episodeDurationModified }
+                        }
+                    }
+
+                    episode.archivedModified?.let { episodeArchivedModified ->
+                        isDeleted = boolValue { value = episode.isArchived }
+                        isDeletedModified = int64Value { value = episodeArchivedModified }
+                    }
+                }
+            }
+    }
 }
-
-private fun toRecord(podcast: Podcast): Record =
-    record {
-        this.podcast = syncUserPodcast {
-            podcast.addedDate?.toInstant()?.epochSecond?.let { epochSecond ->
-                dateAdded = timestamp { seconds = epochSecond }
-            }
-
-            folderUuid = stringValue {
-                val folderUuid = podcast.folderUuid
-                value = if (folderUuid.isNullOrEmpty()) {
-                    Folder.homeFolderUuid
-                } else {
-                    folderUuid
-                }
-            }
-
-            isDeleted = boolValue { value = !podcast.isSubscribed }
-            subscribed = boolValue { value = podcast.isSubscribed }
-
-            uuid = podcast.uuid
-
-            settings = podcastSettings {
-                autoStartFrom = int32Setting {
-                    value = int32Value { value = podcast.startFromSecs }
-                    modifiedAt = timestamp {
-                        seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
-                    }
-                }
-                autoSkipLast = int32Setting {
-                    value = int32Value { value = podcast.skipLastSecs }
-                    modifiedAt = timestamp {
-                        seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
-                    }
-                }
-            }
-
-            sortPosition = int32Value { value = podcast.sortPosition }
-        }
-    }
-
-private fun toRecord(episode: PodcastEpisode): Record =
-    record {
-        this.episode = syncUserEpisode {
-            uuid = episode.uuid
-            podcastUuid = episode.podcastUuid
-
-            episode.playingStatusModified?.let { episodePlayingStatusModified ->
-                playingStatus = int32Value { value = episode.playingStatus.toInt() }
-                playingStatusModified = int64Value { value = episodePlayingStatusModified }
-            }
-
-            episode.starredModified?.let { episodeStarredModified ->
-                starred = boolValue { value = episode.isStarred }
-                starredModified = int64Value { value = episodeStarredModified }
-            }
-
-            episode.playedUpToModified?.let { episodePlayedUpToModified ->
-                playedUpTo = int64Value { value = episode.playedUpTo.toLong() }
-                playedUpToModified = int64Value { value = episodePlayedUpToModified }
-            }
-
-            episode.durationModified?.let { episodeDurationModified ->
-                val episodeDuration = episode.duration
-                if (episodeDuration != 0.0) {
-                    duration = int64Value { value = episodeDuration.toLong() }
-                    durationModified = int64Value { value = episodeDurationModified }
-                }
-            }
-
-            episode.archivedModified?.let { episodeArchivedModified ->
-                isDeleted = boolValue { value = episode.isArchived }
-                isDeletedModified = int64Value { value = episodeArchivedModified }
-            }
-        }
-    }
