@@ -42,9 +42,9 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             isAddBookmarkEnabled = isAddBookmarkEnabled,
-                            addBookmarkIconId = addBookmarkIconId
+                            addBookmarkIconId = R.drawable.ic_plus
                                 .takeIf { !isAddBookmarkEnabled },
-                            addBookmarkIconColor = addBookmarkIconColor
+                            addBookmarkIconColor = SubscriptionTierColor.plusGold
                                 .takeIf { !isAddBookmarkEnabled } ?: SubscriptionTierColor.plusGold,
                         )
                     }
@@ -130,12 +130,6 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         val addBookmarkIconId: Int? = null,
         val addBookmarkIconColor: Color = SubscriptionTierColor.plusGold,
     )
-
-    private val addBookmarkIconId
-        get() = R.drawable.ic_plus
-
-    private val addBookmarkIconColor: Color
-        get() = SubscriptionTierColor.plusGold
 
     enum class UpsellSourceAction {
         PREVIOUS,
