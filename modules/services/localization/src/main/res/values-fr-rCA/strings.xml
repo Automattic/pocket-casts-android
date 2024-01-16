@@ -45,7 +45,6 @@ Language: fr
     <string name="podcast_submit_rating_no_internet">Aucune connexion Internet détectée. Veuillez vous connecter à Internet pour envoyer une note.</string>
     <string name="podcast_rate">Évaluer %s</string>
     <string name="submit">Envoyer</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Rejoignez-nous pour le bêta-test des favoris !</string>
     <string name="whats_new_bookmarks_try_now_button">Essayer maintenant</string>
     <string name="whats_new_bookmarks_title">Les favoris sont là !</string>
     <string name="bookmarks_upsell_instructions_early_access">Bénéficiez d’un accès anticipé à cette fonctionnalité avec Pocket Casts Patron et enregistrez les horodatages de vos épisodes favoris. Bientôt disponible pour les abonnés Plus.</string>

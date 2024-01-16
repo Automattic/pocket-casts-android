@@ -58,8 +58,6 @@ import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
@@ -414,9 +412,7 @@ class PodcastAdapter(
         }
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
-            }
+            add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
             add(
                 EpisodeHeader(
                     showingArchived = showingArchived,
@@ -468,53 +464,51 @@ class PodcastAdapter(
         context: Context,
     ) {
         val content = mutableListOf<Any>().apply {
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                add(Podcast())
-                add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
+            add(Podcast())
+            add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
 
-                if (!bookmarksAvailable) {
-                    add(BookmarkUpsell)
-                } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
-                    add(NoBookmarkMessage)
-                } else {
+            if (!bookmarksAvailable) {
+                add(BookmarkUpsell)
+            } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
+                add(NoBookmarkMessage)
+            } else {
+                add(
+                    BookmarkHeader(
+                        bookmarksCount = bookmarks.size,
+                        searchTerm = searchTerm,
+                        onSearchFocus = onSearchFocus,
+                        onSearchQueryChanged = onSearchQueryChanged,
+                        onOptionsClicked = onBookmarksOptionsClicked,
+                    ),
+                )
+                if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
                     add(
-                        BookmarkHeader(
-                            bookmarksCount = bookmarks.size,
-                            searchTerm = searchTerm,
-                            onSearchFocus = onSearchFocus,
-                            onSearchQueryChanged = onSearchQueryChanged,
-                            onOptionsClicked = onBookmarksOptionsClicked,
+                        NoResultsMessage(
+                            title = context.getString(LR.string.podcast_no_bookmarks_found),
+                            bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
+                            showButton = false,
                         ),
                     )
-                    if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
-                        add(
-                            NoResultsMessage(
-                                title = context.getString(LR.string.podcast_no_bookmarks_found),
-                                bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
-                                showButton = false,
-                            ),
-                        )
-                    } else {
-                        addAll(
-                            bookmarks.map {
-                                BookmarkItemData(
-                                    bookmark = it,
-                                    onBookmarkPlayClicked = onBookmarkPlayClicked,
-                                    onBookmarkRowLongPress = onBookmarkRowLongPress,
-                                    onBookmarkRowClick = { bookmark, adapterPosition ->
-                                        multiSelectBookmarksHelper.toggle(bookmark)
-                                        notifyItemChanged(adapterPosition)
-                                    },
-                                    isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                                    isSelected = { bookmark ->
-                                        multiSelectBookmarksHelper.isSelected(
-                                            bookmark,
-                                        )
-                                    },
-                                )
-                            },
-                        )
-                    }
+                } else {
+                    addAll(
+                        bookmarks.map {
+                            BookmarkItemData(
+                                bookmark = it,
+                                onBookmarkPlayClicked = onBookmarkPlayClicked,
+                                onBookmarkRowLongPress = onBookmarkRowLongPress,
+                                onBookmarkRowClick = { bookmark, adapterPosition ->
+                                    multiSelectBookmarksHelper.toggle(bookmark)
+                                    notifyItemChanged(adapterPosition)
+                                },
+                                isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
+                                isSelected = { bookmark ->
+                                    multiSelectBookmarksHelper.isSelected(
+                                        bookmark,
+                                    )
+                                },
+                            )
+                        },
+                    )
                 }
             }
         }

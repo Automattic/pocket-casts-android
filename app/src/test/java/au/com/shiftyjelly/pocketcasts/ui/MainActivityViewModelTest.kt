@@ -20,12 +20,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
@@ -40,8 +34,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -94,11 +86,6 @@ class MainActivityViewModelTest {
 
     private lateinit var viewModel: MainActivityViewModel
 
-    private val betaEarlyAccessRelease = ReleaseVersion(7, 50, null, 1)
-    private val productionEarlyAccessRelease = ReleaseVersion(7, 50)
-    private val betaFullAccessRelease = ReleaseVersion(7, 51, null, 1)
-    private val productionFullAccessRelease = ReleaseVersion(7, 51)
-
     @Before
     fun setup() = runTest {
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
@@ -107,25 +94,8 @@ class MainActivityViewModelTest {
     /* What's new tests */
 
     @Test
-    fun `given user entitled for bookmarks, when any release, then what's new shown`() = runTest {
-        initViewModel(
-            isUserEntitled = true,
-            currentRelease = mock(),
-            patronExclusiveAccessRelease = mock(),
-        )
-
-        viewModel.state.test {
-            assertTrue(awaitItem().shouldShowWhatsNew)
-        }
-    }
-
-    @Test
-    fun `given user not entitled for bookmarks, when beta early access release, then what's new not shown`() = runTest {
-        initViewModel(
-            isUserEntitled = false,
-            currentRelease = betaEarlyAccessRelease,
-            patronExclusiveAccessRelease = productionEarlyAccessRelease,
-        )
+    fun `given a new user, then what's new should not be displayed`() = runTest {
+        initViewModel(isNewUser = true)
 
         viewModel.state.test {
             assertFalse(awaitItem().shouldShowWhatsNew)
@@ -133,41 +103,20 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun `given user not entitled for bookmarks, when prod early access release, then what's new not shown`() = runTest {
-        initViewModel(
-            isUserEntitled = false,
-            currentRelease = productionEarlyAccessRelease,
-            patronExclusiveAccessRelease = productionEarlyAccessRelease,
-        )
+    fun `given an user and is previous version, then what's should be displayed`() = runTest {
+        initViewModel(shouldSetPreviousVersion = true)
+
+        viewModel.state.test {
+            assertTrue(awaitItem().shouldShowWhatsNew)
+        }
+    }
+
+    @Test
+    fun `given an user and is current version, then what's should not be displayed`() = runTest {
+        initViewModel(shouldSetPreviousVersion = false)
 
         viewModel.state.test {
             assertFalse(awaitItem().shouldShowWhatsNew)
-        }
-    }
-
-    @Test
-    fun `given user not entitled for bookmarks, when beta full access release, then what's new shown`() = runTest {
-        initViewModel(
-            isUserEntitled = false,
-            currentRelease = betaFullAccessRelease,
-            patronExclusiveAccessRelease = productionEarlyAccessRelease,
-        )
-
-        viewModel.state.test {
-            assertTrue(awaitItem().shouldShowWhatsNew)
-        }
-    }
-
-    @Test
-    fun `given user not entitled for bookmarks, when prod full access release, then what's new shown`() = runTest {
-        initViewModel(
-            isUserEntitled = false,
-            currentRelease = productionFullAccessRelease,
-            patronExclusiveAccessRelease = productionEarlyAccessRelease,
-        )
-
-        viewModel.state.test {
-            assertTrue(awaitItem().shouldShowWhatsNew)
         }
     }
 
@@ -248,12 +197,19 @@ class MainActivityViewModelTest {
     }
 
     private fun initViewModel(
-        isUserEntitled: Boolean = true,
-        currentRelease: ReleaseVersion = productionFullAccessRelease,
-        patronExclusiveAccessRelease: ReleaseVersion? = productionEarlyAccessRelease,
+        isNewUser: Boolean = false,
+        shouldSetPreviousVersion: Boolean = false,
     ) {
-        whenever(settings.getMigratedVersionCode()).thenReturn(1) // this is not 0, we don't show what's new to new users
-        whenever(settings.getWhatsNewVersionCode()).thenReturn(2) // this is less than the current what's new version code and so will trigger what's new
+        if (isNewUser) {
+            whenever(settings.getMigratedVersionCode()).thenReturn(0)
+        } else {
+            whenever(settings.getMigratedVersionCode()).thenReturn(1)
+        }
+        if (shouldSetPreviousVersion) {
+            whenever(settings.getWhatsNewVersionCode()).thenReturn(2) // this is less than the current what's new version code and so will trigger what's new
+        } else {
+            whenever(settings.getWhatsNewVersionCode()).thenReturn(Settings.WHATS_NEW_VERSION_CODE)
+        }
 
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(
@@ -263,20 +219,6 @@ class MainActivityViewModelTest {
                 ),
             ),
         )
-
-        val releaseVersion = mock<ReleaseVersionWrapper>().apply {
-            doReturn(currentRelease).whenever(this).currentReleaseVersion
-        }
-        val bookmarksFeature = mock<Feature>().apply {
-            doReturn(FeatureTier.Plus(patronExclusiveAccessRelease)).whenever(this).tier
-        }
-        val feature = mock<FeatureWrapper>().apply {
-            doReturn(bookmarksFeature).whenever(this).bookmarksFeature
-            doReturn(isUserEntitled).whenever(this).isUserEntitled(anyOrNull(), anyOrNull())
-        }
-
-        val featureFlag = mock<FeatureFlagWrapper>()
-        whenever(featureFlag.isEnabled(feature.bookmarksFeature)).thenReturn(true)
 
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,
@@ -288,9 +230,6 @@ class MainActivityViewModelTest {
             podcastManager = podcastManager,
             bookmarkManager = bookmarkManager,
             theme = theme,
-            feature = feature,
-            featureFlag = featureFlag,
-            releaseVersion = releaseVersion,
             analyticsTracker = analyticsTracker,
         )
     }

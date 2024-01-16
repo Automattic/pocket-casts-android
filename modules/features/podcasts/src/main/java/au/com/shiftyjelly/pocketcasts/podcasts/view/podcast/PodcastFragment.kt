@@ -63,8 +63,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -660,14 +658,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         binding?.setupMultiSelect()
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.multiSelectBookmarksHelper.showEditBookmarkPage
-                        .collect { show ->
-                            if (show) onEditBookmarkClick()
-                        }
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.multiSelectBookmarksHelper.showEditBookmarkPage
+                    .collect { show ->
+                        if (show) onEditBookmarkClick()
+                    }
             }
         }
     }
@@ -680,9 +676,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun FragmentPodcastBinding.setupMultiSelect() {
         viewModel.multiSelectEpisodesHelper.setUp(multiSelectEpisodesToolbar)
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            viewModel.multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
-        }
+        viewModel.multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
     }
 
     fun <T> MultiSelectHelper<T>.setUp(multiSelectToolbar: MultiSelectToolbar) {
@@ -868,9 +862,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         itemTouchHelper = null
 
         viewModel.multiSelectEpisodesHelper.cleanup()
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            viewModel.multiSelectBookmarksHelper.cleanup()
-        }
+        viewModel.multiSelectBookmarksHelper.cleanup()
 
         super.onDestroyView()
 

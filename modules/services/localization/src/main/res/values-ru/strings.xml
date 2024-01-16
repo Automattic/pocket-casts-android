@@ -45,7 +45,6 @@ Language: ru
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>
     <string name="podcast_rate">Оцените %s</string>
     <string name="submit">Отправить</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Примите участие в бета-тестировании закладок!</string>
     <string name="whats_new_bookmarks_try_now_button">Попробовать</string>
     <string name="whats_new_bookmarks_title">Закладки уже готовы!</string>
     <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>

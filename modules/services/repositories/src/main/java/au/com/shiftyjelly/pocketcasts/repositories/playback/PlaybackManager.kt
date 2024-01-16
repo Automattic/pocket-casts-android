@@ -62,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -123,6 +124,7 @@ open class PlaybackManager @Inject constructor(
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
+    bookmarkFeature: BookmarkFeatureControl,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
@@ -196,6 +198,7 @@ open class PlaybackManager @Inject constructor(
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
+        bookmarkFeature = bookmarkFeature,
     )
     var sleepAfterEpisode: Boolean = false
 

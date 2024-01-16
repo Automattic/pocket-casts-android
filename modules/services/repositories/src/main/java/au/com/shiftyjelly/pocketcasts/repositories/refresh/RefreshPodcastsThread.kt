@@ -46,7 +46,6 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -85,7 +84,6 @@ class RefreshPodcastsThread(
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
-        fun featureFlagWrapper(): FeatureFlagWrapper
     }
 
     @Volatile
@@ -257,7 +255,6 @@ class RefreshPodcastsThread(
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
-            featureFlagWrapper = entryPoint.featureFlagWrapper(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()
@@ -482,7 +479,7 @@ class RefreshPodcastsThread(
             val phoneActions = mutableListOf<NotificationCompat.Action>()
             val wearActions = mutableListOf<NotificationCompat.Action>()
 
-            for (action in NewEpisodeNotificationAction.values()) {
+            for (action in NewEpisodeNotificationAction.entries) {
                 if (userActions.contains(action)) {
                     intentId++
                     val label = context.resources.getString(action.labelId)
@@ -680,6 +677,6 @@ class RefreshPodcastsThread(
 }
 
 private sealed class AddToUpNext {
-    object Next : AddToUpNext()
-    object Last : AddToUpNext()
+    data object Next : AddToUpNext()
+    data object Last : AddToUpNext()
 }
