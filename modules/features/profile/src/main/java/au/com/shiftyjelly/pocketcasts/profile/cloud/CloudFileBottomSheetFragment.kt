@@ -222,7 +222,6 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 val layoutBookmark = binding.layoutBookmark
-                layoutBookmark.isVisible = true
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
                     viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)
