@@ -6,6 +6,10 @@ import javax.inject.Singleton
 
 @Singleton
 class BookmarkFeatureControl @Inject constructor() {
-    fun isAvailable(userTier: UserTier): Boolean =
-        userTier == UserTier.Patron || userTier == UserTier.Plus
+    fun isAvailable(userTier: UserTier): Boolean {
+        return when (userTier) {
+            UserTier.Plus, UserTier.Patron -> true
+            UserTier.Free -> false
+        }
+    }
 }
