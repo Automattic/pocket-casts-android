@@ -84,6 +84,23 @@ enum class Feature(
             }
         }
     }
+
+    // Please do not delete this method because sometimes we need it
+    fun isCurrentlyExclusiveToPatron(
+        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
+    ): Boolean {
+        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
+            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+        }
+        return when (relativeToEarlyAccessState) {
+            null -> false
+            EarlyAccessState.Before,
+            EarlyAccessState.During,
+            -> !isReleaseCandidate
+            EarlyAccessState.After -> false
+        }
+    }
 }
 
 // It would be nice to be able to use Subscription.SubscriptionTier here, but that's in the
