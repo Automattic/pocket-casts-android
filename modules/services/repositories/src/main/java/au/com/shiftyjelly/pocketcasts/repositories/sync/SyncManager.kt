@@ -26,8 +26,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -81,7 +82,11 @@ interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
     fun getLastSyncAt(): Single<String>
     fun getHomeFolder(): Single<PodcastListResponse>
     fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse>
-    fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse>
+
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled. Use userSyncUpdate instead.")
+    fun syncUpdate(data: String, lastModified: String): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse>
+
+    suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse
     fun episodeSync(request: EpisodeSyncRequest): Completable
 
     // Other

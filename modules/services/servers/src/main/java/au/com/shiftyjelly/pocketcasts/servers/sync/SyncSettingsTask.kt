@@ -154,7 +154,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
-            @Suppress("DEPRECATION")
             val request = NamedSettingsRequest(
                 settings = NamedSettingsSettings(
                     skipForward = settings.skipForwardInSecs.getSyncValue(),
