@@ -90,14 +90,14 @@ fun OnboardingUpgradeFlow(
             ModalBottomSheetValue.Hidden -> {
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
                 if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
-                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
+                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow, source)
                     if (flow is OnboardingFlow.PlusAccountUpgrade) {
                         mainSheetViewModel.onDismiss(flow, source)
                         onBackPressed()
                     }
                 }
             }
-            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
+            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow, source)
             else -> {}
         }
     }

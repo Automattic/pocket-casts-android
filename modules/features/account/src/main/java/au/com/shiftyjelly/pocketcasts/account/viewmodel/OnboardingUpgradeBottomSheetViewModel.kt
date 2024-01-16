@@ -168,17 +168,29 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
         }
     }
 
-    fun onSelectPaymentFrequencyShown(flow: OnboardingFlow) {
+    fun onSelectPaymentFrequencyShown(
+        flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN,
-            mapOf(flowKey to flow.analyticsValue),
+            mapOf(
+                flowKey to flow.analyticsValue,
+                sourceKey to source.analyticsValue,
+            ),
         )
     }
 
-    fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow) {
+    fun onSelectPaymentFrequencyDismissed(
+        flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED,
-            mapOf(flowKey to flow.analyticsValue),
+            mapOf(
+                flowKey to flow.analyticsValue,
+                sourceKey to source.analyticsValue,
+            ),
         )
     }
 
