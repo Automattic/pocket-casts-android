@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -34,6 +35,17 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.protobuf.boolValue
+import com.google.protobuf.int32Value
+import com.google.protobuf.stringValue
+import com.google.protobuf.timestamp
+import com.pocketcasts.service.api.Record
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.int32Setting
+import com.pocketcasts.service.api.podcastSettings
+import com.pocketcasts.service.api.record
+import com.pocketcasts.service.api.syncUpdateRequest
+import com.pocketcasts.service.api.syncUserPodcast
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -41,11 +53,15 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
+import java.time.Instant
+import java.time.format.DateTimeParseException
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxCompletable
 import org.json.JSONArray
 import org.json.JSONException
@@ -117,14 +133,58 @@ class PodcastSyncProcess(
             }
     }
 
-    fun performIncrementalSync(lastModified: String): Completable {
+    @VisibleForTesting
+    fun performIncrementalSync(lastModified: String): Completable =
+        if (featureFlagWrapper.isEnabled(Feature.SETTINGS_SYNC)) {
+            rxCompletable {
+                performIncrementalSyncSuspend(lastModified)
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            oldPerformIncrementalSync(lastModified)
+        }
+
+    private suspend fun performIncrementalSyncSuspend(lastModified: String) {
+        val syncUpdateRequest = getSyncUpdateRequest(lastModified)
+        val protobufResponse = syncManager.userSyncUpdate(syncUpdateRequest)
+        val syncUpdateResponse = SyncUpdateResponse.fromProtobufSyncUpdateResponse(protobufResponse)
+        processServerResponse(
+            response = syncUpdateResponse,
+            episodes = emptyList(), // empty list because this call is not syncing episode data (yet)
+        ).await()
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
+    private fun oldPerformIncrementalSync(lastModified: String): Completable {
         val uploadData = uploadChanges()
         val uploadObservable = syncManager.syncUpdate(uploadData.first, lastModified)
-        val downloadObservable = uploadObservable.flatMap {
+        return uploadObservable.flatMap {
             processServerResponse(it, uploadData.second)
         }.ignoreElement()
-        return downloadObservable
     }
+
+    private fun getSyncUpdateRequest(lastModifiedString: String): SyncUpdateRequest =
+        try {
+            syncUpdateRequest {
+                deviceUtcTimeMs = System.currentTimeMillis()
+
+                try {
+                    lastModified = Instant
+                        .parse(lastModifiedString)
+                        .toEpochMilli()
+                } catch (e: DateTimeParseException) {
+                    Timber.e(e, "Could not convert lastModified String to Long: $lastModifiedString")
+                }
+
+                val podcasts = podcastManager.findPodcastsToSync()
+                val podcastRecords = podcasts.map { toRecord(it) }
+                records.addAll(podcastRecords)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Unable to upload podcast to sync.")
+            throw PocketCastsSyncException(e)
+        }
 
     private fun performFullSync(): Completable {
         // grab the last sync date before we begin
@@ -286,6 +346,8 @@ class PodcastSyncProcess(
             }
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadChanges(): Pair<String, List<PodcastEpisode>> {
         val records = JSONArray()
         uploadPodcastChanges(records)
@@ -302,6 +364,7 @@ class PodcastSyncProcess(
         return Pair(data.toString(), episodes)
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadFolderChanges(records: JSONArray) {
         try {
             val folders = folderManager.findFoldersToSync()
@@ -333,6 +396,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadPlaylistChanges(records: JSONArray) {
         try {
             val playlists = playlistManager.findPlaylistsToSync()
@@ -383,6 +447,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadStatChanges(records: JSONArray) {
         if (statsManager.isSynced(settings) || statsManager.isEmpty) {
             return
@@ -414,6 +479,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadPodcastChanges(records: JSONArray) {
         try {
             val podcasts = podcastManager.findPodcastsToSync()
@@ -444,6 +510,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
             val episodes = episodeManager.findEpisodesToSync()
@@ -506,6 +573,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadBookmarksChanges(records: JSONArray) {
         try {
             val bookmarks = bookmarkManager.findBookmarksToSync()
@@ -743,7 +811,6 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed) {
             podcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
             podcast.isSubscribed = true
-            podcast.isSubscribed = podcastSync.subscribed
             podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
             podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
             podcastSync.sortPosition?.let { podcast.sortPosition = it }
@@ -853,3 +920,43 @@ class PodcastSyncProcess(
         }
     }
 }
+
+private fun toRecord(podcast: Podcast): Record =
+    record {
+        this.podcast = syncUserPodcast {
+            podcast.addedDate?.toInstant()?.epochSecond?.let { epochSecond ->
+                dateAdded = timestamp { seconds = epochSecond }
+            }
+
+            folderUuid = stringValue {
+                val folderUuid = podcast.folderUuid
+                value = if (folderUuid.isNullOrEmpty()) {
+                    Folder.homeFolderUuid
+                } else {
+                    folderUuid
+                }
+            }
+
+            isDeleted = boolValue { value = !podcast.isSubscribed }
+            subscribed = boolValue { value = podcast.isSubscribed }
+
+            uuid = podcast.uuid
+
+            settings = podcastSettings {
+                autoStartFrom = int32Setting {
+                    value = int32Value { value = podcast.startFromSecs }
+                    modifiedAt = timestamp {
+                        seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                    }
+                }
+                autoSkipLast = int32Setting {
+                    value = int32Value { value = podcast.skipLastSecs }
+                    modifiedAt = timestamp {
+                        seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                    }
+                }
+            }
+
+            sortPosition = int32Value { value = podcast.sortPosition }
+        }
+    }
