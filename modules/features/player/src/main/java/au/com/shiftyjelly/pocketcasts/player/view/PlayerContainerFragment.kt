@@ -65,6 +65,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     private val chaptersViewModel: ChaptersViewModel by activityViewModels()
     private var binding: FragmentPlayerContainerBinding? = null
 
+    val overrideTheme: Theme.ThemeType
+        get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPlayerContainerBinding.inflate(inflater, container, false)
         return binding?.root
@@ -104,8 +107,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
 
                     activity?.let {
-                        theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(Theme.ThemeType.DARK))
-                        theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.primaryUi01(Theme.ThemeType.DARK), true), it)
+                        theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
+                        theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
                     }
 
                     upNextFragment.onExpanded()
