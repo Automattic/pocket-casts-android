@@ -21,7 +21,6 @@ object ShelfItems {
         add(ShelfItem.Cast)
         add(ShelfItem.Played)
         add(ShelfItem.Bookmark)
-
         add(ShelfItem.Archive)
     }
     private val items = itemsList.associateBy { it.id }
