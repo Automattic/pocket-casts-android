@@ -194,19 +194,19 @@ private fun Content(
                 ?: throw IllegalStateException("upgradeSource not set")
 
             val userCreatedNewAccount = when (upgradeSource) {
+                OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.APPEARANCE,
+                OnboardingUpgradeSource.BOOKMARKS,
+                OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+                OnboardingUpgradeSource.END_OF_YEAR,
                 OnboardingUpgradeSource.FILES,
                 OnboardingUpgradeSource.FOLDERS,
+                OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
                 OnboardingUpgradeSource.LOGIN,
+                OnboardingUpgradeSource.OVERFLOW_MENU,
                 OnboardingUpgradeSource.PLUS_DETAILS,
                 OnboardingUpgradeSource.PROFILE,
-                OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.SETTINGS,
-                OnboardingUpgradeSource.BOOKMARKS,
-                OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
-                OnboardingUpgradeSource.END_OF_YEAR,
-                OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-                OnboardingUpgradeSource.OVERFLOW_MENU,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 
