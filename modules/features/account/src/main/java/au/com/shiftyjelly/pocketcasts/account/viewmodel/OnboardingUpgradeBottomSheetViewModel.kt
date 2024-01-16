@@ -98,6 +98,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     fun onClickSubscribe(
         activity: Activity,
         flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
     ) {
         (state.value as? Loaded)?.let { loadedState ->
@@ -106,7 +107,11 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
 
             analyticsTracker.track(
                 AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                mapOf(flowKey to flow.analyticsValue, selectedSubscriptionKey to subscription.productDetails.productId),
+                mapOf(
+                    flowKey to flow.analyticsValue,
+                    sourceKey to source.analyticsValue,
+                    selectedSubscriptionKey to subscription.productDetails.productId,
+                ),
             )
 
             viewModelScope.launch {
@@ -180,6 +185,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     companion object {
         const val flowKey = "flow"
         const val selectedSubscriptionKey = "product"
+        const val sourceKey = "source"
     }
 }
 

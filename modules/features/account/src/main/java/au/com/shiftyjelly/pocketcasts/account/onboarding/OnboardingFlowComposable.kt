@@ -205,6 +205,7 @@ private fun Content(
                 OnboardingUpgradeSource.BOOKMARKS,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
                 OnboardingUpgradeSource.END_OF_YEAR,
+                OnboardingUpgradeSource.UNKNOWN,
                 -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
