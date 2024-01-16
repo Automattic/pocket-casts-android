@@ -5,14 +5,21 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
+import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.SyncUserPodcast
 import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
+import com.pocketcasts.service.api.durationOrNull
+import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.episodesSortOrderOrNull
 import com.pocketcasts.service.api.folderUuidOrNull
+import com.pocketcasts.service.api.isDeletedOrNull
+import com.pocketcasts.service.api.playedUpToOrNull
+import com.pocketcasts.service.api.playingStatusOrNull
 import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.sortPositionOrNull
+import com.pocketcasts.service.api.starredOrNull
 import com.pocketcasts.service.api.subscribedOrNull
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -61,24 +68,40 @@ data class SyncUpdateResponse(
         var playedUpTo: Double? = null,
         var duration: Double? = null,
         var playingStatus: EpisodePlayingStatus? = null,
-    )
+    ) {
+        companion object {
+            fun fromSyncUserEpisode(syncUserEpisode: SyncUserEpisode): EpisodeSync =
+                EpisodeSync(
+                    uuid = syncUserEpisode.uuid,
+                    isArchived = syncUserEpisode.isDeletedOrNull?.value ?: false,
+                    starred = syncUserEpisode.starredOrNull?.value ?: false,
+                    playedUpTo = syncUserEpisode.playedUpToOrNull?.value?.toDouble(),
+                    duration = syncUserEpisode.durationOrNull?.value?.toDouble(),
+                    playingStatus = syncUserEpisode.playingStatusOrNull?.value?.let {
+                        EpisodePlayingStatus.fromInt(it)
+                    } ?: EpisodePlayingStatus.NOT_PLAYED,
+                )
+        }
+    }
 
     companion object {
         fun fromProtobufSyncUpdateResponse(
             source: com.pocketcasts.service.api.SyncUpdateResponse,
-        ): SyncUpdateResponse {
-            val podcasts = source.recordsList
-                .mapNotNull { it.podcastOrNull }
-                .map { PodcastSync.fromSyncUserPodcast(it) }
-
-            return SyncUpdateResponse(
+        ): SyncUpdateResponse =
+            SyncUpdateResponse(
                 lastModified = run {
                     val epochMilli = source.lastModified
                     val instant = Instant.ofEpochMilli(epochMilli)
                     DateTimeFormatter.ISO_INSTANT.format(instant)
                 },
-                podcasts = podcasts.toMutableList(),
+                podcasts = source.recordsList
+                    .mapNotNull { it.podcastOrNull }
+                    .map { PodcastSync.fromSyncUserPodcast(it) }
+                    .toMutableList(),
+                episodes = source.recordsList
+                    .mapNotNull { it.episodeOrNull }
+                    .map { EpisodeSync.fromSyncUserEpisode(it) }
+                    .toMutableList(),
             )
-        }
     }
 }
