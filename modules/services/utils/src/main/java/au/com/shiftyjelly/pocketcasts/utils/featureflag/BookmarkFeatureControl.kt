@@ -1,6 +1,5 @@
-package au.com.shiftyjelly.pocketcasts.repositories.bookmark
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import javax.inject.Inject
 import javax.inject.Singleton
 

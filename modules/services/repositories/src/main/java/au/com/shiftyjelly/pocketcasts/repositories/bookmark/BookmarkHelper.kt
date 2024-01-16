@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastRec
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR

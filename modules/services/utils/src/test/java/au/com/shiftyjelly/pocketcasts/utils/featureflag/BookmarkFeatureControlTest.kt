@@ -1,6 +1,5 @@
-package au.com.shiftyjelly.pocketcasts.repositories.bookmark
+package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import junit.framework.TestCase.assertFalse
 import org.junit.Before
 import org.junit.Test
