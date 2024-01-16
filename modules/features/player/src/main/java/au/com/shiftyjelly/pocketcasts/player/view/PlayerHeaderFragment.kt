@@ -194,7 +194,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
-            onAddBookmarkClick()
+            onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
@@ -499,18 +499,17 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.starToggle()
     }
 
-    fun onAddBookmarkClick() {
+    fun onAddBookmarkClick(source: OnboardingUpgradeSource) {
         if (Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
             viewModel.buildBookmarkArguments { arguments ->
                 activityLauncher.launch(arguments.getIntent(requireContext()))
             }
         } else {
-            startUpsellFlow()
+            startUpsellFlow(source)
         }
     }
 
-    private fun startUpsellFlow() {
-        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
+    private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
             showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
