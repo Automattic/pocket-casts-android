@@ -49,6 +49,7 @@ import com.pocketcasts.service.api.int32Setting
 import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.syncUpdateRequest
+import com.pocketcasts.service.api.syncUserBookmark
 import com.pocketcasts.service.api.syncUserEpisode
 import com.pocketcasts.service.api.syncUserFolder
 import com.pocketcasts.service.api.syncUserPlaylist
@@ -200,6 +201,10 @@ class PodcastSyncProcess(
                 val playlistRecords = playlistManager.findPlaylistsToSync()
                     .map { toRecord(it) }
                 records.addAll(playlistRecords)
+
+                val bookmarkRecords = bookmarkManager.findBookmarksToSync()
+                    .map { toRecord(it) }
+                records.addAll(bookmarkRecords)
             }
         } catch (e: Exception) {
             Timber.e(e, "Unable to upload podcast to sync.")
@@ -604,6 +609,7 @@ class PodcastSyncProcess(
         try {
             val bookmarks = bookmarkManager.findBookmarksToSync()
             bookmarks.forEach { bookmark ->
+                @Suppress("DEPRECATION")
                 uploadBookmarkChanges(bookmark, records)
             }
         } catch (e: Exception) {
@@ -612,6 +618,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadBookmarkChanges(bookmark: Bookmark, records: JSONArray) {
         try {
             val fields = JSONObject().apply {
@@ -1071,6 +1078,25 @@ class PodcastSyncProcess(
                     filterDuration = boolValue { value = playlist.filterDuration }
                     longerThan = int32Value { value = playlist.longerThan }
                     shorterThan = int32Value { value = playlist.shorterThan }
+                }
+            }
+
+        private fun toRecord(bookmark: Bookmark): Record =
+            record {
+                this.bookmark = syncUserBookmark {
+                    bookmarkUuid = bookmark.uuid
+                    podcastUuid = bookmark.podcastUuid
+                    episodeUuid = bookmark.episodeUuid
+                    time = int32Value { value = bookmark.timeSecs }
+                    createdAt = bookmark.createdAt.toProtobufTimestamp()
+                    bookmark.titleModified?.let { bookmarkTitleModified ->
+                        title = stringValue { value = bookmark.title }
+                        titleModified = int64Value { value = bookmarkTitleModified }
+                    }
+                    bookmark.deletedModified?.let { bookmarkDeletedModified ->
+                        isDeleted = boolValue { value = bookmark.deleted }
+                        isDeletedModified = int64Value { value = bookmarkDeletedModified }
+                    }
                 }
             }
     }
