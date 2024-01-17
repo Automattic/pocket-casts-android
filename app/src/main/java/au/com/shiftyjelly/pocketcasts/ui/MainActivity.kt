@@ -880,10 +880,6 @@ class MainActivity :
         if (settings.getEndOfYearShowModal()) showEndOfYearModal()
     }
 
-    override fun updatePlayerView() {
-        binding.playerBottomSheet.sheetBehavior?.updateScrollingChild()
-    }
-
     override fun getPlayerBottomSheetState(): Int {
         return binding.playerBottomSheet.sheetBehavior?.state ?: BottomSheetBehavior.STATE_COLLAPSED
     }
