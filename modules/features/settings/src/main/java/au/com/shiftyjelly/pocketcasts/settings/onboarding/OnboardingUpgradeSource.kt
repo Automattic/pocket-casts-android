@@ -1,16 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.settings.onboarding
 
 enum class OnboardingUpgradeSource(val analyticsValue: String) {
+    ACCOUNT_DETAILS("account_details"),
     APPEARANCE("appearance"),
+    BOOKMARKS("bookmarks"),
+    BOOKMARKS_SHELF_ACTION("bookmarks_shelf_action"),
+    END_OF_YEAR("end_of_year"),
     FILES("files"),
     FOLDERS("folders"),
+    HEADPHONE_CONTROLS_SETTINGS("headphone_controls_settings"),
     LOGIN("login"),
+    OVERFLOW_MENU("overflow_menu"),
     PLUS_DETAILS("plus_details"),
     PROFILE("profile"),
-    ACCOUNT_DETAILS("account_details"),
     RECOMMENDATIONS("recommendations"),
     SETTINGS("settings"),
-    BOOKMARKS("bookmarks"),
-    END_OF_YEAR("end_of_year"),
-    HEADPHONE_CONTROLS_SETTINGS("headphone_controls_settings"),
+    UNKNOWN("unknown"),
 }
