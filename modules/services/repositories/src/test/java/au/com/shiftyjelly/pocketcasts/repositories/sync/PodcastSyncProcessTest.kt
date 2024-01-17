@@ -18,16 +18,16 @@ class PodcastSyncProcessTest {
     @Test
     fun podcastToRecord() {
         val addedDateSinceEpoch = Duration.ofSeconds(123)
-        val podcastMock = mock<Podcast> {
-            on { addedDate } doReturn Date(addedDateSinceEpoch.toMillis())
-            on { folderUuid } doReturn "folderUuid"
-            on { uuid } doReturn "uuid"
-            on { startFromSecs } doReturn 11
-            on { skipLastSecs } doReturn 22
-            on { sortPosition } doReturn 3
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastMock).podcast
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcast(
+                addedDateSinceEpoch = addedDateSinceEpoch,
+                folderUuid = "folderUuid",
+                uuid = "uuid",
+                startFromSecs = 11,
+                skipLastSecs = 22,
+                sortPosition = 3,
+            ),
+        ).podcast
 
         assertEquals(addedDateSinceEpoch.seconds, record.dateAdded.seconds)
         assertEquals("folderUuid", record.folderUuid.value)
@@ -38,13 +38,9 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastToRecord_subscribed() {
-        val podcastMock = mock<Podcast> {
-            on { folderUuid } doReturn "folderUuid"
-            on { uuid } doReturn "uuid"
-            on { isSubscribed } doReturn true
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastMock).podcast
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcast(isSubscribed = true),
+        ).podcast
 
         assertFalse(record.isDeleted.value)
         assertTrue(record.subscribed.value)
@@ -52,12 +48,9 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastToRecord_unsubscribed() {
-        val podcastMock = mock<Podcast> {
-            on { folderUuid } doReturn "folderUuid"
-            on { uuid } doReturn "uuid"
-            on { isSubscribed } doReturn false
-        }
-        val record = PodcastSyncProcess.toRecord(podcastMock).podcast
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcast(isSubscribed = false),
+        ).podcast
 
         assertTrue(record.isDeleted.value)
         assertFalse(record.subscribed.value)
@@ -65,21 +58,18 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_hasFields() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-
-            on { playingStatusModified } doReturn 111
-            on { playingStatus } doReturn EpisodePlayingStatus.IN_PROGRESS
-
-            on { playedUpToModified } doReturn 333
-            on { playedUpTo } doReturn 12.0
-
-            on { durationModified } doReturn 444
-            on { duration } doReturn 13.0
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcastEpisode(
+                uuid = "uuid",
+                podcastUuid = "podcastUuid",
+                playingStatusModified = 111,
+                episodePlayingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                playedUpToModified = 333,
+                playedUpTo = 12.0,
+                durationModified = 444,
+                duration = 13.0,
+            ),
+        ).episode
 
         assertEquals("uuid", record.uuid)
         assertEquals("podcastUuid", record.podcastUuid)
@@ -96,34 +86,31 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_missingFields() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-
-            on { playingStatusModified } doReturn null
-            on { playedUpToModified } doReturn null
-            on { durationModified } doReturn null
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcastEpisode(
+                playingStatusModified = null,
+                playedUpToModified = null,
+                durationModified = null,
+                starredModified = null,
+                archiveModified = null,
+            ),
+        ).episode
 
         assertFalse(record.hasPlayingStatus())
         assertFalse(record.hasPlayedUpTo())
         assertFalse(record.hasDuration())
+        assertFalse(record.hasStarred())
+        assertFalse(record.hasIsDeleted()) // archived
     }
 
     @Test
     fun podcastEpisodeToRecord_starred() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { playingStatusModified } doReturn null // avoids NPE
-
-            on { starredModified } doReturn 123
-            on { isStarred } doReturn true
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcastEpisode(
+                starredModified = 123,
+                isStarred = true,
+            ),
+        ).episode
 
         assertEquals(123, record.starredModified.value)
         assertTrue(record.starred.value)
@@ -131,48 +118,25 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_notStarred() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { playingStatusModified } doReturn null // avoids NPE
-
-            on { starredModified } doReturn 222
-            on { isStarred } doReturn false
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcastEpisode(
+                starredModified = 222,
+                isStarred = false,
+            ),
+        ).episode
 
         assertEquals(222, record.starredModified.value)
         assertFalse(record.starred.value)
     }
 
     @Test
-    fun podcastEpisodeToRecord_starredNotModified() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { playingStatusModified } doReturn null // avoids NPE
-
-            on { starredModified } doReturn null
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
-
-        assertFalse(record.hasStarred())
-    }
-
-    @Test
     fun podcastEpisodeToRecord_archived() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { playingStatusModified } doReturn null // avoids NPE
-
-            on { archivedModified } doReturn 123
-            on { isArchived } doReturn true
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcastEpisode(
+                archiveModified = 123,
+                isArchived = true,
+            ),
+        ).episode
 
         assertEquals(123, record.isDeletedModified.value)
         assertTrue(record.isDeleted.value)
@@ -180,52 +144,33 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_notArchived() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { playingStatusModified } doReturn null // avoids NPE
-
-            on { archivedModified } doReturn 222
-            on { isArchived } doReturn false
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
+        val record = PodcastSyncProcess.toRecord(
+            mockPodcastEpisode(
+                archiveModified = 222,
+                isArchived = false,
+            ),
+        ).episode
 
         assertEquals(222, record.isDeletedModified.value)
         assertFalse(record.isDeleted.value)
     }
 
     @Test
-    fun podcastEpisodeToRecord_archivedNotModified() {
-        val podcastEpisodeMock = mock<PodcastEpisode> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { playingStatusModified } doReturn null // avoids NPE
-
-            on { archivedModified } doReturn null
-        }
-
-        val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
-
-        assertFalse(record.hasIsDeleted())
-    }
-
-    @Test
     fun bookmarkToRecord() {
         val createdDateSinceEpoch = Duration.ofSeconds(123)
-        val bookmarkMock = mock<Bookmark> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { episodeUuid } doReturn "episodeUuid"
-            on { timeSecs } doReturn 11
-            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
-            on { titleModified } doReturn 22
-            on { title } doReturn "title"
-            on { deletedModified } doReturn 33
-            on { deleted } doReturn true
-        }
-
-        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
+        val record = PodcastSyncProcess.toRecord(
+            mockBookmark(
+                uuid = "uuid",
+                podcastUuid = "podcastUuid",
+                episodeUuid = "episodeUuid",
+                timeSecs = 11,
+                createdDateSinceEpoch = createdDateSinceEpoch,
+                titleModified = 22,
+                title = "title",
+                deletedModified = 33,
+                deleted = true,
+            ),
+        ).bookmark
 
         assertEquals("uuid", record.bookmarkUuid)
         assertEquals("podcastUuid", record.podcastUuid)
@@ -240,56 +185,101 @@ class PodcastSyncProcessTest {
 
     @Test
     fun bookmarkToRecord_notDeleted() {
-        val createdDateSinceEpoch = Duration.ofSeconds(123)
-        val bookmarkMock = mock<Bookmark> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { episodeUuid } doReturn "episodeUuid"
-            on { timeSecs } doReturn 11
-            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
-            on { titleModified } doReturn null // avoids NPE
-            on { deletedModified } doReturn 33
-            on { deleted } doReturn false
-        }
-
-        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
-
+        val record = PodcastSyncProcess.toRecord(
+            mockBookmark(
+                deletedModified = 0,
+                deleted = false,
+            ),
+        ).bookmark
         assertFalse(record.isDeleted.value)
     }
 
     @Test
     fun bookmarkToRecord_deletedNotModified() {
-        val createdDateSinceEpoch = Duration.ofSeconds(123)
-        val bookmarkMock = mock<Bookmark> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { episodeUuid } doReturn "episodeUuid"
-            on { timeSecs } doReturn 11
-            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
-            on { titleModified } doReturn null // avoids NPE
-            on { deletedModified } doReturn null
-        }
-
-        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
-
+        val record = PodcastSyncProcess.toRecord(
+            mockBookmark(deletedModified = null),
+        ).bookmark
         assertFalse(record.hasIsDeleted())
     }
 
     @Test
     fun bookmarkToRecord_titleNotModified() {
-        val createdDateSinceEpoch = Duration.ofSeconds(123)
-        val bookmarkMock = mock<Bookmark> {
-            on { uuid } doReturn "uuid"
-            on { podcastUuid } doReturn "podcastUuid"
-            on { episodeUuid } doReturn "episodeUuid"
-            on { timeSecs } doReturn 11
-            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
-            on { titleModified } doReturn null
-            on { deletedModified } doReturn null // avoids NPE
-        }
-
-        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
-
+        val record = PodcastSyncProcess.toRecord(
+            mockBookmark(titleModified = null),
+        ).bookmark
         assertFalse(record.hasTitle())
+    }
+
+    private fun mockPodcast(
+        addedDateSinceEpoch: Duration = Duration.ZERO,
+        folderUuid: String = "",
+        uuid: String = "",
+        startFromSecs: Int = 0,
+        skipLastSecs: Int = 0,
+        sortPosition: Int = 0,
+        isSubscribed: Boolean = false,
+    ) = mock<Podcast> {
+        on { this.addedDate } doReturn Date(addedDateSinceEpoch.toMillis())
+        on { this.folderUuid } doReturn folderUuid
+        on { this.uuid } doReturn uuid
+        on { this.startFromSecs } doReturn startFromSecs
+        on { this.skipLastSecs } doReturn skipLastSecs
+        on { this.sortPosition } doReturn sortPosition
+        on { this.isSubscribed } doReturn isSubscribed
+    }
+
+    private fun mockPodcastEpisode(
+        uuid: String = "",
+        podcastUuid: String = "",
+        playingStatusModified: Long? = null,
+        episodePlayingStatus: EpisodePlayingStatus = EpisodePlayingStatus.IN_PROGRESS,
+        playedUpToModified: Long? = null,
+        playedUpTo: Double = 0.0,
+        durationModified: Long? = null,
+        duration: Double = 0.0,
+        starredModified: Long? = null,
+        isStarred: Boolean = false,
+        archiveModified: Long? = null,
+        isArchived: Boolean = false,
+    ) = mock<PodcastEpisode> {
+        on { this.uuid } doReturn uuid
+        on { this.podcastUuid } doReturn podcastUuid
+
+        on { this.playingStatusModified } doReturn playingStatusModified
+        on { this.playingStatus } doReturn episodePlayingStatus
+
+        on { this.playedUpToModified } doReturn playedUpToModified
+        on { this.playedUpTo } doReturn playedUpTo
+
+        on { this.durationModified } doReturn durationModified
+        on { this.duration } doReturn duration
+
+        on { this.starredModified } doReturn starredModified
+        on { this.isStarred } doReturn isStarred
+
+        on { this.archivedModified } doReturn archiveModified
+        on { this.isArchived } doReturn isArchived
+    }
+
+    private fun mockBookmark(
+        uuid: String = "",
+        podcastUuid: String = "",
+        episodeUuid: String = "",
+        timeSecs: Int = 0,
+        createdDateSinceEpoch: Duration = Duration.ZERO,
+        titleModified: Long? = null,
+        title: String = "",
+        deletedModified: Long? = null,
+        deleted: Boolean = false,
+    ) = mock<Bookmark> {
+        on { this.uuid } doReturn uuid
+        on { this.podcastUuid } doReturn podcastUuid
+        on { this.episodeUuid } doReturn episodeUuid
+        on { this.timeSecs } doReturn timeSecs
+        on { this.createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
+        on { this.titleModified } doReturn titleModified
+        on { this.title } doReturn title
+        on { this.deletedModified } doReturn deletedModified
+        on { this.deleted } doReturn deleted
     }
 }
