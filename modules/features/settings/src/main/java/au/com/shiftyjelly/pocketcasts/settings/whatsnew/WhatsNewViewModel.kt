@@ -7,12 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
+import au.com.shiftyjelly.pocketcasts.utils.earlyaccess.EarlyAccessStrings
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -29,9 +25,7 @@ class WhatsNewViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
-    private val releaseVersion: ReleaseVersionWrapper,
-    private val feature: FeatureWrapper,
-    featureFlag: FeatureFlagWrapper,
+    private val bookmarkFeature: BookmarkFeatureControl,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state = _state.asStateFlow()
@@ -40,20 +34,12 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
-        if (isBookmarksEnabled) {
-            updateStateForBookmarks()
-        } else {
-            _state.value = UiState.Loaded(
-                feature = WhatsNewFeature.AutoPlay,
-                tier = UserTier.Free,
-            )
-        }
+        updateStateForBookmarks()
     }
 
     private fun updateStateForBookmarks() {
         val userTier = settings.userTier
-        val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, userTier)
+        val isUserEntitled = bookmarkFeature.isAvailable(userTier)
         if (isUserEntitled) {
             _state.value = UiState.Loaded(
                 feature = bookmarksFeature(isUserEntitled = true),
@@ -61,12 +47,7 @@ class WhatsNewViewModel @Inject constructor(
             )
         } else {
             viewModelScope.launch {
-                val availableForFeatureTier = if (feature.bookmarksFeature.isCurrentlyExclusiveToPatron(releaseVersion)) {
-                    FeatureTier.Patron
-                } else {
-                    feature.bookmarksFeature.tier
-                }
-                val subscriptionTier = availableForFeatureTier.toSubscriptionTier()
+                val subscriptionTier = Subscription.SubscriptionTier.PLUS
 
                 subscriptionManager
                     .freeTrialForSubscriptionTierFlow(subscriptionTier)
@@ -92,7 +73,7 @@ class WhatsNewViewModel @Inject constructor(
     ): WhatsNewFeature.Bookmarks {
         val currentEpisode = playbackManager.getCurrentEpisode()
         return WhatsNewFeature.Bookmarks(
-            title = titleResId(),
+            title = EarlyAccessStrings.getAppropriateTextResource(LR.string.whats_new_bookmarks_title),
             message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
             confirmButtonTitle = if (currentEpisode == null) LR.string.whats_new_bookmarks_enable_now_button else LR.string.whats_new_bookmarks_try_now_button,
             hasFreeTrial = trialExists,
@@ -100,31 +81,6 @@ class WhatsNewViewModel @Inject constructor(
             subscriptionTier = subscriptionTier,
         )
     }
-
-    private fun titleResId(): Int {
-        val bookmarksFeature = feature.bookmarksFeature
-        val patronExclusiveAccessRelease = (bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
-
-        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
-        val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
-            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-        }
-
-        val showJoinBeta = when (relativeToEarlyPatronAccess) {
-            EarlyAccessState.Before,
-            EarlyAccessState.During,
-            -> isReleaseCandidate
-            EarlyAccessState.After -> false
-            null -> false
-        }
-
-        return if (showJoinBeta) {
-            LR.string.whats_new_boomarks_join_beta_testing_title
-        } else {
-            LR.string.whats_new_bookmarks_title
-        }
-    }
-
     fun onConfirm() {
         viewModelScope.launch {
             val currentState = state.value as? UiState.Loaded ?: return@launch
@@ -145,14 +101,8 @@ class WhatsNewViewModel @Inject constructor(
         }
     }
 
-    private fun FeatureTier.toSubscriptionTier() = when (this) {
-        is FeatureTier.Patron -> Subscription.SubscriptionTier.PATRON
-        is FeatureTier.Plus -> Subscription.SubscriptionTier.PLUS
-        is FeatureTier.Free -> Subscription.SubscriptionTier.UNKNOWN
-    }
-
     sealed class UiState {
-        object Loading : UiState()
+        data object Loading : UiState()
         data class Loaded(
             val feature: WhatsNewFeature,
             val tier: UserTier,
@@ -165,7 +115,7 @@ class WhatsNewViewModel @Inject constructor(
         @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
-        object AutoPlay : WhatsNewFeature(
+        data object AutoPlay : WhatsNewFeature(
             title = LR.string.whats_new_autoplay_title,
             message = LR.string.whats_new_autoplay_body,
             confirmButtonTitle = LR.string.whats_new_autoplay_enable_button,
@@ -187,9 +137,9 @@ class WhatsNewViewModel @Inject constructor(
     }
 
     sealed class NavigationState {
-        object PlaybackSettings : NavigationState()
-        object HeadphoneControlsSettings : NavigationState()
-        object FullScreenPlayerScreen : NavigationState()
-        object StartUpsellFlow : NavigationState()
+        data object PlaybackSettings : NavigationState()
+        data object HeadphoneControlsSettings : NavigationState()
+        data object FullScreenPlayerScreen : NavigationState()
+        data object StartUpsellFlow : NavigationState()
     }
 }

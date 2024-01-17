@@ -45,7 +45,6 @@ Language: es
     <string name="podcast_submit_rating_no_internet">No se ha encontrado ninguna conexión a Internet. Conéctate a Internet para enviar una valoración.</string>
     <string name="podcast_rate">Puntúa %s</string>
     <string name="submit">Enviar</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Únete a nosotros en las pruebas beta de marcadores.</string>
     <string name="whats_new_bookmarks_try_now_button">Probar ahora</string>
     <string name="whats_new_bookmarks_title">Ya están aquí los marcadores.</string>
     <string name="bookmarks_upsell_instructions_early_access">Obtén acceso anticipado a esta función con Pocket Casts Patron y guarda las marcas de tiempo de tus episodios favoritos. Disponible próximamente para los suscriptores Plus.</string>

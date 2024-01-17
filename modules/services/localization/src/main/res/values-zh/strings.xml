@@ -45,7 +45,6 @@ Language: zh_CN
     <string name="podcast_submit_rating_no_internet">未发现互联网连接。 请连接到互联网，以提交评级。</string>
     <string name="podcast_rate">评分 %s</string>
     <string name="submit">提交</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">加入我们的书签 Beta 测试！</string>
     <string name="whats_new_bookmarks_try_now_button">立即试用</string>
     <string name="whats_new_bookmarks_title">书签在这里！</string>
     <string name="bookmarks_upsell_instructions_early_access">通过 Pocket Casts Patron 尽早使用此功能，并保存收藏剧集的时间戳。 即将面向 Plus 订阅用户推出。</string>

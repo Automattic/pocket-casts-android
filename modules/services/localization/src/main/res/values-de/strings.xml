@@ -45,7 +45,6 @@ Language: de
     <string name="podcast_submit_rating_no_internet">Keine Internetverbindung gefunden. Bitte stelle eine Internetverbindung her, um eine Bewertung abzugeben.</string>
     <string name="podcast_rate">%s bewerten</string>
     <string name="submit">Übermitteln</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Sei beim Testen der Beta-Version der Lesezeichen dabei!</string>
     <string name="whats_new_bookmarks_try_now_button">Jetzt testen</string>
     <string name="whats_new_bookmarks_title">Die Lesezeichen sind da!</string>
     <string name="bookmarks_upsell_instructions_early_access">Profitiere mit Pocket Casts Patron von frühzeitigem Zugriff auf diese Funktion und speichere Zeitstempel für deine Lieblingsfolgen. Bald für Plus-Abonnenten verfügbar.</string>

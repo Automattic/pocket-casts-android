@@ -43,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
@@ -224,7 +222,6 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 val layoutBookmark = binding.layoutBookmark
-                layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
                     viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)

@@ -45,7 +45,6 @@ Language: it
     <string name="podcast_submit_rating_no_internet">Nessuna connessione a Internet trovata. Connettiti a Internet per inviare una valutazione.</string>
     <string name="podcast_rate">Valuta %s</string>
     <string name="submit">Invia</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Unisciti a noi per il beta test della funzionalità dei segnalibri.</string>
     <string name="whats_new_bookmarks_try_now_button">Prova ora</string>
     <string name="whats_new_bookmarks_title">I segnalibri sono disponibili.</string>
     <string name="bookmarks_upsell_instructions_early_access">Ottieni l\'accesso anticipato a questa funzionalità con Pocket Casts Patron e salva le date e le ore dei tuoi episodi preferiti. Presto disponibile per gli abbonati a Plus.</string>

@@ -42,8 +42,7 @@ import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -89,6 +88,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject lateinit var warningsHelper: WarningsHelper
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var bookmarkFeature: BookmarkFeatureControl
 
     lateinit var imageLoader: PodcastImageLoaderThemed
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -500,7 +501,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     fun onAddBookmarkClick(source: OnboardingUpgradeSource) {
-        if (Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
+        if (bookmarkFeature.isAvailable(settings.userTier)) {
             viewModel.buildBookmarkArguments { arguments ->
                 activityLauncher.launch(arguments.getIntent(requireContext()))
             }
@@ -512,8 +513,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
-            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }

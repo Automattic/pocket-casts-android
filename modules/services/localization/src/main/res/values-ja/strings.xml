@@ -45,7 +45,6 @@ Language: ja_JP
     <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>
     <string name="podcast_rate">%s を評価する</string>
     <string name="submit">送信</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">ブックマークのベータテストに参加してください !</string>
     <string name="whats_new_bookmarks_try_now_button">今すぐ試す</string>
     <string name="whats_new_bookmarks_title">ブックマークはこちら !</string>
     <string name="bookmarks_upsell_instructions_early_access">お早めに Pocket Casts Patron でこの機能にアクセスすると、お気に入りのエピソードのタイムスタンプを保存できます。 まもなく Plus にご登録の皆さまもご利用いただけるようになります。</string>

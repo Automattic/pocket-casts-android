@@ -31,8 +31,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -196,11 +194,9 @@ class EpisodeContainerFragment :
 
         viewPager.adapter = adapter
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
-                tab.setText(adapter.pageTitle(position))
-            }.attach()
-        }
+        TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
+            tab.setText(adapter.pageTitle(position))
+        }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
@@ -265,14 +261,12 @@ class EpisodeContainerFragment :
             get() = sections.indexOf(Section.Bookmarks)
 
         private sealed class Section(@StringRes val titleRes: Int) {
-            object Details : Section(LR.string.details)
-            object Bookmarks : Section(LR.string.bookmarks)
+            data object Details : Section(LR.string.details)
+            data object Bookmarks : Section(LR.string.bookmarks)
         }
 
         private var sections = mutableListOf<Section>(Section.Details).apply {
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                add(Section.Bookmarks)
-            }
+            add(Section.Bookmarks)
         }.toList()
 
         override fun getItemId(position: Int): Long {

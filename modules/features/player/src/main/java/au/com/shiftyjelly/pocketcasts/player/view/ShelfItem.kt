@@ -7,8 +7,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -22,9 +20,7 @@ object ShelfItems {
         add(ShelfItem.Podcast)
         add(ShelfItem.Cast)
         add(ShelfItem.Played)
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            add(ShelfItem.Bookmark)
-        }
+        add(ShelfItem.Bookmark)
         add(ShelfItem.Archive)
     }
     private val items = itemsList.associateBy { it.id }
