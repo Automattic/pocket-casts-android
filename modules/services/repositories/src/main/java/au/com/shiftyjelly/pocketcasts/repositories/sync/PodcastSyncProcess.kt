@@ -1081,7 +1081,8 @@ class PodcastSyncProcess(
                 }
             }
 
-        private fun toRecord(bookmark: Bookmark): Record =
+        @VisibleForTesting
+        internal fun toRecord(bookmark: Bookmark): Record =
             record {
                 this.bookmark = syncUserBookmark {
                     bookmarkUuid = bookmark.uuid

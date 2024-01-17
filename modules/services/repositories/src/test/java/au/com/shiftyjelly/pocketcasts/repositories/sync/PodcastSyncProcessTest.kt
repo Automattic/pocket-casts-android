@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -207,5 +208,88 @@ class PodcastSyncProcessTest {
         val record = PodcastSyncProcess.toRecord(podcastEpisodeMock).episode
 
         assertFalse(record.hasIsDeleted())
+    }
+
+    @Test
+    fun bookmarkToRecord() {
+        val createdDateSinceEpoch = Duration.ofSeconds(123)
+        val bookmarkMock = mock<Bookmark> {
+            on { uuid } doReturn "uuid"
+            on { podcastUuid } doReturn "podcastUuid"
+            on { episodeUuid } doReturn "episodeUuid"
+            on { timeSecs } doReturn 11
+            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
+            on { titleModified } doReturn 22
+            on { title } doReturn "title"
+            on { deletedModified } doReturn 33
+            on { deleted } doReturn true
+        }
+
+        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
+
+        assertEquals("uuid", record.bookmarkUuid)
+        assertEquals("podcastUuid", record.podcastUuid)
+        assertEquals("episodeUuid", record.episodeUuid)
+        assertEquals(11, record.time.value)
+        assertEquals(createdDateSinceEpoch.seconds, record.createdAt.seconds)
+        assertEquals(22, record.titleModified.value)
+        assertEquals("title", record.title.value)
+        assertEquals(33, record.isDeletedModified.value)
+        assertTrue(record.isDeleted.value)
+    }
+
+    @Test
+    fun bookmarkToRecord_notDeleted() {
+        val createdDateSinceEpoch = Duration.ofSeconds(123)
+        val bookmarkMock = mock<Bookmark> {
+            on { uuid } doReturn "uuid"
+            on { podcastUuid } doReturn "podcastUuid"
+            on { episodeUuid } doReturn "episodeUuid"
+            on { timeSecs } doReturn 11
+            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
+            on { titleModified } doReturn null // avoids NPE
+            on { deletedModified } doReturn 33
+            on { deleted } doReturn false
+        }
+
+        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
+
+        assertFalse(record.isDeleted.value)
+    }
+
+    @Test
+    fun bookmarkToRecord_deletedNotModified() {
+        val createdDateSinceEpoch = Duration.ofSeconds(123)
+        val bookmarkMock = mock<Bookmark> {
+            on { uuid } doReturn "uuid"
+            on { podcastUuid } doReturn "podcastUuid"
+            on { episodeUuid } doReturn "episodeUuid"
+            on { timeSecs } doReturn 11
+            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
+            on { titleModified } doReturn null // avoids NPE
+            on { deletedModified } doReturn null
+        }
+
+        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
+
+        assertFalse(record.hasIsDeleted())
+    }
+
+    @Test
+    fun bookmarkToRecord_titleNotModified() {
+        val createdDateSinceEpoch = Duration.ofSeconds(123)
+        val bookmarkMock = mock<Bookmark> {
+            on { uuid } doReturn "uuid"
+            on { podcastUuid } doReturn "podcastUuid"
+            on { episodeUuid } doReturn "episodeUuid"
+            on { timeSecs } doReturn 11
+            on { createdAt } doReturn Date(createdDateSinceEpoch.toMillis())
+            on { titleModified } doReturn null
+            on { deletedModified } doReturn null // avoids NPE
+        }
+
+        val record = PodcastSyncProcess.toRecord(bookmarkMock).bookmark
+
+        assertFalse(record.hasTitle())
     }
 }
