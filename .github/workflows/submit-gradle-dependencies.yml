@@ -20,4 +20,4 @@ jobs:
         with:
           dependency-graph: generate-and-submit
       - name: Generate the dependency graph which will be submitted post-job
-        run: ./gradlew :app:dependencies
+        run: ./gradlew :app:dependencies :automotive:dependencies :wear:dependencies
