@@ -156,7 +156,7 @@ class PodcastSyncProcess(
         val syncUpdateResponse = SyncUpdateResponse.fromProtobufSyncUpdateResponse(protobufResponse)
         processServerResponse(
             response = syncUpdateResponse,
-            episodes = emptyList(), // empty list because this call is not syncing episode data (yet)
+            episodes = episodesToSync,
         ).await()
     }
 
