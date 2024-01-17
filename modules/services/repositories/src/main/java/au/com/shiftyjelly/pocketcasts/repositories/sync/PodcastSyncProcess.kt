@@ -51,6 +51,7 @@ import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.syncUpdateRequest
 import com.pocketcasts.service.api.syncUserEpisode
 import com.pocketcasts.service.api.syncUserFolder
+import com.pocketcasts.service.api.syncUserPlaylist
 import com.pocketcasts.service.api.syncUserPodcast
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -195,6 +196,10 @@ class PodcastSyncProcess(
                 val folderRecords = folderManager.findFoldersToSync()
                     .map { toRecord(it) }
                 records.addAll(folderRecords)
+
+                val playlistRecords = playlistManager.findPlaylistsToSync()
+                    .map { toRecord(it) }
+                records.addAll(playlistRecords)
             }
         } catch (e: Exception) {
             Timber.e(e, "Unable to upload podcast to sync.")
@@ -1034,6 +1039,38 @@ class PodcastSyncProcess(
                     sortPosition = folder.sortPosition
                     podcastsSortType = folder.podcastsSortType.serverId
                     dateAdded = folder.addedDate.toProtobufTimestamp()
+                }
+            }
+
+        private fun toRecord(playlist: Playlist): Record =
+            record {
+                this.playlist = syncUserPlaylist {
+                    uuid = playlist.uuid
+                    originalUuid = playlist.uuid // DO NOT REMOVE: server side this field is important, because it will remain the same upper/lower case
+                    isDeleted = boolValue { value = playlist.deleted }
+                    title = stringValue { value = playlist.title }
+                    allPodcasts = boolValue { value = playlist.allPodcasts }
+                    playlist.podcastUuids?.let {
+                        podcastUuids = stringValue { value = it }
+                    }
+                    audioVideo = int32Value { value = playlist.audioVideo }
+                    notDownloaded = boolValue { value = playlist.notDownloaded }
+                    downloaded = boolValue { value = playlist.downloaded }
+                    downloading = boolValue { value = playlist.downloading }
+                    finished = boolValue { value = playlist.finished }
+                    partiallyPlayed = boolValue { value = playlist.partiallyPlayed }
+                    unplayed = boolValue { value = playlist.unplayed }
+                    starred = boolValue { value = playlist.starred }
+                    manual = boolValue { value = playlist.manual }
+                    playlist.sortPosition?.let {
+                        sortPosition = int32Value { value = it }
+                    }
+                    sortType = int32Value { value = playlist.sortId }
+                    iconId = int32Value { value = playlist.iconId }
+                    filterHours = int32Value { value = playlist.filterHours }
+                    filterDuration = boolValue { value = playlist.filterDuration }
+                    longerThan = int32Value { value = playlist.longerThan }
+                    shorterThan = int32Value { value = playlist.shorterThan }
                 }
             }
     }

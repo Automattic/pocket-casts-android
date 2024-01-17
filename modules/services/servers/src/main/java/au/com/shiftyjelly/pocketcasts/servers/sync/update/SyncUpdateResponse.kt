@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.SyncUserFolder
+import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
 import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
@@ -21,6 +22,7 @@ import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
 import com.pocketcasts.service.api.playingStatusOrNull
+import com.pocketcasts.service.api.playlistOrNull
 import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.starredOrNull
@@ -110,6 +112,10 @@ data class SyncUpdateResponse(
                     .mapNotNull { it.folderOrNull }
                     .mapNotNull { syncUserFolderToFolder(it) }
                     .toMutableList(),
+                playlists = source.recordsList
+                    .mapNotNull { it.playlistOrNull }
+                    .map { syncUserPlaylistToPlaylist(it) }
+                    .toMutableList(),
             )
     }
 }
@@ -130,3 +136,29 @@ private fun syncUserFolderToFolder(syncUserFolder: SyncUserFolder): Folder? =
         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "unable to parse dateAdded from syncUserFolder: dateAdded: ${syncUserFolder.dateAddedOrNull}, folder name: ${syncUserFolder.name}")
         null
     }
+
+private fun syncUserPlaylistToPlaylist(syncUserPlaylist: SyncUserPlaylist): Playlist =
+    Playlist(
+        uuid = syncUserPlaylist.originalUuid, // it's important to use originalUuid, not uuid because the server won't change the upper/lower case of this one
+        deleted = syncUserPlaylist.isDeleted.value,
+        title = syncUserPlaylist.title.value,
+        audioVideo = syncUserPlaylist.audioVideo.value,
+        notDownloaded = syncUserPlaylist.notDownloaded.value,
+        downloaded = syncUserPlaylist.downloaded.value,
+        downloading = syncUserPlaylist.downloading.value,
+        finished = syncUserPlaylist.finished.value,
+        partiallyPlayed = syncUserPlaylist.partiallyPlayed.value,
+        unplayed = syncUserPlaylist.unplayed.value,
+        starred = syncUserPlaylist.starred.value,
+        manual = syncUserPlaylist.manual.value,
+        sortPosition = syncUserPlaylist.sortPosition.value,
+        sortId = syncUserPlaylist.sortType.value,
+        iconId = syncUserPlaylist.iconId.value,
+        allPodcasts = syncUserPlaylist.allPodcasts.value,
+        podcastUuids = syncUserPlaylist.podcastUuids.value,
+        filterHours = syncUserPlaylist.filterHours.value,
+        syncStatus = Playlist.SYNC_STATUS_SYNCED,
+        filterDuration = syncUserPlaylist.filterDuration.value,
+        longerThan = syncUserPlaylist.longerThan.value,
+        shorterThan = syncUserPlaylist.shorterThan.value,
+    )
