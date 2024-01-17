@@ -4,8 +4,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.SyncUserEpisode
+import com.pocketcasts.service.api.SyncUserFolder
 import com.pocketcasts.service.api.SyncUserPodcast
 import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
@@ -13,6 +16,7 @@ import com.pocketcasts.service.api.dateAddedOrNull
 import com.pocketcasts.service.api.durationOrNull
 import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.episodesSortOrderOrNull
+import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
@@ -102,6 +106,27 @@ data class SyncUpdateResponse(
                     .mapNotNull { it.episodeOrNull }
                     .map { EpisodeSync.fromSyncUserEpisode(it) }
                     .toMutableList(),
+                folders = source.recordsList
+                    .mapNotNull { it.folderOrNull }
+                    .mapNotNull { syncUserFolderToFolder(it) }
+                    .toMutableList(),
             )
     }
 }
+
+private fun syncUserFolderToFolder(syncUserFolder: SyncUserFolder): Folder? =
+    syncUserFolder.dateAddedOrNull?.toDate()?.let { syncUserFolderDateAdded ->
+        Folder(
+            uuid = syncUserFolder.folderUuid,
+            name = syncUserFolder.name,
+            sortPosition = syncUserFolder.sortPosition,
+            addedDate = syncUserFolderDateAdded,
+            color = syncUserFolder.color,
+            podcastsSortType = PodcastsSortType.fromServerId(syncUserFolder.podcastsSortType),
+            deleted = syncUserFolder.isDeleted,
+            syncModified = Folder.SYNC_MODIFIED_FROM_SERVER,
+        )
+    } ?: run {
+        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "unable to parse dateAdded from syncUserFolder: dateAdded: ${syncUserFolder.dateAddedOrNull}, folder name: ${syncUserFolder.name}")
+        null
+    }

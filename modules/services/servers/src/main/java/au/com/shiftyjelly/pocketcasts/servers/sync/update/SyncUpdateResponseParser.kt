@@ -221,7 +221,7 @@ class SyncUpdateResponseParser(
                 sortPosition = sortPosition,
                 podcastsSortType = podcastsSortType,
                 deleted = deleted,
-                syncModified = 0,
+                syncModified = Folder.SYNC_MODIFIED_FROM_SERVER,
             )
             response.folders.add(folder)
         }

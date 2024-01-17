@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.protobuf.Timestamp
 import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
@@ -49,6 +50,7 @@ import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.syncUpdateRequest
 import com.pocketcasts.service.api.syncUserEpisode
+import com.pocketcasts.service.api.syncUserFolder
 import com.pocketcasts.service.api.syncUserPodcast
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -189,6 +191,10 @@ class PodcastSyncProcess(
 
                 val episodeRecords = episodesToSync.map { toRecord(it) }
                 records.addAll(episodeRecords)
+
+                val folderRecords = folderManager.findFoldersToSync()
+                    .map { toRecord(it) }
+                records.addAll(folderRecords)
             }
         } catch (e: Exception) {
             Timber.e(e, "Unable to upload podcast to sync.")
@@ -1017,5 +1023,23 @@ class PodcastSyncProcess(
                     }
                 }
             }
+
+        private fun toRecord(folder: Folder): Record =
+            record {
+                this.folder = syncUserFolder {
+                    folderUuid = folder.uuid
+                    isDeleted = folder.deleted
+                    name = folder.name
+                    color = folder.color
+                    sortPosition = folder.sortPosition
+                    podcastsSortType = folder.podcastsSortType.serverId
+                    dateAdded = folder.addedDate.toProtobufTimestamp()
+                }
+            }
     }
 }
+
+private fun Date.toProtobufTimestamp(): Timestamp =
+    timestamp {
+        seconds = toInstant().epochSecond
+    }

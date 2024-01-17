@@ -27,7 +27,7 @@ data class FolderResponse(
             sortPosition = sortPosition ?: 0,
             podcastsSortType = PodcastsSortType.fromServerId(podcastsSortType?.serverId),
             deleted = false,
-            syncModified = 0,
+            syncModified = Folder.SYNC_MODIFIED_FROM_SERVER,
         )
     }
 }
