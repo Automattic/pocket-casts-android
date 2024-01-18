@@ -491,7 +491,8 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun getSyncUserDevice(): SyncUserDevice? =
+    @VisibleForTesting
+    internal fun getSyncUserDevice(): SyncUserDevice? =
         if (statsManager.isSynced(settings) || statsManager.isEmpty) {
             null
         } else {
@@ -991,6 +992,9 @@ class PodcastSyncProcess(
     companion object {
 
         @VisibleForTesting
+        internal val ANDROID_DEVICE_TYPE = 2
+
+        @VisibleForTesting
         internal fun toRecord(podcast: Podcast): Record =
             record {
                 this.podcast = syncUserPodcast {
@@ -1136,8 +1140,6 @@ class PodcastSyncProcess(
             }
     }
 }
-
-private const val ANDROID_DEVICE_TYPE = 2
 
 private fun Date.toProtobufTimestamp(): Timestamp =
     timestamp {
