@@ -975,6 +975,8 @@ class PodcastSyncProcess(
                         }
                     }
 
+                    // In older versions of Pocket Casts it was possible to subscribe or delete
+                    // a podcast. Send both values to ensure we don't break backward compatibility.
                     isDeleted = boolValue { value = !podcast.isSubscribed }
                     subscribed = boolValue { value = podcast.isSubscribed }
 
