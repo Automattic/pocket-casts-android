@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
-import au.com.shiftyjelly.pocketcasts.models.to.StatsBundleData
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
@@ -686,13 +685,13 @@ class PodcastSyncProcess(
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
             .andThen(updateShortcuts(response.playlists))
-            .andThen(cacheStats(response.statsBundleData))
+            .andThen(cacheStats())
             .toSingle { response.lastModified }
     }
 
-    private fun cacheStats(statsBundleData: StatsBundleData? = null): Completable {
+    private fun cacheStats(): Completable {
         return rxCompletable {
-            statsManager.cacheMergedStats(statsBundleData)
+            statsManager.cacheMergedStats()
             statsManager.setSyncStatus(true)
         }
     }

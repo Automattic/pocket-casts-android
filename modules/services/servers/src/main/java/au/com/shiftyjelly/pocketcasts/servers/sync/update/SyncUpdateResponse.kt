@@ -3,14 +3,12 @@ package au.com.shiftyjelly.pocketcasts.servers.sync.update
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
-import au.com.shiftyjelly.pocketcasts.models.to.StatsBundleData
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.SyncUserBookmark
-import com.pocketcasts.service.api.SyncUserDevice
 import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.SyncUserFolder
 import com.pocketcasts.service.api.SyncUserPlaylist
@@ -19,7 +17,6 @@ import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
-import com.pocketcasts.service.api.deviceOrNull
 import com.pocketcasts.service.api.durationOrNull
 import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.episodesSortOrderOrNull
@@ -36,8 +33,6 @@ import com.pocketcasts.service.api.subscribedOrNull
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 data class SyncUpdateResponse(
     var lastModified: String? = null,
@@ -47,7 +42,6 @@ data class SyncUpdateResponse(
     val podcasts: MutableList<PodcastSync> = mutableListOf(),
     val folders: MutableList<Folder> = mutableListOf(),
     val bookmarks: MutableList<Bookmark> = mutableListOf(),
-    val statsBundleData: StatsBundleData? = null,
 ) {
 
     data class PodcastSync(
@@ -129,9 +123,6 @@ data class SyncUpdateResponse(
                     .mapNotNull { it.bookmarkOrNull }
                     .map { syncUserBookmarkToBookmark(it) }
                     .toMutableList(),
-                statsBundleData = source.recordsList
-                    .firstNotNullOfOrNull { it.deviceOrNull }
-                    ?.let { syncUserDeviceToStatsBundleData(it) },
             )
     }
 }
@@ -195,14 +186,4 @@ private fun syncUserBookmarkToBookmark(syncUserBookmark: SyncUserBookmark): Book
         deletedModified = syncUserBookmark.isDeletedModified.value,
         syncStatus = SyncStatus.SYNCED,
 
-    )
-
-private fun syncUserDeviceToStatsBundleData(syncUserDevice: SyncUserDevice) =
-    StatsBundleData(
-        timeSilenceRemoval = syncUserDevice.timeSilenceRemoval.value.toDuration(DurationUnit.SECONDS),
-        timeSkipping = syncUserDevice.timeSkipping.value.toDuration(DurationUnit.SECONDS),
-        timeIntroSkipping = syncUserDevice.timeIntroSkipping.value.toDuration(DurationUnit.SECONDS),
-        timeVariableSpeed = syncUserDevice.timeVariableSpeed.value.toDuration(DurationUnit.SECONDS),
-        timeListened = syncUserDevice.timeListened.value.toDuration(DurationUnit.SECONDS),
-        startedAt = Date(syncUserDevice.timesStartedAt.value),
     )

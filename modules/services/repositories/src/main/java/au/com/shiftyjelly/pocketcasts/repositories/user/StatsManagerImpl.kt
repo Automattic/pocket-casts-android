@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.user
 
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
-import au.com.shiftyjelly.pocketcasts.models.to.StatsBundleData
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import io.reactivex.Single
@@ -219,9 +218,9 @@ class StatsManagerImpl @Inject constructor(
         return syncManager.loadStats()
     }
 
-    override suspend fun cacheMergedStats(statsBundleData: StatsBundleData?) {
+    override suspend fun cacheMergedStats() {
         try {
-            val stats = statsBundleData?.toStatsBundle() ?: getServerStats()
+            val stats = getServerStats()
             cachedServerStats = stats.values
             cachedMergedStats = mergeStats(stats.values, localStatsInServerFormat)
             persistTimes()
