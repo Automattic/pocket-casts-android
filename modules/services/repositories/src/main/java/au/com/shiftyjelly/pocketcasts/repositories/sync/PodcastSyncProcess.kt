@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -158,7 +159,13 @@ class PodcastSyncProcess(
     private suspend fun performIncrementalSyncSuspend(lastModified: String) {
         val episodesToSync = episodeManager.findEpisodesToSync()
         val syncUpdateRequest = getSyncUpdateRequest(lastModified, episodesToSync)
+        if (BuildConfig.DEBUG) {
+            Timber.i("incremental sync request: $syncUpdateRequest")
+        }
         val protobufResponse = syncManager.userSyncUpdate(syncUpdateRequest)
+        if (BuildConfig.DEBUG) {
+            Timber.i("incremental sync response: $protobufResponse")
+        }
         val syncUpdateResponse = SyncUpdateResponse.fromProtobufSyncUpdateResponse(protobufResponse)
         processServerResponse(
             response = syncUpdateResponse,
