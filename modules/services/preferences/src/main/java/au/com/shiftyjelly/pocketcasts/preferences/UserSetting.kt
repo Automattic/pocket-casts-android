@@ -54,7 +54,7 @@ abstract class UserSetting<T>(
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    open fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
+    open fun set(value: T, commit: Boolean = false, needsSync: Boolean) {
         persist(value, commit)
         _flow.value = value
         val modifiedAt = if (needsSync) Instant.now().toString() else null

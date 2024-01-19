@@ -62,12 +62,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setWarnOnMeteredNetwork(warnOnMeteredNetwork: Boolean) {
-        settings.warnOnMeteredNetwork.set(warnOnMeteredNetwork)
+        settings.warnOnMeteredNetwork.set(warnOnMeteredNetwork, needsSync = false)
         _state.update { it.copy(showDataWarning = warnOnMeteredNetwork) }
     }
 
     fun setRefreshPodcastsInBackground(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked)
+        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = false)
         _state.update { it.copy(refreshInBackground = isChecked) }
     }
 

@@ -159,7 +159,7 @@ class StorageSettingsViewModel
     }
 
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
-        settings.warnOnMeteredNetwork.set(isChecked)
+        settings.warnOnMeteredNetwork.set(isChecked, needsSync = false)
         updateMobileDataWarningState()
     }
 
@@ -172,7 +172,7 @@ class StorageSettingsViewModel
     }
 
     private fun onBackgroundRefreshCheckedChange(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked)
+        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = false)
         updateBackgroundRefreshState()
     }
 

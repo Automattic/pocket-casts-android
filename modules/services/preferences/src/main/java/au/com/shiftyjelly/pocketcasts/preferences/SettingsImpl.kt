@@ -445,10 +445,10 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        deleteCloudFileAfterPlaying.set(false)
-        cloudAutoUpload.set(false)
-        cloudAutoDownload.set(false)
-        cloudDownloadOnlyOnWifi.set(false)
+        deleteCloudFileAfterPlaying.set(false, needsSync = false)
+        cloudAutoUpload.set(false, needsSync = false)
+        cloudAutoDownload.set(false, needsSync = false)
+        cloudDownloadOnlyOnWifi.set(false, needsSync = false)
         setCancelledAcknowledged(false)
     }
 
@@ -537,9 +537,9 @@ class SettingsImpl @Inject constructor(
         }
 
         override fun persist(value: PlaybackEffects, commit: Boolean) {
-            globalPlaybackSpeed.set(value.playbackSpeed)
-            globalAudioEffectRemoveSilence.set(value.trimMode)
-            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted)
+            globalPlaybackSpeed.set(value.playbackSpeed, needsSync = false)
+            globalAudioEffectRemoveSilence.set(value.trimMode, needsSync = false)
+            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted, needsSync = false)
         }
     }
 
