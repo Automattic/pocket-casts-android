@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.SUBSCRIPTION_TEST_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -175,6 +176,12 @@ class SubscriptionManagerImpl @Inject constructor(
                 add(
                     QueryProductDetailsParams.Product.newBuilder()
                         .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                )
+                add(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(SUBSCRIPTION_TEST_PRODUCT_ID)
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build(),
                 )
