@@ -25,7 +25,7 @@ PLAY_STORE_TRACK_PRODUCTION = 'production'
 GLOTPRESS_APP_STRINGS_PROJECT_URL = 'https://translate.wordpress.com/projects/pocket-casts/android/'
 VERSION_PROPERTIES_PATH = File.join(PROJECT_ROOT_FOLDER, 'version.properties')
 
-# Instanstiate versioning classes
+# Instantiate versioning classes
 VERSION_CALCULATOR = Fastlane::Wpmreleasetoolkit::Versioning::SemanticVersionCalculator.new
 VERSION_FORMATTER = Fastlane::Wpmreleasetoolkit::Versioning::RCNotationVersionFormatter.new
 BUILD_CODE_CALCULATOR = Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeCalculator.new
@@ -73,7 +73,7 @@ before_all do |_lane|
   # Check that the env files exist
   unless is_ci || File.file?(USER_ENV_FILE_PATH)
     example_path = File.join(PROJECT_ROOT_FOLDER, 'fastlane/env/user.env-example')
-    UI.user_error! "#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values."
+    UI.user_error!("#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values.")
   end
 end
 
@@ -90,29 +90,27 @@ platform :android do
       • Current release version and build code: #{release_version_current} (#{build_code_current}).
       • New release version and build code: #{first_beta_version} (#{build_code_next}).
 
-      Do you want to continue?
-
     MESSAGE
 
-    # Ask user confirmation
-    UI.user_error!('Aborted by user request') unless options[:skip_confirm] || UI.confirm(confirmation_message)
+    UI.important(confirmation_message)
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     # Create the release branch
-    UI.message 'Creating release branch...'
+    UI.message('Creating release branch...')
     Fastlane::Helper::GitHelper.create_branch("release/#{release_version_next}", from: DEFAULT_BRANCH)
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
-    UI.success "Done! New release branch is: #{git_branch}"
+    UI.success("Done! New release branch is: #{git_branch}")
 
     # Bump the version and build code
-    UI.message 'Bumping beta version and build code...'
+    UI.message('Bumping beta version and build code...')
     VERSION_FILE.write_version(
       version_name: first_beta_version,
       version_code: build_code_next
     )
-    UI.success "Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}"
-
-    # Commit the version bump
     commit_version_bump
+    UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
 
     new_version = release_version_current
 
@@ -137,8 +135,9 @@ platform :android do
     new_version = release_version_current
 
     UI.important("Completing code freeze for: #{new_version}")
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
@@ -167,19 +166,20 @@ platform :android do
     override_default_release_branch(options[:base_version]) unless options[:base_version].nil?
 
     UI.important(message)
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     # Bump the release version and build code
-    UI.message 'Bumping beta version and build code...'
+    UI.message('Bumping beta version and build code...')
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     VERSION_FILE.write_version(
       version_name: beta_version_next,
       version_code: build_code_next
     )
-    UI.success "Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}"
-
     commit_version_bump
+    UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
+
     push_to_git_remote(tags: false)
 
     trigger_release_build(branch_to_build: "release/#{release_version_current}")
@@ -218,27 +218,27 @@ platform :android do
     MESSAGE
 
     UI.important(message)
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     # Check tags
     UI.user_error!("The version `#{new_version}` tag already exists!") if git_tag_exists(tag: new_version)
     UI.user_error!("Version #{previous_version} is not tagged! A hotfix branch cannot be created.") unless git_tag_exists(tag: previous_version)
 
     # Create the hotfix branch
-    UI.message 'Creating hotfix branch...'
+    UI.message('Creating hotfix branch...')
     Fastlane::Helper::GitHelper.create_branch("release/#{new_version}", from: previous_version)
-    UI.success "Done! New hotfix branch is: #{git_branch}"
+    UI.success("Done! New hotfix branch is: #{git_branch}")
 
     # Bump the hotfix version and build code and write it to the `version.properties` file
-    UI.message 'Bumping hotfix version and build code...'
+    UI.message('Bumping hotfix version and build code...')
     VERSION_FILE.write_version(
       version_name: new_version,
       version_code: new_version_code
     )
-    UI.success "Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}"
-
     commit_version_bump
+    UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
   lane :finalize_hotfix_release do
@@ -246,8 +246,9 @@ platform :android do
     ensure_git_status_clean
 
     UI.important("Triggering hotfix build for version: #{release_version_current}")
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     trigger_release_build(branch_to_build: "release/#{release_version_current}")
   end
@@ -281,8 +282,9 @@ platform :android do
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-
-      UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+      unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+        UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+      end
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
@@ -331,19 +333,20 @@ platform :android do
     ensure_git_status_clean
 
     UI.important("Finalizing release: #{release_version_current}")
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     configure_apply(force: is_ci)
 
     # Bump the release version and build code
-    UI.message 'Bumping final release version and build code...'
+    UI.message('Bumping final release version and build code...')
     VERSION_FILE.write_version(
       version_name: release_version_current,
       version_code: build_code_next
     )
     commit_version_bump
-    UI.success "Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}"
+    UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
 
     # Download Localizations
     android_download_translations(
@@ -467,7 +470,7 @@ platform :android do
     success = Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
     UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless success
 
-    UI.message "Checked out branch `#{git_branch}` as requested by user.\n"
+    UI.message("Checked out branch `#{git_branch}` as requested by user.\n")
   end
 
   #####################################################################################
