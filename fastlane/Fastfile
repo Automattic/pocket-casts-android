@@ -208,7 +208,6 @@ platform :android do
     # Check versions
     message = <<-MESSAGE
 
-      Current release version: #{release_version_current}
       New hotfix version: #{new_version}
 
       Current build code: #{build_code_current}
