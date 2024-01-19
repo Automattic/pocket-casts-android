@@ -490,7 +490,7 @@ platform :android do
   # Returns the release version of the app in the format `1.2` or `1.2.3` if it is a hotfix
   #
   def current_release_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
     current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
     # Return the formatted release version
     VERSION_FORMATTER.release_version(current_version)
@@ -499,7 +499,7 @@ platform :android do
   #  Returns the next release version of the app in the format `1.2` or `1.2.3` if it is a hotfix
   #
   def next_release_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
     current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
     # Calculate the next release version
     next_release_version = VERSION_CALCULATOR.next_release_version(version: current_version)
@@ -510,7 +510,7 @@ platform :android do
   # Returns the beta version of the app in the format `1.2-rc-1`
   #
   def current_beta_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
     current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
     # Return the formatted release version
     VERSION_FORMATTER.beta_version(current_version)
@@ -520,7 +520,7 @@ platform :android do
   # It first increments the minor number, which also resets the build number to 0
   # It then bumps the build number so the -rc-1 can be appended to the code freeze version
   def first_beta_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    # Read the current release version from the version.properties file and parse it into an AppVersion object
     current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
     # Calculate the next major version number
     first_beta_version = VERSION_CALCULATOR.next_minor_version(version: current_version)
@@ -533,7 +533,7 @@ platform :android do
   # Returns the beta version of the app in the format `1.2-rc-1`
   #
   def next_beta_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
     current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
     # Calculate the next beta version
     next_beta_version = VERSION_CALCULATOR.next_build_number(version: current_version)
@@ -544,7 +544,7 @@ platform :android do
   # Returns the current build code of the app
   #
   def current_build_code
-    # Read the current build code from the version.properties file into to a BuildCode object
+    # Read the current build code from `version.properties` into to a BuildCode object
     current_build_code = VERSION_FILE.read_version_code
     # Return the formatted build code
     BUILD_CODE_FORMATTER.build_code(build_code: current_build_code)
@@ -553,7 +553,7 @@ platform :android do
   # Returns the next build code of the app
   #
   def next_build_code
-    # Read the current build code from the version.properties file into to a BuildCode object
+    # Read the current build code from `version.properties` into to a BuildCode object
     current_build_code = VERSION_FILE.read_version_code
     # Calculate the next build code
     next_build_code = BUILD_CODE_CALCULATOR.next_build_code(build_code: current_build_code)
