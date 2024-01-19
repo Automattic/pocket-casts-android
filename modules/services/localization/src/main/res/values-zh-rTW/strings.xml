@@ -45,7 +45,6 @@ Language: zh_TW
     <string name="podcast_submit_rating_no_internet">找不到網際網路連線。 若要提交評分，請先連線至網際網路。</string>
     <string name="podcast_rate">為 %s 評分</string>
     <string name="submit">提交</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">加入我們的書籤 Beta 測試！</string>
     <string name="whats_new_bookmarks_try_now_button">立即試試</string>
     <string name="whats_new_bookmarks_title">書籤登場！</string>
     <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>
@@ -334,9 +333,9 @@ Language: zh_TW
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB 雲端儲存空間</string>
     <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並同步到所有裝置。</string>
-    <string name="onboarding_plus_feature_folders_title">資料夾</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">資料夾</string>
     <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，享受更多元的收聽方式。</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">桌面應用程式</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面應用程式</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">包含所有你喜愛的 Pocket Casts 功能，以及更多好康</string>
     <string name="onboarding_recommendations_import">匯入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">選取你最愛的 Podcast，或從其他 Podcast 播放器匯入，打造你專屬的 Pocket Casts。 你可以稍後進行。</string>

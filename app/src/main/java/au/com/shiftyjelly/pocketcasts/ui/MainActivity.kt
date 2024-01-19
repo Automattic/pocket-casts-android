@@ -169,6 +169,7 @@ class MainActivity :
     companion object {
         private const val INITIAL_KEY = "initial"
         private const val SOURCE_KEY = "source"
+        private const val SOCIAL_SHARE_PATH = "/social/share/show"
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -879,10 +880,6 @@ class MainActivity :
         if (settings.getEndOfYearShowModal()) showEndOfYearModal()
     }
 
-    override fun updatePlayerView() {
-        binding.playerBottomSheet.sheetBehavior?.updateScrollingChild()
-    }
-
     override fun getPlayerBottomSheetState(): Int {
         return binding.playerBottomSheet.sheetBehavior?.state ?: BottomSheetBehavior.STATE_COLLAPSED
     }
@@ -1278,6 +1275,7 @@ class MainActivity :
                     return
                 } else if (IntentUtil.isNativeShareLink(intent)) {
                     openNativeSharingUrl(intent)
+                    return
                 }
 
                 val scheme = intent.scheme
@@ -1418,10 +1416,14 @@ class MainActivity :
 
     @Suppress("DEPRECATION")
     private fun openSharingUrl(intent: Intent) {
-        val url = intent.data?.path ?: return
+        var sharePath = intent.data?.path ?: return
+        // Prepend social share path to native sharing path
+        if (intent.data?.pathSegments?.size == 1) {
+            sharePath = "$SOCIAL_SHARE_PATH$sharePath"
+        }
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
-            url,
+            sharePath,
             object : ServerCallback<au.com.shiftyjelly.pocketcasts.models.to.Share> {
                 override fun dataReturned(result: au.com.shiftyjelly.pocketcasts.models.to.Share?) {
                     UiUtil.hideProgressDialog(dialog)
@@ -1474,10 +1476,13 @@ class MainActivity :
     @Suppress("DEPRECATION")
     private fun openNativeSharingUrl(intent: Intent) {
         val urlSegments = intent.data?.pathSegments ?: return
-        if (urlSegments.size < 2) return
+        if (urlSegments.size < 2) {
+            openSharingUrl(intent)
+            return
+        }
 
         when (urlSegments[0]) {
-            "podcast" -> openPodcastUrl(urlSegments[1])
+            "podcast" -> openPodcastUrl(IntentUtil.getUrl(intent))
             "episode" -> openEpisodeDialog(
                 episodeUuid = urlSegments[1],
                 source = EpisodeViewSource.SHARE,

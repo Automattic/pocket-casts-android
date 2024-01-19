@@ -45,7 +45,6 @@ Language: es
     <string name="podcast_submit_rating_no_internet">No se ha encontrado ninguna conexión a Internet. Conéctate a Internet para enviar una valoración.</string>
     <string name="podcast_rate">Puntúa %s</string>
     <string name="submit">Enviar</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Únete a nosotros en las pruebas beta de marcadores.</string>
     <string name="whats_new_bookmarks_try_now_button">Probar ahora</string>
     <string name="whats_new_bookmarks_title">Ya están aquí los marcadores.</string>
     <string name="bookmarks_upsell_instructions_early_access">Obtén acceso anticipado a esta función con Pocket Casts Patron y guarda las marcas de tiempo de tus episodios favoritos. Disponible próximamente para los suscriptores Plus.</string>
@@ -334,9 +333,9 @@ Language: es
     <string name="onboarding_plus_feature_cloud_storage_text">Carga tus archivos en el almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Almacenamiento en la nube de 20 GB</string>
     <string name="onboarding_plus_feature_folders_text">Organiza tus pódcast en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
-    <string name="onboarding_plus_feature_folders_title">Carpetas</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Carpetas</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Escucha pódcast en más lugares con nuestras aplicaciones para Windows, macOs y web.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Aplicaciones para ordenador</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicaciones para ordenador</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Haz tuya la aplicación Pocket Casts seleccionando tus pódcast favoritos o impórtalos desde otro reproductor de pódcast. Siempre puedes hacerlo más adelante.</string>

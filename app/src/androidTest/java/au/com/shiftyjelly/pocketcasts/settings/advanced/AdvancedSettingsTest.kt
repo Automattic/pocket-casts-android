@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
@@ -26,6 +27,7 @@ class AdvancedSettingsTest {
             context = context,
             firebaseRemoteConfig = firebaseRemoteConfig,
             moshi = moshi,
+            bookmarkFeature = BookmarkFeatureControl(),
         )
 
         // Non-advanced settings

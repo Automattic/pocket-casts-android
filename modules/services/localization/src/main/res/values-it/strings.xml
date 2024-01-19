@@ -45,7 +45,6 @@ Language: it
     <string name="podcast_submit_rating_no_internet">Nessuna connessione a Internet trovata. Connettiti a Internet per inviare una valutazione.</string>
     <string name="podcast_rate">Valuta %s</string>
     <string name="submit">Invia</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Unisciti a noi per il beta test della funzionalità dei segnalibri.</string>
     <string name="whats_new_bookmarks_try_now_button">Prova ora</string>
     <string name="whats_new_bookmarks_title">I segnalibri sono disponibili.</string>
     <string name="bookmarks_upsell_instructions_early_access">Ottieni l\'accesso anticipato a questa funzionalità con Pocket Casts Patron e salva le date e le ore dei tuoi episodi preferiti. Presto disponibile per gli abbonati a Plus.</string>
@@ -334,9 +333,9 @@ Language: it
     <string name="onboarding_plus_feature_cloud_storage_text">Carica i tuoi file sull\'archiviazione su cloud e rendili disponibili per qualsiasi postazione.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB di archiviazione su cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organizza i tuoi podcast in cartelle e sincronizzali su tutti i dispositivi.</string>
-    <string name="onboarding_plus_feature_folders_title">Cartelle</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Cartelle</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ascolta da più postazioni con le app per Windows, macOS e web.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">App per desktop</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">App per desktop</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tutto ciò che ti piace di Pocket Casts e molto altro</string>
     <string name="onboarding_recommendations_import">Importa</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Personalizza Pocket Casts selezionando i tuoi podcast preferiti o importali da un altro Podcast Player. Puoi eseguire questa azione in un secondo momento.</string>

@@ -33,8 +33,6 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -70,7 +68,6 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
-    var featureFlagWrapper: FeatureFlagWrapper,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -222,9 +219,6 @@ class PodcastSyncProcess(
     }
 
     private suspend fun downloadAndImportBookmarks() {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         val bookmarks = syncManager.getBookmarks()
         importBookmarks(bookmarks)
     }
@@ -513,9 +507,6 @@ class PodcastSyncProcess(
     }
 
     private fun uploadBookmarksChanges(records: JSONArray) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         try {
             val bookmarks = bookmarkManager.findBookmarksToSync()
             bookmarks.forEach { bookmark ->
@@ -643,9 +634,6 @@ class PodcastSyncProcess(
     }
 
     private suspend fun importBookmarks(bookmarks: List<Bookmark>) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         for (bookmark in bookmarks) {
             importBookmark(bookmark)
         }
@@ -717,7 +705,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(sync: SyncUpdateResponse.PodcastSync): Maybe<Podcast> {
         val uuid = sync.uuid
-        if (uuid == null || uuid.isNullOrBlank()) {
+        if (uuid.isNullOrBlank()) {
             return Maybe.empty()
         }
 

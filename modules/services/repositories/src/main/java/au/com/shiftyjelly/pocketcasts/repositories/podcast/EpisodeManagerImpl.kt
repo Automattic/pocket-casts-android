@@ -543,9 +543,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     private fun cleanUpDownloadFiles(episode: BaseEpisode) {
         // remove the download file if one exists
-        episode.downloadedFilePath?.let {
-            FileUtil.deleteFileByPath(episode.downloadedFilePath)
-        }
+        episode.downloadedFilePath?.let(FileUtil::deleteFileByPath)
 
         // remove the temp file as well in case it's there
         val tempFilePath = DownloadHelper.tempPathForEpisode(episode, fileStorage)

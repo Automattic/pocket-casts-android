@@ -138,7 +138,7 @@ open class FileStorage @Inject constructor(
         val newFile = File(dir, file.name)
         if (file.exists() && file.isFile) {
             try {
-                FileUtil.copyFile(file, newFile)
+                FileUtil.copy(file, newFile)
                 val wasDeleted = file.delete()
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Moved ${file.absolutePath} to ${newFile.absolutePath} wasDeleted: $wasDeleted")
             } catch (e: IOException) {
@@ -152,7 +152,7 @@ open class FileStorage @Inject constructor(
     private fun moveDir(fromDir: File, toDir: File) {
         if (fromDir.exists() && fromDir.isDirectory) {
             try {
-                FileUtil.copyDirectory(fromDir, toDir)
+                FileUtil.copy(fromDir, toDir)
                 fromDir.delete()
             } catch (e: IOException) {
                 Timber.e(e, "Problems moving a  directory to a new location. from: ${fromDir.absolutePath} to: ${toDir.absolutePath}")

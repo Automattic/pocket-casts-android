@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module
@@ -120,10 +119,10 @@ class ServersModule {
                 .build()
         }
 
-        fun provideMoshiBuilder(featureFlagWrapper: FeatureFlagWrapper = FeatureFlagWrapper()): Moshi.Builder {
+        fun provideMoshiBuilder(): Moshi.Builder {
             return Moshi.Builder()
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser(featureFlagWrapper))
+                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
                 .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
                 .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
                 .add(AccessToken::class.java, AccessToken.Adapter)

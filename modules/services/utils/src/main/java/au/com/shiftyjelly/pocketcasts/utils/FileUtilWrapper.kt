@@ -12,7 +12,7 @@ import timber.log.Timber
 
 class FileUtilWrapper @Inject constructor() {
     fun deleteDirectoryContents(path: String) {
-        FileUtil.deleteDirectoryContents(path)
+        FileUtil.deleteDirContents(path)
     }
 
     suspend fun saveBitmapToFile(

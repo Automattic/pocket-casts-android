@@ -45,7 +45,6 @@ Language: ru
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>
     <string name="podcast_rate">Оцените %s</string>
     <string name="submit">Отправить</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Примите участие в бета-тестировании закладок!</string>
     <string name="whats_new_bookmarks_try_now_button">Попробовать</string>
     <string name="whats_new_bookmarks_title">Закладки уже готовы!</string>
     <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>
@@ -334,9 +333,9 @@ Language: ru
     <string name="onboarding_plus_feature_cloud_storage_text">Загрузите файлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Облачное хранилище объемом 20 ГБ</string>
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
-    <string name="onboarding_plus_feature_folders_title">Папки</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Папки</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Слушайте подкасты везде: в приложениях для Windows, macOS и веб-приложении.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Приложения для настольных систем</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Приложения для настольных систем</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Всё, что вам нравится в Pocket Casts, и ещё больше</string>
     <string name="onboarding_recommendations_import">Импорт</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Переходите на Pocket Casts. Выберите любимые подкасты или импортируйте их из другого плеера. Вы всегда сможете сделать это позже.</string>

@@ -20,11 +20,11 @@ enum class PlusUpgradeFeatureItem(
 ) : UpgradeFeatureItem {
     DesktopApps(
         image = IR.drawable.ic_desktop_apps,
-        title = LR.string.onboarding_plus_feature_desktop_apps_title,
+        title = LR.string.onboarding_plus_feature_desktop_and_web_apps_title,
     ),
     Folders(
         image = IR.drawable.ic_folders,
-        title = LR.string.onboarding_plus_feature_folders_title,
+        title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
     ),
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,

@@ -58,23 +58,20 @@ fun OnboardingUpgradeFlow(
                 mainSheetViewModel.onClickSubscribe(
                     activity = activity,
                     flow = flow,
+                    source = source,
                     onComplete = onProceed,
                 )
             }
         }
     }
 
-    val startInExpandedState =
-        // Only start with expanded state if there are any subscriptions
+    val startSelectPaymentFrequencyInExpandedState =
+        // Only start with expanded state if there are any subscriptions and payment frequency selection is needed
         hasSubscriptions && (
-            // The hidden state is shown as the first screen in the Upsell flow, so when we return
-            // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            (userSignedInOrSignedUpInUpsellFlow) ||
-                // User already indicated they want to upgrade, so go straight to purchase modal
-                flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
+            flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade
             )
-    val initialValue = if (startInExpandedState) {
+    val initialValue = if (startSelectPaymentFrequencyInExpandedState) {
         ModalBottomSheetValue.Expanded
     } else {
         ModalBottomSheetValue.Hidden
@@ -89,14 +86,14 @@ fun OnboardingUpgradeFlow(
             ModalBottomSheetValue.Hidden -> {
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
                 if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
-                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
+                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow, source)
                     if (flow is OnboardingFlow.PlusAccountUpgrade) {
                         mainSheetViewModel.onDismiss(flow, source)
                         onBackPressed()
                     }
                 }
             }
-            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
+            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow, source)
             else -> {}
         }
     }
@@ -127,6 +124,7 @@ fun OnboardingUpgradeFlow(
                                 mainSheetViewModel.onClickSubscribe(
                                     activity = activity,
                                     flow = flow,
+                                    source = source,
                                     onComplete = onProceed,
                                 )
                             } else {
@@ -148,6 +146,7 @@ fun OnboardingUpgradeFlow(
                         bottomSheetViewModel.onClickSubscribe(
                             activity = activity,
                             flow = flow,
+                            source = source,
                             onComplete = onProceed,
                         )
                     } else {
