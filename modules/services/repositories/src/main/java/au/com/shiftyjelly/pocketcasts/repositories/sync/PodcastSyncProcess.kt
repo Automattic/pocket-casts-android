@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
@@ -68,7 +69,6 @@ import java.time.Instant
 import java.time.format.DateTimeParseException
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -861,11 +861,7 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
             return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false)
                 .doOnSuccess { podcast ->
-                    podcast.startFromSecs = podcastSync.startFromSecs ?: 0
-                    podcast.skipLastSecs = podcastSync.skipLastSecs ?: 0
-                    podcast.addedDate = podcastSync.dateAdded
-                    podcastSync.sortPosition?.let { podcast.sortPosition = it }
-                    podcastSync.folderUuid?.let { podcast.folderUuid = it }
+                    applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
                     podcastManager.updatePodcast(podcast)
                 }
                 .toMaybe()
@@ -880,11 +876,7 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed) {
             podcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
             podcast.isSubscribed = true
-            podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
-            podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
-            podcastSync.sortPosition?.let { podcast.sortPosition = it }
-            podcast.folderUuid = podcastSync.folderUuid
-            podcast.addedDate = podcastSync.dateAdded
+            applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
 
             podcastManager.updatePodcast(podcast)
         } else if (podcast.isSubscribed && !podcastSync.subscribed) { // Unsubscribed on the server but subscribed on device
@@ -892,6 +884,16 @@ class PodcastSyncProcess(
             podcastManager.unsubscribe(podcast.uuid, playbackManager)
         }
         return Maybe.just(podcast)
+    }
+
+    private fun applyPodcastSyncUpdatesToPodcast(podcast: Podcast, podcastSync: SyncUpdateResponse.PodcastSync) {
+        podcast.addedDate = podcastSync.dateAdded
+        podcast.folderUuid = podcastSync.folderUuid
+        podcastSync.sortPosition?.let { podcast.sortPosition = it }
+        podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
+        podcastSync.startFromModified?.let { podcast.startFromModified = it }
+        podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
+        podcastSync.skipLastModified?.let { podcast.skipLastModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1022,13 +1024,13 @@ class PodcastSyncProcess(
                         autoStartFrom = int32Setting {
                             value = int32Value { value = podcast.startFromSecs }
                             modifiedAt = timestamp {
-                                seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                                seconds = podcast.startFromModified?.timeSecs() ?: 0
                             }
                         }
                         autoSkipLast = int32Setting {
                             value = int32Value { value = podcast.skipLastSecs }
                             modifiedAt = timestamp {
-                                seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                                seconds = podcast.skipLastModified?.timeSecs() ?: 0
                             }
                         }
                     }

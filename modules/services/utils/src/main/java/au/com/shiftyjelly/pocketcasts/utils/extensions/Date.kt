@@ -35,3 +35,8 @@ fun Date.toLocalizedFormatLongStyle(): String {
 fun Date.toLocalizedFormatPattern(pattern: String): String {
     return DateUtil.toLocalizedFormatPattern(this, pattern)
 }
+
+/**
+ * Returns the number of seconds since January 1, 1970, 00:00:00 GMT represented by this date
+ */
+fun Date.timeSecs() = this.time / 1000
