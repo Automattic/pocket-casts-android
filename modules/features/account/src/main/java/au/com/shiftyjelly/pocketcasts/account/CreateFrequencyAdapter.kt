@@ -67,12 +67,16 @@ class CreateFrequencyAdapter(
                     when (subscription) {
                         is Subscription.Simple ->
                             ProductAmountView(subscription.recurringPricingPhase.formattedPrice)
-                        is Subscription.WithTrial -> {
-                            val res = LocalContext.current.resources
-                            ProductAmountView(
-                                primaryText = subscription.trialPricingPhase.numPeriodFree(res),
-                                secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
-                            )
+                        is Subscription.WithOffer -> {
+                            if (subscription.isTrial()) {
+                                val res = LocalContext.current.resources
+                                ProductAmountView(
+                                    primaryText = subscription.trialPricingPhase.numPeriodFree(res),
+                                    secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(
+                                        res,
+                                    ),
+                                )
+                            }
                         }
                     }
                 }

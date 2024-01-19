@@ -29,7 +29,7 @@ sealed interface Subscription {
         override fun tryFreeThenPricePerPeriod(res: Resources): String? = null
     }
 
-    class WithTrial(
+    class WithOffer(
         override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
@@ -59,6 +59,17 @@ sealed interface Subscription {
                 recurringPricingPhase.formattedPrice,
             )
         }
+
+        fun isTrial(): Boolean {
+            return this.productDetails.subscriptionOfferDetails?.any {
+                it.offerId == TRIAL_OFFER_ID && (recurringPricingPhase is SubscriptionPricingPhase.Months)
+            } ?: false
+        }
+        fun isIntroOffer(): Boolean {
+            return this.productDetails.subscriptionOfferDetails?.any {
+                it.offerId == INTRO_OFFER_ID && (recurringPricingPhase is SubscriptionPricingPhase.Years)
+            } ?: false
+        }
     }
 
     enum class SubscriptionTier {
@@ -83,6 +94,8 @@ sealed interface Subscription {
         const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
         const val SUBSCRIPTION_TEST_PRODUCT_ID = "com.pocketcasts.plus.testfreetrialoffer"
+        const val INTRO_OFFER_ID = "testyearlyintropricingoffer"
+        const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
 
         fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =
             SubscriptionMapper.map(productDetails, isFreeTrialEligible)
