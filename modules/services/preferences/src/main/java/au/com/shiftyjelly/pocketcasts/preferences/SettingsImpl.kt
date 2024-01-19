@@ -810,7 +810,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val autoArchiveIncludeStarred = UserSetting.BoolPref(
+    override val autoArchiveIncludesStarred = UserSetting.BoolPref(
         sharedPrefKey = Settings.AUTO_ARCHIVE_INCLUDE_STARRED,
         defaultValue = false,
         sharedPrefs = sharedPreferences,

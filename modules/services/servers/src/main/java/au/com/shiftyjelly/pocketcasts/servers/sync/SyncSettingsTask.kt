@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -52,8 +54,20 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
         private fun changedNamedSettingsRequest(settings: Settings) = ChangedNamedSettingsRequest(
             changedSettings = ChangedNamedSettings(
-                skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
-                skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
+                autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting { autoArchiveAfterPlaying, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = autoArchiveAfterPlaying.toIndex(),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting { autoArchiveInactiveSetting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = autoArchiveInactiveSetting.toIndex(),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoArchiveIncludesStarred = settings.autoArchiveIncludesStarred.getSyncSetting(::NamedChangedSettingBool),
+                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(::NamedChangedSettingBool),
                 gridOrder = settings.podcastsSortType.getSyncSetting { podcastSortType, modifiedAt ->
                     NamedChangedSettingInt(
                         value = podcastSortType.serverId,
@@ -61,22 +75,39 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
-                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(::NamedChangedSettingBool),
+                skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
+                skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
             ),
         )
 
         private fun processChangedNameSettingsResponse(response: ChangedNamedSettingsResponse, settings: Settings) {
             for ((key, changedSettingResponse) in response) {
                 when (key) {
-                    "skipForward" -> updateSettingIfPossible(
+                    "autoArchiveInactive" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.skipForwardInSecs,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                        setting = settings.autoArchiveInactive,
+                        newSettingValue = run {
+                            val index = (changedSettingResponse.value as? Number)?.toInt()
+                            index?.let { AutoArchiveInactiveSetting.fromIndex(it) }
+                        },
                     )
-                    "skipBack" -> updateSettingIfPossible(
+                    "autoArchiveIncludesStarred" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.skipBackInSecs,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                        setting = settings.autoArchiveIncludesStarred,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoArchivePlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoArchiveAfterPlaying,
+                        newSettingValue = run {
+                            val index = (changedSettingResponse.value as? Number)?.toInt()
+                            index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
+                        },
+                    )
+                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.freeGiftAcknowledged,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "gridOrder" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -91,11 +122,17 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.marketingOptIn,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
+                    "skipBack" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.freeGiftAcknowledged,
-                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                        setting = settings.skipBackInSecs,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
                     )
+                    "skipForward" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.skipForwardInSecs,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }
         }

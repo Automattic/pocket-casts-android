@@ -76,7 +76,7 @@ class AutoArchiveTest {
         val settings = mock<Settings> {
             on { autoArchiveInactive } doReturn UserSetting.Mock(inactive, mock())
             on { autoArchiveAfterPlaying } doReturn UserSetting.Mock(played, mock())
-            on { autoArchiveIncludeStarred } doReturn UserSetting.Mock(includeStarred, mock())
+            on { autoArchiveIncludesStarred } doReturn UserSetting.Mock(includeStarred, mock())
         }
         return EpisodeManagerImpl(
             settings = settings,
