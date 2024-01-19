@@ -6,6 +6,6 @@ on:
 
 jobs:
   dangermattic:
-    uses: Automattic/dangermattic/.github/workflows/reusable-run-danger.yml@iangmaia/danger-on-gha
+    uses: Automattic/dangermattic/.github/workflows/reusable-run-danger.yml@trunk
     secrets:
       github-token: ${{ secrets.DANGERMATTIC_GITHUB_TOKEN }}

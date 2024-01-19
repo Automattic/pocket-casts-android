@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
@@ -20,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation
 import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation.Companion.SCALE
 import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation.Companion.SCALE_NORMAL
 import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation.Companion.TRANSLATE_Y
-import au.com.shiftyjelly.pocketcasts.player.helper.PCBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -45,8 +43,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val binding = DataBindingUtil.inflate<ViewPlayerBottomSheetBinding>(inflater, R.layout.view_player_bottom_sheet, this, true)
-    var sheetBehavior: PlayerBottomSheetBehavior<PlayerBottomSheet>? = null
-    private var bottomSheetCallback: PCBottomSheetBehavior.BottomSheetCallback? = null
+    var sheetBehavior: BottomSheetBehavior<PlayerBottomSheet>? = null
+    private var bottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
     private var animations: Array<BottomSheetAnimation>? = null
     private var rootView: CoordinatorLayout? = null
 
@@ -56,8 +54,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
     var listener: PlayerBottomSheetListener? = null
     var isDragEnabled: Boolean
-        get() = sheetBehavior?.isDragEnabled ?: false
-        set(value) { sheetBehavior?.isDragEnabled = value }
+        get() = sheetBehavior?.isDraggable ?: false
+        set(value) { sheetBehavior?.isDraggable = value }
 
     init {
         elevation = 8.dpToPx(context).toFloat()
@@ -115,7 +113,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
 
         bottomSheetCallback = createBottomSheetCallback()
-        sheetBehavior = (PCBottomSheetBehavior.from(this) as PlayerBottomSheetBehavior).apply {
+        sheetBehavior = BottomSheetBehavior.from(this).apply {
             addBottomSheetCallback(bottomSheetCallback!!)
         }
 
@@ -124,7 +122,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
             doOnLayout {
                 sheetBehavior?.apply {
-                    state = PCBottomSheetBehavior.STATE_EXPANDED
+                    state = BottomSheetBehavior.STATE_EXPANDED
                 }
             }
         }
@@ -166,7 +164,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         }
     }
 
-    private fun createBottomSheetCallback(): PCBottomSheetBehavior.BottomSheetCallback {
+    private fun createBottomSheetCallback(): BottomSheetBehavior.BottomSheetCallback {
         val miniPlayButtonScale = BottomSheetAnimation(
             viewId = R.id.miniPlayButton,
             rootView = rootView,
@@ -213,7 +211,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         )
         animations = arrayOf(miniPlayButtonScale, playButtonScale, backgroundScale, playerTranslateY)
 
-        return object : PCBottomSheetBehavior.BottomSheetCallback() {
+        return object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 // remove bottom navigation view
                 listener?.onPlayerBottomSheetSlide(slideOffset)
@@ -266,7 +264,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             // Seems like a bug in bottom sheet but not sure.
             // Just to be sure we wrap this in doOnLayout
             sheetBehavior?.let { bottomSheet ->
-                bottomSheet.state = PCBottomSheetBehavior.STATE_EXPANDED
+                bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
             }
 
             if (sheetBehavior == null) {
@@ -277,21 +275,6 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
     fun closePlayer() {
         isPlayerOpen = false
-        sheetBehavior?.state = PCBottomSheetBehavior.STATE_COLLAPSED
-    }
-}
-
-open class PlayerBottomSheetBehavior<V : View> @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-) : PCBottomSheetBehavior<V>(context, attrs) {
-    override fun onInterceptTouchEvent(parent: CoordinatorLayout, child: V, event: MotionEvent): Boolean {
-        if (!isDragEnabled) return false
-        return super.onInterceptTouchEvent(parent, child, event)
-    }
-
-    override fun onTouchEvent(parent: CoordinatorLayout, child: V, event: MotionEvent): Boolean {
-        if (!isDragEnabled) return false
-        return super.onTouchEvent(parent, child, event)
+        sheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }

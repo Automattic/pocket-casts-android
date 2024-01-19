@@ -214,8 +214,14 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         adapter.theme = overrideTheme
 
         if (!isEmbedded) {
-            updateStatusAndNavColors()
             FirebaseAnalyticsTracker.openedUpNext()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isEmbedded) {
+            updateStatusAndNavColors()
         }
     }
 

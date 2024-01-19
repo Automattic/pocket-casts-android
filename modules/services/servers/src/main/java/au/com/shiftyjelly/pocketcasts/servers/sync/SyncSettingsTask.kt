@@ -96,11 +96,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.autoArchiveIncludesStarred,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
-                        changedSettingResponse = changedSettingResponse,
-                        setting = settings.freeGiftAcknowledged,
-                        newSettingValue = (changedSettingResponse.value as? Boolean),
-                    )
                     "autoArchivePlayed" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveAfterPlaying,
@@ -108,6 +103,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             val index = (changedSettingResponse.value as? Number)?.toInt()
                             index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
                         },
+                    )
+                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.freeGiftAcknowledged,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "gridOrder" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,

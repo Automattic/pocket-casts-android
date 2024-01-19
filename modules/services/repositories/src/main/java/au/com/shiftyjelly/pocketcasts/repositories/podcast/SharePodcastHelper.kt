@@ -79,7 +79,7 @@ data class SharePodcastHelper(
             val file = File(path)
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = episode.fileType
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, this.context)
+            val uri = FileUtil.createUriWithReadPermissions(this.context, file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             this.context.startActivity(Intent.createChooser(intent, context.getString(LR.string.podcasts_share_via)))
         } catch (e: Exception) {

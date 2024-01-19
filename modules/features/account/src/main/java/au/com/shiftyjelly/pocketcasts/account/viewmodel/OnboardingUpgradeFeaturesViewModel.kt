@@ -46,7 +46,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
     val state: StateFlow<OnboardingUpgradeFeaturesState> = _state
 
-    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source")
+    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source") ?: OnboardingUpgradeSource.UNKNOWN
     private val showPatronOnly = savedStateHandle.get<Boolean>("show_patron_only")
 
     init {
@@ -170,6 +170,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     fun onClickSubscribe(
         activity: Activity,
         flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
     ) {
         (state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
@@ -184,7 +185,11 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             currentSubscription?.let { subscription ->
                 analyticsTracker.track(
                     AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                    mapOf(OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue, OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId),
+                    mapOf(
+                        OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue,
+                        OnboardingUpgradeBottomSheetViewModel.sourceKey to source.analyticsValue,
+                        OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId,
+                    ),
                 )
 
                 viewModelScope.launch {

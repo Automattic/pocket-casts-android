@@ -45,7 +45,6 @@ Language: ko_KR
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
     <string name="podcast_rate">%s 평가</string>
     <string name="submit">제출</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">북마크에 대한 베타 테스트에 참여하세요!</string>
     <string name="whats_new_bookmarks_try_now_button">지금 시도</string>
     <string name="whats_new_bookmarks_title">북마크는 여기 있습니다!</string>
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>
@@ -334,9 +333,9 @@ Language: ko_KR
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 20GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
-    <string name="onboarding_plus_feature_folders_title">폴더</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">데스크톱 앱</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">데스크톱 앱</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>

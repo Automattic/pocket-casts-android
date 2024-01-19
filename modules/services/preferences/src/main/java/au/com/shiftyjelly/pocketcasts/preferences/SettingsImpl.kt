@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -63,6 +64,7 @@ class SettingsImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val moshi: Moshi,
+    private val bookmarkFeature: BookmarkFeatureControl,
 ) : Settings {
 
     companion object {
@@ -905,6 +907,7 @@ class SettingsImpl @Inject constructor(
         defaultAction = HeadphoneAction.SKIP_FORWARD,
         sharedPrefs = sharedPreferences,
         subscriptionStatusFlow = cachedSubscriptionStatus.flow,
+        bookmarkFeature = bookmarkFeature,
     )
 
     override val headphoneControlsPreviousAction = HeadphoneActionUserSetting(
@@ -912,6 +915,7 @@ class SettingsImpl @Inject constructor(
         defaultAction = HeadphoneAction.SKIP_BACK,
         sharedPrefs = sharedPreferences,
         subscriptionStatusFlow = cachedSubscriptionStatus.flow,
+        bookmarkFeature = bookmarkFeature,
     )
 
     override val headphoneControlsPlayBookmarkConfirmationSound = UserSetting.BoolPref(

@@ -107,7 +107,7 @@ class Support @Inject constructor(
                         out.close()
 
                         val fileUri =
-                            FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                            FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                         intent.putExtra(
                             Intent.EXTRA_TEXT,
@@ -156,7 +156,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
             } catch (e: Exception) {
                 Timber.e(e)
@@ -186,7 +186,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
@@ -380,9 +380,9 @@ class Support @Inject constructor(
             }
             output.append("Database: " + Util.formattedBytes(context.getDatabasePath("pocketcasts").length(), context = context)).append(eol)
             try {
-                output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.getOrCreateEpisodesTempDir()), context)).append(eol)
-                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getOrCreateEpisodesDir()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
-                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getOrCreateNetworkImagesDir()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
+                output.append("Temp directory: " + Util.formattedBytes(FileUtil.dirSize(fileStorage.getOrCreateEpisodesTempDir()), context)).append(eol)
+                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getOrCreateEpisodesDir()?.let(FileUtil::dirSize) ?: 0, context)).append(eol)
+                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getOrCreateNetworkImagesDir()?.let(FileUtil::dirSize) ?: 0, context)).append(eol)
             } catch (e: Exception) {
                 Timber.e(e)
             }

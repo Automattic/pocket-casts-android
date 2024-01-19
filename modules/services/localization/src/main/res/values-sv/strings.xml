@@ -45,7 +45,6 @@ Language: sv_SE
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
     <string name="podcast_rate">Omdöme %s</string>
     <string name="submit">Skicka</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Var med och betatesta bokmärken!</string>
     <string name="whats_new_bookmarks_try_now_button">Testa nu</string>
     <string name="whats_new_bookmarks_title">Bokmärkena är här!</string>
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
@@ -334,9 +333,9 @@ Language: sv_SE
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB molnlagring</string>
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
-    <string name="onboarding_plus_feature_folders_title">Mappar</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Dator-appar</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator-appar</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>
