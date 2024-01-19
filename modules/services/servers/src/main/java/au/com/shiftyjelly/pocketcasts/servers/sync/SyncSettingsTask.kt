@@ -30,15 +30,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return Result.failure()
             }
 
-            listOf(
-                settings.freeGiftAcknowledged,
-                settings.marketingOptIn,
-                settings.podcastsSortType,
-                settings.skipBackInSecs,
-                settings.skipForwardInSecs,
-            ).forEach {
-                it.doesNotNeedSync()
-            }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 
             return Result.success()

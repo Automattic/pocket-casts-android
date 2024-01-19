@@ -38,38 +38,25 @@ class UserSettingTest {
     }
 
     @Test
-    fun keepsSyncEvenWithModificationNotRequiringSync() {
+    fun doesNotSyncAfterModificationNotRequiringSync() {
         val userSetting = getUserSetting()
 
         // first set requires sync
         userSetting.set("first_value", needsSync = true)
 
         // second set does not require sync
-        val newValue = "second_value"
         userSetting.set("second_value", needsSync = false)
-
-        assertWillSync(userSetting, newValue)
-    }
-
-    @Test
-    fun clearsSync() {
-        val userSetting = getUserSetting()
-
-        userSetting.set("new_value", needsSync = true)
-        userSetting.doesNotNeedSync()
 
         assertWillNotSync(userSetting)
     }
 
-    fun assertWillSync(userSetting: UserSetting.StringPref, expected: String) {
-        assertNotNull(userSetting.getModifiedAtServerString())
+    private fun assertWillSync(userSetting: UserSetting.StringPref, expected: String) {
         assertNotNull(userSetting.getModifiedAt())
         val result = userSetting.getSyncSetting { value, _ -> value }
         assertEquals(expected, result)
     }
 
     private fun assertWillNotSync(userSetting: UserSetting.StringPref) {
-        assertNull(userSetting.getModifiedAtServerString())
         assertNull(userSetting.getModifiedAt())
         val result = userSetting.getSyncSetting { _, _ -> Unit }
         assertNull(result)
