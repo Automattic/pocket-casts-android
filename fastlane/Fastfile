@@ -327,7 +327,7 @@ platform :android do
   end
 
   lane :finalize_release do |options|
-    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if android_current_branch_is_hotfix(version_properties_path: VERSION_PROPERTIES_PATH)
+    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
@@ -474,6 +474,13 @@ platform :android do
   #####################################################################################
   # Version Methods
   #####################################################################################
+
+  def release_is_hotfix?
+    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_release_version)
+    # Calculate and return whether the release version is a hotfix
+    VERSION_CALCULATOR.release_is_hotfix?(version: current_version)
+  end
 
   def commit_version_bump
     Fastlane::Helper::GitHelper.commit(
