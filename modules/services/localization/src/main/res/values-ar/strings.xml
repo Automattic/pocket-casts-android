@@ -63,7 +63,6 @@ Language: ar
     <string name="player_sleep_add_1_minute">أكثر من دقيقة واحدة</string>
     <string name="settings_autoplay">التشغيل التلقائي</string>
     <string name="onboarding_patron_feature_early_access_title">الوصول إلى الميزات مبكرًا</string>
-    <string name="onboarding_plus_feature_watch_playback">تشغيل الساعة</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">أيقونات القوالب والتطبيقات الإضافية</string>
     <string name="settings_continuous_playback_summary">في حال كانت قائمة انتظار العناصر التالية لديك فارغة، سنقوم بتشغيل حلقات من البودكاست أو القائمة نفسها التي تستمع إليه حاليًا.</string>
     <string name="renew_your_subscription">تجديد الاشتراك الخاص بك</string>
@@ -178,7 +177,6 @@ Language: ar
     <string name="settings_media_actions_customise">تخصيص إجراءات الوسائط</string>
     <string name="settings_media_actions_show_title">عرض إجراءات الوسائط المخصصة</string>
     <string name="settings_media_actions_show_subtitle">اعرض إجراءات الوسائط المخصصة في تنبيهات الوسائط ضمن Android 13 وAndroid Auto.</string>
-    <string name="plus_take_your_podcasting_to_next_level">انقل تجربتك المتعلقة بالبث الصوتي إلى المستوى التالي مع وصول استثنائي إلى الميزات وخيارات التخصيص.</string>
     <string name="onboarding_recommendations_more">مزيد من %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">يمكن الإلغاء في أي وقت.</string>
     <string name="pocket_casts_query_podcasts">الاستعلام عن البودكاست في Pocket Casts</string>
@@ -271,11 +269,7 @@ Language: ar
     <string name="onboarding_recommendations_make_pocket_casts_yours">اجعل Pocket Casts خاصًا بك من خلال تحديد حلقات البودكاست التي تفضلها أو قم باستيرادها من مشغل حلقة بودكاست أخرى. يمكنك دومًا القيام بذلك لاحقًا.</string>
     <string name="onboarding_recommendations_import">استيراد</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">كل شيء تحبه بشأن Pocket Casts، إلى جانب المزيد</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">الاستمتاع بالوصول إلى ميزات وخيارات تخصيص استثنائية </string>
-    <string name="onboarding_upgrade_unlock_all_features">فتح كل الميزات</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">تطبيقات سطح المكتب</string>
     <string name="onboarding_plus_feature_desktop_apps_text">يمكنك الاستماع في مزيد من الأماكن من خلال تطبيقاتنا التي تعمل بنظامَي التشغيل Windows وmacOS وتطبيقات الويب.</string>
-    <string name="onboarding_plus_feature_folders_title">المجلدات</string>
     <string name="onboarding_plus_feature_folders_text">يمكنك تنظيم حلقات البودكاست الخاصة بك في المجلدات وحافظ عليها قيد المزامنة عبر كل أجهزتك.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ارفع ملفاتك إلى مساحة التخزين على السحابة واجعلها متوافرة في كل مكان.</string>
     <string name="onboarding_plus_feature_themes_icons_title">القوالب والأيقونات</string>
@@ -886,14 +880,10 @@ Language: ar
     <string name="plus_lifetime_member">عضو مدى الحياة</string>
     <string name="plus_learn_more_button">أعرف أكثر</string>
     <string name="plus_learn_more_about_plus">معرفة المزيد حول Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">انقل بثك الصوتي إلى أماكن أخرى باستخدام تطبيقات Windows وmacOS وتطبيقات الويب الخاصة بنا.</string>
     <string name="plus_desktop_apps">تطبيقات سطح المكتب</string>
-    <string name="plus_description_title">ميزات مُحسَّنة للمستمعين المتقدمين</string>
-    <string name="plus_description_body">احصل على المعلومات الشخصية وتوزيعها كل ذلك مرة واحدة. ارفع ملفات الصوت الشخصية الخاصة بك إلى خوادمنا السحابية، واوصل إلى حسابك من خلال مُشغِّل الويب الخاص بنا، واجعل التطبيق خاص بك.</string>
     <string name="plus_create_marketing_features"> كل شيء</string>
     <string name="settings_logs">السجلات</string>
     <string name="plus_cloud_storage_limit">%d جيجابايت من مساحة التخزين السحابي</string>
-    <string name="plus_cloud_storage_body">قم بتسريع محاضراتك. تخلَّص من المحتوى الآخر. كن Podcast DJ الخاص بك.</string>
     <string name="plus_cloud_storage">التخزين السحابي</string>
     <string name="profile_expiry_date_unknown">غير معروف</string>
     <string name="profile_yearly">سنوي</string>
@@ -901,7 +891,6 @@ Language: ar
     <string name="profile_welcome_to_plus">مرحبًا بك في Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">مرحبًا بك في Pocket Casts!</string>
     <string name="profile_web_player">مُشغِّل الويب</string>
-    <string name="profile_upgrade_to_plus">الترقية إلى Plus</string>
     <string name="profile_updates_ends">تنتهي التحديثات: %s</string>
     <string name="profile_updates_ended">انتهت التحديثات: %s</string>
     <string name="profile_time_free">%s مجانًا</string>
@@ -1002,9 +991,9 @@ Language: ar
     <string name="profile_navigation_listening_history">تاريخ الاستماع</string>
     <string name="profile_navigation_files">الملفات</string>
     <string name="profile_monthly">شهريًا</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
     <string name="profile_free_account">حساب مجاني</string>
     <string name="profile_free">مجانية</string>

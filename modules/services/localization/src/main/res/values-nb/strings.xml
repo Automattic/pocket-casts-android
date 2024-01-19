@@ -62,7 +62,6 @@ Language: nb_NO
     <string name="player_sleep_add_1_minute">+ 1 minutt</string>
     <string name="settings_autoplay">Automatisk avspilling</string>
     <string name="onboarding_patron_feature_early_access_title">Tidlig tilgang til funksjoner</string>
-    <string name="onboarding_plus_feature_watch_playback">Klokkeavspilling</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Ekstra temaer og appikoner</string>
     <string name="settings_continuous_playback_summary">Hvis Neste-køen er tom, spiller vi av episoder fra samme podcast eller liste som du lytter til nå.</string>
     <string name="renew_your_subscription">Forny abonnementet</string>
@@ -177,7 +176,6 @@ Language: nb_NO
     <string name="settings_media_actions_customise">Tilpass mediehandlinger</string>
     <string name="settings_media_actions_show_title">Vis tilpassede mediehandlinger</string>
     <string name="settings_media_actions_show_subtitle">Vis tilpassede mediehandlinger i Android 13-medievarsler og Android Auto.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Løft podcastingopplevelsen til neste nivå med eksklusiv tilgang til funksjoner og alternativer for tilpassing.</string>
     <string name="onboarding_recommendations_more">Mer %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Kan kanselleres når som helst.</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts-søk etter podcaster</string>
@@ -270,11 +268,7 @@ Language: nb_NO
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gjør Pocket Casts til din egen ved å velge favorittpodcaster eller importere dem fra en annen podcastspiller. Du kan alltids gjøre dette senere.</string>
     <string name="onboarding_recommendations_import">Importer</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alt du liker med Pocket Casts, pluss mye mer</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Få tilgang til eksklusive funksjoner og alternativer for tilpassing</string>
-    <string name="onboarding_upgrade_unlock_all_features">Lås opp alle funksjoner</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Skrivebordsapper</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lytt på flere steder med appene våre for Windows, macOS og nett.</string>
-    <string name="onboarding_plus_feature_folders_title">Mapper</string>
     <string name="onboarding_plus_feature_folders_text">Ordne podcastene i mapper og synkroniser dem mellom alle enhetene dine.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Last opp filene til skylageret, slik at du har dem tilgjengelig overalt.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temaer og ikoner</string>
@@ -885,14 +879,10 @@ Language: nb_NO
     <string name="plus_lifetime_member">Livstidsmedlem</string>
     <string name="plus_learn_more_button">Finn ut mer</string>
     <string name="plus_learn_more_about_plus">Finn ut mer om Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Ta med deg podcastene til flere steder med appene våre for Windows, macOS og Web.</string>
     <string name="plus_desktop_apps">Skrivebordsapper</string>
-    <string name="plus_description_title">Forbedrede funksjoner for avanserte lyttere</string>
-    <string name="plus_description_body">Bli personlig, og bli distribuert, alt på én gang. Last opp dine personlige lydfiler til skyserverne våre, få tilgang til kontoen din via webspilleren, og sett ditt personlige preg på appen.</string>
     <string name="plus_create_marketing_features"> Alt</string>
     <string name="settings_logs">Logger</string>
     <string name="plus_cloud_storage_limit">%d GB lagringsplass i skyen</string>
-    <string name="plus_cloud_storage_body">Sett fart på forelesningene dine. Skum gjennom annet innhold. Vær din egen Podcast-DJ.</string>
     <string name="plus_cloud_storage">Lagring i skyen</string>
     <string name="profile_expiry_date_unknown">Ukjent</string>
     <string name="profile_yearly">Årlig</string>
@@ -900,7 +890,6 @@ Language: nb_NO
     <string name="profile_welcome_to_plus">Velkommen til Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Velkommen til Pocket Casts!</string>
     <string name="profile_web_player">Webspiller</string>
-    <string name="profile_upgrade_to_plus">Oppgrader til Plus</string>
     <string name="profile_updates_ends">Oppdateringer avsluttes: %s</string>
     <string name="profile_updates_ended">Oppdateringer avsluttet: %s</string>
     <string name="profile_time_free">%s ledig</string>

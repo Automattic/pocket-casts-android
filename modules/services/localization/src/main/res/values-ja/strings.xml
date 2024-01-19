@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-19 10:54:03+0000
+Translation-Revision-Date: 2024-01-10 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">有効化すると、端末のテーマカラーに合わせてウィジェットの色が変わります。</string>
+    <string name="settings_use_dynamic_colors_widget">ウィジェットのダイナミックカラーを使用</string>
+    <string name="widget">ウィジェット</string>
     <string name="bookmark_not_found">ブックマークが見つかりません</string>
     <string name="settings_use_dark_up_next_details">有効にすると、「次のエピソード待機リスト」では常にダークテーマを使用し、無効にすると現在のテーマと一致します</string>
     <string name="settings_use_dark_up_next">次のエピソード待機リストのダークテーマを使用</string>
@@ -45,7 +48,6 @@ Language: ja_JP
     <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>
     <string name="podcast_rate">%s を評価する</string>
     <string name="submit">送信</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">ブックマークのベータテストに参加してください !</string>
     <string name="whats_new_bookmarks_try_now_button">今すぐ試す</string>
     <string name="whats_new_bookmarks_title">ブックマークはこちら !</string>
     <string name="bookmarks_upsell_instructions_early_access">お早めに Pocket Casts Patron でこの機能にアクセスすると、お気に入りのエピソードのタイムスタンプを保存できます。 まもなく Plus にご登録の皆さまもご利用いただけるようになります。</string>
@@ -126,7 +128,6 @@ Language: ja_JP
     <string name="player_sleep_add_1_minute">1分以上</string>
     <string name="player_sleep_1_minute">1分</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">追加のテーマとアプリアイコン</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch 再生</string>
     <string name="onboarding_patron_feature_early_access_title">機能への早期アクセス</string>
     <string name="settings_continuous_playback_summary">「\"次のエピソード」が空の場合、現在視聴中のポッドキャストと同じものまたはリストからエピソードを再生します。</string>
     <string name="renew_your_subscription">サブスクリプションを更新</string>
@@ -242,7 +243,6 @@ Language: ja_JP
     <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
     <string name="settings_media_actions_prioritize_subtitle">上位のアクションを利用できます。</string>
     <string name="settings_media_actions_prioritize_title">カスタムメディアアクションに優先順位を設定</string>
-    <string name="plus_take_your_podcasting_to_next_level">専用の機能やカスタマイズオプションを使用して、あなたのポッドキャスト体験をさらなるレベルに引き上げることができます。</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>
@@ -335,11 +335,7 @@ Language: ja_JP
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB のクラウドストレージ</string>
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
-    <string name="onboarding_plus_feature_folders_title">フォルダー</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">デスクトップアプリ</string>
-    <string name="onboarding_upgrade_unlock_all_features">すべての機能のロックを解除</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">限定機能とカスタマイズオプションへのアクセス権を取得しましょう</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
     <string name="onboarding_recommendations_import">インポート</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>
@@ -963,13 +959,9 @@ Language: ja_JP
     <string name="plus_lifetime_member">無期限メンバー</string>
     <string name="plus_learn_more_button">もっと詳しく知る</string>
     <string name="plus_learn_more_about_plus">Pocket Casts Plus の詳細</string>
-    <string name="plus_desktop_apps_body">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでポッドキャストの活用範囲を広げましょう。</string>
     <string name="plus_desktop_apps">デスクトップアプリ</string>
-    <string name="plus_description_title">上級リスナー向け強化機能</string>
-    <string name="plus_description_body">パーソナルにいろんな仲間とつながる。 個人的な音声ファイルをクラウドサーバーにアップロード。ウェブプレーヤーからアカウントにアクセスして、アプリを自分好みにカスタマイズしましょう。</string>
     <string name="plus_create_marketing_features"> すべて</string>
     <string name="plus_cloud_storage_limit">%dGB のクラウドストレージ</string>
-    <string name="plus_cloud_storage_body">学びの時間をスピーディに。 コンテンツを次々に切り替えて ポッドキャストの DJ になりましょう。</string>
     <string name="plus_cloud_storage">クラウドストレージ</string>
     <string name="profile_expiry_date_unknown">不明</string>
     <string name="profile_yearly">年払い</string>
@@ -977,7 +969,6 @@ Language: ja_JP
     <string name="profile_welcome_to_plus">Pocket Casts Plus へようこそ !</string>
     <string name="profile_welcome_to_free">Pocket Casts へようこそ !</string>
     <string name="profile_web_player">ウェブプレーヤー</string>
-    <string name="profile_upgrade_to_plus">Plus にアップグレード</string>
     <string name="profile_updates_ends">更新終了予定日: %s</string>
     <string name="profile_updates_ended">更新終了日: %s</string>
     <string name="profile_time_free">%s 無料</string>
