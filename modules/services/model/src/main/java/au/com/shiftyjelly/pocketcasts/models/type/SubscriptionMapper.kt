@@ -16,13 +16,13 @@ object SubscriptionMapper {
         val matchingSubscriptionOfferDetails = if (isFreeTrialEligible) {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with trial offers
-                ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no trial offers, return all offers
+                ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers
+                ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no special offers, return all offers available
                 ?: productDetails.subscriptionOfferDetails // if null, return all offers
         } else {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without trial offers
+                ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without special offers
         } ?: emptyList()
 
         // TODO handle multiple matching SubscriptionOfferDetails
@@ -34,8 +34,8 @@ object SubscriptionMapper {
         return relevantSubscriptionOfferDetails
             ?.recurringSubscriptionPricingPhase
             ?.let { recurringPricingPhase ->
-                val trialPricingPhase = relevantSubscriptionOfferDetails.offerSubscriptionPricingPhase
-                if (trialPricingPhase == null) {
+                val offerPricingPhase = relevantSubscriptionOfferDetails.offerSubscriptionPricingPhase
+                if (offerPricingPhase == null) {
                     Subscription.Simple(
                         tier = mapProductIdToTier(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
@@ -46,7 +46,7 @@ object SubscriptionMapper {
                     Subscription.WithOffer(
                         tier = mapProductIdToTier(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
-                        offerPricingPhase = trialPricingPhase,
+                        offerPricingPhase = offerPricingPhase,
                         productDetails = productDetails,
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
@@ -76,7 +76,7 @@ object SubscriptionMapper {
         }
 
     private val ProductDetails.SubscriptionOfferDetails.offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase?
-        get() = trialSubscriptionPricingPhases().run {
+        get() = offerSubscriptionPricingPhases().run {
             when (size) {
                 0 -> null
                 1 -> first()
@@ -93,8 +93,8 @@ object SubscriptionMapper {
     private fun ProductDetails.SubscriptionOfferDetails.recurringSubscriptionPricingPhases() =
         subscriptionPricingPhases<RecurringSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.RECURRING)
 
-    private fun ProductDetails.SubscriptionOfferDetails.trialSubscriptionPricingPhases() =
-        subscriptionPricingPhases<OfferSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.TRIAL)
+    private fun ProductDetails.SubscriptionOfferDetails.offerSubscriptionPricingPhases() =
+        subscriptionPricingPhases<OfferSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.OFFER)
 
     private inline fun <reified T : SubscriptionPricingPhase> ProductDetails.SubscriptionOfferDetails.subscriptionPricingPhases(
         phaseType: SubscriptionPricingPhase.Type,
@@ -103,7 +103,7 @@ object SubscriptionMapper {
             .pricingPhaseList
             .map { it.fromPricingPhase() }
             .filterIsInstance<T>()
-            .filter { it.phaseType() == phaseType } // Must check the phaseType because a SubscriptionPricingPhase class can implement both Trial and Recurring
+            .filter { it.phaseType() == phaseType } // Must check the phaseType because a SubscriptionPricingPhase class can implement both Offer and Recurring
 
     private fun ProductDetails.PricingPhase.fromPricingPhase(): SubscriptionPricingPhase? =
         try {

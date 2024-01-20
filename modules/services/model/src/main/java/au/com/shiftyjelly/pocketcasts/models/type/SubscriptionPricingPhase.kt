@@ -53,11 +53,11 @@ sealed interface SubscriptionPricingPhase {
         "$periodValue ${res.getString(periodResSingular)}"
     fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType
 
-    enum class Type { TRIAL, RECURRING, UNKNOWN }
+    enum class Type { OFFER, RECURRING, UNKNOWN }
 
     private val ProductDetails.PricingPhase.subscriptionPricingPhaseType: Type
         get() = when (recurrenceMode) {
-            ProductDetails.RecurrenceMode.FINITE_RECURRING -> Type.TRIAL
+            ProductDetails.RecurrenceMode.FINITE_RECURRING -> Type.OFFER
             ProductDetails.RecurrenceMode.INFINITE_RECURRING -> Type.RECURRING
             else -> {
                 LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Unable to determine SubscriptionPricingPhase.Type")
@@ -120,8 +120,8 @@ sealed interface SubscriptionPricingPhase {
         override val chronoUnit = ChronoUnit.DAYS
 
         init {
-            if (phaseType() != Type.TRIAL) {
-                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Got a phase type of ${phaseType()} for a Days phase, which only extends TrialSubscriptionPricingPhase")
+            if (phaseType() != Type.OFFER) {
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Got a phase type of ${phaseType()} for a Days phase, which only extends OfferSubscriptionPricingPhase")
             }
         }
     }
