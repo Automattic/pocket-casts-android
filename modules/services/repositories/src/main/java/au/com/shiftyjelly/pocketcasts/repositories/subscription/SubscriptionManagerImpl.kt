@@ -413,7 +413,7 @@ class SubscriptionManagerImpl @Inject constructor(
         val withOffers = tierSubscriptions.filterIsInstance<Subscription.WithOffer>()
 
         return withOffers.find {
-            it.recurringPricingPhase is SubscriptionPricingPhase.Months // trial is available for monthly only
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months
         } ?: tierSubscriptions.firstOrNull {
             when (subscriptionFrequency) {
                 SubscriptionFrequency.MONTHLY -> it.recurringPricingPhase is SubscriptionPricingPhase.Months

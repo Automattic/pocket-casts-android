@@ -333,6 +333,8 @@ private fun UpgradeButton(
         is Subscription.Simple -> stringResource(LR.string.subscribe_to, shortName)
         is Subscription.WithOffer -> if (subscription.isTrial()) {
             stringResource(LR.string.trial_start)
+        } else if (subscription.isIntroOffer()) {
+            "TODO"
         } else {
             stringResource(LR.string.subscribe_to, shortName)
         }
@@ -341,6 +343,8 @@ private fun UpgradeButton(
         is Subscription.Simple -> subscription.recurringPricingPhase.pricePerPeriod(resources)
         is Subscription.WithOffer -> if (subscription.isTrial()) {
             subscription.tryFreeThenPricePerPeriod(resources)
+        } else if (subscription.isIntroOffer()) {
+            "TODO"
         } else {
             subscription.recurringPricingPhase.pricePerPeriod(resources)
         }

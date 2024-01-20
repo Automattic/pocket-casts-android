@@ -62,12 +62,12 @@ sealed interface Subscription {
 
         fun isTrial(): Boolean {
             return this.productDetails.subscriptionOfferDetails?.any {
-                it.offerId == TRIAL_OFFER_ID && (recurringPricingPhase is SubscriptionPricingPhase.Months)
+                it.offerId == TRIAL_OFFER_ID
             } ?: false
         }
         fun isIntroOffer(): Boolean {
             return this.productDetails.subscriptionOfferDetails?.any {
-                it.offerId == INTRO_OFFER_ID && (recurringPricingPhase is SubscriptionPricingPhase.Years)
+                it.offerId == INTRO_OFFER_ID
             } ?: false
         }
     }
