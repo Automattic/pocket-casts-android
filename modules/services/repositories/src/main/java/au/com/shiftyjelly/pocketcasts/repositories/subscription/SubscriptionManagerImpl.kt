@@ -448,7 +448,7 @@ class SubscriptionManagerImpl @Inject constructor(
             emit(
                 FreeTrial(
                     subscriptionTier = subscriptionTier,
-                    exists = defaultSubscription?.trialPricingPhase != null,
+                    exists = defaultSubscription?.offerPricingPhase != null,
                 ),
             )
         }

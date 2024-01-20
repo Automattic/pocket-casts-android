@@ -79,7 +79,7 @@ class CreatePayNowFragment : BaseFragment() {
                             )
                             is Subscription.WithOffer -> if (subscription.isTrial()) {
                                 ProductAmountView(
-                                    primaryText = subscription.trialPricingPhase.numPeriodFree(res),
+                                    primaryText = subscription.offerPricingPhase.numPeriodFree(res),
                                     secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 )

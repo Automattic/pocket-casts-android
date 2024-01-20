@@ -8,7 +8,7 @@ import com.android.billingclient.api.ProductDetails
 sealed interface Subscription {
     val tier: SubscriptionTier
     val recurringPricingPhase: RecurringSubscriptionPricingPhase
-    val trialPricingPhase: TrialSubscriptionPricingPhase?
+    val offerPricingPhase: OfferSubscriptionPricingPhase?
     val productDetails: ProductDetails
     val offerToken: String
     val shortTitle: String
@@ -17,14 +17,14 @@ sealed interface Subscription {
     fun numFreeThenPricePerPeriod(res: Resources): String?
     fun tryFreeThenPricePerPeriod(res: Resources): String?
 
-    // Simple subscriptions do not have a trial phase
+    // Simple subscriptions do not have a offer phase
     class Simple(
         override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val productDetails: ProductDetails,
         override val offerToken: String,
     ) : Subscription {
-        override val trialPricingPhase = null
+        override val offerPricingPhase = null
         override fun numFreeThenPricePerPeriod(res: Resources): String? = null
         override fun tryFreeThenPricePerPeriod(res: Resources): String? = null
     }
@@ -32,7 +32,7 @@ sealed interface Subscription {
     class WithOffer(
         override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
-        override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
+        override val offerPricingPhase: OfferSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails,
         override val offerToken: String,
     ) : Subscription {
@@ -43,7 +43,7 @@ sealed interface Subscription {
             }
             return res.getString(
                 stringRes,
-                trialPricingPhase.periodValuePlural(res),
+                offerPricingPhase.periodValuePlural(res),
                 recurringPricingPhase.formattedPrice,
             )
         }
@@ -55,7 +55,7 @@ sealed interface Subscription {
             }
             return res.getString(
                 stringRes,
-                trialPricingPhase.periodValuePlural(res),
+                offerPricingPhase.periodValuePlural(res),
                 recurringPricingPhase.formattedPrice,
             )
         }

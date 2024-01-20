@@ -16,13 +16,13 @@ object SubscriptionMapper {
         val matchingSubscriptionOfferDetails = if (isFreeTrialEligible) {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { it.trialSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with trial offers
+                ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with trial offers
                 ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no trial offers, return all offers
                 ?: productDetails.subscriptionOfferDetails // if null, return all offers
         } else {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { it.trialSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without trial offers
+                ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without trial offers
         } ?: emptyList()
 
         // TODO handle multiple matching SubscriptionOfferDetails
@@ -34,7 +34,7 @@ object SubscriptionMapper {
         return relevantSubscriptionOfferDetails
             ?.recurringSubscriptionPricingPhase
             ?.let { recurringPricingPhase ->
-                val trialPricingPhase = relevantSubscriptionOfferDetails.trialSubscriptionPricingPhase
+                val trialPricingPhase = relevantSubscriptionOfferDetails.offerSubscriptionPricingPhase
                 if (trialPricingPhase == null) {
                     Subscription.Simple(
                         tier = mapProductIdToTier(productDetails.productId),
@@ -46,7 +46,7 @@ object SubscriptionMapper {
                     Subscription.WithOffer(
                         tier = mapProductIdToTier(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
-                        trialPricingPhase = trialPricingPhase,
+                        offerPricingPhase = trialPricingPhase,
                         productDetails = productDetails,
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
@@ -75,7 +75,7 @@ object SubscriptionMapper {
             }
         }
 
-    private val ProductDetails.SubscriptionOfferDetails.trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase?
+    private val ProductDetails.SubscriptionOfferDetails.offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase?
         get() = trialSubscriptionPricingPhases().run {
             when (size) {
                 0 -> null
@@ -94,7 +94,7 @@ object SubscriptionMapper {
         subscriptionPricingPhases<RecurringSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.RECURRING)
 
     private fun ProductDetails.SubscriptionOfferDetails.trialSubscriptionPricingPhases() =
-        subscriptionPricingPhases<TrialSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.TRIAL)
+        subscriptionPricingPhases<OfferSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.TRIAL)
 
     private inline fun <reified T : SubscriptionPricingPhase> ProductDetails.SubscriptionOfferDetails.subscriptionPricingPhases(
         phaseType: SubscriptionPricingPhase.Type,

@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 
-sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
+sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
     val chronoUnit: ChronoUnit
 
     // i.e., 14 days free
@@ -68,7 +68,7 @@ sealed interface SubscriptionPricingPhase {
     class Years(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
-    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, OfferSubscriptionPricingPhase {
         override val periodValue = period.years
         override val chronoUnit = ChronoUnit.YEARS
         override val periodResSingular = R.string.plus_year
@@ -90,7 +90,7 @@ sealed interface SubscriptionPricingPhase {
     class Months(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
-    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, OfferSubscriptionPricingPhase {
 
         override val periodResSingular = R.string.plus_month
         override val periodResPlural = R.string.months_plural
@@ -113,7 +113,7 @@ sealed interface SubscriptionPricingPhase {
     class Days(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
-    ) : TrialSubscriptionPricingPhase {
+    ) : OfferSubscriptionPricingPhase {
         override val periodResSingular = R.string.plus_day
         override val periodResPlural = R.string.days_plural
         override val periodValue = period.days
