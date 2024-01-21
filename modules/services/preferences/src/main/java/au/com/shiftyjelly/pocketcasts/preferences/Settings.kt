@@ -308,6 +308,7 @@ interface Settings {
     fun getPeriodicSaveTimeMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
+    fun getReportViolationUrl(): String
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>

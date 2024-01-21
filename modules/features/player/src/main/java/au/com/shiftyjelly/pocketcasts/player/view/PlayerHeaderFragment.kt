@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -190,6 +191,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+        }
+        binding.report?.setOnClickListener {
+            trackShelfAction(ShelfItem.Report.analyticsValue)
+            openUrl(settings.getReportViolationUrl())
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
