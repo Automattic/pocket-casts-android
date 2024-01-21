@@ -35,6 +35,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    REPORT_VIOLATION(
+        key = "report_violation",
+        title = "Report Violation",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     ;
 
     companion object {
