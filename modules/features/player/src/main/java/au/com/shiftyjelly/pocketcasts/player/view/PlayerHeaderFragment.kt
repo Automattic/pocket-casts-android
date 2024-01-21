@@ -155,6 +155,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Archive.id to binding.archive,
             ShelfItem.Download.id to binding.download,
             ShelfItem.Bookmark.id to binding.bookmark,
+            ShelfItem.Report.id to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
             val visibleItems = it.first.subList(0, 4).map { it.id }

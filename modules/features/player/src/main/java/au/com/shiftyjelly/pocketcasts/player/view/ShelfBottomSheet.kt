@@ -172,6 +172,9 @@ class ShelfBottomSheet : BaseDialogFragment() {
             ShelfItem.Download -> {
                 Timber.e("Unexpected click on ShelfItem.Download")
             }
+            is ShelfItem.Report -> {
+                Timber.e("ShelfItem.report is not implemented")
+            }
         }
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
