@@ -895,6 +895,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         when (item.itemId) {
             R.id.share -> share()
             R.id.report -> {
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REPORT_TAPPED)
                 openUrl(settings.getReportViolationUrl())
             }
         }
