@@ -16,6 +16,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import com.squareup.moshi.Moshi
+import java.io.File
+import java.net.HttpURLConnection
+import java.util.concurrent.TimeUnit
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -30,9 +33,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.io.File
-import java.net.HttpURLConnection
-import java.util.concurrent.TimeUnit
 
 class PocketCastsAccountAuthenticatorTest {
 
@@ -107,7 +107,7 @@ class PocketCastsAccountAuthenticatorTest {
                     "expiresIn": 1800,
                     "refreshToken": "refresh token"
                 }
-                """.trimIndent()
+                """.trimIndent(),
             )
         mockWebServer.enqueue(response)
 
@@ -115,7 +115,7 @@ class PocketCastsAccountAuthenticatorTest {
             response = null,
             account = account,
             authTokenType = null,
-            options = null
+            options = null,
         )
         assertNotNull(bundle)
         assertEquals(account.name, bundle.getString(AccountManager.KEY_ACCOUNT_NAME))
@@ -142,7 +142,7 @@ class PocketCastsAccountAuthenticatorTest {
                     "error_description": "The provided grant is invalid, expired or has been revoked.",
                     "error_uri": ""
                 }
-                """.trimIndent()
+                """.trimIndent(),
             )
         mockWebServer.enqueue(response)
 
@@ -150,7 +150,7 @@ class PocketCastsAccountAuthenticatorTest {
             response = null,
             account = account,
             authTokenType = null,
-            options = null
+            options = null,
         )
         assertNotNull(bundle)
 
@@ -178,7 +178,7 @@ class PocketCastsAccountAuthenticatorTest {
                 response = null,
                 account = account,
                 authTokenType = null,
-                options = null
+                options = null,
             )
         }
 

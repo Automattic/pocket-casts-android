@@ -26,37 +26,37 @@ fun MessageView(
     buttonTitle: String,
     buttonAction: () -> Unit,
     style: MessageViewColors,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Box(
             modifier = Modifier
                 .padding(16.dp)
                 .background(
                     color = style.backgroundColor(),
-                    shape = RoundedCornerShape(size = 4.dp)
-                )
+                    shape = RoundedCornerShape(size = 4.dp),
+                ),
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
             ) {
                 titleView()
                 TextP40(
                     text = message,
                     color = style.textColor(),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier.padding(top = 12.dp),
                 )
                 TextButton(
                     buttonTitle = buttonTitle,
                     buttonAction = buttonAction,
                     modifier = Modifier.padding(top = 4.dp),
-                    style = style
+                    style = style,
                 )
             }
         }
@@ -68,19 +68,19 @@ private fun TextButton(
     buttonTitle: String,
     buttonAction: () -> Unit = {},
     modifier: Modifier,
-    style: MessageViewColors
+    style: MessageViewColors,
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .minimumInteractiveComponentSize()
-            .clickable { buttonAction() }
+            .clickable { buttonAction() },
     ) {
         TextH40(
             text = buttonTitle,
             color = style.buttonTextColor(),
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         )
     }
 }
@@ -88,8 +88,10 @@ private fun TextButton(
 sealed class MessageViewColors {
     @Composable
     abstract fun backgroundColor(): Color
+
     @Composable
     abstract fun textColor(): Color
+
     @Composable
     abstract fun buttonTextColor(): Color
 

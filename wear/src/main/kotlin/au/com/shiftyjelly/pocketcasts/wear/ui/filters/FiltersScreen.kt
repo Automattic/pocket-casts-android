@@ -55,7 +55,7 @@ private fun Content(
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        columnState = columnState
+        columnState = columnState,
     ) {
         item {
             ScreenHeaderChip(LR.string.filters)
@@ -69,9 +69,9 @@ private fun Content(
                         painter = painterResource(filter.drawableId),
                         contentDescription = null,
                         tint = WearColors.getFilterColor(filter),
-                        modifier = Modifier.padding(horizontal = 8.dp).size(24.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
                     )
-                }
+                },
             )
         }
     }

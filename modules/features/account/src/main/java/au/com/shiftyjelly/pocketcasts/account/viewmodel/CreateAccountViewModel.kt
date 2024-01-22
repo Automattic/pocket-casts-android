@@ -21,8 +21,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CreateAccountViewModel
@@ -30,7 +30,7 @@ class CreateAccountViewModel
     private val syncManager: SyncManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val podcastManager: PodcastManager
+    private val podcastManager: PodcastManager,
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()
@@ -66,20 +66,18 @@ class CreateAccountViewModel
 
             val analyticsProperties = mapOf(
                 PRODUCT_KEY to productKey,
-                IS_FREE_TRIAL_KEY to isFreeTrial
+                IS_FREE_TRIAL_KEY to isFreeTrial,
             )
 
             when (purchaseEvent) {
-
                 is PurchaseEvent.Success -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
 
                 is PurchaseEvent.Cancelled -> analyticsTracker.track(
                     AnalyticsEvent.PURCHASE_CANCELLED,
-                    analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
+                    analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode),
                 )
 
                 is PurchaseEvent.Failure -> {
-
                     // Exclude error_code property if we do not have a responseCode
                     val properties = purchaseEvent.responseCode?.let {
                         analyticsProperties.plus(ERROR_CODE_KEY to it)
@@ -101,7 +99,7 @@ class CreateAccountViewModel
                             .mapNotNull {
                                 Subscription.fromProductDetails(
                                     productDetails = it,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(SubscriptionMapper.mapProductIdToTier(it.productId))
+                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
                                 )
                             }
                         subscriptionManager.getDefaultSubscription(subscriptions)?.let { updateSubscription(it) }
@@ -112,7 +110,7 @@ class CreateAccountViewModel
                 },
                 onError = {
                     errorUpdate(CreateAccountError.CANNOT_LOAD_SUBS, true)
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -174,7 +172,7 @@ class CreateAccountViewModel
     fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(SOURCE_KEY to NewsletterSource.ACCOUNT_UPDATED.analyticsValue, ENABLED_KEY to isChecked)
+            mapOf(SOURCE_KEY to NewsletterSource.ACCOUNT_UPDATED.analyticsValue, ENABLED_KEY to isChecked),
         )
         newsletter.value = isChecked
         newsletter.value?.let {
@@ -267,7 +265,7 @@ class CreateAccountViewModel
                 },
                 onError = {
                     errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -290,7 +288,7 @@ enum class NewsletterSource(val analyticsValue: String) {
 
 enum class SubscriptionType(val value: String, val trackingLabel: String) {
     FREE("Free", "free"),
-    PLUS("Pocket Casts Plus", "plus")
+    PLUS("Pocket Casts Plus", "plus"),
 }
 
 enum class CreateAccountError {
@@ -299,7 +297,7 @@ enum class CreateAccountError {
     INVALID_PASSWORD,
     CANNOT_CREATE_ACCOUNT,
     CANNOT_CREATE_SUB,
-    CANCELLED_CREATE_SUB
+    CANCELLED_CREATE_SUB,
 }
 
 sealed class CreateAccountState {

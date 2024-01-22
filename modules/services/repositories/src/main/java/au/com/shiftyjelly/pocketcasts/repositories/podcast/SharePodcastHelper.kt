@@ -16,14 +16,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.math.round
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class SharePodcastHelper(
@@ -79,7 +79,7 @@ data class SharePodcastHelper(
             val file = File(path)
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = episode.fileType
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, this.context)
+            val uri = FileUtil.createUriWithReadPermissions(this.context, file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             this.context.startActivity(Intent.createChooser(intent, context.getString(LR.string.podcasts_share_via)))
         } catch (e: Exception) {
@@ -123,6 +123,6 @@ data class SharePodcastHelper(
         PODCAST("podcast"),
         EPISODE("episode"),
         EPISODE_FILE("episode_file"),
-        CURRENT_TIME("current_time")
+        CURRENT_TIME("current_time"),
     }
 }

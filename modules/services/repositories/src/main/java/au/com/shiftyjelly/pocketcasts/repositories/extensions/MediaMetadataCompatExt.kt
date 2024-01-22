@@ -240,7 +240,7 @@ fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
                 .Builder()
                 .setTag(fullDescription)
                 .setUri(mediaUri)
-                .build()
+                .build(),
         )
 
 /**
@@ -249,9 +249,8 @@ fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
  */
 @UnstableApi
 fun List<MediaMetadataCompat>.toMediaSource(
-    dataSourceFactory: DataSource.Factory
+    dataSourceFactory: DataSource.Factory,
 ): ConcatenatingMediaSource {
-
     val concatenatingMediaSource = ConcatenatingMediaSource()
     forEach {
         concatenatingMediaSource.addMediaSource(it.toMediaSource(dataSourceFactory))

@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -49,6 +50,9 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.Timer
+import java.util.TimerTask
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,9 +61,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Timer
-import java.util.TimerTask
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class MediaSessionManager(
@@ -71,6 +72,7 @@ class MediaSessionManager(
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
+    val bookmarkFeature: BookmarkFeatureControl,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
@@ -125,7 +127,7 @@ class MediaSessionManager(
                         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                     }
                 },
-            )
+            ),
         )
 
         if (!Util.isAutomotive(context)) { // We can't start activities on automotive
@@ -141,7 +143,8 @@ class MediaSessionManager(
         bookmarkHelper = BookmarkHelper(
             playbackManager,
             bookmarkManager,
-            settings
+            settings,
+            bookmarkFeature,
         )
 
         connect()
@@ -328,7 +331,7 @@ class MediaSessionManager(
             // ignore the playback progress updates as the media session can calculate this without being sent it every second
             "updateCurrentPosition",
             // ignore the user seeking as the event onBufferingStateChanged will update the buffering state
-            "onUserSeeking"
+            "onUserSeeking",
         )
 
         var previousEpisode: BaseEpisode? = null
@@ -365,7 +368,7 @@ class MediaSessionManager(
             .subscribeBy(
                 onError = { throwable ->
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
-                }
+                },
             ).addTo(disposables)
     }
 
@@ -547,7 +550,7 @@ class MediaSessionManager(
                                 playPauseTimer = null
                             }
                         },
-                        600
+                        600,
                     )
                 }
             } else {
@@ -573,7 +576,8 @@ class MediaSessionManager(
                 HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
                 HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
                 HeadphoneAction.NEXT_CHAPTER,
-                HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
+                HeadphoneAction.PREVIOUS_CHAPTER,
+                -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 
@@ -645,7 +649,7 @@ class MediaSessionManager(
                         playbackManager.playNowSuspend(episode = episode, sourceView = source)
                     }
                     LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
-                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
+                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList, needsSync = false)
                     }
                 }
             }
@@ -751,7 +755,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects)
+            settings.globalPlaybackEffects.set(effects, needsSync = false)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

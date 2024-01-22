@@ -5,5 +5,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class ForgotPasswordRequest(
-    @field:Json(name = "email") val email: String
+    @field:Json(name = "email") val email: String,
 )

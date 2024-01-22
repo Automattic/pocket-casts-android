@@ -11,7 +11,7 @@ private const val GAP_COUNT = 0
 class RadioactiveLineView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
     private val lineHeight = 2.dpToPx(context)
 

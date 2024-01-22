@@ -5,9 +5,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.annotations.VisibleForTesting
-import javax.inject.Inject
 
 class ShowNotesManager @Inject constructor(
     private val serverShowNotesManager: ServerShowNotesManager,
@@ -18,14 +18,14 @@ class ShowNotesManager @Inject constructor(
         serverShowNotesManager.loadShowNotesFlow(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            persistImageUrls = ::updateEpisodesWithImageUrls
+            persistImageUrls = ::updateEpisodesWithImageUrls,
         )
 
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState =
         serverShowNotesManager.loadShowNotes(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            persistImageUrls = ::updateEpisodesWithImageUrls
+            persistImageUrls = ::updateEpisodesWithImageUrls,
         )
 
     suspend fun downloadToCacheShowNotes(podcastUuid: String) {

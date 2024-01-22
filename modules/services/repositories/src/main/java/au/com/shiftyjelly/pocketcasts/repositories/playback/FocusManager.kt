@@ -20,17 +20,22 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
     companion object {
         // we don't have audio focus, and can't duck
         private const val AUDIO_NO_FOCUS_NO_DUCK = 0
+
         // we don't have audio focus, and can't duck but focus is going to be given back
         private const val AUDIO_NO_FOCUS_NO_DUCK_TRANSIENT = 1
+
         // we don't have focus, but can duck (play at a low volume) and focus is going to be given back
         private const val AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT = 2
+
         // we have full audio focus
         private const val AUDIO_FOCUSED = 3
     }
 
     private val audioManager: AudioManager? = if (context == null) null else context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
     // track if another app has stolen audio focus
     private var audioFocus: Int = 0
+
     // track when the time lost as we don't want to resume if it has been too long
     private var timeFocusLost: Long = 0
     private var deviceRemovedWhileFocusLost = false
@@ -189,7 +194,7 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
                     }
                 }
             },
-            null
+            null,
         )
     }
 

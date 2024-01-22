@@ -22,7 +22,7 @@ object PodcastImage {
         return listOf(
             getArtworkUrl(size = 960, uuid = uuid),
             getArtworkUrl(size = 480, uuid = uuid),
-            getArtworkUrl(size = 200, uuid = uuid)
+            getArtworkUrl(size = 200, uuid = uuid),
         )
     }
 

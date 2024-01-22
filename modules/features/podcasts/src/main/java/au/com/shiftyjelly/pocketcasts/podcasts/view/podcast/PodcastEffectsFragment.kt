@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var preferenceCustomForPodcast: SwitchPreference? = null
@@ -50,7 +51,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         fun newInstance(podcastUuid: String): PodcastEffectsFragment {
             return PodcastEffectsFragment().apply {
                 arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+                    ARG_PODCAST_UUID to podcastUuid,
                 )
             }
         }
@@ -118,7 +119,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         preferenceCustomForPodcast?.setOnPreferenceChangeListener { _, newValue ->
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_CUSTOM_PLAYBACK_EFFECTS_TOGGLED,
-                mapOf("enabled" to newValue as Boolean)
+                mapOf("enabled" to newValue as Boolean),
             )
             viewModel.updateOverrideGlobalEffects(newValue)
             true

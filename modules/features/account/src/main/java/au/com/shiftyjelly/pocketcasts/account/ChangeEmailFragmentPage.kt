@@ -100,7 +100,7 @@ fun ChangeEmailFragmentPage(
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_change_email_address_title),
             bottomShadow = true,
-            onNavigationClick = onBackPressed
+            onNavigationClick = onBackPressed,
         )
 
         Column(
@@ -113,7 +113,7 @@ fun ChangeEmailFragmentPage(
             Row(
                 modifier = Modifier
                     .padding(
-                        horizontal = 16.dp
+                        horizontal = 16.dp,
                     ),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
@@ -129,7 +129,7 @@ fun ChangeEmailFragmentPage(
                         .basicMarquee(),
                     text = existingEmail,
                     color = MaterialTheme.theme.colors.primaryText01,
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
                 )
             }
 
@@ -137,7 +137,7 @@ fun ChangeEmailFragmentPage(
                 EmailAndPasswordFields(
                     modifier = Modifier
                         .padding(
-                            horizontal = 16.dp
+                            horizontal = 16.dp,
                         ),
                     email = email,
                     emailPlaceholder = stringResource(LR.string.profile_new_email_address),
@@ -156,10 +156,10 @@ fun ChangeEmailFragmentPage(
                 TextH40(
                     modifier = Modifier
                         .padding(
-                            horizontal = 16.dp
+                            horizontal = 16.dp,
                         ),
                     text = errorMessage,
-                    color = MaterialTheme.theme.colors.support05
+                    color = MaterialTheme.theme.colors.support05,
                 )
             }
         }

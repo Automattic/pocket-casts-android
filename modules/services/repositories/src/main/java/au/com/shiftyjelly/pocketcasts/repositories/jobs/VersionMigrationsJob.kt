@@ -21,8 +21,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @AndroidEntryPoint
 @SuppressLint("SpecifyJobSchedulerIdRange")
@@ -77,16 +77,21 @@ class VersionMigrationsJob : JobService() {
             jobScheduler.schedule(
                 JobInfo.Builder(JobIds.VERSION_MIGRATION_JOB_ID, ComponentName(context, VersionMigrationsJob::class.java))
                     .setOverrideDeadline(500) // don't let Android wait for more than 500ms before kicking this off
-                    .build()
+                    .build(),
             )
         }
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var fileStorage: FileStorage
+
     @Inject lateinit var appDatabase: AppDatabase
+
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Volatile private var shouldKeepRunning = true
@@ -157,8 +162,7 @@ class VersionMigrationsJob : JobService() {
 
     private fun removeOldTempPodcastDirectory() {
         try {
-            val oldTempDirectory = fileStorage.oldTempPodcastDirectory
-            FileUtil.deleteDirectoryContents(oldTempDirectory.absolutePath)
+            fileStorage.getOrCreateEpisodesOldTempDir()?.absolutePath?.let(FileUtil::deleteDirContents)
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clear old podcast temp directory")
         }
@@ -172,7 +176,7 @@ class VersionMigrationsJob : JobService() {
             playbackManager.removeEpisode(
                 episodeToRemove = episode,
                 source = SourceView.UNKNOWN,
-                userInitiated = false
+                userInitiated = false,
             )
             appDatabase.episodeDao().delete(episode)
         }
@@ -182,21 +186,21 @@ class VersionMigrationsJob : JobService() {
     private fun performV7Migration() {
         // We want v6 users to keep defaulting to download, new users should get the new stream default
         val currentStreamingPreference = if (settings.contains(Settings.PREFERENCE_GLOBAL_STREAMING_MODE)) settings.streamingMode.value else false
-        settings.streamingMode.set(currentStreamingPreference)
+        settings.streamingMode.set(currentStreamingPreference, needsSync = false)
     }
 
     private fun addUpNextAutoDownload() {
-        settings.autoDownloadUpNext.set(!settings.streamingMode.value)
+        settings.autoDownloadUpNext.set(!settings.streamingMode.value, needsSync = false)
     }
 
     private fun deletePodcastImages() {
         try {
-            val thumbnailsFolder = fileStorage.getOrCreateDirectory("podcast_thumbnails")
-            if (thumbnailsFolder.exists()) {
+            val thumbnailsFolder = fileStorage.getOrCreateDir("podcast_thumbnails")
+            if (thumbnailsFolder != null && thumbnailsFolder.exists()) {
                 thumbnailsFolder.delete()
             }
-            val imageFolder = fileStorage.getOrCreateDirectory("images")
-            if (imageFolder.exists()) {
+            val imageFolder = fileStorage.getOrCreateDir("images")
+            if (imageFolder != null && imageFolder.exists()) {
                 imageFolder.delete()
             }
         } catch (e: Exception) {

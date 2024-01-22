@@ -23,10 +23,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.Flowables
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class CloudBottomSheetViewModel @Inject constructor(
@@ -38,7 +38,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    userManager: UserManager
+    userManager: UserManager,
 ) : ViewModel() {
     lateinit var state: LiveData<BottomSheetState>
     var signInState = userManager.getSignInState().toLiveData()
@@ -177,5 +177,5 @@ class CloudBottomSheetViewModel @Inject constructor(
 data class BottomSheetState(
     val episode: UserEpisode,
     val inUpNext: Boolean,
-    val isPlaying: Boolean
+    val isPlaying: Boolean,
 )

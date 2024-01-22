@@ -9,13 +9,13 @@ import javax.inject.Inject
 class PlayerFactoryImpl @Inject constructor(
     private val settings: Settings,
     private val statsManager: StatsManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : PlayerFactory {
 
     override fun createCastPlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
         return CastPlayer(
             context,
-            onPlayerEvent
+            onPlayerEvent,
         )
     }
 

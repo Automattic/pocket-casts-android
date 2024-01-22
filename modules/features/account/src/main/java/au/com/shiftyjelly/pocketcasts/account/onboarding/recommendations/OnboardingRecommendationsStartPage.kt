@@ -71,7 +71,6 @@ fun OnboardingRecommendationsStartPage(
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
     val state by viewModel.state.collectAsState()
 
@@ -108,7 +107,7 @@ fun OnboardingRecommendationsStartPage(
         onComplete = {
             viewModel.onComplete()
             onComplete()
-        }
+        },
     )
 }
 
@@ -122,7 +121,6 @@ private fun Content(
     onComplete: () -> Unit,
 ) {
     Column {
-
         val numToShowDefault = OnboardingRecommendationsStartPageViewModel.NUM_TO_SHOW_DEFAULT
         val numColumns = when (LocalConfiguration.current.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> numToShowDefault
@@ -134,9 +132,8 @@ private fun Content(
             contentPadding = PaddingValues(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
-
             header {
                 Column {
                     Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
@@ -144,31 +141,31 @@ private fun Content(
                         horizontalArrangement = Arrangement.End,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 18.dp)
+                            .padding(bottom = 18.dp),
 
                     ) {
                         TextH30(
                             text = stringResource(LR.string.onboarding_recommendations_import),
                             modifier = Modifier
                                 .clickable { onImportClicked() }
-                                .padding(horizontal = 16.dp, vertical = 9.dp)
+                                .padding(horizontal = 16.dp, vertical = 9.dp),
                         )
                     }
 
                     TextH10(
                         text = stringResource(LR.string.onboarding_recommendations_find_favorite_podcasts),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
 
                     TextP40(
                         text = stringResource(LR.string.onboarding_recommendations_make_pocket_casts_yours),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
 
                     SearchBarButton(
                         text = stringResource(LR.string.search),
                         onClick = onSearch,
-                        modifier = Modifier.padding(bottom = 25.dp)
+                        modifier = Modifier.padding(bottom = 25.dp),
                     )
                 }
             }
@@ -176,7 +173,7 @@ private fun Content(
             state.sections.forEach { section ->
                 section(
                     section = section,
-                    onSubscribeTap = onSubscribeTap
+                    onSubscribeTap = onSubscribeTap,
                 )
             }
 
@@ -201,19 +198,18 @@ private fun Content(
 
 private fun LazyGridScope.section(
     section: Section,
-    onSubscribeTap: (Podcast) -> Unit
+    onSubscribeTap: (Podcast) -> Unit,
 ) {
     if (section.visiblePodcasts.isEmpty()) return
 
     header {
         TextH20(
             text = section.title,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
     }
 
     items(items = section.visiblePodcasts) {
-
         // Simulate minLines = 2 since we can't do that directly
         // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
         // Google is working on adding a minLines capability though: https://issuetracker.google.com/issues/122476634
@@ -239,7 +235,7 @@ private fun LazyGridScope.section(
                 maxLines = 2,
                 modifier = Modifier
                     .heightIn(min = twoLines)
-                    .clearAndSetSemantics {}
+                    .clearAndSetSemantics {},
             )
         }
     }
@@ -249,7 +245,7 @@ private fun LazyGridScope.section(
             text = stringResource(LR.string.onboarding_recommendations_more, section.title),
             includePadding = false,
             onClick = section::onShowMore,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
     }
 }
@@ -259,11 +255,10 @@ private fun LazyGridScope.section(
 private fun Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-
     fun podcast(isSubscribed: Boolean = false) = Podcast(
         uuid = "5168e260-372e-013b-efad-0acc26574db2",
         title = "Why Do We Do That?",
-        isSubscribed = isSubscribed
+        isSubscribed = isSubscribed,
     )
 
     AppThemeWithBackground(themeType) {
@@ -284,7 +279,7 @@ private fun Preview(
                             podcast(),
                         ),
                         onShowMoreFun = {},
-                    )
+                    ),
                 ),
                 showLoadingSpinner = true,
             ),
@@ -292,7 +287,7 @@ private fun Preview(
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},
-            onComplete = {}
+            onComplete = {},
         )
     }
 }

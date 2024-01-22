@@ -139,7 +139,7 @@ interface Settings {
 
     enum class UpNextAction {
         PLAY_NEXT,
-        PLAY_LAST
+        PLAY_LAST,
     }
 
     enum class CloudSortOrder {
@@ -148,7 +148,7 @@ interface Settings {
         A_TO_Z,
         Z_TO_A,
         SHORT_LONG,
-        LONG_SHORT
+        LONG_SHORT,
     }
 
     sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {

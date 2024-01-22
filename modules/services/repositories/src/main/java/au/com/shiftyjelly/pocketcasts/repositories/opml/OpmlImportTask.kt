@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.opml
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
@@ -26,6 +28,12 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.io.InputStream
+import java.io.StringReader
+import java.net.URL
+import java.util.Scanner
+import java.util.regex.Pattern
+import javax.xml.parsers.SAXParserFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -37,12 +45,6 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
 import org.xml.sax.helpers.DefaultHandler
-import java.io.InputStream
-import java.io.StringReader
-import java.net.URL
-import java.util.Scanner
-import java.util.regex.Pattern
-import javax.xml.parsers.SAXParserFactory
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -99,7 +101,7 @@ class OpmlImportTask @AssistedInject constructor(
                         uri: String?,
                         localName: String?,
                         qName: String?,
-                        attributes: Attributes?
+                        attributes: Attributes?,
                     ) {
                         if (localName.equals("outline", ignoreCase = true)) {
                             val url = attributes?.getValue("xmlUrl")
@@ -108,7 +110,7 @@ class OpmlImportTask @AssistedInject constructor(
                             }
                         }
                     }
-                }
+                },
             )
             return urls
         }
@@ -139,7 +141,7 @@ class OpmlImportTask @AssistedInject constructor(
                     override fun characters(charArray: CharArray, start: Int, length: Int) {
                         decodedUrl.append(String(charArray, start, length))
                     }
-                }
+                },
             )
             return decodedUrl.toString()
         }
@@ -174,14 +176,14 @@ class OpmlImportTask @AssistedInject constructor(
     private fun trackProcessed(numberParsed: Int) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FINISHED,
-            mapOf("number" to numberParsed)
+            mapOf("number" to numberParsed),
         )
     }
 
     fun trackFailure(reason: String) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FAILED,
-            mapOf("reason" to reason)
+            mapOf("reason" to reason),
         )
     }
 
@@ -270,7 +272,15 @@ class OpmlImportTask @AssistedInject constructor(
      * Keep the job in the foreground with a notification
      */
     private fun createForegroundInfo(progress: Int, total: Int): ForegroundInfo {
-        return ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                Settings.NotificationId.OPML.value,
+                buildNotification(progress, total),
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+            )
+        } else {
+            ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
+        }
     }
 
     private fun updateNotification(initialDatabaseCount: Int, podcastCount: Int) {

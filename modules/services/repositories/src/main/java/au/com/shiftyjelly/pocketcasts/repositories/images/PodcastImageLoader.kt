@@ -17,10 +17,10 @@ import coil.request.SuccessResult
 import coil.size.Size
 import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.io.File
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 open class PodcastImageLoader(

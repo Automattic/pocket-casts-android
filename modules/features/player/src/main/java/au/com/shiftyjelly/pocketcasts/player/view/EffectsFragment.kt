@@ -40,7 +40,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeListener, MaterialButtonToggleGroup.OnButtonCheckedListener, View.OnClickListener {
 
     @Inject lateinit var stats: StatsManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var playbackManager: PlaybackManager
 
     override val statusBarColor: StatusBarColor? = null
@@ -141,12 +143,12 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             val trimButtonTextColor = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_checked), // Enabled
-                    intArrayOf()
+                    intArrayOf(),
                 ),
                 intArrayOf(
                     backgroundColor,
-                    playerContrast01
-                )
+                    playerContrast01,
+                ),
             )
             binding?.trimLow?.setTextColor(trimButtonTextColor)
             binding?.trimMedium?.setTextColor(trimButtonTextColor)

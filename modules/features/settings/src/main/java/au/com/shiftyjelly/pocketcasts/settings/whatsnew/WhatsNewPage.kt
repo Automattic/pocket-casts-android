@@ -92,7 +92,7 @@ private fun WhatsNewPageLoaded(
     val targetAlpha = if (closing) 0f else 0.66f
     val scrimAlpha: Float by animateFloatAsState(
         targetValue = targetAlpha,
-        finishedListener = { onClose() }
+        finishedListener = { onClose() },
     )
 
     val performClose = {
@@ -110,10 +110,9 @@ private fun WhatsNewPageLoaded(
             )
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         Column(Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
-
             // Hide the header graphic if the phone is in landscape mode so there is room for the text
             if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 header()
@@ -124,16 +123,15 @@ private fun WhatsNewPageLoaded(
                 modifier = Modifier
                     .padding(all = 16.dp),
             ) {
-
                 SubscriptionBadgeForTier(
                     tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
-                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 )
 
                 Spacer(
                     modifier = Modifier.height(
-                        if (state.tier == UserTier.Free) 0.dp else 16.dp
-                    )
+                        if (state.tier == UserTier.Free) 0.dp else 16.dp,
+                    ),
                 )
 
                 TextH20(
@@ -157,7 +155,7 @@ private fun WhatsNewPageLoaded(
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -192,7 +190,7 @@ private fun getButtonTitle(
                             Subscription.SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
                             Subscription.SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
                             Subscription.SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
-                        }
+                        },
                     )
                 } else {
                     Timber.e("Subscription tier is null. This should not happen when user is not entitled to a feature.")
@@ -216,7 +214,7 @@ private fun WhatsNewAutoPlayPreview(
             ),
             header = { AutoPlayHeader() },
             onConfirm = {},
-            onClose = {}
+            onClose = {},
         )
     }
 }
@@ -241,7 +239,7 @@ private fun WhatsNewBookmarksPreview(
             ),
             header = { BookmarksHeader(onClose = {}) },
             onConfirm = {},
-            onClose = {}
+            onClose = {},
         )
     }
 }

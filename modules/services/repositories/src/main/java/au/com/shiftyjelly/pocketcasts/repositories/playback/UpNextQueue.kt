@@ -96,7 +96,8 @@ enum class UpNextSource(val analyticsValue: String) {
     PLAYER("player"),
     NOW_PLAYING("now_playing"),
     UP_NEXT_SHORTCUT("up_next_shortcut"),
-    UNKNOWN("unknown");
+    UNKNOWN("unknown"),
+    ;
 
     companion object {
         fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN

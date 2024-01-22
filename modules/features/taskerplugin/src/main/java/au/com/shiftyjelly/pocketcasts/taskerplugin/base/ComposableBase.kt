@@ -54,7 +54,7 @@ class TaskerInputFieldState<T>(val content: Content<T>) {
         val taskerVariables: List<String>,
         val possibleItems: Flow<List<T>>? = null,
         val itemToString: (T?) -> String = { it?.toString() ?: "" },
-        val itemContent: @Composable (T) -> Unit = { Text(text = itemToString(it)) }
+        val itemContent: @Composable (T) -> Unit = { Text(text = itemToString(it)) },
     )
 }
 
@@ -75,7 +75,6 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
         selection?.let { content.onTextChange(it) }
     }
     Box {
-
         Row {
             val possibleItems = content.possibleItems?.collectAsState(initial = null)?.value
 
@@ -95,10 +94,12 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                         painter = painterResource(content.iconResId),
                         contentDescription = stringResource(content.labelResId),
                         tint = MaterialTheme.theme.colors.primaryIcon01,
-                        modifier = Modifier.padding(end = 16.dp, start = 16.dp)
+                        modifier = Modifier.padding(end = 16.dp, start = 16.dp),
                     )
                 },
-                trailingIcon = if (!hasSuggestedItems && !hasTaskerVariables) null else {
+                trailingIcon = if (!hasSuggestedItems && !hasTaskerVariables) {
+                    null
+                } else {
                     {
                         Row {
                             if (hasTaskerVariables) {
@@ -107,7 +108,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                                         painter = painterResource(RT.drawable.label_outline),
                                         contentDescription = stringResource(R.string.tasker_variables),
                                         tint = MaterialTheme.theme.colors.primaryIcon01,
-                                        modifier = Modifier.padding(end = 16.dp, start = 16.dp)
+                                        modifier = Modifier.padding(end = 16.dp, start = 16.dp),
                                     )
                                 }
                             }
@@ -117,13 +118,13 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                                         painter = painterResource(RD.drawable.ic_search),
                                         contentDescription = stringResource(R.string.search),
                                         tint = MaterialTheme.theme.colors.primaryIcon01,
-                                        modifier = Modifier.padding(end = 16.dp, start = 16.dp)
+                                        modifier = Modifier.padding(end = 16.dp, start = 16.dp),
                                     )
                                 }
                             }
                         }
                     }
-                }
+                },
             )
             val dropdownMaxHeight = screenSize.height / 6 * 2 // at most dropdown can be 2/6 of the screen size so it doesn't draw over its parent
             if (hasTaskerVariables) {
@@ -131,7 +132,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                     modifier = Modifier.requiredSizeIn(maxHeight = dropdownMaxHeight),
                     expanded = selectionMode == TaskerInputFieldSelectMode.Variable,
                     onDismissRequest = { finishSelecting() },
-                    properties = PopupProperties(focusable = false)
+                    properties = PopupProperties(focusable = false),
                 ) {
                     content.taskerVariables.forEach {
                         DropdownMenuItem(onClick = {
@@ -147,7 +148,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                     modifier = Modifier.requiredSizeIn(maxHeight = dropdownMaxHeight),
                     expanded = selectionMode == TaskerInputFieldSelectMode.ItemList,
                     onDismissRequest = { finishSelecting() },
-                    properties = PopupProperties(focusable = false)
+                    properties = PopupProperties(focusable = false),
                 ) {
                     possibleItems.forEach {
                         DropdownMenuItem(onClick = {
@@ -168,13 +169,14 @@ private fun ComposableTaskerInputFieldPreview() {
     AppTheme(Theme.ThemeType.CLASSIC_LIGHT) {
         ComposableTaskerInputField(
             TaskerInputFieldState.Content(
-                MutableStateFlow("some value"), R.string.archive,
+                MutableStateFlow("some value"),
+                R.string.archive,
                 RD.drawable.widget_play,
                 MutableStateFlow(true),
                 {},
                 listOf("%test"),
-                MutableStateFlow(listOf("Hi", "Hello"))
-            )
+                MutableStateFlow(listOf("Hi", "Hello")),
+            ),
         )
     }
 }
@@ -182,12 +184,12 @@ private fun ComposableTaskerInputFieldPreview() {
 @Composable
 fun ComposableTaskerInputFieldList(
     fieldContents: List<TaskerInputFieldState.Content<*>>,
-    onFinish: () -> Unit
+    onFinish: () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxHeight()
+            .fillMaxHeight(),
     ) {
         LazyColumn {
             fieldContents.forEach { content ->

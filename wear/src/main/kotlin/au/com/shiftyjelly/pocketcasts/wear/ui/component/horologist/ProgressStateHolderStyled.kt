@@ -14,11 +14,11 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.PlaybackProgr
 import com.google.android.horologist.media.model.TimestampProvider
 import com.google.android.horologist.media.ui.state.LocalTimestampProvider
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
+import kotlin.math.abs
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 /**
  * State holder for the media progress indicator that supports both ongoing predictive progress and
@@ -26,7 +26,7 @@ import kotlin.math.abs
  */
 class ProgressStateHolderStyled(
     initial: Float,
-    private val timestampProvider: TimestampProvider
+    private val timestampProvider: TimestampProvider,
 ) {
     private val actual = mutableStateOf(initial)
     private val animatable = Animatable(0f)
@@ -88,6 +88,6 @@ object PlaybackProgressAnimation {
             stiffness = 100f,
             // The default threshold is 0.01, or 1% of the overall progress range, which is quite
             // large and noticeable.
-            visibilityThreshold = 1 / 1000f
+            visibilityThreshold = 1 / 1000f,
         )
 }

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.taskerplugin.queryfilterepisodes.config
+package au.com.shiftyjelly.pocketcasts.taskerplugin.queryUpNext.config
 
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
@@ -14,13 +14,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as RD
 
 @AndroidEntryPoint
-class ActivityConfigQueryFilterEpisodes : ActivityConfigBase<ViewModelConfigQueryFilterEpisodes>() {
-    override val viewModel: ViewModelConfigQueryFilterEpisodes by viewModels()
+class ActivityConfigQueryUpNext : ActivityConfigBase<ViewModelConfigQueryUpNext>() {
+    override val viewModel: ViewModelConfigQueryUpNext by viewModels()
+    override val finishForTaskerRightAway get() = true
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun ComposableConfigQueryFilterEpisodesPreview() {
+private fun ComposableConfigQueryUpNextPreview() {
     AppTheme(Theme.ThemeType.CLASSIC_LIGHT) {
         ComposableTaskerInputFieldList(
             listOf(
@@ -31,9 +32,9 @@ private fun ComposableConfigQueryFilterEpisodesPreview() {
                     MutableStateFlow(true),
                     {},
                     listOf("%test"),
-                    MutableStateFlow(listOf("New Releases", "Up Next"))
-                )
-            )
+                    MutableStateFlow(listOf("New Releases", "Up Next")),
+                ),
+            ),
         ) {}
     }
 }

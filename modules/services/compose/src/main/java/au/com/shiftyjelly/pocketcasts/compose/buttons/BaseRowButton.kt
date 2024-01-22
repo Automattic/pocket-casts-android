@@ -47,7 +47,7 @@ fun BaseRowButton(
     Box(
         modifier = modifier
             .then(if (includePadding) Modifier.padding(16.dp) else Modifier)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         Button(
             onClick = { onClick() },
@@ -55,14 +55,14 @@ fun BaseRowButton(
             border = border,
             modifier = Modifier.fillMaxWidth(),
             colors = colors,
-            enabled = enabled
+            enabled = enabled,
         ) {
             Box(Modifier.fillMaxWidth()) {
                 if (leadingIcon != null) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(4.dp)
+                            .padding(4.dp),
                     ) {
                         leadingIcon()
                     }
@@ -70,14 +70,14 @@ fun BaseRowButton(
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     if (textIcon != null) {
                         Image(
                             painter = painterResource(textIcon),
                             contentDescription = null,
                             colorFilter = ColorFilter.tint(textColor),
-                            modifier = Modifier
+                            modifier = Modifier,
                         )
                     }
                     TextP40(
@@ -87,7 +87,7 @@ fun BaseRowButton(
                         modifier = Modifier
                             .padding(vertical = textVerticalPadding, horizontal = 6.dp),
                         textAlign = TextAlign.Center,
-                        color = textColor
+                        color = textColor,
                     )
                 }
             }

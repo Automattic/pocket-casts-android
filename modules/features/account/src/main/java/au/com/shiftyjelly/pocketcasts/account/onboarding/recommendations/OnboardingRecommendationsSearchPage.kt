@@ -49,7 +49,6 @@ fun OnboardingRecommendationsSearchPage(
     theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingRecommendationsSearchViewModel>()
     val state by viewModel.state.collectAsState()
 
@@ -74,14 +73,14 @@ fun OnboardingRecommendationsSearchPage(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.ime)
-            .fillMaxHeight()
+            .fillMaxHeight(),
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_find_podcasts),
             onNavigationClick = {
                 viewModel.onBackPressed()
                 onBackPressed()
-            }
+            },
         )
 
         SearchBar(
@@ -89,12 +88,14 @@ fun OnboardingRecommendationsSearchPage(
             placeholder = stringResource(LR.string.search),
             onTextChanged = viewModel::updateSearchQuery,
             onSearch = with(LocalContext.current) {
-                { viewModel.queryImmediately(this) }
+                {
+                    viewModel.queryImmediately(this)
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .focusRequester(focusRequester)
+                .focusRequester(focusRequester),
         )
 
         Box(Modifier.height(2.dp)) {
@@ -104,7 +105,7 @@ fun OnboardingRecommendationsSearchPage(
                 LinearProgressIndicator(
                     color = MaterialTheme.theme.colors.secondaryUi01,
                     backgroundColor = MaterialTheme.theme.colors.secondaryUi02,
-                    modifier = Modifier.matchParentSize()
+                    modifier = Modifier.matchParentSize(),
                 )
             }
         }

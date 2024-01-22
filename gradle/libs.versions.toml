@@ -248,7 +248,7 @@ browser = "androidx.browser:browser:1.4.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 car = "androidx.car.app:app:1.2.0"
 cardview = "androidx.cardview:cardview:1.0.0"
-cast = "com.google.android.gms:play-services-cast-framework:21.2.0"
+cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 core-ktx = "androidx.core:core-ktx:1.10.1"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
@@ -449,4 +449,4 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:2.0.3"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.2.2"
+spotless = "com.diffplug.spotless:6.23.3"

@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.SharedPreferences
-import timber.log.Timber
 import java.util.UUID
+import timber.log.Timber
 
 abstract class IdentifyingTracker(
-    private val preferences: SharedPreferences
+    private val preferences: SharedPreferences,
 ) : Tracker {
     private var anonymousID: String? = null // do not access this variable directly. Use methods.
     protected abstract val anonIdPrefKey: String?

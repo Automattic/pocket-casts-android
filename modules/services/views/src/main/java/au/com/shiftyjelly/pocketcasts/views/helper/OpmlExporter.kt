@@ -17,15 +17,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.FileWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import timber.log.Timber
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.FileWriter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class OpmlExporter(
@@ -83,11 +83,12 @@ class OpmlExporter(
             Timber.e(e, "OPML export failed.")
             UiUtil.hideProgressDialog(progressDialog)
             UiUtil.displayAlertError(
-                context = context, title = context.getString(LR.string.settings_opml_export_failed_title),
+                context = context,
+                title = context.getString(LR.string.settings_opml_export_failed_title),
                 message = context.getString(
-                    LR.string.settings_opml_export_failed
+                    LR.string.settings_opml_export_failed,
                 ),
-                onComplete = null
+                onComplete = null,
             )
         }
     }
@@ -108,7 +109,7 @@ class OpmlExporter(
                         userMessage: String?,
                         serverMessageId: String?,
                         serverMessage: String?,
-                        throwable: Throwable?
+                        throwable: Throwable?,
                     ) {
                         trackFailure(reason = "server_call_failure")
                         UiUtil.hideProgressDialog(progressDialog)
@@ -133,7 +134,7 @@ class OpmlExporter(
                             Timber.e(e)
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -149,7 +150,7 @@ class OpmlExporter(
         try {
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/xml"
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
+            val uri = FileUtil.createUriWithReadPermissions(fragment.requireActivity(), file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)
@@ -174,7 +175,7 @@ class OpmlExporter(
 
             intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(LR.string.settings_opml_email_subject))
             intent.putExtra(Intent.EXTRA_TEXT, HtmlCompat.fromHtml(context.getString(LR.string.settings_opml_email_body), HtmlCompat.FROM_HTML_MODE_COMPACT))
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
+            val uri = FileUtil.createUriWithReadPermissions(fragment.requireActivity(), file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)

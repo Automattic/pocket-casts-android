@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class EpisodeRow @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val imageLoader = PodcastImageLoaderThemed(context)

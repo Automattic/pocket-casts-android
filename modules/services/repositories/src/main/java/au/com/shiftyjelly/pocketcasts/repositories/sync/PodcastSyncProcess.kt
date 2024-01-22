@@ -33,8 +33,6 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -43,6 +41,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
+import java.util.Date
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -51,8 +51,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
-import java.util.Date
-import kotlin.coroutines.CoroutineContext
 
 class PodcastSyncProcess(
     val context: Context,
@@ -70,7 +68,6 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
-    var featureFlagWrapper: FeatureFlagWrapper
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -108,7 +105,7 @@ class PodcastSyncProcess(
                     Completable.complete()
                 } else {
                     syncPlayHistory()
-                }
+                },
             )
         return syncUpNextObservable
             .doOnError { throwable ->
@@ -182,7 +179,8 @@ class PodcastSyncProcess(
                     Observable.just(uuid)
                         .subscribeOn(Schedulers.io())
                         .flatMapMaybe { importPodcast(serverPodcastsMap[it]) }
-                }, 5
+                },
+                5,
             )
             .ignoreElements()
         // update existing podcasts
@@ -221,9 +219,6 @@ class PodcastSyncProcess(
     }
 
     private suspend fun downloadAndImportBookmarks() {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         val bookmarks = syncManager.getBookmarks()
         importBookmarks(bookmarks)
     }
@@ -252,7 +247,7 @@ class PodcastSyncProcess(
             skipLastSecs = podcastResponse.autoSkipLast ?: podcast.skipLastSecs,
             folderUuid = podcastResponse.folderUuid,
             sortPosition = podcastResponse.sortPosition ?: podcast.sortPosition,
-            addedDate = addedDate
+            addedDate = addedDate,
         )
     }
 
@@ -423,7 +418,6 @@ class PodcastSyncProcess(
         try {
             val podcasts = podcastManager.findPodcastsToSync()
             for (podcast in podcasts) {
-
                 try {
                     val fields = JSONObject().apply {
                         put("uuid", podcast.uuid)
@@ -513,9 +507,6 @@ class PodcastSyncProcess(
     }
 
     private fun uploadBookmarksChanges(records: JSONArray) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         try {
             val bookmarks = bookmarkManager.findBookmarksToSync()
             bookmarks.forEach { bookmark ->
@@ -592,7 +583,7 @@ class PodcastSyncProcess(
         return Completable.fromAction {
             val firstSync = settings.isFirstSyncRun()
             if (firstSync) {
-                fileStorage.fixBrokenFiles(episodeManager)
+                runBlocking { fileStorage.fixBrokenFiles(episodeManager) }
                 settings.setFirstSyncRun(false)
             }
         }
@@ -620,7 +611,7 @@ class PodcastSyncProcess(
                         .subscribeOn(Schedulers.computation())
                         .flatMap { importPodcast(it).toObservable() }
                 },
-                10
+                10,
             )
             .ignoreElements()
     }
@@ -643,9 +634,6 @@ class PodcastSyncProcess(
     }
 
     private suspend fun importBookmarks(bookmarks: List<Bookmark>) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         for (bookmark in bookmarks) {
             importBookmark(bookmark)
         }
@@ -717,7 +705,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(sync: SyncUpdateResponse.PodcastSync): Maybe<Podcast> {
         val uuid = sync.uuid
-        if (uuid == null || uuid.isNullOrBlank()) {
+        if (uuid.isNullOrBlank()) {
             return Maybe.empty()
         }
 

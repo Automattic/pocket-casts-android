@@ -21,9 +21,9 @@ import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
-import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -36,11 +36,10 @@ fun NotificationScreen(
             painter = painterResource(IR.drawable.ic_check_black_24dp),
             tint = WearColors.success,
             contentDescription = null,
-            modifier = Modifier.size(52.dp)
+            modifier = Modifier.size(52.dp),
         )
     },
 ) {
-
     LaunchedEffect(closeAfterDuration) {
         if (closeAfterDuration != null) {
             delay(closeAfterDuration)
@@ -54,7 +53,7 @@ fun NotificationScreen(
         modifier = Modifier
             .clickable { onClose() }
             .padding(16.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         icon()
         Spacer(modifier = Modifier.height(4.dp))
@@ -72,7 +71,7 @@ private fun NotificationScreenPreview() {
     WearAppTheme {
         NotificationScreen(
             text = "Done",
-            onClose = {}
+            onClose = {},
         )
     }
 }

@@ -30,16 +30,9 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jaredrummler.android.device.DeviceName
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -52,6 +45,11 @@ import java.util.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Singleton
 class Support @Inject constructor(
@@ -64,7 +62,7 @@ class Support @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val systemBatteryRestrictions: SystemBatteryRestrictions,
     private val syncManager: SyncManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -90,7 +88,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
             )
 
             // try to attach the debug information
@@ -109,14 +107,14 @@ class Support @Inject constructor(
                         out.close()
 
                         val fileUri =
-                            FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                            FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                         intent.putExtra(
                             Intent.EXTRA_TEXT,
                             HtmlCompat.fromHtml(
                                 "$intro<br/><br/>",
-                                HtmlCompat.FROM_HTML_MODE_COMPACT
-                            )
+                                HtmlCompat.FROM_HTML_MODE_COMPACT,
+                            ),
                         )
                     }
                 }
@@ -130,7 +128,7 @@ class Support @Inject constructor(
 
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
-                    HtmlCompat.fromHtml(debugStr.toString(), HtmlCompat.FROM_HTML_MODE_COMPACT)
+                    HtmlCompat.fromHtml(debugStr.toString(), HtmlCompat.FROM_HTML_MODE_COMPACT),
                 )
             }
         }
@@ -148,7 +146,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
             )
 
             try {
@@ -158,7 +156,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
             } catch (e: Exception) {
                 Timber.e(e)
@@ -178,7 +176,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
             )
 
             try {
@@ -188,14 +186,14 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
                     HtmlCompat.fromHtml(
                         "$intro<br/><br/>",
-                        HtmlCompat.FROM_HTML_MODE_COMPACT
-                    )
+                        HtmlCompat.FROM_HTML_MODE_COMPACT,
+                    ),
                 )
             } catch (e: Exception) {
                 Timber.e(e)
@@ -214,14 +212,10 @@ class Support @Inject constructor(
     }
 
     private fun getAccountType(isPaid: Boolean) = if (isPaid) {
-        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
-                SubscriptionTier.PATRON -> "Patron Account"
-                SubscriptionTier.PLUS -> "Plus Account"
-                SubscriptionTier.NONE -> ""
-            }
-        } else {
-            "Plus Account"
+        when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
+            SubscriptionTier.PATRON -> "Patron Account"
+            SubscriptionTier.PLUS -> "Plus Account"
+            SubscriptionTier.NONE -> ""
         }
     } else {
         ""
@@ -371,7 +365,7 @@ class Support @Inject constructor(
             }
 
             try {
-                val storageFolder = fileStorage.storageDirectory.absolutePath
+                val storageFolder = fileStorage.getOrCreateStorageDir()?.absolutePath
                 output.append("Storage: ").append(if (settings.usingCustomFolderStorage()) "Custom Folder" else settings.getStorageChoiceName()).append(", ").append(storageFolder).append(eol)
                 output.append("Storage options:").append(eol)
                 val storageOptions = StorageOptions()
@@ -386,9 +380,9 @@ class Support @Inject constructor(
             }
             output.append("Database: " + Util.formattedBytes(context.getDatabasePath("pocketcasts").length(), context = context)).append(eol)
             try {
-                output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.tempPodcastDirectory), context = context)).append(eol)
-                output.append("Podcast directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.podcastDirectory), context = context)).append(eol)
-                output.append("Network image directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.networkImageDirectory), context = context)).append(eol)
+                output.append("Temp directory: " + Util.formattedBytes(FileUtil.dirSize(fileStorage.getOrCreateEpisodesTempDir()), context)).append(eol)
+                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getOrCreateEpisodesDir()?.let(FileUtil::dirSize) ?: 0, context)).append(eol)
+                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getOrCreateNetworkImagesDir()?.let(FileUtil::dirSize) ?: 0, context)).append(eol)
             } catch (e: Exception) {
                 Timber.e(e)
             }

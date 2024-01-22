@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RequirePlusViewModel @Inject constructor(
-    private val analytTracker: AnalyticsTrackerWrapper
+    private val analytTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     fun onShown() {

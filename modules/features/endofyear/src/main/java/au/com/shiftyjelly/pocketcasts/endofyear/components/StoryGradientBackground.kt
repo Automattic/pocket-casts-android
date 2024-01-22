@@ -26,7 +26,7 @@ fun StoryBlurredBackground(
     style: StoryBlurredBackgroundStyle = StoryBlurredBackgroundStyle.Default,
 ) {
     Box(
-        Modifier.wrapContentWidth(unbounded = true)
+        Modifier.wrapContentWidth(unbounded = true),
     ) {
         val context = LocalContext.current
         val screenWidthInPx = LocalView.current.width
@@ -36,9 +36,9 @@ fun StoryBlurredBackground(
                 .size((screenWidthInDp * 2f).dp, (screenWidthInDp * 2f).dp)
                 .offset(
                     x = offset.x.toInt().pxToDp(context).dp,
-                    y = offset.y.toInt().pxToDp(context).dp
+                    y = offset.y.toInt().pxToDp(context).dp,
                 )
-                .rotate(rotate)
+                .rotate(rotate),
         ) {
             Image(
                 painterResource(style.imgResId()),
@@ -46,7 +46,7 @@ fun StoryBlurredBackground(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .alpha(style.alpha())
+                    .alpha(style.alpha()),
             )
         }
     }
@@ -54,7 +54,8 @@ fun StoryBlurredBackground(
 
 enum class StoryBlurredBackgroundStyle {
     Default,
-    Plus;
+    Plus,
+    ;
 
     fun imgResId() = when (this) {
         Default -> R.drawable.story_blurred_background_default

@@ -38,23 +38,32 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
-import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("SpecifyJobSchedulerIdRange")
 class UpNextSyncJob : JobService() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var syncManager: SyncManager
+
     @Inject lateinit var appDatabase: AppDatabase
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManagerImpl
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
     private val disposables = CompositeDisposable()
@@ -109,7 +118,7 @@ class UpNextSyncJob : JobService() {
                 onComplete = {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - jobFinished - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
                     jobFinished(jobParameters, false)
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -149,13 +158,13 @@ class UpNextSyncJob : JobService() {
                     episode?.title,
                     episode?.downloadUrl,
                     podcastUuid,
-                    episode?.publishedDate?.toIsoString()
+                    episode?.publishedDate?.toIsoString(),
                 )
             }
             return UpNextSyncRequest.Change(
                 UpNextChange.ACTION_REPLACE,
                 change.modified,
-                episodes = episodes
+                episodes = episodes,
             )
         }
         // any other action
@@ -171,7 +180,7 @@ class UpNextSyncJob : JobService() {
                 title = episode?.title,
                 url = episode?.downloadUrl,
                 published = publishedDate,
-                podcast = podcastUuid
+                podcast = podcastUuid,
             )
         }
     }

@@ -14,8 +14,8 @@ import java.util.UUID
 @Entity(
     tableName = "bookmarks",
     indices = [
-        Index(name = "bookmarks_podcast_uuid", value = arrayOf("podcast_uuid"))
-    ]
+        Index(name = "bookmarks_podcast_uuid", value = arrayOf("podcast_uuid")),
+    ],
 )
 data class Bookmark(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") var uuid: String,

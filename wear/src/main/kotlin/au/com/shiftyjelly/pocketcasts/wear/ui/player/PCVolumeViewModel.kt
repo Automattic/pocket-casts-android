@@ -9,9 +9,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PCVolumeViewModel @Inject constructor(
     systemAudioRepository: SystemAudioRepository,
-    vibrator: Vibrator
+    vibrator: Vibrator,
 ) : VolumeViewModel(
     volumeRepository = systemAudioRepository,
     audioOutputRepository = systemAudioRepository,
-    vibrator = vibrator
+    vibrator = vibrator,
 )

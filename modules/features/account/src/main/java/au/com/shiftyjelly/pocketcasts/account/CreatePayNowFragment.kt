@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class CreatePayNowFragment : BaseFragment() {
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var binding: FragmentCreatePaynowBinding? = null
@@ -70,7 +71,6 @@ class CreatePayNowFragment : BaseFragment() {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
-
                         val res = LocalContext.current.resources
                         when (subscription) {
                             is Subscription.Simple -> ProductAmountView(
@@ -128,7 +128,7 @@ class CreatePayNowFragment : BaseFragment() {
                         }
                         else -> {}
                     }
-                }
+                },
             )
 
             binding?.btnSubmit?.setOnClickListener {
@@ -140,7 +140,6 @@ class CreatePayNowFragment : BaseFragment() {
                             accountState.errors.contains(CreateAccountError.CANCELLED_CREATE_SUB)
                         )
                 ) {
-
                     binding?.txtError?.text = ""
                     analyticsTracker.track(AnalyticsEvent.CONFIRM_PAYMENT_CONFIRM_BUTTON_TAPPED)
                     displayMainLayout(true, subscription = subscription)
@@ -149,7 +148,7 @@ class CreatePayNowFragment : BaseFragment() {
                         subscriptionManager.launchBillingFlow(
                             requireActivity(),
                             subscription.productDetails,
-                            subscription.offerToken
+                            subscription.offerToken,
                         )
                     }
                 }
@@ -169,7 +168,7 @@ class CreatePayNowFragment : BaseFragment() {
                 when (subscription) {
                     is Subscription.WithTrial -> LR.string.profile_start_free_trial
                     is Subscription.Simple -> LR.string.profile_confirm
-                }
+                },
             )
         } else {
             mainLayout.visibility = View.INVISIBLE

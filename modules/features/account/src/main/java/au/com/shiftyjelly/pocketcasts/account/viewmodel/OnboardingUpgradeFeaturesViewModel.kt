@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import android.app.Activity
 import android.app.Application
-import android.content.Context
-import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -25,9 +23,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -36,7 +33,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingUpgradeFeaturesViewModel @Inject constructor(
@@ -50,40 +46,29 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
     val state: StateFlow<OnboardingUpgradeFeaturesState> = _state
 
-    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source")
+    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source") ?: OnboardingUpgradeSource.UNKNOWN
     private val showPatronOnly = savedStateHandle.get<Boolean>("show_patron_only")
 
     init {
-        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            viewModelScope.launch {
-                subscriptionManager
-                    .observeProductDetails()
-                    .asFlow()
-                    .stateIn(viewModelScope)
-                    .collect { productDetails ->
-                        val subscriptions = when (productDetails) {
-                            is ProductDetailsState.Error -> null
-                            is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                                Subscription.fromProductDetails(
-                                    productDetails = productDetailsState,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
-                                    )
-                                )
-                            }
-                        } ?: emptyList()
-                        updateState(subscriptions)
+        viewModelScope.launch {
+            subscriptionManager
+                .observeProductDetails()
+                .asFlow()
+                .stateIn(viewModelScope)
+                .collect { productDetails ->
+                    val subscriptions = when (productDetails) {
+                        is ProductDetailsState.Error -> emptyList()
+                        is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
+                            Subscription.fromProductDetails(
+                                productDetails = productDetailsState,
+                                isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                ),
+                            )
+                        }
                     }
-            }
-        } else {
-            val accessibiltyManager = getApplication<Application>().getSystemService(Context.ACCESSIBILITY_SERVICE)
-                as? AccessibilityManager
-
-            var isTouchExplorationEnabled = accessibiltyManager?.isTouchExplorationEnabled ?: false
-            accessibiltyManager?.addTouchExplorationStateChangeListener {
-                isTouchExplorationEnabled = it
-            }
-            _state.update { OnboardingUpgradeFeaturesState.OldLoaded(isTouchExplorationEnabled) }
+                    updateState(subscriptions)
+                }
         }
     }
 
@@ -104,7 +89,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             subscriptions = updatedSubscriptions,
             tier = if (showPatronOnly) Subscription.SubscriptionTier.PATRON else lastSelectedTier,
-            frequency = lastSelectedFrequency
+            frequency = lastSelectedFrequency,
         )
 
         val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS
@@ -122,7 +107,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     currentSubscription = selectedSubscription,
                     currentFeatureCard = currentFeatureCard,
                     currentSubscriptionFrequency = currentSubscriptionFrequency,
-                    showNotNow = showNotNow
+                    showNotNow = showNotNow,
                 )
             }
         } ?: _state.update { // In ideal world, we should never get here
@@ -142,24 +127,20 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
-    fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
-    }
-
     fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             val currentSubscription = subscriptionManager
                 .getDefaultSubscription(
                     subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
-                    frequency = frequency
+                    frequency = frequency,
                 )
             settings.setLastSelectedSubscriptionFrequency(frequency)
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
                         currentSubscription = currentSubscription,
-                        currentSubscriptionFrequency = frequency
+                        currentSubscriptionFrequency = frequency,
                     )
                 }
             }
@@ -172,14 +153,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 .getDefaultSubscription(
                     subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = upgradeFeatureCard.subscriptionTier,
-                    frequency = loadedState.currentSubscriptionFrequency
+                    frequency = loadedState.currentSubscriptionFrequency,
                 )
             settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
                         currentSubscription = currentSubscription,
-                        currentFeatureCard = upgradeFeatureCard
+                        currentFeatureCard = upgradeFeatureCard,
                     )
                 }
             }
@@ -189,6 +170,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     fun onClickSubscribe(
         activity: Activity,
         flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
     ) {
         (state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
@@ -197,13 +179,17 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 .getDefaultSubscription(
                     subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
-                    frequency = loadedState.currentSubscriptionFrequency
+                    frequency = loadedState.currentSubscriptionFrequency,
                 )
 
             currentSubscription?.let { subscription ->
                 analyticsTracker.track(
                     AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                    mapOf(OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue, OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId)
+                    mapOf(
+                        OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue,
+                        OnboardingUpgradeBottomSheetViewModel.sourceKey to source.analyticsValue,
+                        OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId,
+                    ),
                 )
 
                 viewModelScope.launch {
@@ -234,14 +220,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                         CreateAccountViewModel.trackPurchaseEvent(
                             subscription,
                             purchaseEvent,
-                            analyticsTracker
+                            analyticsTracker,
                         )
                     }
                 }
                 subscriptionManager.launchBillingFlow(
                     activity,
                     subscription.productDetails,
-                    subscription.offerToken
+                    subscription.offerToken,
                 )
             }
         }
@@ -254,15 +240,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 }
 
 sealed class OnboardingUpgradeFeaturesState {
-    object Loading : OnboardingUpgradeFeaturesState()
+    data object Loading : OnboardingUpgradeFeaturesState()
 
     data class NoSubscriptions(val showNotNow: Boolean) : OnboardingUpgradeFeaturesState()
-
-    data class OldLoaded(
-        private val isTouchExplorationEnabled: Boolean,
-    ) : OnboardingUpgradeFeaturesState() {
-        val scrollAutomatically = !isTouchExplorationEnabled
-    }
 
     data class Loaded(
         val currentFeatureCard: UpgradeFeatureCard,

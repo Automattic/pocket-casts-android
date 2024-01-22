@@ -24,7 +24,8 @@ enum class BookmarksSortTypeDefault(
     TIMESTAMP(
         labelId = R.string.bookmarks_sort_timestamp,
         key = SORT_TYPE_TIMESTAMP,
-    );
+    ),
+    ;
 
     class UserSettingPref(
         sharedPrefKey: String,

@@ -31,15 +31,17 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class NotesFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
@@ -55,7 +57,7 @@ class NotesFragment : BaseFragment() {
         fun newInstance(episodeUuid: String): NotesFragment {
             return NotesFragment().apply {
                 arguments = bundleOf(
-                    ARG_EPISODE_UUID to episodeUuid
+                    ARG_EPISODE_UUID to episodeUuid,
                 )
             }
         }

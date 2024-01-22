@@ -14,10 +14,10 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvail
 import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class GoogleSignInState(val isNewAccount: Boolean)
 
@@ -51,28 +51,28 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_SHOWN,
-            mapOf(AnalyticsProp.flow(flow))
+            mapOf(AnalyticsProp.flow(flow)),
         )
     }
 
     fun onDismiss(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_DISMISSED,
-            mapOf(AnalyticsProp.flow(flow))
+            mapOf(AnalyticsProp.flow(flow)),
         )
     }
 
     fun onSignUpClicked(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount)
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount),
         )
     }
 
     fun onLoginClicked(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn)
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn),
         )
     }
 

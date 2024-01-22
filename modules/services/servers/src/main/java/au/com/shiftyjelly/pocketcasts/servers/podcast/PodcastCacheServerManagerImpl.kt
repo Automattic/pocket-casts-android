@@ -5,13 +5,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.di.PodcastCacheServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import timber.log.Timber
-import javax.inject.Inject
 
 class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetrofit private val retrofit: Retrofit) : PodcastCacheServerManager {
 
@@ -70,7 +70,9 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
                 val response = server.getEpisodeUrl(episode.podcastUuid, episode.uuid)
                 if (response.isSuccessful) {
                     response.body()?.string()
-                } else null
+                } else {
+                    null
+                }
             } catch (e: Exception) {
                 Timber.e(e)
                 null

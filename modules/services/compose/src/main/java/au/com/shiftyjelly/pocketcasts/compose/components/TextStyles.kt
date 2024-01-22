@@ -48,7 +48,7 @@ fun TextH10(
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -72,7 +72,7 @@ fun TextH20(
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -100,7 +100,7 @@ fun TextH30(
         fontWeight = fontWeight ?: FontWeight.W600,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -122,7 +122,7 @@ fun TextP30(
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         fontWeight = fontWeight,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -134,7 +134,7 @@ fun TextH40(
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE,
     fontWeight: FontWeight = FontWeight.W500,
-    disableScale: Boolean = false
+    disableScale: Boolean = false,
 ) {
     Text(
         text = text,
@@ -145,7 +145,7 @@ fun TextH40(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -172,7 +172,7 @@ fun TextP40(
         overflow = TextOverflow.Ellipsis,
         fontFamily = fontFamily,
         fontWeight = fontWeight,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -199,7 +199,7 @@ fun TextH50(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -247,11 +247,12 @@ fun TextP50(
         style = style ?: LocalTextStyle.current,
         textAlign = textAlign,
         fontWeight = fontWeight,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
 val textH60FontSize = 12.sp
+
 @Composable
 fun TextH60(
     text: String,
@@ -292,7 +293,7 @@ fun TextP60(
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
         fontWeight = fontWeight,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -305,7 +306,7 @@ fun TextH70(
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight = FontWeight.W500,
     maxLines: Int = Int.MAX_VALUE,
-    disableScale: Boolean = false
+    disableScale: Boolean = false,
 ) {
     Text(
         text = text,
@@ -326,7 +327,7 @@ fun TextH70(
 fun TextC50(
     text: String,
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     Text(
         text = text.uppercase(Locale.getDefault()),
@@ -338,7 +339,7 @@ fun TextC50(
         letterSpacing = 0.6.sp,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -359,7 +360,7 @@ fun TextC70(
         letterSpacing = 0.6.sp,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

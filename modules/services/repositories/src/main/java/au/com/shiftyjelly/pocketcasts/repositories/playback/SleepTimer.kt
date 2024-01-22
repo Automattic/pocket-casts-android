@@ -54,7 +54,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             context.startActivity(
                 Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                     // Because we're not launching this from an activity context, we must add the FLAG_ACTIVITY_NEW_TASK flag
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
             false
         } else {

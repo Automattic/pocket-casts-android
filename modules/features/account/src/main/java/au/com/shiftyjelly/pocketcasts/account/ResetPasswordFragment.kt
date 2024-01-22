@@ -89,11 +89,11 @@ class ResetPasswordFragment : BaseFragment() {
                                 if (isAdded) {
                                     view.findNavController().popBackStack()
                                 }
-                            }
+                            },
                         )
                     }
                 }
-            }
+            },
         )
 
         val binding = binding ?: return

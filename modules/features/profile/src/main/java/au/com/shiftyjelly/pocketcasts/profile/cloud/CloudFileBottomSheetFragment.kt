@@ -43,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
@@ -52,8 +50,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.rx2.asObservable
 import javax.inject.Inject
+import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
@@ -68,7 +66,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
         fun newInstance(userEpisodeUUID: String, forceDark: Boolean = false): CloudFileBottomSheetFragment {
             val bundle = bundleOf(
                 ARG_UUID to userEpisodeUUID,
-                ARG_FORCE_DARK to forceDark
+                ARG_FORCE_DARK to forceDark,
             )
             val fragment = CloudFileBottomSheetFragment()
             fragment.arguments = bundle
@@ -77,12 +75,19 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var warningsHelper: WarningsHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var bookmarkManager: BookmarkManager
 
     var podcastImageLoader: PodcastImageLoader? = null
@@ -176,16 +181,18 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                         val upNextDialog = OptionsDialog()
                             .setIconColor(ThemeColor.primaryIcon01(theme.activeTheme))
                             .addCheckedOption(
-                                LR.string.play_next, imageId = IR.drawable.ic_upnext_playnext,
+                                LR.string.play_next,
+                                imageId = IR.drawable.ic_upnext_playnext,
                                 click = {
                                     viewModel.playNext(episode)
-                                }
+                                },
                             )
                             .addCheckedOption(
-                                LR.string.play_last, imageId = IR.drawable.ic_upnext_playlast,
+                                LR.string.play_last,
+                                imageId = IR.drawable.ic_upnext_playlast,
                                 click = {
                                     viewModel.playLast(episode)
-                                }
+                                },
                             )
                         activity?.supportFragmentManager?.let {
                             upNextDialog.show(it, "upnext")
@@ -215,13 +222,12 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 val layoutBookmark = binding.layoutBookmark
-                layoutBookmark.isVisible = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)
                 layoutBookmark.setOnClickListener {
                     dialog?.dismiss()
                     viewModel.trackOptionTapped(CloudBottomSheetViewModel.BOOKMARKS)
                     BookmarksContainerFragment.newInstance(
                         episodeUuid = episodeUUID,
-                        sourceView = SourceView.FILES
+                        sourceView = SourceView.FILES,
                     ).show(parentFragmentManager, "bookmarks_container")
                 }
 
@@ -282,7 +288,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
                     OnboardingLauncher.openOnboardingFlow(
                         activity,
-                        OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES)
+                        OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
                     )
                 }
 
@@ -304,7 +310,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 podcastImageLoader?.load(userEpisode = episode, thumbnail = true)?.into(binding.imgFile)
-            }
+            },
         )
 
         viewModel.signInState.observe(
@@ -328,7 +334,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                         layoutLockedCloud.isVisible = true
                     }
                 }
-            }
+            },
         )
     }
 

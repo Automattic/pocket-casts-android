@@ -15,13 +15,13 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class ChaptersViewModel
@@ -29,7 +29,7 @@ class ChaptersViewModel
     episodeManager: EpisodeManager,
     podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
-    private val theme: Theme
+    private val theme: Theme,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -37,7 +37,7 @@ class ChaptersViewModel
 
     data class UiState(
         val chapters: List<ChapterState> = emptyList(),
-        val backgroundColor: Color
+        val backgroundColor: Color,
     )
 
     sealed class ChapterState(val chapter: Chapter) {
@@ -61,14 +61,14 @@ class ChaptersViewModel
     val uiState = Observables.combineLatest(
         upNextStateObservable,
         playbackStateObservable,
-        this::combineUiState
+        this::combineUiState,
     )
         .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
 
     val defaultUiState = UiState(
         chapters = emptyList(),
-        backgroundColor = Color(theme.playerBackgroundColor(null))
+        backgroundColor = Color(theme.playerBackgroundColor(null)),
     )
 
     fun skipToChapter(chapter: Chapter) {
@@ -83,11 +83,11 @@ class ChaptersViewModel
 
         val chapters = buildChaptersWithState(
             chapterList = playbackState.chapters.getList(),
-            playbackPositionMs = playbackState.positionMs
+            playbackPositionMs = playbackState.positionMs,
         )
         return UiState(
             chapters = chapters,
-            backgroundColor = Color(backgroundColor)
+            backgroundColor = Color(backgroundColor),
         )
     }
 

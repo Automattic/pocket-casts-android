@@ -335,7 +335,9 @@ Language: ja_JP
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB のクラウドストレージ</string>
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">フォルダー</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">デスクトップアプリ</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
     <string name="onboarding_recommendations_import">インポート</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>

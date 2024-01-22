@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observer<RefreshState> {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
 
     private lateinit var preferenceAutoPlay: SwitchPreference
@@ -63,7 +64,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceAutoPlay.apply {
             isChecked = settings.autoPlayNextEpisodeOnEmpty.value
             setOnPreferenceChangeListener { _, newValue ->
-                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean)
+                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = false)
                 true
             }
         }
@@ -71,7 +72,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceAutoSubscribeToPlayed.apply {
             isChecked = settings.autoSubscribeToPlayed.value
             setOnPreferenceChangeListener { _, newValue ->
-                settings.autoSubscribeToPlayed.set(newValue as Boolean)
+                settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = false)
                 true
             }
         }
@@ -79,7 +80,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceAutoShowPlayed.apply {
             isChecked = settings.autoShowPlayed.value
             setOnPreferenceChangeListener { _, newValue ->
-                settings.autoShowPlayed.set(newValue as Boolean)
+                settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
                 true
             }
         }

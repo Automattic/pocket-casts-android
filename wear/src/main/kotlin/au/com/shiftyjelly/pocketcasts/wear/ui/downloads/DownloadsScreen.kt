@@ -25,7 +25,6 @@ fun DownloadsScreen(
     columnState: ScalingLazyColumnState,
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
-
     val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
@@ -55,7 +54,7 @@ private fun Content(
             items(episodes) { episode ->
                 EpisodeChip(
                     episode = episode,
-                    onClick = { onItemClick(episode) }
+                    onClick = { onItemClick(episode) },
                 )
             }
         }
@@ -90,7 +89,7 @@ private fun DownloadsScreenPreview() {
                     playedUpTo = 0.0,
                     duration = 20.0,
                 ),
-            )
+            ),
         )
     }
 }

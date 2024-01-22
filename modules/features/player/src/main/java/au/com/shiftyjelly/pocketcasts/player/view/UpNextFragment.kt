@@ -46,9 +46,9 @@ import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
 import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.abs
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -75,9 +75,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var adapter: UpNextAdapter
@@ -111,7 +115,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         override fun multiSelectSelectAll() {
             trackUpNextEvent(
                 AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED,
-                mapOf(SELECT_ALL_KEY to true)
+                mapOf(SELECT_ALL_KEY to true),
             )
             multiSelectHelper.selectAllInList(upNextEpisodes)
             adapter.notifyDataSetChanged()
@@ -120,7 +124,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         override fun multiSelectSelectNone() {
             trackUpNextEvent(
                 AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED,
-                mapOf(SELECT_ALL_KEY to false)
+                mapOf(SELECT_ALL_KEY to false),
             )
             multiSelectHelper.deselectAllInList(upNextEpisodes)
             adapter.notifyDataSetChanged()
@@ -210,8 +214,14 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         adapter.theme = overrideTheme
 
         if (!isEmbedded) {
-            updateStatusAndNavColors()
             FirebaseAnalyticsTracker.openedUpNext()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isEmbedded) {
+            updateStatusAndNavColors()
         }
     }
 
@@ -376,7 +386,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 episodeUuid = episodeUuid,
                 source = EpisodeViewSource.UP_NEXT,
                 podcastUuid = podcastUuid,
-                forceDark = true
+                forceDark = true,
             )
         }
     }
@@ -387,7 +397,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 episodeUuid = episodeUuid,
                 source = EpisodeViewSource.UP_NEXT,
                 podcastUuid = podcastUuid,
-                forceDark = true
+                forceDark = true,
             )
         } else {
             playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
@@ -433,7 +443,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                         SLOTS_KEY to abs(position.minus(dragStartPosition)),
                         DIRECTION_KEY to if (position > dragStartPosition) DOWN else UP,
                         IS_NEXT_KEY to (position == UP_NEXT_ADAPTER_POSITION),
-                    )
+                    ),
                 )
             }
         }
@@ -462,20 +472,20 @@ private val step1 = TourStep(
     "In this update Up Next has been moved into its own screen. We’ve also added some new features.",
     "Take a quick tour",
     null,
-    Gravity.BOTTOM
+    Gravity.BOTTOM,
 )
 private val step2 = TourStep(
     "Now Playing",
     "The Now Playing row shows your progress in the current episode. You can tap here to quickly jump to the player.",
     "Next",
     TourViewTag.ViewId(R.id.itemContainer),
-    Gravity.BOTTOM
+    Gravity.BOTTOM,
 )
 private val step3 = TourStep(
     "Multi-select",
     "Tap the Select Button to enter multi-select mode. You can then select multiple episodes and perform actions in bulk. Actions will appear at the top of the screen.",
     "Finish",
     TourViewTag.ChildWithClass(R.id.toolbar, androidx.appcompat.widget.ActionMenuView::class.java),
-    Gravity.BOTTOM
+    Gravity.BOTTOM,
 )
 private val tour = listOf(step1, step2, step3)

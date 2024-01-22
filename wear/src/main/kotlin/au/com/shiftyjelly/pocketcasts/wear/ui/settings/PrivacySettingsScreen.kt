@@ -48,7 +48,6 @@ private fun Content(
     onLinkCrashReportsToUserChanged: (Boolean) -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
-
         item {
             ScreenHeaderChip(LR.string.settings_privacy_analytics)
         }
@@ -105,7 +104,7 @@ private fun DescriptionText(@StringRes text: Int) {
         style = MaterialTheme.typography.caption3,
         color = MaterialTheme.colors.onSecondary,
         textAlign = TextAlign.Center,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(8.dp),
     )
 }
 

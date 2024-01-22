@@ -15,13 +15,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
+import kotlinx.coroutines.reactive.asFlow
 
 @AndroidEntryPoint
 class OnboardingActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,6 @@ class OnboardingActivity : AppCompatActivity() {
             val currentSignInState = signInState.value
 
             if (currentSignInState != null) {
-
                 val onboardingFlow = remember(savedInstanceState) {
                     IntentCompat.getParcelableExtra(intent, ANALYTICS_FLOW_KEY, OnboardingFlow::class.java)
                 } ?: throw IllegalStateException("Analytics flow not set")
@@ -64,7 +64,7 @@ class OnboardingActivity : AppCompatActivity() {
             Activity.RESULT_OK,
             Intent().apply {
                 putExtra(OnboardingActivityContract.FINISH_KEY, result)
-            }
+            },
         )
         finish()
     }

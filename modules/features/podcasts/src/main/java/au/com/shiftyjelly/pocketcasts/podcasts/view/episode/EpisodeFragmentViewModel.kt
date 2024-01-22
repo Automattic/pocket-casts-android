@@ -35,13 +35,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
+import java.util.Date
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
-import java.util.Date
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class EpisodeFragmentViewModel @Inject constructor(
@@ -54,7 +54,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val settings: Settings,
     private val showNotesManager: ShowNotesManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -117,7 +117,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
                     showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
                     progressUpdatesObservable,
-                    zipper
+                    zipper,
                 )
             }
             .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
@@ -256,7 +256,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     fun playClickedGetShouldClose(
         warningsHelper: WarningsHelper,
         force: Boolean = false,
-        fromListUuid: String? = null
+        fromListUuid: String? = null,
     ): Boolean {
         episode?.let { episode ->
             if (isPlaying.value == true) {

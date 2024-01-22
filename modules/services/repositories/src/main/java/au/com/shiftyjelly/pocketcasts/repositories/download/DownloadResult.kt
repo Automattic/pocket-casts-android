@@ -6,7 +6,7 @@ class DownloadResult private constructor(
     val jobId: UUID?,
     val success: Boolean,
     val episodeUuid: String,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 ) {
 
     companion object {

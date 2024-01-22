@@ -50,9 +50,9 @@ fun EndOfYearLaunchBottomSheet(
             summaryText = stringResource(LR.string.end_of_year_launch_modal_summary),
             primaryButton = BottomSheetContentState.Content.Button.Primary(
                 label = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
-                onClick = { onClick.invoke() }
+                onClick = { onClick.invoke() },
             ),
-        )
+        ),
     )
 }
 
@@ -71,12 +71,12 @@ fun ImageContent(modifier: Modifier = Modifier) {
                 .height(ImageContentCoverHeight)
                 .clip(RoundedCornerShape(ImageContentCoverCornerRadius))
                 .background(BackgroundColor),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Image(
                 painter = painterResource(R.drawable.img_2023_modal),
                 contentDescription = "Pocket Casts Playback", // Intentionally not translated
-                modifier = modifier
+                modifier = modifier,
             )
         }
     }

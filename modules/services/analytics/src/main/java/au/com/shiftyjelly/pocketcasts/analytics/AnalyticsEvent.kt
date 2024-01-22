@@ -36,7 +36,6 @@ enum class AnalyticsEvent(val key: String) {
     /* Plus Upsell */
     PLUS_PROMOTION_SHOWN("plus_promotion_shown"),
     PLUS_PROMOTION_DISMISSED("plus_promotion_dismissed"),
-    PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED("plus_promotion_upgrade_button_tapped"),
     PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED("plus_promotion_not_now_button_tapped"),
 
     /* Pull to refresh */
@@ -531,11 +530,6 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE("settings_notifications_hide_playback_notification_on_pause"),
     SETTINGS_NOTIFICATIONS_SOUND_CHANGED("settings_notifications_sound_changed"),
     SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED("settings_notifications_vibration_changed"),
-
-    /* Settings - Plus */
-    SETTINGS_PLUS_SHOWN("settings_plus_shown"),
-    SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
-    SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
 
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),

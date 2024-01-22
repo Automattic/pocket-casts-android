@@ -16,11 +16,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class CloudFilesViewModel @Inject constructor(
@@ -67,8 +67,8 @@ class CloudFilesViewModel @Inject constructor(
                         true -> "no_files"
                         false -> "files"
                         else -> "unknown"
-                    }
-                )
+                    },
+                ),
             )
         }
         userEpisodeManager.syncFilesInBackground(playbackManager)

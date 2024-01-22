@@ -7,6 +7,7 @@ This can be removed once SubscriptionTier is supported.
 */
 enum class SubscriptionType(val label: String) {
     NONE("none"),
-    PLUS("plus");
+    PLUS("plus"),
+    ;
     override fun toString() = label
 }

@@ -73,6 +73,7 @@ internal fun OnboardingLoginPage(
     }
 
     val view = LocalView.current
+
     @Suppress("NAME_SHADOWING")
     val onLoginComplete = {
         UiUtil.hideKeyboard(view)
@@ -83,23 +84,21 @@ internal fun OnboardingLoginPage(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .windowInsetsPadding(WindowInsets.ime)
+            .windowInsetsPadding(WindowInsets.ime),
     ) {
-
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_welcome_back),
             onNavigationClick = {
                 viewModel.onBackPressed()
                 onBackPressed()
-            }
+            },
         )
 
         Column(
             Modifier
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             EmailAndPasswordFields(
                 email = state.email,
                 password = state.password,
@@ -117,14 +116,14 @@ internal fun OnboardingLoginPage(
                 TextP40(
                     text = errorMessage,
                     color = MaterialTheme.theme.colors.support05,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 )
             }
 
             Spacer(
                 Modifier
                     .heightIn(min = 16.dp)
-                    .weight(1f)
+                    .weight(1f),
             )
 
             TextH40(
@@ -132,7 +131,7 @@ internal fun OnboardingLoginPage(
                 color = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier
                     .clickable { onForgotPasswordTapped() }
-                    .align(Alignment.CenterHorizontally)
+                    .align(Alignment.CenterHorizontally),
             )
 
             Spacer(Modifier.height(16.dp))

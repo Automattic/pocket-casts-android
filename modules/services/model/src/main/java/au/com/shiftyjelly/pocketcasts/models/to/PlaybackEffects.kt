@@ -5,7 +5,9 @@ import java.util.Locale
 
 class PlaybackEffects {
     @Volatile var playbackSpeed = 1.0
+
     @Volatile var trimMode: TrimMode = TrimMode.OFF
+
     @Volatile var isVolumeBoosted = false
 
     val usingDefaultValues: Boolean

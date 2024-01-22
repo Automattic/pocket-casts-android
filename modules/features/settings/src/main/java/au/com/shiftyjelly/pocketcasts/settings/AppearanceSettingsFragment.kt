@@ -38,6 +38,7 @@ class AppearanceSettingsFragment : BaseFragment() {
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
     private val viewModel: SettingsAppearanceViewModel by viewModels()

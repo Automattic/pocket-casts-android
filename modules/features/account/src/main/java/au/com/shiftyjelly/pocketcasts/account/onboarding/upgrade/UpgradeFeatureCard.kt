@@ -31,7 +31,7 @@ enum class UpgradeFeatureCard(
         iconRes = IR.drawable.ic_patron,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
         subscriptionTier = SubscriptionTier.PATRON,
-    )
+    ),
 }
 
 data class FeatureCardsState(

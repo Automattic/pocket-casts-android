@@ -28,7 +28,7 @@ fun QueueButton(inUpNext: Boolean, tint: Color, onClick: () -> Unit) {
         contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.podcasts_up_next),
         modifier = Modifier
             .size(24.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
     )
 }
 
@@ -40,12 +40,12 @@ private fun Preview() {
             QueueButton(
                 inUpNext = true,
                 tint = Color.Yellow,
-                onClick = {}
+                onClick = {},
             )
             QueueButton(
                 inUpNext = false,
                 tint = Color.Blue,
-                onClick = {}
+                onClick = {},
             )
         }
     }

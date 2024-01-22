@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -46,6 +44,9 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.Date
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.transformLatest
@@ -53,22 +54,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
-import java.util.Date
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
-    @ApplicationScope private val applicationScope: CoroutineScope
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : SubscriptionManager,
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
         get() = settings.cachedSubscriptionStatus.value
-        set(value) = settings.cachedSubscriptionStatus.set(value)
+        set(value) = settings.cachedSubscriptionStatus.set(value, needsSync = false)
 
     private var subscriptionStatus = BehaviorRelay.create<Optional<SubscriptionStatus>>().apply {
         val cachedStatus = cachedSubscriptionStatus
@@ -168,20 +166,18 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             ).apply {
-                if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(PATRON_MONTHLY_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build(),
-                    )
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(PATRON_YEARLY_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build(),
-                    )
-                }
+                add(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PATRON_MONTHLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                )
+                add(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                )
             }
 
         val params = QueryProductDetailsParams.newBuilder()
@@ -225,7 +221,7 @@ class SubscriptionManagerImpl @Inject constructor(
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
                             val failureEvent = PurchaseEvent.Failure(
                                 e.message ?: "Unknown error",
-                                billingResult.responseCode
+                                billingResult.responseCode,
                             )
                             purchaseEvents.accept(failureEvent)
                         }
@@ -233,7 +229,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
                         val failureEvent = PurchaseEvent.Failure(
                             purchasesResult.billingResult.debugMessage,
-                            billingResult.responseCode
+                            billingResult.responseCode,
                         )
                         purchaseEvents.accept(failureEvent)
                     }
@@ -361,7 +357,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     if (purchasesResult == null) {
                         LogBuffer.e(
                             LogBuffer.TAG_SUBSCRIPTIONS,
-                            "unable to upgrade plan because billing result returned null purchases"
+                            "unable to upgrade plan because billing result returned null purchases",
                         )
                         return@launch
                     }
@@ -374,7 +370,7 @@ class SubscriptionManagerImpl @Inject constructor(
                                 /* User is changing subscription entitlement, proration rate applied at runtime (https://rb.gy/e876y)
                                    Also, since upgrading to a more expensive tier, recommended replacement mode is CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
                                 .setSubscriptionReplacementMode(BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE)
-                                .build()
+                                .build(),
                         )
                     }
                 }
@@ -432,8 +428,8 @@ class SubscriptionManagerImpl @Inject constructor(
                     Subscription.fromProductDetails(
                         productDetails = productDetailsState,
                         isFreeTrialEligible = isFreeTrialEligible(
-                            mapProductIdToTier(productDetailsState.productId)
-                        )
+                            mapProductIdToTier(productDetailsState.productId),
+                        ),
                     )
                 }
             } ?: emptyList()
@@ -447,19 +443,18 @@ class SubscriptionManagerImpl @Inject constructor(
                 FreeTrial(
                     subscriptionTier = subscriptionTier,
                     exists = defaultSubscription?.trialPricingPhase != null,
-                )
+                ),
             )
         }
 }
 
 private fun shouldAllowUpgradePlan(
     subscribedPlanStatus: SubscriptionStatus,
-    newPlanDetails: ProductDetails
+    newPlanDetails: ProductDetails,
 ) = subscribedPlanStatus is SubscriptionStatus.Paid &&
     subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
     subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-    newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) &&
-    FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+    newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)
 
 sealed class ProductDetailsState {
     data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
@@ -471,7 +466,7 @@ sealed class PurchaseEvent {
     data class Cancelled(@BillingClient.BillingResponseCode val responseCode: Int) : PurchaseEvent()
     data class Failure(
         val errorMessage: String,
-        @BillingClient.BillingResponseCode val responseCode: Int?
+        @BillingClient.BillingResponseCode val responseCode: Int?,
     ) : PurchaseEvent()
 }
 

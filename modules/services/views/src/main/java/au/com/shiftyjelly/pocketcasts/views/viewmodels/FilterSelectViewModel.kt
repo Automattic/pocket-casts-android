@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FilterSelectViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     private var isFragmentChangingConfigurations: Boolean = false

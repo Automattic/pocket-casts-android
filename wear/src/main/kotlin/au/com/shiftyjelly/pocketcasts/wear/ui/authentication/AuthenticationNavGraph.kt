@@ -21,7 +21,6 @@ fun NavGraphBuilder.authenticationNavGraph(
     googleSignInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
 ) {
     navigation(startDestination = AuthenticationNavRoutes.loginScreen, route = authenticationSubGraph) {
-
         scrollable(AuthenticationNavRoutes.loginScreen) {
             LoginScreen(
                 columnState = it.columnState,

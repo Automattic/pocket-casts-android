@@ -15,8 +15,8 @@ import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAutoDownloadAdapter.ClickListener {
 
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var theme: Theme
 
     private val filters = mutableListOf<Playlist>()

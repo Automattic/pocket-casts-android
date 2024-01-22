@@ -10,23 +10,22 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val settings: Settings,
+    private val bookmarkFeature: BookmarkFeatureControl,
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState())
@@ -38,15 +37,14 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                 .stateIn(viewModelScope)
                 .collect {
                     val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                    val isAddBookmarkEnabled = FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                        Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
+                    val isAddBookmarkEnabled = bookmarkFeature.isAvailable(userTier)
 
                     _state.update { state ->
                         state.copy(
                             isAddBookmarkEnabled = isAddBookmarkEnabled,
-                            addBookmarkIconId = addBookmarkIconId
+                            addBookmarkIconId = R.drawable.ic_plus
                                 .takeIf { !isAddBookmarkEnabled },
-                            addBookmarkIconColor = addBookmarkIconColor
+                            addBookmarkIconColor = SubscriptionTierColor.plusGold
                                 .takeIf { !isAddBookmarkEnabled } ?: SubscriptionTierColor.plusGold,
                         )
                     }
@@ -77,13 +75,13 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     fun onConfirmationSoundChanged(playConfirmationSound: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_CONFIRMATION_SOUND,
-            mapOf("value" to playConfirmationSound)
+            mapOf("value" to playConfirmationSound),
         )
     }
 
     fun onNextActionSave(action: HeadphoneAction) {
         if (action.canSave()) {
-            settings.headphoneControlsNextAction.set(action)
+            settings.headphoneControlsNextAction.set(action, needsSync = false)
             trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED)
         } else {
             _state.update { it.copy(startUpsellFromSource = UpsellSourceAction.NEXT) }
@@ -92,7 +90,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     fun onPreviousActionSave(action: HeadphoneAction) {
         if (action.canSave()) {
-            settings.headphoneControlsPreviousAction.set(action)
+            settings.headphoneControlsPreviousAction.set(action, needsSync = false)
             trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED)
         } else {
             _state.update { it.copy(startUpsellFromSource = UpsellSourceAction.PREVIOUS) }
@@ -115,10 +113,12 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     private fun HeadphoneAction.canSave() = when (this) {
         HeadphoneAction.SKIP_BACK,
-        HeadphoneAction.SKIP_FORWARD, -> true
+        HeadphoneAction.SKIP_FORWARD,
+        -> true
         HeadphoneAction.ADD_BOOKMARK -> state.value.isAddBookmarkEnabled
         HeadphoneAction.NEXT_CHAPTER,
-        HeadphoneAction.PREVIOUS_CHAPTER -> {
+        HeadphoneAction.PREVIOUS_CHAPTER,
+        -> {
             Timber.e("Headphone action not supported")
             false
         }
@@ -130,24 +130,6 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         val addBookmarkIconId: Int? = null,
         val addBookmarkIconColor: Color = SubscriptionTierColor.plusGold,
     )
-
-    private val addBookmarkIconId
-        get() = when {
-            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> R.drawable.ic_patron
-            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> R.drawable.ic_plus
-            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
-            else -> null
-        }
-
-    private val addBookmarkIconColor
-        get() = when {
-            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron() -> SubscriptionTierColor.patronPurple
-            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Plus -> SubscriptionTierColor.plusGold
-            Feature.BOOKMARKS_ENABLED.tier is FeatureTier.Free -> null
-            else -> null
-        }
 
     enum class UpsellSourceAction {
         PREVIOUS,

@@ -18,10 +18,10 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.navscaffold.scrollable
+import java.util.concurrent.Executors
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.Executors
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UrlScreenRoutes {
@@ -56,7 +56,6 @@ fun UrlScreen(
     url: String,
     columnState: ScalingLazyColumnState,
 ) {
-
     val coroutineScope = rememberCoroutineScope()
 
     ScalingLazyColumn(
@@ -81,7 +80,7 @@ fun UrlScreen(
                     coroutineScope.launch {
                         openUrlOnPhone(url, context)
                     }
-                }
+                },
             )
         }
     }

@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 data class UserPlaylistUpdate(
     val properties: List<PlaylistProperty>,
-    val source: PlaylistUpdateSource
+    val source: PlaylistUpdateSource,
 ) {
     init {
         if (properties.isEmpty()) {

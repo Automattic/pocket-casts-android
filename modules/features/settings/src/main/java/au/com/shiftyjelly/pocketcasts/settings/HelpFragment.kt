@@ -36,10 +36,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -47,8 +47,11 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var support: Support
 
     val viewModel by viewModels<HelpViewModel>()
@@ -67,7 +70,7 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            menu = R.menu.menu_help
+            menu = R.menu.menu_help,
         )
         toolbar.setOnMenuItemClickListener(this)
 
@@ -113,7 +116,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
 
     override fun onMenuItemClick(item: MenuItem): Boolean =
         when (item.itemId) {
-
             R.id.menu_logs -> {
                 val fragment = LogsFragment()
                 (activity as? FragmentHostListener)?.addFragment(fragment)

@@ -61,7 +61,15 @@ interface SyncServer {
     suspend fun updatePassword(@Header("Authorization") authorization: String, @Body request: UpdatePasswordRequest): LoginTokenResponse
 
     @POST("/user/named_settings/update")
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
     suspend fun namedSettings(@Header("Authorization") authorization: String, @Body request: NamedSettingsRequest): NamedSettingsResponse
+
+    @POST("/user/named_settings/update")
+    suspend fun namedSettings(
+        @Header("Authorization") authorization: String,
+        @Body request: ChangedNamedSettingsRequest,
+    ): ChangedNamedSettingsResponse
 
     @FormUrlEncoded
     @POST("/sync/update")
