@@ -132,11 +132,9 @@ private fun FeatureCard(
             UpgradeButton.PlanType.SUBSCRIBE -> {
                 when (button.subscription) {
                     is Subscription.Simple -> stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes))
-                    is Subscription.WithOffer -> if ((button.subscription as Subscription.WithOffer).isTrial()) {
-                        stringResource(LR.string.trial_start)
-                    } else {
-                        stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes))
-                    }
+                    is Subscription.Trial -> { stringResource(LR.string.trial_start) }
+                    is Subscription.Intro -> { stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes)) }
+                    else -> { stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes)) }
                 }
             }
             UpgradeButton.PlanType.UPGRADE -> stringResource(LR.string.upgrade_to, stringResource(button.shortNameRes))

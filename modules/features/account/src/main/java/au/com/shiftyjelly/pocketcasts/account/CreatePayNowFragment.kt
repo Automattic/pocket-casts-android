@@ -77,13 +77,14 @@ class CreatePayNowFragment : BaseFragment() {
                                 primaryText = subscription.recurringPricingPhase.priceSlashPeriod(res),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             )
-                            is Subscription.WithOffer -> if (subscription.isTrial()) {
+                            is Subscription.Trial -> {
                                 ProductAmountView(
                                     primaryText = subscription.offerPricingPhase.numPeriodFree(res),
                                     secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 )
                             }
+                            else -> {}
                         }
                     }
                 }
@@ -168,7 +169,8 @@ class CreatePayNowFragment : BaseFragment() {
             mainLayout.visibility = View.VISIBLE
             btnSubmit.text = getString(
                 when (subscription) {
-                    is Subscription.WithOffer -> if (subscription.isTrial()) { LR.string.profile_start_free_trial } else LR.string.profile_confirm
+                    is Subscription.Trial -> LR.string.profile_start_free_trial
+                    is Subscription.Intro -> LR.string.profile_confirm
                     is Subscription.Simple -> LR.string.profile_confirm
                 },
             )

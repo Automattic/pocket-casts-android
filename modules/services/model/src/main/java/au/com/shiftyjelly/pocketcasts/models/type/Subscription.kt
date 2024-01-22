@@ -29,13 +29,21 @@ sealed interface Subscription {
         override fun tryFreeThenPricePerPeriod(res: Resources): String? = null
     }
 
-    class WithOffer(
+    sealed class WithOffer(
         override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val offerPricingPhase: OfferSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails,
         override val offerToken: String,
-    ) : Subscription {
+    ) : Subscription
+
+    class Trial(
+        tier: SubscriptionTier,
+        recurringPricingPhase: RecurringSubscriptionPricingPhase,
+        offerPricingPhase: OfferSubscriptionPricingPhase,
+        productDetails: ProductDetails,
+        offerToken: String,
+    ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
@@ -59,16 +67,21 @@ sealed interface Subscription {
                 recurringPricingPhase.formattedPrice,
             )
         }
+    }
 
-        fun isTrial(): Boolean {
-            return this.productDetails.subscriptionOfferDetails?.any {
-                it.offerId == TRIAL_OFFER_ID
-            } ?: false
+    class Intro(
+        tier: SubscriptionTier,
+        recurringPricingPhase: RecurringSubscriptionPricingPhase,
+        offerPricingPhase: OfferSubscriptionPricingPhase,
+        productDetails: ProductDetails,
+        offerToken: String,
+    ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
+        override fun numFreeThenPricePerPeriod(res: Resources): String {
+            return "TODO"
         }
-        fun isIntroOffer(): Boolean {
-            return this.productDetails.subscriptionOfferDetails?.any {
-                it.offerId == INTRO_OFFER_ID
-            } ?: false
+
+        override fun tryFreeThenPricePerPeriod(res: Resources): String {
+            return "TODO"
         }
     }
 
@@ -94,7 +107,6 @@ sealed interface Subscription {
         const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
         const val SUBSCRIPTION_TEST_PRODUCT_ID = "com.pocketcasts.plus.testfreetrialoffer"
-        const val INTRO_OFFER_ID = "testyearlyintropricingoffer"
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
 
         fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =

@@ -43,15 +43,30 @@ object SubscriptionMapper {
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
                 } else {
-                    Subscription.WithOffer(
-                        tier = mapProductIdToTier(productDetails.productId),
-                        recurringPricingPhase = recurringPricingPhase,
-                        offerPricingPhase = offerPricingPhase,
-                        productDetails = productDetails,
-                        offerToken = relevantSubscriptionOfferDetails.offerToken,
-                    )
+                    if (isTrial(productDetails)) {
+                        Subscription.Trial(
+                            tier = mapProductIdToTier(productDetails.productId),
+                            recurringPricingPhase = recurringPricingPhase,
+                            offerPricingPhase = offerPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = relevantSubscriptionOfferDetails.offerToken,
+                        )
+                    } else {
+                        Subscription.Intro(
+                            tier = mapProductIdToTier(productDetails.productId),
+                            recurringPricingPhase = recurringPricingPhase,
+                            offerPricingPhase = offerPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = relevantSubscriptionOfferDetails.offerToken,
+                        )
+                    }
                 }
             }
+    }
+    private fun isTrial(productDetails: ProductDetails): Boolean {
+        return productDetails.subscriptionOfferDetails?.any {
+            it.offerId == Subscription.TRIAL_OFFER_ID
+        } ?: false
     }
 
     private val ProductDetails.SubscriptionOfferDetails.recurringSubscriptionPricingPhase: RecurringSubscriptionPricingPhase?

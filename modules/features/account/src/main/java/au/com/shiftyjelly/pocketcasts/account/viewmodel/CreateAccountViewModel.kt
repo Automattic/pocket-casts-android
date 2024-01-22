@@ -62,7 +62,7 @@ class CreateAccountViewModel
                     it // return full product id for new products
                 }
             } ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-            val isFreeTrial = (subscription as? Subscription.WithOffer)?.isTrial() ?: false
+            val isFreeTrial = (subscription is Subscription.Trial)
 
             val analyticsProperties = mapOf(
                 PRODUCT_KEY to productKey,

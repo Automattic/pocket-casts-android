@@ -84,13 +84,9 @@ class CreateAccountFragment : BaseFragment() {
                     val subscription = subscriptionManager.getDefaultSubscription(state.list)
                     val plusLabel = when (subscription) {
                         is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
-                        is Subscription.WithOffer -> {
-                            if (subscription.isTrial()) {
-                                binding.root.resources.getString(LR.string.pocket_casts_plus_short)
-                            } else {
-                                binding.root.resources.getString(LR.string.pocket_casts_plus)
-                            }
-                        }
+                        is Subscription.Trial -> { binding.root.resources.getString(LR.string.pocket_casts_plus_short) }
+                        is Subscription.Intro -> { binding.root.resources.getString(LR.string.pocket_casts_plus) }
+                        else -> { binding.root.resources.getString(LR.string.pocket_casts_plus) }
                     }
                     binding.lblPlus.text = plusLabel
 
@@ -107,24 +103,23 @@ class CreateAccountFragment : BaseFragment() {
                                         horizontalAlignment = Alignment.End,
                                         emphasized = emphasized,
                                     )
-                                    is Subscription.WithOffer -> {
-                                        if (subscription.isTrial()) {
-                                            val res = LocalContext.current.resources
-                                            val primaryText = stringResource(
-                                                LR.string.plus_trial_duration_free,
-                                                subscription.offerPricingPhase.periodValuePlural(res),
-                                            )
-                                            ProductAmountView(
-                                                primaryText = primaryText,
-                                                secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(
-                                                    res,
-                                                ),
-                                                horizontalAlignment = Alignment.End,
-                                                emphasized = emphasized,
-                                            )
-                                        }
+                                    is Subscription.Trial -> {
+                                        val res = LocalContext.current.resources
+                                        val primaryText = stringResource(
+                                            LR.string.plus_trial_duration_free,
+                                            subscription.offerPricingPhase.periodValuePlural(res),
+                                        )
+                                        ProductAmountView(
+                                            primaryText = primaryText,
+                                            secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(
+                                                res,
+                                            ),
+                                            horizontalAlignment = Alignment.End,
+                                            emphasized = emphasized,
+                                        )
                                     }
                                     null -> { /* show nothing */ }
+                                    else -> { /* show nothing */ }
                                 }
                             }
                         }
