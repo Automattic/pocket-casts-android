@@ -44,8 +44,8 @@ import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -107,7 +107,7 @@ fun OnboardingUpgradeBottomSheet(
 
                         val text = subscription.recurringPricingPhase.pricePerPeriod(resources)
                         val topText = subscription
-                            .trialPricingPhase
+                            .offerPricingPhase
                             ?.numPeriodFreeTrial(resources)
                             ?.uppercase(Locale.getDefault())
 
@@ -139,7 +139,7 @@ fun OnboardingUpgradeBottomSheet(
                     }
             }
 
-            val descriptionText = state.selectedSubscription.trialPricingPhase.let { trialPhase ->
+            val descriptionText = state.selectedSubscription.offerPricingPhase.let { trialPhase ->
                 if (trialPhase != null) {
                     stringResource(
                         LR.string.onboarding_plus_recurring_after_free_trial,
@@ -188,7 +188,7 @@ fun OnboardingUpgradeBottomSheet(
 
             UpgradeRowButton(
                 primaryText = stringResource(
-                    if (state.selectedSubscription.trialPricingPhase != null) {
+                    if (state.selectedSubscription.offerPricingPhase != null) {
                         LR.string.onboarding_plus_start_free_trial_and_subscribe
                     } else {
                         LR.string.subscribe
@@ -236,9 +236,9 @@ private val animationSpec = tween<IntSize>(
 )
 
 private fun recurringAfterString(
-    trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase,
+    offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase,
     res: Resources,
-) = "${trialSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${trialSubscriptionPricingPhase.trialEnd()})"
+) = "${offerSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${offerSubscriptionPricingPhase.trialEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
     SubscriptionTier.PLUS -> R.string.onboarding_plus_subscribe
