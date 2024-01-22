@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.Onboard
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -24,7 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
 fun OnboardingFlowComposable(
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
-    exitOnboarding: () -> Unit,
+    exitOnboarding: (OnboardingExitInfo) -> Unit,
     completeOnboardingToDiscover: () -> Unit,
     signInState: SignInState,
     navController: NavHostController = rememberNavController(),
@@ -56,7 +57,7 @@ fun OnboardingFlowComposable(
 private fun Content(
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
-    exitOnboarding: () -> Unit,
+    exitOnboarding: (OnboardingExitInfo) -> Unit,
     completeOnboardingToDiscover: () -> Unit,
     signInState: SignInState,
     navController: NavHostController,
@@ -89,7 +90,7 @@ private fun Content(
         onboardingRecommendationsFlowGraph(
             theme = theme,
             flow = flow,
-            onBackPressed = exitOnboarding,
+            onBackPressed = { exitOnboarding(OnboardingExitInfo()) },
             onComplete = {
                 navController.navigate(
                     if (signInState.isSignedInAsPlusOrPatron) {
@@ -118,13 +119,13 @@ private fun Content(
                         -> {
                             val popped = navController.popBackStack()
                             if (!popped) {
-                                exitOnboarding()
+                                exitOnboarding(OnboardingExitInfo())
                             }
                         }
 
                         OnboardingFlow.InitialOnboarding,
                         OnboardingFlow.LoggedOut,
-                        -> exitOnboarding()
+                        -> exitOnboarding(OnboardingExitInfo())
                     }
                 },
                 onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
@@ -162,7 +163,7 @@ private fun Content(
             OnboardingForgotPasswordPage(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
-                onCompleted = exitOnboarding,
+                onCompleted = { exitOnboarding(OnboardingExitInfo()) },
             )
         }
 
@@ -221,7 +222,7 @@ private fun Content(
                     if (userCreatedNewAccount) {
                         navController.popBackStack()
                     } else {
-                        exitOnboarding()
+                        exitOnboarding(OnboardingExitInfo())
                     }
                 },
                 onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
@@ -229,7 +230,7 @@ private fun Content(
                     if (userCreatedNewAccount) {
                         navController.navigate(OnboardingNavRoute.welcome)
                     } else {
-                        exitOnboarding()
+                        exitOnboarding(OnboardingExitInfo())
                     }
                 },
             )
@@ -240,13 +241,13 @@ private fun Content(
                 activeTheme = theme,
                 flow = flow,
                 isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
-                onDone = exitOnboarding,
+                onDone = { exitOnboarding(OnboardingExitInfo()) },
                 onContinueToDiscover = completeOnboardingToDiscover,
                 onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                 onBackPressed = {
                     // Don't allow navigation back to the upgrade screen after the user upgrades
                     if (signInState.isSignedInAsPlusOrPatron) {
-                        exitOnboarding()
+                        exitOnboarding(OnboardingExitInfo())
                     } else {
                         navController.popBackStack()
                     }
@@ -258,13 +259,12 @@ private fun Content(
 
 private fun onLoginToExistingAccount(
     flow: OnboardingFlow,
-    exitOnboarding: () -> Unit,
+    exitOnboarding: (OnboardingExitInfo) -> Unit,
     navController: NavHostController,
 ) {
     when (flow) {
-        OnboardingFlow.InitialOnboarding,
-        OnboardingFlow.LoggedOut,
-        -> exitOnboarding()
+        OnboardingFlow.InitialOnboarding -> exitOnboarding(OnboardingExitInfo())
+        OnboardingFlow.LoggedOut -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
 
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
