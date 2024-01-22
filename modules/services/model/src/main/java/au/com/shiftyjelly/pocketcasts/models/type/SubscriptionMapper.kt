@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.SUBSCRIPTION_TEST_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
@@ -15,13 +16,13 @@ object SubscriptionMapper {
         val matchingSubscriptionOfferDetails = if (isFreeTrialEligible) {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { it.trialSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with trial offers
-                ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no trial offers, return all offers
+                ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers
+                ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no special offers, return all offers available
                 ?: productDetails.subscriptionOfferDetails // if null, return all offers
         } else {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { it.trialSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without trial offers
+                ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without special offers
         } ?: emptyList()
 
         // TODO handle multiple matching SubscriptionOfferDetails
@@ -33,8 +34,8 @@ object SubscriptionMapper {
         return relevantSubscriptionOfferDetails
             ?.recurringSubscriptionPricingPhase
             ?.let { recurringPricingPhase ->
-                val trialPricingPhase = relevantSubscriptionOfferDetails.trialSubscriptionPricingPhase
-                if (trialPricingPhase == null) {
+                val offerPricingPhase = relevantSubscriptionOfferDetails.offerSubscriptionPricingPhase
+                if (offerPricingPhase == null) {
                     Subscription.Simple(
                         tier = mapProductIdToTier(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
@@ -42,15 +43,30 @@ object SubscriptionMapper {
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
                 } else {
-                    Subscription.WithTrial(
-                        tier = mapProductIdToTier(productDetails.productId),
-                        recurringPricingPhase = recurringPricingPhase,
-                        trialPricingPhase = trialPricingPhase,
-                        productDetails = productDetails,
-                        offerToken = relevantSubscriptionOfferDetails.offerToken,
-                    )
+                    if (isTrial(productDetails)) {
+                        Subscription.Trial(
+                            tier = mapProductIdToTier(productDetails.productId),
+                            recurringPricingPhase = recurringPricingPhase,
+                            offerPricingPhase = offerPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = relevantSubscriptionOfferDetails.offerToken,
+                        )
+                    } else {
+                        Subscription.Intro(
+                            tier = mapProductIdToTier(productDetails.productId),
+                            recurringPricingPhase = recurringPricingPhase,
+                            offerPricingPhase = offerPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = relevantSubscriptionOfferDetails.offerToken,
+                        )
+                    }
                 }
             }
+    }
+    private fun isTrial(productDetails: ProductDetails): Boolean {
+        return productDetails.subscriptionOfferDetails?.any {
+            it.offerId == Subscription.TRIAL_OFFER_ID
+        } ?: false
     }
 
     private val ProductDetails.SubscriptionOfferDetails.recurringSubscriptionPricingPhase: RecurringSubscriptionPricingPhase?
@@ -74,8 +90,8 @@ object SubscriptionMapper {
             }
         }
 
-    private val ProductDetails.SubscriptionOfferDetails.trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase?
-        get() = trialSubscriptionPricingPhases().run {
+    private val ProductDetails.SubscriptionOfferDetails.offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase?
+        get() = offerSubscriptionPricingPhases().run {
             when (size) {
                 0 -> null
                 1 -> first()
@@ -92,8 +108,8 @@ object SubscriptionMapper {
     private fun ProductDetails.SubscriptionOfferDetails.recurringSubscriptionPricingPhases() =
         subscriptionPricingPhases<RecurringSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.RECURRING)
 
-    private fun ProductDetails.SubscriptionOfferDetails.trialSubscriptionPricingPhases() =
-        subscriptionPricingPhases<TrialSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.TRIAL)
+    private fun ProductDetails.SubscriptionOfferDetails.offerSubscriptionPricingPhases() =
+        subscriptionPricingPhases<OfferSubscriptionPricingPhase>(SubscriptionPricingPhase.Type.OFFER)
 
     private inline fun <reified T : SubscriptionPricingPhase> ProductDetails.SubscriptionOfferDetails.subscriptionPricingPhases(
         phaseType: SubscriptionPricingPhase.Type,
@@ -102,7 +118,7 @@ object SubscriptionMapper {
             .pricingPhaseList
             .map { it.fromPricingPhase() }
             .filterIsInstance<T>()
-            .filter { it.phaseType() == phaseType } // Must check the phaseType because a SubscriptionPricingPhase class can implement both Trial and Recurring
+            .filter { it.phaseType() == phaseType } // Must check the phaseType because a SubscriptionPricingPhase class can implement both Offer and Recurring
 
     private fun ProductDetails.PricingPhase.fromPricingPhase(): SubscriptionPricingPhase? =
         try {
@@ -122,7 +138,7 @@ object SubscriptionMapper {
         }
 
     fun mapProductIdToTier(productId: String) = when (productId) {
-        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
+        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID, SUBSCRIPTION_TEST_PRODUCT_ID) -> SubscriptionTier.PLUS
         in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
         else -> SubscriptionTier.UNKNOWN
     }

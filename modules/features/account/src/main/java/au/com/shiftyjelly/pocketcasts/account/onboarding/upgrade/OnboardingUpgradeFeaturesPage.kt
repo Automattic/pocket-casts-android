@@ -331,11 +331,14 @@ private fun UpgradeButton(
     val shortName = resources.getString(button.shortNameRes)
     val primaryText = when (subscription) {
         is Subscription.Simple -> stringResource(LR.string.subscribe_to, shortName)
-        is Subscription.WithTrial -> stringResource(LR.string.trial_start)
+        is Subscription.Trial -> { stringResource(LR.string.trial_start) }
+        is Subscription.Intro -> { "TODO" }
+        else -> { stringResource(LR.string.subscribe_to, shortName) }
     }
     val secondaryText = when (subscription) {
         is Subscription.Simple -> subscription.recurringPricingPhase.pricePerPeriod(resources)
-        is Subscription.WithTrial -> subscription.tryFreeThenPricePerPeriod(resources)
+        is Subscription.Trial, is Subscription.Intro -> { subscription.tryFreeThenPricePerPeriod(resources) }
+        else -> { subscription.recurringPricingPhase.pricePerPeriod(resources) }
     }
     Box(
         contentAlignment = Alignment.BottomCenter,
