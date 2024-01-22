@@ -67,6 +67,7 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Headers.Companion.headersOf
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -368,6 +369,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             val imageBuilder: ImageRequest.Builder.() -> Unit = {
                 error(IR.drawable.defaultartwork_dark)
+                headers(headersOf("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER))
                 scale(Scale.FIT)
                 transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
             }
