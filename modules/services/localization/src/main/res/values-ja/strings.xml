@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-19 10:54:03+0000
+Translation-Revision-Date: 2024-01-10 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">有効化すると、端末のテーマカラーに合わせてウィジェットの色が変わります。</string>
+    <string name="settings_use_dynamic_colors_widget">ウィジェットのダイナミックカラーを使用</string>
+    <string name="widget">ウィジェット</string>
     <string name="bookmark_not_found">ブックマークが見つかりません</string>
     <string name="settings_use_dark_up_next_details">有効にすると、「次のエピソード待機リスト」では常にダークテーマを使用し、無効にすると現在のテーマと一致します</string>
     <string name="settings_use_dark_up_next">次のエピソード待機リストのダークテーマを使用</string>
@@ -125,7 +128,6 @@ Language: ja_JP
     <string name="player_sleep_add_1_minute">1分以上</string>
     <string name="player_sleep_1_minute">1分</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">追加のテーマとアプリアイコン</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch 再生</string>
     <string name="onboarding_patron_feature_early_access_title">機能への早期アクセス</string>
     <string name="settings_continuous_playback_summary">「\"次のエピソード」が空の場合、現在視聴中のポッドキャストと同じものまたはリストからエピソードを再生します。</string>
     <string name="renew_your_subscription">サブスクリプションを更新</string>

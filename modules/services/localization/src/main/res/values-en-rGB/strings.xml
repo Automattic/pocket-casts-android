@@ -76,7 +76,6 @@ Language: en_GB
     <string name="settings_autoplay">Autoplay</string>
     <string name="player_sleep_1_minute">1 minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra Themes &amp; App Icons</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch Playback</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
     <string name="settings_continuous_playback_summary">If your Up Next queue is empty, we\'ll play episodes from the same podcast or list you\'re currently listening to.</string>
     <string name="renew_your_subscription">Renew your Subscription</string>

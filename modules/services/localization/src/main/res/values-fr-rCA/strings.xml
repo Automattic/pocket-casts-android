@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-18 18:54:04+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">En cas d’activation, les couleurs du widget changeront en fonction des couleurs du thème de l’appareil.</string>
+    <string name="settings_use_dynamic_colors_widget">Utiliser des couleurs dynamiques pour le widget</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Impossible de trouver le favori</string>
     <string name="settings_use_dark_up_next_details">Quand l’option est activée, la File d’attente affichera toujours le thème sombre ou alors elle correspondra au thème actuel si l’option est désactivée</string>
     <string name="settings_use_dark_up_next">Utiliser le thème File d’attente sombre</string>
@@ -125,7 +128,6 @@ Language: fr
     <string name="player_sleep_add_1_minute">+ 1 minute</string>
     <string name="player_sleep_1_minute">1 minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Thèmes et icônes d’applications supplémentaires</string>
-    <string name="onboarding_plus_feature_watch_playback">Lecture sur la montre</string>
     <string name="onboarding_patron_feature_early_access_title">Accès en avant-première aux fonctionnalités</string>
     <string name="settings_continuous_playback_summary">Si votre file d’attente À écouter ensuite est vide, nous diffuserons les épisodes du même podcast ou de la même liste que ceux que vous écoutez actuellement.</string>
     <string name="renew_your_subscription">Renouveler votre abonnement</string>

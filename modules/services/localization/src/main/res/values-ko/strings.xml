@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-19 10:54:03+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">활성화하면 위젯 색상이 기기 테마 색상에 따라 변경됩니다.</string>
+    <string name="settings_use_dynamic_colors_widget">위젯에 동적 색상 사용</string>
+    <string name="widget">위젯</string>
     <string name="bookmark_not_found">북마크를 찾을 수 없음</string>
     <string name="settings_use_dark_up_next_details">활성화되면 다음 에피소드에 항상 어두운 테마를 사용하고 비활성화되면 현재와 일치하는 테마를 사용합니다.</string>
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
@@ -125,7 +128,6 @@ Language: ko_KR
     <string name="player_sleep_add_1_minute">1분</string>
     <string name="player_sleep_1_minute">1분</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">추가 테마 및 앱 아이콘</string>
-    <string name="onboarding_plus_feature_watch_playback">시계 재생</string>
     <string name="onboarding_patron_feature_early_access_title">기능 조기 접근</string>
     <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
     <string name="renew_your_subscription">구독 갱신</string>

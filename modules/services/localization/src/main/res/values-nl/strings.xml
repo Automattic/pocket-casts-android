@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-20 16:54:03+0000
+Translation-Revision-Date: 2024-01-09 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">Wanneer deze instelling is ingeschakeld, veranderen de widgetkleuren op basis van de themakleuren van het apparaat.</string>
+    <string name="settings_use_dynamic_colors_widget">Dynamische kleuren gebruiken voor widgets</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Bladwijzer niet gevonden</string>
     <string name="settings_use_dark_up_next_details">Indien ingeschakeld gebruikt Hierna altijd het donkere thema en indien uitgeschakeld gebruikt het het huidige thema</string>
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
@@ -125,7 +128,6 @@ Language: nl
     <string name="player_sleep_add_1_minute">+ 1 minuut</string>
     <string name="player_sleep_1_minute">1 minuut</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra thema\'s en app-pictogrammen</string>
-    <string name="onboarding_plus_feature_watch_playback">Afspelen op horloge</string>
     <string name="onboarding_patron_feature_early_access_title">Vroegtijdige toegang tot functies</string>
     <string name="settings_continuous_playback_summary">Als je wachtrij Hierna leeg is, zullen we afleveringen afspelen van dezelfde podcast of uit dezelfde lijst waar je op dat moment naar aan het luisteren bent.</string>
     <string name="renew_your_subscription">Verleng je abonnement</string>

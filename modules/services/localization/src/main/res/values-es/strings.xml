@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-20 13:54:04+0000
+Translation-Revision-Date: 2024-01-09 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">Cuando está activado, los colores del widget cambiarán en función de los colores del tema del dispositivo.</string>
+    <string name="settings_use_dynamic_colors_widget">Utiliza colores dinámicos para el widget</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">No se ha encontrado el marcador.</string>
     <string name="settings_use_dark_up_next_details">Si está activado, Up Next utilizará siempre el tema oscuro, o coincidirá con el tema actual si está desactivado</string>
     <string name="settings_use_dark_up_next">Utilizar tema Up Next oscuro</string>
@@ -125,7 +128,6 @@ Language: es
     <string name="player_sleep_add_1_minute">Más de un minuto</string>
     <string name="player_sleep_1_minute">Un minuto</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Temas e iconos de la aplicación adicionales</string>
-    <string name="onboarding_plus_feature_watch_playback">Reproducción en el reloj</string>
     <string name="onboarding_patron_feature_early_access_title">Acceso anticipado a las funciones</string>
     <string name="settings_continuous_playback_summary">Si no tienes ningún episodio en cola, reproduciremos los del pódcast o lista que estés escuchando en ese momento.</string>
     <string name="renew_your_subscription">Renovar la suscripción</string>
