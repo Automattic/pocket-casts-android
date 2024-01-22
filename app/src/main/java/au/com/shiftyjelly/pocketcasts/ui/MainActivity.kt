@@ -108,6 +108,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -247,6 +248,10 @@ class MainActivity :
             OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
                 openTab(VR.id.navigation_discover)
+            }
+            OnboardingFinish.DoneShowPlusPromotion -> {
+                settings.setHasDoneInitialOnboarding()
+                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN))
             }
             null -> {
                 Timber.e("Unexpected null result from onboarding activity")
