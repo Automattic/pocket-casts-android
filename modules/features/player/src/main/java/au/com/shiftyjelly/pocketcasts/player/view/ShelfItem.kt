@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -22,6 +24,9 @@ object ShelfItems {
         add(ShelfItem.Played)
         add(ShelfItem.Bookmark)
         add(ShelfItem.Archive)
+        if (FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)) {
+            add(ShelfItem.Report)
+        }
     }
     private val items = itemsList.associateBy { it.id }
 
@@ -144,5 +149,14 @@ sealed class ShelfItem(
         shownWhen = Shown.Always,
         tier = SubscriptionTier.NONE,
         analyticsValue = "download",
+    )
+
+    object Report : ShelfItem(
+        id = "report",
+        title = { LR.string.report },
+        subtitle = LR.string.report_subtitle,
+        iconRes = { IR.drawable.ic_flag },
+        shownWhen = Shown.Always,
+        analyticsValue = "report",
     )
 }

@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -155,6 +156,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Archive.id to binding.archive,
             ShelfItem.Download.id to binding.download,
             ShelfItem.Bookmark.id to binding.bookmark,
+            ShelfItem.Report.id to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
             val visibleItems = it.first.subList(0, 4).map { it.id }
@@ -189,6 +191,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+        }
+        binding.report?.setOnClickListener {
+            trackShelfAction(ShelfItem.Report.analyticsValue)
+            openUrl(settings.getReportViolationUrl())
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
