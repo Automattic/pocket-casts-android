@@ -10,9 +10,9 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.NoSubscriptions
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
-import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -46,9 +46,9 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     private val _state = MutableStateFlow<OnboardingUpgradeBottomSheetState>(Loading)
     val state: StateFlow<OnboardingUpgradeBottomSheetState> = _state
         .map {
-            // If selected subscription has trialPricingPhase, update mostRecentlySelectedTrialPhase
-            (it as? Loaded)?.selectedSubscription?.trialPricingPhase?.let { trialPhase ->
-                it.copy(mostRecentlySelectedTrialPhase = trialPhase)
+            // If selected subscription has offerPricingPhase, update mostRecentlySelectedOfferPhase
+            (it as? Loaded)?.selectedSubscription?.offerPricingPhase?.let { offerPhase ->
+                it.copy(mostRecentlySelectedOfferPhase = offerPhase)
             } ?: it
         }.stateIn(viewModelScope, SharingStarted.Lazily, _state.value)
 
@@ -207,12 +207,12 @@ sealed class OnboardingUpgradeBottomSheetState {
     data class Loaded constructor(
         val subscriptions: List<Subscription>, // This list should never be empty
         val selectedSubscription: Subscription,
-        // Need to retain the most recently selected trial phase so that information is still available as
-        // it animates out of view after a subscription without a trial phase is selected
-        val mostRecentlySelectedTrialPhase: TrialSubscriptionPricingPhase? = null,
+        // Need to retain the most recently selected offer phase so that information is still available as
+        // it animates out of view after a subscription without a offer phase is selected
+        val mostRecentlySelectedOfferPhase: OfferSubscriptionPricingPhase? = null,
         val purchaseFailed: Boolean = false,
     ) : OnboardingUpgradeBottomSheetState() {
-        val showTrialInfo = selectedSubscription.trialPricingPhase != null
+        val showTrialInfo = selectedSubscription.offerPricingPhase != null
         val upgradeButton = selectedSubscription.toUpgradeButton()
         init {
             if (subscriptions.isEmpty()) {

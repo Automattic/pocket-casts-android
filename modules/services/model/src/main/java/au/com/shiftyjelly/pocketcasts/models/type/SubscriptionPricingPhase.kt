@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 
-sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
+sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
     val chronoUnit: ChronoUnit
 
     // i.e., 14 days free
@@ -53,11 +53,11 @@ sealed interface SubscriptionPricingPhase {
         "$periodValue ${res.getString(periodResSingular)}"
     fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType
 
-    enum class Type { TRIAL, RECURRING, UNKNOWN }
+    enum class Type { OFFER, RECURRING, UNKNOWN }
 
     private val ProductDetails.PricingPhase.subscriptionPricingPhaseType: Type
         get() = when (recurrenceMode) {
-            ProductDetails.RecurrenceMode.FINITE_RECURRING -> Type.TRIAL
+            ProductDetails.RecurrenceMode.FINITE_RECURRING -> Type.OFFER
             ProductDetails.RecurrenceMode.INFINITE_RECURRING -> Type.RECURRING
             else -> {
                 LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Unable to determine SubscriptionPricingPhase.Type")
@@ -68,7 +68,7 @@ sealed interface SubscriptionPricingPhase {
     class Years(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
-    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, OfferSubscriptionPricingPhase {
         override val periodValue = period.years
         override val chronoUnit = ChronoUnit.YEARS
         override val periodResSingular = R.string.plus_year
@@ -90,7 +90,7 @@ sealed interface SubscriptionPricingPhase {
     class Months(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
-    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, OfferSubscriptionPricingPhase {
 
         override val periodResSingular = R.string.plus_month
         override val periodResPlural = R.string.months_plural
@@ -113,15 +113,15 @@ sealed interface SubscriptionPricingPhase {
     class Days(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
-    ) : TrialSubscriptionPricingPhase {
+    ) : OfferSubscriptionPricingPhase {
         override val periodResSingular = R.string.plus_day
         override val periodResPlural = R.string.days_plural
         override val periodValue = period.days
         override val chronoUnit = ChronoUnit.DAYS
 
         init {
-            if (phaseType() != Type.TRIAL) {
-                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Got a phase type of ${phaseType()} for a Days phase, which only extends TrialSubscriptionPricingPhase")
+            if (phaseType() != Type.OFFER) {
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Got a phase type of ${phaseType()} for a Days phase, which only extends OfferSubscriptionPricingPhase")
             }
         }
     }
