@@ -279,7 +279,6 @@ class PodcastSyncProcessTest {
         subscriptionManager = mock(),
         folderManager = mock(),
         syncManager = mock(),
-        featureFlagWrapper = mock(),
     )
 
     private fun mockPodcast(

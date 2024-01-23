@@ -36,6 +36,8 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.protobuf.Timestamp
 import com.google.protobuf.boolValue
@@ -144,7 +146,7 @@ class PodcastSyncProcess(
 
     @VisibleForTesting
     fun performIncrementalSync(lastModified: String): Completable =
-        if (featureFlagWrapper.isEnabled(Feature.SETTINGS_SYNC)) {
+        if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
             rxCompletable {
                 performIncrementalSyncSuspend(lastModified)
             }
