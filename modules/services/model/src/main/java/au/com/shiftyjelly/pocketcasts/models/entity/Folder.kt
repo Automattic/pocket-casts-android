@@ -23,5 +23,6 @@ data class Folder(
     companion object {
         // server side, the home folder also needs a UUID, so again we have a predefined value for it all clients use
         const val homeFolderUuid = "973df93c-e4dc-41fb-879e-0c7b532ebb70"
+        const val SYNC_MODIFIED_FROM_SERVER = 0L
     }
 }

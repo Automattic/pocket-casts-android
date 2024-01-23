@@ -63,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
     ],
-    version = 79,
+    version = 80,
     exportSchema = true,
 )
 @TypeConverters(
@@ -493,6 +493,21 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_79_80 = addMigration(79, 80) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN start_from_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN skip_last_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -862,6 +877,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_76_77,
                 MIGRATION_77_78,
                 MIGRATION_78_79,
+                MIGRATION_79_80,
             )
         }
 
