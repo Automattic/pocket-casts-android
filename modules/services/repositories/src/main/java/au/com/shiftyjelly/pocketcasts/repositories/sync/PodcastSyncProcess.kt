@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -33,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
@@ -45,10 +47,13 @@ import com.google.protobuf.stringValue
 import com.google.protobuf.timestamp
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUserDevice
 import com.pocketcasts.service.api.int32Setting
 import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.syncUpdateRequest
+import com.pocketcasts.service.api.syncUserBookmark
+import com.pocketcasts.service.api.syncUserDevice
 import com.pocketcasts.service.api.syncUserEpisode
 import com.pocketcasts.service.api.syncUserFolder
 import com.pocketcasts.service.api.syncUserPlaylist
@@ -64,7 +69,6 @@ import java.time.Instant
 import java.time.format.DateTimeParseException
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -155,7 +159,13 @@ class PodcastSyncProcess(
     private suspend fun performIncrementalSyncSuspend(lastModified: String) {
         val episodesToSync = episodeManager.findEpisodesToSync()
         val syncUpdateRequest = getSyncUpdateRequest(lastModified, episodesToSync)
+        if (BuildConfig.DEBUG) {
+            Timber.i("incremental sync request: $syncUpdateRequest")
+        }
         val protobufResponse = syncManager.userSyncUpdate(syncUpdateRequest)
+        if (BuildConfig.DEBUG) {
+            Timber.i("incremental sync response: $protobufResponse")
+        }
         val syncUpdateResponse = SyncUpdateResponse.fromProtobufSyncUpdateResponse(protobufResponse)
         processServerResponse(
             response = syncUpdateResponse,
@@ -200,6 +210,17 @@ class PodcastSyncProcess(
                 val playlistRecords = playlistManager.findPlaylistsToSync()
                     .map { toRecord(it) }
                 records.addAll(playlistRecords)
+
+                val bookmarkRecords = bookmarkManager.findBookmarksToSync()
+                    .map { toRecord(it) }
+                records.addAll(bookmarkRecords)
+
+                getSyncUserDevice()?.let { syncUserDevice ->
+                    val syncUserDeviceRecord = record {
+                        this.device = syncUserDevice
+                    }
+                    records.add(syncUserDeviceRecord)
+                }
             }
         } catch (e: Exception) {
             Timber.e(e, "Unable to upload podcast to sync.")
@@ -470,6 +491,23 @@ class PodcastSyncProcess(
         }
     }
 
+    @VisibleForTesting
+    internal fun getSyncUserDevice(): SyncUserDevice? =
+        if (statsManager.isSynced(settings) || statsManager.isEmpty) {
+            null
+        } else {
+            syncUserDevice {
+                deviceId = stringValue { value = settings.getUniqueDeviceId() }
+                deviceType = int32Value { value = ANDROID_DEVICE_TYPE }
+                timeSilenceRemoval = int64Value { value = statsManager.timeSavedSilenceRemovalSecs }
+                timeSkipping = int64Value { value = statsManager.timeSavedSkippingSecs }
+                timeIntroSkipping = int64Value { value = statsManager.timeSavedSkippingIntroSecs }
+                timeVariableSpeed = int64Value { value = statsManager.timeSavedVariableSpeedSecs }
+                timeListened = int64Value { value = statsManager.totalListeningTimeSecs }
+                timesStartedAt = int64Value { value = statsManager.statsStartTimeSecs }
+            }
+        }
+
     @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadStatChanges(records: JSONArray) {
         if (statsManager.isSynced(settings) || statsManager.isEmpty) {
@@ -604,6 +642,7 @@ class PodcastSyncProcess(
         try {
             val bookmarks = bookmarkManager.findBookmarksToSync()
             bookmarks.forEach { bookmark ->
+                @Suppress("DEPRECATION")
                 uploadBookmarkChanges(bookmark, records)
             }
         } catch (e: Exception) {
@@ -612,6 +651,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadBookmarkChanges(bookmark: Bookmark, records: JSONArray) {
         try {
             val fields = JSONObject().apply {
@@ -821,11 +861,7 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
             return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false)
                 .doOnSuccess { podcast ->
-                    podcast.startFromSecs = podcastSync.startFromSecs ?: 0
-                    podcast.skipLastSecs = podcastSync.skipLastSecs ?: 0
-                    podcast.addedDate = podcastSync.dateAdded
-                    podcastSync.sortPosition?.let { podcast.sortPosition = it }
-                    podcastSync.folderUuid?.let { podcast.folderUuid = it }
+                    applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
                     podcastManager.updatePodcast(podcast)
                 }
                 .toMaybe()
@@ -840,11 +876,7 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed) {
             podcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
             podcast.isSubscribed = true
-            podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
-            podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
-            podcastSync.sortPosition?.let { podcast.sortPosition = it }
-            podcast.folderUuid = podcastSync.folderUuid
-            podcast.addedDate = podcastSync.dateAdded
+            applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
 
             podcastManager.updatePodcast(podcast)
         } else if (podcast.isSubscribed && !podcastSync.subscribed) { // Unsubscribed on the server but subscribed on device
@@ -852,6 +884,16 @@ class PodcastSyncProcess(
             podcastManager.unsubscribe(podcast.uuid, playbackManager)
         }
         return Maybe.just(podcast)
+    }
+
+    private fun applyPodcastSyncUpdatesToPodcast(podcast: Podcast, podcastSync: SyncUpdateResponse.PodcastSync) {
+        podcast.addedDate = podcastSync.dateAdded
+        podcast.folderUuid = podcastSync.folderUuid
+        podcastSync.sortPosition?.let { podcast.sortPosition = it }
+        podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
+        podcastSync.startFromModified?.let { podcast.startFromModified = it }
+        podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
+        podcastSync.skipLastModified?.let { podcast.skipLastModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -952,6 +994,9 @@ class PodcastSyncProcess(
     companion object {
 
         @VisibleForTesting
+        internal val ANDROID_DEVICE_TYPE = 2
+
+        @VisibleForTesting
         internal fun toRecord(podcast: Podcast): Record =
             record {
                 this.podcast = syncUserPodcast {
@@ -968,6 +1013,8 @@ class PodcastSyncProcess(
                         }
                     }
 
+                    // In older versions of Pocket Casts it was possible to subscribe or delete
+                    // a podcast. Send both values to ensure we don't break backward compatibility.
                     isDeleted = boolValue { value = !podcast.isSubscribed }
                     subscribed = boolValue { value = podcast.isSubscribed }
 
@@ -977,13 +1024,13 @@ class PodcastSyncProcess(
                         autoStartFrom = int32Setting {
                             value = int32Value { value = podcast.startFromSecs }
                             modifiedAt = timestamp {
-                                seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                                seconds = podcast.startFromModified?.timeSecs() ?: 0
                             }
                         }
                         autoSkipLast = int32Setting {
                             value = int32Value { value = podcast.skipLastSecs }
                             modifiedAt = timestamp {
-                                seconds = System.currentTimeMillis().milliseconds.inWholeSeconds
+                                seconds = podcast.skipLastModified?.timeSecs() ?: 0
                             }
                         }
                     }
@@ -1071,6 +1118,26 @@ class PodcastSyncProcess(
                     filterDuration = boolValue { value = playlist.filterDuration }
                     longerThan = int32Value { value = playlist.longerThan }
                     shorterThan = int32Value { value = playlist.shorterThan }
+                }
+            }
+
+        @VisibleForTesting
+        internal fun toRecord(bookmark: Bookmark): Record =
+            record {
+                this.bookmark = syncUserBookmark {
+                    bookmarkUuid = bookmark.uuid
+                    podcastUuid = bookmark.podcastUuid
+                    episodeUuid = bookmark.episodeUuid
+                    time = int32Value { value = bookmark.timeSecs }
+                    createdAt = bookmark.createdAt.toProtobufTimestamp()
+                    bookmark.titleModified?.let { bookmarkTitleModified ->
+                        title = stringValue { value = bookmark.title }
+                        titleModified = int64Value { value = bookmarkTitleModified }
+                    }
+                    bookmark.deletedModified?.let { bookmarkDeletedModified ->
+                        isDeleted = boolValue { value = bookmark.deleted }
+                        isDeletedModified = int64Value { value = bookmarkDeletedModified }
+                    }
                 }
             }
     }
