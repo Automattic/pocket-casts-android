@@ -303,11 +303,11 @@ abstract class PodcastDao {
         return Completable.fromAction { updateSubscribed(subscribed, uuid) }
     }
 
-    @Query("UPDATE podcasts SET start_from = :autoStartFrom, sync_status = 0 WHERE uuid = :uuid")
-    abstract suspend fun updateStartFrom(autoStartFrom: Int, uuid: String)
+    @Query("UPDATE podcasts SET start_from = :autoStartFrom, start_from_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateStartFrom(autoStartFrom: Int, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET skip_last = :skipLast, sync_status = 0 WHERE uuid = :uuid")
-    abstract suspend fun updateSkipLast(skipLast: Int, uuid: String)
+    @Query("UPDATE podcasts SET skip_last = :skipLast, skip_last_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateSkipLast(skipLast: Int, uuid: String, modified: Date = Date())
 
     @Query("UPDATE podcasts SET color_last_downloaded = :lastDownloaded WHERE uuid = :uuid")
     abstract fun updateColorLastDownloaded(lastDownloaded: Long, uuid: String)
