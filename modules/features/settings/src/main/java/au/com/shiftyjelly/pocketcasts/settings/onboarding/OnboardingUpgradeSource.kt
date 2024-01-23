@@ -9,7 +9,8 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     FILES("files"),
     FOLDERS("folders"),
     HEADPHONE_CONTROLS_SETTINGS("headphone_controls_settings"),
-    LOGIN("login"),
+    LOGIN("login"), // for login from within upsell screen
+    LOGIN_PLUS_PROMOTION("login_plus_promotion"), // for login from outside upsell screen
     OVERFLOW_MENU("overflow_menu"),
     PLUS_DETAILS("plus_details"),
     PROFILE("profile"),
