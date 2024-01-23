@@ -66,7 +66,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -327,19 +326,9 @@ private fun UpgradeButton(
     onClickSubscribe: () -> Unit,
 ) {
     val resources = LocalContext.current.resources
-    val subscription = button.subscription
     val shortName = resources.getString(button.shortNameRes)
-    val primaryText = when (subscription) {
-        is Subscription.Simple -> stringResource(LR.string.subscribe_to, shortName)
-        is Subscription.Trial -> { stringResource(LR.string.trial_start) }
-        is Subscription.Intro -> { "TODO" }
-        else -> { stringResource(LR.string.subscribe_to, shortName) }
-    }
-    val secondaryText = when (subscription) {
-        is Subscription.Simple -> subscription.recurringPricingPhase.pricePerPeriod(resources)
-        is Subscription.Trial, is Subscription.Intro -> { subscription.tryFreeThenPricePerPeriod(resources) }
-        else -> { subscription.recurringPricingPhase.pricePerPeriod(resources) }
-    }
+    val primaryText = stringResource(LR.string.subscribe_to, shortName)
+
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier.fadeBackground(),
@@ -347,13 +336,14 @@ private fun UpgradeButton(
         Column {
             UpgradeRowButton(
                 primaryText = primaryText,
-                secondaryText = secondaryText,
                 backgroundColor = colorResource(button.backgroundColorRes),
                 textColor = colorResource(button.textColorRes),
+                fontWeight = FontWeight.W500,
                 onClick = onClickSubscribe,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
-                    .fillMaxWidth(),
+                    .heightIn(min = 48.dp),
             )
             Spacer(
                 modifier = Modifier
