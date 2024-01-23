@@ -889,6 +889,14 @@ class MainActivity :
         return binding.playerBottomSheet.sheetBehavior?.state ?: BottomSheetBehavior.STATE_COLLAPSED
     }
 
+    override fun addPlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback) {
+        binding.playerBottomSheet.sheetBehavior?.addBottomSheetCallback(callback)
+    }
+
+    override fun removePlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback) {
+        binding.playerBottomSheet.sheetBehavior?.removeBottomSheetCallback(callback)
+    }
+
     override fun lockPlayerBottomSheet(locked: Boolean) {
         binding.playerBottomSheet.isDragEnabled = !locked
     }
