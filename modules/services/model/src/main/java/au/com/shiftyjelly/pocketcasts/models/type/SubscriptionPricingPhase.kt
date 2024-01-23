@@ -27,6 +27,14 @@ sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
         val end = chronoUnit.addTo(ZonedDateTime.now(), periodValue.toLong())
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(end)
     }
+
+    override fun priceSlashPeriod(res: Resources): String {
+        return when (this) {
+            is SubscriptionPricingPhase.Years -> res.getString(R.string.plus_slash_year, this.formattedPrice)
+            is SubscriptionPricingPhase.Months -> res.getString(R.string.plus_slash_month, this.formattedPrice)
+            else -> { "" }
+        }
+    }
 }
 
 sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
@@ -36,7 +44,7 @@ sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
     val renews: Int
     val hint: Int?
     fun pricePerPeriod(res: Resources): String
-    fun priceSlashPeriod(res: Resources): String
+    override fun priceSlashPeriod(res: Resources): String
     fun thenPriceSlashPeriod(res: Resources): String
 }
 
@@ -52,6 +60,8 @@ sealed interface SubscriptionPricingPhase {
     fun periodValueSingular(res: Resources): String =
         "$periodValue ${res.getString(periodResSingular)}"
     fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType
+
+    fun priceSlashPeriod(res: Resources): String
 
     enum class Type { OFFER, RECURRING, UNKNOWN }
 

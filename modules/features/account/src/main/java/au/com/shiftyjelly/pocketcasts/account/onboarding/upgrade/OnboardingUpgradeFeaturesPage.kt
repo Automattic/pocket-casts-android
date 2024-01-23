@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountHorizontalText
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -314,14 +315,25 @@ private fun FeatureCard(
 
             Column {
                 if (subscription is Subscription.WithOffer) {
+                    ProductAmountHorizontalText(
+                        primaryText = subscription.offerPricingPhase.priceSlashPeriod(LocalContext.current.resources),
+                        secondaryText = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
+                    )
+
+                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
                     OfferBadge(
                         shortNameRes = subscription.badgeOfferText(),
                         backgroundColor = upgradeButton.backgroundColorRes,
                         textColor = upgradeButton.textColorRes,
                     )
-
-                    Spacer(modifier = Modifier.weight(2f))
+                } else if (subscription is Subscription.Simple) {
+                    ProductAmountHorizontalText(
+                        primaryText = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
+                    )
                 }
+
+                Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
                 card.featureItems.forEach {
                     UpgradeFeatureItem(it)
