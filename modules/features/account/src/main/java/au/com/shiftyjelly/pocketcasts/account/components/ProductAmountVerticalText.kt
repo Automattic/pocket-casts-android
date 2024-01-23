@@ -57,8 +57,9 @@ fun ProductAmountVerticalText(
 fun ProductAmountHorizontalText(
     primaryText: String? = null,
     secondaryText: String? = null,
-    modifier: Modifier = Modifier,
+    lineThroughSecondaryText: Boolean = true,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
@@ -78,7 +79,7 @@ fun ProductAmountHorizontalText(
                 text = secondaryText,
                 color = MaterialTheme.theme.colors.primaryText02,
                 style = TextStyle(
-                    textDecoration = TextDecoration.LineThrough,
+                    textDecoration = if (lineThroughSecondaryText) TextDecoration.LineThrough else TextDecoration.None,
                 ),
             )
         }

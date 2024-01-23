@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountHorizontalText
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -64,7 +63,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -314,24 +312,7 @@ private fun FeatureCard(
             }
 
             Column {
-                if (subscription is Subscription.WithOffer) {
-                    ProductAmountHorizontalText(
-                        primaryText = subscription.offerPricingPhase.priceSlashPeriod(LocalContext.current.resources),
-                        secondaryText = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
-                    )
-
-                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
-
-                    OfferBadge(
-                        shortNameRes = subscription.badgeOfferText(),
-                        backgroundColor = upgradeButton.backgroundColorRes,
-                        textColor = upgradeButton.textColorRes,
-                    )
-                } else if (subscription is Subscription.Simple) {
-                    ProductAmountHorizontalText(
-                        primaryText = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
-                    )
-                }
+                SubscriptionPriceSection(subscription, upgradeButton)
 
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 

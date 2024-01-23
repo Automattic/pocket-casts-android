@@ -145,7 +145,7 @@ fun OfferBadge(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TextH50(
-                text = stringResource(shortNameRes),
+                text = stringResource(shortNameRes).uppercase(),
                 color = colorResource(id = textColor),
                 fontSize = fontSize,
                 lineHeight = fontSize,

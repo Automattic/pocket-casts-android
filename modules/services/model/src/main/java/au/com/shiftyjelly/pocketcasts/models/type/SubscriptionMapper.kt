@@ -51,7 +51,7 @@ object SubscriptionMapper {
                             productDetails = productDetails,
                             offerToken = relevantSubscriptionOfferDetails.offerToken,
                         )
-                    } else {
+                    } else if (isIntro(productDetails)) {
                         Subscription.Intro(
                             tier = mapProductIdToTier(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
@@ -59,6 +59,8 @@ object SubscriptionMapper {
                             productDetails = productDetails,
                             offerToken = relevantSubscriptionOfferDetails.offerToken,
                         )
+                    } else {
+                        null
                     }
                 }
             }
@@ -66,6 +68,11 @@ object SubscriptionMapper {
     private fun isTrial(productDetails: ProductDetails): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
             it.offerId == Subscription.TRIAL_OFFER_ID
+        } ?: false
+    }
+    private fun isIntro(productDetails: ProductDetails): Boolean {
+        return productDetails.subscriptionOfferDetails?.any {
+            it.offerId == Subscription.INTRO_OFFER_ID
         } ?: false
     }
 
