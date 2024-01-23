@@ -35,7 +35,9 @@ sealed interface Subscription {
         override val offerPricingPhase: OfferSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails,
         override val offerToken: String,
-    ) : Subscription
+    ) : Subscription {
+        abstract fun badgeOfferText(): Int
+    }
 
     class Trial(
         tier: SubscriptionTier,
@@ -44,6 +46,8 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
+        override fun badgeOfferText(): Int = R.string.one_month_free_trial_badge
+
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
@@ -76,6 +80,8 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
+        override fun badgeOfferText(): Int = R.string.half_price_first_year
+
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             return "TODO"
         }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -120,6 +121,38 @@ fun SubscriptionBadgeForTier(
             },
         )
         SubscriptionTier.UNKNOWN -> Unit
+    }
+}
+
+@Composable
+fun OfferBadge(
+    @StringRes shortNameRes: Int,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 14.sp,
+    padding: Dp = 4.dp,
+    backgroundColor: Int,
+    textColor: Int,
+) {
+    Card(
+        shape = RoundedCornerShape(pillCornerRadiusInDp),
+        backgroundColor = colorResource(id = backgroundColor),
+        modifier = modifier,
+    ) {
+        Row(
+            modifier = Modifier
+                .semantics(mergeDescendants = true) {}
+                .padding(horizontal = padding * 2, vertical = padding),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextH50(
+                text = stringResource(shortNameRes),
+                color = colorResource(id = textColor),
+                fontSize = fontSize,
+                lineHeight = fontSize,
+                modifier = Modifier
+                    .padding(start = padding),
+            )
+        }
     }
 }
 

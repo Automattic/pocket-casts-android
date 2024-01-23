@@ -49,7 +49,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,8 +63,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -231,6 +232,7 @@ private fun UpgradeLayout(
 
                         FeatureCards(
                             state = state,
+                            upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
                         )
                     }
@@ -253,6 +255,7 @@ private fun UpgradeLayout(
 @Composable
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    upgradeButton: UpgradeButton,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val featureCardsState = state.featureCardsState
@@ -265,7 +268,9 @@ fun FeatureCards(
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index, pagerHeight ->
         FeatureCard(
+            subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
+            upgradeButton = upgradeButton,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
@@ -278,6 +283,8 @@ fun FeatureCards(
 @Composable
 private fun FeatureCard(
     card: UpgradeFeatureCard,
+    upgradeButton: UpgradeButton,
+    subscription: Subscription,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -306,6 +313,16 @@ private fun FeatureCard(
             }
 
             Column {
+                if (subscription is Subscription.WithOffer) {
+                    OfferBadge(
+                        shortNameRes = subscription.badgeOfferText(),
+                        backgroundColor = upgradeButton.backgroundColorRes,
+                        textColor = upgradeButton.textColorRes,
+                    )
+
+                    Spacer(modifier = Modifier.weight(2f))
+                }
+
                 card.featureItems.forEach {
                     UpgradeFeatureItem(it)
                 }
@@ -452,15 +469,3 @@ private fun Modifier.fadeBackground() = this
             drawContent()
         }
     }
-
-@Preview
-@Composable
-private fun OnboardingPlusFeatureCardPreview() {
-    FeatureCard(card = UpgradeFeatureCard.PLUS)
-}
-
-@Preview
-@Composable
-private fun OnboardingPatonFeatureCardPreview() {
-    FeatureCard(card = UpgradeFeatureCard.PATRON)
-}

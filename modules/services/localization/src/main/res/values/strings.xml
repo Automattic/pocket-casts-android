@@ -1012,6 +1012,11 @@
     <string name="trial_start">Start my free trial</string>
     <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
+    <string name="one_month_free_trial_badge">1 month free trial</string>
+
+    <!-- Intro Offer -->
+
+    <string name="half_price_first_year">50% off your first year</string>
 
     <!-- Settings -->
 
