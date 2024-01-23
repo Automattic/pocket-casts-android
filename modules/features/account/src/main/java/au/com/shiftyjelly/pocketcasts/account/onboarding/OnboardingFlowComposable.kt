@@ -204,6 +204,7 @@ private fun Content(
                 OnboardingUpgradeSource.FOLDERS,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
                 OnboardingUpgradeSource.LOGIN,
+                OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION,
                 OnboardingUpgradeSource.OVERFLOW_MENU,
                 OnboardingUpgradeSource.PLUS_DETAILS,
                 OnboardingUpgradeSource.PROFILE,
@@ -263,8 +264,9 @@ private fun onLoginToExistingAccount(
     navController: NavHostController,
 ) {
     when (flow) {
-        OnboardingFlow.InitialOnboarding -> exitOnboarding(OnboardingExitInfo())
-        OnboardingFlow.LoggedOut -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
+        OnboardingFlow.InitialOnboarding,
+        OnboardingFlow.LoggedOut,
+        -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
 
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
