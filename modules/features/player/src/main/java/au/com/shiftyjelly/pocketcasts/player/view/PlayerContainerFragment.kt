@@ -66,6 +66,16 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     val overrideTheme: Theme.ThemeType
         get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
 
+    private val closeUpNextCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState in listOf(BottomSheetBehavior.STATE_COLLAPSED, BottomSheetBehavior.STATE_HIDDEN)) {
+                upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPlayerContainerBinding.inflate(inflater, container, false)
         return binding?.root
@@ -73,6 +83,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (activity as? FragmentHostListener)?.removePlayerBottomSheetCallback(closeUpNextCallback)
         binding = null
         bookmarksViewModel.multiSelectHelper.context = null
     }
@@ -92,6 +103,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         // Having it gone from the beginning adds a small delay before it can be initially shown.
         binding.upNextFrameBottomSheet.doOnLayout {
             it.isGone = true
+            (activity as? FragmentHostListener)?.addPlayerBottomSheetCallback(closeUpNextCallback)
         }
         upNextBottomSheetBehavior = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
         upNextBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
