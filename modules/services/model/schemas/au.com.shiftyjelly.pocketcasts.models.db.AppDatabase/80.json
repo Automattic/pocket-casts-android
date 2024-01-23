@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 79,
+    "version": 80,
     "identityHash": "27cf072e4b50fca2978749adf68636ed",
     "entities": [
       {
@@ -795,7 +795,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "startFromSecsModified",
+            "fieldPath": "startFromModified",
             "columnName": "start_from_modified",
             "affinity": "INTEGER",
             "notNull": false
@@ -963,7 +963,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "skipLastSecsModified",
+            "fieldPath": "skipLastModified",
             "columnName": "skip_last_modified",
             "affinity": "INTEGER",
             "notNull": false

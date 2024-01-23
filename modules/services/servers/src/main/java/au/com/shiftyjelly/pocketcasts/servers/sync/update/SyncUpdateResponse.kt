@@ -13,7 +13,6 @@ import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.SyncUserFolder
 import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
-import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
@@ -47,23 +46,27 @@ data class SyncUpdateResponse(
     data class PodcastSync(
         var uuid: String? = null,
         var subscribed: Boolean = false,
-        var startFromSecs: Int? = null,
         var episodesSortOrder: Int? = null,
-        var skipLastSecs: Int? = null,
         var folderUuid: String? = null,
         var sortPosition: Int? = null,
         var dateAdded: Date? = null,
+        var startFromSecs: Int? = null,
+        var startFromModified: Date? = null,
+        var skipLastSecs: Int? = null,
+        var skipLastModified: Date? = null,
     ) {
         companion object {
             fun fromSyncUserPodcast(syncUserPodcast: SyncUserPodcast): PodcastSync =
                 PodcastSync(
                     uuid = syncUserPodcast.uuid,
-                    startFromSecs = syncUserPodcast.autoStartFromOrNull?.value,
                     episodesSortOrder = syncUserPodcast.episodesSortOrderOrNull?.value,
-                    skipLastSecs = syncUserPodcast.autoSkipLastOrNull?.value,
                     folderUuid = syncUserPodcast.folderUuidOrNull?.value,
                     sortPosition = syncUserPodcast.sortPositionOrNull?.value,
                     dateAdded = syncUserPodcast.dateAddedOrNull?.toDate(),
+                    startFromSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
+                    startFromModified = syncUserPodcast.settings?.autoStartFromOrNull?.modifiedAt?.toDate(),
+                    skipLastSecs = syncUserPodcast.settings?.autoSkipLast?.value?.value,
+                    skipLastModified = syncUserPodcast.settings?.autoSkipLast?.modifiedAt?.toDate(),
                 ).apply {
                     syncUserPodcast.subscribedOrNull?.value?.let { subscribed = it }
                 }

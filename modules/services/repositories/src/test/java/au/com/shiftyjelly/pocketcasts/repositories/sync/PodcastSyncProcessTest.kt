@@ -4,16 +4,31 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import java.time.Duration
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
+@RunWith(MockitoJUnitRunner::class)
 class PodcastSyncProcessTest {
+
+    @Mock
+    lateinit var statsManager: StatsManager
+
+    @Mock
+    lateinit var settings: Settings
 
     @Test
     fun podcastToRecord() {
@@ -209,6 +224,63 @@ class PodcastSyncProcessTest {
         ).bookmark
         assertFalse(record.hasTitle())
     }
+
+    @Test
+    fun syncDeviceIfStatsChanged() {
+        whenever(statsManager.isSynced(any())).thenReturn(false)
+        whenever(statsManager.isEmpty).thenReturn(false)
+        whenever(settings.getUniqueDeviceId()).thenReturn("deviceId")
+        whenever(statsManager.timeSavedSilenceRemovalSecs).thenReturn(1)
+        whenever(statsManager.timeSavedSkippingSecs).thenReturn(2)
+        whenever(statsManager.timeSavedSkippingIntroSecs).thenReturn(3)
+        whenever(statsManager.timeSavedVariableSpeedSecs).thenReturn(4)
+        whenever(statsManager.totalListeningTimeSecs).thenReturn(5)
+        whenever(statsManager.statsStartTimeSecs).thenReturn(6)
+
+        val result = getPodcastSyncProcess().getSyncUserDevice()
+
+        assertEquals("deviceId", result?.deviceId?.value)
+        assertEquals(PodcastSyncProcess.ANDROID_DEVICE_TYPE, result?.deviceType?.value)
+        assertEquals(1L, result?.timeSilenceRemoval?.value)
+        assertEquals(2L, result?.timeSkipping?.value)
+        assertEquals(3L, result?.timeIntroSkipping?.value)
+        assertEquals(4L, result?.timeVariableSpeed?.value)
+        assertEquals(5L, result?.timeListened?.value)
+        assertEquals(6L, result?.timesStartedAt?.value)
+    }
+
+    @Test
+    fun noSyncDeviceIfAlreadySynced() {
+        whenever(statsManager.isSynced(any())).thenReturn(true)
+        val result = getPodcastSyncProcess().getSyncUserDevice()
+        assertNull(result)
+    }
+
+    @Test
+    fun noSyncDeviceIfStatsEmpty() {
+        whenever(statsManager.isEmpty).thenReturn(true)
+        val result = getPodcastSyncProcess().getSyncUserDevice()
+        assertNull(result)
+    }
+
+    private fun getPodcastSyncProcess() = PodcastSyncProcess(
+        context = mock(),
+        applicationScope = mock(),
+        settings = settings,
+        episodeManager = mock(),
+        podcastManager = mock(),
+        playlistManager = mock(),
+        bookmarkManager = mock(),
+        statsManager = statsManager,
+        fileStorage = mock(),
+        playbackManager = mock(),
+        podcastCacheServerManager = mock(),
+        userEpisodeManager = mock(),
+        subscriptionManager = mock(),
+        folderManager = mock(),
+        syncManager = mock(),
+        featureFlagWrapper = mock(),
+    )
 
     private fun mockPodcast(
         addedDateSinceEpoch: Duration = Duration.ZERO,
