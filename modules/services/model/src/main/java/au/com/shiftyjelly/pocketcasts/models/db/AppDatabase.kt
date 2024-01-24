@@ -3,10 +3,13 @@ package au.com.shiftyjelly.pocketcasts.models.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
+import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.DeleteColumn
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import au.com.shiftyjelly.pocketcasts.model.BuildConfig
@@ -63,8 +66,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
     ],
-    version = 80,
+    version = 82,
     exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
+    ],
 )
 @TypeConverters(
     AnonymousBumpStat.CustomEventPropsTypeConverter::class,
@@ -508,6 +514,45 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_80_81 = addMigration(80, 81) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_add_to_up_next_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN override_global_effects_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN playback_speed_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN volume_boosted_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN trim_silence_level_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        @DeleteColumn(
+            tableName = "podcasts",
+            columnName = "silence_removed",
+        )
+        class DeleteSilenceRemovedMigration : AutoMigrationSpec
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -878,6 +923,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_77_78,
                 MIGRATION_78_79,
                 MIGRATION_79_80,
+                MIGRATION_80_81,
+                // 81 to 82 added via auto migration
             )
         }
 
