@@ -312,7 +312,7 @@ private fun FeatureCard(
             }
 
             Column {
-                SubscriptionPriceSection(subscription, upgradeButton)
+                SubscriptionPriceSection(subscription, upgradeButton, hasBackgroundAlwaysWhite = true)
 
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 

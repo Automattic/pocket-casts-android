@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +59,7 @@ fun ProductAmountHorizontalText(
     primaryText: String? = null,
     secondaryText: String? = null,
     lineThroughSecondaryText: Boolean = true,
+    hasBackgroundAlwaysWhite: Boolean = false,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     modifier: Modifier = Modifier,
 ) {
@@ -68,7 +70,12 @@ fun ProductAmountHorizontalText(
         if (primaryText != null) {
             TextH30(
                 text = primaryText,
-                color = MaterialTheme.theme.colors.primaryText01,
+                color =
+                if (hasBackgroundAlwaysWhite) {
+                    Color.Black
+                } else {
+                    MaterialTheme.theme.colors.primaryText01
+                },
             )
         }
 

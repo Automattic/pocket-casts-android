@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 fun SubscriptionPriceSection(
     subscription: Subscription,
     upgradeButton: UpgradeButton,
+    hasBackgroundAlwaysWhite: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     if (subscription is Subscription.WithOffer) {
@@ -21,12 +22,14 @@ fun SubscriptionPriceSection(
             ProductAmountHorizontalText(
                 primaryText = subscription.offerPricingPhase.priceSlashPeriod(LocalContext.current.resources),
                 secondaryText = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
+                hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
             )
         } else if (subscription is Subscription.Trial) {
             ProductAmountHorizontalText(
                 primaryText = subscription.recurringPricingPhase.formattedPrice,
                 secondaryText = subscription.recurringPricingPhase.period(LocalContext.current.resources),
                 lineThroughSecondaryText = false,
+                hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
             )
         }
 
