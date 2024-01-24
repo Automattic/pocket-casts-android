@@ -406,9 +406,9 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
         val event =
             if (starred) {
-                AnalyticsEvent.EPISODE_UNSTARRED
-            } else {
                 AnalyticsEvent.EPISODE_STARRED
+            } else {
+                AnalyticsEvent.EPISODE_UNSTARRED
             }
         episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
     }
@@ -422,7 +422,8 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView) {
         // Retrieve the episode to make sure we have the latest starred status
         findByUuid(episode.uuid)?.let {
-            starEpisode(episode, !it.isStarred, sourceView)
+            episode.isStarred = !it.isStarred
+            starEpisode(episode, episode.isStarred, sourceView)
         }
     }
 
