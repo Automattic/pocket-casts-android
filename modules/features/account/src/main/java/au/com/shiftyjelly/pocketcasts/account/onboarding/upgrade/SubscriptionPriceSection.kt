@@ -27,7 +27,7 @@ fun SubscriptionPriceSection(
         } else if (subscription is Subscription.Trial) {
             ProductAmountHorizontalText(
                 primaryText = subscription.recurringPricingPhase.formattedPrice,
-                secondaryText = subscription.recurringPricingPhase.period(LocalContext.current.resources),
+                secondaryText = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
                 lineThroughSecondaryText = false,
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
             )
@@ -36,14 +36,14 @@ fun SubscriptionPriceSection(
         Spacer(modifier = modifier.padding(vertical = 4.dp))
 
         OfferBadge(
-            shortNameRes = subscription.badgeOfferText(),
+            text = subscription.badgeOfferText(LocalContext.current.resources),
             backgroundColor = upgradeButton.backgroundColorRes,
             textColor = upgradeButton.textColorRes,
         )
     } else if (subscription is Subscription.Simple) {
         ProductAmountHorizontalText(
             primaryText = subscription.recurringPricingPhase.formattedPrice,
-            secondaryText = subscription.recurringPricingPhase.period(LocalContext.current.resources),
+            secondaryText = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
             lineThroughSecondaryText = false,
         )
     }

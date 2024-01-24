@@ -980,10 +980,7 @@
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
     <string name="plus_slash_month">%s / month</string>
-    <string name="slash_month"> / month</string>
-    <string name="slash_day"> / day</string>
     <string name="plus_slash_year">%s / year</string>
-    <string name="slash_year"> / year</string>
     <string name="plus_then_slash_month">then %s / month</string>
     <string name="plus_then_slash_year">then %s / year</string>
     <string name="plus_trial_then_slash_month">%1$s free then %2$s / month</string>
@@ -1015,7 +1012,6 @@
     <string name="trial_start">Start my free trial</string>
     <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
-    <string name="one_month_free_trial_badge">1 month free trial</string>
 
     <!-- Intro Offer -->
 

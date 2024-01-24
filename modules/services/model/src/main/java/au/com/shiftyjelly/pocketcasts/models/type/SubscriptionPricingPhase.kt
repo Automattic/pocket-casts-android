@@ -59,11 +59,11 @@ sealed interface SubscriptionPricingPhase {
         res.getStringPlural(periodValue, periodResSingular, periodResPlural)
     fun periodValueSingular(res: Resources): String =
         "$periodValue ${res.getString(periodResSingular)}"
+    fun slashPeriod(res: Resources): String =
+        "/ ${res.getString(periodResSingular)}"
     fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType
 
     fun priceSlashPeriod(res: Resources): String
-
-    fun period(res: Resources): String
 
     enum class Type { OFFER, RECURRING, UNKNOWN }
 
@@ -97,9 +97,6 @@ sealed interface SubscriptionPricingPhase {
 
         override fun thenPriceSlashPeriod(res: Resources): String =
             res.getString(R.string.plus_then_slash_year, pricingPhase.formattedPrice)
-
-        override fun period(res: Resources): String =
-            res.getString(R.string.slash_year)
     }
 
     class Months(
@@ -123,9 +120,6 @@ sealed interface SubscriptionPricingPhase {
 
         override fun thenPriceSlashPeriod(res: Resources): String =
             res.getString(R.string.plus_then_slash_month, pricingPhase.formattedPrice)
-
-        override fun period(res: Resources): String =
-            res.getString(R.string.slash_month)
     }
 
     class Days(
@@ -135,9 +129,6 @@ sealed interface SubscriptionPricingPhase {
         override val periodResSingular = R.string.plus_day
         override val periodResPlural = R.string.days_plural
         override val periodValue = period.days
-
-        override fun period(res: Resources): String =
-            res.getString(R.string.slash_day)
 
         override val chronoUnit = ChronoUnit.DAYS
 

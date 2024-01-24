@@ -36,7 +36,7 @@ sealed interface Subscription {
         override val productDetails: ProductDetails,
         override val offerToken: String,
     ) : Subscription {
-        abstract fun badgeOfferText(): Int
+        abstract fun badgeOfferText(res: Resources): String
     }
 
     class Trial(
@@ -46,7 +46,7 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
-        override fun badgeOfferText(): Int = R.string.one_month_free_trial_badge
+        override fun badgeOfferText(res: Resources): String = offerPricingPhase.numPeriodFreeTrial(res)
 
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
@@ -80,7 +80,7 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
-        override fun badgeOfferText(): Int = R.string.half_price_first_year
+        override fun badgeOfferText(res: Resources): String = res.getString(R.string.half_price_first_year)
 
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             return "TODO"

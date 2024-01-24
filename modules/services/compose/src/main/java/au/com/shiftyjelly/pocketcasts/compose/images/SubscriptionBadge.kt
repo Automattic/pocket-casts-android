@@ -126,7 +126,7 @@ fun SubscriptionBadgeForTier(
 
 @Composable
 fun OfferBadge(
-    @StringRes shortNameRes: Int,
+    text: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 14.sp,
     padding: Dp = 4.dp,
@@ -145,7 +145,7 @@ fun OfferBadge(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TextH50(
-                text = stringResource(shortNameRes).uppercase(),
+                text = text.uppercase(),
                 color = colorResource(id = textColor),
                 fontSize = fontSize,
                 lineHeight = fontSize,
