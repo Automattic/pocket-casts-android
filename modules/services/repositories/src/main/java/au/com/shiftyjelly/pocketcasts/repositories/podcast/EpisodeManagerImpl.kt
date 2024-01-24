@@ -422,7 +422,8 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView) {
         // Retrieve the episode to make sure we have the latest starred status
         findByUuid(episode.uuid)?.let {
-            starEpisode(episode, !it.isStarred, sourceView)
+            episode.isStarred = !it.isStarred
+            starEpisode(episode, episode.isStarred, sourceView)
         }
     }
 
