@@ -1,6 +1,8 @@
 7.57
 -----
-
+*   Bug Fixes:
+    *   Fixed starring episode from full-screen player does not prevent episode from being archived
+        ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
 
 7.56
 -----
