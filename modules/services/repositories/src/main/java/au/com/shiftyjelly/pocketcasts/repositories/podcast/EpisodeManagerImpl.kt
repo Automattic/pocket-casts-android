@@ -406,9 +406,9 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
         val event =
             if (starred) {
-                AnalyticsEvent.EPISODE_UNSTARRED
-            } else {
                 AnalyticsEvent.EPISODE_STARRED
+            } else {
+                AnalyticsEvent.EPISODE_UNSTARRED
             }
         episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
     }
