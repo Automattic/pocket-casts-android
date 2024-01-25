@@ -399,7 +399,9 @@ class SubscriptionManagerImpl @Inject constructor(
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier) = freeTrialEligible[tier] ?: true
+    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier): Boolean {
+        return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) true else freeTrialEligible[tier] ?: true
+    }
 
     override fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
         freeTrialEligible[tier] = eligible

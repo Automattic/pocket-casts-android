@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.android.billingclient.api.ProductDetails
 
@@ -116,7 +118,9 @@ sealed interface Subscription {
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
         const val INTRO_OFFER_ID = "testyearlyintropricingoffer"
 
-        fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =
-            SubscriptionMapper.map(productDetails, isFreeTrialEligible)
+        fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
+            val subscription = SubscriptionMapper.map(productDetails, isFreeTrialEligible)
+            return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && subscription is Trial) null else subscription
+        }
     }
 }
