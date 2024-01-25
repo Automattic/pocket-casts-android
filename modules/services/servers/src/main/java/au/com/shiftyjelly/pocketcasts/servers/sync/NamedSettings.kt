@@ -19,6 +19,7 @@ data class NamedSettingsSettings(
 data class ChangedNamedSettings(
     @field:Json(name = "skipForward") val skipForward: NamedChangedSettingInt? = null,
     @field:Json(name = "skipBack") val skipBack: NamedChangedSettingInt? = null,
+    @field:Json(name = "gridLayout") val gridLayout: NamedChangedSettingInt? = null,
     @field:Json(name = "gridOrder") val gridOrder: NamedChangedSettingInt? = null,
     @field:Json(name = "marketingOptIn") val marketingOptIn: NamedChangedSettingBool? = null,
     @field:Json(name = "freeGiftAcknowledgement") val freeGiftAcknowledgement: NamedChangedSettingBool? = null,
