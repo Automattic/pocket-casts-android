@@ -45,6 +45,7 @@ fun SubscriptionPriceSection(
             primaryText = subscription.recurringPricingPhase.formattedPrice,
             secondaryText = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
             lineThroughSecondaryText = false,
+            hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
         )
     }
 }
