@@ -4,6 +4,8 @@ import android.content.res.Resources
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
@@ -15,15 +17,19 @@ import java.time.temporal.ChronoUnit
 sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
     val chronoUnit: ChronoUnit
 
-    // i.e., 14 days free
+    // i.e., 14 offer
     fun numPeriodFree(res: Resources): String =
         res.getString(R.string.profile_amount_free, periodValuePlural(res))
 
-    // i.e., 14 day free trial
-    fun numPeriodFreeTrial(res: Resources): String =
-        res.getString(R.string.plus_trial_duration_free_trial, periodValueSingular(res))
+    // i.e., 14 day offer
+    fun numPeriodOffer(res: Resources): String =
+        if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
+            res.getString(R.string.plus_offer_duration, periodValueSingular(res))
+        } else {
+            res.getString(R.string.plus_trial_duration_free_trial, periodValueSingular(res))
+        }
 
-    fun trialEnd(): String {
+    fun offerEnd(): String {
         val end = chronoUnit.addTo(ZonedDateTime.now(), periodValue.toLong())
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(end)
     }
