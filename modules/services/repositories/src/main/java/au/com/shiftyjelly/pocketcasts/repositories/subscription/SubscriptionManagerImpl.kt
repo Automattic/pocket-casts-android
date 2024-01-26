@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag.isEnabled
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -84,7 +84,8 @@ class SubscriptionManagerImpl @Inject constructor(
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
-    private var freeTrialEligible = HashMap<Subscription.SubscriptionTier, Boolean>()
+    private var freeTrialOfferEligible = HashMap<Subscription.SubscriptionTier, Boolean>()
+    private var introOfferEligible = true
 
     override fun signOut() {
         clearCachedStatus()
@@ -181,7 +182,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build(),
                 )
-                if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
+                if (isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
                     add(
                         QueryProductDetailsParams.Product.newBuilder()
                             .setProductId(SUBSCRIPTION_TEST_PRODUCT_ID)
@@ -279,7 +280,8 @@ class SubscriptionManagerImpl @Inject constructor(
                     purchase.products.map {
                         mapProductIdToTier(it.toString())
                     }.distinct().forEach {
-                        updateFreeTrialEligible(it, false)
+                        updateFreeTrialOfferEligible(it, false)
+                        updateIntroOfferEligible(hasCurrentSubscription = true)
                     }
 
                     FirebaseAnalyticsTracker.plusPurchased()
@@ -312,6 +314,8 @@ class SubscriptionManagerImpl @Inject constructor(
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
         billingClient.queryPurchasesAsync(queryPurchasesParams) { _, purchases ->
+            // Set intro offer eligibility based on whether there are active purchases
+            updateIntroOfferEligible(hasCurrentSubscription = purchases.isNotEmpty())
             purchases.forEach {
                 if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
                     handlePurchase(it)
@@ -330,7 +334,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 it.products.map { productId ->
                     mapProductIdToTier(productId)
                 }.distinct().forEach { tier ->
-                    updateFreeTrialEligible(tier, false)
+                    updateFreeTrialOfferEligible(tier, false)
                 }
             }
         }
@@ -398,15 +402,15 @@ class SubscriptionManagerImpl @Inject constructor(
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
     }
+    override fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean =
+        if (isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) introOfferEligible else (freeTrialOfferEligible[tier] ?: true)
 
-    override fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean {
-        return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) true else freeTrialEligible[tier] ?: true
+    override fun updateFreeTrialOfferEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
+        freeTrialOfferEligible[tier] = eligible
     }
-
-    override fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
-        freeTrialEligible[tier] = eligible
+    override fun updateIntroOfferEligible(hasCurrentSubscription: Boolean) {
+        introOfferEligible = !hasCurrentSubscription && !(cachedSubscriptionStatus?.isLifetimePlus ?: false)
     }
-
     override fun getDefaultSubscription(
         subscriptions: List<Subscription>,
         tier: Subscription.SubscriptionTier?,

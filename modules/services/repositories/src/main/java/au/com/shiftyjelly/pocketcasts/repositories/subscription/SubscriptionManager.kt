@@ -34,7 +34,8 @@ interface SubscriptionManager {
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
     fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean
-    fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean)
+    fun updateFreeTrialOfferEligible(tier: Subscription.SubscriptionTier, eligible: Boolean)
+    fun updateIntroOfferEligible(hasCurrentSubscription: Boolean)
     fun getDefaultSubscription(
         subscriptions: List<Subscription>,
         tier: Subscription.SubscriptionTier? = null,
