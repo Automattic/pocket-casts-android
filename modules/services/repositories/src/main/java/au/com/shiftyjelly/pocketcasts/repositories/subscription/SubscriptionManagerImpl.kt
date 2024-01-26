@@ -399,7 +399,7 @@ class SubscriptionManagerImpl @Inject constructor(
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier): Boolean {
+    override fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean {
         return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) true else freeTrialEligible[tier] ?: true
     }
 
@@ -439,7 +439,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                     Subscription.fromProductDetails(
                         productDetails = productDetailsState,
-                        isFreeTrialEligible = isFreeTrialEligible(
+                        isOfferEligible = isOfferEligible(
                             mapProductIdToTier(productDetailsState.productId),
                         ),
                     )

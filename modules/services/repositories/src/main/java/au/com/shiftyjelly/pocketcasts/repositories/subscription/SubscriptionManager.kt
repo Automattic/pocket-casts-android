@@ -33,7 +33,7 @@ interface SubscriptionManager {
     fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String)
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
-    fun isFreeTrialEligible(tier: Subscription.SubscriptionTier): Boolean
+    fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean
     fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean)
     fun getDefaultSubscription(
         subscriptions: List<Subscription>,

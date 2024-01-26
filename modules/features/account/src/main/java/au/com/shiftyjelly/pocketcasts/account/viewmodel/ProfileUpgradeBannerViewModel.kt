@@ -53,12 +53,11 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                     val subscriptions = (productDetailsState as? ProductDetailsState.Loaded)
                         ?.productDetails
                         ?.mapNotNull { details ->
-                            val isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                SubscriptionMapper.mapProductIdToTier(details.productId),
-                            )
                             Subscription.fromProductDetails(
                                 productDetails = details,
-                                isFreeTrialEligible = isFreeTrialEligible,
+                                isOfferEligible = subscriptionManager.isOfferEligible(
+                                    SubscriptionMapper.mapProductIdToTier(details.productId),
+                                ),
                             )
                         } ?: emptyList()
 
