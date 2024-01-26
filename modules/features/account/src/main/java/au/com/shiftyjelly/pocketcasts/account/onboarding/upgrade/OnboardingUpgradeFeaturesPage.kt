@@ -49,7 +49,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -232,6 +231,7 @@ private fun UpgradeLayout(
 
                         FeatureCards(
                             state = state,
+                            upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
                         )
                     }
@@ -254,6 +254,7 @@ private fun UpgradeLayout(
 @Composable
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    upgradeButton: UpgradeButton,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val featureCardsState = state.featureCardsState
@@ -266,7 +267,9 @@ fun FeatureCards(
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index, pagerHeight ->
         FeatureCard(
+            subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
+            upgradeButton = upgradeButton,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
@@ -279,6 +282,8 @@ fun FeatureCards(
 @Composable
 private fun FeatureCard(
     card: UpgradeFeatureCard,
+    upgradeButton: UpgradeButton,
+    subscription: Subscription,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -307,6 +312,10 @@ private fun FeatureCard(
             }
 
             Column {
+                SubscriptionPriceSection(subscription, upgradeButton, hasBackgroundAlwaysWhite = true)
+
+                Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
                 card.featureItems.forEach {
                     UpgradeFeatureItem(it)
                 }
@@ -327,19 +336,9 @@ private fun UpgradeButton(
     onClickSubscribe: () -> Unit,
 ) {
     val resources = LocalContext.current.resources
-    val subscription = button.subscription
     val shortName = resources.getString(button.shortNameRes)
-    val primaryText = when (subscription) {
-        is Subscription.Simple -> stringResource(LR.string.subscribe_to, shortName)
-        is Subscription.Trial -> { stringResource(LR.string.trial_start) }
-        is Subscription.Intro -> { "TODO" }
-        else -> { stringResource(LR.string.subscribe_to, shortName) }
-    }
-    val secondaryText = when (subscription) {
-        is Subscription.Simple -> subscription.recurringPricingPhase.pricePerPeriod(resources)
-        is Subscription.Trial, is Subscription.Intro -> { subscription.tryFreeThenPricePerPeriod(resources) }
-        else -> { subscription.recurringPricingPhase.pricePerPeriod(resources) }
-    }
+    val primaryText = stringResource(LR.string.subscribe_to, shortName)
+
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier.fadeBackground(),
@@ -347,13 +346,14 @@ private fun UpgradeButton(
         Column {
             UpgradeRowButton(
                 primaryText = primaryText,
-                secondaryText = secondaryText,
                 backgroundColor = colorResource(button.backgroundColorRes),
                 textColor = colorResource(button.textColorRes),
+                fontWeight = FontWeight.W500,
                 onClick = onClickSubscribe,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
-                    .fillMaxWidth(),
+                    .heightIn(min = 48.dp),
             )
             Spacer(
                 modifier = Modifier
@@ -462,15 +462,3 @@ private fun Modifier.fadeBackground() = this
             drawContent()
         }
     }
-
-@Preview
-@Composable
-private fun OnboardingPlusFeatureCardPreview() {
-    FeatureCard(card = UpgradeFeatureCard.PLUS)
-}
-
-@Preview
-@Composable
-private fun OnboardingPatonFeatureCardPreview() {
-    FeatureCard(card = UpgradeFeatureCard.PATRON)
-}

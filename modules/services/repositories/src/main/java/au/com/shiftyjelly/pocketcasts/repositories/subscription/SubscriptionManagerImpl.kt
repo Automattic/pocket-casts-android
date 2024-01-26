@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -179,12 +181,14 @@ class SubscriptionManagerImpl @Inject constructor(
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build(),
                 )
-                add(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(SUBSCRIPTION_TEST_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                )
+                if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
+                    add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(SUBSCRIPTION_TEST_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.SUBS)
+                            .build(),
+                    )
+                }
             }
 
         val params = QueryProductDetailsParams.newBuilder()
@@ -395,7 +399,9 @@ class SubscriptionManagerImpl @Inject constructor(
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier) = freeTrialEligible[tier] ?: true
+    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier): Boolean {
+        return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) true else freeTrialEligible[tier] ?: true
+    }
 
     override fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
         freeTrialEligible[tier] = eligible
