@@ -139,7 +139,7 @@ interface Settings {
 
     enum class UpNextAction {
         PLAY_NEXT,
-        PLAY_LAST
+        PLAY_LAST,
     }
 
     enum class CloudSortOrder {
@@ -148,7 +148,7 @@ interface Settings {
         A_TO_Z,
         Z_TO_A,
         SHORT_LONG,
-        LONG_SHORT
+        LONG_SHORT,
     }
 
     sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
@@ -286,7 +286,7 @@ interface Settings {
     val showArtworkOnLockScreen: UserSetting<Boolean>
     val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
 
-    val autoArchiveIncludeStarred: UserSetting<Boolean>
+    val autoArchiveIncludesStarred: UserSetting<Boolean>
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
     val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
 
@@ -308,6 +308,7 @@ interface Settings {
     fun getPeriodicSaveTimeMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
+    fun getReportViolationUrl(): String
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>
@@ -423,4 +424,6 @@ interface Settings {
     fun getReviewRequestedDates(): List<String>
 
     val useDarkUpNextTheme: UserSetting<Boolean>
+
+    val useDynamicColorsForWidget: UserSetting<Boolean>
 }

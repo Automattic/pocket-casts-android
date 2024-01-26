@@ -30,11 +30,11 @@ import androidx.annotation.XmlRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
-import org.xmlpull.v1.XmlPullParserException
-import timber.log.Timber
 import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import org.xmlpull.v1.XmlPullParserException
+import timber.log.Timber
 
 /**
  * Validates that the calling package is authorized to browse a [MediaBrowserServiceCompat].
@@ -193,7 +193,7 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
     private fun getPackageInfo(callingPackage: String): PackageInfo? =
         packageManager.getPackageInfo(
             callingPackage,
-            PackageManager.GET_SIGNATURES or PackageManager.GET_PERMISSIONS
+            PackageManager.GET_SIGNATURES or PackageManager.GET_PERMISSIONS,
         )
 
     /**
@@ -217,7 +217,6 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
         }
 
     private fun buildCertificateAllowList(parser: XmlResourceParser): Map<String, KnownCallerInfo> {
-
         val certificateAllowList = LinkedHashMap<String, KnownCallerInfo>()
         try {
             var eventType = parser.next()
@@ -323,12 +322,12 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
     private data class KnownCallerInfo(
         internal val name: String,
         internal val packageName: String,
-        internal val signatures: MutableSet<KnownSignature>
+        internal val signatures: MutableSet<KnownSignature>,
     )
 
     private data class KnownSignature(
         internal val signature: String,
-        internal val release: Boolean
+        internal val release: Boolean,
     )
 
     /**
@@ -340,7 +339,7 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
         internal val packageName: String,
         internal val uid: Int,
         internal val signature: String?,
-        internal val permissions: Set<String>
+        internal val permissions: Set<String>,
     )
 }
 

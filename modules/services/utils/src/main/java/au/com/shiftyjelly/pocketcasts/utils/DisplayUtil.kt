@@ -7,12 +7,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class DisplayUtil @Inject constructor(
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val appContext: Context,
 ) {
     fun hasDynamicFontSize() = try {
         Settings.System.getFloat(
             appContext.contentResolver,
-            Settings.System.FONT_SCALE
+            Settings.System.FONT_SCALE,
         ) != 1.0f
     } catch (e: SettingNotFoundException) {
         false

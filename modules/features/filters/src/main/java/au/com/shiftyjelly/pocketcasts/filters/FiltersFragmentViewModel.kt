@@ -11,20 +11,20 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Collections
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.Collections
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class FiltersFragmentViewModel @Inject constructor(
     val playlistManager: PlaylistManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     episodeManager: EpisodeManager,
-    playbackManager: PlaybackManager
+    playbackManager: PlaybackManager,
 ) : ViewModel(), CoroutineScope {
 
     companion object {

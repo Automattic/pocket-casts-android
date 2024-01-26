@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
-import org.junit.Test
 import java.net.SocketTimeoutException
+import org.junit.Test
 
 class SentryHelperTest {
 

@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 data class Clickable(
     val text: String,
     val data: String = text,
-    val onClick: (data: String) -> Unit
+    val onClick: (data: String) -> Unit,
 )
 
 /**
@@ -41,15 +41,15 @@ fun ClickableTextHelper(
         val text: String,
         val tag: String? = null,
         val data: String? = null,
-        val onClick: ((data: AnnotatedString.Range<String>) -> Unit)? = null
+        val onClick: ((data: AnnotatedString.Range<String>) -> Unit)? = null,
     )
 
     val textData = mutableListOf<TextData>()
     if (clickables.isEmpty()) {
         textData.add(
             TextData(
-                text = text
-            )
+                text = text,
+            ),
         )
     } else {
         var startIndex = 0
@@ -60,8 +60,8 @@ fun ClickableTextHelper(
             } else {
                 textData.add(
                     TextData(
-                        text = text.substring(startIndex, endIndex)
-                    )
+                        text = text.substring(startIndex, endIndex),
+                    ),
                 )
                 textData.add(
                     TextData(
@@ -70,15 +70,15 @@ fun ClickableTextHelper(
                         data = link.data,
                         onClick = {
                             link.onClick(it.item)
-                        }
-                    )
+                        },
+                    ),
                 )
                 startIndex = endIndex + link.text.length
                 if (i == clickables.lastIndex && startIndex < text.length) {
                     textData.add(
                         TextData(
-                            text = text.substring(startIndex, text.length)
-                        )
+                            text = text.substring(startIndex, text.length),
+                        ),
                     )
                 }
             }
@@ -94,7 +94,7 @@ fun ClickableTextHelper(
                 )
                 withStyle(
                     style = SpanStyle(
-                        textDecoration = TextDecoration.Underline
+                        textDecoration = TextDecoration.Underline,
                     ),
                 ) {
                     append(linkTextData.text)
@@ -128,6 +128,6 @@ fun ClickableTextHelper(
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }

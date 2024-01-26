@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 interface PodcastManager {
 
@@ -54,6 +54,7 @@ interface PodcastManager {
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
 
+    suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean = false): Podcast
     fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean = false): Single<Podcast>
     fun findOrDownloadPodcastRx(podcastUuid: String): Single<Podcast>
     fun isSubscribingToPodcasts(): Boolean
@@ -129,7 +130,6 @@ interface PodcastManager {
     fun reloadFoldersFromServer()
 
     fun checkForEpisodesToDownload(episodeUuidsAdded: List<String>, downloadManager: DownloadManager)
-    fun getPodcastEpisodesListOrderBy(podcast: Podcast): String
 
     fun countEpisodesInPodcastWithStatus(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int
     fun updateGroupingForAll(grouping: PodcastGrouping)

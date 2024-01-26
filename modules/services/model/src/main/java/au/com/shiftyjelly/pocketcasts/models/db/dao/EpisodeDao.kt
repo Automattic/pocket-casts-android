@@ -22,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class EpisodeDao {
@@ -36,9 +36,6 @@ abstract class EpisodeDao {
 
     @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
     abstract fun observeCount(query: SupportSQLiteQuery): Flowable<Int>
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuidSync(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
@@ -119,7 +116,7 @@ abstract class EpisodeDao {
         WHERE podcasts.subscribed = 1 AND podcasts.show_notifications = 1
         AND (podcasts.added_date IS NULL OR (podcasts.added_date IS NOT NULL AND podcasts.added_date < :date AND podcasts.added_date != podcast_episodes.added_date))
         AND podcast_episodes.archived = 0 AND podcast_episodes.playing_status = :playingStatus AND podcast_episodes.added_date >= :date
-        ORDER BY podcast_episodes.added_date DESC, podcast_episodes.published_date DESC LIMIT 100"""
+        ORDER BY podcast_episodes.added_date DESC, podcast_episodes.published_date DESC LIMIT 100""",
     )
     abstract fun findNotificationEpisodes(date: Date, playingStatus: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): List<PodcastEpisode>
 
@@ -354,7 +351,7 @@ abstract class EpisodeDao {
         AND category IS NOT NULL and category != ''
         GROUP BY category
         ORDER BY totalPlayedTime DESC
-        """
+        """,
     )
     abstract suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
 
@@ -364,7 +361,7 @@ abstract class EpisodeDao {
         FROM podcast_episodes
         JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
         WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """
+        """,
     )
     abstract suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
 
@@ -376,7 +373,7 @@ abstract class EpisodeDao {
         WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
         ORDER BY podcast_episodes.played_up_to DESC
         LIMIT 1
-        """
+        """,
     )
     abstract suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
 
@@ -386,7 +383,7 @@ abstract class EpisodeDao {
         FROM podcast_episodes
         WHERE played_up_to > :playedUpToInSecs 
         AND podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """
+        """,
     )
     abstract suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
 
@@ -396,7 +393,7 @@ abstract class EpisodeDao {
         FROM podcast_episodes
         WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date < :fromEpochMs AND podcast_episodes.last_playback_interaction_date != 0
         LIMIT 1
-        """
+        """,
     )
     abstract suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode?
 
@@ -405,7 +402,7 @@ abstract class EpisodeDao {
         SELECT COUNT(*) 
         FROM podcast_episodes
         WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """
+        """,
     )
     abstract suspend fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 
@@ -414,7 +411,7 @@ abstract class EpisodeDao {
             SELECT COUNT(DISTINCT uuid) AS started FROM podcast_episodes
             WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL 
             AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """
+        """,
     )
     abstract suspend fun countEpisodesStarted(fromEpochMs: Long, toEpochMs: Long): Int
 
@@ -425,7 +422,7 @@ abstract class EpisodeDao {
         WHERE (playing_status = 2 OR played_up_to >= 0.9 * duration) 
         AND podcast_episodes.last_playback_interaction_date IS NOT NULL 
         AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """
+        """,
     )
     abstract suspend fun countEpisodesCompleted(fromEpochMs: Long, toEpochMs: Long): Int
 }

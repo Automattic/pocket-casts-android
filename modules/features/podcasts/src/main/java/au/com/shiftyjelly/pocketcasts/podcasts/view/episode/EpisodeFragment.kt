@@ -59,8 +59,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -82,7 +82,7 @@ class EpisodeFragment : BaseFragment() {
             overridePodcastLink: Boolean = false,
             podcastUuid: String? = null,
             fromListUuid: String? = null,
-            forceDark: Boolean = false
+            forceDark: Boolean = false,
         ): EpisodeFragment {
             return EpisodeFragment().apply {
                 arguments = bundleOf(
@@ -91,7 +91,7 @@ class EpisodeFragment : BaseFragment() {
                     EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                     EpisodeContainerFragment.ARG_PODCAST_UUID to podcastUuid,
                     EpisodeContainerFragment.ARG_FROMLIST_UUID to fromListUuid,
-                    EpisodeContainerFragment.ARG_FORCE_DARK to forceDark
+                    EpisodeContainerFragment.ARG_FORCE_DARK to forceDark,
                 )
             }
         }
@@ -100,9 +100,13 @@ class EpisodeFragment : BaseFragment() {
     override lateinit var statusBarColor: StatusBarColor
 
     @Inject lateinit var serverManager: ServerManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var warningsHelper: WarningsHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
@@ -150,7 +154,7 @@ class EpisodeFragment : BaseFragment() {
         showNotesFormatter = createShowNotesFormatter(contextThemeWrapper)
 
         statusBarColor = StatusBarColor.Custom(
-            context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme
+            context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme,
         )
         return binding?.root
     }
@@ -208,7 +212,6 @@ class EpisodeFragment : BaseFragment() {
                 val binding = binding ?: return@Observer
                 when (state) {
                     is EpisodeFragmentState.Loaded -> {
-
                         binding.loadingGroup.isVisible = true
                         val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
 
@@ -218,7 +221,7 @@ class EpisodeFragment : BaseFragment() {
                                 episode = state.episode,
                                 onFavClicked = { viewModel.starClicked() },
                                 onShareClicked = { share(state) },
-                            )
+                            ),
                         )
 
                         binding.episode = state.episode
@@ -251,8 +254,8 @@ class EpisodeFragment : BaseFragment() {
                         val downloadSize = Util.formattedBytes(bytes = state.episode.sizeInBytes, context = binding.btnDownload.context).replace(
                             "-",
                             getString(
-                                LR.string.podcasts_download_download
-                            )
+                                LR.string.podcasts_download_download,
+                            ),
                         )
                         val episodeStatus = state.episode.episodeStatus
                         binding.btnDownload.state = when (episodeStatus) {
@@ -316,8 +319,8 @@ class EpisodeFragment : BaseFragment() {
                                 AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
                                 mapOf(
                                     AnalyticsProp.Key.EPISODE_UUID to state.episode.uuid,
-                                    AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
-                                )
+                                    AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value,
+                                ),
                             )
                             (parentFragment as? BaseDialogFragment)?.dismiss()
                             if (!overridePodcastLink) {
@@ -351,7 +354,7 @@ class EpisodeFragment : BaseFragment() {
                                     val shouldCloseAfterWarning = viewModel.playClickedGetShouldClose(
                                         warningsHelper,
                                         force = true,
-                                        fromListUuid = fromListUuid
+                                        fromListUuid = fromListUuid,
                                     )
                                     if (shouldCloseAfterWarning) {
                                         (parentFragment as? BaseDialogFragment)?.dismiss()
@@ -371,7 +374,7 @@ class EpisodeFragment : BaseFragment() {
                         Timber.e("Could not load episode $episodeUUID: ${state.error.message}")
                     }
                 }
-            }
+            },
         )
 
         viewModel.showNotesState.observe(viewLifecycleOwner) { showNotesState ->
@@ -443,7 +446,7 @@ class EpisodeFragment : BaseFragment() {
                     .addTextOption(
                         titleId = LR.string.podcast_file_remove,
                         titleColor = it.context.getThemeColor(UR.attr.support_05),
-                        click = { viewModel.deleteDownloadedEpisode() }
+                        click = { viewModel.deleteDownloadedEpisode() },
                     )
                 activity?.supportFragmentManager?.let { fragmentManager ->
                     dialog.show(fragmentManager, "confirm_archive_all")
@@ -509,8 +512,8 @@ class EpisodeFragment : BaseFragment() {
                                     AnalyticsEvent.EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED,
                                     mapOf(
                                         AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
-                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
-                                    )
+                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value,
+                                    ),
                                 )
                             }
 

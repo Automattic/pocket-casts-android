@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun FolderEditNamePage(
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
-    viewModel: FolderEditViewModel
+    viewModel: FolderEditViewModel,
 ) {
     val folderName: String by viewModel.folderName.collectAsState()
     val focusRequester = remember { FocusRequester() }
@@ -32,11 +32,11 @@ fun FolderEditNamePage(
         BottomSheetAppBar(
             title = stringResource(LR.string.name_your_folder),
             navigationButton = NavigationButton.Back,
-            onNavigationClick = { onBackClick() }
+            onNavigationClick = { onBackClick() },
         )
         TextC70(
             text = stringResource(LR.string.name),
-            modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 8.dp),
         )
         FormField(
             value = folderName,
@@ -45,11 +45,11 @@ fun FolderEditNamePage(
             onImeAction = { onNextClick() },
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                .focusRequester(focusRequester)
+                .focusRequester(focusRequester),
         )
         RowButton(
             text = stringResource(LR.string.navigation_continue),
-            onClick = { onNextClick() }
+            onClick = { onNextClick() },
         )
         // so the bottom sheet goes full height
         Spacer(modifier = Modifier.weight(1f))

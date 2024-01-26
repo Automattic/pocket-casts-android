@@ -25,23 +25,23 @@ fun ProductAmountView(
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = horizontalAlignment
+        horizontalAlignment = horizontalAlignment,
     ) {
         if (emphasized) {
             TextH30(
                 text = primaryText,
-                color = MaterialTheme.theme.colors.primaryText01
+                color = MaterialTheme.theme.colors.primaryText01,
             )
         } else {
             TextH40(
                 text = primaryText,
-                color = MaterialTheme.theme.colors.primaryText01
+                color = MaterialTheme.theme.colors.primaryText01,
             )
         }
         if (secondaryText != null) {
             TextP60(
                 text = secondaryText,
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
     }
@@ -55,7 +55,7 @@ private fun ProductAmountPreview(
     AppTheme(themeType) {
         ProductAmountView(
             primaryText = "4 days free",
-            secondaryText = "then $0.99 / month"
+            secondaryText = "then $0.99 / month",
         )
     }
 }

@@ -23,12 +23,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -38,10 +38,10 @@ object WearNetworkModule {
     @Provides
     fun networkRepository(
         @ApplicationContext application: Context,
-        @ApplicationScope coroutineScope: CoroutineScope
+        @ApplicationScope coroutineScope: CoroutineScope,
     ): NetworkRepository = NetworkRepositoryImpl.fromContext(
         application,
-        coroutineScope
+        coroutineScope,
     )
 
     @Provides
@@ -85,9 +85,8 @@ object WearNetworkModule {
         networkingRulesEngine: NetworkingRulesEngine,
         @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
         @ApplicationScope coroutineScope: CoroutineScope,
-        logger: NetworkStatusLogger
+        logger: NetworkStatusLogger,
     ): Call.Factory {
-
         return NetworkSelectingCallFactory(
             networkingRulesEngine = networkingRulesEngine,
             highBandwidthNetworkMediator = highBandwidthNetworkMediator,

@@ -171,6 +171,8 @@ dependencies {
     implementation libs.bundles.sentry
     implementation libs.bundles.work
 
+    implementation platform(libs.compose.bom)
+    androidTestImplementation platform(libs.compose.bom)
     implementation platform(libs.firebase.bom)
     implementation platform(libs.sentry.bom)
 

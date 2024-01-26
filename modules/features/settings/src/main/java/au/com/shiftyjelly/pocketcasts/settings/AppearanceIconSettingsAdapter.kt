@@ -23,7 +23,7 @@ class AppearanceIconSettingsAdapter(
     private var signInState: SignInState?,
     private var selectedAppIcon: AppIcon.AppIconType,
     private val list: List<AppIcon.AppIconType>,
-    private val clickListener: (AppIcon.AppIconType, AppIcon.AppIconType, Boolean) -> Unit
+    private val clickListener: (AppIcon.AppIconType, AppIcon.AppIconType, Boolean) -> Unit,
 ) : RecyclerView.Adapter<AppearanceIconSettingsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

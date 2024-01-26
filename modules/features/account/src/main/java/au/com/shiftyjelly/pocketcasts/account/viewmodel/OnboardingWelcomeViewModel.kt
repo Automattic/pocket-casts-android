@@ -6,10 +6,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingWelcomeViewModel @Inject constructor(
@@ -30,8 +30,8 @@ class OnboardingWelcomeViewModel @Inject constructor(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(
                 AnalyticsProp.SOURCE to NewsletterSource.WELCOME_NEW_ACCOUNT.analyticsValue,
-                AnalyticsProp.ENABLED to newsletter
-            )
+                AnalyticsProp.ENABLED to newsletter,
+            ),
         )
 
         settings.marketingOptIn.set(newsletter, needsSync = true)
@@ -40,14 +40,14 @@ class OnboardingWelcomeViewModel @Inject constructor(
     fun onShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_SHOWN,
-            mapOf(AnalyticsProp.FLOW to flow.analyticsValue)
+            mapOf(AnalyticsProp.FLOW to flow.analyticsValue),
         )
     }
 
     fun onContinueToDiscover(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_DISCOVER_TAPPED,
-            mapOf(AnalyticsProp.FLOW to flow.analyticsValue)
+            mapOf(AnalyticsProp.FLOW to flow.analyticsValue),
         )
         persistNewsletterSelection()
     }
@@ -56,8 +56,8 @@ class OnboardingWelcomeViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_DISMISSED,
             mapOf(
-                AnalyticsProp.FLOW to flow.analyticsValue
-            )
+                AnalyticsProp.FLOW to flow.analyticsValue,
+            ),
         )
         if (persistNewsletter) {
             persistNewsletterSelection()
@@ -67,7 +67,7 @@ class OnboardingWelcomeViewModel @Inject constructor(
     fun onImportTapped(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_IMPORT_TAPPED,
-            mapOf(AnalyticsProp.FLOW to flow.analyticsValue)
+            mapOf(AnalyticsProp.FLOW to flow.analyticsValue),
         )
     }
 

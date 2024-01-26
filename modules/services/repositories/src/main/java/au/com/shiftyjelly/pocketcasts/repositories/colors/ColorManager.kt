@@ -6,15 +6,15 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
+import timber.log.Timber
 
 @Singleton
 class ColorManager @Inject constructor(
     private val staticServerManager: StaticServerManagerImpl,
-    private val podcastManager: PodcastManager
+    private val podcastManager: PodcastManager,
 ) {
 
     companion object {
@@ -60,7 +60,7 @@ class ColorManager @Inject constructor(
                 colors.fabForDarkBg,
                 colors.linkForLightBg,
                 colors.linkForDarkBg,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
             )
             Timber.i("ColorManager successfully updated colors for podcast ${podcast.uuid}")
         } catch (e: Exception) {

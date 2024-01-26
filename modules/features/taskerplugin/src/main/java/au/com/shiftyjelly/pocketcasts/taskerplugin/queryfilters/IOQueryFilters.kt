@@ -7,6 +7,7 @@ import com.joaomgcd.taskerpluginlibrary.output.TaskerOutputVariable
 @TaskerInputRoot
 class InputQueryFilters
 private const val OUTPUT_PREFIX = "filter_"
+
 @TaskerOutputObject
 class OutputQueryFilters constructor(
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}uuid", labelResIdName = "filter_id", htmlLabelResIdName = "filter_id_description") var id: String?,

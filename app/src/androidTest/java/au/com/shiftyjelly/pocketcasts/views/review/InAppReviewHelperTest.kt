@@ -5,10 +5,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.testing.FakeReviewManager
+import java.util.Date
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -19,9 +18,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class InAppReviewHelperTest {
@@ -31,9 +28,6 @@ class InAppReviewHelperTest {
 
     @Mock
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
-
-    @Mock
-    private lateinit var featureFlag: FeatureFlagWrapper
 
     private lateinit var inAppReviewHelper: InAppReviewHelper
 
@@ -48,7 +42,6 @@ class InAppReviewHelperTest {
 
     @Test
     fun testInAppReviewFlowRequestedOnlyOnce() = runTest {
-        whenever(featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)).thenReturn(true)
         whenever(settings.getReviewRequestedDates())
             .thenReturn(emptyList())
             .thenReturn(listOf(Date().toString()))
@@ -60,22 +53,11 @@ class InAppReviewHelperTest {
         verify(reviewManager, times(1)).requestReviewFlow()
     }
 
-    @Test
-    fun testInAppReviewFlowNotStartedWhenFeatureIsDisabled() = runTest {
-        whenever(featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)).thenReturn(false)
-        whenever(settings.getReviewRequestedDates()).thenReturn(emptyList())
-        initInAppReviewHelper()
-
-        launchReviewDialog()
-
-        verifyNoInteractions(reviewManager)
-    }
-
     private fun launchReviewDialog() = runTest {
         inAppReviewHelper.launchReviewDialog(
             activity = mock(),
             delayInMs = 100,
-            sourceView = SourceView.UNKNOWN
+            sourceView = SourceView.UNKNOWN,
         )
     }
 
@@ -84,7 +66,6 @@ class InAppReviewHelperTest {
             settings = settings,
             analyticsTracker = analyticsTracker,
             reviewManager = reviewManager,
-            featureFlag = featureFlag,
         )
     }
 }

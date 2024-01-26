@@ -60,6 +60,8 @@ import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -67,8 +69,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -124,7 +124,7 @@ class PlayerViewModel @Inject constructor(
         val bufferedUpToMs: Int = 0,
         val embeddedArtwork: Artwork = Artwork.None,
         val isUserEpisode: Boolean = false,
-        val theme: Theme.ThemeType = Theme.ThemeType.DARK
+        val theme: Theme.ThemeType = Theme.ThemeType.DARK,
     ) {
 
         val isChaptersPresent: Boolean = !chapters.isEmpty
@@ -187,7 +187,7 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
-        this::mergeListData
+        this::mergeListData,
     )
         .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
@@ -204,16 +204,19 @@ class PlayerViewModel @Inject constructor(
         if (list.isEmpty()) {
             ShelfItems.itemsList
         } else {
-            // Add missing bookmark item if the feature flag is enabled
             val updatedList = when {
-                list.contains(ShelfItem.Bookmark.id) -> list
-                FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) -> {
+                !list.contains(ShelfItem.Bookmark.id) -> {
                     list.toMutableList().apply {
                         add(list.size - 1, ShelfItem.Bookmark.id)
                     }
                 }
+                FeatureFlag.isEnabled(Feature.REPORT_VIOLATION) &&
+                    !list.contains(ShelfItem.Report.id) -> {
+                    list.toMutableList().apply { add(ShelfItem.Bookmark.id) }
+                }
                 else -> list
             }
+
             updatedList.mapNotNull { id ->
                 ShelfItems.itemForId(id)
             }
@@ -318,7 +321,7 @@ class PlayerViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { positionMs ->
                     playbackPositionMs = positionMs
-                }
+                },
             )
             .apply {
                 disposables.add(this)
@@ -344,7 +347,9 @@ class PlayerViewModel @Inject constructor(
         } else if (episode is UserEpisode) {
             val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)
             if (artworkUrl.startsWith("/")) Artwork.Path(artworkUrl) else Artwork.Url(artworkUrl)
-        } else Artwork.None
+        } else {
+            Artwork.None
+        }
 
         val podcastHeader: PlayerHeader
         if (episode == null) {
@@ -378,7 +383,7 @@ class PlayerViewModel @Inject constructor(
                 bufferedUpToMs = playbackState.bufferedMs,
                 embeddedArtwork = embeddedArtwork,
                 isUserEpisode = episode is UserEpisode,
-                theme = theme.activeTheme
+                theme = theme.activeTheme,
             )
         }
         val chapters = playbackState.chapters
@@ -406,7 +411,7 @@ class PlayerViewModel @Inject constructor(
             currentChapter = currentChapter,
             upNextExpanded = upNextExpanded,
             upNextEpisodes = upNextEpisodes,
-            upNextSummary = upNextFooter
+            upNextSummary = upNextFooter,
         )
     }
 
@@ -508,7 +513,7 @@ class PlayerViewModel @Inject constructor(
                 episodeUuid = episode.uuid,
                 timeSecs = timeSecs,
                 backgroundColor = backgroundColor,
-                tintColor = tintColor
+                tintColor = tintColor,
             )
             onSuccess(arguments)
         }
@@ -600,7 +605,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                settings.globalPlaybackEffects.set(effects)
+                settings.globalPlaybackEffects.set(effects, needsSync = false)
             }
             playbackManager.updatePlayerEffects(effects)
         }
@@ -619,7 +624,7 @@ class PlayerViewModel @Inject constructor(
             removeNowPlaying = false,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
-            context = context
+            context = context,
         )
         dialog.setForceDarkTheme(true)
         return dialog

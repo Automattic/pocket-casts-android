@@ -13,7 +13,8 @@ enum class EpisodeViewSource(val value: String) {
     NOTIFICATION_BOOKMARK("notification_bookmark"),
     SEARCH("search"),
     SEARCH_HISTORY("search_history"),
-    UNKNOWN("unknown");
+    UNKNOWN("unknown"),
+    ;
 
     companion object {
         fun fromString(source: String?) =

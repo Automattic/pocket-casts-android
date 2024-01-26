@@ -33,7 +33,6 @@ fun ContinueWithGoogleButton(
     includePadding: Boolean = true,
     onComplete: (GoogleSignInState) -> Unit,
 ) {
-
     val viewModel = hiltViewModel<GoogleSignInButtonViewModel>()
     val context = LocalContext.current
 
@@ -55,7 +54,7 @@ fun ContinueWithGoogleButton(
         viewModel.onGoogleLegacySignInResult(
             result = result,
             onSuccess = onComplete,
-            onError = showError
+            onError = showError,
         )
     }
 
@@ -67,9 +66,9 @@ fun ContinueWithGoogleButton(
             onError = {
                 viewModel.startGoogleLegacySignIn(
                     onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
-                    onError = showError
+                    onError = showError,
                 )
-            }
+            },
         )
     }
 
@@ -80,9 +79,9 @@ fun ContinueWithGoogleButton(
             onError = {
                 viewModel.startGoogleLegacySignIn(
                     onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
-                    onError = showError
+                    onError = showError,
                 )
-            }
+            },
         )
     }
 
@@ -94,6 +93,6 @@ fun ContinueWithGoogleButton(
         fontSize = fontSize,
         includePadding = includePadding,
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
-        onClick = onSignInClick
+        onClick = onSignInClick,
     )
 }

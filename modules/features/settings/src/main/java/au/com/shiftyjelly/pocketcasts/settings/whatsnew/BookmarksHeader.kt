@@ -27,7 +27,7 @@ fun BookmarksHeader(
             painter = painterResource(IR.drawable.whatsnew_bookmarks),
             contentDescription = stringResource(LR.string.bookmarks),
             contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         RowCloseButton(
             onClose = onClose,
@@ -42,7 +42,7 @@ private fun BookmarksHeaderPreview(
 ) {
     AppThemeWithBackground(themeType) {
         BookmarksHeader(
-            onClose = {}
+            onClose = {},
         )
     }
 }

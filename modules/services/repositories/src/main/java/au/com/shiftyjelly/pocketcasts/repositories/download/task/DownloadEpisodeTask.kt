@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download.task
 
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.os.Build
 import android.system.ErrnoException
 import android.system.OsConstants
 import android.util.Log
@@ -32,15 +34,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx2.await
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okhttp3.MediaType
-import okhttp3.Request
-import okhttp3.Response
-import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -59,6 +52,15 @@ import javax.net.ssl.SSLHandshakeException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.await
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType
+import okhttp3.Request
+import okhttp3.Response
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private class UnderscoreInHostName : Exception("Download URL is invalid, as it contains an underscore in the hostname. Please contact the podcast author to resolve this.")
@@ -71,7 +73,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
     var episodeManager: EpisodeManager,
     var userEpisodeManager: UserEpisodeManager,
     @DownloadCallFactory private val callFactory: Call.Factory,
-    @DownloadRequestBuilder private val requestBuilderProvider: Provider<Request.Builder>
+    @DownloadRequestBuilder private val requestBuilderProvider: Provider<Request.Builder>,
 ) : Worker(context, params) {
 
     companion object {
@@ -187,7 +189,15 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val notification = downloadManager.getNotificationBuilder()
             .build()
 
-        return ForegroundInfo(NotificationId.DOWNLOADING.value, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NotificationId.DOWNLOADING.value,
+                notification,
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+            )
+        } else {
+            ForegroundInfo(NotificationId.DOWNLOADING.value, notification)
+        }
     }
 
     private fun markAsRetry(e: Exception? = null) {
@@ -348,8 +358,8 @@ class DownloadEpisodeTask @AssistedInject constructor(
                             null,
                             validationResult.errorMessage
                                 ?: "",
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
                 return
@@ -371,7 +381,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
                 // basic sanity checks to make sure the file looks big enough and it's content type isn't text
                 if (bytesRemaining > 0 && bytesRemaining < BAD_EPISODE_SIZE || bytesRemaining > 0 && bytesRemaining < SUSPECT_EPISODE_SIZE && contentType != null && contentType.toString()
-                    .lowercase().contains("text")
+                        .lowercase().contains("text")
                 ) {
                     if (!emitter.isDisposed) {
                         emitter.onError(DownloadFailed(FileNotFoundException(), "File not found. The podcast author may have moved or deleted this episode file.", false))
@@ -429,7 +439,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     tempDownloadMetaDataFile.delete() // at this point we have the file, don't need the metadata about it anymore
                     val fullDownloadFile = File(pathToSaveTo)
                     try {
-                        FileUtil.copyFile(tempDownloadFile, fullDownloadFile)
+                        FileUtil.copy(tempDownloadFile, fullDownloadFile)
                     } catch (exception: IOException) {
                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
 
@@ -575,9 +585,14 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val statusCode = response.code
         if (statusCode in 400..599) {
             val responseReason = response.message
-            val message = if (statusCode == 404) ERROR_FILE_NOT_FOUND else String.format(
-                ERROR_DOWNLOAD_MESSAGE, if (responseReason.isBlank()) "" else "(error $statusCode $responseReason)"
-            )
+            val message = if (statusCode == 404) {
+                ERROR_FILE_NOT_FOUND
+            } else {
+                String.format(
+                    ERROR_DOWNLOAD_MESSAGE,
+                    if (responseReason.isBlank()) "" else "(error $statusCode $responseReason)",
+                )
+            }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Invalid response returned for episode download. ${response.code} $responseReason ${response.request.url}")
             return ResponseValidationResult(isValid = false, errorMessage = message)
         }
@@ -613,7 +628,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             null,
             progress,
             bytesDownloadedSoFar,
-            total
+            total,
         )
     }
 

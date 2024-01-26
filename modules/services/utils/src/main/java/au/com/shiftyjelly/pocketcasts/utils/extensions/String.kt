@@ -1,12 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import timber.log.Timber
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import timber.log.Timber
 
 val ISO_DATE_FORMATS = object : ThreadLocal<List<SimpleDateFormat>>() {
     override fun initialValue(): List<SimpleDateFormat> {
@@ -17,7 +17,7 @@ val ISO_DATE_FORMATS = object : ThreadLocal<List<SimpleDateFormat>>() {
             // ISO dates can have milliseconds
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
                 timeZone = TimeZone.getTimeZone("UTC")
-            }
+            },
         )
     }
 }

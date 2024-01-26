@@ -17,21 +17,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class CreateFilterViewModel @Inject constructor(
     val playlistManager: PlaylistManager,
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -75,7 +75,7 @@ class CreateFilterViewModel @Inject constructor(
             saveFilter(
                 iconIndex = iconId,
                 colorIndex = colorIndex,
-                isCreatingNewFilter = true
+                isCreatingNewFilter = true,
             )
             withContext(Dispatchers.Main) {
                 reset()
@@ -86,7 +86,7 @@ class CreateFilterViewModel @Inject constructor(
     suspend fun saveFilter(
         iconIndex: Int,
         colorIndex: Int,
-        isCreatingNewFilter: Boolean
+        isCreatingNewFilter: Boolean,
     ) = withContext(Dispatchers.Default) {
         val playlist = playlist.value ?: return@withContext
         playlist.title = filterName.value
@@ -103,8 +103,12 @@ class CreateFilterViewModel @Inject constructor(
             )
             if (properties.isNotEmpty()) {
                 UserPlaylistUpdate(properties, PlaylistUpdateSource.FILTER_OPTIONS)
-            } else null
-        } else null
+            } else {
+                null
+            }
+        } else {
+            null
+        }
 
         userChangedAutoDownload.changedSinceFilterUpdated = false
         userChangedAutoDownloadEpisodeCount.changedSinceFilterUpdated = false
@@ -123,9 +127,11 @@ class CreateFilterViewModel @Inject constructor(
                     userChangedAutoDownload.recordUserChange()
                     UserPlaylistUpdate(
                         listOf(PlaylistProperty.AutoDownload(autoDownload)),
-                        PlaylistUpdateSource.FILTER_EPISODE_LIST
+                        PlaylistUpdateSource.FILTER_EPISODE_LIST,
                     )
-                } else null
+                } else {
+                    null
+                }
                 playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
@@ -162,7 +168,7 @@ class CreateFilterViewModel @Inject constructor(
 
             val userPlaylistUpdate = UserPlaylistUpdate(
                 listOf(PlaylistProperty.AutoDownloadLimit(limit)),
-                PlaylistUpdateSource.FILTER_OPTIONS
+                PlaylistUpdateSource.FILTER_OPTIONS,
             )
             playlistManager.update(playlist, userPlaylistUpdate)
         }
@@ -195,9 +201,11 @@ class CreateFilterViewModel @Inject constructor(
                 val userPlaylistUpdate = if (!isCreatingFilter) {
                     UserPlaylistUpdate(
                         listOf(PlaylistProperty.Starred),
-                        PlaylistUpdateSource.FILTER_EPISODE_LIST
+                        PlaylistUpdateSource.FILTER_EPISODE_LIST,
                     )
-                } else null
+                } else {
+                    null
+                }
                 playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
@@ -222,7 +230,7 @@ class CreateFilterViewModel @Inject constructor(
                 AnalyticsPropKey.DID_CHANGE_AUTO_DOWNLOAD_EPISODE_COUNT to userChangedAutoDownloadEpisodeCount.changedSinceScreenLoad,
                 AnalyticsPropKey.DID_CHANGE_ICON to userChangedIcon.changedSinceScreenLoad,
                 AnalyticsPropKey.DID_CHANGE_NAME to userChangedFilterName.changedSinceScreenLoad,
-                AnalyticsPropKey.DID_CHANGE_COLOR to userChangedColor.changedSinceScreenLoad
+                AnalyticsPropKey.DID_CHANGE_COLOR to userChangedColor.changedSinceScreenLoad,
             )
 
             userChangedAutoDownload.changedSinceScreenLoad = false
@@ -241,7 +249,7 @@ class CreateFilterViewModel @Inject constructor(
 
     data class UserChangeTracker(
         var changedSinceScreenLoad: Boolean = false,
-        var changedSinceFilterUpdated: Boolean = false
+        var changedSinceFilterUpdated: Boolean = false,
     ) {
         fun recordUserChange() {
             changedSinceScreenLoad = true

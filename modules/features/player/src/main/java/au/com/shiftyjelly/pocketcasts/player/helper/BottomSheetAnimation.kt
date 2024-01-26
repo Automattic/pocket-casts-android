@@ -19,7 +19,7 @@ class BottomSheetAnimation(
     val closeStartDelay: Long = 0,
     val openInterpolator: TimeInterpolator = LinearInterpolator(),
     val closeInterpolator: TimeInterpolator = LinearInterpolator(),
-    val disabled: Boolean = false
+    val disabled: Boolean = false,
 ) {
 
     companion object {

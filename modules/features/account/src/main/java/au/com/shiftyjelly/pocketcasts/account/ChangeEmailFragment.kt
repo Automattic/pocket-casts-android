@@ -62,7 +62,7 @@ class ChangeEmailFragment : BaseFragment() {
                             val fragment = ChangeDoneFragment.newInstance()
                             (activity as FragmentHostListener).addFragment(fragment)
                         },
-                        existingEmail = viewModel.existingEmail ?: ""
+                        existingEmail = viewModel.existingEmail ?: "",
                     )
                 }
             }

@@ -53,8 +53,9 @@ class TileDrawable(drawable: Drawable, tileMode: Shader.TileMode, val tilePaddin
             return drawable.bitmap
         }
         val bmp = Bitmap.createBitmap(
-            drawable.intrinsicWidth + tilePadding * 2, drawable.intrinsicHeight + tilePadding * 2,
-            Bitmap.Config.ARGB_8888
+            drawable.intrinsicWidth + tilePadding * 2,
+            drawable.intrinsicHeight + tilePadding * 2,
+            Bitmap.Config.ARGB_8888,
         )
         val c = Canvas(bmp)
         drawable.setBounds(tilePadding, tilePadding, drawable.intrinsicWidth, drawable.intrinsicHeight)

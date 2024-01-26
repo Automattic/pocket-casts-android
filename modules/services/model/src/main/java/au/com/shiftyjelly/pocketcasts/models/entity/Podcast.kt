@@ -44,6 +44,7 @@ data class Podcast(
     @ColumnInfo(name = "override_global_settings") var overrideGlobalSettings: Boolean = false,
     @ColumnInfo(name = "override_global_effects") var overrideGlobalEffects: Boolean = false,
     @ColumnInfo(name = "start_from") var startFromSecs: Int = 0,
+    @ColumnInfo(name = "start_from_modified") var startFromModified: Date? = null,
     @ColumnInfo(name = "playback_speed") var playbackSpeed: Double = 1.0,
     @ColumnInfo(name = "silence_removed") var isSilenceRemoved: Boolean = false,
     @ColumnInfo(name = "volume_boosted") var isVolumeBoosted: Boolean = false,
@@ -71,6 +72,7 @@ data class Podcast(
     @ColumnInfo(name = "episode_frequency") var episodeFrequency: String? = null,
     @ColumnInfo(name = "grouping") var grouping: Int = PodcastGrouping.All.indexOf(PodcastGrouping.None),
     @ColumnInfo(name = "skip_last") var skipLastSecs: Int = 0,
+    @ColumnInfo(name = "skip_last_modified") var skipLastModified: Date? = null,
     @ColumnInfo(name = "show_archived") var showArchived: Boolean = false,
     @ColumnInfo(name = "trim_silence_level") var trimMode: TrimMode = TrimMode.OFF,
     @ColumnInfo(name = "refresh_available") var refreshAvailable: Boolean = false,
@@ -78,7 +80,7 @@ data class Podcast(
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
-    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf()
+    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {
 
     constructor() : this(uuid = "")
@@ -86,7 +88,8 @@ data class Podcast(
     enum class AutoAddUpNext(val databaseInt: Int, val analyticsValue: String) {
         OFF(0, "off"),
         PLAY_LAST(1, "add_last"),
-        PLAY_NEXT(2, "add_first");
+        PLAY_NEXT(2, "add_first"),
+        ;
 
         companion object {
             fun fromDatabaseInt(int: Int?) = values().firstOrNull { it.databaseInt == int }
@@ -97,7 +100,7 @@ data class Podcast(
         // A holder of podcast substitutes when needed for UserEpisodes
         val userPodcast = Podcast(
             uuid = "da7aba5e-f11e-f11e-f11e-da7aba5ef11e",
-            title = "Custom Episode"
+            title = "Custom Episode",
         )
 
         const val SYNC_STATUS_NOT_SYNCED = 0

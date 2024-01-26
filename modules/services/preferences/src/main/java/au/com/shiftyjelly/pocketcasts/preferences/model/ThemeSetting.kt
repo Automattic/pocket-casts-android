@@ -13,7 +13,8 @@ enum class ThemeSetting(val id: String) {
     LIGHT_CONTRAST("lightContrast"),
     ELECTRIC("electric"),
     CLASSIC_LIGHT("classicLight"),
-    RADIOACTIVE("radioactive");
+    RADIOACTIVE("radioactive"),
+    ;
 
     class UserSettingPref(
         sharedPrefKey: String,

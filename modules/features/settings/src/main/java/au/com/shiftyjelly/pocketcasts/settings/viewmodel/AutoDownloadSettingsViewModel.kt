@@ -7,10 +7,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class AutoDownloadSettingsViewModel @Inject constructor(
@@ -34,10 +34,10 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun onUpNextChange(newValue: Boolean) {
-        settings.autoDownloadUpNext.set(newValue)
+        settings.autoDownloadUpNext.set(newValue, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED,
-            mapOf("enabled" to newValue)
+            mapOf("enabled" to newValue),
         )
     }
 
@@ -46,7 +46,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun onNewEpisodesChange(newValue: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED,
-            mapOf("enabled" to newValue)
+            mapOf("enabled" to newValue),
         )
     }
 
@@ -63,7 +63,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun onDownloadOnlyOnUnmeteredChange(enabled: Boolean) {
-        settings.autoDownloadUnmeteredOnly.set(enabled)
+        settings.autoDownloadUnmeteredOnly.set(enabled, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED,
             mapOf("enabled" to enabled),
@@ -73,7 +73,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun getAutoDownloadUnmeteredOnly() = settings.autoDownloadUnmeteredOnly.value
 
     fun onDownloadOnlyWhenChargingChange(enabled: Boolean) {
-        settings.autoDownloadOnlyWhenCharging.set(enabled)
+        settings.autoDownloadOnlyWhenCharging.set(enabled, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_ONLY_WHEN_CHARGING_TOGGLED,
             mapOf("enabled" to enabled),

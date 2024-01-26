@@ -62,11 +62,6 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -75,6 +70,11 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -133,9 +133,13 @@ class AddFileActivity :
         get() = Dispatchers.Main
 
     @Inject lateinit var fileStorage: FileStorage
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var settings: Settings
 
     private val viewModel: AddFileViewModel by viewModels()
@@ -203,7 +207,7 @@ class AddFileActivity :
                     0
                 }
             },
-            onLockedItemTapped = ::openOnboardingFlow
+            onLockedItemTapped = ::openOnboardingFlow,
         )
 
         updateForm(readOnly = true, loading = true)
@@ -342,7 +346,7 @@ class AddFileActivity :
             navigationIcon = NavigationIcon.BackArrow,
             activity = this,
             theme = theme,
-            menu = R.menu.menu_addfile
+            menu = R.menu.menu_addfile,
         )
         toolbar.setOnMenuItemClickListener(this)
     }
@@ -355,7 +359,7 @@ class AddFileActivity :
                 darkThemeColors()
             } else {
                 lightThemeColors()
-            }
+            },
         )
         colorAdapter.submitList(listItems)
     }
@@ -588,7 +592,7 @@ class AddFileActivity :
     private fun saveBitmapToFile(): File? {
         val bitmap = this.bitmap ?: return null
         try {
-            val outImageFile = fileStorage.getCloudFileImage(uuid)
+            val outImageFile = fileStorage.getOrCreateCloudFileImage(uuid)
             FileOutputStream(outImageFile).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)
                 return outImageFile

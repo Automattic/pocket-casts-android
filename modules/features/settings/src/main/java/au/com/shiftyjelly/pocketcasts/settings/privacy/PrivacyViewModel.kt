@@ -5,10 +5,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class PrivacyViewModel @Inject constructor(
@@ -24,7 +24,7 @@ class PrivacyViewModel @Inject constructor(
             val analytics: Boolean,
             val crashReports: Boolean,
             val linkAccount: Boolean,
-            private val getUserEmail: () -> String?
+            private val getUserEmail: () -> String?,
         ) : UiState() {
             fun shouldShowLinkUserSetting() = crashReports && getUserEmail() != null
         }
@@ -35,8 +35,8 @@ class PrivacyViewModel @Inject constructor(
             analytics = analyticsTracker.getSendUsageStats(),
             crashReports = settings.sendCrashReports.value,
             linkAccount = settings.linkCrashReportsToUser.value,
-            getUserEmail = { syncManager.getEmail() }
-        )
+            getUserEmail = { syncManager.getEmail() },
+        ),
     )
     val uiState: StateFlow<UiState> = mutableUiState.asStateFlow()
 

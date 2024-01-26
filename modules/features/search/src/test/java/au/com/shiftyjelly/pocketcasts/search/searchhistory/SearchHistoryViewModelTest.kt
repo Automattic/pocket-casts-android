@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import io.reactivex.Flowable
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -22,7 +23,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -45,7 +45,7 @@ class SearchHistoryViewModelTest {
         subscriptionList = emptyList(),
         type = SubscriptionType.PLUS,
         tier = SubscriptionTier.PLUS,
-        index = 0
+        index = 0,
     )
 
     private val subscriptionStatusFree = SubscriptionStatus.Free()
@@ -99,9 +99,9 @@ class SearchHistoryViewModelTest {
                 Flowable.just(
                     SignInState.SignedIn(
                         email = "",
-                        subscriptionStatus = if (isPlusUser) subscriptionStatusPaid else subscriptionStatusFree
-                    )
-                )
+                        subscriptionStatus = if (isPlusUser) subscriptionStatusPaid else subscriptionStatusFree,
+                    ),
+                ),
             )
         whenever(searchHistoryManager.findAll(showFolders = anyBoolean()))
             .thenReturn(mock())

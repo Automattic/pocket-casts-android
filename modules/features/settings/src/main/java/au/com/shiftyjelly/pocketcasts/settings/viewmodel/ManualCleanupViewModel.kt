@@ -15,13 +15,13 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -29,13 +29,13 @@ class ManualCleanupViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     data class State(
         val diskSpaceViews: List<DiskSpaceView> = listOf(
             DiskSpaceView(title = LR.string.unplayed),
             DiskSpaceView(title = LR.string.in_progress),
-            DiskSpaceView(title = LR.string.played)
+            DiskSpaceView(title = LR.string.played),
         ),
         val totalSelectedDownloadSize: Long = 0L,
         val deleteButton: DeleteButton = DeleteButton(),
@@ -85,7 +85,7 @@ class ManualCleanupViewModel
                     _state.value = State(
                         diskSpaceViews = updatedDiskSpaceViews,
                         totalSelectedDownloadSize = downloadSize,
-                        deleteButton = deleteButton
+                        deleteButton = deleteButton,
                     )
                 }
         }
@@ -123,7 +123,7 @@ class ManualCleanupViewModel
                 episodeManager.deleteEpisodeFiles(
                     episodes = episodesToDelete,
                     playbackManager = playbackManager,
-                    removeFromUpNext = false
+                    removeFromUpNext = false,
                 )
                 _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
             }
@@ -156,7 +156,7 @@ class ManualCleanupViewModel
         val downloadSize = updatedDiskSpaceViews.filter { it.isChecked }.sumOf { it.episodesBytesSize }
         _state.value = _state.value.copy(
             diskSpaceViews = updatedDiskSpaceViews,
-            totalSelectedDownloadSize = downloadSize
+            totalSelectedDownloadSize = downloadSize,
         )
     }
 

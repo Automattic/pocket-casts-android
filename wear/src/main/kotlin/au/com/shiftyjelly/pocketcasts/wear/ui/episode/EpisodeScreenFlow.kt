@@ -17,7 +17,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.wear.compose.material.SwipeToDismissBoxState
-import au.com.shiftyjelly.pocketcasts.wear.extensions.responsive
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
@@ -54,17 +53,15 @@ object EpisodeScreenFlow {
             arguments = listOf(
                 navArgument(episodeUuidArgument) {
                     type = NavType.StringType
-                }
+                },
             ),
         ) {
             scrollable(
                 route = episodeScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.responsive(
-                    firstItemIsFullWidth = false,
-                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top)
-                )
+                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
+                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+                ),
             ) {
-
                 // Listen for results from streaming confirmation screen
                 navController.currentBackStackEntry?.savedStateHandle
                     ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
@@ -110,10 +107,7 @@ object EpisodeScreenFlow {
                 }
             }
 
-            scrollable(
-                route = upNextOptionsScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.responsive(),
-            ) {
+            scrollable(upNextOptionsScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 val episodeScreenBackStackEntry = remember(it.backStackEntry) {
                     navController.getBackStackEntry(episodeScreen)

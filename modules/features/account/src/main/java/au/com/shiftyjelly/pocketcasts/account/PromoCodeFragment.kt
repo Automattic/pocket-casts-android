@@ -120,7 +120,7 @@ class PromoCodeFragment : BaseFragment() {
                         }
                     }
                 }
-            }
+            },
         )
 
         binding?.btnClose?.setOnClickListener { activity?.finish() }

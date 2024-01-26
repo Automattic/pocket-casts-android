@@ -47,12 +47,12 @@ fun ModalBottomSheet(
                 state = BottomSheetContentState(content),
                 onDismiss = {
                     hideBottomSheet(coroutineScope, sheetState)
-                }
+                },
             )
         },
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         scrimColor = Color.Black.copy(alpha = .25f),
-        content = {}
+        content = {},
     )
 
     LaunchedEffect(Unit) {

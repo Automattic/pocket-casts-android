@@ -3,15 +3,15 @@ package au.com.shiftyjelly.pocketcasts.servers.refresh
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.RefreshServerRetrofit
-import retrofit2.Response
-import retrofit2.Retrofit
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
+import retrofit2.Response
+import retrofit2.Retrofit
 
 class RefreshServerManagerImpl @Inject constructor(
     @RefreshServerRetrofit retrofit: Retrofit,
-    private val settings: Settings
+    private val settings: Settings,
 ) : RefreshServerManager {
 
     companion object {

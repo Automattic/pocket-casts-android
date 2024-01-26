@@ -220,7 +220,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                     tabStackMap.pop()
                 }
                 fragmentCommand(
-                    RemoveAllAndShowExisting(toRemove, ShowExisting(tabStackMap.peekValue()!!))
+                    RemoveAllAndShowExisting(toRemove, ShowExisting(tabStackMap.peekValue()!!)),
                 )
             }
         }
@@ -252,7 +252,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
      */
     open fun currentFragment(): Fragment? {
         return activityDelegate?.fragmentManager?.findFragmentByTag(
-            tabStackMap.peekValue().toString()
+            tabStackMap.peekValue().toString(),
         )
     }
 
@@ -272,7 +272,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                 infoEvents.forEach {
                     infoPublisher.onNext(it)
                 }
-            }
+            },
         )
     }
 
@@ -290,8 +290,9 @@ open class BottomNavigator internal constructor() : ViewModel() {
             is ShowAndRemove ->
                 listOf(
                     NavigatorAction.FragmentRemoved(
-                        command.removeTag.className, command.showTag.className
-                    )
+                        command.removeTag.className,
+                        command.showTag.className,
+                    ),
                 )
             is RemoveAllAndShowExisting -> {
                 command.remove
@@ -302,7 +303,8 @@ open class BottomNavigator internal constructor() : ViewModel() {
             is ShowExisting -> emptyList() // tracked by tabSwitches
             is Clear -> command.allCurrentTags.map {
                 NavigatorAction.FragmentRemoved(
-                    it.className, null
+                    it.className,
+                    null,
                 )
             }
             is FragmentTransactionCommand.RemoveUnknown -> emptyList() // no info
@@ -331,7 +333,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
             @IdRes defaultTab: Int,
             @IdRes fragmentContainer: Int,
             @IdRes modalContainer: Int,
-            bottomNavigationView: BottomNavigationView
+            bottomNavigationView: BottomNavigationView,
         ): BottomNavigator {
             val navigator = ViewModelProvider(activity).get(BottomNavigator::class.java)
             val fragmentFactoryWithDetachability =
@@ -342,7 +344,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                 activity = activity,
                 fragmentContainer = fragmentContainer,
                 modalContainer = modalContainer,
-                bottomNavigationView = bottomNavigationView
+                bottomNavigationView = bottomNavigationView,
             )
             return navigator
         }
@@ -375,7 +377,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
             @IdRes defaultTab: Int,
             @IdRes fragmentContainer: Int,
             @IdRes modalContainer: Int,
-            bottomNavigationView: BottomNavigationView
+            bottomNavigationView: BottomNavigationView,
         ): BottomNavigator {
             val navigator = ViewModelProvider(activity).get(BottomNavigator::class.java)
             navigator.onCreate(
@@ -384,7 +386,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                 activity = activity,
                 fragmentContainer = fragmentContainer,
                 modalContainer = modalContainer,
-                bottomNavigationView = bottomNavigationView
+                bottomNavigationView = bottomNavigationView,
             )
             return navigator
         }
@@ -406,7 +408,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
         activity: FragmentActivity,
         fragmentContainer: Int,
         modalContainer: Int,
-        bottomNavigationView: BottomNavigationView
+        bottomNavigationView: BottomNavigationView,
     ) {
         validateInputs(bottomNavigationView, rootFragmentsFactory, defaultTab)
         this.rootFragmentsFactory = rootFragmentsFactory
@@ -417,7 +419,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
         activityDelegate?.clear()
         activityDelegate = ActivityDelegate(
             fragmentContainer, modalContainer, fragmentManagerFactory, activity.lifecycle, bottomNavigationView,
-            this
+            this,
         )
 
         cleanupUnknownFragments()
@@ -436,7 +438,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
     private fun validateInputs(
         bottomNavigationView: BottomNavigationView,
         rootFragmentsFactory: Map<Int, () -> FragmentInfo>,
-        defaultTab: Int
+        defaultTab: Int,
     ) {
         val bottomNavItems =
             (0 until bottomNavigationView.menu.size()).map { bottomNavigationView.menu.getItem(it) }
@@ -444,15 +446,17 @@ open class BottomNavigator internal constructor() : ViewModel() {
         bottomNavItems.forEach {
             if (rootFragmentsFactory[it.itemId] == null) {
                 throw IllegalArgumentException(
-                    "rootFragmentsFactory is missing a the fragment for tab ${it.title}"
+                    "rootFragmentsFactory is missing a the fragment for tab ${it.title}",
                 )
             }
             if (it.itemId == defaultTab) foundDefaultTab = true
         }
 
-        if (!foundDefaultTab) throw IllegalArgumentException(
-            "defaultTab was not found in the BottomNavigationView"
-        )
+        if (!foundDefaultTab) {
+            throw IllegalArgumentException(
+                "defaultTab was not found in the BottomNavigationView",
+            )
+        }
     }
 }
 
@@ -461,7 +465,7 @@ sealed class NavigatorAction {
     data class TabSwitched(@IdRes val newTab: Int, @IdRes val previousTab: Int) : NavigatorAction()
     data class FragmentRemoved(
         val removedFragmentClassName: String?,
-        val newShownFragmentClassName: String?
+        val newShownFragmentClassName: String?,
     ) : NavigatorAction()
 }
 
@@ -476,5 +480,5 @@ data class FragmentInfo(
      * that might not be feasable. By setting detachable = false the fragment's view will be kept
      * and memory and just hidden view.
      */
-    val isDetachable: Boolean
+    val isDetachable: Boolean,
 )

@@ -11,15 +11,14 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.utils.extensions.clipToRange
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.round
 
 @HiltViewModel
 class PodcastEffectsViewModel
@@ -89,9 +88,7 @@ class PodcastEffectsViewModel
 
     private fun changePlaybackSpeed(speed: Double) {
         val podcast = this.podcast.value ?: return
-        val clippedToRangeSpeed = speed.clipToRange(0.5, 3.0)
-        // to stop the issue 1.2000000000000002
-        val roundedSpeed = round(clippedToRangeSpeed * 10.0) / 10.0
+        val roundedSpeed = speed.roundedSpeed()
         podcastManager.updatePlaybackSpeed(podcast, roundedSpeed)
         updatedSpeed = roundedSpeed
         if (shouldUpdatePlaybackManager()) {

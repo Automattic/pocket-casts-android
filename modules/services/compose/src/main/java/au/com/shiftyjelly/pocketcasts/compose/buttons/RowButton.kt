@@ -59,7 +59,9 @@ fun RowButton(
                     tint = textColor,
                 )
             }
-        } else null,
+        } else {
+            null
+        },
         onClick = onClick,
         cornerRadius = cornerRadius,
         textVerticalPadding = textVerticalPadding,
@@ -111,7 +113,7 @@ fun RowButtonTextIconPreview() {
         RowButton(
             text = "Share",
             textIcon = IR.drawable.ic_retry,
-            onClick = {}
+            onClick = {},
         )
     }
 }

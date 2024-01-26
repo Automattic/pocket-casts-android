@@ -50,7 +50,6 @@ fun LoggingInScreen(
     withMinimumDelay: Boolean = false,
     onClose: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<LoggingInScreenViewModel>()
     val state = viewModel.state.collectAsState().value
 
@@ -79,7 +78,7 @@ private fun Content(
         modifier = Modifier
             .clickable { onClose() }
             .padding(16.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         val placeholder = @Composable {
             LoadingSpinner(Modifier.size(36.dp))
@@ -117,7 +116,7 @@ private fun Content(
                 text = stringResource(LR.string.profile_logging_in),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onPrimary,
-                style = MaterialTheme.typography.title2
+                style = MaterialTheme.typography.title2,
             )
         }
 
@@ -125,9 +124,8 @@ private fun Content(
             BoxWithConstraints(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
-
                 val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
                 val background = MaterialTheme.colors.background
 
@@ -142,8 +140,8 @@ private fun Content(
                         softWrap = false,
                         modifier = Modifier.fadeOutOverflow(
                             overFlowWidthPx = widthPx.toInt(),
-                            backgroundColor = background
-                        )
+                            backgroundColor = background,
+                        ),
                     )
                 }
             }
@@ -155,7 +153,6 @@ private fun Modifier.fadeOutOverflow(
     overFlowWidthPx: Int,
     backgroundColor: Color,
 ) = drawWithContent {
-
     // draw text first
     drawContent()
 
@@ -181,7 +178,7 @@ private fun Modifier.fadeOutOverflow(
 private fun LoggingInScreenPreview() {
     WearAppTheme {
         LoggingInScreen(
-            onClose = {}
+            onClose = {},
         )
     }
 }

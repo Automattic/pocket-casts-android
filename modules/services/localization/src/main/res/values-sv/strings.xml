@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 11:54:03+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">När denna funktion är aktiverad ändras widgetens färger baserat på enhetens temafärger.</string>
+    <string name="settings_use_dynamic_colors_widget">Använd dynamiska färger för widget</string>
+    <string name="widget">Widget</string>
+    <string name="bookmark_not_found">Bokmärke hittades inte</string>
+    <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
+    <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
     <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad för 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Prenumerera på Plus och ta reda på hur du lyssnar jämfört med 2022, annan rolig statistik och Premium-funktioner som bokmärken och mappar.</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
@@ -42,7 +48,6 @@ Language: sv_SE
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
     <string name="podcast_rate">Omdöme %s</string>
     <string name="submit">Skicka</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Var med och betatesta bokmärken!</string>
     <string name="whats_new_bookmarks_try_now_button">Testa nu</string>
     <string name="whats_new_bookmarks_title">Bokmärkena är här!</string>
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
@@ -88,7 +93,7 @@ Language: sv_SE
     <string name="bookmarks_select_option">Välj bokmärken</string>
     <string name="bookmarks_delete_summary_singular">Detta bokmärke kommer att tas bort. Det här går inte att ångra.</string>
     <string name="bookmarks_delete_summary_plural">%d bokmärken kommer att tas bort. Det här går inte att ångra.</string>
-    <string name="bookmarks_deleted_singular">1 bokmärke har tagits bort</string>
+    <string name="bookmarks_deleted_singular">Bokmärke borttaget</string>
     <string name="bookmarks_deleted_plural">%1$d bokmärken har tagits bort</string>
     <string name="bookmarks_delete_singular">Ta bort bokmärke</string>
     <string name="bookmarks_delete_plural">Ta bort bokmärken</string>
@@ -123,7 +128,6 @@ Language: sv_SE
     <string name="player_sleep_add_1_minute">+ 1 minut</string>
     <string name="player_sleep_1_minute">1 minut</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra teman och appikoner</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch-uppspelning</string>
     <string name="onboarding_patron_feature_early_access_title">Tidig åtkomst till funktioner</string>
     <string name="settings_continuous_playback_summary">Om din Nästa-kö är tom kommer vi att spela upp avsnitt från den podcast eller lista som du för närvarande lyssnar på.</string>
     <string name="renew_your_subscription">Förnya din prenumeration</string>
@@ -239,7 +243,6 @@ Language: sv_SE
     <string name="settings_media_actions_customise">Anpassa mediaåtgärder</string>
     <string name="settings_media_actions_prioritize_subtitle">Dina vanligaste åtgärder kommer att vara tillgängliga.</string>
     <string name="settings_media_actions_prioritize_title">Prioritera dina anpassade mediaåtgärder</string>
-    <string name="plus_take_your_podcasting_to_next_level">Ta din podcastupplevelse till nästa nivå med exklusiv tillgång till funktioner och anpassningsalternativ.</string>
     <string name="onboarding_recommendations_more">Mer %s</string>
     <string name="filter_id_or_title">Filter-ID eller -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -332,11 +335,9 @@ Language: sv_SE
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB molnlagring</string>
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
-    <string name="onboarding_plus_feature_folders_title">Mappar</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Dator-appar</string>
-    <string name="onboarding_upgrade_unlock_all_features">Lås upp alla funktioner</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Få tillgång till exklusiva funktioner och anpassningsalternativ</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator-appar</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>
@@ -960,13 +961,9 @@ Language: sv_SE
     <string name="plus_lifetime_member">Livstidsmedlem</string>
     <string name="plus_learn_more_button">Lär dig mer</string>
     <string name="plus_learn_more_about_plus">Läs mer om Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Ta dina podcasts till fler platser med våra appar för Windows, macOS och webben.</string>
     <string name="plus_desktop_apps">Dator-appar</string>
-    <string name="plus_description_title">Förbättrade funktioner för avancerade lyssnare</string>
-    <string name="plus_description_body">Bli personlig och distribuerad, allt på samma gång. Ladda upp dina personliga ljudfiler till våra molnservrar, kom åt ditt konto via vår webbspelare och gör appen till din egen.</string>
     <string name="plus_create_marketing_features"> Allt</string>
     <string name="plus_cloud_storage_limit">%d GB molnlagring</string>
-    <string name="plus_cloud_storage_body">Snabba upp dina föreläsningar. Ta del av annat innehåll. Bli din egen podcast-DJ.</string>
     <string name="plus_cloud_storage">Molnlagring</string>
     <string name="profile_expiry_date_unknown">Okänd</string>
     <string name="profile_yearly">Årligen</string>
@@ -974,7 +971,6 @@ Language: sv_SE
     <string name="profile_welcome_to_plus">Välkommen till Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Välkommen till Pocket Casts!</string>
     <string name="profile_web_player">Webbspelare</string>
-    <string name="profile_upgrade_to_plus">Uppgradera till Plus</string>
     <string name="profile_updates_ends">Uppdateringar slutar: %s</string>
     <string name="profile_updates_ended">Uppdateringar slutade: %s</string>
     <string name="profile_time_free">%s gratis</string>

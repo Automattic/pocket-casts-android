@@ -26,11 +26,11 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function3
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.rxCompletable
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.rx2.rxCompletable
+import timber.log.Timber
 
 @Singleton
 class SubscribeManager @Inject constructor(
@@ -39,7 +39,7 @@ class SubscribeManager @Inject constructor(
     private val staticServerManager: StaticServerManager,
     private val syncManager: SyncManager,
     @ApplicationContext val context: Context,
-    val settings: Settings
+    val settings: Settings,
 ) {
 
     private val subscribeRelay: PublishRelay<PodcastSubscribe> by lazy { setupSubscribeRelay() }
@@ -64,7 +64,7 @@ class SubscribeManager @Inject constructor(
                     uuidsInQueue.remove(podcast.uuid)
                     Timber.i("Subscribed successfully to podcast ${podcast.uuid}")
                     subscriptionChangedRelay.accept(podcast.uuid)
-                }
+                },
             )
         return source
     }
@@ -168,10 +168,12 @@ class SubscribeManager @Inject constructor(
         val allPodcastsObservable = podcastDao.findSubscribedRx().subscribeOn(Schedulers.io())
         // group the server podcast and all the existing podcasts to calculate the new podcast properties
         val cleanPodcastObservable = Single.zip(
-            serverPodcastObservable, colorObservable, allPodcastsObservable,
+            serverPodcastObservable,
+            colorObservable,
+            allPodcastsObservable,
             Function3<Podcast, Optional<ArtworkColors>, List<Podcast>, Podcast> { podcast, colors, allPodcasts ->
                 cleanPodcast(podcast, colors, allPodcasts)
-            }
+            },
         )
         // add sync information
         if (syncManager.isLoggedIn()) {

@@ -57,13 +57,13 @@ fun FolderImage(
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 11.sp,
     badgeCount: Int = 0,
-    badgeType: BadgeType = BadgeType.OFF
+    badgeType: BadgeType = BadgeType.OFF,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color = color)
-            .aspectRatio(1f)
+            .aspectRatio(1f),
     ) {
         val constraints = this
 
@@ -73,16 +73,16 @@ fun FolderImage(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             gradientTop,
-                            gradientBottom
-                        )
-                    )
+                            gradientBottom,
+                        ),
+                    ),
                 )
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {}
         val podcastSize = (constraints.maxWidth.value / imageSizeRatio).dp
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             val imagePadding = (constraints.maxWidth.value / paddingImageRatio).dp
             Spacer(modifier = Modifier.height(imagePadding))
@@ -92,14 +92,14 @@ fun FolderImage(
                         uuid = podcastUuids.getOrNull(0),
                         color = color,
                         gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize)
+                        modifier = Modifier.size(podcastSize),
                     )
                     Spacer(modifier = Modifier.height(imagePadding))
                     FolderPodcastImage(
                         uuid = podcastUuids.getOrNull(2),
                         color = color,
                         gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize)
+                        modifier = Modifier.size(podcastSize),
                     )
                 }
                 Spacer(modifier = Modifier.width(imagePadding))
@@ -108,14 +108,14 @@ fun FolderImage(
                         uuid = podcastUuids.getOrNull(1),
                         color = color,
                         gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize)
+                        modifier = Modifier.size(podcastSize),
                     )
                     Spacer(modifier = Modifier.height(imagePadding))
                     FolderPodcastImage(
                         uuid = podcastUuids.getOrNull(3),
                         color = color,
                         gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize)
+                        modifier = Modifier.size(podcastSize),
                     )
                 }
             }
@@ -133,16 +133,16 @@ fun FolderImage(
                         shadow = Shadow(
                             color = Color(0x33000000),
                             offset = Offset(0f, 2f),
-                            blurRadius = 4f
-                        )
-                    )
+                            blurRadius = 4f,
+                        ),
+                    ),
                 )
             }
         }
         PodcastBadge(
             count = badgeCount,
             modifier = Modifier.align(Alignment.TopEnd),
-            badgeType = badgeType
+            badgeType = badgeType,
         )
     }
 }
@@ -162,7 +162,7 @@ private fun PodcastBadge(modifier: Modifier = Modifier, count: Int, badgeType: B
         }
         drawPath(
             color = badgeColor,
-            path = badgePath
+            path = badgePath,
         )
     }
     Text(
@@ -170,7 +170,7 @@ private fun PodcastBadge(modifier: Modifier = Modifier, count: Int, badgeType: B
         fontSize = if (count > 9) 12.sp else 14.sp,
         fontWeight = FontWeight.Bold,
         color = Color.White,
-        modifier = modifier.padding(end = if (count > 9) 1.dp else 4.dp)
+        modifier = modifier.padding(end = if (count > 9) 1.dp else 4.dp),
     )
 }
 
@@ -179,7 +179,7 @@ private fun FolderPodcastImage(
     uuid: String?,
     color: Color,
     gradientColor: List<Color>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (uuid == null) {
         BoxWithConstraints(modifier) {
@@ -197,24 +197,24 @@ private fun FolderPodcastImage(
                 elevation = elevation,
                 shape = RoundedCornerShape(corners),
                 backgroundColor = color,
-                modifier = modifier
+                modifier = modifier,
             ) {
                 Box(
                     modifier = Modifier
                         .size(maxWidth)
-                        .background(brush = Brush.verticalGradient(colors = gradientColor))
+                        .background(brush = Brush.verticalGradient(colors = gradientColor)),
                 ) {}
                 Box(
                     modifier = Modifier
                         .size(maxWidth)
-                        .background(color = Color(0x19000000))
+                        .background(color = Color(0x19000000)),
                 ) {}
             }
         }
     } else {
         PodcastImage(
             uuid = uuid,
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
@@ -245,6 +245,6 @@ private fun FolderImagePreview() {
         podcastUuids = emptyList(),
         badgeCount = 1,
         badgeType = BadgeType.ALL_UNFINISHED,
-        modifier = Modifier.size(100.dp)
+        modifier = Modifier.size(100.dp),
     )
 }

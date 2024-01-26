@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey
         Index(value = ["podcast_uuid"], unique = true),
         Index(value = ["folder_uuid"], unique = true),
         Index(value = ["episode_uuid"], unique = true),
-    ]
+    ],
 )
 data class SearchHistoryItem(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "_id") var id: Long? = null,

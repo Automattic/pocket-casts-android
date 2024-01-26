@@ -24,6 +24,7 @@ class ShowNotesManagerTest {
     val coroutineRule = MainCoroutineRule()
 
     @Mock lateinit var serverShowNotesManager: ServerShowNotesManager
+
     @Mock lateinit var episodeManager: EpisodeManager
 
     private lateinit var showNotesManager: ShowNotesManager
@@ -38,21 +39,20 @@ class ShowNotesManagerTest {
 
     @Test
     fun updatesEpisodesWithImageUrls() = runTest {
-
         val episodeWithImage1 = ShowNotesEpisode(
             uuid = "episode_uuid1",
             showNotes = "show_notes1",
-            image = "image1"
+            image = "image1",
         )
         val episodeWithImage2 = ShowNotesEpisode(
             uuid = "episode_uuid2",
             showNotes = "show_notes2",
-            image = "image2"
+            image = "image2",
         )
         val episodeWithoutImage = ShowNotesEpisode(
             uuid = "episode_uuid3",
             showNotes = "show_notes3",
-            image = null
+            image = null,
         )
 
         val showNotesResponse = ShowNotesResponse(
@@ -63,7 +63,7 @@ class ShowNotesManagerTest {
                     episodeWithImage2,
                     episodeWithoutImage,
                 ),
-            )
+            ),
         )
         showNotesManager.updateEpisodesWithImageUrls(showNotesResponse)
 
@@ -75,7 +75,7 @@ class ShowNotesManagerTest {
         }
         val expectedUpdates = listOf(
             imageUrlUpdateForEpisode(episodeWithImage1),
-            imageUrlUpdateForEpisode(episodeWithImage2)
+            imageUrlUpdateForEpisode(episodeWithImage2),
         )
 
         verify(episodeManager).updateImageUrls(expectedUpdates)

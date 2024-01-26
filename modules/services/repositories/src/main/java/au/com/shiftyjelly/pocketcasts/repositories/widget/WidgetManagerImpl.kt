@@ -22,25 +22,28 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class WidgetManagerImpl @Inject constructor(
     private val settings: Settings,
     private val podcastManager: PodcastManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : WidgetManager {
+
+    private var remoteViewsLayoutId: Int = getRemoteViewsLayoutId()
 
     override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?) {
         when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive,
-            AppPlatform.WearOs -> { /* do nothing */ }
+            AppPlatform.WearOs,
+            -> { /* do nothing */ }
             AppPlatform.Phone -> {
                 try {
                     val appWidgetManager = AppWidgetManager.getInstance(context)
 
-                    val views = RemoteViews(context.packageName, R.layout.widget)
+                    val views = RemoteViews(context.packageName, remoteViewsLayoutId)
                     val widgetName = ComponentName(context, PodcastWidget::class.java)
                     if (playingEpisode == null) {
                         showPlayingControls(false, views)
@@ -56,6 +59,26 @@ class WidgetManagerImpl @Inject constructor(
                     Timber.e(e)
                 }
             }
+        }
+    }
+
+    override fun updateWidgetFromSettings(playbackManager: PlaybackManager?) {
+        try {
+            /* We cannot apply a theme dynamically to an app widget.
+            As a workaround, multiple layouts are provided, and the correct theme/layout is picked
+            when remote views layout needs to be updated.
+            https://stackoverflow.com/a/4501902/193545 */
+            remoteViewsLayoutId = getRemoteViewsLayoutId()
+
+            val views = RemoteViews(context.packageName, remoteViewsLayoutId)
+            val widgetName = ComponentName(context, PodcastWidget::class.java)
+
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            appWidgetManager.updateAppWidget(widgetName, views)
+
+            updateWidgetFromPlaybackState(playbackManager)
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 
@@ -86,7 +109,7 @@ class WidgetManagerImpl @Inject constructor(
         for (i in widgetIds.indices) {
             val widgetId = widgetIds[i]
 
-            val views = RemoteViews(context.packageName, R.layout.widget)
+            val views = RemoteViews(context.packageName, remoteViewsLayoutId)
             updateOnClicks(views, context)
             updateSkipAmounts(views, settings)
             setupView(views, isPlaying, playbackManager, widgetName, context)
@@ -154,7 +177,7 @@ class WidgetManagerImpl @Inject constructor(
             context,
             widgetName,
             views,
-            R.id.widget_artwork
+            R.id.widget_artwork,
         )
         val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
         if (playingEpisode is UserEpisode) {
@@ -191,5 +214,11 @@ class WidgetManagerImpl @Inject constructor(
 
     private fun getSkipForwardIntent(): PendingIntent? {
         return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
+    }
+
+    private fun getRemoteViewsLayoutId() = if (settings.useDynamicColorsForWidget.value) {
+        R.layout.widget_dynamic_colors_theme
+    } else {
+        R.layout.widget_default_theme
     }
 }

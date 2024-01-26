@@ -19,7 +19,11 @@ import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
+import java.net.HttpURLConnection
+import java.util.Date
+import java.util.concurrent.TimeUnit
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.CoroutineScope
@@ -38,9 +42,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Retrofit
 import timber.log.Timber
-import java.net.HttpURLConnection
-import java.util.Date
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class PodcastSyncProcessTest {
@@ -50,7 +51,6 @@ class PodcastSyncProcessTest {
     private lateinit var retrofit: Retrofit
     private lateinit var okhttpCache: Cache
     private lateinit var appDatabase: AppDatabase
-    private val featureFlagWrapper: FeatureFlagWrapper = mock()
 
     @Before
     fun setUp() {
@@ -61,8 +61,17 @@ class PodcastSyncProcessTest {
 
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
-        whenever(featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) doReturn true
-        val moshi = ServersModule.provideMoshiBuilder(featureFlagWrapper).build()
+        FeatureFlag.initialize(
+            listOf(object : FeatureProvider {
+                override val priority = 0
+
+                override fun hasFeature(feature: Feature) = feature == Feature.SETTINGS_SYNC
+
+                override fun isEnabled(feature: Feature) = false
+            }),
+        )
+
+        val moshi = ServersModule.provideMoshiBuilder().build()
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
         okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context)
@@ -93,7 +102,7 @@ class PodcastSyncProcessTest {
                 episode = PodcastEpisode(
                     uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
                     podcastUuid = "3f580d2e-d9c0-4cde-94b3-728c271f373a",
-                    publishedDate = Date()
+                    publishedDate = Date(),
                 ),
                 timeSecs = 23,
                 title = "Bookmark",
@@ -103,7 +112,7 @@ class PodcastSyncProcessTest {
                 episode = PodcastEpisode(
                     uuid = "920cbb66-d5dc-4128-a2a0-c8bfbe55ce78",
                     podcastUuid = "3fcb9f78-24a0-49b9-9078-8f572280b61d",
-                    publishedDate = Date()
+                    publishedDate = Date(),
                 ),
                 timeSecs = 875,
                 title = "Bookmark Deleted",
@@ -127,7 +136,7 @@ class PodcastSyncProcessTest {
             val syncServerManager = SyncServerManager(
                 retrofit = retrofit,
                 settings = settings,
-                cache = okhttpCache
+                cache = okhttpCache,
             )
 
             val syncManager = SyncManagerImpl(
@@ -135,11 +144,12 @@ class PodcastSyncProcessTest {
                 context = context,
                 settings = settings,
                 syncAccountManager = syncAccountManager,
-                syncServerManager = syncServerManager
+                syncServerManager = syncServerManager,
             )
 
             val syncProcess = PodcastSyncProcess(
                 context = context,
+                applicationScope = CoroutineScope(Dispatchers.Default),
                 settings = settings,
                 episodeManager = episodeManager,
                 podcastManager = podcastManager,
@@ -153,8 +163,6 @@ class PodcastSyncProcessTest {
                 subscriptionManager = mock(),
                 folderManager = folderManager,
                 syncManager = syncManager,
-                featureFlagWrapper = featureFlagWrapper,
-                applicationScope = CoroutineScope(Dispatchers.Default),
             )
 
             val response = MockResponse()
@@ -211,7 +219,7 @@ class PodcastSyncProcessTest {
                         ]
                       }
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             mockWebServer.enqueue(response)
 

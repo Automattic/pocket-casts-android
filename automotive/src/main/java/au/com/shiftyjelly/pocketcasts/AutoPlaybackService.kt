@@ -32,10 +32,10 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -51,7 +51,9 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 class AutoPlaybackService : PlaybackService() {
 
     @Inject lateinit var listSource: ListRepository
-    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()
@@ -167,7 +169,7 @@ class AutoPlaybackService : PlaybackService() {
         val region = discoverFeed.regions[discoverFeed.defaultRegionCode] ?: return emptyList()
         val replacements = mapOf(
             discoverFeed.regionCodeToken to region.code,
-            discoverFeed.regionNameToken to region.name
+            discoverFeed.regionNameToken to region.name,
         )
 
         val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, resources)

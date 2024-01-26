@@ -93,10 +93,10 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
-import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -116,7 +116,7 @@ fun StoriesPage(
     onUpsellClicked: () -> Unit,
 ) {
     val shareLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult(),
     ) {
         /* Share activity dismissed, start paused story */
         if (it.resultCode == Activity.RESULT_OK) {
@@ -151,7 +151,7 @@ fun StoriesPage(
                                 file,
                                 currentStory.identifier,
                                 shareLauncher,
-                                shareTextData
+                                shareTextData,
                             )
                         }
                     },
@@ -160,7 +160,7 @@ fun StoriesPage(
             }
             is State.Loading -> StoriesLoadingView(
                 progress = (state as State.Loading).progress,
-                onCloseClicked = onCloseClicked
+                onCloseClicked = onCloseClicked,
             )
             State.Error -> {
                 viewModel.trackStoryFailedToLoad()
@@ -189,7 +189,7 @@ private fun StoriesView(
         state.currentStory?.let { story ->
             Box(
                 modifier = modifier
-                    .clip(RoundedCornerShape(StoryViewCornerSize))
+                    .clip(RoundedCornerShape(StoryViewCornerSize)),
             ) {
                 val onCaptureBitmap =
                     convertibleToBitmap(content = {
@@ -205,7 +205,7 @@ private fun StoriesView(
                             onStart,
                             onReplayClicked,
                             onUpsellClicked,
-                            modifier
+                            modifier,
                         )
                     })
                 Column {
@@ -267,14 +267,14 @@ private fun StorySharableContent(
             modifier = modifier
                 .fillMaxSize()
                 .background(color = story.backgroundColor),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             val storyModifier = modifier.then(
                 if (userTier == UserTier.Free && story.plusOnly) {
                     Modifier.blur(StoriesViewBlurRadius)
                 } else {
                     Modifier
-                }
+                },
             )
             when (story) {
                 is StoryIntro -> StoryIntroView(storyModifier)
@@ -306,7 +306,7 @@ private fun StorySharableContent(
             if (shouldShowUpsell()) {
                 PaidStoryWallView(
                     freeTrial = freeTrial,
-                    onUpsellClicked = onUpsellClicked
+                    onUpsellClicked = onUpsellClicked,
                 )
                 onPause()
             }
@@ -334,7 +334,7 @@ private fun ShareButton(
         onClick = {
             onClick.invoke()
         },
-        modifier = modifier
+        modifier = modifier,
 
     )
 }
@@ -352,11 +352,11 @@ private fun StoriesLoadingView(
                 color = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 24.dp),
             )
         },
         onCloseClicked = onCloseClicked,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -369,13 +369,13 @@ private fun StoriesErrorView(
     StoriesEmptyView(
         content = {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 TextH30(
                     text = stringResource(id = LR.string.end_of_year_stories_failed),
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    modifier = modifier.padding(horizontal = 40.dp)
+                    modifier = modifier.padding(horizontal = 40.dp),
                 )
                 Button(
                     onClick = { onRetryClicked.invoke() },
@@ -394,7 +394,7 @@ private fun StoriesErrorView(
             }
         },
         onCloseClicked = onCloseClicked,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -407,12 +407,12 @@ private fun StoriesEmptyView(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.Black)
+            .background(color = Color.Black),
     ) {
         RowCloseButton(onCloseClicked)
         Box(
             contentAlignment = Alignment.Center,
-            modifier = modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize(),
         ) {
             content()
         }
@@ -458,9 +458,9 @@ private fun StorySwitcher(
                                 }
                             }
                         }
-                    }
+                    },
                 )
-            }
+            },
     ) {
         content?.invoke()
     }
@@ -488,7 +488,8 @@ private fun showShareForFile(
             .intent
 
         val pendingIntent = PendingIntent.getBroadcast(
-            context, 0,
+            context,
+            0,
             Intent(context, ShareResultReceiver::class.java).apply {
                 putExtra(ShareResultReceiver.EXTRA_STORY_ID, storyIdentifier)
             },
@@ -496,7 +497,7 @@ private fun showShareForFile(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             } else {
                 PendingIntent.FLAG_UPDATE_CURRENT
-            }
+            },
         )
 
         val chooserIntent = Intent.createChooser(shareIntent, null, pendingIntent.intentSender)
@@ -533,13 +534,13 @@ private fun StoriesScreenPreview(
                 currentStory = StoryListenedNumbers(
                     ListenedNumbers(
                         numberOfEpisodes = 1,
-                        numberOfPodcasts = 1
+                        numberOfPodcasts = 1,
                     ),
-                    topPodcasts = emptyList()
+                    topPodcasts = emptyList(),
                 ),
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
-                    widths = listOf(0.25f, 0.75f)
+                    widths = listOf(0.25f, 0.75f),
                 ),
                 userTier = UserTier.Free,
                 freeTrial = FreeTrial(
@@ -569,7 +570,7 @@ private fun StoriesLoadingViewPreview(
     AppTheme(themeType) {
         StoriesLoadingView(
             progress = 0.5f,
-            onCloseClicked = {}
+            onCloseClicked = {},
         )
     }
 }

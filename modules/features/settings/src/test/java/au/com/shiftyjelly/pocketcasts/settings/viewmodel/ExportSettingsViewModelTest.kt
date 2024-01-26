@@ -34,11 +34,13 @@ class ExportSettingsViewModelTest {
         testSubject.onImportByUrlClicked()
         verify(analyticsTracker).track(AnalyticsEvent.SETTINGS_IMPORT_BY_URL)
     }
+
     @Test
     fun `onExportByEmail should track analytics event`() = runTest {
         testSubject.onExportByEmail()
         verify(analyticsTracker).track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_EMAIL_TAPPED)
     }
+
     @Test
     fun `onExportFile should track analytics event`() = runTest {
         testSubject.onExportFile()

@@ -3,7 +3,7 @@
     android:minResizeWidth="220dp"
     android:minHeight="40dp"
     android:updatePeriodMillis="1000"
-    android:initialLayout="@layout/widget"
+    android:initialLayout="@layout/widget_default_theme"
     android:previewImage="@drawable/widget_preview"
     android:resizeMode="horizontal">
 </appwidget-provider>

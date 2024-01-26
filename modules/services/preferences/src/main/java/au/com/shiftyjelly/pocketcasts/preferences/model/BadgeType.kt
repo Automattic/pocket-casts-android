@@ -25,7 +25,8 @@ enum class BadgeType(
         persistedInt = 2,
         labelId = R.string.podcasts_badges_all_unfinished,
         analyticsValue = "unfinished_episodes",
-    );
+    ),
+    ;
 
     companion object {
         val defaultValue = OFF

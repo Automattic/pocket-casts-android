@@ -24,22 +24,23 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import java.io.File
+import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
-import java.io.File
-import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * The only class outside of the server module that should use this class is the
@@ -95,7 +96,7 @@ open class SyncServerManager @Inject constructor(
         val request = EmailChangeRequest(
             newEmail,
             password,
-            SCOPE_MOBILE
+            SCOPE_MOBILE,
         )
         return server.emailChange(addBearer(token), request)
     }
@@ -116,20 +117,34 @@ open class SyncServerManager @Inject constructor(
     fun validatePromoCode(code: String): Single<PromoCodeResponse> =
         server.validatePromoCode(PromoCodeRequest(code))
 
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse =
         server.namedSettings(addBearer(token), request)
 
-    fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<SyncUpdateResponse> {
+    suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest, token: AccessToken): ChangedNamedSettingsResponse =
+        server.namedSettings(addBearer(token), request)
+
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
+    fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> {
         val fields = mutableMapOf(
             "email" to email,
             "token" to token.value,
             "data" to data,
             "device_utc_time_ms" to System.currentTimeMillis().toString(),
-            "last_modified" to lastModified
+            "last_modified" to lastModified,
         )
         addDeviceFields(fields)
+
+        @Suppress("DEPRECATION")
         return server.syncUpdate(fields)
     }
+
+    suspend fun userSyncUpdate(
+        token: AccessToken,
+        request: SyncUpdateRequest,
+    ): SyncUpdateResponse =
+        server.userSyncUpdate(addBearer(token), request)
 
     fun upNextSync(request: UpNextSyncRequest, token: AccessToken): Single<UpNextSyncResponse> =
         server.upNextSync(addBearer(token), request)
@@ -186,7 +201,7 @@ open class SyncServerManager @Inject constructor(
 
     fun subscriptionPurchase(
         request: SubscriptionPurchaseRequest,
-        token: AccessToken
+        token: AccessToken,
     ): Single<SubscriptionStatusResponse> =
         server.subscriptionPurchase(addBearer(token), request)
 
@@ -226,7 +241,7 @@ open class SyncServerManager @Inject constructor(
                     emitter.tryOnError(e)
                 }
             },
-            BackpressureStrategy.LATEST
+            BackpressureStrategy.LATEST,
         )
     }
 
@@ -265,7 +280,7 @@ open class SyncServerManager @Inject constructor(
     private fun buildBasicRequest(): BasicRequest {
         return BasicRequest(
             model = Settings.SYNC_API_MODEL,
-            version = Settings.SYNC_API_VERSION
+            version = Settings.SYNC_API_VERSION,
         )
     }
 

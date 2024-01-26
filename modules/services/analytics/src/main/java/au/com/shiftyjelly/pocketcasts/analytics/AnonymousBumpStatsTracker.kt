@@ -2,15 +2,15 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AnonymousBumpStatsTracker @Inject constructor(
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
 ) : Tracker, CoroutineScope {
     companion object {
         private val PAID_SPONSOR_RELATED_EVENTS = listOf(
@@ -19,7 +19,7 @@ class AnonymousBumpStatsTracker @Inject constructor(
             AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY,
             AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
             AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
-            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED
+            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
         )
 
         private fun shouldTrack(event: AnalyticsEvent) =
@@ -34,7 +34,7 @@ class AnonymousBumpStatsTracker @Inject constructor(
             launch {
                 val bumpStat = AnonymousBumpStat(
                     name = event.name.lowercase(Locale.getDefault()),
-                    customEventProps = properties
+                    customEventProps = properties,
                 ).withBumpName()
                 bumpStatsDao.insert(bumpStat)
             }

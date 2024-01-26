@@ -10,7 +10,7 @@ data class ArtworkColors(
     val fabForDarkBg: Int = 0,
     val linkForLightBg: Int = 0,
     val linkForDarkBg: Int = 0,
-    val timeDownloadedMs: Long = 0
+    val timeDownloadedMs: Long = 0,
 ) {
 
     fun copyToPodcast(podcast: Podcast): Podcast {

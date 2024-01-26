@@ -26,7 +26,7 @@ data class ResultPodcast(
     @field:Json(name = "category") val category: String?,
     @field:Json(name = "description") val description: String?,
     @field:Json(name = "language") val language: String?,
-    @field:Json(name = "media_type") val mediaType: String?
+    @field:Json(name = "media_type") val mediaType: String?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -38,7 +38,7 @@ data class ResultPodcast(
             podcastCategory = category ?: "",
             podcastDescription = description ?: "",
             podcastLanguage = language ?: "",
-            mediaType = mediaType
+            mediaType = mediaType,
         )
     }
 }

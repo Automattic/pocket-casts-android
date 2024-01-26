@@ -38,6 +38,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -45,8 +47,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -72,7 +72,7 @@ class AutoDownloadSettingsFragment :
         fun newInstance(showToolbar: Boolean = true): AutoDownloadSettingsFragment {
             return AutoDownloadSettingsFragment().apply {
                 arguments = bundleOf(
-                    ARG_SHOW_TOOLBAR to showToolbar
+                    ARG_SHOW_TOOLBAR to showToolbar,
                 )
             }
         }
@@ -82,8 +82,11 @@ class AutoDownloadSettingsFragment :
         get() = Dispatchers.Main
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var theme: Theme
 
     private val viewModel: AutoDownloadSettingsViewModel by viewModels()
@@ -280,9 +283,11 @@ class AutoDownloadSettingsFragment :
                 val userPlaylistUpdate = if (userChanged) {
                     UserPlaylistUpdate(
                         listOf(PlaylistProperty.AutoDownload(autoDownloadStatus)),
-                        PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS
+                        PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS,
                     )
-                } else null
+                } else {
+                    null
+                }
                 playlistManager.update(it, userPlaylistUpdate)
             }
             launch(Dispatchers.Main) { updateFiltersSelectedSummary() }
@@ -333,7 +338,7 @@ class AutoDownloadSettingsFragment :
                         else -> resources.getString(LR.string.settings_podcasts_selected_x, autoDownloadingCount)
                     }
                     podcastsPreference?.summary = summary
-                }
+                },
             )
     }
 
@@ -346,7 +351,7 @@ class AutoDownloadSettingsFragment :
                 onSuccess = { on ->
                     updateNewEpisodesSwitch(on)
                     newEpisodesPreference?.isChecked = on
-                }
+                },
             )
     }
 

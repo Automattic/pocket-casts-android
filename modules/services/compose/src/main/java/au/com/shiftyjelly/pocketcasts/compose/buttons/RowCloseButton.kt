@@ -24,10 +24,10 @@ fun RowCloseButton(
     Row(
         modifier = modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.End,
     ) {
         IconButton(
-            onClick = onClose
+            onClick = onClose,
         ) {
             Icon(
                 imageVector = NavigationButton.Close.image,

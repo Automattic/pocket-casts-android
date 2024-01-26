@@ -6,11 +6,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginIdentity
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @JsonClass(generateAdapter = true)
 data class WatchSyncAuthData(
@@ -24,7 +24,7 @@ object WatchSyncAuthDataSerializer : Serializer<WatchSyncAuthData?> {
         Moshi.Builder()
             .add(RefreshToken::class.java, RefreshToken.Adapter)
             .add(LoginIdentity.Adapter)
-            .build()
+            .build(),
     )
 
     override val defaultValue: WatchSyncAuthData? = null

@@ -37,7 +37,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class CreateAccountFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
@@ -79,7 +81,6 @@ class CreateAccountFragment : BaseFragment() {
         viewModel.createAccountState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is CreateAccountState.ProductsLoaded -> {
-
                     val subscription = subscriptionManager.getDefaultSubscription(state.list)
                     val plusLabel = when (subscription) {
                         is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
@@ -91,7 +92,6 @@ class CreateAccountFragment : BaseFragment() {
                         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                         setContent {
                             AppTheme(theme.activeTheme) {
-
                                 val emphasized = true
                                 when (subscription) {
                                     is Subscription.Simple -> ProductAmountView(
@@ -99,19 +99,19 @@ class CreateAccountFragment : BaseFragment() {
                                         secondaryText = stringResource(subscription.recurringPricingPhase.perPeriod)
                                             .lowercase(Locale.getDefault()),
                                         horizontalAlignment = Alignment.End,
-                                        emphasized = emphasized
+                                        emphasized = emphasized,
                                     )
                                     is Subscription.WithTrial -> {
                                         val res = LocalContext.current.resources
                                         val primaryText = stringResource(
                                             LR.string.plus_trial_duration_free,
-                                            subscription.trialPricingPhase.periodValuePlural(res)
+                                            subscription.trialPricingPhase.periodValuePlural(res),
                                         )
                                         ProductAmountView(
                                             primaryText = primaryText,
                                             secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
                                             horizontalAlignment = Alignment.End,
-                                            emphasized = emphasized
+                                            emphasized = emphasized,
                                         )
                                     }
                                     null -> { /* show nothing */ }

@@ -17,7 +17,7 @@
 #
 # 4. Check the Compose and Accompanist versions are compatible.
 #    https://github.com/google/accompanist
-#    compose = Compose Version
+#    compose = Compose Version from compose-bom
 #    accompanist = Accompanist Version
 
 [versions]
@@ -27,20 +27,21 @@ accompanist = "0.30.1"
 android-application = "8.1.1"
 billing = "6.0.1"
 coil = "2.2.1"
-compose = "1.4.2"
+compose = "2023.04.01" # uses compose version 1.4.2, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
-compose-kotlin-compiler = "1.3.0"
+# Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
+compose-kotlin-compiler = "1.5.2"
 coroutines = "1.6.4"
 espresso = "3.4.0"
 firebase = "30.5.0"
 glide = "4.13.2"
 google-services = "4.3.14"
-hilt = "2.43.2"
-hilt-compiler = "1.0.0"
-horologist = "0.4.10"
-kotlin = "1.7.10"
+hilt = "2.49"
+hilt-compiler = "1.1.0"
+horologist = "0.4.17"
+kotlin = "1.9.0"
 kotlin-coroutines = "1.6.4"
-ksp = "1.7.10-1.0.6"
+ksp = "1.9.0-1.0.13"
 lifecycle = "2.6.0"
 lottie = "5.2.0"
 media3 = "1.0.0"
@@ -56,7 +57,7 @@ sentry = "6.28.0"
 sentry-plugin = "3.10.0"
 showkase = "1.0.2"
 test = "1.5.0"
-wear-compose = "1.2.0-beta02"
+wear-compose = "1.2.1"
 work = "2.8.1"
 
 [libraries]
@@ -77,17 +78,18 @@ coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 # Compose
-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
-compose-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
-compose-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2", version.ref = "compose" }
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
+compose-animation = { module = "androidx.compose.animation:animation" }
+compose-icons = { module = "androidx.compose.material:material-icons-extended" }
+compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
+compose-material = { module = "androidx.compose.material:material" }
+compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 compose-activity = "androidx.activity:activity-compose:1.5.1"
 compose-constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
@@ -246,7 +248,7 @@ browser = "androidx.browser:browser:1.4.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 car = "androidx.car.app:app:1.2.0"
 cardview = "androidx.cardview:cardview:1.0.0"
-cast = "com.google.android.gms:play-services-cast-framework:21.2.0"
+cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 core-ktx = "androidx.core:core-ktx:1.10.1"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
@@ -276,6 +278,7 @@ uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
 viewpager = "androidx.viewpager2:viewpager2:1.0.0"
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
 wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
+wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 [bundles]
 aboutlibraries = [
@@ -446,4 +449,4 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:2.0.3"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.2.2"
+spotless = "com.diffplug.spotless:6.23.3"

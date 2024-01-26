@@ -3,11 +3,13 @@
 
 // Generated files should ignore deprecation warnings
 @file:Suppress("DEPRECATION")
+
 package com.pocketcasts.service.api
 
 @kotlin.jvm.JvmName("-initializebookmarksResponse")
 public inline fun bookmarksResponse(block: com.pocketcasts.service.api.BookmarksResponseKt.Dsl.() -> kotlin.Unit): com.pocketcasts.service.api.BookmarksResponse =
     com.pocketcasts.service.api.BookmarksResponseKt.Dsl._create(com.pocketcasts.service.api.BookmarksResponse.newBuilder()).apply { block() }._build()
+
 /**
  * Protobuf type `api.BookmarksResponse`
  */
@@ -15,7 +17,7 @@ public object BookmarksResponseKt {
     @kotlin.OptIn(com.google.protobuf.kotlin.OnlyForUseByGeneratedProtoCode::class)
     @com.google.protobuf.kotlin.ProtoDslMarker
     public class Dsl private constructor(
-        private val _builder: com.pocketcasts.service.api.BookmarksResponse.Builder
+        private val _builder: com.pocketcasts.service.api.BookmarksResponse.Builder,
     ) {
         public companion object {
             @kotlin.jvm.JvmSynthetic
@@ -33,14 +35,16 @@ public object BookmarksResponseKt {
          */
         @kotlin.OptIn(com.google.protobuf.kotlin.OnlyForUseByGeneratedProtoCode::class)
         public class BookmarksProxy private constructor() : com.google.protobuf.kotlin.DslProxy()
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          */
         public val bookmarks: com.google.protobuf.kotlin.DslList<com.pocketcasts.service.api.BookmarkResponse, BookmarksProxy>
             @kotlin.jvm.JvmSynthetic
             get() = com.google.protobuf.kotlin.DslList(
-                _builder.getBookmarksList()
+                _builder.getBookmarksList(),
             )
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          * @param value The bookmarks to add.
@@ -50,6 +54,7 @@ public object BookmarksResponseKt {
         public fun com.google.protobuf.kotlin.DslList<com.pocketcasts.service.api.BookmarkResponse, BookmarksProxy>.add(value: com.pocketcasts.service.api.BookmarkResponse) {
             _builder.addBookmarks(value)
         }
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          * @param value The bookmarks to add.
@@ -60,6 +65,7 @@ public object BookmarksResponseKt {
         public inline operator fun com.google.protobuf.kotlin.DslList<com.pocketcasts.service.api.BookmarkResponse, BookmarksProxy>.plusAssign(value: com.pocketcasts.service.api.BookmarkResponse) {
             add(value)
         }
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          * @param values The bookmarks to add.
@@ -69,6 +75,7 @@ public object BookmarksResponseKt {
         public fun com.google.protobuf.kotlin.DslList<com.pocketcasts.service.api.BookmarkResponse, BookmarksProxy>.addAll(values: kotlin.collections.Iterable<com.pocketcasts.service.api.BookmarkResponse>) {
             _builder.addAllBookmarks(values)
         }
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          * @param values The bookmarks to add.
@@ -79,6 +86,7 @@ public object BookmarksResponseKt {
         public inline operator fun com.google.protobuf.kotlin.DslList<com.pocketcasts.service.api.BookmarkResponse, BookmarksProxy>.plusAssign(values: kotlin.collections.Iterable<com.pocketcasts.service.api.BookmarkResponse>) {
             addAll(values)
         }
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          * @param index The index to set the value at.
@@ -89,6 +97,7 @@ public object BookmarksResponseKt {
         public operator fun com.google.protobuf.kotlin.DslList<com.pocketcasts.service.api.BookmarkResponse, BookmarksProxy>.set(index: kotlin.Int, value: com.pocketcasts.service.api.BookmarkResponse) {
             _builder.setBookmarks(index, value)
         }
+
         /**
          * `repeated .api.BookmarkResponse bookmarks = 1;`
          */

@@ -143,8 +143,8 @@ object FirebaseAnalyticsTracker {
             "category_open",
             bundle = bundleOf(
                 "id" to categoryId,
-                "region" to region
-            )
+                "region" to region,
+            ),
         )
 
         logEvent("category_page_open_$categoryId")
@@ -195,8 +195,8 @@ object FirebaseAnalyticsTracker {
             Event.VIEW_PROMOTION,
             bundleOf(
                 Param.PROMOTION_ID to promotionId,
-                Param.PROMOTION_NAME to promotionName
-            )
+                Param.PROMOTION_NAME to promotionName,
+            ),
         )
     }
 
@@ -205,8 +205,8 @@ object FirebaseAnalyticsTracker {
             Event.SELECT_PROMOTION,
             bundleOf(
                 Param.PROMOTION_ID to promotionId,
-                Param.PROMOTION_NAME to promotionName
-            )
+                Param.PROMOTION_NAME to promotionName,
+            ),
         )
     }
 
@@ -215,8 +215,8 @@ object FirebaseAnalyticsTracker {
             "close_promotion",
             bundleOf(
                 Param.PROMOTION_ID to promotionId,
-                Param.PROMOTION_NAME to promotionName
-            )
+                Param.PROMOTION_NAME to promotionName,
+            ),
         )
     }
 
@@ -237,7 +237,7 @@ object FirebaseAnalyticsTracker {
             Param.ITEM_ID to sku,
             Param.ITEM_NAME to title,
             Param.PRICE to price,
-            Param.QUANTITY to 1
+            Param.QUANTITY to 1,
         )
         if (isFreeTrial) {
             plan.putString(Param.COUPON, "FREE TRIAL")
@@ -247,8 +247,8 @@ object FirebaseAnalyticsTracker {
             bundleOf(
                 Param.CURRENCY to currency,
                 Param.VALUE to price,
-                Param.ITEMS to arrayOf(plan)
-            )
+                Param.ITEMS to arrayOf(plan),
+            ),
         )
     }
 

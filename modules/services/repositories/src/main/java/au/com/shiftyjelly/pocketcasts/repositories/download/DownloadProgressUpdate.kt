@@ -11,7 +11,7 @@ data class DownloadProgressUpdate(
     var customMessage: String? = null,
     var downloadProgress: Float = 0f,
     var downloadedSoFar: Long = 0,
-    var totalToDownload: Long = 0
+    var totalToDownload: Long = 0,
 ) : Parcelable
 
 fun DownloadProgressUpdate.toData(): Data {
@@ -33,6 +33,6 @@ fun Data.toDownloadProgressUpdate(): DownloadProgressUpdate? {
         getString("customMessage"),
         getFloat("downloadProgress", 0f),
         getLong("downloadedSoFar", 0),
-        getLong("totalDownload", 0)
+        getLong("totalDownload", 0),
     )
 }
