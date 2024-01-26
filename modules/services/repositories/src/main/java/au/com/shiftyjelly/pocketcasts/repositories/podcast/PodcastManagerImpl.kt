@@ -117,6 +117,9 @@ class PodcastManagerImpl @Inject constructor(
         subscribeManager.subscribeOnQueue(podcastUuid, sync)
     }
 
+    override suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean): Podcast =
+        subscribeToPodcastSuspend(podcastUuid, sync)
+
     /**
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
      * Do this now rather than adding it to a queue.
@@ -647,7 +650,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
         if (show) {
-            settings.notifyRefreshPodcast.set(true)
+            settings.notifyRefreshPodcast.set(true, needsSync = false)
         }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }

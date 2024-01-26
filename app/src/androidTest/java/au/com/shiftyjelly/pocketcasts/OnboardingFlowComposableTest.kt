@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlowComposable
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingNavRoute
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -33,7 +34,7 @@ class OnboardingFlowComposableTest {
     fun setupAppNavHost(
         flow: OnboardingFlow,
         signInState: SignInState = mock(),
-        exitOnboarding: () -> Unit = {},
+        exitOnboarding: (OnboardingExitInfo) -> Unit = {},
         completeOnboardingToDiscover: () -> Unit = {},
     ) {
         composeTestRule.activity.setContent {

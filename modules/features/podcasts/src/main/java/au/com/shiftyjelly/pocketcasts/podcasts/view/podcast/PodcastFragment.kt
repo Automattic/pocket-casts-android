@@ -58,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
@@ -567,6 +568,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding.toolbar.let {
             it.inflateMenu(R.menu.podcast_menu)
             it.setOnMenuItemClickListener(this)
+
+            val reportMenuItem = it.menu.findItem(R.id.report)
+            reportMenuItem.isVisible = FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
+
             it.setNavigationOnClickListener {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
@@ -660,14 +665,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         binding?.setupMultiSelect()
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.multiSelectBookmarksHelper.showEditBookmarkPage
-                        .collect { show ->
-                            if (show) onEditBookmarkClick()
-                        }
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.multiSelectBookmarksHelper.showEditBookmarkPage
+                    .collect { show ->
+                        if (show) onEditBookmarkClick()
+                    }
             }
         }
     }
@@ -680,9 +683,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun FragmentPodcastBinding.setupMultiSelect() {
         viewModel.multiSelectEpisodesHelper.setUp(multiSelectEpisodesToolbar)
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            viewModel.multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
-        }
+        viewModel.multiSelectBookmarksHelper.setUp(multiSelectBookmarksToolbar)
     }
 
     fun <T> MultiSelectHelper<T>.setUp(multiSelectToolbar: MultiSelectToolbar) {
@@ -868,9 +869,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         itemTouchHelper = null
 
         viewModel.multiSelectEpisodesHelper.cleanup()
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            viewModel.multiSelectBookmarksHelper.cleanup()
-        }
+        viewModel.multiSelectBookmarksHelper.cleanup()
 
         super.onDestroyView()
 
@@ -895,6 +894,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.share -> share()
+            R.id.report -> {
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REPORT_TAPPED)
+                openUrl(settings.getReportViolationUrl())
+            }
         }
         return true
     }

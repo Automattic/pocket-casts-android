@@ -204,16 +204,19 @@ class PlayerViewModel @Inject constructor(
         if (list.isEmpty()) {
             ShelfItems.itemsList
         } else {
-            // Add missing bookmark item if the feature flag is enabled
             val updatedList = when {
-                list.contains(ShelfItem.Bookmark.id) -> list
-                FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) -> {
+                !list.contains(ShelfItem.Bookmark.id) -> {
                     list.toMutableList().apply {
                         add(list.size - 1, ShelfItem.Bookmark.id)
                     }
                 }
+                FeatureFlag.isEnabled(Feature.REPORT_VIOLATION) &&
+                    !list.contains(ShelfItem.Report.id) -> {
+                    list.toMutableList().apply { add(ShelfItem.Bookmark.id) }
+                }
                 else -> list
             }
+
             updatedList.mapNotNull { id ->
                 ShelfItems.itemForId(id)
             }
@@ -602,7 +605,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                settings.globalPlaybackEffects.set(effects)
+                settings.globalPlaybackEffects.set(effects, needsSync = false)
             }
             playbackManager.updatePlayerEffects(effects)
         }

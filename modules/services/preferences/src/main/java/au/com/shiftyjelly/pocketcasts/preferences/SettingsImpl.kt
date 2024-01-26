@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -63,6 +64,7 @@ class SettingsImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val moshi: Moshi,
+    private val bookmarkFeature: BookmarkFeatureControl,
 ) : Settings {
 
     companion object {
@@ -443,10 +445,10 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        deleteCloudFileAfterPlaying.set(false)
-        cloudAutoUpload.set(false)
-        cloudAutoDownload.set(false)
-        cloudDownloadOnlyOnWifi.set(false)
+        deleteCloudFileAfterPlaying.set(false, needsSync = false)
+        cloudAutoUpload.set(false, needsSync = false)
+        cloudAutoDownload.set(false, needsSync = false)
+        cloudDownloadOnlyOnWifi.set(false, needsSync = false)
         setCancelledAcknowledged(false)
     }
 
@@ -535,9 +537,9 @@ class SettingsImpl @Inject constructor(
         }
 
         override fun persist(value: PlaybackEffects, commit: Boolean) {
-            globalPlaybackSpeed.set(value.playbackSpeed)
-            globalAudioEffectRemoveSilence.set(value.trimMode)
-            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted)
+            globalPlaybackSpeed.set(value.playbackSpeed, needsSync = false)
+            globalAudioEffectRemoveSilence.set(value.trimMode, needsSync = false)
+            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted, needsSync = false)
         }
     }
 
@@ -808,7 +810,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val autoArchiveIncludeStarred = UserSetting.BoolPref(
+    override val autoArchiveIncludesStarred = UserSetting.BoolPref(
         sharedPrefKey = Settings.AUTO_ARCHIVE_INCLUDE_STARRED,
         defaultValue = false,
         sharedPrefs = sharedPreferences,
@@ -850,6 +852,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getEpisodeSearchDebounceMs(): Long {
         return getRemoteConfigLong(FirebaseConfig.EPISODE_SEARCH_DEBOUNCE_MS)
+    }
+
+    override fun getReportViolationUrl(): String {
+        return firebaseRemoteConfig.getString(FirebaseConfig.REPORT_VIOLATION_URL)
     }
 
     private fun getRemoteConfigLong(key: String): Long {
@@ -905,6 +911,7 @@ class SettingsImpl @Inject constructor(
         defaultAction = HeadphoneAction.SKIP_FORWARD,
         sharedPrefs = sharedPreferences,
         subscriptionStatusFlow = cachedSubscriptionStatus.flow,
+        bookmarkFeature = bookmarkFeature,
     )
 
     override val headphoneControlsPreviousAction = HeadphoneActionUserSetting(
@@ -912,6 +919,7 @@ class SettingsImpl @Inject constructor(
         defaultAction = HeadphoneAction.SKIP_BACK,
         sharedPrefs = sharedPreferences,
         subscriptionStatusFlow = cachedSubscriptionStatus.flow,
+        bookmarkFeature = bookmarkFeature,
     )
 
     override val headphoneControlsPlayBookmarkConfirmationSound = UserSetting.BoolPref(

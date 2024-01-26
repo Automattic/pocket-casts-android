@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.doOnLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -36,8 +36,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
@@ -65,6 +63,19 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     private val chaptersViewModel: ChaptersViewModel by activityViewModels()
     private var binding: FragmentPlayerContainerBinding? = null
 
+    val overrideTheme: Theme.ThemeType
+        get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
+
+    private val closeUpNextCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState in listOf(BottomSheetBehavior.STATE_COLLAPSED, BottomSheetBehavior.STATE_HIDDEN)) {
+                upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPlayerContainerBinding.inflate(inflater, container, false)
         return binding?.root
@@ -72,6 +83,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (activity as? FragmentHostListener)?.removePlayerBottomSheetCallback(closeUpNextCallback)
         binding = null
         bookmarksViewModel.multiSelectHelper.context = null
     }
@@ -84,20 +96,29 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         val binding = binding ?: return
 
+        // UpNext bottom sheet needs to be gone. Otherwise, dragging player bottom sheet doesn't work as
+        // the motion events are intercepted.
+        //
+        // However, we make it gone after it is laid out to speed up initial fling motion to show it.
+        // Having it gone from the beginning adds a small delay before it can be initially shown.
+        binding.upNextFrameBottomSheet.doOnLayout {
+            it.isGone = true
+            (activity as? FragmentHostListener)?.addPlayerBottomSheetCallback(closeUpNextCallback)
+        }
         upNextBottomSheetBehavior = BottomSheetBehavior.from(binding.upNextFrameBottomSheet)
         upNextBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                updateUpNextVisibility(newState != BottomSheetBehavior.STATE_COLLAPSED)
+
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
-                    upNextBottomSheetBehavior.setPeekHeight(0, false)
-                    updateUpNextVisibility(true)
 
                     activity?.let {
-                        theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(Theme.ThemeType.DARK))
-                        theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.primaryUi01(Theme.ThemeType.DARK), true), it)
+                        theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
+                        theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
                     }
 
                     upNextFragment.onExpanded()
@@ -105,7 +126,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
-                    updateUpNextVisibility(false)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
                     upNextFragment.onCollapsed()
@@ -119,9 +139,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             private var previousPosition: Int = INVALID_TAB_POSITION
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
-                if (state == SCROLL_STATE_IDLE) {
-                    (activity as? FragmentHostListener)?.updatePlayerView()
-                }
                 viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
             }
 
@@ -211,8 +228,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun openUpNext() {
-        val upNextFragment = UpNextFragment.newInstance(source = UpNextSource.PLAYER)
-        (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
+        updateUpNextVisibility(true)
+        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     fun onPlayerOpen() {
@@ -266,10 +283,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun updateUpNextVisibility(show: Boolean) {
-        val bottomSheet = binding?.upNextFrameBottomSheet
-        if (bottomSheet != null && bottomSheet.isVisible != show) {
-            bottomSheet.isVisible = show
-        }
+        binding?.upNextFrameBottomSheet?.isVisible = show
         (activity as? FragmentHostListener)?.lockPlayerBottomSheet(show)
     }
 
@@ -339,17 +353,11 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             newSections.add(Section.Chapters)
         }
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            newSections.add(Section.Bookmarks)
-        }
+        newSections.add(Section.Bookmarks)
 
         this.sections = newSections
 
-        if (hadNotes != hasNotes || hadChapters != hasChapters) {
-            return true
-        }
-
-        return false
+        return hadNotes != hasNotes || hadChapters != hasChapters
     }
 
     override fun getItemId(position: Int): Long {

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-20 16:54:03+0000
+Translation-Revision-Date: 2024-01-09 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">Wanneer deze instelling is ingeschakeld, veranderen de widgetkleuren op basis van de themakleuren van het apparaat.</string>
+    <string name="settings_use_dynamic_colors_widget">Dynamische kleuren gebruiken voor widgets</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Bladwijzer niet gevonden</string>
     <string name="settings_use_dark_up_next_details">Indien ingeschakeld gebruikt Hierna altijd het donkere thema en indien uitgeschakeld gebruikt het het huidige thema</string>
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
@@ -45,7 +48,6 @@ Language: nl
     <string name="podcast_submit_rating_no_internet">Geen internetverbinding gevonden. Maak verbinding met het internet om een beoordeling in te dienen.</string>
     <string name="podcast_rate">Tarief %s</string>
     <string name="submit">Verzenden</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Doe mee met de betatests voor bladwijzers!</string>
     <string name="whats_new_bookmarks_try_now_button">Probeer het nu</string>
     <string name="whats_new_bookmarks_title">De bladwijzers zijn er!</string>
     <string name="bookmarks_upsell_instructions_early_access">Krijg vroegtijdige toegang tot deze functie met Pocket Casts Patron en sla tijdstempels op van je favoriete afleveringen. Binnenkort beschikbaar voor Plus-abonnees.</string>
@@ -126,7 +128,6 @@ Language: nl
     <string name="player_sleep_add_1_minute">+ 1 minuut</string>
     <string name="player_sleep_1_minute">1 minuut</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra thema\'s en app-pictogrammen</string>
-    <string name="onboarding_plus_feature_watch_playback">Afspelen op horloge</string>
     <string name="onboarding_patron_feature_early_access_title">Vroegtijdige toegang tot functies</string>
     <string name="settings_continuous_playback_summary">Als je wachtrij Hierna leeg is, zullen we afleveringen afspelen van dezelfde podcast of uit dezelfde lijst waar je op dat moment naar aan het luisteren bent.</string>
     <string name="renew_your_subscription">Verleng je abonnement</string>
@@ -242,7 +243,6 @@ Language: nl
     <string name="settings_media_actions_customise">Media-acties aanpassen</string>
     <string name="settings_media_actions_prioritize_subtitle">Uw belangrijkste acties zullen beschikbaar zijn</string>
     <string name="settings_media_actions_prioritize_title">Uw aangepaste media-acties prioriteren</string>
-    <string name="plus_take_your_podcasting_to_next_level">Til je podcast-ervaring naar het volgende niveau met exclusieve toegang tot functies en aanpassingsmogelijkheden.</string>
     <string name="onboarding_recommendations_more">Meer %s</string>
     <string name="filter_id_or_title">Filter-ID of -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -335,11 +335,9 @@ Language: nl
     <string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB cloudopslag</string>
     <string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
-    <string name="onboarding_plus_feature_folders_title">Mappen</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappen</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Desktop-apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Ontgrendel alle functies</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Krijg toegang tot exclusieve functies en aanpassingsmogelijkheden</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop-apps</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
     <string name="onboarding_recommendations_import">Importeren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>
@@ -963,13 +961,9 @@ Language: nl
     <string name="plus_lifetime_member">Levenslang lid</string>
     <string name="plus_learn_more_button">Meer weten</string>
     <string name="plus_learn_more_about_plus">Bekijk meer informatie over Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Neem je podcasts altijd met je mee met onze apps voor Windows en macOS en de online apps.</string>
     <string name="plus_desktop_apps">Desktop-apps</string>
-    <string name="plus_description_title">Verbeterde functies voor geavanceerde luisteraars</string>
-    <string name="plus_description_body">Tegelijkertijd persoonlijk zijn en gedeeld worden. Upload je persoonlijke audiobestanden naar onze cloudservers, krijg toegang tot je account via onze online speler en pas de app naar je eigen voorkeuren aan.</string>
     <string name="plus_create_marketing_features"> Alles</string>
     <string name="plus_cloud_storage_limit">%dGB cloud-opslagruimte</string>
-    <string name="plus_cloud_storage_body">Versnel je lezingen. Haast je door andere content heen. Word je eigen podcast-DJ.</string>
     <string name="plus_cloud_storage">Opslag in de cloud</string>
     <string name="profile_expiry_date_unknown">Onbekend</string>
     <string name="profile_yearly">Jaarlijks</string>
@@ -977,7 +971,6 @@ Language: nl
     <string name="profile_welcome_to_plus">Welkom bij Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Welkom bij Pocket Casts!</string>
     <string name="profile_web_player">Online speler</string>
-    <string name="profile_upgrade_to_plus">Upgraden naar Plus</string>
     <string name="profile_updates_ends">Updates beëindigen: %s</string>
     <string name="profile_updates_ended">Updates beëindigd: %s</string>
     <string name="profile_time_free">%s gratis</string>

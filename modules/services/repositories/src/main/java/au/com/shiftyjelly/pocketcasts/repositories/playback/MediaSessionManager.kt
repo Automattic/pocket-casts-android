@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -71,6 +72,7 @@ class MediaSessionManager(
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
+    val bookmarkFeature: BookmarkFeatureControl,
     applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
@@ -142,6 +144,7 @@ class MediaSessionManager(
             playbackManager,
             bookmarkManager,
             settings,
+            bookmarkFeature,
         )
 
         connect()
@@ -646,7 +649,7 @@ class MediaSessionManager(
                         playbackManager.playNowSuspend(episode = episode, sourceView = source)
                     }
                     LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
-                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
+                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList, needsSync = false)
                     }
                 }
             }
@@ -752,7 +755,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects)
+            settings.globalPlaybackEffects.set(effects, needsSync = false)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

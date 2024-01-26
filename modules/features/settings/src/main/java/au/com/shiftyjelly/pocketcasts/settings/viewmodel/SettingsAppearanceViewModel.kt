@@ -16,8 +16,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -73,18 +71,8 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     fun loadThemesAndIcons() {
         createAccountState.postValue(SettingsAppearanceState.ThemesAndIconsLoading)
-        val appIcons = if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            appIcon.allAppIconTypes.toList()
-        } else {
-            appIcon.allAppIconTypes.toList().filterNot {
-                it in listOf(
-                    AppIcon.AppIconType.PATRON_CHROME,
-                    AppIcon.AppIconType.PATRON_ROUND,
-                    AppIcon.AppIconType.PATRON_GLOW,
-                    AppIcon.AppIconType.PATRON_DARK,
-                )
-            }
-        }
+        val appIcons = appIcon.allAppIconTypes.toList()
+
         createAccountState.postValue(
             SettingsAppearanceState.ThemesAndIconsLoaded(
                 theme.activeTheme,
@@ -127,7 +115,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUpNextDarkTheme(value: Boolean) {
-        settings.useDarkUpNextTheme.set(value)
+        settings.useDarkUpNextTheme.set(value, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
             mapOf("enabled" to value),
@@ -135,7 +123,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateWidgetForDynamicColors(value: Boolean) {
-        settings.useDynamicColorsForWidget.set(value)
+        settings.useDynamicColorsForWidget.set(value, needsSync = false)
         viewModelScope.launch(Dispatchers.IO) {
             widgetManager.updateWidgetFromSettings(playbackManager)
         }
@@ -146,7 +134,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
-        settings.showArtworkOnLockScreen.set(value)
+        settings.showArtworkOnLockScreen.set(value, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
             mapOf("enabled" to value),
@@ -154,7 +142,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEmbeddedArtwork(value: Boolean) {
-        settings.useEmbeddedArtwork.set(value)
+        settings.useEmbeddedArtwork.set(value, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

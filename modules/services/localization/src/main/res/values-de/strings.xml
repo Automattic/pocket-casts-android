@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-20 11:54:04+0000
+Translation-Revision-Date: 2024-01-09 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">Nach dem Aktivieren ändern sich die Farben des Widgets basierend auf den Theme-Farben des Geräts.</string>
+    <string name="settings_use_dynamic_colors_widget">Dynamische Farben für das Widget verwenden</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Lesezeichen nicht gefunden</string>
     <string name="settings_use_dark_up_next_details">Wenn das dunkle Theme aktiviert ist, wird es in „Up Next“ immer verwendet. Wenn es deaktiviert ist, wird „Up Next“ an das aktuelle Theme angepasst</string>
     <string name="settings_use_dark_up_next">Dunkles „Up Next“-Theme verwenden</string>
@@ -45,7 +48,6 @@ Language: de
     <string name="podcast_submit_rating_no_internet">Keine Internetverbindung gefunden. Bitte stelle eine Internetverbindung her, um eine Bewertung abzugeben.</string>
     <string name="podcast_rate">%s bewerten</string>
     <string name="submit">Übermitteln</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Sei beim Testen der Beta-Version der Lesezeichen dabei!</string>
     <string name="whats_new_bookmarks_try_now_button">Jetzt testen</string>
     <string name="whats_new_bookmarks_title">Die Lesezeichen sind da!</string>
     <string name="bookmarks_upsell_instructions_early_access">Profitiere mit Pocket Casts Patron von frühzeitigem Zugriff auf diese Funktion und speichere Zeitstempel für deine Lieblingsfolgen. Bald für Plus-Abonnenten verfügbar.</string>
@@ -126,7 +128,6 @@ Language: de
     <string name="player_sleep_add_1_minute">+ 1 Minute</string>
     <string name="player_sleep_1_minute">1 Minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Zusätzliche Themes und App-Icons</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch-Wiedergabe</string>
     <string name="onboarding_patron_feature_early_access_title">Frühzeitiger Zugriff auf Funktionen</string>
     <string name="settings_continuous_playback_summary">Wenn deine Warteschlange leer ist, spielen wir Folgen aus dem Podcast oder der Liste, die du dir gerade anhörst.</string>
     <string name="renew_your_subscription">Abonnement verlängern</string>
@@ -242,7 +243,6 @@ Language: de
     <string name="settings_media_actions_customise">Medienaktionen anpassen</string>
     <string name="settings_media_actions_prioritize_subtitle">Deine häufigsten Aktionen werden verfügbar sein.</string>
     <string name="settings_media_actions_prioritize_title">Deine individuellen Medienaktionen priorisieren</string>
-    <string name="plus_take_your_podcasting_to_next_level">Bringe dein Podcast-Erlebnis auf die nächste Ebene mit exklusivem Zugriff auf Funktionen und Anpassungsoptionen.</string>
     <string name="onboarding_recommendations_more">Mehr %s</string>
     <string name="filter_id_or_title">Filter-ID oder -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -335,11 +335,9 @@ Language: de
     <string name="onboarding_plus_feature_cloud_storage_text">Lade deine Dateien in den Cloud-Speicher. Dann kannst du von überall aus darauf zugreifen.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB Cloud-Speicher</string>
     <string name="onboarding_plus_feature_folders_text">Verwalte deine Podcasts in Ordnern und halte sie auf all deinen Geräten synchron.</string>
-    <string name="onboarding_plus_feature_folders_title">Ordner</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Ordner</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Mit unseren Windows-, macOS- und Web-Apps kannst du deine Inhalte auf beliebigen Geräten anhören.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Desktop-Apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Alle Funktionen nutzen</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Erhalte Zugriff auf exklusive Funktionen und Anpassungsoptionen</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop-Apps</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
     <string name="onboarding_recommendations_import">Importieren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Wähle deine Lieblings-Podcasts aus oder importiere sie aus einem anderen Podcast Player und gestalte Pocket Casts ganz individuell. Das kannst du auch jederzeit später erledigen.</string>
@@ -963,13 +961,9 @@ Language: de
     <string name="plus_lifetime_member">Lebenslange Mitgliedschaft</string>
     <string name="plus_learn_more_button">Weitere Informationen</string>
     <string name="plus_learn_more_about_plus">Weitere Informationen zu Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Mit unseren Windows-, macOS- und Web-Apps hast du deine Podcasts immer parat.</string>
     <string name="plus_desktop_apps">Desktop-Apps</string>
-    <string name="plus_description_title">Erweiterte Funktionen für Vielhörer</string>
-    <string name="plus_description_body">Persönlich und überall verfügbar: Lade deine persönlichen Audiodateien auf unsere Cloudserver hoch, greife über unseren Webplayer auf dein Konto zu und passe die App ganz an deine Bedürfnisse an.</string>
     <string name="plus_create_marketing_features"> Alles</string>
     <string name="plus_cloud_storage_limit">%d GB Cloud-Speicher</string>
-    <string name="plus_cloud_storage_body">Verkürze deine Wiedergaben und hör dir schneller noch mehr an. Stelle deine Podcasts selbst zusammen.</string>
     <string name="plus_cloud_storage">Cloud-Speicher</string>
     <string name="profile_expiry_date_unknown">Unbekannt</string>
     <string name="profile_yearly">Jährlich</string>
@@ -977,7 +971,6 @@ Language: de
     <string name="profile_welcome_to_plus">Willkommen bei Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Willkommen bei Pocket Casts!</string>
     <string name="profile_web_player">Webplayer</string>
-    <string name="profile_upgrade_to_plus">Upgrade auf Plus</string>
     <string name="profile_updates_ends">Aktualisierungen enden: %s</string>
     <string name="profile_updates_ended">Aktualisierungen beendet: %s</string>
     <string name="profile_time_free">%s frei</string>

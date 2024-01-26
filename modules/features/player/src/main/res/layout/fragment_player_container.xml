@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<au.com.shiftyjelly.pocketcasts.player.helper.NestedCoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -102,15 +102,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="8dp"
-        app:behavior_peekHeight="0dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        android:clickable="true"
         android:translationZ="200dp"
-        android:visibility="gone" />
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
 
     <au.com.shiftyjelly.pocketcasts.views.tour.TourView
         android:id="@+id/tourView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</au.com.shiftyjelly.pocketcasts.player.helper.NestedCoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

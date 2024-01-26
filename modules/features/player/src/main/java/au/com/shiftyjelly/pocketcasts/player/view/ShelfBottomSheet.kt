@@ -17,11 +17,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
@@ -40,6 +43,8 @@ class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
 
     @Inject lateinit var playbackManager: PlaybackManager
+
+    @Inject lateinit var settings: Settings
 
     override val statusBarColor: StatusBarColor? = null
 
@@ -166,10 +171,13 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
             }
             is ShelfItem.Bookmark -> {
-                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick()
+                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick(OnboardingUpgradeSource.OVERFLOW_MENU)
             }
             ShelfItem.Download -> {
                 Timber.e("Unexpected click on ShelfItem.Download")
+            }
+            is ShelfItem.Report -> {
+                openUrl(settings.getReportViolationUrl())
             }
         }
         analyticsTracker.track(

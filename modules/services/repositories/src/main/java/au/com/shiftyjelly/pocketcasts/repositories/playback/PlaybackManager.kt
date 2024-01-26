@@ -62,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -123,6 +124,7 @@ open class PlaybackManager @Inject constructor(
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
+    bookmarkFeature: BookmarkFeatureControl,
     private val playbackManagerNetworkWatcher: PlaybackManagerNetworkWatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
@@ -197,7 +199,8 @@ open class PlaybackManager @Inject constructor(
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
-    )
+        bookmarkFeature = bookmarkFeature,
+        )
     var sleepAfterEpisode: Boolean = false
 
     var player: Player? = null
@@ -388,10 +391,10 @@ open class PlaybackManager @Inject constructor(
 
     private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
         settings.warnOnMeteredNetwork.value &&
-            lastWarnedPlayedEpisodeUuid != episodeUUID &&
-            (player is LocalPlayer) && // don't warn if chromecasting
-            isStreaming() &&
-            isPlaying()
+                lastWarnedPlayedEpisodeUuid != episodeUUID &&
+                (player is LocalPlayer) && // don't warn if chromecasting
+                isStreaming() &&
+                isPlaying()
 
     fun getPlaybackSpeed(): Double {
         return playbackStateRelay.blockingFirst().playbackSpeed
@@ -1554,10 +1557,10 @@ open class PlaybackManager @Inject constructor(
             playbackOnDevice
         } else {
             episode.isDownloaded &&
-                playbackOnDevice &&
-                episode.downloadedFilePath != null &&
-                player != null &&
-                episode.downloadedFilePath != player?.filePath
+                    playbackOnDevice &&
+                    episode.downloadedFilePath != null &&
+                    player != null &&
+                    episode.downloadedFilePath != player?.filePath
         }
 
         // if the player has a different media file path then it is changing

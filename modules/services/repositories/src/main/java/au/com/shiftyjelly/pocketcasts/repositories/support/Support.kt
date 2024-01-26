@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jaredrummler.android.device.DeviceName
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -109,7 +107,7 @@ class Support @Inject constructor(
                         out.close()
 
                         val fileUri =
-                            FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                            FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                         intent.putExtra(
                             Intent.EXTRA_TEXT,
@@ -158,7 +156,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
             } catch (e: Exception) {
                 Timber.e(e)
@@ -188,7 +186,7 @@ class Support @Inject constructor(
 
                 debugFile.writeBytes(logBytes)
                 val fileUri =
-                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri)
                 intent.putExtra(
                     Intent.EXTRA_TEXT,
@@ -214,14 +212,10 @@ class Support @Inject constructor(
     }
 
     private fun getAccountType(isPaid: Boolean) = if (isPaid) {
-        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-            when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
-                SubscriptionTier.PATRON -> "Patron Account"
-                SubscriptionTier.PLUS -> "Plus Account"
-                SubscriptionTier.NONE -> ""
-            }
-        } else {
-            "Plus Account"
+        when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
+            SubscriptionTier.PATRON -> "Patron Account"
+            SubscriptionTier.PLUS -> "Plus Account"
+            SubscriptionTier.NONE -> ""
         }
     } else {
         ""
@@ -317,7 +311,7 @@ class Support @Inject constructor(
             output.append("Auto archive settings").append(eol)
             output.append("Auto archive played episodes after: ${settings.autoArchiveAfterPlaying.value.analyticsValue}").append(eol)
             output.append("Auto archive inactive episodes after: ${settings.autoArchiveInactive.value.analyticsValue}").append(eol)
-            output.append("Auto archive starred episodes: ${settings.autoArchiveIncludeStarred.value}").append(eol)
+            output.append("Auto archive starred episodes: ${settings.autoArchiveIncludesStarred.value}").append(eol)
 
             output.append(eol)
             output.append("Auto downloads").append(eol)
@@ -386,9 +380,9 @@ class Support @Inject constructor(
             }
             output.append("Database: " + Util.formattedBytes(context.getDatabasePath("pocketcasts").length(), context = context)).append(eol)
             try {
-                output.append("Temp directory: " + Util.formattedBytes(FileUtil.folderSize(fileStorage.getOrCreateEpisodesTempDir()), context)).append(eol)
-                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getOrCreateEpisodesDir()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
-                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getOrCreateNetworkImagesDir()?.let(FileUtil::folderSize) ?: 0, context)).append(eol)
+                output.append("Temp directory: " + Util.formattedBytes(FileUtil.dirSize(fileStorage.getOrCreateEpisodesTempDir()), context)).append(eol)
+                output.append("Podcast directory: " + Util.formattedBytes(fileStorage.getOrCreateEpisodesDir()?.let(FileUtil::dirSize) ?: 0, context)).append(eol)
+                output.append("Network image directory: " + Util.formattedBytes(fileStorage.getOrCreateNetworkImagesDir()?.let(FileUtil::dirSize) ?: 0, context)).append(eol)
             } catch (e: Exception) {
                 Timber.e(e)
             }

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-19 10:54:03+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">활성화하면 위젯 색상이 기기 테마 색상에 따라 변경됩니다.</string>
+    <string name="settings_use_dynamic_colors_widget">위젯에 동적 색상 사용</string>
+    <string name="widget">위젯</string>
     <string name="bookmark_not_found">북마크를 찾을 수 없음</string>
     <string name="settings_use_dark_up_next_details">활성화되면 다음 에피소드에 항상 어두운 테마를 사용하고 비활성화되면 현재와 일치하는 테마를 사용합니다.</string>
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
@@ -45,7 +48,6 @@ Language: ko_KR
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
     <string name="podcast_rate">%s 평가</string>
     <string name="submit">제출</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">북마크에 대한 베타 테스트에 참여하세요!</string>
     <string name="whats_new_bookmarks_try_now_button">지금 시도</string>
     <string name="whats_new_bookmarks_title">북마크는 여기 있습니다!</string>
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>
@@ -126,7 +128,6 @@ Language: ko_KR
     <string name="player_sleep_add_1_minute">1분</string>
     <string name="player_sleep_1_minute">1분</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">추가 테마 및 앱 아이콘</string>
-    <string name="onboarding_plus_feature_watch_playback">시계 재생</string>
     <string name="onboarding_patron_feature_early_access_title">기능 조기 접근</string>
     <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
     <string name="renew_your_subscription">구독 갱신</string>
@@ -242,7 +243,6 @@ Language: ko_KR
     <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
     <string name="settings_media_actions_prioritize_subtitle">상위 작업이 제공됩니다.</string>
     <string name="settings_media_actions_prioritize_title">사용자 정의 미디어 작업 우선순위 지정</string>
-    <string name="plus_take_your_podcasting_to_next_level">기능과 사용자 정의 옵션에 접근하는 독점 권한으로 팟캐스팅 환경의 수준을 높이세요.</string>
     <string name="onboarding_recommendations_more">%s 추가</string>
     <string name="filter_id_or_title">필터 ID 또는 제목</string>
     <string name="filter_title">필터 제목</string>
@@ -335,11 +335,9 @@ Language: ko_KR
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 20GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
-    <string name="onboarding_plus_feature_folders_title">폴더</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">데스크톱 앱</string>
-    <string name="onboarding_upgrade_unlock_all_features">모든 기능 잠금 해제</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">독점 기능 및 사용자 정의 옵션 접근 권한 받기</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">데스크톱 앱</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
@@ -963,13 +961,9 @@ Language: ko_KR
     <string name="plus_lifetime_member">평생회원</string>
     <string name="plus_learn_more_button">더 알아보기</string>
     <string name="plus_learn_more_about_plus">Pocket Casts Plus 더 알아보기</string>
-    <string name="plus_desktop_apps_body">Windows, macOS 및 웹 앱을 통해 팟캐스트를 더 많은 곳으로 가져가세요.</string>
     <string name="plus_desktop_apps">데스크톱 앱</string>
-    <string name="plus_description_title">고급 청취자를 위한 향상된 기능</string>
-    <string name="plus_description_body">한꺼번에 개인화하고 배포하세요. 개인 오디오 파일을 클라우드 서버에 업로드하고, 웹 플레이어를 통해 계정에 접근하고, 앱을 나만의 것으로 만드세요.</string>
     <string name="plus_create_marketing_features"> 모든 것</string>
     <string name="plus_cloud_storage_limit">클라우드 저장 공간 %dGB</string>
-    <string name="plus_cloud_storage_body">강의 속도를 높이세요. 다른 콘텐츠를 압도하세요. 고유한 팟캐스트 DJ가 되세요.</string>
     <string name="plus_cloud_storage">클라우드 저장 공간</string>
     <string name="profile_expiry_date_unknown">알 수 없음</string>
     <string name="profile_yearly">매년</string>
@@ -977,7 +971,6 @@ Language: ko_KR
     <string name="profile_welcome_to_plus">Pocket Casts Plus에 오신 것을 환영합니다!</string>
     <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="profile_web_player">웹 플레이어</string>
-    <string name="profile_upgrade_to_plus">Plus로 업그레이드</string>
     <string name="profile_updates_ends">업데이트 종료: %s</string>
     <string name="profile_updates_ended">업데이트 종료됨: %s</string>
     <string name="profile_time_free">%s 무료</string>

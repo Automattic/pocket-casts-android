@@ -19,7 +19,8 @@ import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
 import java.net.HttpURLConnection
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -50,7 +51,6 @@ class PodcastSyncProcessTest {
     private lateinit var retrofit: Retrofit
     private lateinit var okhttpCache: Cache
     private lateinit var appDatabase: AppDatabase
-    private val featureFlagWrapper: FeatureFlagWrapper = mock()
 
     @Before
     fun setUp() {
@@ -61,8 +61,17 @@ class PodcastSyncProcessTest {
 
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
-        whenever(featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) doReturn true
-        val moshi = ServersModule.provideMoshiBuilder(featureFlagWrapper).build()
+        FeatureFlag.initialize(
+            listOf(object : FeatureProvider {
+                override val priority = 0
+
+                override fun hasFeature(feature: Feature) = feature == Feature.SETTINGS_SYNC
+
+                override fun isEnabled(feature: Feature) = false
+            }),
+        )
+
+        val moshi = ServersModule.provideMoshiBuilder().build()
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
         okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context)
@@ -140,6 +149,7 @@ class PodcastSyncProcessTest {
 
             val syncProcess = PodcastSyncProcess(
                 context = context,
+                applicationScope = CoroutineScope(Dispatchers.Default),
                 settings = settings,
                 episodeManager = episodeManager,
                 podcastManager = podcastManager,
@@ -153,8 +163,6 @@ class PodcastSyncProcessTest {
                 subscriptionManager = mock(),
                 folderManager = folderManager,
                 syncManager = syncManager,
-                featureFlagWrapper = featureFlagWrapper,
-                applicationScope = CoroutineScope(Dispatchers.Default),
             )
 
             val response = MockResponse()

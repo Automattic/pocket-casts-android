@@ -98,6 +98,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     fun onClickSubscribe(
         activity: Activity,
         flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
     ) {
         (state.value as? Loaded)?.let { loadedState ->
@@ -106,7 +107,11 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
 
             analyticsTracker.track(
                 AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                mapOf(flowKey to flow.analyticsValue, selectedSubscriptionKey to subscription.productDetails.productId),
+                mapOf(
+                    flowKey to flow.analyticsValue,
+                    sourceKey to source.analyticsValue,
+                    selectedSubscriptionKey to subscription.productDetails.productId,
+                ),
             )
 
             viewModelScope.launch {
@@ -163,23 +168,36 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
         }
     }
 
-    fun onSelectPaymentFrequencyShown(flow: OnboardingFlow) {
+    fun onSelectPaymentFrequencyShown(
+        flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN,
-            mapOf(flowKey to flow.analyticsValue),
+            mapOf(
+                flowKey to flow.analyticsValue,
+                sourceKey to source.analyticsValue,
+            ),
         )
     }
 
-    fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow) {
+    fun onSelectPaymentFrequencyDismissed(
+        flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED,
-            mapOf(flowKey to flow.analyticsValue),
+            mapOf(
+                flowKey to flow.analyticsValue,
+                sourceKey to source.analyticsValue,
+            ),
         )
     }
 
     companion object {
         const val flowKey = "flow"
         const val selectedSubscriptionKey = "product"
+        const val sourceKey = "source"
     }
 }
 

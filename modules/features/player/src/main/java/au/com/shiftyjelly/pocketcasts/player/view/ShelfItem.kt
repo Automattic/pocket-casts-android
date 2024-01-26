@@ -22,10 +22,11 @@ object ShelfItems {
         add(ShelfItem.Podcast)
         add(ShelfItem.Cast)
         add(ShelfItem.Played)
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            add(ShelfItem.Bookmark)
-        }
+        add(ShelfItem.Bookmark)
         add(ShelfItem.Archive)
+        if (FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)) {
+            add(ShelfItem.Report)
+        }
     }
     private val items = itemsList.associateBy { it.id }
 
@@ -148,5 +149,14 @@ sealed class ShelfItem(
         shownWhen = Shown.Always,
         tier = SubscriptionTier.NONE,
         analyticsValue = "download",
+    )
+
+    object Report : ShelfItem(
+        id = "report",
+        title = { LR.string.report },
+        subtitle = LR.string.report_subtitle,
+        iconRes = { IR.drawable.ic_flag },
+        shownWhen = Shown.Always,
+        analyticsValue = "report",
     )
 }

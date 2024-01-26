@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download.task
 
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.os.Build
 import android.system.ErrnoException
 import android.system.OsConstants
 import android.util.Log
@@ -187,7 +189,15 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val notification = downloadManager.getNotificationBuilder()
             .build()
 
-        return ForegroundInfo(NotificationId.DOWNLOADING.value, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NotificationId.DOWNLOADING.value,
+                notification,
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+            )
+        } else {
+            ForegroundInfo(NotificationId.DOWNLOADING.value, notification)
+        }
     }
 
     private fun markAsRetry(e: Exception? = null) {
@@ -429,7 +439,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     tempDownloadMetaDataFile.delete() // at this point we have the file, don't need the metadata about it anymore
                     val fullDownloadFile = File(pathToSaveTo)
                     try {
-                        FileUtil.copyFile(tempDownloadFile, fullDownloadFile)
+                        FileUtil.copy(tempDownloadFile, fullDownloadFile)
                     } catch (exception: IOException) {
                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, exception, "Could not move download temp ${tempDownloadFile.path} to $pathToSaveTo. SavePathFileExists: ${fullDownloadFile.exists()}")
 

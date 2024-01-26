@@ -18,13 +18,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UploadProgressManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toUploadData
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
+import au.com.shiftyjelly.pocketcasts.servers.sync.ChangedNamedSettingsRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.ChangedNamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
-import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastListResponse
@@ -41,9 +42,10 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -345,12 +347,19 @@ class SyncManagerImpl @Inject constructor(
 
 // Sync
 
-    override fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse> =
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
+    override fun syncUpdate(data: String, lastModified: String): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> =
         getEmail()?.let { email ->
             getCacheTokenOrLoginRxSingle { token ->
+                @Suppress("DEPRECATION")
                 syncServerManager.syncUpdate(email, data, lastModified, token)
             }
         } ?: Single.error(Exception("Not logged in"))
+
+    override suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse =
+        getCacheTokenOrLogin { token ->
+            syncServerManager.userSyncUpdate(token, request)
+        }
 
     override fun getLastSyncAt(): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->
@@ -395,9 +404,17 @@ class SyncManagerImpl @Inject constructor(
             syncServerManager.loadStats(token)
         }
 
-    override suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse =
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
+    override suspend fun namedSettings(
+        request: au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest,
+    ): NamedSettingsResponse = getCacheTokenOrLogin { token ->
+        syncServerManager.namedSettings(request, token)
+    }
+
+    override suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest): ChangedNamedSettingsResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.namedSettings(request, token)
+            syncServerManager.changedNamedSettings(request, token)
         }
 
     override fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse> =

@@ -32,7 +32,7 @@
             android:minHeight="?android:attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:navigationIcon="@drawable/ic_arrow_back_24dp"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:popupTheme="@style/LightPopupTheme" />
 
         <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
             android:id="@+id/multiSelectEpisodesToolbar"

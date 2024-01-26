@@ -2,28 +2,39 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class UserSetting<T>(
-    protected val sharedPrefKey: String,
+    val sharedPrefKey: String,
     protected val sharedPrefs: SharedPreferences,
 ) {
 
-    private val needsSyncKey = "${sharedPrefKey}NeedsSync"
+    private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
-    var needsSync: Boolean
-        get() = sharedPrefs.getBoolean(needsSyncKey, false)
-        set(value) {
-            sharedPrefs.edit().run {
-                putBoolean(needsSyncKey, value)
-                apply()
-            }
-        }
+    private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
+
+    fun getModifiedAt(): Instant? = tryOrNull {
+        getModifiedAtServerString()?.let { Instant.parse(it) }
+    }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
+    fun <U> getSyncSetting(f: (T, String) -> U): U? {
+        val modifiedAtServerString = getModifiedAtServerString()
+        // Only need to sync if modifiedAtServerString is not null
+        return if (modifiedAtServerString != null) {
+            f(value, modifiedAtServerString)
+        } else {
+            null
+        }
+    }
+
+    // Returns the value to sync if sync is needed. Returns null if sync is not needed.
+    @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
     fun getSyncValue(): T? {
-        val needsSync = sharedPrefs.getBoolean(needsSyncKey, false)
+        val needsSync = getModifiedAtServerString() != null
         return if (needsSync) value else null
     }
 
@@ -43,14 +54,27 @@ abstract class UserSetting<T>(
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
+    open fun set(value: T, commit: Boolean = false, needsSync: Boolean) {
         persist(value, commit)
         _flow.value = value
+        val modifiedAt = if (needsSync) Instant.now().toString() else null
+        updateModifiedAtServerString(modifiedAt)
+    }
 
-        // Since this parameter is defaulted to false, let's not let the default overwrite
-        // a previous request to sync.
-        if (needsSync) {
-            this.needsSync = true
+    // A null parameter reflects a setting that does not need to be synced
+    private fun updateModifiedAtServerString(modifiedAt: String?) {
+        if (modifiedAt != null) {
+            val parsable = tryOrNull { Instant.parse(modifiedAt) } != null
+            if (!parsable) {
+                // Only persist the string if it is parsable
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot set invalid modified at server string: $modifiedAt")
+                return
+            }
+        }
+
+        sharedPrefs.edit().run {
+            putString(modifiedAtKey, modifiedAt)
+            apply()
         }
     }
 
@@ -266,5 +290,13 @@ abstract class UserSetting<T>(
     ) {
         override fun get(): T = initialValue
         override fun persist(value: T, commit: Boolean) {}
+        override fun set(value: T, commit: Boolean, needsSync: Boolean) {}
     }
 }
+
+private inline fun <T> tryOrNull(f: () -> T): T? =
+    try {
+        f()
+    } catch (e: Exception) {
+        null
+    }

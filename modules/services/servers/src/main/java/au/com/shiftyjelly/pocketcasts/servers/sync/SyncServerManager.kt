@@ -24,8 +24,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -116,10 +117,16 @@ open class SyncServerManager @Inject constructor(
     fun validatePromoCode(code: String): Single<PromoCodeResponse> =
         server.validatePromoCode(PromoCodeRequest(code))
 
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse =
         server.namedSettings(addBearer(token), request)
 
-    fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<SyncUpdateResponse> {
+    suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest, token: AccessToken): ChangedNamedSettingsResponse =
+        server.namedSettings(addBearer(token), request)
+
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
+    fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> {
         val fields = mutableMapOf(
             "email" to email,
             "token" to token.value,
@@ -128,8 +135,16 @@ open class SyncServerManager @Inject constructor(
             "last_modified" to lastModified,
         )
         addDeviceFields(fields)
+
+        @Suppress("DEPRECATION")
         return server.syncUpdate(fields)
     }
+
+    suspend fun userSyncUpdate(
+        token: AccessToken,
+        request: SyncUpdateRequest,
+    ): SyncUpdateResponse =
+        server.userSyncUpdate(addBearer(token), request)
 
     fun upNextSync(request: UpNextSyncRequest, token: AccessToken): Single<UpNextSyncResponse> =
         server.upNextSync(addBearer(token), request)

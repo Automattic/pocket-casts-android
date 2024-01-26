@@ -1,9 +1,24 @@
-7.56
+7.57
 -----
 
 *   Updates:
     *   Warn when switching to metered network if warn before using data setting is enabled
         ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
+*   Bug Fixes:
+    *   Fixed starring episode from full-screen player does not prevent episode from being archived
+        ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
+
+7.56
+-----
+
+*   Updates:
+    *   Use fling motion instead of scroll motion to open UpNext bottom sheet
+        ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
+*   Bug Fixes:
+    *   Fixed incorrect podcast loading below the correct one on opening native podcast share url
+        ([#1696](https://github.com/Automattic/pocket-casts-android/pull/1696))
+    *   Fixed an issue where navigation and status bar could sometimes use incorrect theming with Up Next screen.
+        ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
 
 7.55
 -----
@@ -11,7 +26,6 @@
 *   Updates:
     *   Save selected tab on Player screen after screen rotation
         ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
-
 *   Bug Fixes:
     *   Improve handling of user files on watch
         ([#1638](https://github.com/Automattic/pocket-casts-android/pull/1638))

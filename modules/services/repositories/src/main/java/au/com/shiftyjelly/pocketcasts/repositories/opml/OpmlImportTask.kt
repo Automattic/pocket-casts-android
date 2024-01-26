@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.opml
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
@@ -270,7 +272,15 @@ class OpmlImportTask @AssistedInject constructor(
      * Keep the job in the foreground with a notification
      */
     private fun createForegroundInfo(progress: Int, total: Int): ForegroundInfo {
-        return ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                Settings.NotificationId.OPML.value,
+                buildNotification(progress, total),
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+            )
+        } else {
+            ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
+        }
     }
 
     private fun updateNotification(initialDatabaseCount: Int, podcastCount: Int) {
