@@ -24,40 +24,44 @@ class AppLifecycleObserver constructor(
     @ApplicationContext private val appContext: Context,
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val appLifecycleOwner: LifecycleOwner = ProcessLifecycleOwner.get(),
-    private val preferencesFeatureProvider: PreferencesFeatureProvider,
+    private val applicationScope: CoroutineScope,
     private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
     private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
+    private val networkConnectionWatcher: NetworkConnectionWatcherImpl,
     private val packageUtil: PackageUtil,
+    private val preferencesFeatureProvider: PreferencesFeatureProvider,
     private val settings: Settings,
-    private val applicationScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     @Inject
     constructor(
         @ApplicationContext appContext: Context,
+        @ApplicationScope applicationScope: CoroutineScope,
         appLifecycleAnalytics: AppLifecycleAnalytics,
-        preferencesFeatureProvider: PreferencesFeatureProvider,
         defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
+        networkConnectionWatcher: NetworkConnectionWatcherImpl,
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
         packageUtil: PackageUtil,
+        preferencesFeatureProvider: PreferencesFeatureProvider,
         settings: Settings,
-        @ApplicationScope applicationScope: CoroutineScope,
     ) : this(
         appContext = appContext,
+        applicationScope = applicationScope,
         appLifecycleAnalytics = appLifecycleAnalytics,
         appLifecycleOwner = ProcessLifecycleOwner.get(),
-        preferencesFeatureProvider = preferencesFeatureProvider,
         defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
         firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
+        networkConnectionWatcher = networkConnectionWatcher,
         packageUtil = packageUtil,
+        preferencesFeatureProvider = preferencesFeatureProvider,
         settings = settings,
-        applicationScope = applicationScope,
     )
 
     fun setup() {
         appLifecycleOwner.lifecycle.addObserver(this)
         handleNewInstallOrUpgrade()
         setupFeatureFlags()
+        networkConnectionWatcher.startWatching()
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -73,6 +77,7 @@ class AppLifecycleObserver constructor(
 
     override fun onDestroy(owner: LifecycleOwner) {
         applicationScope.cancel("Application onTerminate")
+        networkConnectionWatcher.stopWatching()
         super.onDestroy(owner)
     }
 

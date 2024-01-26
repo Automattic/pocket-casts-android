@@ -1,5 +1,9 @@
 7.57
 -----
+
+*   Updates:
+    *   Warn when switching to metered network if warn before using data setting is enabled
+        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
 *   Bug Fixes:
     *   Fixed starring episode from full-screen player does not prevent episode from being archived
         ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
@@ -29,6 +33,7 @@
         ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
     *   Fixed an issue with incorrect playback speed shown on the media notification
         ([#1648](https://github.com/Automattic/pocket-casts-android/pull/1666))
+
 7.54
 -----
 
