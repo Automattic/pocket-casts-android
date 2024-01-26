@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,12 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
@@ -31,9 +26,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerView
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -111,11 +104,14 @@ private fun FeatureCard(
                 iconRes = card.iconRes,
                 shortNameRes = card.shortNameRes,
             )
-
-            AmountView(button.subscription)
         }
 
         Column {
+            SubscriptionPriceSection(
+                subscription = button.subscription,
+                upgradeButton = button,
+            )
+
             card.featureItems.forEach {
                 UpgradeFeatureItem(
                     item = it,
@@ -129,15 +125,7 @@ private fun FeatureCard(
 
         val primaryText = when (button.planType) {
             UpgradeButton.PlanType.RENEW -> stringResource(LR.string.renew_your_subscription)
-            UpgradeButton.PlanType.SUBSCRIBE -> {
-                when (button.subscription) {
-                    is Subscription.Simple -> stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes))
-                    is Subscription.Trial -> { stringResource(LR.string.trial_start) }
-                    is Subscription.Intro -> { stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes)) }
-                    else -> { stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes)) }
-                }
-            }
-            UpgradeButton.PlanType.UPGRADE -> stringResource(LR.string.upgrade_to, stringResource(button.shortNameRes))
+            UpgradeButton.PlanType.SUBSCRIBE, UpgradeButton.PlanType.UPGRADE -> { stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes)) }
         }
         OnboardingUpgradeHelper.UpgradeRowButton(
             primaryText = primaryText,
@@ -150,27 +138,4 @@ private fun FeatureCard(
                 .heightIn(min = 48.dp),
         )
     }
-}
-
-@Composable
-private fun AmountView(
-    subscription: Subscription,
-) {
-    Text(
-        fontSize = 22.sp,
-        lineHeight = 30.sp,
-        color = MaterialTheme.theme.colors.primaryText01,
-        text = buildAnnotatedString {
-            withStyle(style = SpanStyle(fontWeight = FontWeight.W700)) {
-                append("${subscription.recurringPricingPhase.formattedPrice} ")
-            }
-
-            withStyle(style = SpanStyle(fontWeight = FontWeight.W400)) {
-                append(
-                    stringResource(subscription.recurringPricingPhase.perPeriod)
-                        .lowercase(Locale.getDefault()),
-                )
-            }
-        },
-    )
 }

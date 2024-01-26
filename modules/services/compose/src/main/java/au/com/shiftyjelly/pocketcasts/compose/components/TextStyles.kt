@@ -88,6 +88,7 @@ fun TextH30(
     disableScale: Boolean = false,
     fontSize: TextUnit? = null,
     lineHeight: TextUnit = 21.sp,
+    style: TextStyle = TextStyle(),
 ) {
     val fontSizeUpdated = fontSize ?: 18.sp
     Text(
@@ -100,6 +101,7 @@ fun TextH30(
         fontWeight = fontWeight ?: FontWeight.W600,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
+        style = style,
         modifier = modifier,
     )
 }
@@ -282,6 +284,7 @@ fun TextP60(
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
     fontWeight: FontWeight? = null,
+    style: TextStyle = TextStyle(),
 ) {
     Text(
         text = text,
@@ -293,6 +296,7 @@ fun TextP60(
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
         fontWeight = fontWeight,
+        style = style,
         modifier = modifier,
     )
 }

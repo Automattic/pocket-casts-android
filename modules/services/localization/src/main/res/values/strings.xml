@@ -1013,6 +1013,10 @@
     <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
 
+    <!-- Intro Offer -->
+
+    <string name="half_price_first_year">50% off your first year</string>
+
     <!-- Settings -->
 
     <string name="settings">Settings</string>

@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.android.billingclient.api.ProductDetails
 
@@ -35,7 +37,9 @@ sealed interface Subscription {
         override val offerPricingPhase: OfferSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails,
         override val offerToken: String,
-    ) : Subscription
+    ) : Subscription {
+        abstract fun badgeOfferText(res: Resources): String
+    }
 
     class Trial(
         tier: SubscriptionTier,
@@ -44,6 +48,8 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
+        override fun badgeOfferText(res: Resources): String = offerPricingPhase.numPeriodFreeTrial(res)
+
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
@@ -76,6 +82,8 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
+        override fun badgeOfferText(res: Resources): String = res.getString(R.string.half_price_first_year)
+
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             return "TODO"
         }
@@ -108,8 +116,11 @@ sealed interface Subscription {
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
         const val SUBSCRIPTION_TEST_PRODUCT_ID = "com.pocketcasts.plus.testfreetrialoffer"
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
+        const val INTRO_OFFER_ID = "testyearlyintropricingoffer"
 
-        fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =
-            SubscriptionMapper.map(productDetails, isFreeTrialEligible)
+        fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
+            val subscription = SubscriptionMapper.map(productDetails, isFreeTrialEligible)
+            return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && subscription is Trial) null else subscription
+        }
     }
 }
