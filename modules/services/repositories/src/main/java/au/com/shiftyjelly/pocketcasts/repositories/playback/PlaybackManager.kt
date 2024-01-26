@@ -200,7 +200,7 @@ open class PlaybackManager @Inject constructor(
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
         bookmarkFeature = bookmarkFeature,
-        )
+    )
     var sleepAfterEpisode: Boolean = false
 
     var player: Player? = null
@@ -391,10 +391,10 @@ open class PlaybackManager @Inject constructor(
 
     private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
         settings.warnOnMeteredNetwork.value &&
-                lastWarnedPlayedEpisodeUuid != episodeUUID &&
-                (player is LocalPlayer) && // don't warn if chromecasting
-                isStreaming() &&
-                isPlaying()
+            lastWarnedPlayedEpisodeUuid != episodeUUID &&
+            (player is LocalPlayer) && // don't warn if chromecasting
+            isStreaming() &&
+            isPlaying()
 
     fun getPlaybackSpeed(): Double {
         return playbackStateRelay.blockingFirst().playbackSpeed
@@ -1557,10 +1557,10 @@ open class PlaybackManager @Inject constructor(
             playbackOnDevice
         } else {
             episode.isDownloaded &&
-                    playbackOnDevice &&
-                    episode.downloadedFilePath != null &&
-                    player != null &&
-                    episode.downloadedFilePath != player?.filePath
+                playbackOnDevice &&
+                episode.downloadedFilePath != null &&
+                player != null &&
+                episode.downloadedFilePath != player?.filePath
         }
 
         // if the player has a different media file path then it is changing
