@@ -12,33 +12,24 @@ import androidx.annotation.Px
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
 import coil.decode.DecodeUtils
-import coil.size.Dimension
 import coil.size.Scale
 import coil.size.Size
-import coil.size.isOriginal
-import coil.size.pxOrElse
 import coil.transform.Transformation
 
-import kotlin.math.roundToInt
-
 /**
- * A [Transformation] that crops the image to fit the target's dimensions and rounds the corners of
- * the image.
  *
- * If you're using Jetpack Compose, use `Modifier.clip(RoundedCornerShape(radius))` instead of this
- * transformation as it's more efficient.
+ * This is a modified version of the RoundedCornersTransformation class from Coil,
+ * altered to remove cropping to the target's size and prevent scaling issues.
  *
- * @param topLeft The radius for the top left corner.
- * @param topRight The radius for the top right corner.
- * @param bottomLeft The radius for the bottom left corner.
- * @param bottomRight The radius for the bottom right corner.
+ * https://github.com/coil-kt/coil/issues/421#issuecomment-640133205
+ * https://github.com/Automattic/pocket-casts-android/issues/1719
  */
 
 class RoundedCornersTransformation(
     @Px private val topLeft: Float = 0f,
     @Px private val topRight: Float = 0f,
     @Px private val bottomLeft: Float = 0f,
-    @Px private val bottomRight: Float = 0f
+    @Px private val bottomRight: Float = 0f,
 ) : Transformation {
 
     constructor(@Px radius: Float) : this(radius, radius, radius, radius)
@@ -54,7 +45,9 @@ class RoundedCornersTransformation(
     override suspend fun transform(input: Bitmap, size: Size): Bitmap {
         val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
 
-        val (outputWidth, outputHeight) = calculateOutputSize(input, size)
+        // Do not crop to target's size to avoid scaling issues.
+        // https://github.com/coil-kt/coil/issues/421#issuecomment-640133205
+        val (outputWidth, outputHeight) = input.width to input.height
 
         val output = createBitmap(outputWidth, outputHeight, input.config)
         output.applyCanvas {
@@ -66,7 +59,7 @@ class RoundedCornersTransformation(
                 srcHeight = input.height,
                 dstWidth = outputWidth,
                 dstHeight = outputHeight,
-                scale = Scale.FILL
+                scale = Scale.FILL,
             ).toFloat()
             val dx = (outputWidth - multiplier * input.width) / 2
             val dy = (outputHeight - multiplier * input.height) / 2
@@ -78,10 +71,14 @@ class RoundedCornersTransformation(
             paint.shader = shader
 
             val radii = floatArrayOf(
-                topLeft, topLeft,
-                topRight, topRight,
-                bottomRight, bottomRight,
-                bottomLeft, bottomLeft,
+                topLeft,
+                topLeft,
+                topRight,
+                topRight,
+                bottomRight,
+                bottomRight,
+                bottomLeft,
+                bottomLeft,
             )
             val rect = RectF(0f, 0f, width.toFloat(), height.toFloat())
             val path = Path().apply { addRoundRect(rect, radii, Path.Direction.CW) }
@@ -89,28 +86,6 @@ class RoundedCornersTransformation(
         }
 
         return output
-    }
-
-    private fun calculateOutputSize(input: Bitmap, size: Size): Pair<Int, Int> {
-        if (size.isOriginal) {
-            return input.width to input.height
-        }
-
-        val (dstWidth, dstHeight) = size
-        if (dstWidth is Dimension.Pixels && dstHeight is Dimension.Pixels) {
-            return dstWidth.px to dstHeight.px
-        }
-
-        val multiplier = DecodeUtils.computeSizeMultiplier(
-            srcWidth = input.width,
-            srcHeight = input.height,
-            dstWidth = size.width.pxOrElse { Int.MIN_VALUE },
-            dstHeight = size.height.pxOrElse { Int.MIN_VALUE },
-            scale = Scale.FILL
-        )
-        val outputWidth = (multiplier * input.width).roundToInt()
-        val outputHeight = (multiplier * input.height).roundToInt()
-        return outputWidth to outputHeight
     }
 
     override fun equals(other: Any?): Boolean {
