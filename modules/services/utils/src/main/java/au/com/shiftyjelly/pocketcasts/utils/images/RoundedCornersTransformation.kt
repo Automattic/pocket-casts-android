@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.ui.images
+package au.com.shiftyjelly.pocketcasts.utils.images
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Color

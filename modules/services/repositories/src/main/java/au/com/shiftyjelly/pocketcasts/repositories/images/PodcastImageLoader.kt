@@ -9,13 +9,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
+import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
 import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import coil.size.Size
-import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
