@@ -48,7 +48,7 @@ sealed interface Subscription {
         productDetails: ProductDetails,
         offerToken: String,
     ) : WithOffer(tier, recurringPricingPhase, offerPricingPhase, productDetails, offerToken) {
-        override fun badgeOfferText(res: Resources): String = offerPricingPhase.numPeriodFreeTrial(res)
+        override fun badgeOfferText(res: Resources): String = offerPricingPhase.numPeriodOffer(res)
 
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {

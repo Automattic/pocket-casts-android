@@ -233,7 +233,7 @@ private val animationSpec = tween<IntSize>(
 private fun recurringAfterString(
     offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase,
     res: Resources,
-) = "${offerSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${offerSubscriptionPricingPhase.trialEnd()})"
+) = "${offerSubscriptionPricingPhase.numPeriodOffer(res)} (${offerSubscriptionPricingPhase.offerEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
     SubscriptionTier.PLUS -> R.string.onboarding_plus_subscribe
