@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.LocalContext
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
-import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountVerticalText
 import au.com.shiftyjelly.pocketcasts.account.databinding.AdapterFrequencyItemBinding
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -66,10 +66,10 @@ class CreateFrequencyAdapter(
                 AppTheme(activeTheme) {
                     when (subscription) {
                         is Subscription.Simple ->
-                            ProductAmountView(subscription.recurringPricingPhase.formattedPrice)
+                            ProductAmountVerticalText(subscription.recurringPricingPhase.formattedPrice)
                         is Subscription.Trial -> {
                             val res = LocalContext.current.resources
-                            ProductAmountView(
+                            ProductAmountVerticalText(
                                 primaryText = subscription.offerPricingPhase.numPeriodFree(res),
                                 secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(
                                     res,
