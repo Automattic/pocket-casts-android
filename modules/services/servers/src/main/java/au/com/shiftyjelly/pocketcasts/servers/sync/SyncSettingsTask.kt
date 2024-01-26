@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -74,6 +75,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                gridLayout = settings.podcastGridLayout.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
                 marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
                 skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
                 skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
@@ -116,6 +123,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             val serverId = (changedSettingResponse.value as? Number)?.toInt()
                             PodcastsSortType.fromServerId(serverId)
                         },
+                    )
+                    "gridLayout" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastGridLayout,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGridLayoutType::fromServerId),
                     )
                     "marketingOptIn" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -182,7 +194,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
-            @Suppress("DEPRECATION")
             val request = NamedSettingsRequest(
                 settings = NamedSettingsSettings(
                     skipForward = settings.skipForwardInSecs.getSyncValue(),

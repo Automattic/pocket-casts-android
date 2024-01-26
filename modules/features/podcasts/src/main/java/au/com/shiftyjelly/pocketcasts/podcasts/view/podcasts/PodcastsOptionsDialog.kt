@@ -46,7 +46,7 @@ class PodcastsOptionsDialog(
                     descriptionId = LR.string.podcasts_layout_large_grid,
                     isOn = { settings.podcastGridLayout.value == PodcastGridLayoutType.LARGE_ARTWORK },
                     click = {
-                        settings.podcastGridLayout.set(PodcastGridLayoutType.LARGE_ARTWORK, needsSync = false)
+                        settings.podcastGridLayout.set(PodcastGridLayoutType.LARGE_ARTWORK, needsSync = true)
                         trackTapOnModalOption(ModalOption.LAYOUT)
                         trackLayoutChanged(PodcastGridLayoutType.LARGE_ARTWORK)
                     },
@@ -56,7 +56,7 @@ class PodcastsOptionsDialog(
                     descriptionId = LR.string.podcasts_layout_small_grid,
                     isOn = { settings.podcastGridLayout.value == PodcastGridLayoutType.SMALL_ARTWORK },
                     click = {
-                        settings.podcastGridLayout.set(PodcastGridLayoutType.SMALL_ARTWORK, needsSync = false)
+                        settings.podcastGridLayout.set(PodcastGridLayoutType.SMALL_ARTWORK, needsSync = true)
                         trackTapOnModalOption(ModalOption.LAYOUT)
                         trackLayoutChanged(PodcastGridLayoutType.SMALL_ARTWORK)
                     },
@@ -66,7 +66,7 @@ class PodcastsOptionsDialog(
                     descriptionId = LR.string.podcasts_layout_list_view,
                     isOn = { settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW },
                     click = {
-                        settings.podcastGridLayout.set(PodcastGridLayoutType.LIST_VIEW, needsSync = false)
+                        settings.podcastGridLayout.set(PodcastGridLayoutType.LIST_VIEW, needsSync = true)
                         trackTapOnModalOption(ModalOption.LAYOUT)
                         trackLayoutChanged(PodcastGridLayoutType.LIST_VIEW)
                     },

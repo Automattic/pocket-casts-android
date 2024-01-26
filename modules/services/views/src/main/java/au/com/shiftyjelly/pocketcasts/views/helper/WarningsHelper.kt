@@ -49,7 +49,12 @@ class WarningsHelper @Inject constructor(
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             applicationScope.launch {
-                playbackManager.playNow(episode = episode, forceStream = true, sourceView = sourceView)
+                playbackManager.playNowSuspend(
+                    episode = episode,
+                    forceStream = true,
+                    showedStreamWarning = true,
+                    sourceView = sourceView,
+                )
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }
         })
