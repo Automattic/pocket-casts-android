@@ -43,6 +43,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
+    INTRO_PLUS_OFFER_ENABLED(
+        key = "intro_plus_offer_enabled",
+        title = "Intro Offer Plus",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     ;
 
     companion object {
