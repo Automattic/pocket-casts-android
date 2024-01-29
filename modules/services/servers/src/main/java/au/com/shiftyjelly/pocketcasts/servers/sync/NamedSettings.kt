@@ -29,6 +29,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "playbackSpeed") val playbackSpeed: NamedChangedSettingDouble? = null,
     @field:Json(name = "trimSilence") val trimSilence: NamedChangedSettingInt? = null,
     @field:Json(name = "volumeBoost") val volumeBoost: NamedChangedSettingBool? = null,
+    @field:Json(name = "rowAction") val rowAction: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)

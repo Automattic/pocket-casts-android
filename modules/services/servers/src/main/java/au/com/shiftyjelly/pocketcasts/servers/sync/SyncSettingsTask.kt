@@ -94,6 +94,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 volumeBoost = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
                     NamedChangedSettingBool(effects.isVolumeBoosted, modifiedAt)
                 },
+                rowAction = settings.streamingMode.getSyncSetting { mode, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = if (mode) 0 else 1,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -180,6 +186,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                                 isVolumeBoosted = newValue
                             }
                         },
+                    )
+                    "rowAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.streamingMode,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
