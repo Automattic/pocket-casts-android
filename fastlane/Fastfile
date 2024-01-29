@@ -3,7 +3,7 @@
 default_platform(:android)
 fastlane_require 'dotenv'
 
-UI.user_error!('Please run fastlane via `bundle exec`') unless FastlaneCore::Helper.bundler?
+UI.user_error!('Please run fastlane via `bundle exec`') unless FastlaneCore::Helper.bundler?   
 
 ########################################################################
 # Constants
