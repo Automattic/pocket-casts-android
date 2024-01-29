@@ -622,10 +622,8 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
-        val isOn = trimMode != TrimMode.OFF
         podcast.trimMode = trimMode
-        podcast.isSilenceRemoved = isOn
-        podcastDao.updateTrimSilenceMode(trimMode, isOn, podcast.uuid)
+        podcastDao.updateTrimSilenceMode(trimMode, podcast.uuid)
     }
 
     override fun updateVolumeBoosted(podcast: Podcast, override: Boolean) {
@@ -639,8 +637,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateEffects(podcast: Podcast, effects: PlaybackEffects) {
-        podcast.playbackEffects = effects
-        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode != TrimMode.OFF, podcast.uuid)
+        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
         updateTrimMode(podcast, effects.trimMode)
     }
 

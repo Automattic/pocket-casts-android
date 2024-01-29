@@ -249,8 +249,8 @@ abstract class PodcastDao {
         return Single.fromCallable { isSubscribedToPodcast(uuid) }
     }
 
-    @Query("UPDATE podcasts SET auto_add_to_up_next = :autoAddToUpNext WHERE uuid = :uuid")
-    abstract suspend fun updateAutoAddToUpNext(autoAddToUpNext: Podcast.AutoAddUpNext, uuid: String)
+    @Query("UPDATE podcasts SET auto_add_to_up_next = :autoAddToUpNext, auto_add_to_up_next_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateAutoAddToUpNext(autoAddToUpNext: Podcast.AutoAddUpNext, uuid: String, modified: Date = Date())
 
     @Transaction
     open suspend fun updateAutoAddToUpNexts(autoAddToUpNext: Podcast.AutoAddUpNext, podcastUuids: List<String>) {
@@ -272,20 +272,24 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET exclude_from_auto_archive = :excludeFromAutoArchive WHERE uuid = :uuid")
     abstract fun updateExcludeFromAutoArchive(excludeFromAutoArchive: Boolean, uuid: String)
 
-    @Query("UPDATE podcasts SET override_global_effects = :override WHERE uuid = :uuid")
-    abstract fun updateOverrideGlobalEffects(override: Boolean, uuid: String)
+    @Query("UPDATE podcasts SET override_global_effects = :override, override_global_effects_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateOverrideGlobalEffects(override: Boolean, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET trim_silence_level = :trimMode, silence_removed = :removeSilence WHERE uuid = :uuid")
-    abstract fun updateTrimSilenceMode(trimMode: TrimMode, removeSilence: Boolean, uuid: String)
+    @Query("UPDATE podcasts SET trim_silence_level = :trimMode, trim_silence_level_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateTrimSilenceMode(trimMode: TrimMode, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET volume_boosted = :volumeBoosted WHERE uuid = :uuid")
-    abstract fun updateVolumeBoosted(volumeBoosted: Boolean, uuid: String)
+    @Query("UPDATE podcasts SET volume_boosted = :volumeBoosted, volume_boosted_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateVolumeBoosted(volumeBoosted: Boolean, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET playback_speed = :speed WHERE uuid = :uuid")
-    abstract fun updatePlaybackSpeed(speed: Double, uuid: String)
+    @Query("UPDATE podcasts SET playback_speed = :speed, playback_speed_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updatePlaybackSpeed(speed: Double, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET playback_speed = :speed, volume_boosted = :volumeBoosted, silence_removed = :removeSilence WHERE uuid = :uuid")
-    abstract fun updateEffects(speed: Double, volumeBoosted: Boolean, removeSilence: Boolean, uuid: String)
+    @Transaction
+    open fun updateEffects(speed: Double, volumeBoosted: Boolean, trimMode: TrimMode, uuid: String, modified: Date = Date()) {
+        updatePlaybackSpeed(speed, uuid, modified)
+        updateVolumeBoosted(volumeBoosted, uuid, modified)
+        updateTrimSilenceMode(trimMode, uuid, modified)
+    }
 
     @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType WHERE uuid = :uuid")
     abstract fun updateEpisodesSortType(episodesSortType: EpisodesSortType, uuid: String)
