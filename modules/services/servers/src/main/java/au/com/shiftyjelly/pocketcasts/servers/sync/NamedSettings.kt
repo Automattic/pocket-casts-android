@@ -27,6 +27,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoArchiveInactive") val autoArchiveInactive: NamedChangedSettingInt? = null,
     @field:Json(name = "autoArchiveIncludesStarred") val autoArchiveIncludesStarred: NamedChangedSettingBool? = null,
     @field:Json(name = "rowAction") val rowAction: NamedChangedSettingInt? = null,
+    @field:Json(name = "upNextSwipe") val upNextSwipe: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)

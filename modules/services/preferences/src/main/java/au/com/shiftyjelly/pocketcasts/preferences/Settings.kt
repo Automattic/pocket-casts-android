@@ -137,9 +137,14 @@ interface Settings {
         BOOKMARK(21483650),
     }
 
-    enum class UpNextAction {
-        PLAY_NEXT,
-        PLAY_LAST,
+    enum class UpNextAction(val serverId: Int) {
+        PLAY_NEXT(serverId = 0),
+        PLAY_LAST(serverId = 1),
+        ;
+
+        companion object {
+            fun fromServerId(id: Int) = entries.find { it.serverId == id } ?: PLAY_NEXT
+        }
     }
 
     enum class CloudSortOrder {

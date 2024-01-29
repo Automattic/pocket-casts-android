@@ -169,7 +169,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.upNextSwipe.set(it, needsSync = false)
+                            settings.upNextSwipe.set(it, needsSync = true)
                         },
                     )
 
