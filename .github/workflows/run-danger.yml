@@ -1,8 +1,6 @@
 name: ☢️ Danger
 
 on:
-  pull_request:
-    types: [opened, synchronize, edited, review_requested, review_request_removed, labeled, unlabeled, milestoned, demilestoned]
   pull_request_target:
     types: [opened, synchronize]
 
