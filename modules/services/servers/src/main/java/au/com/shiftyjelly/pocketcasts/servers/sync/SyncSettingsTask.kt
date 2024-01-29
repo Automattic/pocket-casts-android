@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
@@ -84,6 +85,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
                 skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
                 skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
+                playbackSpeed = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingDouble(effects.playbackSpeed, modifiedAt)
+                },
+                trimSilence = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingInt(effects.trimMode.serverId, modifiedAt)
+                },
+                volumeBoost = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingBool(effects.isVolumeBoosted, modifiedAt)
+                },
                 rowAction = settings.streamingMode.getSyncSetting { mode, modifiedAt ->
                     NamedChangedSettingInt(
                         value = if (mode) 0 else 1,
@@ -149,6 +159,33 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.skipForwardInSecs,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "playbackSpeed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toDouble()?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                playbackSpeed = newValue
+                            }
+                        },
+                    )
+                    "trimSilence" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                trimMode = TrimMode.fromServerId(newValue)
+                            }
+                        },
+                    )
+                    "volumeBoost" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                isVolumeBoosted = newValue
+                            }
+                        },
                     )
                     "rowAction" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,

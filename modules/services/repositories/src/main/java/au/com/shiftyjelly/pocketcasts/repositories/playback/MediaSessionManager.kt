@@ -755,7 +755,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects, needsSync = false)
+            settings.globalPlaybackEffects.set(effects, needsSync = true)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

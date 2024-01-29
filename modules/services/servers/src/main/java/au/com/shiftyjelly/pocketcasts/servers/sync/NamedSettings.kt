@@ -26,6 +26,9 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoArchivePlayed") val autoArchiveAfterPlaying: NamedChangedSettingInt? = null,
     @field:Json(name = "autoArchiveInactive") val autoArchiveInactive: NamedChangedSettingInt? = null,
     @field:Json(name = "autoArchiveIncludesStarred") val autoArchiveIncludesStarred: NamedChangedSettingBool? = null,
+    @field:Json(name = "playbackSpeed") val playbackSpeed: NamedChangedSettingDouble? = null,
+    @field:Json(name = "trimSilence") val trimSilence: NamedChangedSettingInt? = null,
+    @field:Json(name = "volumeBoost") val volumeBoost: NamedChangedSettingBool? = null,
     @field:Json(name = "rowAction") val rowAction: NamedChangedSettingInt? = null,
 )
 
@@ -38,6 +41,12 @@ data class NamedChangedSettingInt(
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingBool(
     @field:Json(name = "value") val value: Boolean,
+    @field:Json(name = "modified_at") val modifiedAt: String,
+)
+
+@JsonClass(generateAdapter = true)
+data class NamedChangedSettingDouble(
+    @field:Json(name = "value") val value: Double,
     @field:Json(name = "modified_at") val modifiedAt: String,
 )
 
