@@ -153,7 +153,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.streamingMode.set(it, needsSync = false)
+                            settings.streamingMode.set(it, needsSync = true)
                         },
                     )
 

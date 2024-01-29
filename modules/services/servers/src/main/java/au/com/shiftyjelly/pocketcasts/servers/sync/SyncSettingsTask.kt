@@ -84,6 +84,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
                 skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
                 skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
+                rowAction = settings.streamingMode.getSyncSetting { mode, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = if (mode) 0 else 1,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -143,6 +149,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.skipForwardInSecs,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "rowAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.streamingMode,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
