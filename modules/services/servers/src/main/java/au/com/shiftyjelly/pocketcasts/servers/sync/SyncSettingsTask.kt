@@ -100,6 +100,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                upNextSwipe = settings.upNextSwipe.getSyncSetting { action, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = action.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -191,6 +197,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.streamingMode,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
+                    )
+                    "upNextSwipe" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.upNextSwipe,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(Settings.UpNextAction::fromServerId),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
