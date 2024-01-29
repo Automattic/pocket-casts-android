@@ -113,6 +113,13 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                showCustomMediaActions = settings.customMediaActionsVisibility.getSyncSetting(::NamedChangedSettingBool),
+                mediaActionsOrder = settings.mediaControlItems.getSyncSetting { items, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = items.joinToString(separator = ",", transform = Settings.MediaNotificationControls::serverId),
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -209,6 +216,18 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.upNextSwipe,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(Settings.UpNextAction::fromServerId),
+                    )
+                    "mediaActions" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.customMediaActionsVisibility,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "mediaActionsOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.mediaControlItems,
+                        newSettingValue = (changedSettingResponse.value as? String)
+                            ?.split(',')
+                            ?.mapNotNull(Settings.MediaNotificationControls::fromServerId),
                     )
                     "episodeGrouping" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,

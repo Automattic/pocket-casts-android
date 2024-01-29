@@ -31,6 +31,8 @@ data class ChangedNamedSettings(
     @field:Json(name = "volumeBoost") val volumeBoost: NamedChangedSettingBool? = null,
     @field:Json(name = "rowAction") val rowAction: NamedChangedSettingInt? = null,
     @field:Json(name = "upNextSwipe") val upNextSwipe: NamedChangedSettingInt? = null,
+    @field:Json(name = "mediaActions") val showCustomMediaActions: NamedChangedSettingBool? = null,
+    @field:Json(name = "mediaActionsOrder") val mediaActionsOrder: NamedChangedSettingString? = null,
     @field:Json(name = "episodeGrouping") val episodeGrouping: NamedChangedSettingInt? = null,
 )
 
@@ -49,6 +51,12 @@ data class NamedChangedSettingBool(
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingDouble(
     @field:Json(name = "value") val value: Double,
+    @field:Json(name = "modified_at") val modifiedAt: String,
+)
+
+@JsonClass(generateAdapter = true)
+data class NamedChangedSettingString(
+    @field:Json(name = "value") val value: String,
     @field:Json(name = "modified_at") val modifiedAt: String,
 )
 

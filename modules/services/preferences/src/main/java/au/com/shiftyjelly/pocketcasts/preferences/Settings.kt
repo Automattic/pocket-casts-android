@@ -156,8 +156,12 @@ interface Settings {
         LONG_SHORT,
     }
 
-    sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
-
+    sealed class MediaNotificationControls(
+        @StringRes val controlName: Int,
+        @DrawableRes val iconRes: Int,
+        val key: String,
+        val serverId: String,
+    ) {
         companion object {
             val All
                 get() = listOf(PlaybackSpeed, Star, MarkAsPlayed, PlayNext, Archive)
@@ -174,17 +178,51 @@ interface Settings {
             fun itemForId(id: String): MediaNotificationControls? {
                 return items[id]
             }
+
+            fun fromServerId(id: String) = All.find { it.serverId == id }
         }
 
-        object Archive : MediaNotificationControls(LR.string.archive, IR.drawable.ic_archive, ARCHIVE_KEY)
+        init {
+            // We use comma as a delimiter when syncing list of these settings
+            require(!serverId.contains(',')) {
+                "Media notification control server ID cannot contain a comma"
+            }
+        }
 
-        object MarkAsPlayed : MediaNotificationControls(LR.string.mark_as_played, IR.drawable.ic_markasplayed, MARK_AS_PLAYED_KEY)
+        data object Archive : MediaNotificationControls(
+            controlName = LR.string.archive,
+            iconRes = IR.drawable.ic_archive,
+            key = ARCHIVE_KEY,
+            serverId = "archive",
+        )
 
-        object PlayNext : MediaNotificationControls(LR.string.play_next, com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next, PLAY_NEXT_KEY)
+        data object MarkAsPlayed : MediaNotificationControls(
+            controlName = LR.string.mark_as_played,
+            iconRes = IR.drawable.ic_markasplayed,
+            key = MARK_AS_PLAYED_KEY,
+            serverId = "mark_as_played",
+        )
 
-        object PlaybackSpeed : MediaNotificationControls(LR.string.playback_speed, IR.drawable.auto_1x, PLAYBACK_SPEED_KEY)
+        data object PlayNext : MediaNotificationControls(
+            controlName = LR.string.play_next,
+            iconRes = com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next,
+            key = PLAY_NEXT_KEY,
+            serverId = "play_next",
+        )
 
-        object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
+        data object PlaybackSpeed : MediaNotificationControls(
+            controlName = LR.string.playback_speed,
+            iconRes = IR.drawable.auto_1x,
+            key = PLAYBACK_SPEED_KEY,
+            serverId = "playback_speed",
+        )
+
+        data object Star : MediaNotificationControls(
+            controlName = LR.string.star,
+            iconRes = IR.drawable.ic_star,
+            key = STAR_KEY,
+            serverId = "star",
+        )
     }
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
