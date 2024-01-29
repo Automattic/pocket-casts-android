@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -106,6 +107,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                episodeGrouping = settings.podcastGroupingDefault.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -202,6 +209,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.upNextSwipe,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(Settings.UpNextAction::fromServerId),
+                    )
+                    "episodeGrouping" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastGroupingDefault,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGrouping::fromServerId),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
