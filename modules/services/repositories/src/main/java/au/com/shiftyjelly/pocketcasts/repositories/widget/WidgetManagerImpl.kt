@@ -22,11 +22,11 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Inject
 import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class WidgetManagerImpl @Inject constructor(
@@ -191,7 +191,7 @@ class WidgetManagerImpl @Inject constructor(
                 target = target,
                 size = 128,
                 episode = playingEpisode,
-                coroutineScope = this
+                coroutineScope = this,
             )
         } else if (playingEpisode is UserEpisode) {
             imageLoader.smallPlaceholder().loadForTarget(playingEpisode, 128, target)

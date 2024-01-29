@@ -38,12 +38,12 @@ import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
+import java.io.File
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import java.io.File
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
@@ -58,7 +58,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         inflater,
         R.layout.view_mini_player,
         this,
-        true
+        true,
     )
     private var playing = false
     private val stringPause: String = context.resources.getString(LR.string.pause)
@@ -256,7 +256,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private fun loadEpisodeArtwork(
         artwork: Artwork,
         imageView: ImageView,
-        imageLoader: PodcastImageLoaderThemed
+        imageLoader: PodcastImageLoaderThemed,
     ): Disposable? {
         if (artwork is Artwork.None || loadedEpisodeArtwork == artwork) return null
         imageView.imageTintList = null
@@ -266,7 +266,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             scale(Scale.FIT)
             transformations(
                 RoundedCornersTransformation(imageLoader.radiusPx.toFloat()),
-                ThemedImageTintTransformation(imageView.context)
+                ThemedImageTintTransformation(imageView.context),
             )
         }
         loadedEpisodeArtwork = artwork
@@ -296,7 +296,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
                 } else {
                     Artwork.Url(artworkUrl)
                 }
-            } else Artwork.None
+            } else {
+                Artwork.None
+            }
         }
     }
 

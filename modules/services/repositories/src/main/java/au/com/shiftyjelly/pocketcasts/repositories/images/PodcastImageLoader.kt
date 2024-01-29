@@ -132,8 +132,11 @@ open class PodcastImageLoader(
             // If episode artwork image fails, try podcast image
             val imageRequest = loadPodcastImageForEpisode(episode)
             if (size != null) imageRequest.size(size)
-            if (target != null) imageRequest.target(target)
-            else imageRequest.into(imageView!!)
+            if (target != null) {
+                imageRequest.target(target)
+            } else {
+                imageRequest.into(imageView!!)
+            }
             imageRequest.build()
         }
 
