@@ -1,11 +1,13 @@
 name: ☢️ Danger
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, edited, review_requested, review_request_removed, labeled, unlabeled, milestoned, demilestoned]
+  pull_request_target:
+    types: [opened, synchronize]
 
 jobs:
   dangermattic:
-    uses: Automattic/dangermattic/.github/workflows/reusable-run-danger.yml@trunk
+    uses: Automattic/dangermattic/.github/workflows/reusable-run-danger.yml@iangmaia/danger-run-on-forks
     secrets:
       github-token: ${{ secrets.DANGERMATTIC_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
