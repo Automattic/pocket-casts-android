@@ -308,7 +308,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.autoPlayNextEpisodeOnEmpty.set(it, needsSync = false)
+                            settings.autoPlayNextEpisodeOnEmpty.set(it, needsSync = true)
                         },
                     )
                 }
