@@ -121,6 +121,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 keepScreenAwake = settings.keepScreenAwake.getSyncSetting(::NamedChangedSettingBool),
+                openPlayerAutomatically = settings.openPlayerAutomatically.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -239,6 +240,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "keepScreenAwake" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.keepScreenAwake,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "openPlayer" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.openPlayerAutomatically,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
