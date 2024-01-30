@@ -227,7 +227,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.mediaControlItems,
                         newSettingValue = (changedSettingResponse.value as? String)
                             ?.split(',')
-                            ?.mapNotNull(Settings.MediaNotificationControls::fromServerId),
+                            ?.mapNotNull(Settings.MediaNotificationControls::fromServerId)
+                            ?.appendMissingControls(),
                     )
                     "episodeGrouping" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -328,3 +329,5 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
         return run(settings, namedSettingsCaller)
     }
 }
+
+private fun List<Settings.MediaNotificationControls>.appendMissingControls() = this + (Settings.MediaNotificationControls.All - this)
