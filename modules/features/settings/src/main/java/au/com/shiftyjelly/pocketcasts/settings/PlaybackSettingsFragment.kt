@@ -255,7 +255,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.keepScreenAwake.set(it, needsSync = false)
+                            settings.keepScreenAwake.set(it, needsSync = true)
                         },
                     )
 
@@ -266,7 +266,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.openPlayerAutomatically.set(it, needsSync = false)
+                            settings.openPlayerAutomatically.set(it, needsSync = true)
                         },
                     )
 

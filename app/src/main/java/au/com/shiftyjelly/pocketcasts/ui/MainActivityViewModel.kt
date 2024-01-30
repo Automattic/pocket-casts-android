@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -92,7 +93,7 @@ class MainActivityViewModel
             Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
         }
         .toFlowable(BackpressureStrategy.LATEST)
-    val playbackState = playbackStateRx.toLiveData()
+    val playbackState = playbackStateRx.asFlow()
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val isSignedIn: Boolean
