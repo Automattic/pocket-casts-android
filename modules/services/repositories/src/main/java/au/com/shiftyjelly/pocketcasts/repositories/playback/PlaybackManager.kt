@@ -125,7 +125,7 @@ open class PlaybackManager @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
     bookmarkFeature: BookmarkFeatureControl,
-    private val playbackManagerNetworkWatcher: PlaybackManagerNetworkWatcher,
+    private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
@@ -219,6 +219,7 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.setup()
         mediaSessionManager.startObserving()
         updatePausedPlaybackState()
+        val playbackManagerNetworkWatcher = playbackManagerNetworkWatcherFactory.create(::onSwitchedToMeteredConnection)
 
         launch {
             castManager.startSessionListener(object : CastManager.SessionListener {
@@ -234,10 +235,8 @@ open class PlaybackManager @Inject constructor(
                     castReconnected()
                 }
             })
+            playbackManagerNetworkWatcher.observeConnection()
         }
-        playbackManagerNetworkWatcher.initialize(
-            onSwitchToMeteredConnection = ::onSwitchedToMeteredConnection,
-        )
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
