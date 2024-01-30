@@ -36,6 +36,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "episodeGrouping") val episodeGrouping: NamedChangedSettingInt? = null,
     @field:Json(name = "keepScreenAwake") val keepScreenAwake: NamedChangedSettingBool? = null,
     @field:Json(name = "openPlayer") val openPlayerAutomatically: NamedChangedSettingBool? = null,
+    @field:Json(name = "showArchived") val showArchived: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
