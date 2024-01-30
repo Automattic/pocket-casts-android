@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -87,7 +88,7 @@ class AppDatabaseTest {
         assertEquals(true, podcast?.overrideGlobalSettings)
         assertEquals(123, podcast?.startFromSecs)
         assertEquals(1.2, podcast?.playbackSpeed)
-        assertEquals(true, podcast?.isSilenceRemoved)
+        assertEquals(TrimMode.OFF, podcast?.trimMode)
         assertEquals(true, podcast?.isVolumeBoosted)
         assertEquals(true, podcast?.isSubscribed)
         assertEquals(true, podcast?.isShowNotifications)
@@ -146,6 +147,8 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_76_77,
                 AppDatabase.MIGRATION_77_78,
                 AppDatabase.MIGRATION_78_79,
+                AppDatabase.MIGRATION_79_80,
+                AppDatabase.MIGRATION_80_81,
             )
             .build()
         // close the database and release any stream resources when the test finishes

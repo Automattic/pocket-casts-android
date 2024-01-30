@@ -36,7 +36,6 @@
                 android:visibility="@{viewModel.isPodcastArtworkVisible()}"
                 android:clickable="true"
                 android:scaleType="fitCenter"
-                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -440,6 +439,13 @@
                     android:id="@+id/download"
                     android:contentDescription="@string/download"
                     app:srcCompat="@drawable/ic_download_32"
+                    app:tint="?attr/player_contrast_03"
+                    style="@style/shelf_item" />
+
+                <ImageButton
+                    android:id="@+id/report"
+                    android:contentDescription="@string/report"
+                    app:srcCompat="@drawable/ic_flag"
                     app:tint="?attr/player_contrast_03"
                     style="@style/shelf_item" />
 

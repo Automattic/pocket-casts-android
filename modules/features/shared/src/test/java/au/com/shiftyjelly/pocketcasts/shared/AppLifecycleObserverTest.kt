@@ -56,6 +56,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var appLifecycle: Lifecycle
 
+    @Mock private lateinit var networkConnectionWatcher: NetworkConnectionWatcherImpl
+
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Before
@@ -74,6 +76,7 @@ class AppLifecycleObserverTest {
             firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
             packageUtil = packageUtil,
             settings = settings,
+            networkConnectionWatcher = networkConnectionWatcher,
             applicationScope = CoroutineScope(Dispatchers.Default),
         )
     }
@@ -90,8 +93,8 @@ class AppLifecycleObserverTest {
         appLifecycleObserver.setup()
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
-        verify(autoPlayNextEpisodeSetting).set(true)
-        verify(useUpNextDarkThemeSetting).set(false)
+        verify(autoPlayNextEpisodeSetting).set(true, needsSync = false)
+        verify(useUpNextDarkThemeSetting).set(false, needsSync = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -108,7 +111,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
-        verify(useUpNextDarkThemeSetting).set(false)
+        verify(useUpNextDarkThemeSetting).set(false, needsSync = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -124,7 +127,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
-        verify(useUpNextDarkThemeSetting).set(false)
+        verify(useUpNextDarkThemeSetting).set(false, needsSync = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 

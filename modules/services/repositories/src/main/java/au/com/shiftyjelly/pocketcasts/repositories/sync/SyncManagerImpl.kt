@@ -42,9 +42,10 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -346,12 +347,19 @@ class SyncManagerImpl @Inject constructor(
 
 // Sync
 
-    override fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse> =
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
+    override fun syncUpdate(data: String, lastModified: String): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> =
         getEmail()?.let { email ->
             getCacheTokenOrLoginRxSingle { token ->
+                @Suppress("DEPRECATION")
                 syncServerManager.syncUpdate(email, data, lastModified, token)
             }
         } ?: Single.error(Exception("Not logged in"))
+
+    override suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse =
+        getCacheTokenOrLogin { token ->
+            syncServerManager.userSyncUpdate(token, request)
+        }
 
     override fun getLastSyncAt(): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->

@@ -1880,4 +1880,9 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
+    <style name="LightPopupTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:backgroundTint">@android:color/white</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
 </resources>

@@ -14,14 +14,10 @@ abstract class UserSetting<T>(
 
     private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
-    fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
+    private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
 
     fun getModifiedAt(): Instant? = tryOrNull {
         getModifiedAtServerString()?.let { Instant.parse(it) }
-    }
-
-    fun doesNotNeedSync() {
-        updateModifiedAtServerString(null)
     }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
@@ -58,31 +54,26 @@ abstract class UserSetting<T>(
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
+    open fun set(value: T, commit: Boolean = false, needsSync: Boolean) {
         persist(value, commit)
         _flow.value = value
-
-        if (needsSync) {
-            updateModifiedAtServerString()
-        }
+        val modifiedAt = if (needsSync) Instant.now().toString() else null
+        updateModifiedAtServerString(modifiedAt)
     }
 
-    private fun updateModifiedAtServerString(modifiedAt: String? = Instant.now().toString()) {
-        val valueToPersist = if (modifiedAt == null) {
-            // Allow persisting of nulls
-            null
-        } else {
+    // A null parameter reflects a setting that does not need to be synced
+    private fun updateModifiedAtServerString(modifiedAt: String?) {
+        if (modifiedAt != null) {
             val parsable = tryOrNull { Instant.parse(modifiedAt) } != null
             if (!parsable) {
+                // Only persist the string if it is parsable
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot set invalid modified at server string: $modifiedAt")
                 return
             }
-            // Only persist the string if it is parsable
-            modifiedAt
         }
 
         sharedPrefs.edit().run {
-            putString(modifiedAtKey, valueToPersist)
+            putString(modifiedAtKey, modifiedAt)
             apply()
         }
     }
@@ -299,6 +290,7 @@ abstract class UserSetting<T>(
     ) {
         override fun get(): T = initialValue
         override fun persist(value: T, commit: Boolean) {}
+        override fun set(value: T, commit: Boolean, needsSync: Boolean) {}
     }
 }
 

@@ -62,7 +62,6 @@ Language: nb_NO
     <string name="player_sleep_add_1_minute">+ 1 minutt</string>
     <string name="settings_autoplay">Automatisk avspilling</string>
     <string name="onboarding_patron_feature_early_access_title">Tidlig tilgang til funksjoner</string>
-    <string name="onboarding_plus_feature_watch_playback">Klokkeavspilling</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Ekstra temaer og appikoner</string>
     <string name="settings_continuous_playback_summary">Hvis Neste-køen er tom, spiller vi av episoder fra samme podcast eller liste som du lytter til nå.</string>
     <string name="renew_your_subscription">Forny abonnementet</string>

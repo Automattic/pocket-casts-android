@@ -66,7 +66,7 @@ class EffectsViewModel
         val effects = effectsData.toEffects()
         viewModelScope.launch {
             playbackManager.updatePlayerEffects(effects)
-            settings.globalPlaybackEffects.set(effects)
+            settings.globalPlaybackEffects.set(effects, needsSync = true)
         }
     }
 

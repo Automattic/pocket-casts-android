@@ -108,6 +108,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -247,6 +248,10 @@ class MainActivity :
             OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
                 openTab(VR.id.navigation_discover)
+            }
+            OnboardingFinish.DoneShowPlusPromotion -> {
+                settings.setHasDoneInitialOnboarding()
+                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
             null -> {
                 Timber.e("Unexpected null result from onboarding activity")
@@ -710,12 +715,18 @@ class MainActivity :
     private fun setupPlayerViews(showMiniPlayerImmediately: Boolean) {
         binding.playerBottomSheet.listener = this
 
-        viewModel.playbackState.observe(this) { state ->
-            if (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) {
-                launch(Dispatchers.Default) {
-                    val episode = episodeManager.findEpisodeByUuid(state.episodeUuid)
-                    if (episode?.isVideo == true && state.isPlaying) {
-                        launch(Dispatchers.Main) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playbackState.collect { state ->
+                    val lastPlaybackState = viewModel.lastPlaybackState
+                    val isEpisodeChanged = lastPlaybackState?.episodeUuid != state.episodeUuid
+                    val isPlaybackChanged = lastPlaybackState?.isPlaying == false && state.isPlaying
+
+                    if (isEpisodeChanged || isPlaybackChanged) {
+                        val episode = withContext(Dispatchers.Default) {
+                            episodeManager.findEpisodeByUuid(state.episodeUuid)
+                        }
+                        if (episode?.isVideo == true && state.isPlaying) {
                             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                                 binding.playerBottomSheet.openPlayer()
                             } else {
@@ -723,26 +734,20 @@ class MainActivity :
                             }
                         }
                     }
+
+                    if (viewModel.isPlayerOpen && isEpisodeChanged) {
+                        updateNavAndStatusColors(true, state.podcast)
+                    }
+
+                    if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
+                        binding.playerBottomSheet.openPlayer()
+                    }
+
+                    updatePlaybackState(state)
+
+                    viewModel.lastPlaybackState = state
                 }
             }
-
-            if (viewModel.isPlayerOpen && viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid) {
-                updateNavAndStatusColors(true, state.podcast)
-            }
-
-            if (viewModel.lastPlaybackState != null &&
-                (
-                    viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid ||
-                        (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)
-                    ) &&
-                settings.openPlayerAutomatically.value
-            ) {
-                binding.playerBottomSheet.openPlayer()
-            }
-
-            updatePlaybackState(state)
-
-            viewModel.lastPlaybackState = state
         }
 
         val upNextQueueObservable =
@@ -882,6 +887,14 @@ class MainActivity :
 
     override fun getPlayerBottomSheetState(): Int {
         return binding.playerBottomSheet.sheetBehavior?.state ?: BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun addPlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback) {
+        binding.playerBottomSheet.sheetBehavior?.addBottomSheetCallback(callback)
+    }
+
+    override fun removePlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback) {
+        binding.playerBottomSheet.sheetBehavior?.removeBottomSheetCallback(callback)
     }
 
     override fun lockPlayerBottomSheet(locked: Boolean) {

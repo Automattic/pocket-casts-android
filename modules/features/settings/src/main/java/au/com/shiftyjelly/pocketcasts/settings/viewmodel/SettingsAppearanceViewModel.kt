@@ -115,7 +115,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUpNextDarkTheme(value: Boolean) {
-        settings.useDarkUpNextTheme.set(value)
+        settings.useDarkUpNextTheme.set(value, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
             mapOf("enabled" to value),
@@ -123,7 +123,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateWidgetForDynamicColors(value: Boolean) {
-        settings.useDynamicColorsForWidget.set(value)
+        settings.useDynamicColorsForWidget.set(value, needsSync = false)
         viewModelScope.launch(Dispatchers.IO) {
             widgetManager.updateWidgetFromSettings(playbackManager)
         }
@@ -134,7 +134,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
-        settings.showArtworkOnLockScreen.set(value)
+        settings.showArtworkOnLockScreen.set(value, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
             mapOf("enabled" to value),
@@ -142,7 +142,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEmbeddedArtwork(value: Boolean) {
-        settings.useEmbeddedArtwork.set(value)
+        settings.useEmbeddedArtwork.set(value, needsSync = false)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

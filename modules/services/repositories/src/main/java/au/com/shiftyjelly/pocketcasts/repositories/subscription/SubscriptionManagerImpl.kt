@@ -66,7 +66,7 @@ class SubscriptionManagerImpl @Inject constructor(
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
         get() = settings.cachedSubscriptionStatus.value
-        set(value) = settings.cachedSubscriptionStatus.set(value)
+        set(value) = settings.cachedSubscriptionStatus.set(value, needsSync = false)
 
     private var subscriptionStatus = BehaviorRelay.create<Optional<SubscriptionStatus>>().apply {
         val cachedStatus = cachedSubscriptionStatus

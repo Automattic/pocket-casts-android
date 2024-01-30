@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-19 15:54:03+0000
+Translation-Revision-Date: 2024-01-09 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">Se attivato, i colori dei widget cambieranno in base ai colori del tema del dispositivo.</string>
+    <string name="settings_use_dynamic_colors_widget">Usa colori dinamici per il widget</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Segnalibro non trovato</string>
     <string name="settings_use_dark_up_next_details">Se attivato, il Successivo utilizzerà sempre il tema scuro, oppure sarà applicato il tema corrente se disattivato</string>
     <string name="settings_use_dark_up_next">Usa il tema scuro per Successivo</string>
@@ -125,7 +128,6 @@ Language: it
     <string name="player_sleep_add_1_minute">+ 1 minuto</string>
     <string name="player_sleep_1_minute">1 minuto</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Temi aggiuntivi e icone delle app</string>
-    <string name="onboarding_plus_feature_watch_playback">Riproduzione su smartwatch</string>
     <string name="onboarding_patron_feature_early_access_title">Accesso anticipato alle funzionalità</string>
     <string name="settings_continuous_playback_summary">Se la coda Successivo è vuota, riprodurremo gli episodi dello stesso podcast o l\'elenco che stai ascoltando.</string>
     <string name="renew_your_subscription">Rinnova il tuo abbonamento</string>

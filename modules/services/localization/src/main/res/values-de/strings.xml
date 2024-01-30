@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-20 11:54:04+0000
+Translation-Revision-Date: 2024-01-09 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">Nach dem Aktivieren ändern sich die Farben des Widgets basierend auf den Theme-Farben des Geräts.</string>
+    <string name="settings_use_dynamic_colors_widget">Dynamische Farben für das Widget verwenden</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Lesezeichen nicht gefunden</string>
     <string name="settings_use_dark_up_next_details">Wenn das dunkle Theme aktiviert ist, wird es in „Up Next“ immer verwendet. Wenn es deaktiviert ist, wird „Up Next“ an das aktuelle Theme angepasst</string>
     <string name="settings_use_dark_up_next">Dunkles „Up Next“-Theme verwenden</string>
@@ -125,7 +128,6 @@ Language: de
     <string name="player_sleep_add_1_minute">+ 1 Minute</string>
     <string name="player_sleep_1_minute">1 Minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Zusätzliche Themes und App-Icons</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch-Wiedergabe</string>
     <string name="onboarding_patron_feature_early_access_title">Frühzeitiger Zugriff auf Funktionen</string>
     <string name="settings_continuous_playback_summary">Wenn deine Warteschlange leer ist, spielen wir Folgen aus dem Podcast oder der Liste, die du dir gerade anhörst.</string>
     <string name="renew_your_subscription">Abonnement verlängern</string>

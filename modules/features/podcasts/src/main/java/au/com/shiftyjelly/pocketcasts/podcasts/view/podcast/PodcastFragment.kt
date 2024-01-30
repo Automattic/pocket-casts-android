@@ -58,11 +58,14 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -565,6 +568,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding.toolbar.let {
             it.inflateMenu(R.menu.podcast_menu)
             it.setOnMenuItemClickListener(this)
+
+            val reportMenuItem = it.menu.findItem(R.id.report)
+            reportMenuItem.isVisible = FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
+
             it.setNavigationOnClickListener {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
@@ -887,6 +894,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.share -> share()
+            R.id.report -> {
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REPORT_TAPPED)
+                openUrl(settings.getReportViolationUrl())
+            }
         }
         return true
     }

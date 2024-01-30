@@ -4,9 +4,14 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -30,15 +35,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return Result.failure()
             }
 
-            listOf(
-                settings.freeGiftAcknowledged,
-                settings.marketingOptIn,
-                settings.podcastsSortType,
-                settings.skipBackInSecs,
-                settings.skipForwardInSecs,
-            ).forEach {
-                it.doesNotNeedSync()
-            }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
 
             return Result.success()
@@ -61,31 +57,103 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
         private fun changedNamedSettingsRequest(settings: Settings) = ChangedNamedSettingsRequest(
             changedSettings = ChangedNamedSettings(
-                skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
-                skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
+                autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting { autoArchiveAfterPlaying, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = autoArchiveAfterPlaying.toIndex(),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting { autoArchiveInactiveSetting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = autoArchiveInactiveSetting.toIndex(),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoArchiveIncludesStarred = settings.autoArchiveIncludesStarred.getSyncSetting(::NamedChangedSettingBool),
+                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(::NamedChangedSettingBool),
                 gridOrder = settings.podcastsSortType.getSyncSetting { podcastSortType, modifiedAt ->
                     NamedChangedSettingInt(
                         value = podcastSortType.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
+                gridLayout = settings.podcastGridLayout.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
                 marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
-                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(::NamedChangedSettingBool),
+                skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
+                skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
+                playbackSpeed = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingDouble(effects.playbackSpeed, modifiedAt)
+                },
+                trimSilence = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingInt(effects.trimMode.serverId, modifiedAt)
+                },
+                volumeBoost = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingBool(effects.isVolumeBoosted, modifiedAt)
+                },
+                rowAction = settings.streamingMode.getSyncSetting { mode, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = if (mode) 0 else 1,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                upNextSwipe = settings.upNextSwipe.getSyncSetting { action, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = action.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                episodeGrouping = settings.podcastGroupingDefault.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                showCustomMediaActions = settings.customMediaActionsVisibility.getSyncSetting(::NamedChangedSettingBool),
+                mediaActionsOrder = settings.mediaControlItems.getSyncSetting { items, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = items.joinToString(separator = ",", transform = Settings.MediaNotificationControls::serverId),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                keepScreenAwake = settings.keepScreenAwake.getSyncSetting(::NamedChangedSettingBool),
+                openPlayerAutomatically = settings.openPlayerAutomatically.getSyncSetting(::NamedChangedSettingBool),
+                showArchived = settings.showArchivedDefault.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
         private fun processChangedNameSettingsResponse(response: ChangedNamedSettingsResponse, settings: Settings) {
             for ((key, changedSettingResponse) in response) {
                 when (key) {
-                    "skipForward" -> updateSettingIfPossible(
+                    "autoArchiveInactive" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.skipForwardInSecs,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                        setting = settings.autoArchiveInactive,
+                        newSettingValue = run {
+                            val index = (changedSettingResponse.value as? Number)?.toInt()
+                            index?.let { AutoArchiveInactiveSetting.fromIndex(it) }
+                        },
                     )
-                    "skipBack" -> updateSettingIfPossible(
+                    "autoArchiveIncludesStarred" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.skipBackInSecs,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                        setting = settings.autoArchiveIncludesStarred,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoArchivePlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoArchiveAfterPlaying,
+                        newSettingValue = run {
+                            val index = (changedSettingResponse.value as? Number)?.toInt()
+                            index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
+                        },
+                    )
+                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.freeGiftAcknowledged,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "gridOrder" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -95,16 +163,97 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             PodcastsSortType.fromServerId(serverId)
                         },
                     )
+                    "gridLayout" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastGridLayout,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGridLayoutType::fromServerId),
+                    )
                     "marketingOptIn" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.marketingOptIn,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "freeGiftAcknowledgement" -> updateSettingIfPossible(
+                    "skipBack" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.freeGiftAcknowledged,
+                        setting = settings.skipBackInSecs,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "skipForward" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.skipForwardInSecs,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "playbackSpeed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toDouble()?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                playbackSpeed = newValue
+                            }
+                        },
+                    )
+                    "trimSilence" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                trimMode = TrimMode.fromServerId(newValue)
+                            }
+                        },
+                    )
+                    "volumeBoost" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                isVolumeBoosted = newValue
+                            }
+                        },
+                    )
+                    "rowAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.streamingMode,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
+                    )
+                    "upNextSwipe" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.upNextSwipe,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(Settings.UpNextAction::fromServerId),
+                    )
+                    "mediaActions" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.customMediaActionsVisibility,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
+                    "mediaActionsOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.mediaControlItems,
+                        newSettingValue = (changedSettingResponse.value as? String)
+                            ?.split(',')
+                            ?.mapNotNull(Settings.MediaNotificationControls::fromServerId)
+                            ?.appendMissingControls(),
+                    )
+                    "episodeGrouping" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastGroupingDefault,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGrouping::fromServerId),
+                    )
+                    "keepScreenAwake" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.keepScreenAwake,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "openPlayer" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.openPlayerAutomatically,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "showArchived" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.showArchivedDefault,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }
         }
@@ -154,7 +303,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
-            @Suppress("DEPRECATION")
             val request = NamedSettingsRequest(
                 settings = NamedSettingsSettings(
                     skipForward = settings.skipForwardInSecs.getSyncValue(),
@@ -172,17 +320,17 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
                     if (value.value is Number) { // Probably will have to change this when we do other settings, but for now just Number is fine
                         when (key) {
-                            "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt())
-                            "skipBack" -> settings.skipBackInSecs.set(value.value.toInt())
+                            "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt(), needsSync = false)
+                            "skipBack" -> settings.skipBackInSecs.set(value.value.toInt(), needsSync = false)
                             "gridOrder" -> {
                                 val sortType = PodcastsSortType.fromServerId(value.value.toInt())
-                                settings.podcastsSortType.set(sortType)
+                                settings.podcastsSortType.set(sortType, needsSync = false)
                             }
                         }
                     } else if (value.value is Boolean) {
                         when (key) {
-                            "marketingOptIn" -> settings.marketingOptIn.set(value.value)
-                            "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value)
+                            "marketingOptIn" -> settings.marketingOptIn.set(value.value, needsSync = false)
+                            "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value, needsSync = false)
                         }
                     }
                 } else {
@@ -199,3 +347,5 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
         return run(settings, namedSettingsCaller)
     }
 }
+
+private fun List<Settings.MediaNotificationControls>.appendMissingControls() = this + (Settings.MediaNotificationControls.All - this)

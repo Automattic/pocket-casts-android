@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-18 15:54:04+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">När denna funktion är aktiverad ändras widgetens färger baserat på enhetens temafärger.</string>
+    <string name="settings_use_dynamic_colors_widget">Använd dynamiska färger för widget</string>
+    <string name="widget">Widget</string>
     <string name="bookmark_not_found">Bokmärke hittades inte</string>
     <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
@@ -125,7 +128,6 @@ Language: sv_SE
     <string name="player_sleep_add_1_minute">+ 1 minut</string>
     <string name="player_sleep_1_minute">1 minut</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra teman och appikoner</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch-uppspelning</string>
     <string name="onboarding_patron_feature_early_access_title">Tidig åtkomst till funktioner</string>
     <string name="settings_continuous_playback_summary">Om din Nästa-kö är tom kommer vi att spela upp avsnitt från den podcast eller lista som du för närvarande lyssnar på.</string>
     <string name="renew_your_subscription">Förnya din prenumeration</string>

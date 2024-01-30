@@ -153,7 +153,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.streamingMode.set(it)
+                            settings.streamingMode.set(it, needsSync = true)
                         },
                     )
 
@@ -169,7 +169,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.upNextSwipe.set(it)
+                            settings.upNextSwipe.set(it, needsSync = true)
                         },
                     )
 
@@ -188,7 +188,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.podcastGroupingDefault.set(it)
+                            settings.podcastGroupingDefault.set(it, needsSync = true)
                             showSetAllGroupingDialog(it)
                         },
                     )
@@ -205,7 +205,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.showArchivedDefault.set(it)
+                            settings.showArchivedDefault.set(it, needsSync = true)
                             showSetAllArchiveDialog(it)
                         },
                     )
@@ -255,7 +255,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.keepScreenAwake.set(it)
+                            settings.keepScreenAwake.set(it, needsSync = true)
                         },
                     )
 
@@ -266,7 +266,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.openPlayerAutomatically.set(it)
+                            settings.openPlayerAutomatically.set(it, needsSync = true)
                         },
                     )
 
@@ -277,7 +277,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.intelligentPlaybackResumption.set(it)
+                            settings.intelligentPlaybackResumption.set(it, needsSync = false)
                         },
                     )
 
@@ -288,7 +288,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.tapOnUpNextShouldPlay.set(it)
+                            settings.tapOnUpNextShouldPlay.set(it, needsSync = false)
                         },
                     )
 
@@ -308,7 +308,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.autoPlayNextEpisodeOnEmpty.set(it)
+                            settings.autoPlayNextEpisodeOnEmpty.set(it, needsSync = false)
                         },
                     )
                 }

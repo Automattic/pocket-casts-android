@@ -117,6 +117,9 @@ class PodcastManagerImpl @Inject constructor(
         subscribeManager.subscribeOnQueue(podcastUuid, sync)
     }
 
+    override suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean): Podcast =
+        subscribeToPodcastSuspend(podcastUuid, sync)
+
     /**
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
      * Do this now rather than adding it to a queue.
@@ -619,10 +622,8 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
-        val isOn = trimMode != TrimMode.OFF
         podcast.trimMode = trimMode
-        podcast.isSilenceRemoved = isOn
-        podcastDao.updateTrimSilenceMode(trimMode, isOn, podcast.uuid)
+        podcastDao.updateTrimSilenceMode(trimMode, podcast.uuid)
     }
 
     override fun updateVolumeBoosted(podcast: Podcast, override: Boolean) {
@@ -636,8 +637,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateEffects(podcast: Podcast, effects: PlaybackEffects) {
-        podcast.playbackEffects = effects
-        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode != TrimMode.OFF, podcast.uuid)
+        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
         updateTrimMode(podcast, effects.trimMode)
     }
 
@@ -647,7 +647,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
         if (show) {
-            settings.notifyRefreshPodcast.set(true)
+            settings.notifyRefreshPodcast.set(true, needsSync = false)
         }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }

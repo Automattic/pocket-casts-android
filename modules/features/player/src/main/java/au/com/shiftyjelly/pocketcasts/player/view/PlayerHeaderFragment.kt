@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
+import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -53,7 +55,6 @@ import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.size.Scale
 import coil.size.Size
-import coil.transform.RoundedCornersTransformation
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -67,6 +68,7 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Headers.Companion.headersOf
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -155,6 +157,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Archive.id to binding.archive,
             ShelfItem.Download.id to binding.download,
             ShelfItem.Bookmark.id to binding.bookmark,
+            ShelfItem.Report.id to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
             val visibleItems = it.first.subList(0, 4).map { it.id }
@@ -189,6 +192,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+        }
+        binding.report?.setOnClickListener {
+            trackShelfAction(ShelfItem.Report.analyticsValue)
+            openUrl(settings.getReportViolationUrl())
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
@@ -368,6 +375,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             val imageBuilder: ImageRequest.Builder.() -> Unit = {
                 error(IR.drawable.defaultartwork_dark)
+                headers(headersOf("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER))
                 scale(Scale.FIT)
                 transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
             }

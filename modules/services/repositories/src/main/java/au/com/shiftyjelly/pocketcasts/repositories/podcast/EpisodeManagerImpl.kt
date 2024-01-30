@@ -406,9 +406,9 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
         val event =
             if (starred) {
-                AnalyticsEvent.EPISODE_UNSTARRED
-            } else {
                 AnalyticsEvent.EPISODE_STARRED
+            } else {
+                AnalyticsEvent.EPISODE_UNSTARRED
             }
         episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
     }
@@ -422,7 +422,8 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView) {
         // Retrieve the episode to make sure we have the latest starred status
         findByUuid(episode.uuid)?.let {
-            starEpisode(episode, !it.isStarred, sourceView)
+            episode.isStarred = !it.isStarred
+            starEpisode(episode, episode.isStarred, sourceView)
         }
     }
 
@@ -620,7 +621,7 @@ class EpisodeManagerImpl @Inject constructor(
             val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
 
             if (shouldArchiveBasedOnSettings &&
-                (settings.autoArchiveIncludeStarred.value || !episode.isStarred)
+                (settings.autoArchiveIncludesStarred.value || !episode.isStarred)
             ) {
                 if (sync) {
                     episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
@@ -641,7 +642,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     @Suppress("NAME_SHADOWING")
     private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
-        val episodesWithoutStarred = if (!settings.autoArchiveIncludeStarred.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
+        val episodesWithoutStarred = if (!settings.autoArchiveIncludesStarred.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
         val episodesByPodcast = episodesWithoutStarred.groupBy { it.podcastUuid }.toMutableMap() // Sort in to podcasts
 
         for ((podcastUuid, episodes) in episodesByPodcast) {
@@ -909,7 +910,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (autoArchiveAfterPlayingTime > 0) {
             val playedEpisodes = episodeDao.findByEpisodePlayingAndArchiveStatus(podcast.uuid, EpisodePlayingStatus.COMPLETED, false)
-                .filter { (settings.autoArchiveIncludeStarred.value && it.isStarred) || !it.isStarred }
+                .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
                 .filter { it.lastPlaybackInteractionDate != null && now.time - it.lastPlaybackInteractionDate!!.time > autoArchiveAfterPlayingTime }
 
             runBlocking {
@@ -929,7 +930,7 @@ class EpisodeManagerImpl @Inject constructor(
         val inactiveTime = inactiveSetting.timeSeconds * 1000L
         if (inactiveTime > 0) {
             val inactiveEpisodes = episodeDao.findInactiveEpisodes(podcast.uuid, Date(now.time - inactiveTime))
-                .filter { settings.autoArchiveIncludeStarred.value || !it.isStarred }
+                .filter { settings.autoArchiveIncludesStarred.value || !it.isStarred }
             if (inactiveEpisodes.isNotEmpty()) {
                 runBlocking {
                     archiveAllInList(inactiveEpisodes, playbackManager)
@@ -956,7 +957,7 @@ class EpisodeManagerImpl @Inject constructor(
             if (allEpisodes.isNotEmpty() && episodeLimit < allEpisodes.size) {
                 val episodesToRemove = allEpisodes.subList(episodeLimit, allEpisodes.size)
                     .filter { !it.isArchived }
-                    .filter { (settings.autoArchiveIncludeStarred.value && it.isStarred) || !it.isStarred }
+                    .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
                     .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
                 if (episodesToRemove.isNotEmpty()) {
                     runBlocking {

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.ui.helper
 import android.view.View
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 interface FragmentHostListener {
     fun addFragment(fragment: Fragment, onTop: Boolean = false)
@@ -22,6 +23,8 @@ interface FragmentHostListener {
     fun showAccountUpgradeNow(autoSelectPlus: Boolean)
     fun updateStatusBar()
     fun getPlayerBottomSheetState(): Int
+    fun addPlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback)
+    fun removePlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback)
     fun openEpisodeDialog(episodeUuid: String?, source: EpisodeViewSource, podcastUuid: String?, forceDark: Boolean)
     fun lockPlayerBottomSheet(locked: Boolean)
     fun updateSystemColors()

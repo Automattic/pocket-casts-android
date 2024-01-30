@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-19 10:54:03+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">若你啟用此功能，小工具的顏色就會配合裝置的佈景主題顏色連帶變更。</string>
+    <string name="settings_use_dynamic_colors_widget">啟用小工具的動態色彩功能</string>
+    <string name="widget">小工具</string>
     <string name="bookmark_not_found">找不到書籤</string>
     <string name="settings_use_dark_up_next_details">啟用後，「接下來播放」將永遠使用深色系佈景主題；若停用，系統則將採用與屆時設定相符的主題</string>
     <string name="settings_use_dark_up_next">使用暗色系「接下來播放」佈景主題</string>
@@ -125,7 +128,6 @@ Language: zh_TW
     <string name="player_sleep_add_1_minute">1 分鐘</string>
     <string name="player_sleep_1_minute">1 分鐘</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">其他主題和應用程式圖示</string>
-    <string name="onboarding_plus_feature_watch_playback">手錶播放</string>
     <string name="onboarding_patron_feature_early_access_title">搶先使用新功能</string>
     <string name="settings_continuous_playback_summary">如果「接下來播放」佇列是空的，我們會播放你正在聆聽的同一個 Podcast 或清單內的單集。</string>
     <string name="renew_your_subscription">續訂</string>

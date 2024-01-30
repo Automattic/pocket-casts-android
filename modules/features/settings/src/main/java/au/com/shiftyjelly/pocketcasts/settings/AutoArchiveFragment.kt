@@ -79,7 +79,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack {
     }
 
     private fun updateStarredSummary() {
-        val starredSummary = getString(if (settings.autoArchiveIncludeStarred.value) LR.string.settings_auto_archive_starred_summary else LR.string.settings_auto_archive_no_starred_summary)
+        val starredSummary = getString(if (settings.autoArchiveIncludesStarred.value) LR.string.settings_auto_archive_starred_summary else LR.string.settings_auto_archive_no_starred_summary)
         autoArchiveIncludeStarred.summary = starredSummary
     }
 
@@ -108,6 +108,6 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack {
     }
 
     private fun setupIncludeStarred() {
-        autoArchiveIncludeStarred.isChecked = settings.autoArchiveIncludeStarred.value
+        autoArchiveIncludeStarred.isChecked = settings.autoArchiveIncludesStarred.value
     }
 }

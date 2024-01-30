@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-12-20 09:54:04+0000
+Translation-Revision-Date: 2024-01-09 09:54:25+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_use_dynamic_colors_widget_details">启用后，小工具的颜色会跟随设备主题颜色而改变。</string>
+    <string name="settings_use_dynamic_colors_widget">为小工具使用动态颜色</string>
+    <string name="widget">小工具</string>
     <string name="bookmark_not_found">未找到书签</string>
     <string name="settings_use_dark_up_next_details">启用后，“下一个”将始终使用深色主题；禁用后，将与当前主题匹配</string>
     <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
@@ -125,7 +128,6 @@ Language: zh_CN
     <string name="player_sleep_add_1_minute">+ 1 分钟</string>
     <string name="player_sleep_1_minute">1 分钟</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">其他主题和应用图标</string>
-    <string name="onboarding_plus_feature_watch_playback">观看播放</string>
     <string name="onboarding_patron_feature_early_access_title">抢先体验功能</string>
     <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
     <string name="renew_your_subscription">续订您的订阅</string>

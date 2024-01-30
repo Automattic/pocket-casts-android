@@ -213,7 +213,7 @@ class AppIcon @Inject constructor(
     var activeAppIcon: AppIconType = AppIconType.fromSetting(settings.appIcon.value)
         set(value) {
             field = value
-            settings.appIcon.set(value.setting)
+            settings.appIcon.set(value.setting, needsSync = false)
         }
 
     val allAppIconTypes = AppIconType.values()
