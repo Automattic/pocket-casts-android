@@ -188,7 +188,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.podcastGroupingDefault.set(it, needsSync = false)
+                            settings.podcastGroupingDefault.set(it, needsSync = true)
                             showSetAllGroupingDialog(it)
                         },
                     )
