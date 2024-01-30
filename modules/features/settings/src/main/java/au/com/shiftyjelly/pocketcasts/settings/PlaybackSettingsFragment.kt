@@ -205,7 +205,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     },
                                 ),
                             )
-                            settings.showArchivedDefault.set(it, needsSync = false)
+                            settings.showArchivedDefault.set(it, needsSync = true)
                             showSetAllArchiveDialog(it)
                         },
                     )
