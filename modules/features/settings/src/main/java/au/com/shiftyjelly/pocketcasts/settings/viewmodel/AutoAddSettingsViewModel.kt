@@ -81,7 +81,7 @@ class AutoAddSettingsViewModel @Inject constructor(
     }
 
     fun autoAddUpNextLimitBehaviorChanged(behavior: AutoAddUpNextLimitBehaviour) {
-        settings.autoAddUpNextLimitBehaviour.set(behavior, needsSync = false)
+        settings.autoAddUpNextLimitBehaviour.set(behavior, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED,
             mapOf(

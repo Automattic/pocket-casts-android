@@ -43,6 +43,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "playUpNextOnTap") val playUpNextOnTap: NamedChangedSettingBool? = null,
     @field:Json(name = "playOverNotifications") val playOverNotifications: NamedChangedSettingInt? = null,
     @field:Json(name = "autoUpNextLimit") val autoUpNextLimit: NamedChangedSettingInt? = null,
+    @field:Json(name = "autoUpNextLimitReached") val autoUpNextLimitReached: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)
