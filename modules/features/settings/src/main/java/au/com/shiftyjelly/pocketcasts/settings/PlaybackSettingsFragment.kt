@@ -288,7 +288,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.tapOnUpNextShouldPlay.set(it, needsSync = false)
+                            settings.tapOnUpNextShouldPlay.set(it, needsSync = true)
                         },
                     )
 
