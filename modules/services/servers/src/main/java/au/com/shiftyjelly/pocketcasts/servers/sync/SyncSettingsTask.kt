@@ -142,6 +142,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                warnDataUsage = settings.warnOnMeteredNetwork.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -306,6 +307,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoAddUpNextLimitBehaviour,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(AutoAddUpNextLimitBehaviour::fromServerId),
+                    )
+                    "warnDataUsage" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.warnOnMeteredNetwork,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
