@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -53,6 +52,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import io.sentry.Sentry
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -265,6 +265,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_PLAYING,
                 -> {
                     if (notification != null) {
+                        val span = Sentry.startTransaction("PlaybackStateChangedWithNotification", "Playback", true)
                         try {
                             startForeground(Settings.NotificationId.PLAYING.value, notification)
                             notificationManager.enteredForeground(notification)
@@ -278,6 +279,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                                 SentryHelper.recordException(e)
                                 FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
                             }
+                        } finally {
+                            span.finish()
                         }
                     } else {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "can't startForeground as the notification is null")
