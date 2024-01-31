@@ -117,7 +117,7 @@ class NotificationsSettingsFragment :
 
         hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
             val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
-            settings.hideNotificationOnPause.set(newBool, needsSync = false)
+            settings.hideNotificationOnPause.set(newBool, needsSync = true)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
                 mapOf("enabled" to newBool),
@@ -368,6 +368,7 @@ class NotificationsSettingsFragment :
         super.onResume()
         setupEnabledNotifications()
         setupNotificationVibrate()
+        setupHidePlaybackNotifications()
         setupPlayOverNotifications()
     }
 
