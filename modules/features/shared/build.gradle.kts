@@ -25,4 +25,5 @@ dependencies {
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:repositories"))
     implementation(project(":modules:services:utils"))
+    testImplementation(project(":modules:services:sharedtest"))
 }

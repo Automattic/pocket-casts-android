@@ -125,6 +125,7 @@ open class PlaybackManager @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
     bookmarkFeature: BookmarkFeatureControl,
+    private val playbackManagerNetworkWatcher: PlaybackManagerNetworkWatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
@@ -233,6 +234,9 @@ open class PlaybackManager @Inject constructor(
                 }
             })
         }
+        playbackManagerNetworkWatcher.initialize(
+            onSwitchToMeteredConnection = ::onSwitchedToMeteredConnection,
+        )
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
@@ -371,9 +375,26 @@ open class PlaybackManager @Inject constructor(
         return player?.supportsVolumeBoost() ?: false
     }
 
+    private suspend fun onSwitchedToMeteredConnection() {
+        val episode = getCurrentEpisode() ?: return
+
+        if (!shouldWarnWhenSwitchingToMeteredConnection(episode.uuid)) return
+
+        sendDataWarningNotification(episode)
+        lastWarnedPlayedEpisodeUuid = episode.uuid
+        pauseSuspend(sourceView = SourceView.METERED_NETWORK_CHANGE)
+    }
+
     fun shouldWarnAboutPlayback(episodeUUID: String? = upNextQueue.currentEpisode?.uuid): Boolean {
         return settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
     }
+
+    private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
+        settings.warnOnMeteredNetwork.value &&
+            lastWarnedPlayedEpisodeUuid != episodeUUID &&
+            (player is LocalPlayer) && // don't warn if chromecasting
+            isStreaming() &&
+            isPlaying()
 
     fun getPlaybackSpeed(): Double {
         return playbackStateRelay.blockingFirst().playbackSpeed
@@ -387,28 +408,59 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun playQueue(sourceView: SourceView = SourceView.UNKNOWN) {
-        launch { playQueueSuspend(sourceView) }
+    fun playQueue(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        showedStreamWarning: Boolean = false,
+    ) {
+        launch { playQueueSuspend(sourceView, showedStreamWarning) }
     }
 
-    suspend fun playQueueSuspend(sourceView: SourceView = SourceView.UNKNOWN) {
+    suspend fun playQueueSuspend(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        showedStreamWarning: Boolean = false,
+    ) {
         if (upNextQueue.currentEpisode != null) {
-            loadEpisodeWhenRequired(sourceView)
+            loadEpisodeWhenRequired(sourceView, showedStreamWarning)
         }
     }
 
-    fun playNow(episode: BaseEpisode, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+    fun playNow(
+        episode: BaseEpisode,
+        forceStream: Boolean = false,
+        showedStreamWarning: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
         launch {
-            playNowSuspend(episode = episode, forceStream = forceStream, sourceView = sourceView)
+            playNowSuspend(
+                episode = episode,
+                forceStream = forceStream,
+                showedStreamWarning = showedStreamWarning,
+                sourceView = sourceView,
+            )
         }
     }
 
-    suspend fun playNowSuspend(episode: BaseEpisode, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+    suspend fun playNowSuspend(
+        episode: BaseEpisode,
+        forceStream: Boolean = false,
+        showedStreamWarning: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
         forcePlayerSwitch = true
-        playNowSync(episode = episode, forceStream = forceStream, sourceView = sourceView)
+        playNowSync(
+            episode = episode,
+            forceStream = forceStream,
+            showedStreamWarning = showedStreamWarning,
+            sourceView = sourceView,
+        )
     }
 
-    suspend fun playNowSync(episode: BaseEpisode, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+    suspend fun playNowSync(
+        episode: BaseEpisode,
+        forceStream: Boolean = false,
+        showedStreamWarning: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play now: ${episode.uuid} ${episode.title}")
 
         withContext(Dispatchers.IO) {
@@ -430,7 +482,12 @@ open class PlaybackManager @Inject constructor(
                 automaticUpNextSource = automaticUpNextSource(sourceView, episode),
                 onAdd = {
                     launch {
-                        loadCurrentEpisode(play = true, forceStream = forceStream, sourceView = sourceView)
+                        loadCurrentEpisode(
+                            play = true,
+                            forceStream = forceStream,
+                            showedStreamWarning = showedStreamWarning,
+                            sourceView = sourceView,
+                        )
                     }
                 },
             )
@@ -441,7 +498,10 @@ open class PlaybackManager @Inject constructor(
             }
         } else if (!switchEpisode && playbackStateRelay.blockingFirst().isPaused) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No player switch required. Playing queue.")
-            playQueue(sourceView)
+            playQueue(
+                showedStreamWarning = showedStreamWarning,
+                sourceView = sourceView,
+            )
         }
     }
 
@@ -474,6 +534,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.STATS,
             SourceView.WHATS_NEW,
             SourceView.NOTIFICATION_BOOKMARK,
+            SourceView.METERED_NETWORK_CHANGE,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -539,9 +600,16 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun loadEpisodeWhenRequired(sourceView: SourceView = SourceView.UNKNOWN) {
+    private suspend fun loadEpisodeWhenRequired(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        showedStreamWarning: Boolean = false,
+    ) {
         if (isPlayerSwitchRequired()) {
-            loadCurrentEpisode(play = true, sourceView = sourceView)
+            loadCurrentEpisode(
+                play = true,
+                showedStreamWarning = showedStreamWarning,
+                sourceView = sourceView,
+            )
         } else {
             play(sourceView)
         }
@@ -1501,7 +1569,12 @@ open class PlaybackManager @Inject constructor(
     /**
      * Load the episode
      */
-    private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+    private suspend fun loadCurrentEpisode(
+        play: Boolean,
+        showedStreamWarning: Boolean = false,
+        forceStream: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
         // make sure we have the most recent copy from the database
         val currentUpNextEpisode = upNextQueue.currentEpisode
         val episode: BaseEpisode? = when (currentUpNextEpisode) {
@@ -1582,6 +1655,7 @@ open class PlaybackManager @Inject constructor(
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) && // The watch handles these warnings before this is called
                 settings.warnOnMeteredNetwork.value &&
+                episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&
                 !forceStream &&
                 play
@@ -1645,7 +1719,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         // keep track of last played episode id so we don't keep bugging the user about streaming on data
-        if (play) {
+        if (showedStreamWarning) {
             lastWarnedPlayedEpisodeUuid = episode.uuid
         }
         // keep track of the last played episode so we can auto select the next episode for Android Automotive
@@ -1775,7 +1849,13 @@ open class PlaybackManager @Inject constructor(
             null
         }
 
-        val streamIntent = buildNotificationIntent(2, NotificationBroadcastReceiver.INTENT_ACTION_STREAM_EPISODE, episode, notificationTag, application)
+        val streamIntent = buildNotificationIntent(
+            intentId = 2,
+            intentName = NotificationBroadcastReceiver.INTENT_ACTION_STREAM_EPISODE_FROM_STREAM_WARNING,
+            episode = episode,
+            notificationTag = notificationTag,
+            context = application,
+        )
         val streamAction = NotificationCompat.Action(IR.drawable.notification_action_play, "Yes, keep playing", streamIntent)
 
         val color = ContextCompat.getColor(application, R.color.notification_color)
