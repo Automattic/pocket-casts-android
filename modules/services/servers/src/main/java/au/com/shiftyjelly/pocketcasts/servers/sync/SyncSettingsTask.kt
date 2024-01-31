@@ -125,6 +125,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 showArchived = settings.showArchivedDefault.getSyncSetting(::NamedChangedSettingBool),
                 intelligentResumption = settings.intelligentPlaybackResumption.getSyncSetting(::NamedChangedSettingBool),
                 autoPlayEnabled = settings.autoPlayNextEpisodeOnEmpty.getSyncSetting(::NamedChangedSettingBool),
+                hideNotificationOnPause = settings.hideNotificationOnPause.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -263,6 +264,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "autoPlayEnabled" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoPlayNextEpisodeOnEmpty,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "hideNotificationOnPause" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.hideNotificationOnPause,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
