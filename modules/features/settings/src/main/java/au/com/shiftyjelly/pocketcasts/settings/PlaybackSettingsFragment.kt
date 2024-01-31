@@ -277,7 +277,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
                                 mapOf("enabled" to it),
                             )
-                            settings.intelligentPlaybackResumption.set(it, needsSync = false)
+                            settings.intelligentPlaybackResumption.set(it, needsSync = true)
                         },
                     )
 
