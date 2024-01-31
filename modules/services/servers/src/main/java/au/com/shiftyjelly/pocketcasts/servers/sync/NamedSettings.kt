@@ -41,6 +41,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoPlayEnabled") val autoPlayEnabled: NamedChangedSettingBool? = null,
     @field:Json(name = "hideNotificationOnPause") val hideNotificationOnPause: NamedChangedSettingBool? = null,
     @field:Json(name = "playUpNextOnTap") val playUpNextOnTap: NamedChangedSettingBool? = null,
+    @field:Json(name = "playOverNotifications") val playOverNotifications: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)

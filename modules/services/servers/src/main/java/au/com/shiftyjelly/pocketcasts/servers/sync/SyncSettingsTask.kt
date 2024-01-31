@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -127,6 +128,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 autoPlayEnabled = settings.autoPlayNextEpisodeOnEmpty.getSyncSetting(::NamedChangedSettingBool),
                 hideNotificationOnPause = settings.hideNotificationOnPause.getSyncSetting(::NamedChangedSettingBool),
                 playUpNextOnTap = settings.tapOnUpNextShouldPlay.getSyncSetting(::NamedChangedSettingBool),
+                playOverNotifications = settings.playOverNotification.getSyncSetting { mode, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = mode.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -276,6 +283,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.tapOnUpNextShouldPlay,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "playOverNotifications" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.playOverNotification,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PlayOverNotificationSetting::fromServerId),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
