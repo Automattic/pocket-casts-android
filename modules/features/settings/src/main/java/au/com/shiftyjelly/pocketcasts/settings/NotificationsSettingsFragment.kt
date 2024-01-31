@@ -145,7 +145,7 @@ class NotificationsSettingsFragment :
                 ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
                 ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
 
-            settings.playOverNotification.set(playOverNotificationSetting, needsSync = false)
+            settings.playOverNotification.set(playOverNotificationSetting, needsSync = true)
             changePlayOverNotificationSummary()
 
             analyticsTracker.track(
