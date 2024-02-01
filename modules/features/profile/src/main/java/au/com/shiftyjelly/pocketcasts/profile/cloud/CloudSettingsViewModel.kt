@@ -33,7 +33,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setAddToUpNext(enabled: Boolean) {
-        settings.cloudAddToUpNext.set(enabled, needsSync = false)
+        settings.cloudAddToUpNext.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED,
             mapOf("enabled" to enabled),

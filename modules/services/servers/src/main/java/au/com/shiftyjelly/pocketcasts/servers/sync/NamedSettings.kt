@@ -49,6 +49,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "privacyAnalytics") val collectAnalytics: NamedChangedSettingBool? = null,
     @field:Json(name = "privacyCrashReports") val sendCrashReports: NamedChangedSettingBool? = null,
     @field:Json(name = "privacyLinkAccount") val linkCrashReportsToUser: NamedChangedSettingBool? = null,
+    @field:Json(name = "filesAutoUpNext") val addFileToUpNextAutomatically: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
