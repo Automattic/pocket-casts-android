@@ -34,7 +34,7 @@ class UserAnalyticsSettings @Inject constructor(
         } else {
             SentryAndroid.init(context) { it.dsn = "" }
         }
-        settings.sendCrashReports.set(enabled, needsSync = false)
+        settings.sendCrashReports.set(enabled, needsSync = true)
     }
 
     fun updateLinkAccountSetting(enabled: Boolean) {
