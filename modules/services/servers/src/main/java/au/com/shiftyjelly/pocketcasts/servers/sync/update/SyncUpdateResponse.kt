@@ -72,6 +72,8 @@ data class SyncUpdateResponse(
         var trimSilenceModified: Date? = null,
         var useVolumeBoost: Boolean? = null,
         var useVolumeBoostModified: Date? = null,
+        var showNotifications: Boolean? = null,
+        var showNotificationsModified: Date? = null,
     ) {
         companion object {
             fun fromSyncUserPodcast(syncUserPodcast: SyncUserPodcast): PodcastSync =
@@ -98,6 +100,8 @@ data class SyncUpdateResponse(
                     trimSilenceModified = syncUserPodcast.settings.trimSilenceOrNull?.modifiedAt?.toDate(),
                     useVolumeBoost = syncUserPodcast.settings.volumeBoostOrNull?.value?.value,
                     useVolumeBoostModified = syncUserPodcast.settings.volumeBoostOrNull?.modifiedAt?.toDate(),
+                    showNotifications = syncUserPodcast.settings.notification?.value?.value,
+                    showNotificationsModified = syncUserPodcast.settings.notification?.modifiedAt?.toDate(),
                 )
         }
     }

@@ -294,8 +294,8 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType WHERE uuid = :uuid")
     abstract fun updateEpisodesSortType(episodesSortType: EpisodesSortType, uuid: String)
 
-    @Query("UPDATE podcasts SET show_notifications = :show WHERE uuid = :uuid")
-    abstract fun updateShowNotifications(show: Boolean, uuid: String)
+    @Query("UPDATE podcasts SET show_notifications = :show, show_notifications_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateShowNotifications(show: Boolean, uuid: String, modified: Date = Date())
 
     @Query("UPDATE podcasts SET subscribed = :subscribed WHERE uuid = :uuid")
     abstract fun updateSubscribed(subscribed: Boolean, uuid: String)
@@ -335,8 +335,8 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus")
     abstract fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
 
-    @Query("UPDATE podcasts SET show_notifications = :showNotifications")
-    abstract suspend fun updateAllShowNotifications(showNotifications: Boolean)
+    @Query("UPDATE podcasts SET show_notifications = :showNotifications, show_notifications_modified = :modified, sync_status = 0")
+    abstract suspend fun updateAllShowNotifications(showNotifications: Boolean, modified: Date = Date())
 
     @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)

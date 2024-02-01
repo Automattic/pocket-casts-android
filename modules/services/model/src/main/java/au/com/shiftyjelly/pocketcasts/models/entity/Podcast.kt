@@ -53,6 +53,7 @@ data class Podcast(
     @ColumnInfo(name = "is_folder") var isFolder: Boolean = false,
     @ColumnInfo(name = "subscribed") var isSubscribed: Boolean = false,
     @ColumnInfo(name = "show_notifications") var isShowNotifications: Boolean = false,
+    @ColumnInfo(name = "show_notifications_modified") var showNotificationsModified: Date? = null,
     @ColumnInfo(name = "auto_download_status") var autoDownloadStatus: Int = 0,
     @ColumnInfo(name = "auto_add_to_up_next") var autoAddToUpNext: AutoAddUpNext = AutoAddUpNext.OFF,
     @ColumnInfo(name = "auto_add_to_up_next_modified") var autoAddToUpNextModified: Date? = null,
