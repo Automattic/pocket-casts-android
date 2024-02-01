@@ -419,6 +419,8 @@ class MainActivity :
         updateSystemColors()
 
         mediaRouter = MediaRouter.getInstance(this)
+
+        ThemeSettingObserver(theme, settings.theme, this).observeThemeChanges()
     }
 
     private fun resetEoYBadgeIfNeeded() {
