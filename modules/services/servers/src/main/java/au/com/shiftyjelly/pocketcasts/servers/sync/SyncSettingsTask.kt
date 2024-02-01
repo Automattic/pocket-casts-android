@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -131,6 +132,13 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 playOverNotifications = settings.playOverNotification.getSyncSetting { mode, modifiedAt ->
                     NamedChangedSettingInt(
                         value = mode.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoUpNextLimit = settings.autoAddUpNextLimit.getSyncSetting(::NamedChangedSettingInt),
+                autoUpNextLimitReached = settings.autoAddUpNextLimitBehaviour.getSyncSetting { behaviour, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = behaviour.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
@@ -288,6 +296,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.playOverNotification,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PlayOverNotificationSetting::fromServerId),
+                    )
+                    "autoUpNextLimit" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoAddUpNextLimit,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "autoUpNextLimitReached" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoAddUpNextLimitBehaviour,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(AutoAddUpNextLimitBehaviour::fromServerId),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
