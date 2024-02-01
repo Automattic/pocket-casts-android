@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
@@ -152,6 +153,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 theme = settings.theme.getSyncSetting { value, modifiedAt ->
                     NamedChangedSettingInt(
                         value = value.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                podcastBadges = settings.podcastBadgeType.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
@@ -354,6 +361,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.theme,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(ThemeSetting::fromServerId),
+                    )
+                    "badges" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastBadgeType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(BadgeType::fromServerId),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
