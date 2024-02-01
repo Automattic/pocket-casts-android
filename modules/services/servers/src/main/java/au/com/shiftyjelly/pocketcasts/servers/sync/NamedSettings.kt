@@ -48,6 +48,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "notifications") val showPodcastNotifications: NamedChangedSettingBool? = null,
     @field:Json(name = "privacyAnalytics") val collectAnalytics: NamedChangedSettingBool? = null,
     @field:Json(name = "privacyCrashReports") val sendCrashReports: NamedChangedSettingBool? = null,
+    @field:Json(name = "privacyLinkAccount") val linkCrashReportsToUser: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)

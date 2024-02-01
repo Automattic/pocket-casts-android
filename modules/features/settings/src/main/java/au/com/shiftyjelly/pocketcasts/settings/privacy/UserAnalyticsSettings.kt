@@ -41,6 +41,6 @@ class UserAnalyticsSettings @Inject constructor(
         val user = if (enabled) User().apply { email = syncManager.getEmail() } else null
         Sentry.setUser(user)
 
-        settings.linkCrashReportsToUser.set(enabled, needsSync = false)
+        settings.linkCrashReportsToUser.set(enabled, needsSync = true)
     }
 }
