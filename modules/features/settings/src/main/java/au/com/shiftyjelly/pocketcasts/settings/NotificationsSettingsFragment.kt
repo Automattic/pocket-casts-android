@@ -418,7 +418,7 @@ class NotificationsSettingsFragment :
 
                 enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
                     val checked = newValue as Boolean
-                    settings.notifyRefreshPodcast.set(checked, needsSync = false)
+                    settings.notifyRefreshPodcast.set(checked, needsSync = true)
 
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,

@@ -587,6 +587,9 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun updateAllShowNotifications(showNotifications: Boolean) {
+        if (showNotifications) {
+            settings.notifyRefreshPodcast.set(true, needsSync = true)
+        }
         podcastDao.updateAllShowNotifications(showNotifications)
     }
 
@@ -647,7 +650,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
         if (show) {
-            settings.notifyRefreshPodcast.set(true, needsSync = false)
+            settings.notifyRefreshPodcast.set(true, needsSync = true)
         }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }

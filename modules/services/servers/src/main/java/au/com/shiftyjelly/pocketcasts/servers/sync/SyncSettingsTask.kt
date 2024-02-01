@@ -143,6 +143,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 warnDataUsage = settings.warnOnMeteredNetwork.getSyncSetting(::NamedChangedSettingBool),
+                showPodcastNotifications = settings.notifyRefreshPodcast.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -311,6 +312,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "warnDataUsage" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.warnOnMeteredNetwork,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "notifications" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.notifyRefreshPodcast,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")

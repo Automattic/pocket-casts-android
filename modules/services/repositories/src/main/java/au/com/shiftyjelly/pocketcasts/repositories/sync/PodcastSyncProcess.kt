@@ -906,6 +906,8 @@ class PodcastSyncProcess(
         podcastSync.trimSilenceModified?.let { podcast.trimModeModified = it }
         podcastSync.useVolumeBoost?.let { podcast.isVolumeBoosted = it }
         podcastSync.useVolumeBoostModified?.let { podcast.volumeBoostedModified = it }
+        podcastSync.showNotifications?.let { podcast.isShowNotifications = it }
+        podcastSync.showNotificationsModified?.let { podcast.showNotificationsModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1086,6 +1088,12 @@ class PodcastSyncProcess(
                             value = boolValue { value = podcast.isVolumeBoosted }
                             modifiedAt = timestamp {
                                 seconds = podcast.volumeBoostedModified?.timeSecs() ?: 0
+                            }
+                        }
+                        notification = boolSetting {
+                            value = boolValue { value = podcast.isShowNotifications }
+                            modifiedAt = timestamp {
+                                seconds = podcast.showNotificationsModified?.timeSecs() ?: 0
                             }
                         }
                     }
