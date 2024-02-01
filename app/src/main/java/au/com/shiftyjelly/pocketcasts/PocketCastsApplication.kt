@@ -137,6 +137,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         SentryAndroid.init(this) { options ->
             options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.MOBILE.value)
+            options.sampleRate = 0.3
         }
 
         // Link email to Sentry crash reports only if the user has opted in
