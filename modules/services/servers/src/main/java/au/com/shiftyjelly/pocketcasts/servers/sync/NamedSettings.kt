@@ -46,6 +46,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoUpNextLimitReached") val autoUpNextLimitReached: NamedChangedSettingInt? = null,
     @field:Json(name = "warnDataUsage") val warnDataUsage: NamedChangedSettingBool? = null,
     @field:Json(name = "notifications") val showPodcastNotifications: NamedChangedSettingBool? = null,
+    @field:Json(name = "privacyAnalytics") val collectAnalytics: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
