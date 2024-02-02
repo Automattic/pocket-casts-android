@@ -147,6 +147,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 collectAnalytics = settings.collectAnalytics.getSyncSetting(::NamedChangedSettingBool),
                 sendCrashReports = settings.sendCrashReports.getSyncSetting(::NamedChangedSettingBool),
                 linkCrashReportsToUser = settings.linkCrashReportsToUser.getSyncSetting(::NamedChangedSettingBool),
+                addFileToUpNextAutomatically = settings.cloudAddToUpNext.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -335,6 +336,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "privacyLinkAccount" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.linkCrashReportsToUser,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesAutoUpNext" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudAddToUpNext,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
