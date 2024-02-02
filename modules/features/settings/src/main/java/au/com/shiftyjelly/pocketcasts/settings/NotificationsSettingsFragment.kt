@@ -263,7 +263,7 @@ class NotificationsSettingsFragment :
                                 if (madeChange) {
                                     trackActionsChange(selectedActions)
                                 }
-                                settings.newEpisodeNotificationActions.set(selectedActions, needsSync = false)
+                                settings.newEpisodeNotificationActions.set(selectedActions, needsSync = true)
                                 changeActionsSummary()
                             },
                         )

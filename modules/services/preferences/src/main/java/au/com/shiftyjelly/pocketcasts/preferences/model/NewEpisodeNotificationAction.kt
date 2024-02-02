@@ -8,36 +8,42 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class NewEpisodeNotificationAction(
     val id: Int,
+    val serverId: String,
     @StringRes val labelId: Int,
     @DrawableRes val drawableId: Int,
     @DrawableRes val largeDrawableId: Int,
 ) {
     Play(
         id = 1,
+        serverId = "play",
         labelId = LR.string.play,
         drawableId = IR.drawable.notification_action_play,
         largeDrawableId = IR.drawable.notification_action_play_large,
     ),
     PlayNext(
         id = 2,
+        serverId = "play_next",
         labelId = LR.string.play_next,
         drawableId = IR.drawable.notification_action_playnext,
         largeDrawableId = IR.drawable.notification_action_playnext_large,
     ),
     PlayLast(
         id = 3,
+        serverId = "play_last",
         labelId = LR.string.play_last,
         drawableId = IR.drawable.notification_action_playlast,
         largeDrawableId = IR.drawable.notification_action_playlast_large,
     ),
     Archive(
         id = 4,
+        serverId = "archive",
         labelId = LR.string.archive,
         drawableId = IR.drawable.notification_action_archive,
         largeDrawableId = IR.drawable.notification_action_archive_large,
     ),
     Download(
         id = 5,
+        serverId = "download",
         labelId = LR.string.download,
         drawableId = IR.drawable.notification_action_download,
         largeDrawableId = IR.drawable.notification_action_download_large,
@@ -55,5 +61,7 @@ enum class NewEpisodeNotificationAction(
             val actionLabel = resources.getString(action.labelId)
             actionLabel == label
         }
+
+        fun fromServerId(id: String) = entries.find { it.serverId == id }
     }
 }
