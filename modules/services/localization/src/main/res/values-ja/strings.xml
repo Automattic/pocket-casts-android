@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-10 09:54:03+0000
+Translation-Revision-Date: 2024-01-30 11:54:02+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="report_subtitle">不適切なコンテンツを報告する</string>
+    <string name="report">報告</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch アプリと Wear OS アプリ</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">フォルダーとブックマーク</string>
     <string name="settings_use_dynamic_colors_widget_details">有効化すると、端末のテーマカラーに合わせてウィジェットの色が変わります。</string>
     <string name="settings_use_dynamic_colors_widget">ウィジェットのダイナミックカラーを使用</string>
     <string name="widget">ウィジェット</string>
@@ -335,9 +339,8 @@ Language: ja_JP
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB のクラウドストレージ</string>
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">フォルダー</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">デスクトップアプリ</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">デスクトップアプリとウェブアプリ</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
     <string name="onboarding_recommendations_import">インポート</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>

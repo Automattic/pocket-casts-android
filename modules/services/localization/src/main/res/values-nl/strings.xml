@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-09 14:54:03+0000
+Translation-Revision-Date: 2024-01-30 11:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="report_subtitle">Opgepaste content melden</string>
+    <string name="report">Melden</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch- en Wear OS-apps</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappen en bladwijzers</string>
     <string name="settings_use_dynamic_colors_widget_details">Wanneer deze instelling is ingeschakeld, veranderen de widgetkleuren op basis van de themakleuren van het apparaat.</string>
     <string name="settings_use_dynamic_colors_widget">Dynamische kleuren gebruiken voor widgets</string>
     <string name="widget">Widget</string>
@@ -335,9 +339,8 @@ Language: nl
     <string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB cloudopslag</string>
     <string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappen</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop-apps</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop- en web-apps</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
     <string name="onboarding_recommendations_import">Importeren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>

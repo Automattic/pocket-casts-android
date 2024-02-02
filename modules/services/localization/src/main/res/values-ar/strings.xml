@@ -269,9 +269,7 @@ Language: ar
     <string name="onboarding_recommendations_make_pocket_casts_yours">اجعل Pocket Casts خاصًا بك من خلال تحديد حلقات البودكاست التي تفضلها أو قم باستيرادها من مشغل حلقة بودكاست أخرى. يمكنك دومًا القيام بذلك لاحقًا.</string>
     <string name="onboarding_recommendations_import">استيراد</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">كل شيء تحبه بشأن Pocket Casts، إلى جانب المزيد</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">تطبيقات سطح المكتب</string>
     <string name="onboarding_plus_feature_desktop_apps_text">يمكنك الاستماع في مزيد من الأماكن من خلال تطبيقاتنا التي تعمل بنظامَي التشغيل Windows وmacOS وتطبيقات الويب.</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">المجلدات</string>
     <string name="onboarding_plus_feature_folders_text">يمكنك تنظيم حلقات البودكاست الخاصة بك في المجلدات وحافظ عليها قيد المزامنة عبر كل أجهزتك.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ارفع ملفاتك إلى مساحة التخزين على السحابة واجعلها متوافرة في كل مكان.</string>
     <string name="onboarding_plus_feature_themes_icons_title">القوالب والأيقونات</string>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-09 09:54:25+0000
+Translation-Revision-Date: 2024-01-30 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="report_subtitle">부적절한 콘텐츠 신고</string>
+    <string name="report">보고서</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch 및 Wear OS 앱</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더 및 북마크</string>
     <string name="settings_use_dynamic_colors_widget_details">활성화하면 위젯 색상이 기기 테마 색상에 따라 변경됩니다.</string>
     <string name="settings_use_dynamic_colors_widget">위젯에 동적 색상 사용</string>
     <string name="widget">위젯</string>
@@ -335,9 +339,8 @@ Language: ko_KR
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 20GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">데스크톱 앱</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">데스크톱 및 웹 앱</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
