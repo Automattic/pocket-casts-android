@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -1276,32 +1277,20 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
-        val lastPodcastOrFilterUuid = settings.lastLoadedFromPodcastOrFilterUuid.value.uuid
-        val lastEpisodeUuid = lastPlayedEpisodeUuid
-        if (lastEpisodeUuid == null || lastPodcastOrFilterUuid == null) {
-            return null
-        }
-
-        val allEpisodes: List<BaseEpisode> = when (lastPodcastOrFilterUuid) {
-            AutomaticUpNextSource.Companion.Predefined.downloads ->
-                episodeManager.observeDownloadEpisodes().asFlow().firstOrNull()
-
-            AutomaticUpNextSource.Companion.Predefined.files ->
-                cloudFilesManager.cloudFilesList.asFlow().firstOrNull()
-
-            AutomaticUpNextSource.Companion.Predefined.starred ->
-                episodeManager.observeStarredEpisodes().asFlow().firstOrNull()
-
+        val allEpisodes: List<BaseEpisode> = when (val autoSource = settings.lastAutoPlaySource.value) {
+            is AutoPlaySource.Downloads -> episodeManager.observeDownloadEpisodes().asFlow().firstOrNull()
+            is AutoPlaySource.Files -> cloudFilesManager.cloudFilesList.asFlow().firstOrNull()
+            is AutoPlaySource.Starred -> episodeManager.observeStarredEpisodes().asFlow().firstOrNull()
             // First check if it is a podcast uuid, then check if it is from a filter
-            else -> podcastManager.findPodcastByUuid(lastPodcastOrFilterUuid)?.let { podcast ->
-                autoPlayOrderForPodcastEpisodes(podcast)
-            } ?: playlistManager.findByUuidSync(lastPodcastOrFilterUuid)?.let { playlist ->
-                playlistManager.findEpisodes(playlist, episodeManager, this)
-            }
+            is AutoPlaySource.PodcastOrFilter -> podcastManager.findPodcastByUuid(autoSource.uuid)
+                ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
+                ?: playlistManager.findByUuidSync(autoSource.uuid)
+                    ?.let { playlist -> playlistManager.findEpisodes(playlist, episodeManager, this) }
+            is AutoPlaySource.None -> null
         } ?: emptyList()
 
         val allEpisodeUuids = allEpisodes.map { it.uuid }
-        val lastEpisodeIndex = allEpisodeUuids.indexOfFirst { it == lastEpisodeUuid }
+        val lastEpisodeIndex = allEpisodeUuids.indexOfFirst { it == lastPlayedEpisodeUuid }
 
         // go down the episode list until the end, and then go up the episode list
         val episodeUuidsSlice = allEpisodeUuids.slice(lastEpisodeIndex + 1 until allEpisodeUuids.size) + allEpisodeUuids.slice(0 until lastEpisodeIndex).asReversed()

@@ -25,8 +25,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
@@ -643,9 +643,10 @@ class MediaSessionManager(
                     enqueueCommand("play from media id") {
                         playbackManager.playNowSuspend(episode = episode, sourceView = source)
                     }
-                    LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
-                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList, needsSync = false)
-                    }
+                    settings.lastAutoPlaySource.set(
+                        value = AutoPlaySource.fromId(autoMediaId.sourceId.orEmpty()),
+                        needsSync = false,
+                    )
                 }
             }
         }
