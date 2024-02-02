@@ -56,6 +56,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var appLifecycle: Lifecycle
 
+    @Mock private lateinit var networkConnectionWatcher: NetworkConnectionWatcherImpl
+
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Before
@@ -74,6 +76,7 @@ class AppLifecycleObserverTest {
             firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
             packageUtil = packageUtil,
             settings = settings,
+            networkConnectionWatcher = networkConnectionWatcher,
             applicationScope = CoroutineScope(Dispatchers.Default),
         )
     }

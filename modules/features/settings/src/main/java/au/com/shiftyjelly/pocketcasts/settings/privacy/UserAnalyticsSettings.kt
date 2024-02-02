@@ -34,13 +34,13 @@ class UserAnalyticsSettings @Inject constructor(
         } else {
             SentryAndroid.init(context) { it.dsn = "" }
         }
-        settings.sendCrashReports.set(enabled, needsSync = false)
+        settings.sendCrashReports.set(enabled, needsSync = true)
     }
 
     fun updateLinkAccountSetting(enabled: Boolean) {
         val user = if (enabled) User().apply { email = syncManager.getEmail() } else null
         Sentry.setUser(user)
 
-        settings.linkCrashReportsToUser.set(enabled, needsSync = false)
+        settings.linkCrashReportsToUser.set(enabled, needsSync = true)
     }
 }

@@ -1,6 +1,16 @@
 7.57
 -----
 
+*   Updates:
+    *   Warn when switching to metered network if warn before using data setting is enabled
+        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
+    *   Display episode artwork from podcast feed on Mini-player, Notification & Widget.
+        ([#1599](https://github.com/Automattic/pocket-casts-android/pull/1599))
+*   Bug Fixes:
+    *   Fixed starring episode from full-screen player does not prevent episode from being archived
+        ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
+    *   Fixed "Hide playback notification on pause" setting not representing its state correctly
+        ([#1769](https://github.com/Automattic/pocket-casts-android/pull/1769))
 
 7.56
 -----
@@ -27,6 +37,7 @@
         ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
     *   Fixed an issue with incorrect playback speed shown on the media notification
         ([#1648](https://github.com/Automattic/pocket-casts-android/pull/1666))
+
 7.54
 -----
 

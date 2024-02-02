@@ -159,7 +159,7 @@ class StorageSettingsViewModel
     }
 
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
-        settings.warnOnMeteredNetwork.set(isChecked, needsSync = false)
+        settings.warnOnMeteredNetwork.set(isChecked, needsSync = true)
         updateMobileDataWarningState()
     }
 

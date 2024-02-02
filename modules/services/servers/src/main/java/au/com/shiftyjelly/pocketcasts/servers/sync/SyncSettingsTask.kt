@@ -4,11 +4,16 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -74,9 +79,74 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                gridLayout = settings.podcastGridLayout.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
                 marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
                 skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
                 skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
+                playbackSpeed = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingDouble(effects.playbackSpeed, modifiedAt)
+                },
+                trimSilence = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingInt(effects.trimMode.serverId, modifiedAt)
+                },
+                volumeBoost = settings.globalPlaybackEffects.getSyncSetting { effects, modifiedAt ->
+                    NamedChangedSettingBool(effects.isVolumeBoosted, modifiedAt)
+                },
+                rowAction = settings.streamingMode.getSyncSetting { mode, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = if (mode) 0 else 1,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                upNextSwipe = settings.upNextSwipe.getSyncSetting { action, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = action.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                episodeGrouping = settings.podcastGroupingDefault.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                showCustomMediaActions = settings.customMediaActionsVisibility.getSyncSetting(::NamedChangedSettingBool),
+                mediaActionsOrder = settings.mediaControlItems.getSyncSetting { items, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = items.joinToString(separator = ",", transform = Settings.MediaNotificationControls::serverId),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                keepScreenAwake = settings.keepScreenAwake.getSyncSetting(::NamedChangedSettingBool),
+                openPlayerAutomatically = settings.openPlayerAutomatically.getSyncSetting(::NamedChangedSettingBool),
+                showArchived = settings.showArchivedDefault.getSyncSetting(::NamedChangedSettingBool),
+                intelligentResumption = settings.intelligentPlaybackResumption.getSyncSetting(::NamedChangedSettingBool),
+                autoPlayEnabled = settings.autoPlayNextEpisodeOnEmpty.getSyncSetting(::NamedChangedSettingBool),
+                hideNotificationOnPause = settings.hideNotificationOnPause.getSyncSetting(::NamedChangedSettingBool),
+                playUpNextOnTap = settings.tapOnUpNextShouldPlay.getSyncSetting(::NamedChangedSettingBool),
+                playOverNotifications = settings.playOverNotification.getSyncSetting { mode, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = mode.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoUpNextLimit = settings.autoAddUpNextLimit.getSyncSetting(::NamedChangedSettingInt),
+                autoUpNextLimitReached = settings.autoAddUpNextLimitBehaviour.getSyncSetting { behaviour, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = behaviour.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                warnDataUsage = settings.warnOnMeteredNetwork.getSyncSetting(::NamedChangedSettingBool),
+                showPodcastNotifications = settings.notifyRefreshPodcast.getSyncSetting(::NamedChangedSettingBool),
+                collectAnalytics = settings.collectAnalytics.getSyncSetting(::NamedChangedSettingBool),
+                sendCrashReports = settings.sendCrashReports.getSyncSetting(::NamedChangedSettingBool),
+                linkCrashReportsToUser = settings.linkCrashReportsToUser.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -117,6 +187,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             PodcastsSortType.fromServerId(serverId)
                         },
                     )
+                    "gridLayout" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastGridLayout,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGridLayoutType::fromServerId),
+                    )
                     "marketingOptIn" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.marketingOptIn,
@@ -131,6 +206,136 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.skipForwardInSecs,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "playbackSpeed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toDouble()?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                playbackSpeed = newValue
+                            }
+                        },
+                    )
+                    "trimSilence" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                trimMode = TrimMode.fromServerId(newValue)
+                            }
+                        },
+                    )
+                    "volumeBoost" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.globalPlaybackEffects,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.let { newValue ->
+                            settings.globalPlaybackEffects.value.apply {
+                                isVolumeBoosted = newValue
+                            }
+                        },
+                    )
+                    "rowAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.streamingMode,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
+                    )
+                    "upNextSwipe" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.upNextSwipe,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(Settings.UpNextAction::fromServerId),
+                    )
+                    "mediaActions" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.customMediaActionsVisibility,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "mediaActionsOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.mediaControlItems,
+                        newSettingValue = (changedSettingResponse.value as? String)
+                            ?.split(',')
+                            ?.mapNotNull(Settings.MediaNotificationControls::fromServerId)
+                            ?.appendMissingControls(),
+                    )
+                    "episodeGrouping" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastGroupingDefault,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGrouping::fromServerId),
+                    )
+                    "keepScreenAwake" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.keepScreenAwake,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "openPlayer" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.openPlayerAutomatically,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "showArchived" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.showArchivedDefault,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "intelligentResumption" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.intelligentPlaybackResumption,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoPlayEnabled" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoPlayNextEpisodeOnEmpty,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "hideNotificationOnPause" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.hideNotificationOnPause,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "playUpNextOnTap" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.tapOnUpNextShouldPlay,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "playOverNotifications" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.playOverNotification,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PlayOverNotificationSetting::fromServerId),
+                    )
+                    "autoUpNextLimit" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoAddUpNextLimit,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt(),
+                    )
+                    "autoUpNextLimitReached" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoAddUpNextLimitBehaviour,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(AutoAddUpNextLimitBehaviour::fromServerId),
+                    )
+                    "warnDataUsage" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.warnOnMeteredNetwork,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "notifications" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.notifyRefreshPodcast,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "privacyAnalytics" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.collectAnalytics,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "privacyCrashReports" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.sendCrashReports,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "privacyLinkAccount" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.linkCrashReportsToUser,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
@@ -182,7 +387,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
-            @Suppress("DEPRECATION")
             val request = NamedSettingsRequest(
                 settings = NamedSettingsSettings(
                     skipForward = settings.skipForwardInSecs.getSyncValue(),
@@ -227,3 +431,5 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
         return run(settings, namedSettingsCaller)
     }
 }
+
+private fun List<Settings.MediaNotificationControls>.appendMissingControls() = this + (Settings.MediaNotificationControls.All - this)
