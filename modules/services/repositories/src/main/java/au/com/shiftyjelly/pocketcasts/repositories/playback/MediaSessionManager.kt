@@ -400,14 +400,9 @@ class MediaSessionManager(
         mediaSession.setMetadata(nowPlaying)
 
         if (settings.showArtworkOnLockScreen.value) {
-            if (Util.isAutomotive(context)) {
-                val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
-                nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
-                nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
-            } else {
-                val bitmap = AutoConverter.getBitmapForPodcast(podcast, false, context)
-                nowPlayingBuilder = nowPlayingBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-            }
+            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
+            nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
+            if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 
             val nowPlayingWithArtwork = nowPlayingBuilder.build()
             Timber.i("MediaSession metadata. With artwork.")

@@ -23,6 +23,9 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -30,7 +33,9 @@ class WidgetManagerImpl @Inject constructor(
     private val settings: Settings,
     private val podcastManager: PodcastManager,
     @ApplicationContext private val context: Context,
-) : WidgetManager {
+) : WidgetManager, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext get() = Dispatchers.IO
 
     private var remoteViewsLayoutId: Int = getRemoteViewsLayoutId()
 
@@ -180,7 +185,15 @@ class WidgetManagerImpl @Inject constructor(
             R.id.widget_artwork,
         )
         val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
-        if (playingEpisode is UserEpisode) {
+        if (playingEpisode is PodcastEpisode) {
+            imageLoader.smallPlaceholder().loadEpisodeArtworkInto(
+                imageView = null,
+                target = target,
+                size = 128,
+                episode = playingEpisode,
+                coroutineScope = this,
+            )
+        } else if (playingEpisode is UserEpisode) {
             imageLoader.smallPlaceholder().loadForTarget(playingEpisode, 128, target)
         } else if (podcast != null) {
             imageLoader.smallPlaceholder().loadForTarget(podcast, 128, target)
