@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.protobuf.Timestamp
 import com.google.protobuf.boolValue
+import com.google.protobuf.doubleValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
 import com.google.protobuf.stringValue
@@ -48,6 +50,8 @@ import com.google.protobuf.timestamp
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUserDevice
+import com.pocketcasts.service.api.boolSetting
+import com.pocketcasts.service.api.doubleSetting
 import com.pocketcasts.service.api.int32Setting
 import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
@@ -884,6 +888,26 @@ class PodcastSyncProcess(
         podcastSync.startFromModified?.let { podcast.startFromModified = it }
         podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
         podcastSync.skipLastModified?.let { podcast.skipLastModified = it }
+        podcastSync.addToUpNextLocalSetting?.let { podcast.autoAddToUpNext = it }
+        podcastSync.addToUpNextModifiedLocalSetting?.let { podcast.autoAddToUpNextModified = it }
+        podcastSync.useCustomPlaybackEffects?.let { podcast.overrideGlobalEffects = it }
+        podcastSync.useCustomPlaybackEffectsModified?.let { podcast.overrideGlobalEffectsModified = it }
+        podcastSync.playbackSpeed?.let { podcast.playbackSpeed = it }
+        podcastSync.playbackSpeedModified?.let { podcast.playbackSpeedModified = it }
+        podcastSync.trimSilence?.let {
+            podcast.trimMode = when (it) {
+                0 -> TrimMode.OFF
+                1 -> TrimMode.LOW
+                2 -> TrimMode.MEDIUM
+                3 -> TrimMode.HIGH
+                else -> TrimMode.OFF
+            }
+        }
+        podcastSync.trimSilenceModified?.let { podcast.trimModeModified = it }
+        podcastSync.useVolumeBoost?.let { podcast.isVolumeBoosted = it }
+        podcastSync.useVolumeBoostModified?.let { podcast.volumeBoostedModified = it }
+        podcastSync.showNotifications?.let { podcast.isShowNotifications = it }
+        podcastSync.showNotificationsModified?.let { podcast.showNotificationsModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1023,6 +1047,55 @@ class PodcastSyncProcess(
                                 seconds = podcast.skipLastModified?.timeSecs() ?: 0
                             }
                         }
+                        addToUpNext = boolSetting {
+                            value = boolValue { value = podcast.addToUpNextSyncSetting }
+                            modifiedAt = timestamp {
+                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: 0
+                            }
+                        }
+                        addToUpNextPosition = int32Setting {
+                            value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
+                            modifiedAt = timestamp {
+                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: 0
+                            }
+                        }
+                        playbackEffects = boolSetting {
+                            value = boolValue { value = podcast.overrideGlobalEffects }
+                            modifiedAt = timestamp {
+                                seconds = podcast.overrideGlobalEffectsModified?.timeSecs() ?: 0
+                            }
+                        }
+                        playbackSpeed = doubleSetting {
+                            value = doubleValue { value = podcast.playbackSpeed }
+                            modifiedAt = timestamp {
+                                seconds = podcast.playbackSpeedModified?.timeSecs() ?: 0
+                            }
+                        }
+                        trimSilence = int32Setting {
+                            value = int32Value {
+                                value = when (podcast.trimMode) {
+                                    TrimMode.OFF -> 0
+                                    TrimMode.LOW -> 1
+                                    TrimMode.MEDIUM -> 2
+                                    TrimMode.HIGH -> 3
+                                }
+                            }
+                            modifiedAt = timestamp {
+                                seconds = podcast.trimModeModified?.timeSecs() ?: 0
+                            }
+                        }
+                        volumeBoost = boolSetting {
+                            value = boolValue { value = podcast.isVolumeBoosted }
+                            modifiedAt = timestamp {
+                                seconds = podcast.volumeBoostedModified?.timeSecs() ?: 0
+                            }
+                        }
+                        notification = boolSetting {
+                            value = boolValue { value = podcast.isShowNotifications }
+                            modifiedAt = timestamp {
+                                seconds = podcast.showNotificationsModified?.timeSecs() ?: 0
+                            }
+                        }
                     }
 
                     sortPosition = int32Value { value = podcast.sortPosition }
@@ -1137,3 +1210,23 @@ private fun Date.toProtobufTimestamp(): Timestamp =
     timestamp {
         seconds = toInstant().epochSecond
     }
+
+private val Podcast.addToUpNextSyncSetting get() = autoAddToUpNext != Podcast.AutoAddUpNext.OFF
+private val Podcast.addToUpNextPositionSyncSetting get() = when (autoAddToUpNext) {
+    Podcast.AutoAddUpNext.OFF, Podcast.AutoAddUpNext.PLAY_LAST -> 0
+    Podcast.AutoAddUpNext.PLAY_NEXT -> 1
+}
+private val SyncUpdateResponse.PodcastSync.addToUpNextLocalSetting get() = when (addToUpNext) {
+    false -> Podcast.AutoAddUpNext.OFF
+    true -> when (addToUpNextPosition) {
+        0 -> Podcast.AutoAddUpNext.PLAY_LAST
+        1 -> Podcast.AutoAddUpNext.PLAY_NEXT
+        else -> null
+    }
+    else -> null
+}
+private val SyncUpdateResponse.PodcastSync.addToUpNextModifiedLocalSetting get() = addToUpNextModified?.let { addModified ->
+    addToUpNextPositionModified?.let { positionModified ->
+        maxOf(addModified, positionModified)
+    }
+}

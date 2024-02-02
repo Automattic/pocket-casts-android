@@ -64,7 +64,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceAutoPlay.apply {
             isChecked = settings.autoPlayNextEpisodeOnEmpty.value
             setOnPreferenceChangeListener { _, newValue ->
-                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = false)
+                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = true)
                 true
             }
         }

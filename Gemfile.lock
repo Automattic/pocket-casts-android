@@ -360,7 +360,7 @@ PLATFORMS
 DEPENDENCIES
   danger-dangermattic!
   fastlane (~> 2.216)
-  fastlane-plugin-wpmreleasetoolkit (~> 9.2)
+  fastlane-plugin-wpmreleasetoolkit (~> 9.3)
 
 BUNDLED WITH
    2.4.21

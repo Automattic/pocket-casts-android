@@ -587,6 +587,9 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun updateAllShowNotifications(showNotifications: Boolean) {
+        if (showNotifications) {
+            settings.notifyRefreshPodcast.set(true, needsSync = true)
+        }
         podcastDao.updateAllShowNotifications(showNotifications)
     }
 
@@ -622,10 +625,8 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
-        val isOn = trimMode != TrimMode.OFF
         podcast.trimMode = trimMode
-        podcast.isSilenceRemoved = isOn
-        podcastDao.updateTrimSilenceMode(trimMode, isOn, podcast.uuid)
+        podcastDao.updateTrimSilenceMode(trimMode, podcast.uuid)
     }
 
     override fun updateVolumeBoosted(podcast: Podcast, override: Boolean) {
@@ -639,8 +640,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateEffects(podcast: Podcast, effects: PlaybackEffects) {
-        podcast.playbackEffects = effects
-        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode != TrimMode.OFF, podcast.uuid)
+        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
         updateTrimMode(podcast, effects.trimMode)
     }
 
@@ -650,7 +650,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
         if (show) {
-            settings.notifyRefreshPodcast.set(true, needsSync = false)
+            settings.notifyRefreshPodcast.set(true, needsSync = true)
         }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }

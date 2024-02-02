@@ -125,7 +125,7 @@ open class PlaybackManager @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
     bookmarkFeature: BookmarkFeatureControl,
-    private val playbackManagerNetworkWatcher: PlaybackManagerNetworkWatcher,
+    private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
@@ -135,6 +135,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+        private const val CONTENT_TYPE_KEY = "content_type"
         private const val SOURCE_KEY = "source"
         private const val SEEK_TO_PERCENT_KEY = "seek_to_percent"
         private const val SEEK_FROM_PERCENT_KEY = "seek_from_percent"
@@ -218,6 +219,7 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.setup()
         mediaSessionManager.startObserving()
         updatePausedPlaybackState()
+        val playbackManagerNetworkWatcher = playbackManagerNetworkWatcherFactory.create(::onSwitchedToMeteredConnection)
 
         launch {
             castManager.startSessionListener(object : CastManager.SessionListener {
@@ -233,10 +235,8 @@ open class PlaybackManager @Inject constructor(
                     castReconnected()
                 }
             })
+            playbackManagerNetworkWatcher.observeConnection()
         }
-        playbackManagerNetworkWatcher.initialize(
-            onSwitchToMeteredConnection = ::onSwitchedToMeteredConnection,
-        )
     }
 
     fun getCurrentEpisode(): BaseEpisode? {
@@ -2255,7 +2255,14 @@ open class PlaybackManager @Inject constructor(
             Timber.w("Found unknown playback source.")
         }
         if (!sourceView.skipTracking()) {
-            analyticsTracker.track(event, mapOf(SOURCE_KEY to sourceView.analyticsValue))
+            val contentType = if (getCurrentEpisode()?.isVideo == true) ContentType.VIDEO else ContentType.AUDIO
+            analyticsTracker.track(
+                event,
+                mapOf(
+                    SOURCE_KEY to sourceView.analyticsValue,
+                    CONTENT_TYPE_KEY to contentType.analyticsValue,
+                ),
+            )
         }
     }
 
@@ -2294,5 +2301,10 @@ open class PlaybackManager @Inject constructor(
 
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
         this.notificationPermissionChecker = notificationPermissionChecker
+    }
+
+    private enum class ContentType(val analyticsValue: String) {
+        AUDIO("audio"),
+        VIDEO("video"),
     }
 }

@@ -1,42 +1,36 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.net.NetworkCapabilities
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class PlaybackManagerNetworkWatcher @Inject constructor(
+class PlaybackManagerNetworkWatcher @AssistedInject constructor(
     private val networkConnectionWatcher: NetworkConnectionWatcher,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @Assisted private val onSwitchToMeteredConnection: suspend () -> Unit,
 ) {
-
     private var connectionIsMetered: Boolean? = null
-    private lateinit var onSwitchToMeteredConnection: suspend () -> Unit
 
-    init {
-        applicationScope.launch {
-            networkConnectionWatcher.networkCapabilities.collect { networkCapabilties ->
-                networkCapabilties?.let {
-                    onNetworkStateChanged(it)
-                }
+    suspend fun observeConnection(): Nothing {
+        networkConnectionWatcher.networkCapabilities.collect { networkCapabilties ->
+            networkCapabilties?.let {
+                onNetworkStateChanged(it)
             }
         }
     }
 
-    fun initialize(onSwitchToMeteredConnection: suspend () -> Unit) {
-        this.onSwitchToMeteredConnection = onSwitchToMeteredConnection
-    }
-
-    private fun onNetworkStateChanged(networkCapabilities: NetworkCapabilities) {
+    suspend fun onNetworkStateChanged(networkCapabilities: NetworkCapabilities) {
         val newConnectionIsMetered = networkCapabilities.isMetered()
         val changedToMetered = connectionIsMetered == false && newConnectionIsMetered
-        applicationScope.launch {
-            if (changedToMetered) {
-                onSwitchToMeteredConnection()
-            }
-            connectionIsMetered = newConnectionIsMetered
+        if (changedToMetered) {
+            onSwitchToMeteredConnection()
         }
+        connectionIsMetered = newConnectionIsMetered
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(onSwitchToMeteredConnection: suspend () -> Unit): PlaybackManagerNetworkWatcher
     }
 }
 

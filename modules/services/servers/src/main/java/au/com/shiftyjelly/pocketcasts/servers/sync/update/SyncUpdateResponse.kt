@@ -13,6 +13,8 @@ import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.SyncUserFolder
 import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
+import com.pocketcasts.service.api.addToUpNextOrNull
+import com.pocketcasts.service.api.addToUpNextPositionOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
@@ -22,6 +24,8 @@ import com.pocketcasts.service.api.episodesSortOrderOrNull
 import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
+import com.pocketcasts.service.api.playbackEffectsOrNull
+import com.pocketcasts.service.api.playbackSpeedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
 import com.pocketcasts.service.api.playingStatusOrNull
 import com.pocketcasts.service.api.playlistOrNull
@@ -29,6 +33,8 @@ import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.starredOrNull
 import com.pocketcasts.service.api.subscribedOrNull
+import com.pocketcasts.service.api.trimSilenceOrNull
+import com.pocketcasts.service.api.volumeBoostOrNull
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -54,22 +60,49 @@ data class SyncUpdateResponse(
         var startFromModified: Date? = null,
         var skipLastSecs: Int? = null,
         var skipLastModified: Date? = null,
+        var addToUpNext: Boolean? = null,
+        var addToUpNextModified: Date? = null,
+        var addToUpNextPosition: Int? = null,
+        var addToUpNextPositionModified: Date? = null,
+        var useCustomPlaybackEffects: Boolean? = null,
+        var useCustomPlaybackEffectsModified: Date? = null,
+        var playbackSpeed: Double? = null,
+        var playbackSpeedModified: Date? = null,
+        var trimSilence: Int? = null,
+        var trimSilenceModified: Date? = null,
+        var useVolumeBoost: Boolean? = null,
+        var useVolumeBoostModified: Date? = null,
+        var showNotifications: Boolean? = null,
+        var showNotificationsModified: Date? = null,
     ) {
         companion object {
             fun fromSyncUserPodcast(syncUserPodcast: SyncUserPodcast): PodcastSync =
                 PodcastSync(
                     uuid = syncUserPodcast.uuid,
+                    subscribed = syncUserPodcast.subscribedOrNull?.value ?: false,
                     episodesSortOrder = syncUserPodcast.episodesSortOrderOrNull?.value,
                     folderUuid = syncUserPodcast.folderUuidOrNull?.value,
                     sortPosition = syncUserPodcast.sortPositionOrNull?.value,
                     dateAdded = syncUserPodcast.dateAddedOrNull?.toDate(),
                     startFromSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
-                    startFromModified = syncUserPodcast.settings?.autoStartFromOrNull?.modifiedAt?.toDate(),
-                    skipLastSecs = syncUserPodcast.settings?.autoSkipLast?.value?.value,
-                    skipLastModified = syncUserPodcast.settings?.autoSkipLast?.modifiedAt?.toDate(),
-                ).apply {
-                    syncUserPodcast.subscribedOrNull?.value?.let { subscribed = it }
-                }
+                    startFromModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
+                    skipLastSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
+                    skipLastModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
+                    addToUpNext = syncUserPodcast.settings.addToUpNextOrNull?.value?.value,
+                    addToUpNextModified = syncUserPodcast.settings.addToUpNextOrNull?.modifiedAt?.toDate(),
+                    addToUpNextPosition = syncUserPodcast.settings.addToUpNextPositionOrNull?.value?.value,
+                    addToUpNextPositionModified = syncUserPodcast.settings.addToUpNextPositionOrNull?.modifiedAt?.toDate(),
+                    useCustomPlaybackEffects = syncUserPodcast.settings.playbackEffectsOrNull?.value?.value,
+                    useCustomPlaybackEffectsModified = syncUserPodcast.settings.playbackEffectsOrNull?.modifiedAt?.toDate(),
+                    playbackSpeed = syncUserPodcast.settings.playbackSpeedOrNull?.value?.value,
+                    playbackSpeedModified = syncUserPodcast.settings.playbackSpeedOrNull?.modifiedAt?.toDate(),
+                    trimSilence = syncUserPodcast.settings.trimSilenceOrNull?.value?.value,
+                    trimSilenceModified = syncUserPodcast.settings.trimSilenceOrNull?.modifiedAt?.toDate(),
+                    useVolumeBoost = syncUserPodcast.settings.volumeBoostOrNull?.value?.value,
+                    useVolumeBoostModified = syncUserPodcast.settings.volumeBoostOrNull?.modifiedAt?.toDate(),
+                    showNotifications = syncUserPodcast.settings.notification?.value?.value,
+                    showNotificationsModified = syncUserPodcast.settings.notification?.modifiedAt?.toDate(),
+                )
         }
     }
 

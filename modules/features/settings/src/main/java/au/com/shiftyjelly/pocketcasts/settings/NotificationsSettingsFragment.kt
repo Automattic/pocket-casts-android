@@ -117,7 +117,7 @@ class NotificationsSettingsFragment :
 
         hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
             val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
-            settings.hideNotificationOnPause.set(newBool, needsSync = false)
+            settings.hideNotificationOnPause.set(newBool, needsSync = true)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
                 mapOf("enabled" to newBool),
@@ -145,7 +145,7 @@ class NotificationsSettingsFragment :
                 ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
                 ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
 
-            settings.playOverNotification.set(playOverNotificationSetting, needsSync = false)
+            settings.playOverNotification.set(playOverNotificationSetting, needsSync = true)
             changePlayOverNotificationSummary()
 
             analyticsTracker.track(
@@ -368,6 +368,7 @@ class NotificationsSettingsFragment :
         super.onResume()
         setupEnabledNotifications()
         setupNotificationVibrate()
+        setupHidePlaybackNotifications()
         setupPlayOverNotifications()
     }
 
@@ -417,7 +418,7 @@ class NotificationsSettingsFragment :
 
                 enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
                     val checked = newValue as Boolean
-                    settings.notifyRefreshPodcast.set(checked, needsSync = false)
+                    settings.notifyRefreshPodcast.set(checked, needsSync = true)
 
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,

@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import java.time.Duration
@@ -41,6 +42,11 @@ class PodcastSyncProcessTest {
                 startFromSecs = 11,
                 skipLastSecs = 22,
                 sortPosition = 3,
+                autoAddToUpNext = Podcast.AutoAddUpNext.PLAY_NEXT,
+                overrideGlobalEffects = true,
+                playbackSpeed = 2.0,
+                trimMode = TrimMode.HIGH,
+                isVolumeBoosted = true,
             ),
         ).podcast
 
@@ -49,6 +55,12 @@ class PodcastSyncProcessTest {
         assertEquals("uuid", record.uuid)
         assertEquals(11, record.settings.autoStartFrom.value.value)
         assertEquals(22, record.settings.autoSkipLast.value.value)
+        assertEquals(true, record.settings.addToUpNext.value.value)
+        assertEquals(1, record.settings.addToUpNextPosition.value.value)
+        assertEquals(true, record.settings.playbackEffects.value.value)
+        assertEquals(2.0, record.settings.playbackSpeed.value.value, 0.01)
+        assertEquals(3, record.settings.trimSilence.value.value)
+        assertEquals(true, record.settings.volumeBoost.value.value)
     }
 
     @Test
@@ -289,6 +301,11 @@ class PodcastSyncProcessTest {
         skipLastSecs: Int = 0,
         sortPosition: Int = 0,
         isSubscribed: Boolean = false,
+        autoAddToUpNext: Podcast.AutoAddUpNext = Podcast.AutoAddUpNext.OFF,
+        overrideGlobalEffects: Boolean = false,
+        playbackSpeed: Double = 1.0,
+        trimMode: TrimMode = TrimMode.OFF,
+        isVolumeBoosted: Boolean = false,
     ) = mock<Podcast> {
         on { this.addedDate } doReturn Date(addedDateSinceEpoch.toMillis())
         on { this.folderUuid } doReturn folderUuid
@@ -297,6 +314,11 @@ class PodcastSyncProcessTest {
         on { this.skipLastSecs } doReturn skipLastSecs
         on { this.sortPosition } doReturn sortPosition
         on { this.isSubscribed } doReturn isSubscribed
+        on { this.autoAddToUpNext } doReturn autoAddToUpNext
+        on { this.overrideGlobalEffects } doReturn overrideGlobalEffects
+        on { this.playbackSpeed } doReturn playbackSpeed
+        on { this.trimMode } doReturn trimMode
+        on { this.isVolumeBoosted } doReturn isVolumeBoosted
     }
 
     private fun mockPodcastEpisode(
