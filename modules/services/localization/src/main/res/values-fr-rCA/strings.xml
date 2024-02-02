@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-09 09:54:25+0000
+Translation-Revision-Date: 2024-01-29 18:54:02+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="report_subtitle">Signaler du contenu inapproprié</string>
+    <string name="report">Signaler</string>
+    <string name="onboarding_plus_feature_watch_playback">Applications Apple Watch et Wear OS</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Dossiers et favoris</string>
     <string name="settings_use_dynamic_colors_widget_details">En cas d’activation, les couleurs du widget changeront en fonction des couleurs du thème de l’appareil.</string>
     <string name="settings_use_dynamic_colors_widget">Utiliser des couleurs dynamiques pour le widget</string>
     <string name="widget">Widget</string>
@@ -335,9 +339,8 @@ Language: fr
     <string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 Go de stockage Cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organisez vos podcasts dans des dossiers et synchronisez-les sur tous vos appareils.</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Dossiers</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Écoutez vos podcasts partout grâce à nos applications Windows, macOS et Web.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Applications de bureau</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Applications Web et de bureau</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tout ce que vous aimez chez Pocket Casts, et bien plus encore</string>
     <string name="onboarding_recommendations_import">Importer</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Personnalisez Pocket Casts en sélectionnant vos podcasts préférés ou en les important à partir d’un autre lecteur de podcast. Vous pouvez toujours le faire plus tard.</string>

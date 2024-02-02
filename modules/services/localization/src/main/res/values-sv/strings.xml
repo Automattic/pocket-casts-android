@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-09 09:54:25+0000
+Translation-Revision-Date: 2024-01-30 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="report_subtitle">Rapportera olämpligt innehåll</string>
+    <string name="report">Rapportera</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch- och Wear OS-appar</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar och bokmärken</string>
     <string name="settings_use_dynamic_colors_widget_details">När denna funktion är aktiverad ändras widgetens färger baserat på enhetens temafärger.</string>
     <string name="settings_use_dynamic_colors_widget">Använd dynamiska färger för widget</string>
     <string name="widget">Widget</string>
@@ -335,9 +339,8 @@ Language: sv_SE
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB molnlagring</string>
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator-appar</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator- och webbappar</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-09 16:54:03+0000
+Translation-Revision-Date: 2024-01-30 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="report_subtitle">Informar de contenido inapropiado</string>
+    <string name="report">Informe</string>
+    <string name="onboarding_plus_feature_watch_playback">Aplicaciones para Apple Watch y Wear OS</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Carpetas y marcadores</string>
     <string name="settings_use_dynamic_colors_widget_details">Cuando está activado, los colores del widget cambiarán en función de los colores del tema del dispositivo.</string>
     <string name="settings_use_dynamic_colors_widget">Utiliza colores dinámicos para el widget</string>
     <string name="widget">Widget</string>
@@ -335,9 +339,8 @@ Language: es
     <string name="onboarding_plus_feature_cloud_storage_text">Carga tus archivos en el almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Almacenamiento en la nube de 20 GB</string>
     <string name="onboarding_plus_feature_folders_text">Organiza tus pódcast en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Carpetas</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Escucha pódcast en más lugares con nuestras aplicaciones para Windows, macOs y web.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicaciones para ordenador</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicaciones web y para ordenador</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Haz tuya la aplicación Pocket Casts seleccionando tus pódcast favoritos o impórtalos desde otro reproductor de pódcast. Siempre puedes hacerlo más adelante.</string>

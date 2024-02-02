@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-09 09:54:25+0000
+Translation-Revision-Date: 2024-01-30 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="report_subtitle">报告不适宜的内容</string>
+    <string name="report">报告</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS 应用程序</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">文件夹和书签</string>
     <string name="settings_use_dynamic_colors_widget_details">启用后，小工具的颜色会跟随设备主题颜色而改变。</string>
     <string name="settings_use_dynamic_colors_widget">为小工具使用动态颜色</string>
     <string name="widget">小工具</string>
@@ -335,9 +339,8 @@ Language: zh_CN
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB 云存储空间</string>
     <string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">文件夹</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面应用程序</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面和 Web 应用程序</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
     <string name="onboarding_recommendations_import">导入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">选择您喜欢的播客，或从其他播客播放器导入播客，定制您的 Pocket Casts。 您可以稍后完成此操作。</string>
