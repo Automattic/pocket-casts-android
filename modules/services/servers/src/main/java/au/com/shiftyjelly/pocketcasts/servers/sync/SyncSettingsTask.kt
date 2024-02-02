@@ -145,6 +145,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 warnDataUsage = settings.warnOnMeteredNetwork.getSyncSetting(::NamedChangedSettingBool),
                 showPodcastNotifications = settings.notifyRefreshPodcast.getSyncSetting(::NamedChangedSettingBool),
                 collectAnalytics = settings.collectAnalytics.getSyncSetting(::NamedChangedSettingBool),
+                sendCrashReports = settings.sendCrashReports.getSyncSetting(::NamedChangedSettingBool),
+                linkCrashReportsToUser = settings.linkCrashReportsToUser.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -323,6 +325,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "privacyAnalytics" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.collectAnalytics,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "privacyCrashReports" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.sendCrashReports,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "privacyLinkAccount" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.linkCrashReportsToUser,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
