@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
@@ -173,6 +174,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 },
                 autoShowPlayed = settings.autoShowPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
                 autoSubscribeToPlayed = settings.autoSubscribeToPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
+                autoPlayLastSource = settings.lastAutoPlaySource.getSyncSetting { source, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = source.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -392,6 +399,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.autoSubscribeToPlayed,
                         newSettingValue = (changedSettingResponse.value as? Boolean)?.takeIf { Util.isAutomotive(context = context) },
                     )
+                    "autoPlayLastListUuid" -> {
+                        val syncedValue = updateSettingIfPossible(
+                            changedSettingResponse = changedSettingResponse,
+                            setting = settings.lastAutoPlaySource,
+                            newSettingValue = (changedSettingResponse.value as? String)?.let(AutoPlaySource::fromServerId),
+                        )
+                        if (syncedValue != null) {
+                            settings.trackingAutoPlaySource.set(syncedValue, needsSync = false)
+                        }
+                    }
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }
@@ -401,15 +418,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             changedSettingResponse: ChangedSettingResponse,
             setting: UserSetting<T>,
             newSettingValue: T?,
-        ) {
+        ): T? {
             if (newSettingValue == null) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid ${setting.sharedPrefKey} value: ${changedSettingResponse.value}")
-                return
+                return null
             }
 
             if (changedSettingResponse.modifiedAt == null) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} from the server because setting was not modifiedAt on the server")
-                return
+                return null
             }
 
             val serverModifiedAtInstant = try {
@@ -419,7 +436,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     LogBuffer.TAG_INVALID_STATE,
                     "Not syncing ${setting.sharedPrefKey} from the server because server returned modifiedAt value that could not be parsed: ${changedSettingResponse.modifiedAt}",
                 )
-                return
+                return null
             }
 
             val localModifiedAt = setting.getModifiedAt()
@@ -427,13 +444,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             // we don't know the local value is newer than the server value.
             if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
-                return
+                return null
             }
 
             setting.set(
                 value = newSettingValue,
                 needsSync = false,
             )
+            return newSettingValue
         }
 
         @Suppress("DEPRECATION")
