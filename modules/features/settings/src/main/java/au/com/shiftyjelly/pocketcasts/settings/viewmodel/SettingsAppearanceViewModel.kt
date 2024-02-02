@@ -142,7 +142,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEmbeddedArtwork(value: Boolean) {
-        settings.useEmbeddedArtwork.set(value, needsSync = false)
+        settings.useEmbeddedArtwork.set(value, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

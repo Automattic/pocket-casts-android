@@ -180,6 +180,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                useEmbeddedArtwork = settings.useEmbeddedArtwork.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -362,6 +363,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "privacyAnalytics" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.collectAnalytics,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "useEmbeddedArtwork" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useEmbeddedArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "privacyCrashReports" -> updateSettingIfPossible(
