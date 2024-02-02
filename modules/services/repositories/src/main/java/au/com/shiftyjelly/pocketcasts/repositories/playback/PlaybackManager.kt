@@ -480,7 +480,7 @@ open class PlaybackManager @Inject constructor(
             pause(transientLoss = true)
             upNextQueue.playNow(
                 episode = episode,
-                automaticUpNextSource = automaticUpNextSource(sourceView, episode),
+                automaticUpNextSource = autoPlaySource(sourceView, episode),
                 onAdd = {
                     launch {
                         loadCurrentEpisode(
@@ -509,7 +509,7 @@ open class PlaybackManager @Inject constructor(
     // Returning null means a source should not affect the auto play behavior. Listening history is not
     // returning null because it should actively disable auto play if a user plays an episode from the
     // listening history screen.
-    private fun automaticUpNextSource(sourceView: SourceView, episode: BaseEpisode): AutomaticUpNextSource? =
+    private fun autoPlaySource(sourceView: SourceView, episode: BaseEpisode): AutoPlaySource? =
         when (sourceView) {
             SourceView.AUTO_PAUSE,
             SourceView.AUTO_PLAY,
@@ -541,7 +541,13 @@ open class PlaybackManager @Inject constructor(
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
             SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
             SourceView.NOTIFICATION,
-            -> (episode as? PodcastEpisode)?.let { AutomaticUpNextSource(it) }
+            -> {
+                val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.uuid) }
+                if (source != null) {
+                    settings.trackingAutoPlaySource.set(source, needsSync = false)
+                }
+                source
+            }
 
             // These screens should be setting an appropriate value for [AutomaticUpNextSource.mostRecentList]
             // when the user views them, otherwise [AutomaticUpNextSource.create] will not return the proper
@@ -553,7 +559,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.FILTERS,
             SourceView.PODCAST_SCREEN,
             SourceView.STARRED,
-            -> AutomaticUpNextSource()
+            -> settings.trackingAutoPlaySource.value
         }
 
     suspend fun play(

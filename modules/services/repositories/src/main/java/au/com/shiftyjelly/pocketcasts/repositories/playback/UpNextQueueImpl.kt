@@ -157,17 +157,14 @@ class UpNextQueueImpl @Inject constructor(
 
     override suspend fun playNow(
         episode: BaseEpisode,
-        automaticUpNextSource: AutomaticUpNextSource?,
+        automaticUpNextSource: AutoPlaySource?,
         onAdd: (() -> Unit)?,
     ) = withContext(coroutineContext) {
         // Don't build an Up Next if it is already empty
         if (queueEpisodes.isEmpty()) {
             // when the upNextQueue is empty, save the source for auto playing the next episode
             automaticUpNextSource?.let {
-                settings.lastAutoPlaySource.set(
-                    value = AutoPlaySource.fromId(it.uuid.orEmpty()),
-                    needsSync = false,
-                )
+                settings.lastAutoPlaySource.set(value = it, needsSync = false)
             }
             saveChanges(UpNextAction.ClearAll)
         }
@@ -311,6 +308,7 @@ class UpNextQueueImpl @Inject constructor(
         // clear last loaded uuid if anything gets added to the up next queue
         val hasQueuedItems = currentEpisode != null
         if (hasQueuedItems) {
+            settings.trackingAutoPlaySource.set(AutoPlaySource.None, needsSync = false)
             settings.lastAutoPlaySource.set(AutoPlaySource.None, needsSync = false)
         }
     }

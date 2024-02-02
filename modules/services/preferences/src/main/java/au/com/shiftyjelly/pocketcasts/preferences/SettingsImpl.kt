@@ -1232,6 +1232,14 @@ class SettingsImpl @Inject constructor(
         toString = AutoPlaySource::id,
     )
 
+    override val trackingAutoPlaySource = UserSetting.PrefFromString(
+        sharedPrefKey = "localAutoPlaySource",
+        defaultValue = AutoPlaySource.None,
+        sharedPrefs = sharedPreferences,
+        fromString = AutoPlaySource::fromId,
+        toString = AutoPlaySource::id,
+    )
+
     override val theme = ThemeSetting.UserSettingPref(
         sharedPrefKey = "pocketCastsTheme",
         defaultValue = ThemeSetting.DARK,

@@ -32,11 +32,11 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
@@ -189,7 +189,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         recyclerView.adapter = adapter
         listSavedState?.let { recyclerView.layoutManager?.onRestoreInstanceState(it) }
         setShowFilterOptions(showingFilterOptionsBeforeModal)
-        AutomaticUpNextSource.mostRecentList = viewModel.playlistUUID
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), needsSync = false)
     }
 
     override fun onDestroyView() {

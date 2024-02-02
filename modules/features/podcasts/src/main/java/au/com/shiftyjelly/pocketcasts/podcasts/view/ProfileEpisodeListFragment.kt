@@ -30,10 +30,10 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -195,10 +195,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         super.onResume()
         binding?.recyclerView?.adapter = adapter
         when (mode) {
-            Mode.Downloaded -> AutomaticUpNextSource.Companion.Predefined.downloads
-            Mode.History -> null
-            Mode.Starred -> AutomaticUpNextSource.Companion.Predefined.starred
-        }.let { AutomaticUpNextSource.mostRecentList = it }
+            Mode.Downloaded -> AutoPlaySource.Downloads
+            Mode.History -> AutoPlaySource.None
+            Mode.Starred -> AutoPlaySource.Starred
+        }.let { settings.trackingAutoPlaySource.set(it, needsSync = false) }
     }
 
     override fun onDestroyView() {

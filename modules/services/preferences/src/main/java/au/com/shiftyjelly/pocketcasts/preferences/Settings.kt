@@ -448,6 +448,11 @@ interface Settings {
 
     val lastAutoPlaySource: UserSetting<AutoPlaySource>
 
+    // This property is used for determining which source should be used for auto play
+    // We don't want to always change the auto play source but we want to always track it
+    // in case we need to change it.
+    val trackingAutoPlaySource: UserSetting<AutoPlaySource>
+
     // It would be better to have this be a UserSetting<ThemeType>, but that
     // is not easy due to the way our modules are structured.
     val theme: UserSetting<ThemeSetting>
