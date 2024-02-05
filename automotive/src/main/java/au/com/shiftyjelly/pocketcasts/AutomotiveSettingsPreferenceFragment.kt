@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.os.Bundle
-import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
@@ -173,12 +172,10 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun setupAbout() {
-        about.apply {
-            summary = getString(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
-            setOnPreferenceClickListener {
-                (activity as? FragmentHostListener)?.addFragment(AutomotiveAboutFragment())
-                true
-            }
+        about.summary = getString(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
+        about.setOnPreferenceClickListener {
+            (activity as? FragmentHostListener)?.addFragment(AutomotiveAboutFragment())
+            true
         }
     }
 }
