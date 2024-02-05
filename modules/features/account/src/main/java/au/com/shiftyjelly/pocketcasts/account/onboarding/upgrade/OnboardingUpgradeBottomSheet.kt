@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -106,7 +107,11 @@ fun OnboardingUpgradeBottomSheet(
                         // as the user changes selections.
                         val interactionSource = remember(subscription) { MutableInteractionSource() }
 
-                        val text = subscription.recurringPricingPhase.pricePerPeriod(resources)
+                        val price = when (subscription) {
+                            is Subscription.Intro -> (subscription.offerPricingPhase as RecurringSubscriptionPricingPhase).pricePerPeriod(resources)
+                            else -> subscription.recurringPricingPhase.pricePerPeriod(resources)
+                        }
+
                         val topText = when (subscription) {
                             is Subscription.WithOffer -> subscription.badgeOfferText(resources).uppercase(Locale.getDefault())
                             else -> null
@@ -119,7 +124,7 @@ fun OnboardingUpgradeBottomSheet(
 
                             if (subscription == state.selectedSubscription) {
                                 OutlinedRowButton(
-                                    text = text,
+                                    text = price,
                                     topText = topText,
                                     subscriptionTier = subscriptionTier,
                                     brush = subscriptionTier.toOutlinedButtonBrush(),
@@ -129,7 +134,7 @@ fun OnboardingUpgradeBottomSheet(
                                 )
                             } else {
                                 UnselectedOutlinedRowButton(
-                                    text = text,
+                                    text = price,
                                     topText = topText,
                                     subscriptionTier = subscriptionTier,
                                     onClick = { viewModel.updateSelectedSubscription(subscription) },
