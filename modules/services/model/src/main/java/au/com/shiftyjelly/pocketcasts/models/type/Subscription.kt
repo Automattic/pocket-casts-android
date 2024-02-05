@@ -116,10 +116,10 @@ sealed interface Subscription {
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
         const val SUBSCRIPTION_TEST_PRODUCT_ID = "com.pocketcasts.plus.testfreetrialoffer"
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
-        const val INTRO_OFFER_ID = "testyearlyintropricingoffer"
+        const val INTRO_OFFER_ID = "testyearlyintropricingoffer-newusers"
 
-        fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
-            val subscription = SubscriptionMapper.map(productDetails, isFreeTrialEligible)
+        fun fromProductDetails(productDetails: ProductDetails, isOfferEligible: Boolean): Subscription? {
+            val subscription = SubscriptionMapper.map(productDetails, isOfferEligible)
             return if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && subscription is Trial) null else subscription
         }
     }
