@@ -128,7 +128,7 @@ fun SubscriptionBadgeForTier(
 fun OfferBadge(
     text: String,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 14.sp,
+    fontSize: TextUnit = 11.sp,
     padding: Dp = 4.dp,
     backgroundColor: Int,
     textColor: Int,

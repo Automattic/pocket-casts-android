@@ -20,15 +20,16 @@ fun SubscriptionPriceSection(
     if (subscription is Subscription.WithOffer) {
         if (subscription is Subscription.Intro) {
             ProductAmountHorizontalText(
-                primaryText = subscription.offerPricingPhase.priceSlashPeriod(LocalContext.current.resources),
-                secondaryText = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
+                price = subscription.offerPricingPhase.pricingPhase.formattedPrice,
+                period = subscription.offerPricingPhase.slashPeriod(LocalContext.current.resources),
+                originalPrice = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
             )
         } else if (subscription is Subscription.Trial) {
             ProductAmountHorizontalText(
-                primaryText = subscription.recurringPricingPhase.formattedPrice,
-                secondaryText = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
-                lineThroughSecondaryText = false,
+                price = subscription.recurringPricingPhase.formattedPrice,
+                originalPrice = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
+                lineThroughOriginalPrice = false,
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
             )
         }
@@ -42,9 +43,9 @@ fun SubscriptionPriceSection(
         )
     } else if (subscription is Subscription.Simple) {
         ProductAmountHorizontalText(
-            primaryText = subscription.recurringPricingPhase.formattedPrice,
-            secondaryText = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
-            lineThroughSecondaryText = false,
+            price = subscription.recurringPricingPhase.formattedPrice,
+            originalPrice = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
+            lineThroughOriginalPrice = false,
             hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
         )
     }
