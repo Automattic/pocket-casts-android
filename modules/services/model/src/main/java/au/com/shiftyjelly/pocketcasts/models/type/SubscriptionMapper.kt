@@ -12,8 +12,8 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 
 object SubscriptionMapper {
-    fun map(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
-        val matchingSubscriptionOfferDetails = if (isFreeTrialEligible) {
+    fun map(productDetails: ProductDetails, isOfferEligible: Boolean): Subscription? {
+        val matchingSubscriptionOfferDetails = if (isOfferEligible) {
             productDetails
                 .subscriptionOfferDetails
                 ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers

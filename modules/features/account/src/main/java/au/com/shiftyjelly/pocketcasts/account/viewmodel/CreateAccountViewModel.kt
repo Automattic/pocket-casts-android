@@ -106,7 +106,7 @@ class CreateAccountViewModel
                             .mapNotNull {
                                 Subscription.fromProductDetails(
                                     productDetails = it,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
+                                    isOfferEligible = subscriptionManager.isOfferEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
                                 )
                             }
                         subscriptionManager.getDefaultSubscription(subscriptions)?.let { updateSubscription(it) }

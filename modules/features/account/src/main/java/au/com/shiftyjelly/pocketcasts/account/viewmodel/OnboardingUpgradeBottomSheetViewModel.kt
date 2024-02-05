@@ -64,7 +64,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                             Subscription.fromProductDetails(
                                 productDetails = productDetailsState,
-                                isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                                isOfferEligible = subscriptionManager.isOfferEligible(
                                     SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
                                 ),
                             )
