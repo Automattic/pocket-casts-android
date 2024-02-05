@@ -58,8 +58,8 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         setupAutoSubscribeToPlayed()
         setupAutoShowPlayed()
         setupSkipForward()
+        setupSkipBackward()
         setupRefreshNow()
-        changeSkipTitles()
         setupAbout()
     }
 
@@ -118,6 +118,25 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
             .launchIn(lifecycleScope)
     }
 
+    private fun setupSkipBackward() {
+        preferenceSkipBackward.setInputAsSeconds()
+        preferenceSkipBackward.setOnPreferenceChangeListener { _, newValue ->
+            val value = newValue.toString().toIntOrNull() ?: 0
+            if (value > 0) {
+                settings.skipBackInSecs.set(value, needsSync = true)
+                true
+            } else {
+                false
+            }
+        }
+        settings.skipBackInSecs.flow
+            .onEach {
+                preferenceSkipBackward.text = it.toString()
+                preferenceSkipBackward.summary = resources.getStringPluralSeconds(settings.skipBackInSecs.value)
+            }
+            .launchIn(lifecycleScope)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun setupRefreshNow() {
         preferenceRefreshNow.setOnPreferenceClickListener {
@@ -153,21 +172,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceRefreshNow.summary = status
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        preferenceSkipBackward.setOnPreferenceChangeListener { _, newValue ->
-            val value = newValue.toString().toIntOrNull() ?: 0
-            if (value > 0) {
-                settings.skipBackInSecs.set(value, needsSync = true)
-                changeSkipTitles()
-                true
-            } else {
-                false
-            }
-        }
-    }
-
     private fun setupAbout() {
         about.apply {
             summary = getString(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
@@ -176,10 +180,5 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
                 true
             }
         }
-    }
-
-    private fun changeSkipTitles() {
-        val skipBackwardSummary = resources.getStringPluralSeconds(settings.skipBackInSecs.value)
-        preferenceSkipBackward.summary = skipBackwardSummary
     }
 }
