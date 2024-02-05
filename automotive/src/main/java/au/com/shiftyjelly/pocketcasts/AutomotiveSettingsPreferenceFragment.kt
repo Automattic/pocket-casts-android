@@ -56,6 +56,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
 
         setupAutoPlay()
         setupAutoSubscribeToPlayed()
+        setupAutoShowPlayed()
         changeSkipTitles()
         setupRefreshNow()
         setupAbout()
@@ -82,6 +83,18 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         }
         settings.autoSubscribeToPlayed.flow
             .onEach { preferenceAutoSubscribeToPlayed.isChecked = it }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun setupAutoShowPlayed() {
+        preferenceAutoShowPlayed.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
+                true
+            }
+        }
+        settings.autoShowPlayed.flow
+            .onEach { preferenceAutoShowPlayed.isChecked = it }
             .launchIn(lifecycleScope)
     }
 
@@ -124,18 +137,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         super.onDestroyView()
 
         refreshObservable?.removeObserver(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        preferenceAutoShowPlayed.apply {
-            isChecked = settings.autoShowPlayed.value
-            setOnPreferenceChangeListener { _, newValue ->
-                settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
-                true
-            }
-        }
     }
 
     private fun setupAbout() {
