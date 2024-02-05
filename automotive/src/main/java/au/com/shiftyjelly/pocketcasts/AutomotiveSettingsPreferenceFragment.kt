@@ -2,10 +2,7 @@ package au.com.shiftyjelly.pocketcasts
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.toLiveData
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -18,17 +15,20 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
 import java.util.Date
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx2.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observer<RefreshState> {
+class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     @Inject lateinit var settings: Settings
 
@@ -41,7 +41,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
     private lateinit var preferenceSkipBackward: EditTextPreference
     private lateinit var preferenceRefreshNow: Preference
     private lateinit var about: Preference
-    private var refreshObservable: LiveData<RefreshState>? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_auto)
@@ -57,8 +56,8 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         setupAutoPlay()
         setupAutoSubscribeToPlayed()
         setupAutoShowPlayed()
-        changeSkipTitles()
         setupRefreshNow()
+        changeSkipTitles()
         setupAbout()
     }
 
@@ -98,17 +97,43 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
             .launchIn(lifecycleScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun setupRefreshNow() {
+        preferenceRefreshNow.setOnPreferenceClickListener {
+            podcastManager.refreshPodcasts(fromLog = "Automotive")
+            updateRefreshSummary(RefreshState.Refreshing)
+            true
+        }
+        settings.refreshStateObservable.asFlow()
+            .flatMapLatest { state ->
+                flow {
+                    while (true) {
+                        emit(state)
+                        delay(500.milliseconds)
+                    }
+                }
+            }
+            .onEach { updateRefreshSummary(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun updateRefreshSummary(state: RefreshState) {
+        val status = when (state) {
+            is RefreshState.Success -> {
+                val time = Date().time - state.date.time
+                val timeAmount = resources.getStringPluralSecondsMinutesHoursDaysOrYears(time)
+                getString(LR.string.profile_last_refresh, timeAmount)
+            }
+            is RefreshState.Never -> getString(LR.string.profile_refreshed_never)
+            is RefreshState.Refreshing -> getString(LR.string.profile_refreshing)
+            is RefreshState.Failed -> getString(LR.string.profile_refresh_failed)
+            else -> getString(LR.string.profile_refresh_status_unknown)
+        }
+        preferenceRefreshNow.summary = status
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        refreshObservable =
-            settings.refreshStateObservable
-                .toFlowable(BackpressureStrategy.LATEST)
-                .switchMap { state ->
-                    Flowable.interval(500, TimeUnit.MILLISECONDS).switchMap { Flowable.just(state) }
-                }
-                .toLiveData()
-        refreshObservable?.observe(viewLifecycleOwner, this)
 
         preferenceSkipForward.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
@@ -133,12 +158,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        refreshObservable?.removeObserver(this)
-    }
-
     private fun setupAbout() {
         about.apply {
             summary = getString(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
@@ -147,33 +166,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
                 true
             }
         }
-    }
-
-    private fun setupRefreshNow() {
-        preferenceRefreshNow.setOnPreferenceClickListener {
-            podcastManager.refreshPodcasts(fromLog = "Automotive")
-            updateRefreshSummary(RefreshState.Refreshing)
-            true
-        }
-    }
-
-    override fun onChanged(value: RefreshState) {
-        updateRefreshSummary(value)
-    }
-
-    private fun updateRefreshSummary(state: RefreshState) {
-        val status = when (state) {
-            is RefreshState.Success -> {
-                val time = Date().time - state.date.time
-                val timeAmount = resources.getStringPluralSecondsMinutesHoursDaysOrYears(time)
-                getString(LR.string.profile_last_refresh, timeAmount)
-            }
-            is RefreshState.Never -> getString(LR.string.profile_refreshed_never)
-            is RefreshState.Refreshing -> getString(LR.string.profile_refreshing)
-            is RefreshState.Failed -> getString(LR.string.profile_refresh_failed)
-            else -> getString(LR.string.profile_refresh_status_unknown)
-        }
-        preferenceRefreshNow.summary = status
     }
 
     private fun changeSkipTitles() {
