@@ -436,13 +436,6 @@
                     style="@style/shelf_item" />
 
                 <ImageButton
-                    android:id="@+id/download"
-                    android:contentDescription="@string/download"
-                    app:srcCompat="@drawable/ic_download_32"
-                    app:tint="?attr/player_contrast_03"
-                    style="@style/shelf_item" />
-
-                <ImageButton
                     android:id="@+id/report"
                     android:contentDescription="@string/report"
                     app:srcCompat="@drawable/ic_flag"

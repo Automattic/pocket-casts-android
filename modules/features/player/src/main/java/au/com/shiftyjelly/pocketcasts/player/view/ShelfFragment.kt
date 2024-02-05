@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfTitleBindin
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -157,7 +158,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
 
     override fun onShelfItemTouchHelperFinished(position: Int) {
         trackShelfItemMovedEvent(position)
-        settings.setShelfItems(items.filterIsInstance<ShelfItem>().map { it.id })
+        settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), needsSync = false)
     }
 
     private fun sectionTitleAt(position: Int) =
@@ -292,15 +293,15 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
         if (item is ShelfItem && holder is ItemViewHolder) {
             val binding = holder.binding
 
-            binding.lblTitle.setText(item.title(episode))
-            binding.imgIcon.setImageResource(item.iconRes(episode))
+            binding.lblTitle.setText(item.titleId(episode))
+            binding.imgIcon.setImageResource(item.iconId(episode))
             binding.dragHandle.isVisible = editable
 
             if (listener != null) {
                 holder.itemView.setOnClickListener { listener.invoke(item) }
             }
 
-            val subtitle = item.subtitle
+            val subtitle = item.subtitleId
             binding.lblSubtitle.isVisible = editable && subtitle != null && episode is UserEpisode
             if (subtitle != null) {
                 binding.lblSubtitle.setText(subtitle)
