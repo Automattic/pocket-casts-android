@@ -55,6 +55,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         about = findPreference("about")!!
 
         setupAutoPlay()
+        setupAutoSubscribeToPlayed()
         changeSkipTitles()
         setupRefreshNow()
         setupAbout()
@@ -69,6 +70,18 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         }
         settings.autoPlayNextEpisodeOnEmpty.flow
             .onEach { preferenceAutoPlay.isChecked = it }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun setupAutoSubscribeToPlayed() {
+        preferenceAutoSubscribeToPlayed.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = false)
+                true
+            }
+        }
+        settings.autoSubscribeToPlayed.flow
+            .onEach { preferenceAutoSubscribeToPlayed.isChecked = it }
             .launchIn(lifecycleScope)
     }
 
@@ -115,15 +128,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
 
     override fun onResume() {
         super.onResume()
-
-
-        preferenceAutoSubscribeToPlayed.apply {
-            isChecked = settings.autoSubscribeToPlayed.value
-            setOnPreferenceChangeListener { _, newValue ->
-                settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = false)
-                true
-            }
-        }
 
         preferenceAutoShowPlayed.apply {
             isChecked = settings.autoShowPlayed.value
