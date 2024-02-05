@@ -63,11 +63,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun setupAutoPlay() {
-        preferenceAutoPlay.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = true)
-                true
-            }
+        preferenceAutoPlay.setOnPreferenceChangeListener { _, newValue ->
+            settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
+            true
         }
         settings.autoPlayNextEpisodeOnEmpty.flow
             .onEach { preferenceAutoPlay.isChecked = it }
@@ -75,11 +73,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun setupAutoSubscribeToPlayed() {
-        preferenceAutoSubscribeToPlayed.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = false)
-                true
-            }
+        preferenceAutoSubscribeToPlayed.setOnPreferenceChangeListener { _, newValue ->
+            settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = false)
+            true
         }
         settings.autoSubscribeToPlayed.flow
             .onEach { preferenceAutoSubscribeToPlayed.isChecked = it }
@@ -87,11 +83,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun setupAutoShowPlayed() {
-        preferenceAutoShowPlayed.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
-                true
-            }
+        preferenceAutoShowPlayed.setOnPreferenceChangeListener { _, newValue ->
+            settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
+            true
         }
         settings.autoShowPlayed.flow
             .onEach { preferenceAutoShowPlayed.isChecked = it }
