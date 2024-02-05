@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.toLiveData
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
@@ -22,6 +23,8 @@ import io.reactivex.Flowable
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -51,9 +54,22 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         preferenceSkipBackward = findPreference(Settings.PREFERENCE_SKIP_BACKWARD)!!
         about = findPreference("about")!!
 
+        setupAutoPlay()
         changeSkipTitles()
         setupRefreshNow()
         setupAbout()
+    }
+
+    private fun setupAutoPlay() {
+        preferenceAutoPlay.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = true)
+                true
+            }
+        }
+        settings.autoPlayNextEpisodeOnEmpty.flow
+            .onEach { preferenceAutoPlay.isChecked = it }
+            .launchIn(lifecycleScope)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
