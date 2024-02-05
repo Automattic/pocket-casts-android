@@ -74,7 +74,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun setupAutoSubscribeToPlayed() {
         preferenceAutoSubscribeToPlayed.setOnPreferenceChangeListener { _, newValue ->
-            settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = false)
+            settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = true)
             true
         }
         settings.autoSubscribeToPlayed.flow
@@ -84,7 +84,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun setupAutoShowPlayed() {
         preferenceAutoShowPlayed.setOnPreferenceChangeListener { _, newValue ->
-            settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
+            settings.autoShowPlayed.set(newValue as Boolean, needsSync = true)
             true
         }
         settings.autoShowPlayed.flow

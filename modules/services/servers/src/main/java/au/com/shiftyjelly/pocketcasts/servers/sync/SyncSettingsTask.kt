@@ -162,6 +162,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                autoShowPlayed = settings.autoShowPlayed.getSyncSetting(::NamedChangedSettingBool),
+                autoSubscribeToPlayed = settings.autoSubscribeToPlayed.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -355,6 +357,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "filesAutoUpNext" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.cloudAddToUpNext,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoShowPlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoShowPlayed,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoSubscribeToPlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoSubscribeToPlayed,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "theme" -> updateSettingIfPossible(
