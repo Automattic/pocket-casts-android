@@ -158,7 +158,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
 
     override fun onShelfItemTouchHelperFinished(position: Int) {
         trackShelfItemMovedEvent(position)
-        settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), needsSync = false)
+        settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), needsSync = true)
     }
 
     private fun sectionTitleAt(position: Int) =

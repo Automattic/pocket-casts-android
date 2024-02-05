@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -185,6 +186,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 notificationSettingActions = settings.newEpisodeNotificationActions.getSyncSetting { actions, modifiedAt ->
                     NamedChangedSettingString(
                         value = actions.joinToString(separator = ",", transform = NewEpisodeNotificationAction::serverId),
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                playerShelfItems = settings.shelfItems.getSyncSetting { items, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = items.joinToString(separator = ",", transform = ShelfItem::serverId),
                         modifiedAt = modifiedAt,
                     )
                 },
@@ -428,6 +435,13 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         newSettingValue = (changedSettingResponse.value as? String)
                             ?.split(',')
                             ?.mapNotNull(NewEpisodeNotificationAction::fromServerId),
+                    )
+                    "playerShelf" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.shelfItems,
+                        newSettingValue = (changedSettingResponse.value as? String)
+                            ?.split(',')
+                            ?.mapNotNull(ShelfItem::fromServerId),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }

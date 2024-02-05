@@ -83,7 +83,12 @@ enum class ShelfItem(
     ),
     ;
 
+    // We can safely use the ID as server ID. Keeping it if need to make changes in the future.
+    val serverId get() = id
+
     companion object {
         fun fromId(id: String) = entries.find { it.id == id }
+
+        fun fromServerId(id: String) = entries.find { it.serverId == id }
     }
 }
