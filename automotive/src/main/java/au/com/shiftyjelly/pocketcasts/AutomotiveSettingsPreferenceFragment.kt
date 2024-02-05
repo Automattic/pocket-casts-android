@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
@@ -56,6 +57,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         setupAutoPlay()
         setupAutoSubscribeToPlayed()
         setupAutoShowPlayed()
+        setupSkipForward()
         setupRefreshNow()
         changeSkipTitles()
         setupAbout()
@@ -97,6 +99,25 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
             .launchIn(lifecycleScope)
     }
 
+    private fun setupSkipForward() {
+        preferenceSkipForward.setInputAsSeconds()
+        preferenceSkipForward.setOnPreferenceChangeListener { _, newValue ->
+            val value = newValue.toString().toIntOrNull() ?: 0
+            if (value > 0) {
+                settings.skipForwardInSecs.set(value, needsSync = true)
+                true
+            } else {
+                false
+            }
+        }
+        settings.skipForwardInSecs.flow
+            .onEach {
+                preferenceSkipForward.text = it.toString()
+                preferenceSkipForward.summary = resources.getStringPluralSeconds(settings.skipForwardInSecs.value)
+            }
+            .launchIn(lifecycleScope)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun setupRefreshNow() {
         preferenceRefreshNow.setOnPreferenceClickListener {
@@ -135,17 +156,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        preferenceSkipForward.setOnPreferenceChangeListener { _, newValue ->
-            val value = newValue.toString().toIntOrNull() ?: 0
-            if (value > 0) {
-                settings.skipForwardInSecs.set(value, needsSync = true)
-                changeSkipTitles()
-                true
-            } else {
-                false
-            }
-        }
-
         preferenceSkipBackward.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
@@ -169,8 +179,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun changeSkipTitles() {
-        val skipForwardSummary = resources.getStringPluralSeconds(settings.skipForwardInSecs.value)
-        preferenceSkipForward.summary = skipForwardSummary
         val skipBackwardSummary = resources.getStringPluralSeconds(settings.skipBackInSecs.value)
         preferenceSkipBackward.summary = skipBackwardSummary
     }
