@@ -59,6 +59,47 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
         setupAbout()
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        refreshObservable =
+                settings.refreshStateObservable
+                        .toFlowable(BackpressureStrategy.LATEST)
+                        .switchMap { state ->
+                            Flowable.interval(500, TimeUnit.MILLISECONDS).switchMap { Flowable.just(state) }
+                        }
+                        .toLiveData()
+        refreshObservable?.observe(viewLifecycleOwner, this)
+
+        preferenceSkipForward?.setOnPreferenceChangeListener { _, newValue ->
+            val value = newValue.toString().toIntOrNull() ?: 0
+            if (value > 0) {
+                settings.skipForwardInSecs.set(value, needsSync = true)
+                changeSkipTitles()
+                true
+            } else {
+                false
+            }
+        }
+
+        preferenceSkipBackward?.setOnPreferenceChangeListener { _, newValue ->
+            val value = newValue.toString().toIntOrNull() ?: 0
+            if (value > 0) {
+                settings.skipBackInSecs.set(value, needsSync = true)
+                changeSkipTitles()
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        refreshObservable?.removeObserver(this)
+    }
+
     override fun onResume() {
         super.onResume()
         preferenceAutoPlay.apply {
@@ -103,47 +144,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observe
                 true
             }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        refreshObservable =
-            settings.refreshStateObservable
-                .toFlowable(BackpressureStrategy.LATEST)
-                .switchMap { state ->
-                    Flowable.interval(500, TimeUnit.MILLISECONDS).switchMap { Flowable.just(state) }
-                }
-                .toLiveData()
-        refreshObservable?.observe(viewLifecycleOwner, this)
-
-        preferenceSkipForward?.setOnPreferenceChangeListener { _, newValue ->
-            val value = newValue.toString().toIntOrNull() ?: 0
-            if (value > 0) {
-                settings.skipForwardInSecs.set(value, needsSync = true)
-                changeSkipTitles()
-                true
-            } else {
-                false
-            }
-        }
-
-        preferenceSkipBackward?.setOnPreferenceChangeListener { _, newValue ->
-            val value = newValue.toString().toIntOrNull() ?: 0
-            if (value > 0) {
-                settings.skipBackInSecs.set(value, needsSync = true)
-                changeSkipTitles()
-                true
-            } else {
-                false
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        refreshObservable?.removeObserver(this)
     }
 
     override fun onChanged(value: RefreshState) {
