@@ -147,10 +147,21 @@ fun OnboardingUpgradeBottomSheet(
 
             val descriptionText = state.selectedSubscription.offerPricingPhase.let { offerPhase ->
                 if (offerPhase != null) {
-                    stringResource(
-                        LR.string.onboarding_plus_recurring_after_free_trial,
-                        recurringAfterString(offerPhase, resources),
-                    )
+                    if (selectedSubscription is Subscription.Intro) {
+                        stringResource(
+                            LR.string.onboarding_plus_recurring_after_intro_offer,
+                            recurringAfterIntroString(
+                                offerPhase,
+                                state.selectedSubscription.recurringPricingPhase,
+                                resources,
+                            ),
+                        )
+                    } else {
+                        stringResource(
+                            LR.string.onboarding_plus_recurring_after_free_trial,
+                            recurringAfterTrialString(offerPhase, resources),
+                        )
+                    }
                 } else {
                     val firstLine = stringResource(state.selectedSubscription.recurringPricingPhase.renews)
                     val secondLine = stringResource(LR.string.onboarding_plus_can_be_canceled_at_any_time)
@@ -235,10 +246,16 @@ private val animationSpec = tween<IntSize>(
     easing = EaseInOut,
 )
 
-private fun recurringAfterString(
+private fun recurringAfterTrialString(
     offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase,
     res: Resources,
-) = "${offerSubscriptionPricingPhase.numPeriodOffer(res)} (${offerSubscriptionPricingPhase.offerEnd()})"
+) = "${offerSubscriptionPricingPhase.numPeriodOffer(res, isTrial = true)} (${offerSubscriptionPricingPhase.offerEnd()})"
+private fun recurringAfterIntroString(
+    offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase,
+    recurringSubscriptionPricingPhase: RecurringSubscriptionPricingPhase,
+    res: Resources,
+): String =
+    "${recurringSubscriptionPricingPhase.formattedPrice} ${res.getString(LR.string.onboarding_plus_recurring_after_intro_offer_sufix)} (${offerSubscriptionPricingPhase.offerEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
     SubscriptionTier.PLUS -> R.string.onboarding_plus_subscribe
