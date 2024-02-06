@@ -44,10 +44,37 @@ class WhatsNewViewModel @Inject constructor(
     }
 
     private fun updateStateForSlumberStudiosPromo() {
-        _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.SlumberStudiosPromo(settings.getSlumberStudiosPromoCode()),
-            tier = settings.userTier,
-        )
+        when (val userTier = settings.userTier) {
+            UserTier.Plus, UserTier.Patron -> {
+                _state.value = UiState.Loaded(
+                    feature = WhatsNewFeature.SlumberStudiosPromo(
+                        promoCode = settings.getSlumberStudiosPromoCode(),
+                    ),
+                    tier = settings.userTier,
+                )
+            }
+
+            UserTier.Free -> {
+                viewModelScope.launch {
+                    val subscriptionTier = Subscription.SubscriptionTier.PLUS
+
+                    subscriptionManager
+                        .freeTrialForSubscriptionTierFlow(subscriptionTier)
+                        .stateIn(viewModelScope)
+                        .collect { freeTrial ->
+                            _state.value = UiState.Loaded(
+                                feature = WhatsNewFeature.SlumberStudiosPromo(
+                                    promoCode = settings.getSlumberStudiosPromoCode(),
+                                    hasFreeTrial = freeTrial.exists,
+                                    isUserEntitled = false,
+                                    subscriptionTier = subscriptionTier,
+                                ),
+                                tier = userTier,
+                            )
+                        }
+                }
+            }
+        }
     }
 
     private fun updateStateForBookmarks() {
@@ -94,6 +121,7 @@ class WhatsNewViewModel @Inject constructor(
             subscriptionTier = subscriptionTier,
         )
     }
+
     fun onConfirm() {
         viewModelScope.launch {
             val currentState = state.value as? UiState.Loaded ?: return@launch
@@ -108,6 +136,7 @@ class WhatsNewViewModel @Inject constructor(
                 } else {
                     NavigationState.StartUpsellFlow
                 }
+
                 is WhatsNewFeature.SlumberStudiosPromo -> NavigationState.SlumberStudiosRedeemPromoCode
             }
             _navigationState.emit(target)
@@ -128,20 +157,29 @@ class WhatsNewViewModel @Inject constructor(
         @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
+        abstract val hasFreeTrial: Boolean
+        abstract val isUserEntitled: Boolean
+        abstract val subscriptionTier: Subscription.SubscriptionTier? // To show subscription when user is not entitled to the feature
+
         data class Bookmarks(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
             @StringRes override val confirmButtonTitle: Int,
-            val hasFreeTrial: Boolean,
-            val isUserEntitled: Boolean,
-            val subscriptionTier: Subscription.SubscriptionTier? = null, // To show subscription when user is not entitled to the feature
+            override val hasFreeTrial: Boolean,
+            override val isUserEntitled: Boolean,
+            override val subscriptionTier: Subscription.SubscriptionTier? = null,
         ) : WhatsNewFeature(
             title = title,
             message = message,
             confirmButtonTitle = confirmButtonTitle,
         )
 
-        data class SlumberStudiosPromo(val promoCode: String) : WhatsNewFeature(
+        data class SlumberStudiosPromo(
+            val promoCode: String,
+            override val hasFreeTrial: Boolean = false,
+            override val isUserEntitled: Boolean = true,
+            override val subscriptionTier: Subscription.SubscriptionTier? = null,
+        ) : WhatsNewFeature(
             title = LR.string.whats_new_slumber_studios_title,
             message = LR.string.whats_new_slumber_studios_body,
             confirmButtonTitle = LR.string.whats_new_slumber_studios_redeem_now_button,

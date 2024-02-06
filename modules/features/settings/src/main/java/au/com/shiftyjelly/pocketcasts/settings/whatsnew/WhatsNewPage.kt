@@ -183,6 +183,7 @@ private fun Message(
         textAlign = TextAlign.Center,
         color = MaterialTheme.theme.colors.primaryText02,
     )
+
     is WhatsNewFeature.SlumberStudiosPromo -> HtmlText(
         html = stringResource(state.feature.message, state.feature.promoCode),
         textStyleResId = UR.style.P40,
@@ -202,7 +203,7 @@ private fun getButtonTitle(
                 if (state.feature.subscriptionTier != null) {
                     stringResource(
                         LR.string.upgrade_to,
-                        when (state.feature.subscriptionTier) {
+                        when (requireNotNull(state.feature.subscriptionTier)) {
                             Subscription.SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
                             Subscription.SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
                             Subscription.SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
@@ -215,7 +216,12 @@ private fun getButtonTitle(
             }
         }
     }
-    is WhatsNewFeature.SlumberStudiosPromo -> stringResource(state.feature.confirmButtonTitle)
+
+    is WhatsNewFeature.SlumberStudiosPromo -> when {
+        state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
+        state.feature.hasFreeTrial -> stringResource(LR.string.profile_start_free_trial)
+        else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
+    }
 }
 
 @Composable
@@ -228,6 +234,8 @@ private fun WhatsNewSlumberStudiosPreview(
             state = UiState.Loaded(
                 feature = WhatsNewFeature.SlumberStudiosPromo(
                     promoCode = "PROMO",
+                    hasFreeTrial = false,
+                    isUserEntitled = true,
                 ),
                 tier = UserTier.Plus,
             ),
