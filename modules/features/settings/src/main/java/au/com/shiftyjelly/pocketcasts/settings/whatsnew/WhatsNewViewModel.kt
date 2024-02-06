@@ -86,7 +86,6 @@ class WhatsNewViewModel @Inject constructor(
             val currentState = state.value as? UiState.Loaded ?: return@launch
             val currentEpisode = playbackManager.getCurrentEpisode()
             val target = when (currentState.feature) {
-                is WhatsNewFeature.AutoPlay -> NavigationState.PlaybackSettings
                 is WhatsNewFeature.Bookmarks -> if (currentState.feature.isUserEntitled) {
                     if (currentEpisode == null) {
                         NavigationState.HeadphoneControlsSettings
@@ -115,13 +114,6 @@ class WhatsNewViewModel @Inject constructor(
         @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
-        data object AutoPlay : WhatsNewFeature(
-            title = LR.string.whats_new_autoplay_title,
-            message = LR.string.whats_new_autoplay_body,
-            confirmButtonTitle = LR.string.whats_new_autoplay_enable_button,
-            closeButtonTitle = LR.string.whats_new_autoplay_maybe_later_button,
-        )
-
         data class Bookmarks(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
@@ -137,7 +129,6 @@ class WhatsNewViewModel @Inject constructor(
     }
 
     sealed class NavigationState {
-        data object PlaybackSettings : NavigationState()
         data object HeadphoneControlsSettings : NavigationState()
         data object FullScreenPlayerScreen : NavigationState()
         data object StartUpsellFlow : NavigationState()

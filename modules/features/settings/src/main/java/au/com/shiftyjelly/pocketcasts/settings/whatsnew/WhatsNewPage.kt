@@ -63,7 +63,6 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        is WhatsNewFeature.AutoPlay -> AutoPlayHeader()
                         is WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
                     }
                 },
@@ -177,7 +176,6 @@ private fun WhatsNewPageLoaded(
 private fun getButtonTitle(
     state: UiState.Loaded,
 ): String = when (state.feature) {
-    WhatsNewFeature.AutoPlay -> stringResource(state.feature.confirmButtonTitle)
     is WhatsNewFeature.Bookmarks -> {
         when {
             state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
@@ -198,24 +196,6 @@ private fun getButtonTitle(
                 }
             }
         }
-    }
-}
-
-@Composable
-@Preview
-private fun WhatsNewAutoPlayPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    AppThemeWithBackground(themeType) {
-        WhatsNewPageLoaded(
-            state = UiState.Loaded(
-                feature = WhatsNewFeature.AutoPlay,
-                tier = UserTier.Free,
-            ),
-            header = { AutoPlayHeader() },
-            onConfirm = {},
-            onClose = {},
-        )
     }
 }
 
