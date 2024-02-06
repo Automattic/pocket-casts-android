@@ -271,7 +271,7 @@ class Theme @Inject constructor(private val settings: Settings) {
         ThemeType.fromThemeSetting(settings.theme.value)
 
     private fun setThemeToPreferences(theme: ThemeType) {
-        settings.theme.set(theme.themeSetting, needsSync = false)
+        settings.theme.set(theme.themeSetting, needsSync = true)
     }
 
     private fun getPreferredDarkThemeFromPreferences(): ThemeType =
