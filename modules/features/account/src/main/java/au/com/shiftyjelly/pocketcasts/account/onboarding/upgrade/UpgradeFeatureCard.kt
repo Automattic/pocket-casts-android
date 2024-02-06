@@ -21,7 +21,7 @@ enum class UpgradeFeatureCard(
         shortNameRes = LR.string.pocket_casts_plus_short,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         iconRes = IR.drawable.ic_plus,
-        featureItems = PlusUpgradeFeatureItem.values().toList(),
+        featureItems = PlusUpgradeFeatureItem.entries.filter { it.isVisible },
         subscriptionTier = SubscriptionTier.PLUS,
     ),
     PATRON(
@@ -29,7 +29,7 @@ enum class UpgradeFeatureCard(
         shortNameRes = LR.string.pocket_casts_patron_short,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         iconRes = IR.drawable.ic_patron,
-        featureItems = PatronUpgradeFeatureItem.values().toList(),
+        featureItems = PatronUpgradeFeatureItem.entries.filter { it.isVisible },
         subscriptionTier = SubscriptionTier.PATRON,
     ),
 }

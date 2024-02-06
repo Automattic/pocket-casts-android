@@ -46,10 +46,10 @@ enum class Feature(
     SLUMBER_STUDIOS_PROMO(
         key = "slumber_studios_promo",
         title = "Slumber Studios Promo",
-        defaultValue = false,
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
-        hasDevToggle = false,
+        hasDevToggle = true,
     ),
     ;
 
