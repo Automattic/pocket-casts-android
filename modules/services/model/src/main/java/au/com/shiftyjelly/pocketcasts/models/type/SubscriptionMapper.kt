@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MO
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.SUBSCRIPTION_TEST_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
@@ -144,9 +146,10 @@ object SubscriptionMapper {
             null
         }
 
-    fun mapProductIdToTier(productId: String) = when (productId) {
-        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID, SUBSCRIPTION_TEST_PRODUCT_ID) -> SubscriptionTier.PLUS
-        in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
+    fun mapProductIdToTier(productId: String) = when {
+        FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && productId == SUBSCRIPTION_TEST_PRODUCT_ID -> SubscriptionTier.PLUS
+        productId in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
+        productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
         else -> SubscriptionTier.UNKNOWN
     }
 }
