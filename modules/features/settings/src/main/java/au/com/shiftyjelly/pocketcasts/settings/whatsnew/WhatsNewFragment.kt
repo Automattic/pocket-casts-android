@@ -94,6 +94,7 @@ class WhatsNewFragment : BaseFragment() {
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
             NavigationState.FullScreenPlayerScreen -> openPlayer()
             NavigationState.StartUpsellFlow -> startUpsellFlow()
+            NavigationState.SlumberStudiosRedeemPromoCode -> {} // TODO: Implement SlumberStudiosRedeemPromoCode action
         }
     }
 
