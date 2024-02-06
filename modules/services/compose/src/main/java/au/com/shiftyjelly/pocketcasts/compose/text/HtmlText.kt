@@ -23,6 +23,7 @@ fun HtmlText(
     color: Color = MaterialTheme.theme.colors.primaryText01,
     linkColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
     maxLines: Int = Int.MAX_VALUE,
+    lineSpacingMultiplier: Float = 1.4f,
     @StyleRes textStyleResId: Int = UR.style.H50,
 ) {
     AndroidView(
@@ -30,6 +31,7 @@ fun HtmlText(
         factory = { context ->
             TextView(context).apply {
                 setTextAppearance(textStyleResId)
+                setLineSpacing(0f, lineSpacingMultiplier)
                 setMaxLines(maxLines)
                 setTextColor(color.toArgb())
                 setLinkTextColor(linkColor.toArgb())
