@@ -77,7 +77,7 @@ class WhatsNewFragment : BaseFragment() {
                             onClose()
                         },
 
-                    )
+                        )
 
                     DisposableEffect(Unit) {
                         onDispose {
