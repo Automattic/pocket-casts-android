@@ -137,7 +137,11 @@ class WhatsNewViewModel @Inject constructor(
                     NavigationState.StartUpsellFlow
                 }
 
-                is WhatsNewFeature.SlumberStudiosPromo -> NavigationState.SlumberStudiosRedeemPromoCode
+                is WhatsNewFeature.SlumberStudiosPromo -> if (currentState.feature.isUserEntitled) {
+                    NavigationState.SlumberStudiosRedeemPromoCode
+                } else {
+                    NavigationState.StartUpsellFlow
+                }
             }
             _navigationState.emit(target)
         }

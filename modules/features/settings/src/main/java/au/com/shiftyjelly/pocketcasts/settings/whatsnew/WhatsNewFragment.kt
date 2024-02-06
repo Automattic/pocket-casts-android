@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,7 +95,7 @@ class WhatsNewFragment : BaseFragment() {
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
             NavigationState.FullScreenPlayerScreen -> openPlayer()
             NavigationState.StartUpsellFlow -> startUpsellFlow()
-            NavigationState.SlumberStudiosRedeemPromoCode -> {} // TODO: Implement SlumberStudiosRedeemPromoCode action
+            NavigationState.SlumberStudiosRedeemPromoCode -> redeemSlumberStudiosPromoCode()
         }
     }
 
@@ -115,6 +116,10 @@ class WhatsNewFragment : BaseFragment() {
             source = OnboardingUpgradeSource.BOOKMARKS,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+    }
+
+    private fun redeemSlumberStudiosPromoCode() {
+        openUrl(Settings.SLUMBER_STUDIOS_PROMO_URL)
     }
 
     companion object {
