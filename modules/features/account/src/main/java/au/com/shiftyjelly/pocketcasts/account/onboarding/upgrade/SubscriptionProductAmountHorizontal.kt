@@ -7,15 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountHorizontalText
-import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 
 @Composable
-fun SubscriptionPriceSection(
+fun SubscriptionProductAmountHorizontal(
     subscription: Subscription,
-    upgradeButton: UpgradeButton,
-    hasBackgroundAlwaysWhite: Boolean = false,
     modifier: Modifier = Modifier,
+    hasBackgroundAlwaysWhite: Boolean = false,
 ) {
     if (subscription is Subscription.WithOffer) {
         if (subscription is Subscription.Intro) {
@@ -35,12 +33,6 @@ fun SubscriptionPriceSection(
         }
 
         Spacer(modifier = modifier.padding(vertical = 4.dp))
-
-        OfferBadge(
-            text = subscription.badgeOfferText(LocalContext.current.resources),
-            backgroundColor = upgradeButton.backgroundColorRes,
-            textColor = upgradeButton.textColorRes,
-        )
     } else if (subscription is Subscription.Simple) {
         ProductAmountHorizontalText(
             price = subscription.recurringPricingPhase.formattedPrice,

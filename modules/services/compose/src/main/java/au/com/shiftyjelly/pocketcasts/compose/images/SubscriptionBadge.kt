@@ -17,6 +17,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -128,7 +129,7 @@ fun SubscriptionBadgeForTier(
 fun OfferBadge(
     text: String,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 11.sp,
+    fontSize: TextUnit = 14.sp,
     padding: Dp = 4.dp,
     backgroundColor: Int,
     textColor: Int,
@@ -139,12 +140,13 @@ fun OfferBadge(
         modifier = modifier,
     ) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .semantics(mergeDescendants = true) {}
                 .padding(horizontal = padding * 2, vertical = padding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TextH50(
+                textAlign = TextAlign.Center,
                 text = text.uppercase(),
                 color = colorResource(id = textColor),
                 fontSize = fontSize,
