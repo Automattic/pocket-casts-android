@@ -33,6 +33,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.File
+import java.time.Instant
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -126,13 +127,13 @@ open class SyncServerManager @Inject constructor(
         server.namedSettings(addBearer(token), request)
 
     @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
-    fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> {
+    fun syncUpdate(email: String, data: String, lastSyncTime: Instant, token: AccessToken): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> {
         val fields = mutableMapOf(
             "email" to email,
             "token" to token.value,
             "data" to data,
             "device_utc_time_ms" to System.currentTimeMillis().toString(),
-            "last_modified" to lastModified,
+            "last_modified" to lastSyncTime.toString(),
         )
         addDeviceFields(fields)
 

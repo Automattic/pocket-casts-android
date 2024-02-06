@@ -21,8 +21,8 @@ abstract class UserSetting<T>(
     }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
-    fun <U> getSyncSetting(f: (T, String) -> U): U? {
-        val modifiedAtServerString = getModifiedAtServerString()
+    fun <U> getSyncSetting(lastSyncTime: Instant, f: (T, String) -> U): U? {
+        val modifiedAtServerString = getModifiedAtServerString() ?: lastSyncTime.takeIf { it != Instant.EPOCH }?.toString()
         // Only need to sync if modifiedAtServerString is not null
         return if (modifiedAtServerString != null) {
             f(value, modifiedAtServerString)

@@ -52,6 +52,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import java.net.HttpURLConnection
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.rx2.rxSingle
@@ -348,11 +349,11 @@ class SyncManagerImpl @Inject constructor(
 // Sync
 
     @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
-    override fun syncUpdate(data: String, lastModified: String): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> =
+    override fun syncUpdate(data: String, lastSyncTime: Instant): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> =
         getEmail()?.let { email ->
             getCacheTokenOrLoginRxSingle { token ->
                 @Suppress("DEPRECATION")
-                syncServerManager.syncUpdate(email, data, lastModified, token)
+                syncServerManager.syncUpdate(email, data, lastSyncTime, token)
             }
         } ?: Single.error(Exception("Not logged in"))
 
