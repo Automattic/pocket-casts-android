@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.text
 
 import android.text.method.LinkMovementMethod
+import android.view.Gravity
 import android.widget.TextView
 import androidx.annotation.StyleRes
 import androidx.compose.material.MaterialTheme
@@ -21,6 +22,7 @@ fun HtmlText(
     html: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    gravity: Int = Gravity.START,
     linkColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
     maxLines: Int = Int.MAX_VALUE,
     lineSpacingMultiplier: Float = 1.4f,
@@ -30,6 +32,7 @@ fun HtmlText(
         modifier = modifier,
         factory = { context ->
             TextView(context).apply {
+                setGravity(gravity)
                 setTextAppearance(textStyleResId)
                 setLineSpacing(0f, lineSpacingMultiplier)
                 setMaxLines(maxLines)
