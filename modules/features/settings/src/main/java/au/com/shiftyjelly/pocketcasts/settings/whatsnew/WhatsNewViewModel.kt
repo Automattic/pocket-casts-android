@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.earlyaccess.EarlyAccessStrings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -134,13 +135,13 @@ class WhatsNewViewModel @Inject constructor(
                         NavigationState.FullScreenPlayerScreen
                     }
                 } else {
-                    NavigationState.StartUpsellFlow
+                    NavigationState.StartUpsellFlow(OnboardingUpgradeSource.BOOKMARKS)
                 }
 
                 is WhatsNewFeature.SlumberStudiosPromo -> if (currentState.feature.isUserEntitled) {
                     NavigationState.SlumberStudiosRedeemPromoCode
                 } else {
-                    NavigationState.StartUpsellFlow
+                    NavigationState.StartUpsellFlow(OnboardingUpgradeSource.SLUMBER_STUDIOS)
                 }
             }
             _navigationState.emit(target)
@@ -193,7 +194,7 @@ class WhatsNewViewModel @Inject constructor(
     sealed class NavigationState {
         data object HeadphoneControlsSettings : NavigationState()
         data object FullScreenPlayerScreen : NavigationState()
-        data object StartUpsellFlow : NavigationState()
+        data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState()
         data object SlumberStudiosRedeemPromoCode : NavigationState()
     }
 }

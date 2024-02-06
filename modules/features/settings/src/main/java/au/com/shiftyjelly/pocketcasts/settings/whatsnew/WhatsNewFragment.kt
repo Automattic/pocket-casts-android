@@ -92,10 +92,10 @@ class WhatsNewFragment : BaseFragment() {
 
     private fun performConfirmAction(navigationState: NavigationState) {
         when (navigationState) {
-            NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
-            NavigationState.FullScreenPlayerScreen -> openPlayer()
-            NavigationState.StartUpsellFlow -> startUpsellFlow()
-            NavigationState.SlumberStudiosRedeemPromoCode -> redeemSlumberStudiosPromoCode()
+            is NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
+            is NavigationState.FullScreenPlayerScreen -> openPlayer()
+            is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
+            is NavigationState.SlumberStudiosRedeemPromoCode -> redeemSlumberStudiosPromoCode()
         }
     }
 
@@ -111,9 +111,9 @@ class WhatsNewFragment : BaseFragment() {
         fragmentHostListener.openPlayer(SourceView.WHATS_NEW.analyticsValue)
     }
 
-    private fun startUpsellFlow() {
+    private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
-            source = OnboardingUpgradeSource.BOOKMARKS,
+            source = source,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
