@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -11,12 +13,15 @@ interface UpgradeFeatureItem {
     @get:StringRes val title: Int
 
     @get:StringRes val text: Int?
+
+    val isVisible: Boolean
 }
 
 enum class PlusUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int? = null,
+    override val isVisible: Boolean = true,
 ) : UpgradeFeatureItem {
     DesktopApps(
         image = IR.drawable.ic_desktop_apps,
@@ -41,6 +46,12 @@ enum class PlusUpgradeFeatureItem(
     UndyingGratitude(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_plus_feature_gratitude_title,
+        isVisible = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
+    ),
+    SlumberStudiosPromo(
+        image = IR.drawable.ic_slumber_studios,
+        title = LR.string.onboarding_plus_feature_slumber_studios_title,
+        isVisible = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
     ),
 }
 
@@ -48,6 +59,7 @@ enum class PatronUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int? = null,
+    override val isVisible: Boolean = true,
 ) : UpgradeFeatureItem {
     EverythingInPlus(
         image = IR.drawable.ic_check,
