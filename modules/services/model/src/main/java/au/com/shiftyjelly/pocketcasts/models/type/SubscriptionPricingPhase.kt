@@ -4,8 +4,6 @@ import android.content.res.Resources
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
@@ -22,11 +20,11 @@ sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
         res.getString(R.string.profile_amount_free, periodValuePlural(res))
 
     // i.e., 14 day offer
-    fun numPeriodOffer(res: Resources): String =
-        if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
-            res.getString(R.string.plus_offer_duration, periodValueSingular(res))
-        } else {
+    fun numPeriodOffer(res: Resources, isTrial: Boolean): String =
+        if (isTrial) {
             res.getString(R.string.plus_trial_duration_free_trial, periodValueSingular(res))
+        } else {
+            res.getString(R.string.plus_offer_duration, periodValueSingular(res))
         }
 
     fun offerEnd(): String {

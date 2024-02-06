@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -13,7 +14,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -56,9 +59,12 @@ fun ProductAmountVerticalText(
 
 @Composable
 fun ProductAmountHorizontalText(
-    primaryText: String? = null,
-    secondaryText: String? = null,
-    lineThroughSecondaryText: Boolean = true,
+    price: String? = null,
+    priceTextFontSize: TextUnit = 22.sp,
+    originalPrice: String? = null,
+    period: String? = null,
+    originalPriceFontSize: TextUnit = 13.sp,
+    lineThroughOriginalPrice: Boolean = true,
     hasBackgroundAlwaysWhite: Boolean = false,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     modifier: Modifier = Modifier,
@@ -67,9 +73,10 @@ fun ProductAmountHorizontalText(
         modifier = modifier,
         verticalAlignment = verticalAlignment,
     ) {
-        if (primaryText != null) {
+        if (price != null) {
             TextH30(
-                text = primaryText,
+                text = price,
+                fontSize = priceTextFontSize,
                 color =
                 if (hasBackgroundAlwaysWhite) {
                     Color.Black
@@ -79,14 +86,24 @@ fun ProductAmountHorizontalText(
             )
         }
 
+        if (period != null) {
+            TextP60(
+                text = period,
+                fontSize = originalPriceFontSize,
+                color = MaterialTheme.theme.colors.primaryText02,
+                modifier = modifier.padding(start = 4.dp),
+            )
+        }
+
         Spacer(modifier = Modifier.width(4.dp))
 
-        if (secondaryText != null) {
+        if (originalPrice != null) {
             TextP60(
-                text = secondaryText,
+                text = originalPrice,
+                fontSize = originalPriceFontSize,
                 color = MaterialTheme.theme.colors.primaryText02,
                 style = TextStyle(
-                    textDecoration = if (lineThroughSecondaryText) TextDecoration.LineThrough else TextDecoration.None,
+                    textDecoration = if (lineThroughOriginalPrice) TextDecoration.LineThrough else TextDecoration.None,
                 ),
             )
         }

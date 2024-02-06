@@ -284,12 +284,14 @@ fun TextP60(
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
     fontWeight: FontWeight? = null,
+    fontSize: TextUnit? = null,
     style: TextStyle = TextStyle(),
 ) {
+    val fontSizeUpdated = fontSize ?: 13.sp
     Text(
         text = text,
         color = color,
-        fontSize = 13.sp,
+        fontSize = fontSizeUpdated,
         lineHeight = 15.sp,
         letterSpacing = 0.sp,
         maxLines = maxLines,

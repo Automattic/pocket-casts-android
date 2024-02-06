@@ -24,8 +24,10 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatu
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel.State
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -95,7 +97,7 @@ private fun FeatureCard(
         modifier = modifier.padding(horizontal = 16.dp),
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
@@ -104,12 +106,20 @@ private fun FeatureCard(
                 iconRes = card.iconRes,
                 shortNameRes = card.shortNameRes,
             )
+
+            if (button.subscription is Subscription.WithOffer) {
+                OfferBadge(
+                    text = (button.subscription as Subscription.WithOffer).badgeOfferText(LocalContext.current.resources),
+                    backgroundColor = button.backgroundColorRes,
+                    textColor = button.textColorRes,
+                    modifier = Modifier.padding(start = 4.dp),
+                )
+            }
         }
 
         Column {
-            SubscriptionPriceSection(
+            SubscriptionProductAmountHorizontal(
                 subscription = button.subscription,
-                upgradeButton = button,
             )
 
             card.featureItems.forEach {
