@@ -52,7 +52,7 @@ class AccountDetailsViewModel
                 .mapNotNull {
                     Subscription.fromProductDetails(
                         productDetails = it,
-                        isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                        isOfferEligible = subscriptionManager.isOfferEligible(
                             SubscriptionMapper.mapProductIdToTier(it.productId),
                         ),
                     )

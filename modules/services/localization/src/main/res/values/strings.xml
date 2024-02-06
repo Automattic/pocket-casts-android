@@ -977,6 +977,7 @@
     <string name="plus_lifetime_member">Lifetime Member</string>
     <string name="plus_trial_duration_free">%s FREE</string>
     <string name="plus_trial_duration_free_trial">%s free trial</string>
+    <string name="plus_offer_duration">%s offer</string>
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
     <string name="plus_slash_month">%s / month</string>
@@ -1012,6 +1013,10 @@
     <string name="trial_start">Start my free trial</string>
     <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
+
+    <!-- Intro Offer -->
+
+    <string name="half_price_first_year">50% off your first year</string>
 
     <!-- Settings -->
 
@@ -1719,6 +1724,8 @@
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
     <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Recurring payment at %s</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">after your first year</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Can be canceled at any time.</string>
     <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>
     <string name="onboarding_welcome_get_you_listening_plus">Thank you, now let\'s get you listening!</string>

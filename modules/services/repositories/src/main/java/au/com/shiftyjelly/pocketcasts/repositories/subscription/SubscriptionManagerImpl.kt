@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.SUBSCRIPTION_TEST_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -22,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag.isEnabled
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -81,7 +84,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
-    private var freeTrialEligible = HashMap<Subscription.SubscriptionTier, Boolean>()
+    private var hasOfferEligible = HashMap<Subscription.SubscriptionTier, Boolean>()
 
     override fun signOut() {
         clearCachedStatus()
@@ -178,6 +181,14 @@ class SubscriptionManagerImpl @Inject constructor(
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build(),
                 )
+                if (isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
+                    add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(SUBSCRIPTION_TEST_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.SUBS)
+                            .build(),
+                    )
+                }
             }
 
         val params = QueryProductDetailsParams.newBuilder()
@@ -268,7 +279,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     purchase.products.map {
                         mapProductIdToTier(it.toString())
                     }.distinct().forEach {
-                        updateFreeTrialEligible(it, false)
+                        updateOfferEligible(it, false)
                     }
 
                     FirebaseAnalyticsTracker.plusPurchased()
@@ -295,7 +306,7 @@ class SubscriptionManagerImpl @Inject constructor(
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
-        updateFreeTrialEligibilityIfPurchaseHistoryExists()
+        updateOfferEligibilityIfPurchaseHistoryExists()
 
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
@@ -309,7 +320,7 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    private fun updateFreeTrialEligibilityIfPurchaseHistoryExists() {
+    private fun updateOfferEligibilityIfPurchaseHistoryExists() {
         val queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -319,7 +330,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 it.products.map { productId ->
                     mapProductIdToTier(productId)
                 }.distinct().forEach { tier ->
-                    updateFreeTrialEligible(tier, false)
+                    updateOfferEligible(tier, false)
                 }
             }
         }
@@ -387,13 +398,10 @@ class SubscriptionManagerImpl @Inject constructor(
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
     }
-
-    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier) = freeTrialEligible[tier] ?: true
-
-    override fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
-        freeTrialEligible[tier] = eligible
+    override fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean = (hasOfferEligible[tier] ?: true)
+    override fun updateOfferEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
+        hasOfferEligible[tier] = eligible
     }
-
     override fun getDefaultSubscription(
         subscriptions: List<Subscription>,
         tier: Subscription.SubscriptionTier?,
@@ -403,11 +411,10 @@ class SubscriptionManagerImpl @Inject constructor(
         val subscriptionFrequency = frequency ?: SubscriptionFrequency.YEARLY
 
         val tierSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
-        val trialsIfPresent = tierSubscriptions
-            .filterIsInstance<Subscription.WithTrial>()
+        val withOffers = tierSubscriptions.filterIsInstance<Subscription.WithOffer>()
 
-        return trialsIfPresent.find {
-            it.recurringPricingPhase is SubscriptionPricingPhase.Months // trial is available for monthly only
+        return withOffers.find {
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months
         } ?: tierSubscriptions.firstOrNull {
             when (subscriptionFrequency) {
                 SubscriptionFrequency.MONTHLY -> it.recurringPricingPhase is SubscriptionPricingPhase.Months
@@ -427,7 +434,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                     Subscription.fromProductDetails(
                         productDetails = productDetailsState,
-                        isFreeTrialEligible = isFreeTrialEligible(
+                        isOfferEligible = isOfferEligible(
                             mapProductIdToTier(productDetailsState.productId),
                         ),
                     )
@@ -442,7 +449,7 @@ class SubscriptionManagerImpl @Inject constructor(
             emit(
                 FreeTrial(
                     subscriptionTier = subscriptionTier,
-                    exists = defaultSubscription?.trialPricingPhase != null,
+                    exists = defaultSubscription?.offerPricingPhase != null,
                 ),
             )
         }

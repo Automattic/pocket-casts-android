@@ -47,7 +47,10 @@ class CreateAccountViewModel
 
     companion object {
         private const val PRODUCT_KEY = "product"
-        private const val IS_FREE_TRIAL_KEY = "is_free_trial"
+        private const val OFFER_TYPE_KEY = "offer_type"
+        private const val OFFER_TYPE_NONE = "none"
+        private const val OFFER_TYPE_FREE_TRIAL = "free_trial"
+        private const val OFFER_TYPE_INTRO_OFFER = "intro_offer"
         private const val ERROR_CODE_KEY = "error_code"
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
@@ -62,11 +65,15 @@ class CreateAccountViewModel
                     it // return full product id for new products
                 }
             } ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-            val isFreeTrial = subscription is Subscription.WithTrial
+            val offerType = when (subscription) {
+                is Subscription.Trial -> OFFER_TYPE_FREE_TRIAL
+                is Subscription.Intro -> OFFER_TYPE_INTRO_OFFER
+                else -> OFFER_TYPE_NONE
+            }
 
             val analyticsProperties = mapOf(
                 PRODUCT_KEY to productKey,
-                IS_FREE_TRIAL_KEY to isFreeTrial,
+                OFFER_TYPE_KEY to offerType,
             )
 
             when (purchaseEvent) {
@@ -99,7 +106,7 @@ class CreateAccountViewModel
                             .mapNotNull {
                                 Subscription.fromProductDetails(
                                     productDetails = it,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
+                                    isOfferEligible = subscriptionManager.isOfferEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
                                 )
                             }
                         subscriptionManager.getDefaultSubscription(subscriptions)?.let { updateSubscription(it) }
