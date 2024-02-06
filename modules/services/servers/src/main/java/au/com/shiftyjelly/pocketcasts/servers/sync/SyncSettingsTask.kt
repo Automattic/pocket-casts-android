@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -26,10 +27,14 @@ import timber.log.Timber
 
 class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     companion object {
-        suspend fun run(settings: Settings, namedSettingsCall: NamedSettingsCaller): Result {
+        suspend fun run(
+            context: Context,
+            settings: Settings,
+            namedSettingsCall: NamedSettingsCaller,
+        ): Result {
             try {
                 if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
-                    syncSettings(settings, namedSettingsCall)
+                    syncSettings(context, settings, namedSettingsCall)
                 } else {
                     @Suppress("DEPRECATION")
                     oldSyncSettings(settings, namedSettingsCall)
@@ -45,6 +50,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
         }
 
         private suspend fun syncSettings(
+            context: Context,
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
@@ -54,12 +60,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return
             }
 
-            val request = changedNamedSettingsRequest(settings)
+            val request = changedNamedSettingsRequest(context, settings)
             val response = namedSettingsCall.changedNamedSettings(request)
-            processChangedNameSettingsResponse(response, settings)
+            processChangedNameSettingsResponse(context, settings, response)
         }
 
-        private fun changedNamedSettingsRequest(settings: Settings) = ChangedNamedSettingsRequest(
+        private fun changedNamedSettingsRequest(
+            context: Context,
+            settings: Settings,
+        ) = ChangedNamedSettingsRequest(
             changedSettings = ChangedNamedSettings(
                 autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting { autoArchiveAfterPlaying, modifiedAt ->
                     NamedChangedSettingInt(
@@ -162,10 +171,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                autoShowPlayed = settings.autoShowPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
+                autoSubscribeToPlayed = settings.autoSubscribeToPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
-        private fun processChangedNameSettingsResponse(response: ChangedNamedSettingsResponse, settings: Settings) {
+        private fun processChangedNameSettingsResponse(
+            context: Context,
+            settings: Settings,
+            response: ChangedNamedSettingsResponse,
+        ) {
             for ((key, changedSettingResponse) in response) {
                 when (key) {
                     "autoArchiveInactive" -> updateSettingIfPossible(
@@ -367,6 +382,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.podcastBadgeType,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(BadgeType::fromServerId),
                     )
+                    "autoShowPlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoShowPlayed,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.takeIf { Util.isAutomotive(context = context) },
+                    )
+                    "autoSubscribeToPlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoSubscribeToPlayed,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.takeIf { Util.isAutomotive(context = context) },
+                    )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }
@@ -458,7 +483,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
     lateinit var namedSettingsCaller: NamedSettingsCaller
 
     override suspend fun doWork(): Result {
-        return run(settings, namedSettingsCaller)
+        return run(context, settings, namedSettingsCaller)
     }
 }
 

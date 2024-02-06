@@ -374,7 +374,7 @@ class PodcastSyncProcess(
     private fun syncSettings(): Completable {
         return rxCompletable {
             val startTime = SystemClock.elapsedRealtime()
-            SyncSettingsTask.run(settings, syncManager)
+            SyncSettingsTask.run(context, settings, syncManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync settings - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         }
     }
