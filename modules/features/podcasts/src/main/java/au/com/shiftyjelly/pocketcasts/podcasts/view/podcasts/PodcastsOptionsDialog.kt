@@ -130,7 +130,7 @@ class PodcastsOptionsDialog(
                 checked = badgeType == BadgeType.OFF,
                 click = {
                     val newBadgeType = BadgeType.OFF
-                    settings.podcastBadgeType.set(newBadgeType, needsSync = false)
+                    settings.podcastBadgeType.set(newBadgeType, needsSync = true)
                     trackBadgeChanged(newBadgeType)
                 },
             )
@@ -139,7 +139,7 @@ class PodcastsOptionsDialog(
                 checked = badgeType == BadgeType.ALL_UNFINISHED,
                 click = {
                     val newBadgeType = BadgeType.ALL_UNFINISHED
-                    settings.podcastBadgeType.set(newBadgeType, needsSync = false)
+                    settings.podcastBadgeType.set(newBadgeType, needsSync = true)
                     trackBadgeChanged(newBadgeType)
                 },
             )
@@ -148,7 +148,7 @@ class PodcastsOptionsDialog(
                 checked = badgeType == BadgeType.LATEST_EPISODE,
                 click = {
                     val newBadgeType = BadgeType.LATEST_EPISODE
-                    settings.podcastBadgeType.set(newBadgeType, needsSync = false)
+                    settings.podcastBadgeType.set(newBadgeType, needsSync = true)
                     trackBadgeChanged(newBadgeType)
                 },
             )
