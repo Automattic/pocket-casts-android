@@ -92,9 +92,6 @@ fun ProductAmountHorizontalText(
                 fontSize = originalPriceFontSize,
                 color = MaterialTheme.theme.colors.primaryText02,
                 modifier = modifier.padding(start = 4.dp),
-                style = TextStyle(
-                    textDecoration = if (lineThroughOriginalPrice) TextDecoration.LineThrough else TextDecoration.None,
-                ),
             )
         }
 
