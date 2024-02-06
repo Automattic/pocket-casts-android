@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
-import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -92,10 +91,10 @@ class WhatsNewFragment : BaseFragment() {
 
     private fun performConfirmAction(navigationState: NavigationState) {
         when (navigationState) {
-            NavigationState.PlaybackSettings -> openFragment(PlaybackSettingsFragment.newInstance(scrollToAutoPlay = true))
             NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
             NavigationState.FullScreenPlayerScreen -> openPlayer()
             NavigationState.StartUpsellFlow -> startUpsellFlow()
+            NavigationState.SlumberStudiosRedeemPromoCode -> {} // TODO: Implement SlumberStudiosRedeemPromoCode action
         }
     }
 

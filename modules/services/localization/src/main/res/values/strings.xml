@@ -93,6 +93,7 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
+    <string name="slumber_studios" translatable="false">Slumber&#160;Studios</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
@@ -1409,14 +1410,14 @@
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
-    <string name="whats_new_autoplay_title">Autoplay is here!</string>
-    <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
-    <string name="whats_new_autoplay_enable_button">Enable it now</string>
-    <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
     <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
     <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
     <string name="whats_new_bookmarks_enable_now_button">Enable it now</string>
     <string name="whats_new_bookmarks_try_now_button">Try it now</string>
+    <string name="whats_new_slumber_studios_title">Dream big</string>
+    <!-- %1$s is Slumber Studios promo code -->
+    <string name="whats_new_slumber_studios_body">As part of your Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Redeem your code</string>
 
     <!-- Errors -->
 

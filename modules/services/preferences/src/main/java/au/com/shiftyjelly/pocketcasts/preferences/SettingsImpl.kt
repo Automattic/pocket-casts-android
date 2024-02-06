@@ -858,6 +858,10 @@ class SettingsImpl @Inject constructor(
         return firebaseRemoteConfig.getString(FirebaseConfig.REPORT_VIOLATION_URL)
     }
 
+    override fun getSlumberStudiosPromoCode(): String {
+        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_PROMO_CODE)
+    }
+
     private fun getRemoteConfigLong(key: String): Long {
         val value = firebaseRemoteConfig.getLong(key)
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value

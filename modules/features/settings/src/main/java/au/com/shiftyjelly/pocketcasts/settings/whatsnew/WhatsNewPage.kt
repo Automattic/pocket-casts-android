@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
 import android.content.res.Configuration
+import android.view.Gravity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
@@ -47,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun WhatsNewPage(
@@ -63,8 +66,8 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        is WhatsNewFeature.AutoPlay -> AutoPlayHeader()
                         is WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
+                        is WhatsNewFeature.SlumberStudiosPromo -> SlumberStudiosHeader(onClose)
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -123,16 +126,18 @@ private fun WhatsNewPageLoaded(
                 modifier = Modifier
                     .padding(all = 16.dp),
             ) {
-                SubscriptionBadgeForTier(
-                    tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
-                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
-                )
+                if (state.feature is WhatsNewFeature.Bookmarks) {
+                    SubscriptionBadgeForTier(
+                        tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
+                        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
+                    )
 
-                Spacer(
-                    modifier = Modifier.height(
-                        if (state.tier == UserTier.Free) 0.dp else 16.dp,
-                    ),
-                )
+                    Spacer(
+                        modifier = Modifier.height(
+                            if (state.tier == UserTier.Free) 0.dp else 16.dp,
+                        ),
+                    )
+                }
 
                 TextH20(
                     text = stringResource(id = state.feature.title),
@@ -142,11 +147,7 @@ private fun WhatsNewPageLoaded(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextP40(
-                    text = stringResource(state.feature.message),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText02,
-                )
+                Message(state)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -174,10 +175,25 @@ private fun WhatsNewPageLoaded(
 }
 
 @Composable
+private fun Message(
+    state: UiState.Loaded,
+) = when (state.feature) {
+    is WhatsNewFeature.Bookmarks -> TextP40(
+        text = stringResource(state.feature.message),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.theme.colors.primaryText02,
+    )
+    is WhatsNewFeature.SlumberStudiosPromo -> HtmlText(
+        html = stringResource(state.feature.message, state.feature.promoCode),
+        textStyleResId = UR.style.P40,
+        gravity = Gravity.CENTER_HORIZONTAL,
+    )
+}
+
+@Composable
 private fun getButtonTitle(
     state: UiState.Loaded,
 ): String = when (state.feature) {
-    WhatsNewFeature.AutoPlay -> stringResource(state.feature.confirmButtonTitle)
     is WhatsNewFeature.Bookmarks -> {
         when {
             state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
@@ -199,20 +215,23 @@ private fun getButtonTitle(
             }
         }
     }
+    is WhatsNewFeature.SlumberStudiosPromo -> stringResource(state.feature.confirmButtonTitle)
 }
 
 @Composable
 @Preview
-private fun WhatsNewAutoPlayPreview(
+private fun WhatsNewSlumberStudiosPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
         WhatsNewPageLoaded(
             state = UiState.Loaded(
-                feature = WhatsNewFeature.AutoPlay,
-                tier = UserTier.Free,
+                feature = WhatsNewFeature.SlumberStudiosPromo(
+                    promoCode = "PROMO",
+                ),
+                tier = UserTier.Plus,
             ),
-            header = { AutoPlayHeader() },
+            header = { SlumberStudiosHeader(onClose = {}) },
             onConfirm = {},
             onClose = {},
         )

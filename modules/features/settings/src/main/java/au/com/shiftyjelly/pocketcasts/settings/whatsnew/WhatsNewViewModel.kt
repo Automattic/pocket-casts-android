@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.earlyaccess.EarlyAccessStrings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -34,7 +36,18 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        updateStateForBookmarks()
+        if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)) {
+            updateStateForSlumberStudiosPromo()
+        } else {
+            updateStateForBookmarks()
+        }
+    }
+
+    private fun updateStateForSlumberStudiosPromo() {
+        _state.value = UiState.Loaded(
+            feature = WhatsNewFeature.SlumberStudiosPromo(settings.getSlumberStudiosPromoCode()),
+            tier = settings.userTier,
+        )
     }
 
     private fun updateStateForBookmarks() {
@@ -86,7 +99,6 @@ class WhatsNewViewModel @Inject constructor(
             val currentState = state.value as? UiState.Loaded ?: return@launch
             val currentEpisode = playbackManager.getCurrentEpisode()
             val target = when (currentState.feature) {
-                is WhatsNewFeature.AutoPlay -> NavigationState.PlaybackSettings
                 is WhatsNewFeature.Bookmarks -> if (currentState.feature.isUserEntitled) {
                     if (currentEpisode == null) {
                         NavigationState.HeadphoneControlsSettings
@@ -96,6 +108,7 @@ class WhatsNewViewModel @Inject constructor(
                 } else {
                     NavigationState.StartUpsellFlow
                 }
+                is WhatsNewFeature.SlumberStudiosPromo -> NavigationState.SlumberStudiosRedeemPromoCode
             }
             _navigationState.emit(target)
         }
@@ -115,13 +128,6 @@ class WhatsNewViewModel @Inject constructor(
         @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
-        data object AutoPlay : WhatsNewFeature(
-            title = LR.string.whats_new_autoplay_title,
-            message = LR.string.whats_new_autoplay_body,
-            confirmButtonTitle = LR.string.whats_new_autoplay_enable_button,
-            closeButtonTitle = LR.string.whats_new_autoplay_maybe_later_button,
-        )
-
         data class Bookmarks(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
@@ -134,12 +140,18 @@ class WhatsNewViewModel @Inject constructor(
             message = message,
             confirmButtonTitle = confirmButtonTitle,
         )
+
+        data class SlumberStudiosPromo(val promoCode: String) : WhatsNewFeature(
+            title = LR.string.whats_new_slumber_studios_title,
+            message = LR.string.whats_new_slumber_studios_body,
+            confirmButtonTitle = LR.string.whats_new_slumber_studios_redeem_now_button,
+        )
     }
 
     sealed class NavigationState {
-        data object PlaybackSettings : NavigationState()
         data object HeadphoneControlsSettings : NavigationState()
         data object FullScreenPlayerScreen : NavigationState()
         data object StartUpsellFlow : NavigationState()
+        data object SlumberStudiosRedeemPromoCode : NavigationState()
     }
 }
