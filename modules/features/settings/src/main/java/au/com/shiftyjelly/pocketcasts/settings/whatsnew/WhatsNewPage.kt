@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -128,9 +129,12 @@ private fun WhatsNewPageLoaded(
                 modifier = Modifier,
             ) {
                 if (state.fullModel) {
+                    Spacer(Modifier.height(8.dp))
+
+                    Pill()
+
                     Box(
                         modifier = Modifier
-                            .padding(top = 16.dp)
                             .align(Alignment.Start),
                     ) {
                         RowTextButton(
