@@ -71,7 +71,7 @@ fun WhatsNewPage(
                         is WhatsNewFeature.SlumberStudiosPromo ->
                             SlumberStudiosHeader(
                                 onClose = onClose,
-                                fullModal = uiState.fullModel
+                                fullModal = uiState.fullModel,
                             )
                     }
                 },
