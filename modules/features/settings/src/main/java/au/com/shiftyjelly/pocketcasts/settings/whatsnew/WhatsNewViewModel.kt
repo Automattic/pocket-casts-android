@@ -37,10 +37,16 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)) {
-            updateStateForSlumberStudiosPromo()
-        } else {
-            updateStateForBookmarks()
+        viewModelScope.launch {
+            settings.cachedSubscriptionStatus.flow
+                .stateIn(viewModelScope)
+                .collect {
+                    if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)) {
+                        updateStateForSlumberStudiosPromo()
+                    } else {
+                        updateStateForBookmarks()
+                    }
+                }
         }
     }
 
