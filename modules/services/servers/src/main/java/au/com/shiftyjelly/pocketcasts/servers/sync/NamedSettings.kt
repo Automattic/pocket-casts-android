@@ -54,6 +54,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "badges") val podcastBadges: NamedChangedSettingInt? = null,
     @field:Json(name = "autoSubscribeToPlayed") val autoSubscribeToPlayed: NamedChangedSettingBool? = null,
     @field:Json(name = "autoShowPlayed") val autoShowPlayed: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoPlayLastListUuid") val autoPlayLastSource: NamedChangedSettingString? = null,
 )
 
 @JsonClass(generateAdapter = true)
