@@ -14,11 +14,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -448,7 +448,12 @@ interface Settings {
     fun setFullySignedOut(boolean: Boolean)
     fun getFullySignedOut(): Boolean
 
-    val lastLoadedFromPodcastOrFilterUuid: UserSetting<LastPlayedList>
+    val lastAutoPlaySource: UserSetting<AutoPlaySource>
+
+    // This property is used for determining which source should be used for auto play
+    // We don't want to always change the auto play source but we want to always track it
+    // in case we need to change it.
+    val trackingAutoPlaySource: UserSetting<AutoPlaySource>
 
     // It would be better to have this be a UserSetting<ThemeType>, but that
     // is not easy due to the way our modules are structured.

@@ -12,8 +12,12 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
+import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -24,10 +28,14 @@ import timber.log.Timber
 
 class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     companion object {
-        suspend fun run(settings: Settings, namedSettingsCall: NamedSettingsCaller): Result {
+        suspend fun run(
+            context: Context,
+            settings: Settings,
+            namedSettingsCall: NamedSettingsCaller,
+        ): Result {
             try {
                 if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
-                    syncSettings(settings, namedSettingsCall)
+                    syncSettings(context, settings, namedSettingsCall)
                 } else {
                     @Suppress("DEPRECATION")
                     oldSyncSettings(settings, namedSettingsCall)
@@ -43,6 +51,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
         }
 
         private suspend fun syncSettings(
+            context: Context,
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ) {
@@ -52,12 +61,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return
             }
 
-            val request = changedNamedSettingsRequest(settings)
+            val request = changedNamedSettingsRequest(context, settings)
             val response = namedSettingsCall.changedNamedSettings(request)
-            processChangedNameSettingsResponse(response, settings)
+            processChangedNameSettingsResponse(context, settings, response)
         }
 
-        private fun changedNamedSettingsRequest(settings: Settings) = ChangedNamedSettingsRequest(
+        private fun changedNamedSettingsRequest(
+            context: Context,
+            settings: Settings,
+        ) = ChangedNamedSettingsRequest(
             changedSettings = ChangedNamedSettings(
                 autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting { autoArchiveAfterPlaying, modifiedAt ->
                     NamedChangedSettingInt(
@@ -148,10 +160,34 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 sendCrashReports = settings.sendCrashReports.getSyncSetting(::NamedChangedSettingBool),
                 linkCrashReportsToUser = settings.linkCrashReportsToUser.getSyncSetting(::NamedChangedSettingBool),
                 addFileToUpNextAutomatically = settings.cloudAddToUpNext.getSyncSetting(::NamedChangedSettingBool),
+                theme = settings.theme.getSyncSetting { value, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = value.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                podcastBadges = settings.podcastBadgeType.getSyncSetting { type, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = type.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                autoShowPlayed = settings.autoShowPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
+                autoSubscribeToPlayed = settings.autoSubscribeToPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
+                autoPlayLastSource = settings.lastAutoPlaySource.getSyncSetting { source, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = source.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
-        private fun processChangedNameSettingsResponse(response: ChangedNamedSettingsResponse, settings: Settings) {
+        private fun processChangedNameSettingsResponse(
+            context: Context,
+            settings: Settings,
+            response: ChangedNamedSettingsResponse,
+        ) {
             for ((key, changedSettingResponse) in response) {
                 when (key) {
                     "autoArchiveInactive" -> updateSettingIfPossible(
@@ -343,6 +379,36 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.cloudAddToUpNext,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
+                    "theme" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.theme,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(ThemeSetting::fromServerId),
+                    )
+                    "badges" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastBadgeType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(BadgeType::fromServerId),
+                    )
+                    "autoShowPlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoShowPlayed,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.takeIf { Util.isAutomotive(context = context) },
+                    )
+                    "autoSubscribeToPlayed" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoSubscribeToPlayed,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.takeIf { Util.isAutomotive(context = context) },
+                    )
+                    "autoPlayLastListUuid" -> {
+                        val syncedValue = updateSettingIfPossible(
+                            changedSettingResponse = changedSettingResponse,
+                            setting = settings.lastAutoPlaySource,
+                            newSettingValue = (changedSettingResponse.value as? String)?.let(AutoPlaySource::fromServerId),
+                        )
+                        if (syncedValue != null) {
+                            settings.trackingAutoPlaySource.set(syncedValue, needsSync = false)
+                        }
+                    }
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }
@@ -352,15 +418,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             changedSettingResponse: ChangedSettingResponse,
             setting: UserSetting<T>,
             newSettingValue: T?,
-        ) {
+        ): T? {
             if (newSettingValue == null) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid ${setting.sharedPrefKey} value: ${changedSettingResponse.value}")
-                return
+                return null
             }
 
             if (changedSettingResponse.modifiedAt == null) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} from the server because setting was not modifiedAt on the server")
-                return
+                return null
             }
 
             val serverModifiedAtInstant = try {
@@ -370,7 +436,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     LogBuffer.TAG_INVALID_STATE,
                     "Not syncing ${setting.sharedPrefKey} from the server because server returned modifiedAt value that could not be parsed: ${changedSettingResponse.modifiedAt}",
                 )
-                return
+                return null
             }
 
             val localModifiedAt = setting.getModifiedAt()
@@ -378,13 +444,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             // we don't know the local value is newer than the server value.
             if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
-                return
+                return null
             }
 
             setting.set(
                 value = newSettingValue,
                 needsSync = false,
             )
+            return newSettingValue
         }
 
         @Suppress("DEPRECATION")
@@ -434,7 +501,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
     lateinit var namedSettingsCaller: NamedSettingsCaller
 
     override suspend fun doWork(): Result {
-        return run(settings, namedSettingsCaller)
+        return run(context, settings, namedSettingsCaller)
     }
 }
 

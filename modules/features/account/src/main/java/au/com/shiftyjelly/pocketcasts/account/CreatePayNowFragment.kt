@@ -13,7 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountVerticalText
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreatePaynowBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
@@ -73,15 +73,18 @@ class CreatePayNowFragment : BaseFragment() {
                     AppTheme(theme.activeTheme) {
                         val res = LocalContext.current.resources
                         when (subscription) {
-                            is Subscription.Simple -> ProductAmountView(
+                            is Subscription.Simple -> ProductAmountVerticalText(
                                 primaryText = subscription.recurringPricingPhase.priceSlashPeriod(res),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             )
-                            is Subscription.WithTrial -> ProductAmountView(
-                                primaryText = subscription.trialPricingPhase.numPeriodFree(res),
-                                secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            )
+                            is Subscription.Trial -> {
+                                ProductAmountVerticalText(
+                                    primaryText = subscription.offerPricingPhase.numPeriodFree(res),
+                                    secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                )
+                            }
+                            else -> {}
                         }
                     }
                 }
@@ -166,7 +169,8 @@ class CreatePayNowFragment : BaseFragment() {
             mainLayout.visibility = View.VISIBLE
             btnSubmit.text = getString(
                 when (subscription) {
-                    is Subscription.WithTrial -> LR.string.profile_start_free_trial
+                    is Subscription.Trial -> LR.string.profile_start_free_trial
+                    is Subscription.Intro -> LR.string.profile_confirm
                     is Subscription.Simple -> LR.string.profile_confirm
                 },
             )

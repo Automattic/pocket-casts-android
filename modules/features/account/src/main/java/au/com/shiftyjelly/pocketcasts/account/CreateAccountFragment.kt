@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
-import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountVerticalText
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
@@ -84,7 +84,9 @@ class CreateAccountFragment : BaseFragment() {
                     val subscription = subscriptionManager.getDefaultSubscription(state.list)
                     val plusLabel = when (subscription) {
                         is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
-                        is Subscription.WithTrial -> binding.root.resources.getString(LR.string.pocket_casts_plus_short)
+                        is Subscription.Trial -> { binding.root.resources.getString(LR.string.pocket_casts_plus_short) }
+                        is Subscription.Intro -> { binding.root.resources.getString(LR.string.pocket_casts_plus) }
+                        else -> { binding.root.resources.getString(LR.string.pocket_casts_plus) }
                     }
                     binding.lblPlus.text = plusLabel
 
@@ -94,27 +96,30 @@ class CreateAccountFragment : BaseFragment() {
                             AppTheme(theme.activeTheme) {
                                 val emphasized = true
                                 when (subscription) {
-                                    is Subscription.Simple -> ProductAmountView(
+                                    is Subscription.Simple -> ProductAmountVerticalText(
                                         primaryText = subscription.recurringPricingPhase.formattedPrice,
                                         secondaryText = stringResource(subscription.recurringPricingPhase.perPeriod)
                                             .lowercase(Locale.getDefault()),
                                         horizontalAlignment = Alignment.End,
                                         emphasized = emphasized,
                                     )
-                                    is Subscription.WithTrial -> {
+                                    is Subscription.Trial -> {
                                         val res = LocalContext.current.resources
                                         val primaryText = stringResource(
                                             LR.string.plus_trial_duration_free,
-                                            subscription.trialPricingPhase.periodValuePlural(res),
+                                            subscription.offerPricingPhase.periodValuePlural(res),
                                         )
-                                        ProductAmountView(
+                                        ProductAmountVerticalText(
                                             primaryText = primaryText,
-                                            secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
+                                            secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(
+                                                res,
+                                            ),
                                             horizontalAlignment = Alignment.End,
                                             emphasized = emphasized,
                                         )
                                     }
                                     null -> { /* show nothing */ }
+                                    else -> { /* show nothing */ }
                                 }
                             }
                         }

@@ -44,8 +44,10 @@ import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -105,11 +107,15 @@ fun OnboardingUpgradeBottomSheet(
                         // as the user changes selections.
                         val interactionSource = remember(subscription) { MutableInteractionSource() }
 
-                        val text = subscription.recurringPricingPhase.pricePerPeriod(resources)
-                        val topText = subscription
-                            .trialPricingPhase
-                            ?.numPeriodFreeTrial(resources)
-                            ?.uppercase(Locale.getDefault())
+                        val price = when (subscription) {
+                            is Subscription.Intro -> (subscription.offerPricingPhase as RecurringSubscriptionPricingPhase).pricePerPeriod(resources)
+                            else -> subscription.recurringPricingPhase.pricePerPeriod(resources)
+                        }
+
+                        val topText = when (subscription) {
+                            is Subscription.WithOffer -> subscription.badgeOfferText(resources).uppercase(Locale.getDefault())
+                            else -> null
+                        }
 
                         Column {
                             if (topText == null) {
@@ -118,7 +124,7 @@ fun OnboardingUpgradeBottomSheet(
 
                             if (subscription == state.selectedSubscription) {
                                 OutlinedRowButton(
-                                    text = text,
+                                    text = price,
                                     topText = topText,
                                     subscriptionTier = subscriptionTier,
                                     brush = subscriptionTier.toOutlinedButtonBrush(),
@@ -128,7 +134,7 @@ fun OnboardingUpgradeBottomSheet(
                                 )
                             } else {
                                 UnselectedOutlinedRowButton(
-                                    text = text,
+                                    text = price,
                                     topText = topText,
                                     subscriptionTier = subscriptionTier,
                                     onClick = { viewModel.updateSelectedSubscription(subscription) },
@@ -139,12 +145,23 @@ fun OnboardingUpgradeBottomSheet(
                     }
             }
 
-            val descriptionText = state.selectedSubscription.trialPricingPhase.let { trialPhase ->
-                if (trialPhase != null) {
-                    stringResource(
-                        LR.string.onboarding_plus_recurring_after_free_trial,
-                        recurringAfterString(trialPhase, resources),
-                    )
+            val descriptionText = state.selectedSubscription.offerPricingPhase.let { offerPhase ->
+                if (offerPhase != null) {
+                    if (selectedSubscription is Subscription.Intro) {
+                        stringResource(
+                            LR.string.onboarding_plus_recurring_after_intro_offer,
+                            recurringAfterIntroString(
+                                offerPhase,
+                                state.selectedSubscription.recurringPricingPhase,
+                                resources,
+                            ),
+                        )
+                    } else {
+                        stringResource(
+                            LR.string.onboarding_plus_recurring_after_free_trial,
+                            recurringAfterTrialString(offerPhase, resources),
+                        )
+                    }
                 } else {
                     val firstLine = stringResource(state.selectedSubscription.recurringPricingPhase.renews)
                     val secondLine = stringResource(LR.string.onboarding_plus_can_be_canceled_at_any_time)
@@ -187,13 +204,7 @@ fun OnboardingUpgradeBottomSheet(
             )
 
             UpgradeRowButton(
-                primaryText = stringResource(
-                    if (state.selectedSubscription.trialPricingPhase != null) {
-                        LR.string.onboarding_plus_start_free_trial_and_subscribe
-                    } else {
-                        LR.string.subscribe
-                    },
-                ),
+                primaryText = selectedTier.toSubscribeButton(resources),
                 backgroundColor = colorResource(state.upgradeButton.backgroundColorRes),
                 textColor = colorResource(state.upgradeButton.textColorRes),
                 onClick = onClickSubscribe,
@@ -235,17 +246,31 @@ private val animationSpec = tween<IntSize>(
     easing = EaseInOut,
 )
 
-private fun recurringAfterString(
-    trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase,
+private fun recurringAfterTrialString(
+    offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase,
     res: Resources,
-) = "${trialSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${trialSubscriptionPricingPhase.trialEnd()})"
+) = "${offerSubscriptionPricingPhase.numPeriodOffer(res, isTrial = true)} (${offerSubscriptionPricingPhase.offerEnd()})"
+private fun recurringAfterIntroString(
+    offerSubscriptionPricingPhase: OfferSubscriptionPricingPhase,
+    recurringSubscriptionPricingPhase: RecurringSubscriptionPricingPhase,
+    res: Resources,
+): String =
+    "${recurringSubscriptionPricingPhase.formattedPrice} ${res.getString(LR.string.onboarding_plus_recurring_after_intro_offer_sufix)} (${offerSubscriptionPricingPhase.offerEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
     SubscriptionTier.PLUS -> R.string.onboarding_plus_subscribe
     SubscriptionTier.PATRON -> R.string.onboarding_patron_subscribe
     SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
 }
-
+fun SubscriptionTier.toSubscribeButton(res: Resources) =
+    res.getString(
+        LR.string.upgrade_to,
+        when (this) {
+            SubscriptionTier.PATRON -> res.getString(LR.string.pocket_casts_patron_short)
+            SubscriptionTier.PLUS -> res.getString(LR.string.pocket_casts_plus_short)
+            SubscriptionTier.UNKNOWN -> res.getString(LR.string.pocket_casts_plus_short)
+        },
+    )
 fun SubscriptionTier.toOutlinedButtonBrush() = when (this) {
     SubscriptionTier.PLUS -> OnboardingUpgradeHelper.plusGradientBrush
     SubscriptionTier.PATRON -> OnboardingUpgradeHelper.patronGradientBrush

@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +38,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -49,7 +54,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -73,6 +78,9 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val MAX_OFFER_BADGE_TEXT_LENGTH = 23
+private const val MIN_SCREEN_WIDTH_FOR_HORIZONTAL_DISPLAY = 400
 
 @Composable
 internal fun OnboardingUpgradeFeaturesPage(
@@ -232,6 +240,7 @@ private fun UpgradeLayout(
 
                         FeatureCards(
                             state = state,
+                            upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
                         )
                     }
@@ -254,6 +263,7 @@ private fun UpgradeLayout(
 @Composable
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    upgradeButton: UpgradeButton,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val featureCardsState = state.featureCardsState
@@ -266,7 +276,9 @@ fun FeatureCards(
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index, pagerHeight ->
         FeatureCard(
+            subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
+            upgradeButton = upgradeButton,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
@@ -279,6 +291,8 @@ fun FeatureCards(
 @Composable
 private fun FeatureCard(
     card: UpgradeFeatureCard,
+    upgradeButton: UpgradeButton,
+    subscription: Subscription,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -292,21 +306,72 @@ private fun FeatureCard(
         Column(
             modifier = Modifier.padding(24.dp),
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                contentAlignment = Alignment.TopStart,
-            ) {
-                SubscriptionBadge(
-                    iconRes = card.iconRes,
-                    shortNameRes = card.shortNameRes,
-                    backgroundColor = Color.Black,
-                    textColor = Color.White,
-                )
+            var offerBadgeTextLength by remember { mutableStateOf(MAX_OFFER_BADGE_TEXT_LENGTH) }
+            val screenWidth = LocalConfiguration.current.screenWidthDp
+            val displayInHorizontal = screenWidth >= MIN_SCREEN_WIDTH_FOR_HORIZONTAL_DISPLAY && offerBadgeTextLength <= MAX_OFFER_BADGE_TEXT_LENGTH
+
+            if (displayInHorizontal) {
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                ) {
+                    SubscriptionBadge(
+                        iconRes = card.iconRes,
+                        shortNameRes = card.shortNameRes,
+                        backgroundColor = Color.Black,
+                        textColor = Color.White,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .wrapContentHeight(),
+                    )
+
+                    if (subscription is Subscription.WithOffer) {
+                        val offerText = subscription.badgeOfferText(LocalContext.current.resources)
+                        offerBadgeTextLength = offerText.length
+                        OfferBadge(
+                            text = offerText,
+                            backgroundColor = upgradeButton.backgroundColorRes,
+                            textColor = upgradeButton.textColorRes,
+                            modifier = Modifier.padding(start = 4.dp),
+                        )
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                ) {
+                    SubscriptionBadge(
+                        iconRes = card.iconRes,
+                        shortNameRes = card.shortNameRes,
+                        backgroundColor = Color.Black,
+                        textColor = Color.White,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .wrapContentHeight(),
+                    )
+
+                    if (subscription is Subscription.WithOffer) {
+                        val offerText = subscription.badgeOfferText(LocalContext.current.resources)
+                        offerBadgeTextLength = offerText.length
+                        OfferBadge(
+                            text = offerText,
+                            backgroundColor = upgradeButton.backgroundColorRes,
+                            textColor = upgradeButton.textColorRes,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
+                }
             }
 
             Column {
+                SubscriptionProductAmountHorizontal(subscription, hasBackgroundAlwaysWhite = true)
+
+                Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
                 card.featureItems.forEach {
                     UpgradeFeatureItem(it)
                 }
@@ -327,16 +392,9 @@ private fun UpgradeButton(
     onClickSubscribe: () -> Unit,
 ) {
     val resources = LocalContext.current.resources
-    val subscription = button.subscription
     val shortName = resources.getString(button.shortNameRes)
-    val primaryText = when (subscription) {
-        is Subscription.Simple -> stringResource(LR.string.subscribe_to, shortName)
-        is Subscription.WithTrial -> stringResource(LR.string.trial_start)
-    }
-    val secondaryText = when (subscription) {
-        is Subscription.Simple -> subscription.recurringPricingPhase.pricePerPeriod(resources)
-        is Subscription.WithTrial -> subscription.tryFreeThenPricePerPeriod(resources)
-    }
+    val primaryText = stringResource(LR.string.subscribe_to, shortName)
+
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier.fadeBackground(),
@@ -344,13 +402,14 @@ private fun UpgradeButton(
         Column {
             UpgradeRowButton(
                 primaryText = primaryText,
-                secondaryText = secondaryText,
                 backgroundColor = colorResource(button.backgroundColorRes),
                 textColor = colorResource(button.textColorRes),
+                fontWeight = FontWeight.W500,
                 onClick = onClickSubscribe,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
-                    .fillMaxWidth(),
+                    .heightIn(min = 48.dp),
             )
             Spacer(
                 modifier = Modifier
@@ -459,15 +518,3 @@ private fun Modifier.fadeBackground() = this
             drawContent()
         }
     }
-
-@Preview
-@Composable
-private fun OnboardingPlusFeatureCardPreview() {
-    FeatureCard(card = UpgradeFeatureCard.PLUS)
-}
-
-@Preview
-@Composable
-private fun OnboardingPatonFeatureCardPreview() {
-    FeatureCard(card = UpgradeFeatureCard.PATRON)
-}

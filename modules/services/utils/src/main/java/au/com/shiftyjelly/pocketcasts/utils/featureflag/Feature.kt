@@ -43,6 +43,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
+    INTRO_PLUS_OFFER_ENABLED(
+        key = "intro_plus_offer_enabled",
+        title = "Intro Offer Plus",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     SLUMBER_STUDIOS_PROMO(
         key = "slumber_studios_promo",
         title = "Slumber Studios Promo",

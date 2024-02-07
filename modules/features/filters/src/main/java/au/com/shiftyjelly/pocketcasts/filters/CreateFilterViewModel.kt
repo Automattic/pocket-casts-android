@@ -88,6 +88,7 @@ class CreateFilterViewModel @Inject constructor(
         playlist.title = filterName.value ?: ""
         playlist.iconId = Playlist.calculateCombinedIconId(colorIndex, iconIndex)
         playlist.draft = false
+        playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
 
         // If in filter creation flow a filter is not being updated by the user,
         // there are no user updated playlist properties
@@ -119,6 +120,7 @@ class CreateFilterViewModel @Inject constructor(
         launch {
             playlist.value?.let { playlist ->
                 playlist.autoDownload = autoDownload
+
                 val userPlaylistUpdate = if (isAutoDownloadSwitchInitialized) {
                     userChangedAutoDownload.recordUserChange()
                     UserPlaylistUpdate(

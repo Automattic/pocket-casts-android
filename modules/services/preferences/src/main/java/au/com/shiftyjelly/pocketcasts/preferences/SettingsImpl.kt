@@ -26,12 +26,12 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -1228,23 +1228,20 @@ class SettingsImpl @Inject constructor(
     override fun getFullySignedOut(): Boolean =
         getBoolean(PROCESSED_SIGNOUT_KEY, true)
 
-    override val lastLoadedFromPodcastOrFilterUuid = UserSetting.PrefFromString(
-        sharedPrefKey = "LastSelectedPodcastOrFilterUuid",
-        defaultValue = LastPlayedList.default,
+    override val lastAutoPlaySource = UserSetting.PrefFromString(
+        sharedPrefKey = "LastSelectedPodcastOrFilterUuid", // legacy name
+        defaultValue = AutoPlaySource.None,
         sharedPrefs = sharedPreferences,
-        fromString = {
-            if (it.isEmpty()) {
-                LastPlayedList.default
-            } else {
-                LastPlayedList.Uuid(it)
-            }
-        },
-        toString = {
-            when (it) {
-                LastPlayedList.None -> ""
-                is LastPlayedList.Uuid -> it.uuid
-            }
-        },
+        fromString = AutoPlaySource::fromId,
+        toString = AutoPlaySource::id,
+    )
+
+    override val trackingAutoPlaySource = UserSetting.PrefFromString(
+        sharedPrefKey = "localAutoPlaySource",
+        defaultValue = AutoPlaySource.None,
+        sharedPrefs = sharedPreferences,
+        fromString = AutoPlaySource::fromId,
+        toString = AutoPlaySource::id,
     )
 
     override val theme = ThemeSetting.UserSettingPref(
