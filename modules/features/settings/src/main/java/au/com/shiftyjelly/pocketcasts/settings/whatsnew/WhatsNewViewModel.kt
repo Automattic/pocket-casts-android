@@ -52,6 +52,7 @@ class WhatsNewViewModel @Inject constructor(
                         promoCode = settings.getSlumberStudiosPromoCode(),
                         message = LR.string.whats_new_slumber_studios_body,
                     ),
+                    fullModel = true,
                     tier = userTier,
                 )
             }
@@ -62,6 +63,7 @@ class WhatsNewViewModel @Inject constructor(
                         message = LR.string.whats_new_slumber_studios_body_free_user,
                         isUserEntitled = false,
                     ),
+                    fullModel = true,
                     tier = userTier,
                 )
             }
@@ -143,6 +145,7 @@ class WhatsNewViewModel @Inject constructor(
         data class Loaded(
             val feature: WhatsNewFeature,
             val tier: UserTier,
+            val fullModel: Boolean = false,
         ) : UiState()
     }
 
