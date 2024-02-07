@@ -52,30 +52,18 @@ class WhatsNewViewModel @Inject constructor(
                         promoCode = settings.getSlumberStudiosPromoCode(),
                         message = LR.string.whats_new_slumber_studios_body,
                     ),
-                    tier = settings.userTier,
+                    tier = userTier,
                 )
             }
 
             UserTier.Free -> {
-                viewModelScope.launch {
-                    val subscriptionTier = Subscription.SubscriptionTier.PLUS
-
-                    subscriptionManager
-                        .freeTrialForSubscriptionTierFlow(subscriptionTier)
-                        .stateIn(viewModelScope)
-                        .collect { freeTrial ->
-                            _state.value = UiState.Loaded(
-                                feature = WhatsNewFeature.SlumberStudiosPromo(
-                                    promoCode = settings.getSlumberStudiosPromoCode(),
-                                    message = LR.string.whats_new_slumber_studios_body_free_user,
-                                    hasOffer = freeTrial.exists,
-                                    isUserEntitled = false,
-                                    subscriptionTier = subscriptionTier,
-                                ),
-                                tier = userTier,
-                            )
-                        }
-                }
+                _state.value = UiState.Loaded(
+                    feature = WhatsNewFeature.SlumberStudiosPromo(
+                        message = LR.string.whats_new_slumber_studios_body_free_user,
+                        isUserEntitled = false,
+                    ),
+                    tier = userTier,
+                )
             }
         }
     }
@@ -182,7 +170,7 @@ class WhatsNewViewModel @Inject constructor(
         )
 
         data class SlumberStudiosPromo(
-            val promoCode: String,
+            val promoCode: String = "",
             @StringRes override val message: Int,
             override val hasOffer: Boolean = false,
             override val isUserEntitled: Boolean = true,

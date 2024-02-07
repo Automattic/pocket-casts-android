@@ -219,7 +219,6 @@ private fun getButtonTitle(
 
     is WhatsNewFeature.SlumberStudiosPromo -> when {
         state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
-        state.feature.hasOffer -> stringResource(LR.string.profile_start_free_trial)
         else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
     }
 }
