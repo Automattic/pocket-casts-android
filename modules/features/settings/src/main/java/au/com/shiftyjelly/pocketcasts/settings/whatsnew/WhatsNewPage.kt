@@ -231,6 +231,7 @@ private fun Message(
         textStyleResId = UR.style.P40,
         gravity = Gravity.CENTER_HORIZONTAL,
         modifier = Modifier.padding(horizontal = 16.dp),
+        selectable = true,
     )
 }
 
