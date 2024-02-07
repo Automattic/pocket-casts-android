@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -67,7 +68,11 @@ fun WhatsNewPage(
                 header = {
                     when (uiState.feature) {
                         is WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
-                        is WhatsNewFeature.SlumberStudiosPromo -> SlumberStudiosHeader(onClose)
+                        is WhatsNewFeature.SlumberStudiosPromo ->
+                            SlumberStudiosHeader(
+                                onClose = onClose,
+                                fullModal = uiState.fullModel,
+                            )
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -111,21 +116,47 @@ private fun WhatsNewPageLoaded(
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = performClose,
             )
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
+            .padding(if (state.fullModel) 0.dp else 16.dp)
             .fillMaxSize(),
     ) {
-        Column(Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
-            // Hide the header graphic if the phone is in landscape mode so there is room for the text
-            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                header()
-            }
-
+        Column(
+            Modifier
+                .background(MaterialTheme.theme.colors.primaryUi01)
+                .then(if (state.fullModel) Modifier.fillMaxSize() else Modifier),
+        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(all = 16.dp),
+                modifier = Modifier,
             ) {
+                if (state.fullModel) {
+                    Spacer(Modifier.height(8.dp))
+
+                    Pill()
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Start),
+                    ) {
+                        RowTextButton(
+                            text = stringResource(LR.string.cancel),
+                            fontSize = 15.sp,
+                            onClick = performClose,
+                            fullWidth = false,
+                            includePadding = false,
+                        )
+                    }
+                }
+
+                // Hide the header graphic if the phone is in landscape mode so there is room for the text
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    if (state.fullModel) {
+                        Spacer(modifier = Modifier.weight(0.4f))
+                    }
+                    header()
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 if (state.feature is WhatsNewFeature.Bookmarks) {
                     SubscriptionBadgeForTier(
                         tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
@@ -139,6 +170,10 @@ private fun WhatsNewPageLoaded(
                     )
                 }
 
+                if (state.fullModel) {
+                    Spacer(modifier = Modifier.weight(0.1f))
+                }
+
                 TextH20(
                     text = stringResource(id = state.feature.title),
                     textAlign = TextAlign.Center,
@@ -149,14 +184,19 @@ private fun WhatsNewPageLoaded(
 
                 Message(state)
 
-                Spacer(modifier = Modifier.height(16.dp))
+                if (state.fullModel) {
+                    Spacer(modifier = Modifier.weight(0.5f))
+                } else {
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
 
                 RowButton(
                     text = getButtonTitle(state),
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -166,9 +206,10 @@ private fun WhatsNewPageLoaded(
                         text = stringResource(it),
                         fontSize = 15.sp,
                         onClick = performClose,
-                        includePadding = false,
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -182,11 +223,14 @@ private fun Message(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
         color = MaterialTheme.theme.colors.primaryText02,
+        modifier = Modifier.padding(horizontal = 16.dp),
     )
+
     is WhatsNewFeature.SlumberStudiosPromo -> HtmlText(
         html = stringResource(state.feature.message, state.feature.promoCode),
         textStyleResId = UR.style.P40,
         gravity = Gravity.CENTER_HORIZONTAL,
+        modifier = Modifier.padding(horizontal = 16.dp),
     )
 }
 
@@ -197,12 +241,12 @@ private fun getButtonTitle(
     is WhatsNewFeature.Bookmarks -> {
         when {
             state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
-            state.feature.hasFreeTrial -> stringResource(LR.string.profile_start_free_trial)
+            state.feature.hasOffer -> stringResource(LR.string.profile_start_free_trial)
             else -> {
                 if (state.feature.subscriptionTier != null) {
                     stringResource(
                         LR.string.upgrade_to,
-                        when (state.feature.subscriptionTier) {
+                        when (requireNotNull(state.feature.subscriptionTier)) {
                             Subscription.SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
                             Subscription.SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
                             Subscription.SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
@@ -215,7 +259,11 @@ private fun getButtonTitle(
             }
         }
     }
-    is WhatsNewFeature.SlumberStudiosPromo -> stringResource(state.feature.confirmButtonTitle)
+
+    is WhatsNewFeature.SlumberStudiosPromo -> when {
+        state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
+        else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
+    }
 }
 
 @Composable
@@ -228,7 +276,11 @@ private fun WhatsNewSlumberStudiosPreview(
             state = UiState.Loaded(
                 feature = WhatsNewFeature.SlumberStudiosPromo(
                     promoCode = "PROMO",
+                    message = LR.string.whats_new_slumber_studios_body,
+                    hasOffer = false,
+                    isUserEntitled = true,
                 ),
+                fullModel = true,
                 tier = UserTier.Plus,
             ),
             header = { SlumberStudiosHeader(onClose = {}) },
@@ -250,7 +302,7 @@ private fun WhatsNewBookmarksPreview(
                     title = LR.string.whats_new_bookmarks_title,
                     message = LR.string.whats_new_bookmarks_body,
                     confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
-                    hasFreeTrial = false,
+                    hasOffer = false,
                     isUserEntitled = true,
                     subscriptionTier = Subscription.SubscriptionTier.PLUS,
                 ),

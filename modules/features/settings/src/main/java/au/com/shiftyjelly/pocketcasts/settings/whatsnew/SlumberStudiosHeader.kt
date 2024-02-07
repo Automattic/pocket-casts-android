@@ -48,6 +48,7 @@ private const val PaddingTop = 80
 fun SlumberStudiosHeader(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    fullModal: Boolean = true,
 ) {
     val width = LocalConfiguration.current.screenWidthDp - 48
     val size = width / slumberStudioImageResItems.size
@@ -62,7 +63,7 @@ fun SlumberStudiosHeader(
                 .fillMaxWidth()
                 .clipToBounds()
                 .height((size * 2 + PaddingTop).dp)
-                .padding(top = PaddingTop.dp),
+                .then(if (fullModal) Modifier else Modifier.padding(top = PaddingTop.dp)),
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -92,10 +93,12 @@ fun SlumberStudiosHeader(
             }
         }
 
-        RowCloseButton(
-            onClose = onClose,
-            tintColor = if (MaterialTheme.theme.isLight) Color.Black else Color.White,
-        )
+        if (!fullModal) {
+            RowCloseButton(
+                onClose = onClose,
+                tintColor = if (MaterialTheme.theme.isLight) Color.Black else Color.White,
+            )
+        }
     }
 }
 

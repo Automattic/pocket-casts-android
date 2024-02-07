@@ -53,20 +53,21 @@ fun RowOutlinedButton(
     leadingIcon: Painter? = null,
     tintIcon: Boolean = true,
     onClick: () -> Unit,
+    fullWidth: Boolean = true,
 ) {
     Row(
         modifier = modifier
             .then(if (includePadding) Modifier.padding(16.dp) else Modifier)
-            .fillMaxWidth(),
+            .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier),
     ) {
         OutlinedButton(
             onClick = { onClick() },
             shape = RoundedCornerShape(12.dp),
             border = border,
             colors = colors,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = if (fullWidth) Modifier.fillMaxWidth() else Modifier,
         ) {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+            Box(if (fullWidth) Modifier.fillMaxWidth() else Modifier, contentAlignment = Alignment.CenterStart) {
                 RowOutlinedImage(
                     image = leadingIcon,
                     colors = colors,
@@ -75,7 +76,7 @@ fun RowOutlinedButton(
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = if (fullWidth) Modifier.fillMaxWidth() else Modifier,
                 ) {
                     RowOutlinedImage(
                         image = textIcon,

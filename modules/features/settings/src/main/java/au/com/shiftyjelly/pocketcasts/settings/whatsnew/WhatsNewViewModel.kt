@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.earlyaccess.EarlyAccessStrings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -44,10 +45,29 @@ class WhatsNewViewModel @Inject constructor(
     }
 
     private fun updateStateForSlumberStudiosPromo() {
-        _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.SlumberStudiosPromo(settings.getSlumberStudiosPromoCode()),
-            tier = settings.userTier,
-        )
+        when (val userTier = settings.userTier) {
+            UserTier.Plus, UserTier.Patron -> {
+                _state.value = UiState.Loaded(
+                    feature = WhatsNewFeature.SlumberStudiosPromo(
+                        promoCode = settings.getSlumberStudiosPromoCode(),
+                        message = LR.string.whats_new_slumber_studios_body,
+                    ),
+                    fullModel = true,
+                    tier = userTier,
+                )
+            }
+
+            UserTier.Free -> {
+                _state.value = UiState.Loaded(
+                    feature = WhatsNewFeature.SlumberStudiosPromo(
+                        message = LR.string.whats_new_slumber_studios_body_free_user,
+                        isUserEntitled = false,
+                    ),
+                    fullModel = true,
+                    tier = userTier,
+                )
+            }
+        }
     }
 
     private fun updateStateForBookmarks() {
@@ -89,11 +109,12 @@ class WhatsNewViewModel @Inject constructor(
             title = EarlyAccessStrings.getAppropriateTextResource(LR.string.whats_new_bookmarks_title),
             message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
             confirmButtonTitle = if (currentEpisode == null) LR.string.whats_new_bookmarks_enable_now_button else LR.string.whats_new_bookmarks_try_now_button,
-            hasFreeTrial = trialExists,
+            hasOffer = trialExists,
             isUserEntitled = isUserEntitled,
             subscriptionTier = subscriptionTier,
         )
     }
+
     fun onConfirm() {
         viewModelScope.launch {
             val currentState = state.value as? UiState.Loaded ?: return@launch
@@ -106,9 +127,14 @@ class WhatsNewViewModel @Inject constructor(
                         NavigationState.FullScreenPlayerScreen
                     }
                 } else {
-                    NavigationState.StartUpsellFlow
+                    NavigationState.StartUpsellFlow(OnboardingUpgradeSource.BOOKMARKS)
                 }
-                is WhatsNewFeature.SlumberStudiosPromo -> NavigationState.SlumberStudiosRedeemPromoCode
+
+                is WhatsNewFeature.SlumberStudiosPromo -> if (currentState.feature.isUserEntitled) {
+                    NavigationState.SlumberStudiosRedeemPromoCode
+                } else {
+                    NavigationState.StartUpsellFlow(OnboardingUpgradeSource.SLUMBER_STUDIOS)
+                }
             }
             _navigationState.emit(target)
         }
@@ -119,6 +145,7 @@ class WhatsNewViewModel @Inject constructor(
         data class Loaded(
             val feature: WhatsNewFeature,
             val tier: UserTier,
+            val fullModel: Boolean = false,
         ) : UiState()
     }
 
@@ -128,22 +155,32 @@ class WhatsNewViewModel @Inject constructor(
         @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
+        abstract val hasOffer: Boolean
+        abstract val isUserEntitled: Boolean
+        abstract val subscriptionTier: Subscription.SubscriptionTier? // To show subscription when user is not entitled to the feature
+
         data class Bookmarks(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
             @StringRes override val confirmButtonTitle: Int,
-            val hasFreeTrial: Boolean,
-            val isUserEntitled: Boolean,
-            val subscriptionTier: Subscription.SubscriptionTier? = null, // To show subscription when user is not entitled to the feature
+            override val hasOffer: Boolean,
+            override val isUserEntitled: Boolean,
+            override val subscriptionTier: Subscription.SubscriptionTier? = null,
         ) : WhatsNewFeature(
             title = title,
             message = message,
             confirmButtonTitle = confirmButtonTitle,
         )
 
-        data class SlumberStudiosPromo(val promoCode: String) : WhatsNewFeature(
+        data class SlumberStudiosPromo(
+            val promoCode: String = "",
+            @StringRes override val message: Int,
+            override val hasOffer: Boolean = false,
+            override val isUserEntitled: Boolean = true,
+            override val subscriptionTier: Subscription.SubscriptionTier? = null,
+        ) : WhatsNewFeature(
             title = LR.string.whats_new_slumber_studios_title,
-            message = LR.string.whats_new_slumber_studios_body,
+            message = message,
             confirmButtonTitle = LR.string.whats_new_slumber_studios_redeem_now_button,
         )
     }
@@ -151,7 +188,7 @@ class WhatsNewViewModel @Inject constructor(
     sealed class NavigationState {
         data object HeadphoneControlsSettings : NavigationState()
         data object FullScreenPlayerScreen : NavigationState()
-        data object StartUpsellFlow : NavigationState()
+        data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState()
         data object SlumberStudiosRedeemPromoCode : NavigationState()
     }
 }
