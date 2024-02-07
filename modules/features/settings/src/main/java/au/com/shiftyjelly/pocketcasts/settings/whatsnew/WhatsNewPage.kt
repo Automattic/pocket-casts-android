@@ -198,7 +198,7 @@ private fun getButtonTitle(
     is WhatsNewFeature.Bookmarks -> {
         when {
             state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
-            state.feature.hasFreeTrial -> stringResource(LR.string.profile_start_free_trial)
+            state.feature.hasOffer -> stringResource(LR.string.profile_start_free_trial)
             else -> {
                 if (state.feature.subscriptionTier != null) {
                     stringResource(
@@ -219,7 +219,7 @@ private fun getButtonTitle(
 
     is WhatsNewFeature.SlumberStudiosPromo -> when {
         state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
-        state.feature.hasFreeTrial -> stringResource(LR.string.profile_start_free_trial)
+        state.feature.hasOffer -> stringResource(LR.string.profile_start_free_trial)
         else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
     }
 }
@@ -235,7 +235,7 @@ private fun WhatsNewSlumberStudiosPreview(
                 feature = WhatsNewFeature.SlumberStudiosPromo(
                     promoCode = "PROMO",
                     message = LR.string.whats_new_slumber_studios_body,
-                    hasFreeTrial = false,
+                    hasOffer = false,
                     isUserEntitled = true,
                 ),
                 tier = UserTier.Plus,
@@ -259,7 +259,7 @@ private fun WhatsNewBookmarksPreview(
                     title = LR.string.whats_new_bookmarks_title,
                     message = LR.string.whats_new_bookmarks_body,
                     confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
-                    hasFreeTrial = false,
+                    hasOffer = false,
                     isUserEntitled = true,
                     subscriptionTier = Subscription.SubscriptionTier.PLUS,
                 ),

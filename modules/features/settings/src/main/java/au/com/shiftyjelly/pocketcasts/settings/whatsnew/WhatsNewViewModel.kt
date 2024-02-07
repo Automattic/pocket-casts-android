@@ -68,7 +68,7 @@ class WhatsNewViewModel @Inject constructor(
                                 feature = WhatsNewFeature.SlumberStudiosPromo(
                                     promoCode = settings.getSlumberStudiosPromoCode(),
                                     message = LR.string.whats_new_slumber_studios_body_free_user,
-                                    hasFreeTrial = freeTrial.exists,
+                                    hasOffer = freeTrial.exists,
                                     isUserEntitled = false,
                                     subscriptionTier = subscriptionTier,
                                 ),
@@ -119,7 +119,7 @@ class WhatsNewViewModel @Inject constructor(
             title = EarlyAccessStrings.getAppropriateTextResource(LR.string.whats_new_bookmarks_title),
             message = if (isUserEntitled) LR.string.whats_new_bookmarks_body else LR.string.bookmarks_upsell_instructions,
             confirmButtonTitle = if (currentEpisode == null) LR.string.whats_new_bookmarks_enable_now_button else LR.string.whats_new_bookmarks_try_now_button,
-            hasFreeTrial = trialExists,
+            hasOffer = trialExists,
             isUserEntitled = isUserEntitled,
             subscriptionTier = subscriptionTier,
         )
@@ -164,7 +164,7 @@ class WhatsNewViewModel @Inject constructor(
         @StringRes open val confirmButtonTitle: Int,
         @StringRes val closeButtonTitle: Int? = null,
     ) {
-        abstract val hasFreeTrial: Boolean
+        abstract val hasOffer: Boolean
         abstract val isUserEntitled: Boolean
         abstract val subscriptionTier: Subscription.SubscriptionTier? // To show subscription when user is not entitled to the feature
 
@@ -172,7 +172,7 @@ class WhatsNewViewModel @Inject constructor(
             @StringRes override val title: Int,
             @StringRes override val message: Int,
             @StringRes override val confirmButtonTitle: Int,
-            override val hasFreeTrial: Boolean,
+            override val hasOffer: Boolean,
             override val isUserEntitled: Boolean,
             override val subscriptionTier: Subscription.SubscriptionTier? = null,
         ) : WhatsNewFeature(
@@ -184,7 +184,7 @@ class WhatsNewViewModel @Inject constructor(
         data class SlumberStudiosPromo(
             val promoCode: String,
             @StringRes override val message: Int,
-            override val hasFreeTrial: Boolean = false,
+            override val hasOffer: Boolean = false,
             override val isUserEntitled: Boolean = true,
             override val subscriptionTier: Subscription.SubscriptionTier? = null,
         ) : WhatsNewFeature(
