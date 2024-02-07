@@ -114,7 +114,7 @@ private fun WhatsNewPageLoaded(
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
-                onClick = performClose,
+                onClick = { if (!state.fullModel) performClose() },
             )
             .padding(if (state.fullModel) 0.dp else 16.dp)
             .fillMaxSize(),
@@ -231,6 +231,7 @@ private fun Message(
         textStyleResId = UR.style.P40,
         gravity = Gravity.CENTER_HORIZONTAL,
         modifier = Modifier.padding(horizontal = 16.dp),
+        selectable = true,
     )
 }
 

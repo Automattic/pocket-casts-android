@@ -65,7 +65,9 @@ class WhatsNewFragment : BaseFragment() {
                                 AnalyticsEvent.WHATSNEW_CONFIRM_BUTTON_TAPPED,
                                 mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
                             )
-                            onClose()
+                            if (it.shouldCloseOnConfirm) {
+                                onClose()
+                            }
                             performConfirmAction(it)
                             confirmActionClicked = true
                         },

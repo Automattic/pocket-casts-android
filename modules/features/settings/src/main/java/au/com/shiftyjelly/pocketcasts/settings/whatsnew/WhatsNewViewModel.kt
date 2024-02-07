@@ -37,10 +37,16 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)) {
-            updateStateForSlumberStudiosPromo()
-        } else {
-            updateStateForBookmarks()
+        viewModelScope.launch {
+            settings.cachedSubscriptionStatus.flow
+                .stateIn(viewModelScope)
+                .collect {
+                    if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)) {
+                        updateStateForSlumberStudiosPromo()
+                    } else {
+                        updateStateForBookmarks()
+                    }
+                }
         }
     }
 
@@ -133,7 +139,10 @@ class WhatsNewViewModel @Inject constructor(
                 is WhatsNewFeature.SlumberStudiosPromo -> if (currentState.feature.isUserEntitled) {
                     NavigationState.SlumberStudiosRedeemPromoCode
                 } else {
-                    NavigationState.StartUpsellFlow(OnboardingUpgradeSource.SLUMBER_STUDIOS)
+                    NavigationState.StartUpsellFlow(
+                        source = OnboardingUpgradeSource.SLUMBER_STUDIOS,
+                        shouldCloseOnConfirm = false,
+                    )
                 }
             }
             _navigationState.emit(target)
@@ -185,10 +194,15 @@ class WhatsNewViewModel @Inject constructor(
         )
     }
 
-    sealed class NavigationState {
+    sealed class NavigationState(
+        open val shouldCloseOnConfirm: Boolean = true,
+    ) {
         data object HeadphoneControlsSettings : NavigationState()
         data object FullScreenPlayerScreen : NavigationState()
-        data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState()
-        data object SlumberStudiosRedeemPromoCode : NavigationState()
+        data class StartUpsellFlow(
+            val source: OnboardingUpgradeSource,
+            override val shouldCloseOnConfirm: Boolean = true,
+        ) : NavigationState()
+        data object SlumberStudiosRedeemPromoCode : NavigationState(shouldCloseOnConfirm = false)
     }
 }

@@ -26,6 +26,7 @@ fun HtmlText(
     linkColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
     maxLines: Int = Int.MAX_VALUE,
     lineSpacingMultiplier: Float = 1.4f,
+    selectable: Boolean = false,
     @StyleRes textStyleResId: Int = UR.style.H50,
 ) {
     AndroidView(
@@ -38,6 +39,7 @@ fun HtmlText(
                 setMaxLines(maxLines)
                 setTextColor(color.toArgb())
                 setLinkTextColor(linkColor.toArgb())
+                setTextIsSelectable(selectable)
                 movementMethod = LinkMovementMethod.getInstance()
             }
         },
