@@ -20,7 +20,7 @@
 # https://github.com/shiftyjelly/pocketcasts-android/issues/1656
 -keep class au.com.shiftyjelly.pocketcasts.core.player.** { *; }
 
--dontwarn au.com.shiftyjelly.pocketcasts.ui.R$style
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$style
 -dontwarn android.test.**
 -dontwarn org.junit.internal.runners.statements.**
 -dontwarn org.junit.rules.**
