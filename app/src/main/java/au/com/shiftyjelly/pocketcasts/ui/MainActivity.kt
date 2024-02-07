@@ -809,7 +809,6 @@ class MainActivity :
                     if (state.shouldShowWhatsNew) {
                         showBottomSheet(
                             fragment = WhatsNewFragment(),
-                            swipeEnabled = false,
                         )
                         viewModel.onWhatsNewShown()
                     }

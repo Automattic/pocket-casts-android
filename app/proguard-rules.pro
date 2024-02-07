@@ -171,6 +171,7 @@
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$id
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$layout
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$string
+-dontwarn au.com.shiftyjelly.pocketcasts.*.R$style
 -dontwarn au.com.shiftyjelly.pocketcasts.*.R$styleable
 -dontwarn com.google.android.material.R$attr
 -dontwarn com.google.android.material.R$dimen

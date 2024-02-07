@@ -42,6 +42,7 @@ interface Settings {
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
         const val WP_COM_API_URL = "https://public-api.wordpress.com"
+        const val SLUMBER_STUDIOS_PROMO_URL = "https://slumberstudios.com/pocketcasts"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
@@ -58,7 +59,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9116
+        const val WHATS_NEW_VERSION_CODE = 9117
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -352,6 +353,7 @@ interface Settings {
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String
+    fun getSlumberStudiosPromoCode(): String
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>

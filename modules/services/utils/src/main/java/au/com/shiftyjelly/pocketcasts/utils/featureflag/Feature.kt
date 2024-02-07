@@ -51,6 +51,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
+    SLUMBER_STUDIOS_PROMO(
+        key = "slumber_studios_promo",
+        title = "Slumber Studios Promo",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Plus(null),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

@@ -209,6 +209,7 @@ private fun Content(
                 OnboardingUpgradeSource.PLUS_DETAILS,
                 OnboardingUpgradeSource.PROFILE,
                 OnboardingUpgradeSource.SETTINGS,
+                OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 
