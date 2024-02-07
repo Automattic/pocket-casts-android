@@ -234,6 +234,7 @@ private fun WhatsNewSlumberStudiosPreview(
             state = UiState.Loaded(
                 feature = WhatsNewFeature.SlumberStudiosPromo(
                     promoCode = "PROMO",
+                    message = LR.string.whats_new_slumber_studios_body,
                     hasFreeTrial = false,
                     isUserEntitled = true,
                 ),

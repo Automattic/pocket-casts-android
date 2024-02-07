@@ -50,6 +50,7 @@ class WhatsNewViewModel @Inject constructor(
                 _state.value = UiState.Loaded(
                     feature = WhatsNewFeature.SlumberStudiosPromo(
                         promoCode = settings.getSlumberStudiosPromoCode(),
+                        message = LR.string.whats_new_slumber_studios_body,
                     ),
                     tier = settings.userTier,
                 )
@@ -66,6 +67,7 @@ class WhatsNewViewModel @Inject constructor(
                             _state.value = UiState.Loaded(
                                 feature = WhatsNewFeature.SlumberStudiosPromo(
                                     promoCode = settings.getSlumberStudiosPromoCode(),
+                                    message = LR.string.whats_new_slumber_studios_body_free_user,
                                     hasFreeTrial = freeTrial.exists,
                                     isUserEntitled = false,
                                     subscriptionTier = subscriptionTier,
@@ -181,12 +183,13 @@ class WhatsNewViewModel @Inject constructor(
 
         data class SlumberStudiosPromo(
             val promoCode: String,
+            @StringRes override val message: Int,
             override val hasFreeTrial: Boolean = false,
             override val isUserEntitled: Boolean = true,
             override val subscriptionTier: Subscription.SubscriptionTier? = null,
         ) : WhatsNewFeature(
             title = LR.string.whats_new_slumber_studios_title,
-            message = LR.string.whats_new_slumber_studios_body,
+            message = message,
             confirmButtonTitle = LR.string.whats_new_slumber_studios_redeem_now_button,
         )
     }
