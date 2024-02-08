@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/account_nav_graph"
     app:startDestination="@+id/accountFragment">
 
@@ -13,11 +11,6 @@
         <action
             android:id="@+id/action_createAccountFragment_to_createEmailFragment"
             app:destination="@id/createEmailFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
-        <action
-            android:id="@+id/action_createAccountFragment_to_createFrequencyFragment"
-            app:destination="@id/createFrequencyFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
@@ -59,16 +52,6 @@
     <fragment
         android:id="@+id/createDoneFragment"
         android:name="au.com.shiftyjelly.pocketcasts.account.CreateDoneFragment" />
-    <fragment
-        android:id="@+id/createFrequencyFragment"
-        android:name="au.com.shiftyjelly.pocketcasts.account.CreateFrequencyFragment"
-        android:label="@string/plus_select_payment_frequency">
-        <action
-            android:id="@+id/action_createFrequencyFragment_to_createTOSFragment"
-            app:destination="@id/createTOSFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
-    </fragment>
     <fragment
         android:id="@+id/createTOSFragment"
         android:name="au.com.shiftyjelly.pocketcasts.account.CreateTOSFragment"
