@@ -2,6 +2,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import java.time.Instant
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -52,13 +53,13 @@ class UserSettingTest {
 
     private fun assertWillSync(userSetting: UserSetting.StringPref, expected: String) {
         assertNotNull(userSetting.getModifiedAt())
-        val result = userSetting.getSyncSetting { value, _ -> value }
+        val result = userSetting.getSyncSetting(Instant.EPOCH) { value, _ -> value }
         assertEquals(expected, result)
     }
 
     private fun assertWillNotSync(userSetting: UserSetting.StringPref) {
         assertNull(userSetting.getModifiedAt())
-        val result = userSetting.getSyncSetting { _, _ -> Unit }
+        val result = userSetting.getSyncSetting(Instant.EPOCH) { _, _ -> Unit }
         assertNull(result)
     }
 
