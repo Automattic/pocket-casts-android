@@ -45,9 +45,6 @@
         <action
             android:id="@+id/action_createEmailFragment_to_createDoneFragment"
             app:destination="@id/createDoneFragment" />
-        <action
-            android:id="@+id/action_createEmailFragment_to_createPayNowFragment"
-            app:destination="@id/createPayNowFragment" />
     </fragment>
     <fragment
         android:id="@+id/createDoneFragment"
@@ -66,22 +63,8 @@
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popUpTo="@id/accountFragment" />
-        <action
-            android:id="@+id/action_createTOSFragment_to_createPayNowFragment"
-            app:destination="@id/createPayNowFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
-    <fragment
-        android:id="@+id/createPayNowFragment"
-        android:name="au.com.shiftyjelly.pocketcasts.account.CreatePayNowFragment"
-        android:label="@string/profile_create_completed">
-        <action
-            android:id="@+id/action_createPayNowFragment_to_createDoneFragment"
-            app:destination="@id/createDoneFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
-    </fragment>
+
     <fragment
         android:id="@+id/resetPasswordFragment"
         android:name="au.com.shiftyjelly.pocketcasts.account.ResetPasswordFragment"

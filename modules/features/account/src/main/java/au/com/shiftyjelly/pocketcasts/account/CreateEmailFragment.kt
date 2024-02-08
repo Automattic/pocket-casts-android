@@ -99,8 +99,6 @@ class CreateEmailFragment : BaseFragment() {
                     progress.isVisible = false
                     if (viewModel.subscriptionType.value == SubscriptionType.FREE) {
                         view.findNavController().navigate(R.id.action_createEmailFragment_to_createDoneFragment)
-                    } else {
-                        view.findNavController().navigate(R.id.action_createEmailFragment_to_createPayNowFragment)
                     }
                 }
                 is CreateAccountState.Failure -> {
