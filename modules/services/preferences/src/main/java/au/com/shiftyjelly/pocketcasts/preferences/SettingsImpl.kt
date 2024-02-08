@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAc
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -82,8 +83,21 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
+
+    override val shelfItems = UserSetting.PrefFromString(
+        sharedPrefKey = "shelfItems",
+        defaultValue = ShelfItem.entries.toList(),
+        sharedPrefs = sharedPreferences,
+        fromString = { itemIdsString ->
+            val decodedItems = itemIdsString.split(',').mapNotNull(ShelfItem::fromId)
+            decodedItems + (ShelfItem.entries - decodedItems)
+        },
+        toString = { items ->
+            val allItems = items.distinct() + (ShelfItem.entries - items)
+            allItems.joinToString(separator = ",", transform = ShelfItem::id)
+        },
+    )
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1049,15 +1063,6 @@ class SettingsImpl @Inject constructor(
 
     override fun setWhatsNewVersionCode(value: Int) {
         setInt("WhatsNewVersionCode", value)
-    }
-
-    private fun getShelfItems(): List<String> {
-        return getStringList("shelfItems")
-    }
-
-    override fun setShelfItems(items: List<String>) {
-        setStringList("shelfItems", items)
-        shelfItemsObservable.accept(items)
     }
 
     private fun getMultiSelectItems(): List<Int> {
