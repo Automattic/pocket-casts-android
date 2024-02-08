@@ -63,9 +63,6 @@ class AccountActivity : AppCompatActivity() {
             val accountAuthenticatorResponse = IntentCompat.getParcelableExtra(intent, KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
             if (accountAuthenticatorResponse != null || navigateToSignIn) {
                 graph.setStartDestination(R.id.signInFragment)
-            } else if (isNewUpgradeInstance(intent)) {
-                viewModel.clearReadyForUpgrade()
-                graph.setStartDestination(R.id.createFrequencyFragment)
             } else if (isPromoCodeInstance(intent)) {
                 graph.setStartDestination(R.id.promoCodeFragment)
                 arguments.putString(PromoCodeFragment.ARG_PROMO_CODE, intent.getStringExtra(PROMO_CODE_VALUE))
@@ -132,7 +129,6 @@ class AccountActivity : AppCompatActivity() {
             R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
-            R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_SHOWN
@@ -164,7 +160,6 @@ class AccountActivity : AppCompatActivity() {
             R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
-            R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
