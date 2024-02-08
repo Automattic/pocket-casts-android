@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
+import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -781,20 +782,24 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getString(preference, defaultValue) ?: defaultValue
     }
 
-    override val newEpisodeNotificationActions = UserSetting.PrefFromString<NewEpisodeNotificationActionSetting>(
+    override val newEpisodeNotificationActions = UserSetting.PrefFromString(
         sharedPrefKey = "notification_actions",
-        defaultValue = NewEpisodeNotificationActionSetting.Default,
+        defaultValue = NewEpisodeNotificationAction.DefaultValues,
         sharedPrefs = sharedPreferences,
-        fromString = {
-            when (it) {
-                NewEpisodeNotificationActionSetting.Default.stringValue -> NewEpisodeNotificationActionSetting.Default
-                else -> NewEpisodeNotificationActionSetting.ValueOf(it)
+        fromString = { actionIdsString ->
+            when (actionIdsString) {
+                "" -> NewEpisodeNotificationAction.DefaultValues
+                else -> actionIdsString.splitIgnoreEmpty(",").mapNotNull { actionIdString ->
+                    NewEpisodeNotificationAction.entries.find { action ->
+                        action.id.toString() == actionIdString
+                    }
+                }
             }
         },
-        toString = {
-            when (it) {
-                NewEpisodeNotificationActionSetting.Default -> NewEpisodeNotificationActionSetting.Default.stringValue
-                is NewEpisodeNotificationActionSetting.ValueOf -> it.value
+        toString = { actions ->
+            when (actions) {
+                NewEpisodeNotificationAction.DefaultValues -> ""
+                else -> actions.joinToString(separator = ",") { it.id.toString() }
             }
         },
     )

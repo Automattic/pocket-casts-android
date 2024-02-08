@@ -56,6 +56,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoShowPlayed") val autoShowPlayed: NamedChangedSettingBool? = null,
     @field:Json(name = "autoPlayLastListUuid") val autoPlayLastSource: NamedChangedSettingString? = null,
     @field:Json(name = "useEmbeddedArtwork") val useEmbeddedArtwork: NamedChangedSettingBool? = null,
+    @field:Json(name = "notificationActions") val notificationSettingActions: NamedChangedSettingString? = null,
 )
 
 @JsonClass(generateAdapter = true)

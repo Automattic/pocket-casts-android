@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingS
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
@@ -181,6 +182,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 useEmbeddedArtwork = settings.useEmbeddedArtwork.getSyncSetting(::NamedChangedSettingBool),
+                notificationSettingActions = settings.newEpisodeNotificationActions.getSyncSetting { actions, modifiedAt ->
+                    NamedChangedSettingString(
+                        value = actions.joinToString(separator = ",", transform = NewEpisodeNotificationAction::serverId),
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -415,6 +422,13 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             settings.trackingAutoPlaySource.set(syncedValue, needsSync = false)
                         }
                     }
+                    "notificationActions" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.newEpisodeNotificationActions,
+                        newSettingValue = (changedSettingResponse.value as? String)
+                            ?.split(',')
+                            ?.mapNotNull(NewEpisodeNotificationAction::fromServerId),
+                    )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }

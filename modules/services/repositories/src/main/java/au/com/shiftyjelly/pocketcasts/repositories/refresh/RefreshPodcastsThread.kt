@@ -21,12 +21,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -474,7 +474,7 @@ class RefreshPodcastsThread(
                 NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY
             }
 
-            val userActions = NewEpisodeNotificationAction.loadFromSettings(settings)
+            val userActions = settings.newEpisodeNotificationActions.value
 
             val phoneActions = mutableListOf<NotificationCompat.Action>()
             val wearActions = mutableListOf<NotificationCompat.Action>()
@@ -679,4 +679,12 @@ class RefreshPodcastsThread(
 private sealed class AddToUpNext {
     data object Next : AddToUpNext()
     data object Last : AddToUpNext()
+}
+
+private val NewEpisodeNotificationAction.notificationAction: String get() = when (this) {
+    NewEpisodeNotificationAction.Play -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_EPISODE
+    NewEpisodeNotificationAction.PlayNext -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_NEXT
+    NewEpisodeNotificationAction.PlayLast -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_LAST
+    NewEpisodeNotificationAction.Archive -> NotificationBroadcastReceiver.INTENT_ACTION_ARCHIVE
+    NewEpisodeNotificationAction.Download -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_DOWNLOADED
 }
