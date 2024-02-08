@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
@@ -17,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CircleIconButton
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.flowlayout.FlowRow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FolderColorPicker(selectedId: Int, onClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     FlowRow(modifier = modifier.padding(start = 14.dp, top = 16.dp, end = 2.dp)) {

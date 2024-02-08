@@ -154,7 +154,6 @@ dependencies {
 //    debugImplementation libs.leakcanary
 //    debugProdImplementation libs.leakcanary
 
-    implementation libs.bundles.accompanist
     implementation libs.bundles.billing
     implementation libs.bundles.coroutines
     implementation libs.bundles.firebase

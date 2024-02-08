@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
 import android.content.res.Configuration
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -46,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.SectionId
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
@@ -60,7 +63,6 @@ import au.com.shiftyjelly.pocketcasts.compose.podcast.PodcastSubscribeImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -70,11 +72,11 @@ fun OnboardingRecommendationsStartPage(
     onSearch: () -> Unit,
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
     val state by viewModel.state.collectAsState()
 
-    val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
@@ -82,10 +84,15 @@ fun OnboardingRecommendationsStartPage(
     }
 
     LaunchedEffect(Unit) {
-        systemUiController.apply {
-            setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !theme.darkTheme)
-            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
-        }
+        val statusBar = SystemBarStyle.auto(
+            pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f).toArgb(),
+            pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f).toArgb(),
+        ) { theme.darkTheme }
+        val navigationBar = SystemBarStyle.auto(
+            Color.Transparent.toArgb(),
+            Color.Transparent.toArgb(),
+        ) { theme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
     BackHandler {
         viewModel.onBackPressed()

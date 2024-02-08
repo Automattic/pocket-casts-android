@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
@@ -36,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -44,11 +46,11 @@ internal fun OnboardingCreateAccountPage(
     theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
     onAccountCreated: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
-    val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
@@ -56,11 +58,16 @@ internal fun OnboardingCreateAccountPage(
     }
 
     LaunchedEffect(Unit) {
-        systemUiController.apply {
-            // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
-            setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
-            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
-        }
+        // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+        val statusBar = SystemBarStyle.auto(
+            pocketCastsTheme.colors.secondaryUi01.toArgb(),
+            pocketCastsTheme.colors.secondaryUi01.toArgb(),
+        ) { theme.darkTheme }
+        val navigationBar = SystemBarStyle.auto(
+            Color.Transparent.toArgb(),
+            Color.Transparent.toArgb(),
+        ) { theme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
 
     BackHandler {
@@ -152,6 +159,7 @@ private fun OnboardingCreateAccountPagePreview(
             theme = themeType,
             onBackPressed = {},
             onAccountCreated = {},
+            onUpdateSystemBars = {},
         )
     }
 }

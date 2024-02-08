@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.import
 
+import androidx.activity.SystemBarStyle
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -34,8 +37,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.androidbrowserhelper.trusted.Utils.setStatusBarColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -48,12 +49,19 @@ fun OnboardingImportFrom(
     buttonText: String? = null,
     buttonClick: (() -> Unit)? = null,
     onBackPressed: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
-    rememberSystemUiController().apply {
-        // Use the secondaryUI01 so the status bar matches the ThemedTopAppBar
-        setStatusBarColor(MaterialTheme.theme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
-        setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
-    }
+    val pocketCastsTheme = MaterialTheme.theme
+    // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+    val statusBar = SystemBarStyle.auto(
+        pocketCastsTheme.colors.secondaryUi01.toArgb(),
+        pocketCastsTheme.colors.secondaryUi01.toArgb(),
+    ) { theme.darkTheme }
+    val navigationBar = SystemBarStyle.auto(
+        Color.Transparent.toArgb(),
+        Color.Transparent.toArgb(),
+    ) { theme.darkTheme }
+    onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
 
     Column(
         Modifier
@@ -160,6 +168,7 @@ private fun OnboardingImportFromPreview(
             buttonText = "A button",
             buttonClick = {},
             onBackPressed = {},
+            onUpdateSystemBars = {},
         )
     }
 }

@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
@@ -129,7 +129,7 @@ class PodcastRatingsViewModel
 
     enum class Star(val icon: ImageVector) {
         FilledStar(Icons.Filled.Star),
-        HalfStar(Icons.Default.StarHalf),
+        HalfStar(Icons.AutoMirrored.Filled.StarHalf),
         BorderedStar(Icons.Filled.StarBorder),
     }
 

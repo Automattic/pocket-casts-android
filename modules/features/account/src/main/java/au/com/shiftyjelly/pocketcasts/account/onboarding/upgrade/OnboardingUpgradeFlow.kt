@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -40,6 +41,7 @@ fun OnboardingUpgradeFlow(
     onBackPressed: () -> Unit,
     onNeedLogin: () -> Unit,
     onProceed: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val bottomSheetViewModel = hiltViewModel<OnboardingUpgradeBottomSheetViewModel>()
     val mainSheetViewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
@@ -136,6 +138,7 @@ fun OnboardingUpgradeFlow(
                     },
                     onNotNowPressed = onProceed,
                     canUpgrade = hasSubscriptions,
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
         },
