@@ -59,6 +59,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    DESELECT_CHAPTERS(
+        key = "deselect_chapters",
+        title = "Deselect Chapters",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Plus(null),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    )
     ;
 
     companion object {
