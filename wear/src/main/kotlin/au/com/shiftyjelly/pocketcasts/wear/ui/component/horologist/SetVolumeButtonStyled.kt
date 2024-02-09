@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeMute
 import androidx.compose.material.icons.filled.VolumeDown
-import androidx.compose.material.icons.filled.VolumeMute
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,13 +15,13 @@ import com.google.android.horologist.compose.material.IconRtlMode
 
 @Composable
 fun SetVolumeButtonStyled(
-    onVolumeClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    volumeUiState: VolumeUiState? = null,
-    enabled: Boolean = true,
-    imageVolumeMute: ImageVector = Icons.Default.VolumeMute,
-    imageVolume: ImageVector = Icons.Default.VolumeDown,
-    imageVolumeMax: ImageVector = Icons.Default.VolumeUp,
+        onVolumeClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        volumeUiState: VolumeUiState? = null,
+        enabled: Boolean = true,
+        imageVolumeMute: ImageVector = Icons.AutoMirrored.Filled.VolumeMute,
+        imageVolume: ImageVector = Icons.Default.VolumeDown,
+        imageVolumeMax: ImageVector = Icons.Default.VolumeUp,
 ) {
     SettingsButton(
         modifier = modifier,
