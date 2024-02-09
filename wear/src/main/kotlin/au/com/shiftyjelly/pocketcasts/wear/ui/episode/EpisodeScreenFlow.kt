@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -56,6 +58,7 @@ object EpisodeScreenFlow {
                 },
             ),
         ) {
+            @Suppress("DEPRECATION")
             scrollable(
                 route = episodeScreen,
                 columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
@@ -107,6 +110,7 @@ object EpisodeScreenFlow {
                 }
             }
 
+            @Suppress("DEPRECATION")
             scrollable(upNextOptionsScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 val episodeScreenBackStackEntry = remember(it.backStackEntry) {
@@ -119,6 +123,7 @@ object EpisodeScreenFlow {
                 )
             }
 
+            @Suppress("DEPRECATION")
             composable(deleteDownloadConfirmationScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
@@ -142,6 +147,7 @@ object EpisodeScreenFlow {
                 )
             }
 
+            @Suppress("DEPRECATION")
             composable(deleteDownloadNotificationScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
@@ -150,6 +156,7 @@ object EpisodeScreenFlow {
                 )
             }
 
+            @Suppress("DEPRECATION")
             composable(removeFromUpNextNotificationScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(

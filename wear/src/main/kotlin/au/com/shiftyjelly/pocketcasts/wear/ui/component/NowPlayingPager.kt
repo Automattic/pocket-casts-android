@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalFoundationApi::class)
+@file:Suppress("DEPRECATION")
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
@@ -39,7 +40,7 @@ fun NowPlayingPager(
     navController: NavController,
     pagerState: PagerState = rememberPagerState { NowPlayingPager.pageCount },
     swipeToDismissState: SwipeToDismissBoxState,
-    scrollableScaffoldContext: ScrollableScaffoldContext? = null,
+    @Suppress("DEPRECATION") scrollableScaffoldContext: ScrollableScaffoldContext? = null,
     firstPageContent: @Composable () -> Unit,
 ) {
     val defaultTimeTextMode = remember { scrollableScaffoldContext?.timeTextMode }
@@ -60,6 +61,7 @@ fun NowPlayingPager(
         scrollableScaffoldContext?.timeTextMode = if (pagerState.currentPage == 0) {
             defaultTimeTextMode
         } else {
+            @Suppress("DEPRECATION")
             NavScaffoldViewModel.TimeTextMode.Off
         }
     }
