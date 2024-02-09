@@ -26,7 +26,7 @@ accompanist = "0.34.0"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
 android-application = "8.1.1"
 billing = "6.0.1"
-coil = "2.2.1"
+coil = "2.5.0"
 compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
