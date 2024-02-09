@@ -30,7 +30,7 @@ coil = "2.2.1"
 compose = "2023.04.01" # uses compose version 1.4.2, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
-compose-kotlin-compiler = "1.5.2"
+compose-kotlin-compiler = "1.5.9"
 coroutines = "1.6.4"
 espresso = "3.4.0"
 firebase = "30.5.0"
