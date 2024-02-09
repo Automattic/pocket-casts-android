@@ -22,7 +22,6 @@ fun PauseButtonStyled(
     colors: ButtonColors = ButtonDefaults.iconButtonColors(),
     iconSize: Dp = 30.dp,
     icon: ImageVector = Icons.Default.Pause,
-    tapTargetSize: DpSize = DpSize(60.dp, 60.dp),
 ) {
     MediaButton(
         onClick = onClick,
@@ -32,6 +31,5 @@ fun PauseButtonStyled(
         enabled = enabled,
         colors = colors,
         iconSize = iconSize,
-        tapTargetSize = tapTargetSize,
     )
 }

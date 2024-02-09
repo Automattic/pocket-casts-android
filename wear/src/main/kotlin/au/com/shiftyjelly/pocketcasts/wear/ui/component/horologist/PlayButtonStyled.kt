@@ -22,7 +22,6 @@ fun PlayButtonStyled(
     colors: ButtonColors = MediaButtonDefaults.mediaButtonDefaultColors,
     iconSize: Dp = 30.dp,
     icon: ImageVector = Icons.Default.PlayArrow,
-    tapTargetSize: DpSize = DpSize(60.dp, 60.dp),
 ) {
     MediaButton(
         onClick = onClick,
@@ -32,6 +31,5 @@ fun PlayButtonStyled(
         enabled = enabled,
         colors = colors,
         iconSize = iconSize,
-        tapTargetSize = tapTargetSize,
     )
 }

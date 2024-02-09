@@ -55,7 +55,6 @@ fun PlayPauseButtonStyled(
                 modifier = modifier,
                 colors = colors,
                 iconSize = iconSize,
-                tapTargetSize = tapTargetSize,
                 icon = pauseIcon,
             )
         } else {
@@ -65,7 +64,6 @@ fun PlayPauseButtonStyled(
                 modifier = modifier,
                 colors = colors,
                 iconSize = iconSize,
-                tapTargetSize = tapTargetSize,
                 icon = playIcon,
             )
         }

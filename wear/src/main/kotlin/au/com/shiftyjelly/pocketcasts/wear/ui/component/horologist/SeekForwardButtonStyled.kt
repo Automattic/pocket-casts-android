@@ -24,7 +24,6 @@ fun SeekForwardButtonStyled(
     colors: ButtonColors = MediaButtonDefaults.mediaButtonDefaultColors,
     iconSize: Dp = 30.dp,
     iconAlign: Alignment.Horizontal = Alignment.Start,
-    tapTargetSize: DpSize = DpSize(48.dp, 60.dp),
 ) {
     val contentDescription = when (seekButtonIncrement) {
         is SeekButtonIncrement.Known -> stringResource(
@@ -42,7 +41,6 @@ fun SeekForwardButtonStyled(
         enabled = enabled,
         colors = colors,
         iconSize = iconSize,
-        tapTargetSize = tapTargetSize,
         iconAlign = iconAlign,
     )
 }

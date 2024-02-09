@@ -138,7 +138,6 @@ fun NowPlayingScreen(
                             pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
                             seekIconSize = 35.dp,
                             seekIconAlign = Alignment.CenterHorizontally,
-                            seekTapTargetSize = DpSize(50.dp, 60.dp),
                             progressColor = MaterialTheme.colors.onPrimary,
                             trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
                             backgroundColor = Color.Transparent,
