@@ -27,7 +27,7 @@ accompanist = "0.30.1"
 android-application = "8.1.1"
 billing = "6.0.1"
 coil = "2.2.1"
-compose = "2023.04.01" # uses compose version 1.4.2, see https://developer.android.com/jetpack/compose/bom/bom-mapping
+compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
 compose-kotlin-compiler = "1.5.9"
