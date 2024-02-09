@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.SUBSCRIPTION_TEST_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -23,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag.isEnabled
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -181,14 +178,6 @@ class SubscriptionManagerImpl @Inject constructor(
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build(),
                 )
-                if (isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(SUBSCRIPTION_TEST_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build(),
-                    )
-                }
             }
 
         val params = QueryProductDetailsParams.newBuilder()
@@ -488,23 +477,23 @@ data class FreeTrial(
 )
 
 private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
-    val originalPlatform = SubscriptionPlatform.values().getOrNull(platform) ?: SubscriptionPlatform.NONE
+    val originalPlatform = SubscriptionPlatform.entries.getOrNull(platform) ?: SubscriptionPlatform.NONE
 
     val subs = subscriptions?.map { it.toSubscription() } ?: emptyList()
     subs.getOrNull(index)?.isPrimarySubscription = true // Mark the subscription that the server says is the main one
     return if (paid == 0) {
         SubscriptionStatus.Free(expiryDate, giftDays, originalPlatform, subs)
     } else {
-        val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
-        val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
+        val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
+        val enumType = SubscriptionType.entries.getOrNull(type) ?: SubscriptionType.NONE
         val enumTier = SubscriptionTier.fromString(tier, enumType)
         SubscriptionStatus.Paid(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, enumTier, index)
     }
 }
 
 private fun SubscriptionResponse.toSubscription(): SubscriptionStatus.Subscription {
-    val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
+    val enumType = SubscriptionType.entries.getOrNull(type) ?: SubscriptionType.NONE
     val enumTier = SubscriptionTier.fromString(tier, enumType)
-    val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
+    val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
     return SubscriptionStatus.Subscription(enumType, enumTier, freq, expiryDate, autoRenewing, updateUrl)
 }
