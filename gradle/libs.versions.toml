@@ -14,15 +14,9 @@
 #    https://github.com/google/horologist/blob/main/gradle/libs.versions.toml
 #    wear-compose = Wear Compose Version
 #    horologist = Horologist Version
-#
-# 4. Check the Compose and Accompanist versions are compatible.
-#    https://github.com/google/accompanist
-#    compose = Compose Version from compose-bom
-#    accompanist = Accompanist Version
 
 [versions]
 aboutlibraries = "10.5.0"
-accompanist = "0.34.0"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
 android-application = "8.1.1"
 billing = "6.0.1"
@@ -65,10 +59,6 @@ java = "17"
 # About Libraries
 aboutLibraries-compose = "com.mikepenz:aboutlibraries-compose:10.5.0"
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
-
-# Accompanist
-accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 # Billing
 billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
@@ -285,11 +275,6 @@ wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 aboutlibraries = [
     "aboutlibraries-core",
     "aboutLibraries-compose"
-]
-
-accompanist = [
-    "accompanist-flowlayout",
-    "accompanist-systemuicontroller"
 ]
 
 billing = [
