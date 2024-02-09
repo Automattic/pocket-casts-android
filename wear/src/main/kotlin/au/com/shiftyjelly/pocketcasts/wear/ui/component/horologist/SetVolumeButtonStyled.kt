@@ -15,13 +15,13 @@ import com.google.android.horologist.compose.material.IconRtlMode
 
 @Composable
 fun SetVolumeButtonStyled(
-        onVolumeClick: () -> Unit,
-        modifier: Modifier = Modifier,
-        volumeUiState: VolumeUiState? = null,
-        enabled: Boolean = true,
-        imageVolumeMute: ImageVector = Icons.AutoMirrored.Filled.VolumeMute,
-        imageVolume: ImageVector = Icons.AutoMirrored.Filled.VolumeDown,
-        imageVolumeMax: ImageVector = Icons.AutoMirrored.Filled.VolumeUp,
+    onVolumeClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    volumeUiState: VolumeUiState? = null,
+    enabled: Boolean = true,
+    imageVolumeMute: ImageVector = Icons.AutoMirrored.Filled.VolumeMute,
+    imageVolume: ImageVector = Icons.AutoMirrored.Filled.VolumeDown,
+    imageVolumeMax: ImageVector = Icons.AutoMirrored.Filled.VolumeUp,
 ) {
     SettingsButton(
         modifier = modifier,

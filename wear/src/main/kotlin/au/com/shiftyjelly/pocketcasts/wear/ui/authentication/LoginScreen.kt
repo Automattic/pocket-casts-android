@@ -30,7 +30,7 @@ fun LoginScreen(
             Chip(
                 labelId = LR.string.log_in_with_google,
                 colors = ChipDefaults.secondaryChipColors(),
-                icon = DrawableResPaintable(IR.drawable.google_g_white,),
+                icon = DrawableResPaintable(IR.drawable.google_g_white),
                 onClick = {
                     viewModel.onGoogleLoginClicked()
                     onLoginWithGoogleClick()
