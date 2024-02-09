@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -64,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeature
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
@@ -76,7 +79,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val MAX_OFFER_BADGE_TEXT_LENGTH = 23
@@ -90,6 +92,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     onClickSubscribe: () -> Unit,
     onNotNowPressed: () -> Unit,
     canUpgrade: Boolean,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
@@ -111,7 +114,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     }
 
     val scrollState = rememberScrollState()
-    SetStatusBarBackground(scrollState)
+    SetStatusBarBackground(scrollState, onUpdateSystemBars)
 
     when (state) {
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
@@ -420,8 +423,10 @@ private fun UpgradeButton(
 }
 
 @Composable
-private fun SetStatusBarBackground(scrollState: ScrollState) {
-    val systemUiController = rememberSystemUiController()
+private fun SetStatusBarBackground(
+    scrollState: ScrollState,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+) {
     val hasScrolled = scrollState.value > 0
 
     val scrimAlpha: Float by animateFloatAsState(
@@ -431,16 +436,15 @@ private fun SetStatusBarBackground(scrollState: ScrollState) {
     )
 
     val statusBarBackground = if (scrimAlpha > 0) {
-        OnboardingUpgradeHelper.backgroundColor.copy(alpha = scrimAlpha)
+        OnboardingUpgradeHelper.backgroundColor.copy(alpha = scrimAlpha).toArgb()
     } else {
-        Color.Transparent
+        Color.Transparent.toArgb()
     }
 
     LaunchedEffect(statusBarBackground) {
-        systemUiController.apply {
-            setStatusBarColor(statusBarBackground, darkIcons = false)
-            setNavigationBarColor(Color.Transparent, darkIcons = false)
-        }
+        val statusBar = SystemBarStyle.dark(statusBarBackground)
+        val navigationBar = SystemBarStyle.dark(Color.Transparent.toArgb())
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
 }
 

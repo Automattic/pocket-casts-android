@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -26,16 +27,17 @@ object OnboardingRecommendationsFlow {
         onBackPressed: () -> Unit,
         onComplete: () -> Unit,
         navController: NavController,
+        onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     ) {
         navigation(
             route = this@OnboardingRecommendationsFlow.route,
             startDestination = start,
         ) {
-            importFlowGraph(theme, navController, flow)
+            importFlowGraph(theme, navController, flow, onUpdateSystemBars)
 
             composable(start) {
                 OnboardingRecommendationsStartPage(
-                    theme = theme,
+                    theme,
                     onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
                     onSearch = with(LocalContext.current) {
                         {
@@ -52,12 +54,14 @@ object OnboardingRecommendationsFlow {
                     },
                     onBackPressed = onBackPressed,
                     onComplete = onComplete,
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
             composable(search) {
                 OnboardingRecommendationsSearchPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
         }
