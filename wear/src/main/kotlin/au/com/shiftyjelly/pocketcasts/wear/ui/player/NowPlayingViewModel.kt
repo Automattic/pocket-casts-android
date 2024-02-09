@@ -28,7 +28,6 @@ class NowPlayingViewModel @Inject constructor(
     settings: Settings,
     private val theme: Theme,
     @ApplicationScope private val coroutineScope: CoroutineScope,
-    private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
 ) : ViewModel() {
     private var playAttempt: Job? = null
 
@@ -101,7 +100,7 @@ class NowPlayingViewModel @Inject constructor(
         } else {
             playAttempt?.cancel()
 
-            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = coroutineScope.launch { play() }
         }
     }
 
@@ -124,7 +123,7 @@ class NowPlayingViewModel @Inject constructor(
         if (confirmedStreaming && !playbackManager.isPlaying()) {
             playAttempt?.cancel()
 
-            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = coroutineScope.launch { play() }
         }
     }
 

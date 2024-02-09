@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
-import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import coil.ImageLoader
 import coil.request.ImageRequest
@@ -81,7 +80,6 @@ class EpisodeViewModel @Inject constructor(
     theme: Theme,
     @ApplicationContext appContext: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
     private val userEpisodeManager: UserEpisodeManager,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
@@ -340,7 +338,7 @@ class EpisodeViewModel @Inject constructor(
         } else {
             playAttempt?.cancel()
 
-            playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = applicationScope.launch { play() }
         }
     }
 
@@ -349,7 +347,7 @@ class EpisodeViewModel @Inject constructor(
         if (confirmedStreaming && !playbackManager.isPlaying()) {
             playAttempt?.cancel()
 
-            playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
+            playAttempt = applicationScope.launch { play() }
         }
     }
 
