@@ -91,7 +91,7 @@ compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-ui-util = { module = "androidx.compose.ui:ui-util" }
-compose-activity = "androidx.activity:activity-compose:1.5.1"
+compose-activity = "androidx.activity:activity-compose:1.8.2"
 compose-constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
 # Coroutines
