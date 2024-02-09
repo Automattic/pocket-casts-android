@@ -66,7 +66,7 @@ enum class Feature(
         tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
-    )
+    ),
     ;
 
     companion object {
