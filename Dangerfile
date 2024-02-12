@@ -13,22 +13,21 @@ if github.pr_labels.include?('releases')
   return
 end
 
-labels_checker.check(
-  do_not_merge_labels: ['do not merge'],
-  required_labels: [//],
-  required_labels_error: 'PR requires at least one label.'
-)
-
 view_changes_checker.check
 
 pr_size_checker.check_diff_size(max_size: 500)
 
 android_unit_test_checker.check_missing_tests
 
+# skip remaining checks if we have a Draft PR
+return if github.pr_draft?
+
+labels_checker.check(
+  do_not_merge_labels: ['do not merge'],
+  required_labels: [//],
+  required_labels_error: 'PR requires at least one label.'
+)
+
 milestone_checker.check_milestone_due_date(days_before_due: 2)
 
 warn('PR is classed as Work in Progress') if github_utils.wip_feature?
-
-unless github_utils.requested_reviewers? || github.pr_draft?
-  warn("No reviewers have been set for this PR yet. Please request a review from **@\u2060Automattic/pocket-casts-android**.")
-end
