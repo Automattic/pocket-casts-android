@@ -1728,6 +1728,7 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        var posUpdatedOnPlayerReset = false
         // We want to make sure we get the current position at the last possible moment before changing/resetting the player
         val currentPositionMs = if (
             isPlayerSwitchRequired() ||
@@ -1744,6 +1745,7 @@ open class PlaybackManager @Inject constructor(
                     // This helps avoid having the audio jump "back" a second or so when the currently playing episode
                     // is downloaded.
                     episodeManager.updatePlayedUpTo(episode, playerPositionSeconds, forceUpdate = true)
+                    posUpdatedOnPlayerReset = true
                 }
 
                 resetPlayer()
@@ -1811,7 +1813,7 @@ open class PlaybackManager @Inject constructor(
             if (sameEpisode && currentPositionMs != null) {
                 player?.seekToTimeMs(currentPositionMs)
             }
-            play(sourceView)
+            play(sourceView, posUpdatedOnPlayerReset)
         } else {
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
@@ -1906,10 +1908,17 @@ open class PlaybackManager @Inject constructor(
         return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
     }
 
-    private suspend fun play(sourceView: SourceView = SourceView.UNKNOWN) {
+    private suspend fun play(
+        sourceView: SourceView = SourceView.UNKNOWN,
+        posUpdatedOnPlayerReset: Boolean = false,
+    ) {
         val episode = getCurrentEpisode()?.let {
-            // Make sure we have the most up-to-date episode instance
-            episodeManager.findEpisodeByUuid(it.uuid)
+            if (posUpdatedOnPlayerReset) {
+                // Retrieves latest episode instance to address potential audio skip back issue (PR#1510)
+                episodeManager.findEpisodeByUuid(it.uuid) ?: it
+            } else {
+                it
+            }
         }
         if (episode == null || player == null) {
             return
@@ -2035,9 +2044,9 @@ open class PlaybackManager @Inject constructor(
         }
 
         val currentTimeSecs = currentTimeMs.toDouble() / 1000.0
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Saved time in database %.3f", currentTimeSecs)
         episodeManager.updatePlayedUpTo(episode, currentTimeSecs, false)
         episodeManager.updatePlaybackInteractionDate(episode)
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Saved time in database %.3f", currentTimeSecs)
 
         statsManager.persistTimes()
     }
