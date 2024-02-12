@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingS
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
@@ -204,6 +205,19 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                headphoneControlsNextAction = settings.headphoneControlsNextAction.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                headphoneControlsPreviousAction = settings.headphoneControlsPreviousAction.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                headphoneControlsPlayBookmarkConfirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
             ),
         )
 
@@ -455,6 +469,21 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "showArtworkOnLockScreen" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.showArtworkOnLockScreen,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "headphoneControlsNextAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.headphoneControlsNextAction,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { HeadphoneAction.fromServerId(it) ?: HeadphoneAction.SKIP_FORWARD },
+                    )
+                    "headphoneControlsPreviousAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.headphoneControlsPreviousAction,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { HeadphoneAction.fromServerId(it) ?: HeadphoneAction.SKIP_BACK },
+                    )
+                    "headphoneControlsPlayBookmarkConfirmationSound" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.headphoneControlsPlayBookmarkConfirmationSound,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
