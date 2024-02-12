@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -11,19 +12,20 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
 import io.reactivex.Observable
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class ChaptersViewModel
@@ -67,19 +69,27 @@ class ChaptersViewModel
     private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .observeOn(Schedulers.io())
 
-    val uiState: Flowable<UiState> = Observables.combineLatest(
-        upNextStateObservable,
-        playbackStateObservable,
-        _selectedIndexes.asObservable(),
-        this::combineUiState,
+    private val mutableState = MutableStateFlow(
+        UiState(backgroundColor = Color(theme.playerBackgroundColor(null))),
     )
-        .distinctUntilChanged()
-        .toFlowable(BackpressureStrategy.LATEST)
+    val uiState: StateFlow<UiState>
+        get() = mutableState
 
-    val defaultUiState = UiState(
-        chapters = emptyList(),
-        backgroundColor = Color(theme.playerBackgroundColor(null)),
-    )
+    init {
+        viewModelScope.launch {
+            combine(
+                upNextStateObservable.asFlow(),
+                playbackStateObservable.asFlow(),
+                _selectedIndexes,
+                this@ChaptersViewModel::combineUiState,
+            )
+                .distinctUntilChanged()
+                .stateIn(viewModelScope)
+                .collect {
+                    mutableState.value = it
+                }
+        }
+    }
 
     fun skipToChapter(chapter: Chapter) {
         launch {
