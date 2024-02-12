@@ -976,13 +976,13 @@ class SettingsImpl @Inject constructor(
         )
     }
 
-    override fun setCloudSortOrder(sortOrder: Settings.CloudSortOrder) {
-        setInt("cloud_sort_order", sortOrder.ordinal)
-    }
-
-    override fun getCloudSortOrder(): Settings.CloudSortOrder {
-        return Settings.CloudSortOrder.values().getOrNull(getInt("cloud_sort_order", 0)) ?: Settings.CloudSortOrder.NEWEST_OLDEST
-    }
+    override val cloudSortOrder = UserSetting.PrefFromInt(
+        sharedPrefKey = "cloud_sort_order",
+        defaultValue = Settings.CloudSortOrder.NEWEST_OLDEST,
+        sharedPrefs = sharedPreferences,
+        fromInt = { ordinal -> Settings.CloudSortOrder.entries.find { it.ordinal == ordinal } ?: Settings.CloudSortOrder.NEWEST_OLDEST },
+        toInt = Settings.CloudSortOrder::ordinal,
+    )
 
     override val cloudAddToUpNext = UserSetting.BoolPref(
         sharedPrefKey = "cloudUpNext",
