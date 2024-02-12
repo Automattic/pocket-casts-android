@@ -115,7 +115,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUpNextDarkTheme(value: Boolean) {
-        settings.useDarkUpNextTheme.set(value, needsSync = false)
+        settings.useDarkUpNextTheme.set(value, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
             mapOf("enabled" to value),
