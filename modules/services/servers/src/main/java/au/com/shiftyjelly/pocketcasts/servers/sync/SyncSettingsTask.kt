@@ -453,7 +453,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "theme" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.theme,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(ThemeSetting::fromServerId),
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
                     )
                     "badges" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
