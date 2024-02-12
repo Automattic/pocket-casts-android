@@ -198,6 +198,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                showArtworkOnLockScreen = settings.showArtworkOnLockScreen.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingBool(
+                        value = setting,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -445,6 +451,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         newSettingValue = (changedSettingResponse.value as? String)
                             ?.split(',')
                             ?.mapNotNull(ShelfItem::fromServerId),
+                    )
+                    "showArtworkOnLockScreen" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.showArtworkOnLockScreen,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }

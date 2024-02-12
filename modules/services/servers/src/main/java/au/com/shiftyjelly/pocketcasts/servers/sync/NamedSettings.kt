@@ -58,6 +58,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "useEmbeddedArtwork") val useEmbeddedArtwork: NamedChangedSettingBool? = null,
     @field:Json(name = "notificationActions") val notificationSettingActions: NamedChangedSettingString? = null,
     @field:Json(name = "playerShelf") val playerShelfItems: NamedChangedSettingString? = null,
+    @field:Json(name = "showArtworkOnLockScreen") val showArtworkOnLockScreen: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
