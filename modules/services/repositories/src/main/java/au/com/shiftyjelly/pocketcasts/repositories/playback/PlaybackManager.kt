@@ -2044,9 +2044,9 @@ open class PlaybackManager @Inject constructor(
         }
 
         val currentTimeSecs = currentTimeMs.toDouble() / 1000.0
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Saved time in database %.3f", currentTimeSecs)
         episodeManager.updatePlayedUpTo(episode, currentTimeSecs, false)
         episodeManager.updatePlaybackInteractionDate(episode)
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Saved time in database %.3f", currentTimeSecs)
 
         statsManager.persistTimes()
     }
