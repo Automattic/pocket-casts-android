@@ -49,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ChapterRow(
     state: ChaptersViewModel.ChapterState,
+    selected: Boolean,
+    onSelectionChange: (Boolean, Chapter) -> Unit,
     onClick: () -> Unit,
     onUrlClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -79,8 +81,8 @@ fun ChapterRow(
         ) {
             if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                 Checkbox(
-                    checked = false,
-                    onCheckedChange = null,
+                    checked = selected,
+                    onCheckedChange = { selected -> onSelectionChange(selected, chapter) },
                     modifier = Modifier
                         .padding(start = 16.dp),
                 )
@@ -171,16 +173,22 @@ fun ChapterRowPreview() {
         Column {
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Played(chapter = chapter),
+                selected = true,
+                onSelectionChange = { _, _ -> },
                 onClick = {},
                 onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Playing(chapter = chapter, progress = 0.5f),
+                selected = false,
+                onSelectionChange = { _, _ -> },
                 onClick = {},
                 onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter),
+                selected = false,
+                onSelectionChange = { _, _ -> },
                 onClick = {},
                 onUrlClick = {},
             )

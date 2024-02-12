@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 
 @HiltViewModel
 class ChaptersViewModel
@@ -37,14 +39,21 @@ class ChaptersViewModel
 
     data class UiState(
         val chapters: List<ChapterState> = emptyList(),
+        val selectedIndexes: List<Int> = emptyList(),
         val backgroundColor: Color,
-    )
+    ) {
+        fun isSelected(chapter: Chapter): Boolean {
+            return selectedIndexes.contains(chapter.index)
+        }
+    }
 
     sealed class ChapterState(val chapter: Chapter) {
         class Played(chapter: Chapter) : ChapterState(chapter)
         class Playing(val progress: Float, chapter: Chapter) : ChapterState(chapter)
         class NotPlayed(chapter: Chapter) : ChapterState(chapter)
     }
+
+    private val _selectedIndexes = MutableStateFlow(emptyList<Int>())
 
     private val _scrollToChapterState = MutableStateFlow<Chapter?>(null)
     val scrollToChapterState = _scrollToChapterState.asStateFlow()
@@ -58,9 +67,10 @@ class ChaptersViewModel
     private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .observeOn(Schedulers.io())
 
-    val uiState = Observables.combineLatest(
+    val uiState: Flowable<UiState> = Observables.combineLatest(
         upNextStateObservable,
         playbackStateObservable,
+        _selectedIndexes.asObservable(),
         this::combineUiState,
     )
         .distinctUntilChanged()
@@ -77,7 +87,11 @@ class ChaptersViewModel
         }
     }
 
-    private fun combineUiState(upNextState: UpNextQueue.State, playbackState: PlaybackState): UiState {
+    private fun combineUiState(
+        upNextState: UpNextQueue.State,
+        playbackState: PlaybackState,
+        selectedIndexes: List<Int>,
+    ): UiState {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
@@ -87,6 +101,7 @@ class ChaptersViewModel
         )
         return UiState(
             chapters = chapters,
+            selectedIndexes = selectedIndexes,
             backgroundColor = Color(backgroundColor),
         )
     }
@@ -113,5 +128,16 @@ class ChaptersViewModel
             chapters.add(chapterState)
         }
         return chapters
+    }
+
+    fun onSelectionChange(select: Boolean, chapter: Chapter) {
+        val indexes = _selectedIndexes.value.toMutableSet().apply {
+            if (select) {
+                add(chapter.index)
+            } else {
+                remove(chapter.index)
+            }
+        }
+        _selectedIndexes.value = indexes.distinct()
     }
 }

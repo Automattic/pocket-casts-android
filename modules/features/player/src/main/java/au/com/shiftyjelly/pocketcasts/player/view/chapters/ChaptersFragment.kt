@@ -69,6 +69,8 @@ class ChaptersFragment : BaseFragment() {
                     ChaptersPage(
                         lazyListState = lazyListState,
                         chapters = uiState.chapters,
+                        isSelected = { uiState.isSelected(it) },
+                        onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
                         onChapterClick = ::onChapterClick,
                         onUrlClick = ::onUrlClick,
                         backgroundColor = uiState.backgroundColor,
