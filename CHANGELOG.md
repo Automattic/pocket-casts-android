@@ -15,6 +15,8 @@
         ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
     *   Fixed "Hide playback notification on pause" setting not representing its state correctly
         ([#1769](https://github.com/Automattic/pocket-casts-android/pull/1769))
+    *   Improved skipping behavior from bluetooth device 
+        ([#1818](https://github.com/Automattic/pocket-casts-android/pull/1818))
 
 7.56
 -----
