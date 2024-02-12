@@ -68,6 +68,9 @@ data class ChangedNamedSettings(
     @field:Json(name = "useDarkUpNextTheme") val useDarkUpNextTheme: NamedChangedSettingBool? = null,
     @field:Json(name = "useDynamicColorsForWidget") val useDynamicColorsForWidget: NamedChangedSettingBool? = null,
     @field:Json(name = "filesSortOrder") val filesSortOrder: NamedChangedSettingInt? = null,
+    @field:Json(name = "darkThemePreference") val darkThemePreference: NamedChangedSettingInt? = null,
+    @field:Json(name = "lightThemePreference") val lightThemePreference: NamedChangedSettingInt? = null,
+    @field:Json(name = "useSystemTheme") val useSystemTheme: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)

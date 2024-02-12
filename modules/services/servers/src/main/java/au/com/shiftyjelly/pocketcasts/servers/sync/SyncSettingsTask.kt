@@ -246,6 +246,19 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                darkThemePreference = settings.darkThemePreference.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = value.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                lightThemePreference = settings.lightThemePreference.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = value.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                useSystemTheme = settings.useSystemTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
             ),
         )
 
@@ -543,6 +556,21 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
+                    )
+                    "darkThemePreference" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.darkThemePreference,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.DARK },
+                    )
+                    "lightThemePreference" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.lightThemePreference,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
+                    )
+                    "useSystemTheme" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useSystemTheme,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
