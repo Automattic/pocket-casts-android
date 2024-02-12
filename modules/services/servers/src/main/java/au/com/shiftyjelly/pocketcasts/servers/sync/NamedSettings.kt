@@ -66,6 +66,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "playerBookmarksSortType") val playerBookmarksSortType: NamedChangedSettingInt? = null,
     @field:Json(name = "podcastBookmarksSortType") val podcastBookmarksSortType: NamedChangedSettingInt? = null,
     @field:Json(name = "useDarkUpNextTheme") val useDarkUpNextTheme: NamedChangedSettingBool? = null,
+    @field:Json(name = "useDynamicColorsForWidget") val useDynamicColorsForWidget: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)

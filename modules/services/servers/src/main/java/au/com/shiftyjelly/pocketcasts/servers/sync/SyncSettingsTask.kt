@@ -239,6 +239,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 useDarkUpNextTheme = settings.useDarkUpNextTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                useDynamicColorsForWidget = settings.useDynamicColorsForWidget.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
             ),
         )
 
@@ -525,6 +526,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "useDarkUpNextTheme" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.useDarkUpNextTheme,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "useDynamicColorsForWidget" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useDynamicColorsForWidget,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
