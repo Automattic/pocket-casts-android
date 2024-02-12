@@ -134,7 +134,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
-        settings.showArtworkOnLockScreen.set(value, needsSync = false)
+        settings.showArtworkOnLockScreen.set(value, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
             mapOf("enabled" to value),
@@ -142,7 +142,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEmbeddedArtwork(value: Boolean) {
-        settings.useEmbeddedArtwork.set(value, needsSync = false)
+        settings.useEmbeddedArtwork.set(value, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

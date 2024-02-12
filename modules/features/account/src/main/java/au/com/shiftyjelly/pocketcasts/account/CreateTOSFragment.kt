@@ -43,10 +43,7 @@ class CreateTOSFragment : BaseFragment() {
             viewModel.updateTermsOfUse(true)
             analyticsTracker.track(AnalyticsEvent.TERMS_OF_USE_ACCEPTED)
 
-            if (viewModel.upgradeMode.value == true) {
-                viewModel.updateStateTotAccountCreated()
-                it.findNavController().navigate(R.id.action_createTOSFragment_to_createPayNowFragment)
-            } else {
+            if (viewModel.upgradeMode.value == false) {
                 it.findNavController().navigate(R.id.action_createTOSFragment_to_createEmailFragment)
             }
         }

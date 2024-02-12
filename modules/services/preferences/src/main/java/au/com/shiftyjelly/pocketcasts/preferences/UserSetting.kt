@@ -21,8 +21,8 @@ abstract class UserSetting<T>(
     }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
-    fun <U> getSyncSetting(f: (T, String) -> U): U? {
-        val modifiedAtServerString = getModifiedAtServerString()
+    fun <U> getSyncSetting(lastSyncTime: Instant, f: (T, String) -> U): U? {
+        val modifiedAtServerString = getModifiedAtServerString() ?: lastSyncTime.takeIf { it != Instant.EPOCH }?.toString()
         // Only need to sync if modifiedAtServerString is not null
         return if (modifiedAtServerString != null) {
             f(value, modifiedAtServerString)
@@ -45,8 +45,7 @@ abstract class UserSetting<T>(
     val flow: StateFlow<T> by lazy { _flow }
 
     // External callers should use [value] to get the current value if they can't
-    // listen to the flow for changes. This method is solely to be used to intitialize
-    // the flow.
+    // listen to the flow for changes.
     protected abstract fun get(): T
 
     val value: T
@@ -56,7 +55,7 @@ abstract class UserSetting<T>(
 
     open fun set(value: T, commit: Boolean = false, needsSync: Boolean) {
         persist(value, commit)
-        _flow.value = value
+        _flow.value = get()
         val modifiedAt = if (needsSync) Instant.now().toString() else null
         updateModifiedAtServerString(modifiedAt)
     }

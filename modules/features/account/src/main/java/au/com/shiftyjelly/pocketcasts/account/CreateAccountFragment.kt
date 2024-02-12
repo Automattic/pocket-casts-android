@@ -145,8 +145,6 @@ class CreateAccountFragment : BaseFragment() {
             analyticsTracker.track(AnalyticsEvent.SELECT_ACCOUNT_TYPE_BUTTON_TAPPED, mapOf(KEY_ACCOUNT_TYPE to accountType))
             if (viewModel.subscriptionType.value == SubscriptionType.FREE) {
                 it.findNavController().navigate(R.id.action_createAccountFragment_to_createEmailFragment)
-            } else if (viewModel.subscriptionType.value == SubscriptionType.PLUS) {
-                it.findNavController().navigate(R.id.action_createAccountFragment_to_createFrequencyFragment)
             }
         }
     }

@@ -114,9 +114,8 @@ sealed interface Subscription {
         const val PLUS_YEARLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.yearly"
         const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
-        const val SUBSCRIPTION_TEST_PRODUCT_ID = "com.pocketcasts.plus.testfreetrialoffer"
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
-        const val INTRO_OFFER_ID = "testyearlyintropricingoffer-newusers"
+        const val INTRO_OFFER_ID = "plus-yearly-intro-50percent"
 
         fun fromProductDetails(productDetails: ProductDetails, isOfferEligible: Boolean): Subscription? {
             val subscription = SubscriptionMapper.map(productDetails, isOfferEligible)

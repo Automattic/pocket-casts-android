@@ -18,9 +18,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -236,9 +236,9 @@ class NotificationsSettingsFragment :
     private fun setupActions() {
         changeActionsSummary()
         notificationActions?.setOnPreferenceClickListener {
-            val initialActions = NewEpisodeNotificationAction.loadFromSettings(settings)
+            val initialActions = settings.newEpisodeNotificationActions.value
             val selectedActions = initialActions.toMutableList()
-            val initialSelection = selectedActions.map { it.index() }.toIntArray()
+            val initialSelection = selectedActions.map(NewEpisodeNotificationAction::ordinal).toIntArray()
             val onSelect: MultiChoiceListener = { dialog, _, items ->
                 selectedActions.clear()
                 selectedActions.addAll(NewEpisodeNotificationAction.fromLabels(items.map { it.toString() }, resources))
@@ -246,22 +246,29 @@ class NotificationsSettingsFragment :
             }
 
             activity?.let { activity ->
-                val dialog = MaterialDialog(activity).show {
-                    listItemsMultiChoice(items = NewEpisodeNotificationAction.labels(resources), waitForPositiveButton = false, allowEmptySelection = true, initialSelection = initialSelection, selection = onSelect)
-                    title(res = LR.string.settings_notification_actions_title)
-                    positiveButton(
-                        res = LR.string.ok,
-                        click = {
-                            val madeChange = initialActions != selectedActions
-                            if (madeChange) {
-                                trackActionsChange(selectedActions)
-                            }
-                            NewEpisodeNotificationAction.saveToSettings(selectedActions, settings)
-                            changeActionsSummary()
-                        },
+                val dialog = MaterialDialog(activity)
+                    .listItemsMultiChoice(
+                        items = NewEpisodeNotificationAction.labels(resources),
+                        waitForPositiveButton = false,
+                        allowEmptySelection = true,
+                        initialSelection = initialSelection,
+                        selection = onSelect,
                     )
-                    negativeButton(res = LR.string.cancel)
-                }
+                    .show {
+                        title(res = LR.string.settings_notification_actions_title)
+                        positiveButton(
+                            res = LR.string.ok,
+                            click = {
+                                val madeChange = initialActions != selectedActions
+                                if (madeChange) {
+                                    trackActionsChange(selectedActions)
+                                }
+                                settings.newEpisodeNotificationActions.set(selectedActions, needsSync = true)
+                                changeActionsSummary()
+                            },
+                        )
+                        negativeButton(res = LR.string.cancel)
+                    }
                 changeActionsDialog(selectedActions, dialog)
             }
 
@@ -273,17 +280,17 @@ class NotificationsSettingsFragment :
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_NOTIFICATIONS_ACTIONS_CHANGED,
             mapOf(
-                "action_archive" to selectedActions.contains(NewEpisodeNotificationAction.ARCHIVE),
-                "action_download" to selectedActions.contains(NewEpisodeNotificationAction.DOWNLOAD),
-                "action_play" to selectedActions.contains(NewEpisodeNotificationAction.PLAY),
-                "action_play_next" to selectedActions.contains(NewEpisodeNotificationAction.PLAY_NEXT),
-                "action_play_last" to selectedActions.contains(NewEpisodeNotificationAction.PLAY_LAST),
+                "action_archive" to selectedActions.contains(NewEpisodeNotificationAction.Archive),
+                "action_download" to selectedActions.contains(NewEpisodeNotificationAction.Download),
+                "action_play" to selectedActions.contains(NewEpisodeNotificationAction.Play),
+                "action_play_next" to selectedActions.contains(NewEpisodeNotificationAction.PlayNext),
+                "action_play_last" to selectedActions.contains(NewEpisodeNotificationAction.PlayLast),
             ),
         )
     }
 
     private fun changeActionsSummary() {
-        val userActions = NewEpisodeNotificationAction.loadFromSettings(settings)
+        val userActions = settings.newEpisodeNotificationActions.value
         val actionStrings = userActions.joinToString { resources.getString(it.labelId) }
         notificationActions?.summary = if (userActions.isEmpty()) resources.getString(LR.string.none) else actionStrings
     }
@@ -298,12 +305,7 @@ class NotificationsSettingsFragment :
         if (actions.size < 3) {
             dialog.updateListItemsMultiChoice(items = NewEpisodeNotificationAction.labels(resources), disabledIndices = intArrayOf(), selection = onSelect)
         } else {
-            val disabled = arrayListOf<Int>()
-            NewEpisodeNotificationAction.values().forEach { action ->
-                if (!actions.contains(action)) {
-                    disabled.add(action.index())
-                }
-            }
+            val disabled = NewEpisodeNotificationAction.entries.filter { it !in actions }.map(NewEpisodeNotificationAction::ordinal)
             dialog.updateListItemsMultiChoice(items = NewEpisodeNotificationAction.labels(resources), disabledIndices = disabled.toIntArray(), selection = onSelect)
         }
     }

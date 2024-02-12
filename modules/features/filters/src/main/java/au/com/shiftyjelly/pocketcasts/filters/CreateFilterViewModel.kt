@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -22,6 +21,8 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -49,24 +50,27 @@ class CreateFilterViewModel @Inject constructor(
 
     private var hasBeenInitialised = false
     var isAutoDownloadSwitchInitialized = false
+
+    private val _lockedToFirstPage = MutableStateFlow(true)
+    val lockedToFirstPage get() = _lockedToFirstPage.asStateFlow()
+
     lateinit var playlist: LiveData<Playlist>
-    val lockedToFirstPage = MutableLiveData<Boolean>(true)
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) =
         withContext(Dispatchers.IO) { playlistManager.createPlaylist(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true) }
 
-    val filterName = MutableLiveData("")
+    val filterName = MutableStateFlow("")
     var iconId: Int = 0
-    var colorIndex = MutableLiveData(0)
+    var colorIndex = MutableStateFlow(0)
 
-    var userChangedFilterName = UserChangeTracker()
-    var userChangedIcon = UserChangeTracker()
-    var userChangedColor = UserChangeTracker()
-    var userChangedAutoDownload = UserChangeTracker()
-    var userChangedAutoDownloadEpisodeCount = UserChangeTracker()
+    private var userChangedFilterName = UserChangeTracker()
+    private var userChangedIcon = UserChangeTracker()
+    private var userChangedColor = UserChangeTracker()
+    private var userChangedAutoDownload = UserChangeTracker()
+    private var userChangedAutoDownloadEpisodeCount = UserChangeTracker()
 
     fun saveNewFilterDetails() {
-        val colorIndex = colorIndex.value ?: return
+        val colorIndex = colorIndex.value
         launch {
             saveFilter(
                 iconIndex = iconId,
@@ -85,7 +89,7 @@ class CreateFilterViewModel @Inject constructor(
         isCreatingNewFilter: Boolean,
     ) = withContext(Dispatchers.Default) {
         val playlist = playlist.value ?: return@withContext
-        playlist.title = filterName.value ?: ""
+        playlist.title = filterName.value
         playlist.iconId = Playlist.calculateCombinedIconId(colorIndex, iconIndex)
         playlist.draft = false
         playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
@@ -116,7 +120,7 @@ class CreateFilterViewModel @Inject constructor(
         playlistManager.update(playlist, userPlaylistUpdate, isCreatingFilter = true)
     }
 
-    fun updateAutodownload(autoDownload: Boolean) {
+    fun updateAutoDownload(autoDownload: Boolean) {
         launch {
             playlist.value?.let { playlist ->
                 playlist.autoDownload = autoDownload
@@ -177,7 +181,7 @@ class CreateFilterViewModel @Inject constructor(
         iconId = 0
         colorIndex.value = 0
         hasBeenInitialised = false
-        lockedToFirstPage.value = true
+        _lockedToFirstPage.value = true
     }
 
     fun clearNewFilter() {
@@ -189,7 +193,7 @@ class CreateFilterViewModel @Inject constructor(
     }
 
     fun starredChipTapped(isCreatingFilter: Boolean) {
-        lockedToFirstPage.value = false
+        _lockedToFirstPage.value = false
         launch {
             playlist.value?.let { playlist ->
                 playlist.starred = !playlist.starred
@@ -239,6 +243,10 @@ class CreateFilterViewModel @Inject constructor(
 
             analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_DISMISSED, properties)
         }
+    }
+
+    fun onOptionPageOpen() {
+        _lockedToFirstPage.value = false
     }
 
     data class UserChangeTracker(

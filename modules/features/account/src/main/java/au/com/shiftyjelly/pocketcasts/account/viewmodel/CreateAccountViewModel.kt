@@ -191,10 +191,6 @@ class CreateAccountViewModel
         termsOfUse.value = value
     }
 
-    fun updateStateTotAccountCreated() {
-        createAccountState.value = CreateAccountState.AccountCreated
-    }
-
     fun updateStateToFinished() {
         createAccountState.value = CreateAccountState.Finished
     }
@@ -314,7 +310,6 @@ sealed class CreateAccountState {
     data class ProductsLoaded(val list: List<Subscription>) : CreateAccountState()
     object AccountCreating : CreateAccountState()
     object AccountCreated : CreateAccountState()
-    object SubscriptionCreating : CreateAccountState()
     object SubscriptionCreated : CreateAccountState()
     object Finished : CreateAccountState()
     data class Failure(val errors: MutableSet<CreateAccountError>, val message: String?) : CreateAccountState()

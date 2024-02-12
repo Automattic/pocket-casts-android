@@ -32,14 +32,16 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
+import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -81,8 +83,21 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val shelfItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getShelfItems()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
+
+    override val shelfItems = UserSetting.PrefFromString(
+        sharedPrefKey = "shelfItems",
+        defaultValue = ShelfItem.entries.toList(),
+        sharedPrefs = sharedPreferences,
+        fromString = { itemIdsString ->
+            val decodedItems = itemIdsString.split(',').mapNotNull(ShelfItem::fromId)
+            decodedItems + (ShelfItem.entries - decodedItems)
+        },
+        toString = { items ->
+            val allItems = items.distinct() + (ShelfItem.entries - items)
+            allItems.joinToString(separator = ",", transform = ShelfItem::id)
+        },
+    )
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -781,20 +796,24 @@ class SettingsImpl @Inject constructor(
         return sharedPreferences.getString(preference, defaultValue) ?: defaultValue
     }
 
-    override val newEpisodeNotificationActions = UserSetting.PrefFromString<NewEpisodeNotificationActionSetting>(
+    override val newEpisodeNotificationActions = UserSetting.PrefFromString(
         sharedPrefKey = "notification_actions",
-        defaultValue = NewEpisodeNotificationActionSetting.Default,
+        defaultValue = NewEpisodeNotificationAction.DefaultValues,
         sharedPrefs = sharedPreferences,
-        fromString = {
-            when (it) {
-                NewEpisodeNotificationActionSetting.Default.stringValue -> NewEpisodeNotificationActionSetting.Default
-                else -> NewEpisodeNotificationActionSetting.ValueOf(it)
+        fromString = { actionIdsString ->
+            when (actionIdsString) {
+                "" -> NewEpisodeNotificationAction.DefaultValues
+                else -> actionIdsString.splitIgnoreEmpty(",").mapNotNull { actionIdString ->
+                    NewEpisodeNotificationAction.entries.find { action ->
+                        action.id.toString() == actionIdString
+                    }
+                }
             }
         },
-        toString = {
-            when (it) {
-                NewEpisodeNotificationActionSetting.Default -> NewEpisodeNotificationActionSetting.Default.stringValue
-                is NewEpisodeNotificationActionSetting.ValueOf -> it.value
+        toString = { actions ->
+            when (actions) {
+                NewEpisodeNotificationAction.DefaultValues -> ""
+                else -> actions.joinToString(separator = ",") { it.id.toString() }
             }
         },
     )
@@ -1044,15 +1063,6 @@ class SettingsImpl @Inject constructor(
 
     override fun setWhatsNewVersionCode(value: Int) {
         setInt("WhatsNewVersionCode", value)
-    }
-
-    private fun getShelfItems(): List<String> {
-        return getStringList("shelfItems")
-    }
-
-    override fun setShelfItems(items: List<String>) {
-        setStringList("shelfItems", items)
-        shelfItemsObservable.accept(items)
     }
 
     private fun getMultiSelectItems(): List<Int> {

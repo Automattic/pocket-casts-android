@@ -55,6 +55,10 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoSubscribeToPlayed") val autoSubscribeToPlayed: NamedChangedSettingBool? = null,
     @field:Json(name = "autoShowPlayed") val autoShowPlayed: NamedChangedSettingBool? = null,
     @field:Json(name = "autoPlayLastListUuid") val autoPlayLastSource: NamedChangedSettingString? = null,
+    @field:Json(name = "useEmbeddedArtwork") val useEmbeddedArtwork: NamedChangedSettingBool? = null,
+    @field:Json(name = "notificationActions") val notificationSettingActions: NamedChangedSettingString? = null,
+    @field:Json(name = "playerShelf") val playerShelfItems: NamedChangedSettingString? = null,
+    @field:Json(name = "showArtworkOnLockScreen") val showArtworkOnLockScreen: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)

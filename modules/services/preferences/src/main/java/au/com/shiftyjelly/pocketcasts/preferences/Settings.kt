@@ -19,10 +19,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
@@ -228,8 +229,9 @@ interface Settings {
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
+
+    val shelfItems: UserSetting<List<ShelfItem>>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -328,7 +330,7 @@ interface Settings {
     fun showPlayedEpisodes(): Boolean
 
     val showArtworkOnLockScreen: UserSetting<Boolean>
-    val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
+    val newEpisodeNotificationActions: UserSetting<List<NewEpisodeNotificationAction>>
 
     val autoArchiveIncludesStarred: UserSetting<Boolean>
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
@@ -384,7 +386,6 @@ interface Settings {
     fun getCustomStorageLimitGb(): Long
     fun getCancelledAcknowledged(): Boolean
     fun setCancelledAcknowledged(value: Boolean)
-    fun setShelfItems(items: List<String>)
     fun getSeenPlayerTour(): Boolean
     fun setSeenPlayerTour(value: Boolean)
     fun setSeenUpNextTour(value: Boolean)

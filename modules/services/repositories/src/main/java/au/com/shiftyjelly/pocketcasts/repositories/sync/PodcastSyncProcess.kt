@@ -70,7 +70,6 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
 import java.time.Instant
-import java.time.format.DateTimeParseException
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -111,23 +110,26 @@ class PodcastSyncProcess(
             return Completable.complete()
         }
 
-        val lastModified = settings.getLastModified()
+        val lasSyncTimeString = settings.getLastModified()
+        val lastSyncTime = runCatching { Instant.parse(lasSyncTimeString) }
+            .onFailure { Timber.e(it, "Could not convert lastModified String to Long: $lasSyncTimeString") }
+            .getOrDefault(Instant.EPOCH)
 
-        val downloadObservable = if (lastModified == null) {
+        val downloadObservable = if (lastSyncTime == Instant.EPOCH) {
             performFullSync().andThen(syncUpNext())
         } else {
             if (settings.getHomeGridNeedsRefresh()) {
                 Timber.i("SyncProcess: Refreshing home grid")
                 performHomeGridRefresh()
                     .andThen(syncUpNext())
-                    .andThen(performIncrementalSync(lastModified))
+                    .andThen(performIncrementalSync(lastSyncTime))
             } else {
                 syncUpNext()
-                    .andThen(performIncrementalSync(lastModified))
+                    .andThen(performIncrementalSync(lastSyncTime))
             }
         }
         val syncUpNextObservable = downloadObservable
-            .andThen(syncSettings())
+            .andThen(syncSettings(lastSyncTime))
             .andThen(syncCloudFiles())
             .andThen(firstSyncChanges())
             .andThen(
@@ -149,19 +151,19 @@ class PodcastSyncProcess(
     }
 
     @VisibleForTesting
-    fun performIncrementalSync(lastModified: String): Completable =
+    fun performIncrementalSync(lastSyncTime: Instant): Completable =
         if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
             rxCompletable {
-                performIncrementalSyncSuspend(lastModified)
+                performIncrementalSyncSuspend(lastSyncTime)
             }
         } else {
             @Suppress("DEPRECATION")
-            oldPerformIncrementalSync(lastModified)
+            oldPerformIncrementalSync(lastSyncTime)
         }
 
-    private suspend fun performIncrementalSyncSuspend(lastModified: String) {
+    private suspend fun performIncrementalSyncSuspend(lastSyncTime: Instant) {
         val episodesToSync = episodeManager.findEpisodesToSync()
-        val syncUpdateRequest = getSyncUpdateRequest(lastModified, episodesToSync)
+        val syncUpdateRequest = getSyncUpdateRequest(lastSyncTime, episodesToSync)
         if (BuildConfig.DEBUG) {
             Timber.i("incremental sync request: $syncUpdateRequest")
         }
@@ -178,44 +180,37 @@ class PodcastSyncProcess(
 
     @Suppress("DEPRECATION")
     @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
-    private fun oldPerformIncrementalSync(lastModified: String): Completable {
+    private fun oldPerformIncrementalSync(lastSyncTime: Instant): Completable {
         val uploadData = uploadChanges()
-        val uploadObservable = syncManager.syncUpdate(uploadData.first, lastModified)
+        val uploadObservable = syncManager.syncUpdate(uploadData.first, lastSyncTime)
         return uploadObservable.flatMap {
             processServerResponse(it, uploadData.second)
         }.ignoreElement()
     }
 
-    private fun getSyncUpdateRequest(lastModifiedString: String, episodesToSync: List<PodcastEpisode>): SyncUpdateRequest =
+    private fun getSyncUpdateRequest(
+        lastSyncTime: Instant,
+        episodesToSync: List<PodcastEpisode>,
+    ): SyncUpdateRequest {
         try {
-            syncUpdateRequest {
+            return syncUpdateRequest {
                 deviceUtcTimeMs = System.currentTimeMillis()
-
-                try {
-                    lastModified = Instant
-                        .parse(lastModifiedString)
-                        .toEpochMilli()
-                } catch (e: DateTimeParseException) {
-                    Timber.e(e, "Could not convert lastModified String to Long: $lastModifiedString")
-                }
+                lastModified = lastSyncTime.toEpochMilli()
 
                 val podcasts = podcastManager.findPodcastsToSync()
-                val podcastRecords = podcasts.map { toRecord(it) }
+                val podcastRecords = podcasts.map { toRecord(it, lastSyncTime) }
                 records.addAll(podcastRecords)
 
                 val episodeRecords = episodesToSync.map { toRecord(it) }
                 records.addAll(episodeRecords)
 
-                val folderRecords = folderManager.findFoldersToSync()
-                    .map { toRecord(it) }
+                val folderRecords = folderManager.findFoldersToSync().map { toRecord(it) }
                 records.addAll(folderRecords)
 
-                val playlistRecords = playlistManager.findPlaylistsToSync()
-                    .map { toRecord(it) }
+                val playlistRecords = playlistManager.findPlaylistsToSync().map { toRecord(it) }
                 records.addAll(playlistRecords)
 
-                val bookmarkRecords = bookmarkManager.findBookmarksToSync()
-                    .map { toRecord(it) }
+                val bookmarkRecords = bookmarkManager.findBookmarksToSync().map { toRecord(it) }
                 records.addAll(bookmarkRecords)
 
                 getSyncUserDevice()?.let { syncUserDevice ->
@@ -229,6 +224,7 @@ class PodcastSyncProcess(
             Timber.e(e, "Unable to upload podcast to sync.")
             throw PocketCastsSyncException(e)
         }
+    }
 
     private fun performFullSync(): Completable {
         // grab the last sync date before we begin
@@ -371,10 +367,10 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun syncSettings(): Completable {
+    private fun syncSettings(lastSyncTime: Instant): Completable {
         return rxCompletable {
             val startTime = SystemClock.elapsedRealtime()
-            SyncSettingsTask.run(context, settings, syncManager)
+            SyncSettingsTask.run(context, lastSyncTime, settings, syncManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync settings - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         }
     }
@@ -1011,7 +1007,7 @@ class PodcastSyncProcess(
         internal val ANDROID_DEVICE_TYPE = 2
 
         @VisibleForTesting
-        internal fun toRecord(podcast: Podcast): Record =
+        internal fun toRecord(podcast: Podcast, lastSyncTime: Instant): Record =
             record {
                 this.podcast = syncUserPodcast {
                     podcast.addedDate?.toInstant()?.epochSecond?.let { epochSecond ->
@@ -1038,37 +1034,37 @@ class PodcastSyncProcess(
                         autoStartFrom = int32Setting {
                             value = int32Value { value = podcast.startFromSecs }
                             modifiedAt = timestamp {
-                                seconds = podcast.startFromModified?.timeSecs() ?: 0
+                                seconds = podcast.startFromModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         autoSkipLast = int32Setting {
                             value = int32Value { value = podcast.skipLastSecs }
                             modifiedAt = timestamp {
-                                seconds = podcast.skipLastModified?.timeSecs() ?: 0
+                                seconds = podcast.skipLastModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         addToUpNext = boolSetting {
                             value = boolValue { value = podcast.addToUpNextSyncSetting }
                             modifiedAt = timestamp {
-                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: 0
+                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         addToUpNextPosition = int32Setting {
                             value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
                             modifiedAt = timestamp {
-                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: 0
+                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         playbackEffects = boolSetting {
                             value = boolValue { value = podcast.overrideGlobalEffects }
                             modifiedAt = timestamp {
-                                seconds = podcast.overrideGlobalEffectsModified?.timeSecs() ?: 0
+                                seconds = podcast.overrideGlobalEffectsModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         playbackSpeed = doubleSetting {
                             value = doubleValue { value = podcast.playbackSpeed }
                             modifiedAt = timestamp {
-                                seconds = podcast.playbackSpeedModified?.timeSecs() ?: 0
+                                seconds = podcast.playbackSpeedModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         trimSilence = int32Setting {
@@ -1081,19 +1077,19 @@ class PodcastSyncProcess(
                                 }
                             }
                             modifiedAt = timestamp {
-                                seconds = podcast.trimModeModified?.timeSecs() ?: 0
+                                seconds = podcast.trimModeModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         volumeBoost = boolSetting {
                             value = boolValue { value = podcast.isVolumeBoosted }
                             modifiedAt = timestamp {
-                                seconds = podcast.volumeBoostedModified?.timeSecs() ?: 0
+                                seconds = podcast.volumeBoostedModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                         notification = boolSetting {
                             value = boolValue { value = podcast.isShowNotifications }
                             modifiedAt = timestamp {
-                                seconds = podcast.showNotificationsModified?.timeSecs() ?: 0
+                                seconds = podcast.showNotificationsModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                     }

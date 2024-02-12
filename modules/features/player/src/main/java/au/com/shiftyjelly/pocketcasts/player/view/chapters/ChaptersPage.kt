@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfItems.itemsList
 
 @Composable
 fun ChaptersPage(
@@ -38,7 +37,7 @@ fun ChaptersPage(
                 onClick = { onChapterClick(state.chapter, state is ChaptersViewModel.ChapterState.Playing) },
                 onUrlClick = { onUrlClick(state.chapter.url.toString()) },
             )
-            if (index <= itemsList.lastIndex) {
+            if (index < chapters.lastIndex) {
                 Divider(
                     color = MaterialTheme.theme.colors.playerContrast06,
                     thickness = 1.dp,

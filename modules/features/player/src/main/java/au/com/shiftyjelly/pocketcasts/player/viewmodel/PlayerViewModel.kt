@@ -20,12 +20,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfItem
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfItems
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -66,7 +65,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -200,29 +202,15 @@ class PlayerViewModel @Inject constructor(
 
     private var playbackPositionMs: Int = 0
 
-    private val shelfObservable = settings.shelfItemsObservable.map { list ->
-        if (list.isEmpty()) {
-            ShelfItems.itemsList
-        } else {
-            val updatedList = when {
-                !list.contains(ShelfItem.Bookmark.id) -> {
-                    list.toMutableList().apply {
-                        add(list.size - 1, ShelfItem.Bookmark.id)
-                    }
+    private val shelfObservable = settings.shelfItems.flow
+        .map { items ->
+            items.filter { item ->
+                when (item) {
+                    ShelfItem.Report -> FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
+                    else -> true
                 }
-                FeatureFlag.isEnabled(Feature.REPORT_VIOLATION) &&
-                    !list.contains(ShelfItem.Report.id) -> {
-                    list.toMutableList().apply { add(ShelfItem.Bookmark.id) }
-                }
-                else -> list
             }
-
-            updatedList.mapNotNull { id ->
-                ShelfItems.itemForId(id)
-            }
-        }
-    }
-        .toFlowable(BackpressureStrategy.LATEST)
+        }.asFlowable(viewModelScope.coroutineContext)
 
     private val shelfUpNext = upNextStateObservable.distinctUntilChanged { t1, t2 ->
         val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -233,8 +221,7 @@ class PlayerViewModel @Inject constructor(
 
     private val trimmedShelfObservable = Flowables.combineLatest(shelfUpNext.toFlowable(BackpressureStrategy.LATEST), shelfObservable).map { (upNextState, shelf) ->
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
-        val isUserEpisode = episode is UserEpisode
-        val trimmedShelf = if (isUserEpisode) shelf.filter { it.shownWhen == ShelfItem.Shown.UserEpisodeOnly || it.shownWhen == ShelfItem.Shown.Always } else shelf.filter { it.shownWhen == ShelfItem.Shown.EpisodeOnly || it.shownWhen == ShelfItem.Shown.Always }
+        val trimmedShelf = shelf.filter { it.showIf(episode) }
         return@map Pair(trimmedShelf, episode)
     }
 

@@ -49,6 +49,8 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
     private var chipLayoutStartY: Float = 0f
     private var scrollToChip: View? = null
 
+    private val episodeAdapter = SimpleEpisodeListAdapter()
+
     companion object {
         fun newInstance(): CreateFilterChipFragment {
             return CreateFilterChipFragment()
@@ -62,13 +64,38 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val episodeAdapter = SimpleEpisodeListAdapter()
-
         binding.recyclerView.adapter = episodeAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.addItemDecoration(DividerItemDecoration(view.context, RecyclerView.VERTICAL))
 
+        observePlaylist()
+
+        // Setup sticky header for horizontal scroll view
+        binding.rootScrollView.doOnLayout { chipLayoutStartY = binding.chipScrollView.y }
+        binding.rootScrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            if (scrollY >= chipLayoutStartY) {
+                binding.chipScrollView.translationY = scrollY - chipLayoutStartY
+                binding.chipScrollView.elevation = 8.dpToPx(binding.root.context).toFloat()
+            } else {
+                binding.chipScrollView.translationY = 0f
+                binding.chipScrollView.elevation = 0f
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        scrollToChip = null
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun openOptionPageFrom(optionView: View, fragment: Fragment) {
+        (activity as FragmentHostListener).showModal(fragment)
+        scrollToChip = optionView
+        viewModel.onOptionPageOpen()
+    }
+
+    private fun observePlaylist() {
         viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
             val color = playlist.getColor(context)
 
@@ -187,30 +214,6 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
                 }
             }
         }
-
-        // Setup sticky header for horizontal scroll view
-        binding.rootScrollView.doOnLayout { chipLayoutStartY = binding.chipScrollView.y }
-        binding.rootScrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            if (scrollY >= chipLayoutStartY) {
-                binding.chipScrollView.translationY = scrollY - chipLayoutStartY
-                binding.chipScrollView.elevation = 8.dpToPx(binding.root.context).toFloat()
-            } else {
-                binding.chipScrollView.translationY = 0f
-                binding.chipScrollView.elevation = 0f
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        scrollToChip = null
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun openOptionPageFrom(optionView: View, fragment: Fragment) {
-        (activity as FragmentHostListener).showModal(fragment)
-        scrollToChip = optionView
-        viewModel.lockedToFirstPage.value = false
     }
 }
 

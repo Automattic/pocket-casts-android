@@ -33,6 +33,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
+import java.time.Instant
 import retrofit2.Response
 
 interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
@@ -84,7 +85,7 @@ interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
     fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse>
 
     @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled. Use userSyncUpdate instead.")
-    fun syncUpdate(data: String, lastModified: String): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse>
+    fun syncUpdate(data: String, lastSyncTime: Instant): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse>
 
     suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse
     fun episodeSync(request: EpisodeSyncRequest): Completable

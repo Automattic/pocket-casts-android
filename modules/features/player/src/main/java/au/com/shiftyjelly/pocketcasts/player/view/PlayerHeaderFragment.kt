@@ -15,13 +15,13 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
+import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -147,25 +148,22 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
 
         val shelfViews = mapOf(
-            ShelfItem.Effects.id to binding.effects,
-            ShelfItem.Sleep.id to binding.sleep,
-            ShelfItem.Star.id to binding.star,
-            ShelfItem.Share.id to binding.share,
-            ShelfItem.Podcast.id to binding.podcast,
-            ShelfItem.Cast.id to binding.cast,
-            ShelfItem.Played.id to binding.played,
-            ShelfItem.Archive.id to binding.archive,
-            ShelfItem.Download.id to binding.download,
-            ShelfItem.Bookmark.id to binding.bookmark,
-            ShelfItem.Report.id to binding.report,
+            ShelfItem.Effects to binding.effects,
+            ShelfItem.Sleep to binding.sleep,
+            ShelfItem.Star to binding.star,
+            ShelfItem.Share to binding.share,
+            ShelfItem.Podcast to binding.podcast,
+            ShelfItem.Cast to binding.cast,
+            ShelfItem.Played to binding.played,
+            ShelfItem.Archive to binding.archive,
+            ShelfItem.Bookmark to binding.bookmark,
+            ShelfItem.Report to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            val visibleItems = it.first.subList(0, 4).map { it.id }
             binding.shelf.removeAllViews()
-            visibleItems.forEach { id ->
-                shelfViews[id]?.let { binding.shelf.addView(it) }
-            }
-
+            it.first.subList(0, 4)
+                .mapNotNull(shelfViews::get)
+                .forEach { itemView -> binding.shelf += itemView }
             binding.shelf.addView(binding.playerActions)
         }
 
@@ -184,10 +182,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.archive.setOnClickListener {
             trackShelfAction(ShelfItem.Archive.analyticsValue)
             viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
-        }
-        binding.download.setOnClickListener {
-            trackShelfAction(ShelfItem.Download.analyticsValue)
-            viewModel.downloadCurrentlyPlaying()
         }
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
@@ -258,15 +252,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val starResource = if (headerViewModel.isStarred) R.drawable.ic_star_filled_32 else R.drawable.ic_star_32
             binding.star.setImageResource(starResource)
             binding.star.imageTintList = ColorStateList.valueOf(starTint)
-
-            val downloadResource = if (headerViewModel.downloadStatus == EpisodeStatusEnum.NOT_DOWNLOADED) {
-                IR.drawable.ic_download
-            } else if (headerViewModel.downloadStatus == EpisodeStatusEnum.DOWNLOADED) {
-                IR.drawable.ic_downloaded
-            } else {
-                IR.drawable.ic_cancel
-            }
-            binding.download.setImageResource(downloadResource)
 
             if (headerViewModel.isChaptersPresent) {
                 headerViewModel.chapter?.let {

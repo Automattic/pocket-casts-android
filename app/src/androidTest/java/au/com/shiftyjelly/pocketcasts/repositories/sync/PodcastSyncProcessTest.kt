@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
 import java.net.HttpURLConnection
+import java.time.Instant
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import junit.framework.TestCase.assertEquals
@@ -223,7 +224,7 @@ class PodcastSyncProcessTest {
                 )
             mockWebServer.enqueue(response)
 
-            val lastModified = System.currentTimeMillis().toString()
+            val lastModified = Instant.ofEpochMilli(System.currentTimeMillis())
 
             syncProcess.performIncrementalSync(lastModified)
                 .doOnError {

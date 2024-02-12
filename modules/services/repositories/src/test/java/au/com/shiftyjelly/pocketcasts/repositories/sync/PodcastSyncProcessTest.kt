@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import java.time.Duration
+import java.time.Instant
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -48,6 +49,7 @@ class PodcastSyncProcessTest {
                 trimMode = TrimMode.HIGH,
                 isVolumeBoosted = true,
             ),
+            Instant.now(),
         ).podcast
 
         assertEquals(addedDateSinceEpoch.seconds, record.dateAdded.seconds)
@@ -67,6 +69,7 @@ class PodcastSyncProcessTest {
     fun podcastToRecord_subscribed() {
         val record = PodcastSyncProcess.toRecord(
             mockPodcast(isSubscribed = true),
+            Instant.now(),
         ).podcast
 
         assertFalse(record.isDeleted.value)
@@ -77,6 +80,7 @@ class PodcastSyncProcessTest {
     fun podcastToRecord_unsubscribed() {
         val record = PodcastSyncProcess.toRecord(
             mockPodcast(isSubscribed = false),
+            Instant.now(),
         ).podcast
 
         assertTrue(record.isDeleted.value)
