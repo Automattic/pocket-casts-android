@@ -58,6 +58,9 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -1327,4 +1330,12 @@ class SettingsImpl @Inject constructor(
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
+
+    private val _themeReconfigurationEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    override val themeReconfigurationEvents: Flow<Unit>
+        get() = _themeReconfigurationEvents
+
+    override fun requestThemeReconfiguration() {
+        _themeReconfigurationEvents.tryEmit(Unit)
+    }
 }

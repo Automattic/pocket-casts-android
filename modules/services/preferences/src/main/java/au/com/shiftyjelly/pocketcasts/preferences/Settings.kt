@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -502,4 +503,14 @@ interface Settings {
     val useDarkUpNextTheme: UserSetting<Boolean>
 
     val useDynamicColorsForWidget: UserSetting<Boolean>
+
+    // We need to have a trigger for requesting theme changes.
+    // It is needed because during the sync we apply updates
+    // to individual theme settings one by one.
+    //
+    // If we were to react to them this way and not as a whole
+    // it might lead to side effects such us resetting following
+    // system dark mode.
+    val themeReconfigurationEvents: Flow<Unit>
+    fun requestThemeReconfiguration()
 }
