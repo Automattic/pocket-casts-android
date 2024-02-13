@@ -238,6 +238,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                useDarkUpNextTheme = settings.useDarkUpNextTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
             ),
         )
 
@@ -520,6 +521,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBookmarksSortType,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForPodcast.fromServerId(it) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "useDarkUpNextTheme" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useDarkUpNextTheme,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
