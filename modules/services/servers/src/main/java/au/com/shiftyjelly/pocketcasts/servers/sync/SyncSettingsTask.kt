@@ -240,6 +240,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 },
                 useDarkUpNextTheme = settings.useDarkUpNextTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
                 useDynamicColorsForWidget = settings.useDynamicColorsForWidget.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                filesSortOrder = settings.cloudSortOrder.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -532,6 +538,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.useDynamicColorsForWidget,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesSortOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudSortOrder,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }

@@ -149,13 +149,39 @@ interface Settings {
         }
     }
 
-    enum class CloudSortOrder {
-        NEWEST_OLDEST,
-        OLDEST_NEWEST,
-        A_TO_Z,
-        Z_TO_A,
-        SHORT_LONG,
-        LONG_SHORT,
+    enum class CloudSortOrder(
+        val analyticsValue: String,
+        val serverId: Int,
+    ) {
+        NEWEST_OLDEST(
+            analyticsValue = "newest_to_oldest",
+            serverId = 0,
+        ),
+        OLDEST_NEWEST(
+            analyticsValue = "oldest_to_newest",
+            serverId = 1,
+        ),
+        A_TO_Z(
+            analyticsValue = "title_a_to_z",
+            serverId = 2,
+        ),
+        Z_TO_A(
+            analyticsValue = "title_z_to_a",
+            serverId = 3,
+        ),
+        SHORT_LONG(
+            analyticsValue = "shortest_to_longest",
+            serverId = 4,
+        ),
+        LONG_SHORT(
+            analyticsValue = "longest_to_shortest",
+            serverId = 5,
+        ),
+        ;
+
+        companion object {
+            fun fromServerId(id: Int) = entries.find { it.serverId == id }
+        }
     }
 
     sealed class MediaNotificationControls(
@@ -362,8 +388,7 @@ interface Settings {
 
     val freeGiftAcknowledged: UserSetting<Boolean>
 
-    fun setCloudSortOrder(sortOrder: CloudSortOrder)
-    fun getCloudSortOrder(): CloudSortOrder
+    val cloudSortOrder: UserSetting<CloudSortOrder>
     val cloudAddToUpNext: UserSetting<Boolean>
     val deleteLocalFileAfterPlaying: UserSetting<Boolean>
     val deleteCloudFileAfterPlaying: UserSetting<Boolean>
