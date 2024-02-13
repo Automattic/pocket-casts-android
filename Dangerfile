@@ -7,7 +7,7 @@ rubocop.lint(files: [], force_exclusion: true, inline_comment: true, fail_on_inl
 
 manifest_pr_checker.check_gemfile_lock_updated
 
-# skip remaining checks if we're during the release process
+# skip remaining checks if we're in a release-process PR
 if github.pr_labels.include?('releases')
   message('This PR has the `releases` label: some checks will be skipped.')
   return
@@ -19,8 +19,11 @@ pr_size_checker.check_diff_size(max_size: 500)
 
 android_unit_test_checker.check_missing_tests
 
-# skip remaining checks if we have a Draft PR
-return if github.pr_draft?
+# skip remaining checks if the PR is still a Draft
+if github.pr_draft?
+  message('This PR is still a Draft: some checks will be skipped.')
+  return
+end
 
 labels_checker.check(
   do_not_merge_labels: ['do not merge'],
