@@ -420,7 +420,7 @@ class MainActivity :
 
         mediaRouter = MediaRouter.getInstance(this)
 
-        ThemeSettingObserver(theme, settings.theme, settings.useSystemTheme, this).observeThemeChanges()
+        ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
     }
 
     private fun resetEoYBadgeIfNeeded() {

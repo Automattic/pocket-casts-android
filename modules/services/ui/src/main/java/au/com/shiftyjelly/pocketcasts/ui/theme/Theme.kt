@@ -253,7 +253,7 @@ class Theme @Inject constructor(private val settings: Settings) {
 
             updateTheme(activity, theme)
         } else {
-            updateTheme(activity, activeTheme)
+            updateTheme(activity, getThemeFromPreferences())
         }
     }
 

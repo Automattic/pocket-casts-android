@@ -267,6 +267,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             settings: Settings,
             response: ChangedNamedSettingsResponse,
         ) {
+            var isThemeChanged = false
+
             for ((key, changedSettingResponse) in response) {
                 when (key) {
                     "autoArchiveInactive" -> updateSettingIfPossible(
@@ -467,7 +469,22 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.theme,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
-                    )
+                    ).also { isThemeChanged = it != null || isThemeChanged }
+                    "darkThemePreference" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.darkThemePreference,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.DARK },
+                    ).also { isThemeChanged = it != null || isThemeChanged }
+                    "lightThemePreference" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.lightThemePreference,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
+                    ).also { isThemeChanged = it != null || isThemeChanged }
+                    "useSystemTheme" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useSystemTheme,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    ).also { isThemeChanged = it != null || isThemeChanged }
                     "badges" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBadgeType,
@@ -557,23 +574,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
                     )
-                    "darkThemePreference" -> updateSettingIfPossible(
-                        changedSettingResponse = changedSettingResponse,
-                        setting = settings.darkThemePreference,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.DARK },
-                    )
-                    "lightThemePreference" -> updateSettingIfPossible(
-                        changedSettingResponse = changedSettingResponse,
-                        setting = settings.lightThemePreference,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
-                    )
-                    "useSystemTheme" -> updateSettingIfPossible(
-                        changedSettingResponse = changedSettingResponse,
-                        setting = settings.useSystemTheme,
-                        newSettingValue = (changedSettingResponse.value as? Boolean),
-                    )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
+            }
+
+            if (isThemeChanged) {
+                settings.requestThemeReconfiguration()
             }
         }
 
