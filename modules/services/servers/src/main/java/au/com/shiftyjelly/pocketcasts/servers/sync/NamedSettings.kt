@@ -62,6 +62,9 @@ data class ChangedNamedSettings(
     @field:Json(name = "headphoneControlsNextAction") val headphoneControlsNextAction: NamedChangedSettingInt? = null,
     @field:Json(name = "headphoneControlsPreviousAction") val headphoneControlsPreviousAction: NamedChangedSettingInt? = null,
     @field:Json(name = "headphoneControlsPlayBookmarkConfirmationSound") val headphoneControlsPlayBookmarkConfirmationSound: NamedChangedSettingBool? = null,
+    @field:Json(name = "episodeBookmarksSortType") val episodeBookmarksSortType: NamedChangedSettingInt? = null,
+    @field:Json(name = "playerBookmarksSortType") val playerBookmarksSortType: NamedChangedSettingInt? = null,
+    @field:Json(name = "podcastBookmarksSortType") val podcastBookmarksSortType: NamedChangedSettingInt? = null,
 )
 
 @JsonClass(generateAdapter = true)

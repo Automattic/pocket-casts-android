@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingS
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -218,6 +220,24 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 headphoneControlsPlayBookmarkConfirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                episodeBookmarksSortType = settings.episodeBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                playerBookmarksSortType = settings.playerBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                podcastBookmarksSortType = settings.podcastBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
             ),
         )
 
@@ -485,6 +505,21 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.headphoneControlsPlayBookmarkConfirmationSound,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "episodeBookmarksSortType" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.episodeBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeDefault.fromServerId(it) ?: BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "playerBookmarksSortType" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.playerBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeDefault.fromServerId(it) ?: BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "podcastBookmarksSortType" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForPodcast.fromServerId(it) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST },
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
