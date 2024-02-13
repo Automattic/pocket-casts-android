@@ -41,21 +41,16 @@ class ChaptersViewModel
 
     data class UiState(
         val chapters: List<ChapterState> = emptyList(),
-        val selectedIndexes: List<Int> = emptyList(),
         val backgroundColor: Color,
-    ) {
-        fun isSelected(chapter: Chapter): Boolean {
-            return selectedIndexes.contains(chapter.index)
-        }
-    }
+    )
 
-    sealed class ChapterState(val chapter: Chapter) {
-        class Played(chapter: Chapter) : ChapterState(chapter)
-        class Playing(val progress: Float, chapter: Chapter) : ChapterState(chapter)
-        class NotPlayed(chapter: Chapter) : ChapterState(chapter)
-    }
+    sealed class ChapterState {
+        abstract val chapter: Chapter
 
-    private val _selectedIndexes = MutableStateFlow(emptyList<Int>())
+        data class Played(override val chapter: Chapter) : ChapterState()
+        data class Playing(val progress: Float, override val chapter: Chapter) : ChapterState()
+        data class NotPlayed(override val chapter: Chapter) : ChapterState()
+    }
 
     private val _scrollToChapterState = MutableStateFlow<Chapter?>(null)
     val scrollToChapterState = _scrollToChapterState.asStateFlow()
@@ -69,24 +64,23 @@ class ChaptersViewModel
     private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .observeOn(Schedulers.io())
 
-    private val mutableState = MutableStateFlow(
+    private val _uiState = MutableStateFlow(
         UiState(backgroundColor = Color(theme.playerBackgroundColor(null))),
     )
     val uiState: StateFlow<UiState>
-        get() = mutableState
+        get() = _uiState
 
     init {
         viewModelScope.launch {
             combine(
                 upNextStateObservable.asFlow(),
                 playbackStateObservable.asFlow(),
-                _selectedIndexes,
                 this@ChaptersViewModel::combineUiState,
             )
                 .distinctUntilChanged()
                 .stateIn(viewModelScope)
                 .collect {
-                    mutableState.value = it
+                    _uiState.value = it
                 }
         }
     }
@@ -100,18 +94,24 @@ class ChaptersViewModel
     private fun combineUiState(
         upNextState: UpNextQueue.State,
         playbackState: PlaybackState,
-        selectedIndexes: List<Int>,
     ): UiState {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
         val chapters = buildChaptersWithState(
-            chapterList = playbackState.chapters.getList(),
+            chapterList = playbackState.chapters.getList().map { chapter ->
+                // Map selected state from the UI state until we get it from the server
+                _uiState.value.chapters
+                    .find { it.hasChapter(chapter) }
+                    ?.chapter
+                    ?.let {
+                        chapter.copy(selected = it.selected)
+                    } ?: chapter
+            },
             playbackPositionMs = playbackState.positionMs,
         )
         return UiState(
             chapters = chapters,
-            selectedIndexes = selectedIndexes,
             backgroundColor = Color(backgroundColor),
         )
     }
@@ -140,14 +140,23 @@ class ChaptersViewModel
         return chapters
     }
 
-    fun onSelectionChange(select: Boolean, chapter: Chapter) {
-        val indexes = _selectedIndexes.value.toMutableSet().apply {
-            if (select) {
-                add(chapter.index)
-            } else {
-                remove(chapter.index)
-            }
-        }
-        _selectedIndexes.value = indexes.distinct()
+    fun onSelectionChange(selected: Boolean, chapter: Chapter) {
+        _uiState.value = _uiState.value.copy(
+            chapters = _uiState.value.chapters.map { chapterState ->
+                if (chapterState.hasChapter(chapter)) {
+                    val updatedChapter = chapterState.chapter.copy(selected = selected)
+                    when (chapterState) {
+                        is ChapterState.Played -> chapterState.copy(chapter = updatedChapter)
+                        is ChapterState.Playing -> chapterState.copy(chapter = updatedChapter)
+                        is ChapterState.NotPlayed -> chapterState.copy(chapter = updatedChapter)
+                    }
+                } else {
+                    chapterState
+                }
+            },
+        )
     }
+
+    private fun ChapterState.hasChapter(chapter: Chapter) =
+        this.chapter.index == chapter.index && this.chapter.title == chapter.title
 }
