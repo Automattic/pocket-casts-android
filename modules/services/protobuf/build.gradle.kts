@@ -1,20 +1,35 @@
+import com.google.protobuf.gradle.id
+
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.protobuf)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(libs.versions.java.get().toInt())
+    }
+}
 
-android {
-    namespace = "au.com.shiftyjelly.pocketcasts.protobuf"
-    buildFeatures {
-        buildConfig = true
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        all().configureEach {
+            builtins {
+                getByName("java") {
+                    option("lite")
+                }
+                id("kotlin") {
+                    option("lite")
+                }
+            }
+        }
     }
 }
 
 dependencies {
+    api(libs.protobuf.javalite)
+    api(libs.protobuf.kotlin.lite)
 }
