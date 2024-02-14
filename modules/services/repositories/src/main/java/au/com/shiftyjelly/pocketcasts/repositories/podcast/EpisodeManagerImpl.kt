@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -924,7 +923,7 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
 
-        val podcastInactiveSetting = AutoArchiveInactiveSetting.fromIndex(podcast.autoArchiveInactive)
+        val podcastInactiveSetting = podcast.autoArchiveInactive
         val inactiveSetting = if (podcast.overrideGlobalArchive) podcastInactiveSetting else settings.autoArchiveInactive.value
 
         val inactiveTime = inactiveSetting.timeSeconds * 1000L

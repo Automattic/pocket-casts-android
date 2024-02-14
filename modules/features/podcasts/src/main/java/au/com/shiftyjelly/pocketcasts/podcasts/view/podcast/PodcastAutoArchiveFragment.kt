@@ -13,6 +13,7 @@ import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -98,7 +99,7 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
             preferenceEpisodeLimitCategory?.isVisible = podcast.overrideGlobalArchive
 
             preferenceAutoArchivePodcastPlayedEpisodes?.value = afterPlayingValues[podcast.autoArchiveAfterPlaying.index]
-            preferenceAutoArchivePodcastInactiveEpisodes?.value = inactiveValues[podcast.autoArchiveInactive]
+            preferenceAutoArchivePodcastInactiveEpisodes?.value = inactiveValues[podcast.autoArchiveInactive.index]
 
             val episodeLimitIndex = PodcastAutoArchiveViewModel.EPISODE_LIMITS.indexOf(podcast.autoArchiveEpisodeLimit)
             preferenceAutoArchiveEpisodeLimit?.value = episodeLimitValues[episodeLimitIndex]
@@ -128,22 +129,12 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
         preferenceAutoArchivePodcastInactiveEpisodes?.setOnPreferenceChangeListener { _, newValue ->
             val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
             val index = max(inactiveValues.indexOf(stringVal), 0) // Returns -1 on not found, default it to 0
+            val value = AutoArchiveInactive.fromIndex(index) ?: AutoArchiveInactive.Default
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-                mapOf(
-                    "value" to when (index) {
-                        0 -> "never"
-                        1 -> "after_24_hours"
-                        2 -> "after_2_days"
-                        3 -> "after_1_week"
-                        4 -> "after_2_weeks"
-                        5 -> "after_30_days"
-                        6 -> "after_3_months"
-                        else -> "unknown"
-                    },
-                ),
+                mapOf("value" to value.analyticsValue),
             )
-            viewModel.updateInactive(index)
+            viewModel.updateInactive(value)
             true
         }
 

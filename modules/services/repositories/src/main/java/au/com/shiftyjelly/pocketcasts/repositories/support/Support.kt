@@ -296,7 +296,7 @@ class Support @Inject constructor(
                     if (podcast.overrideGlobalArchive) {
                         podcastsOutput.append("Episode limit: ").append(podcast.autoArchiveEpisodeLimit).append(eol)
                         podcastsOutput.append("Archive after playing: ").append(afterPlayingValues[podcast.autoArchiveAfterPlaying.index]).append(eol)
-                        podcastsOutput.append("Archive inactive: ").append(inactiveValues[podcast.autoArchiveInactive]).append(eol)
+                        podcastsOutput.append("Archive inactive: ").append(inactiveValues[podcast.autoArchiveInactive.index]).append(eol)
                     }
                     podcastsOutput.append("Auto add to up next: ").append(autoAddToUpNextToString(podcast.autoAddToUpNext)).append(eol)
                     podcastsOutput.append(eol)

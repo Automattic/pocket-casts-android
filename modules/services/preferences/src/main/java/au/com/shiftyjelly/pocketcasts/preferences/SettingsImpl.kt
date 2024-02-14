@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -25,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -853,11 +853,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "autoArchiveInactiveIndex",
         defaultValue = getString("autoArchiveInactiveEpisodes")?.let {
             // Use the old String setting if it exists before falling back to the default value
-            AutoArchiveInactiveSetting.fromString(it, context)
-        } ?: AutoArchiveInactiveSetting.default,
+            AutoArchiveInactive.fromString(it, context)
+        } ?: AutoArchiveInactive.Default,
         sharedPrefs = sharedPreferences,
-        fromInt = { AutoArchiveInactiveSetting.fromIndex(it) },
-        toInt = { it.toIndex() },
+        fromInt = { AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default },
+        toInt = { it.index },
     )
 
     override fun getCustomStorageLimitGb(): Long {

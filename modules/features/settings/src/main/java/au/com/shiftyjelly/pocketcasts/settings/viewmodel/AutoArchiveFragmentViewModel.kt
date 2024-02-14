@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -43,7 +43,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
     }
 
     fun onInactiveChanged(newStringValue: String) {
-        val newValue = AutoArchiveInactiveSetting.fromString(newStringValue, context)
+        val newValue = AutoArchiveInactive.fromString(newStringValue, context)
         settings.autoArchiveInactive.set(newValue, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,

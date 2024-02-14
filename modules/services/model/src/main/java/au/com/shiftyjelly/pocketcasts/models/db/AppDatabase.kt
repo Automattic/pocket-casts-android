@@ -14,6 +14,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import au.com.shiftyjelly.pocketcasts.model.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
@@ -88,6 +89,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     TrimModeTypeConverter::class,
     UserEpisodeServerStatusConverter::class,
     AutoArchiveAfterPlayingTypeConverter::class,
+    AutoArchiveInactiveTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao

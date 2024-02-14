@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,7 +42,7 @@ class PodcastAutoArchiveViewModel @Inject constructor(
             val podcast = podcast.value ?: return@launch
             podcast.overrideGlobalArchive = checked
             podcast.autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.value
-            podcast.autoArchiveInactive = settings.autoArchiveInactive.value.toIndex()
+            podcast.autoArchiveInactive = settings.autoArchiveInactive.value
             podcastManager.updatePodcast(podcast)
         }
     }
@@ -54,10 +55,10 @@ class PodcastAutoArchiveViewModel @Inject constructor(
         }
     }
 
-    fun updateInactive(index: Int) {
+    fun updateInactive(value: AutoArchiveInactive) {
         launch {
             val podcast = podcast.value ?: return@launch
-            podcast.autoArchiveInactive = index
+            podcast.autoArchiveInactive = value
             podcastManager.updatePodcast(podcast)
         }
     }
