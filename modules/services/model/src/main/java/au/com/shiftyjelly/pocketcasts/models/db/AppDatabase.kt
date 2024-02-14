@@ -66,7 +66,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
     ],
-    version = 83,
+    version = 84,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -562,6 +562,39 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_83_84 = addMigration(83, 84) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_played_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_inactive_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_episode_limit_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN grouping_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN show_archived_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -935,6 +968,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_80_81,
                 // 81 to 82 added via auto migration
                 MIGRATION_82_83,
+                MIGRATION_83_84,
             )
         }
 
