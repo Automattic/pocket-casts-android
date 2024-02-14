@@ -43,13 +43,15 @@ android {
         coreLibraryDesugaringEnabled true
     }
 
+    final javaVersion = JavaVersion.toVersion(libs.versions.java.get())
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility javaVersion
+        targetCompatibility javaVersion
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = javaVersion.toString()
         // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
         freeCompilerArgs += [
             "-opt-in=kotlin.RequiresOptIn"
