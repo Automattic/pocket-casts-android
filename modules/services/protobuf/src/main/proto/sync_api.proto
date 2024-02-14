@@ -79,6 +79,7 @@ message PodcastSettings {
   Int32Setting auto_archive_inactive = 13;
   Int32Setting auto_archive_episode_limit = 14;
   Int32Setting episode_grouping = 15;
+  BoolSetting show_archived = 16;
 }
 
 message SyncUserEpisode {
