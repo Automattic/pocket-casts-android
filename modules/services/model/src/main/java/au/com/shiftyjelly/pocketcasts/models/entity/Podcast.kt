@@ -71,6 +71,7 @@ data class Podcast(
     @ColumnInfo(name = "sync_status") var syncStatus: Int = SYNC_STATUS_NOT_SYNCED,
     @ColumnInfo(name = "exclude_from_auto_archive") var excludeFromAutoArchive: Boolean = false, // Not used anymore
     @ColumnInfo(name = "override_global_archive") var overrideGlobalArchive: Boolean = false,
+    @ColumnInfo(name = "override_global_archive_modified") var overrideGlobalArchiveModified: Date? = null,
     @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
     @ColumnInfo(name = "auto_archive_played_after_modified") var autoArchiveAfterPlayingModified: Date? = null,
     @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,

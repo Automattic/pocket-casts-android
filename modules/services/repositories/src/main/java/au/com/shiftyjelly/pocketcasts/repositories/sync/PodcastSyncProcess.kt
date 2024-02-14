@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -904,6 +906,14 @@ class PodcastSyncProcess(
         podcastSync.useVolumeBoostModified?.let { podcast.volumeBoostedModified = it }
         podcastSync.showNotifications?.let { podcast.isShowNotifications = it }
         podcastSync.showNotificationsModified?.let { podcast.showNotificationsModified = it }
+        podcastSync.autoArchive?.let { podcast.overrideGlobalArchive = it }
+        podcastSync.autoArchiveModified?.let { podcast.overrideGlobalArchiveModified = it }
+        podcastSync.autoArchivePlayed?.let { podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) }
+        podcastSync.autoArchivePlayedModified?.let { podcast.autoArchiveAfterPlayingModified = it }
+        podcastSync.autoArchiveInactive?.let { podcast.autoArchiveInactive = AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default }
+        podcastSync.autoArchiveInactiveModified?.let { podcast.autoArchiveInactiveModified = it }
+        podcastSync.autoArchiveEpisodeLimit?.let { podcast.autoArchiveEpisodeLimit = it }
+        podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1090,6 +1100,30 @@ class PodcastSyncProcess(
                             value = boolValue { value = podcast.isShowNotifications }
                             modifiedAt = timestamp {
                                 seconds = podcast.showNotificationsModified?.timeSecs() ?: lastSyncTime.epochSecond
+                            }
+                        }
+                        autoArchive = boolSetting {
+                            value = boolValue { value = podcast.overrideGlobalArchive }
+                            modifiedAt = timestamp {
+                                seconds = podcast.overrideGlobalEffectsModified?.timeSecs() ?: lastSyncTime.epochSecond
+                            }
+                        }
+                        autoArchivePlayed = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveAfterPlaying.serverId }
+                            modifiedAt = timestamp {
+                                seconds = podcast.autoArchiveAfterPlayingModified?.timeSecs() ?: lastSyncTime.epochSecond
+                            }
+                        }
+                        autoArchiveInactive = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveInactive.serverId }
+                            modifiedAt = timestamp {
+                                seconds = podcast.autoArchiveInactiveModified?.timeSecs() ?: lastSyncTime.epochSecond
+                            }
+                        }
+                        autoArchiveEpisodeLimit = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
+                            modifiedAt = timestamp {
+                                seconds = podcast.autoArchiveEpisodeLimitModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                     }

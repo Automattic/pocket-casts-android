@@ -15,6 +15,10 @@ import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
 import com.pocketcasts.service.api.addToUpNextOrNull
 import com.pocketcasts.service.api.addToUpNextPositionOrNull
+import com.pocketcasts.service.api.autoArchiveEpisodeLimitOrNull
+import com.pocketcasts.service.api.autoArchiveInactiveOrNull
+import com.pocketcasts.service.api.autoArchiveOrNull
+import com.pocketcasts.service.api.autoArchivePlayedOrNull
 import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
@@ -76,6 +80,14 @@ data class SyncUpdateResponse(
         var useVolumeBoostModified: Date? = null,
         var showNotifications: Boolean? = null,
         var showNotificationsModified: Date? = null,
+        var autoArchive: Boolean? = null,
+        var autoArchiveModified: Date? = null,
+        var autoArchivePlayed: Int? = null,
+        var autoArchivePlayedModified: Date? = null,
+        var autoArchiveInactive: Int? = null,
+        var autoArchiveInactiveModified: Date? = null,
+        var autoArchiveEpisodeLimit: Int? = null,
+        var autoArchiveEpisodeLimitModified: Date? = null,
     ) {
         companion object {
             fun fromSyncUserPodcast(syncUserPodcast: SyncUserPodcast): PodcastSync =
@@ -104,6 +116,14 @@ data class SyncUpdateResponse(
                     useVolumeBoostModified = syncUserPodcast.settings.volumeBoostOrNull?.modifiedAt?.toDate(),
                     showNotifications = syncUserPodcast.settings.notificationOrNull?.value?.value,
                     showNotificationsModified = syncUserPodcast.settings.notificationOrNull?.modifiedAt?.toDate(),
+                    autoArchive = syncUserPodcast.settings.autoArchiveOrNull?.value?.value,
+                    autoArchiveModified = syncUserPodcast.settings.autoArchiveOrNull?.modifiedAt?.toDate(),
+                    autoArchivePlayed = syncUserPodcast.settings.autoArchivePlayedOrNull?.value?.value,
+                    autoArchivePlayedModified = syncUserPodcast.settings.autoArchivePlayedOrNull?.modifiedAt?.toDate(),
+                    autoArchiveInactive = syncUserPodcast.settings.autoArchiveInactiveOrNull?.value?.value,
+                    autoArchiveInactiveModified = syncUserPodcast.settings.autoArchiveInactiveOrNull?.modifiedAt?.toDate(),
+                    autoArchiveEpisodeLimit = syncUserPodcast.settings.autoArchiveEpisodeLimitOrNull?.value?.value,
+                    autoArchiveEpisodeLimitModified = syncUserPodcast.settings.autoArchiveEpisodeLimitOrNull?.modifiedAt?.toDate(),
                 )
         }
     }
