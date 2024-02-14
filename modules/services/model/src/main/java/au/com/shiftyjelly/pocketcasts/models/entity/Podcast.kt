@@ -11,6 +11,8 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.Bundle
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -69,9 +71,9 @@ data class Podcast(
     @ColumnInfo(name = "sync_status") var syncStatus: Int = SYNC_STATUS_NOT_SYNCED,
     @ColumnInfo(name = "exclude_from_auto_archive") var excludeFromAutoArchive: Boolean = false, // Not used anymore
     @ColumnInfo(name = "override_global_archive") var overrideGlobalArchive: Boolean = false,
-    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: Int = 0,
+    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
     @ColumnInfo(name = "auto_archive_played_after_modified") var autoArchiveAfterPlayingModified: Date? = null,
-    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: Int = 0,
+    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,
     @ColumnInfo(name = "auto_archive_inactive_after_modified") var autoArchiveInactiveModified: Date? = null,
     @ColumnInfo(name = "auto_archive_episode_limit") var autoArchiveEpisodeLimit: Int? = null,
     @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,

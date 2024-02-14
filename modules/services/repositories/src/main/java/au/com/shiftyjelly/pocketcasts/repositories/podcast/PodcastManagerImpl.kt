@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -84,8 +86,8 @@ class PodcastManagerImpl @Inject constructor(
                     podcast.isShowNotifications = false
                     podcast.autoDownloadStatus = Podcast.AUTO_DOWNLOAD_OFF
                     podcast.autoAddToUpNext = Podcast.AutoAddUpNext.OFF
-                    podcast.autoArchiveAfterPlaying = 0
-                    podcast.autoArchiveInactive = 0
+                    podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.defaultValue(context)
+                    podcast.autoArchiveInactive = AutoArchiveInactive.Default
                     podcast.autoArchiveEpisodeLimit = null
                     podcast.overrideGlobalArchive = false
                     podcast.folderUuid = null
