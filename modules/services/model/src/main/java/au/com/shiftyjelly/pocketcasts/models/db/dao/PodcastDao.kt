@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -350,10 +351,10 @@ abstract class PodcastDao {
     abstract fun countEpisodesInPodcastWithStatus(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int
 
     @Query("UPDATE podcasts SET grouping = :grouping WHERE uuid = :uuid")
-    abstract fun updateGrouping(grouping: Int, uuid: String)
+    abstract fun updateGrouping(grouping: PodcastGrouping, uuid: String)
 
     @Query("UPDATE podcasts SET grouping = :grouping WHERE subscribed = 1")
-    abstract fun updatePodcastGroupingForAll(grouping: Int)
+    abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping)
 
     @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
     abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
