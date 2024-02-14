@@ -350,11 +350,11 @@ abstract class PodcastDao {
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid AND episode_status = :episodeStatus")
     abstract fun countEpisodesInPodcastWithStatus(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int
 
-    @Query("UPDATE podcasts SET grouping = :grouping WHERE uuid = :uuid")
-    abstract fun updateGrouping(grouping: PodcastGrouping, uuid: String)
+    @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateGrouping(grouping: PodcastGrouping, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET grouping = :grouping WHERE subscribed = 1")
-    abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping)
+    @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE subscribed = 1")
+    abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping, modified: Date = Date())
 
     @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
     abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
