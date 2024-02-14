@@ -8,6 +8,7 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -24,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
@@ -842,11 +842,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "autoArchivePlayedEpisodesIndex",
         defaultValue = getString("autoArchivePlayedEpisodes")?.let {
             // Use the old String setting if it exists before falling back to the default value
-            AutoArchiveAfterPlayingSetting.fromString(it, context)
-        } ?: AutoArchiveAfterPlayingSetting.defaultValue(context),
+            AutoArchiveAfterPlaying.fromString(it, context)
+        } ?: AutoArchiveAfterPlaying.defaultValue(context),
         sharedPrefs = sharedPreferences,
-        fromInt = { AutoArchiveAfterPlayingSetting.fromIndex(it) },
-        toInt = { it.toIndex() },
+        fromInt = { AutoArchiveAfterPlaying.fromIndex(it) ?: AutoArchiveAfterPlaying.defaultValue(context) },
+        toInt = { it.index },
     )
 
     override val autoArchiveInactive = UserSetting.PrefFromInt(

@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
@@ -81,7 +81,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             changedSettings = ChangedNamedSettings(
                 autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting(lastSyncTime) { autoArchiveAfterPlaying, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = autoArchiveAfterPlaying.toIndex(),
+                        value = autoArchiveAfterPlaying.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
@@ -287,10 +287,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "autoArchivePlayed" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveAfterPlaying,
-                        newSettingValue = run {
-                            val index = (changedSettingResponse.value as? Number)?.toInt()
-                            index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
-                        },
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) },
                     )
                     "freeGiftAcknowledgement" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,

@@ -99,7 +99,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack {
 
     private fun setupAutoArchiveAfterPlaying() {
         val stringArray = resources.getStringArray(LR.array.settings_auto_archive_played_values)
-        autoArchivePlayedEpisodes.value = stringArray[settings.autoArchiveAfterPlaying.value.toIndex()]
+        autoArchivePlayedEpisodes.value = stringArray[settings.autoArchiveAfterPlaying.value.index]
     }
 
     private fun setupAutoArchiveInactive() {
