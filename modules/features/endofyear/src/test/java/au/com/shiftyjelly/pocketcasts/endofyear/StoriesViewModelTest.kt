@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import java.util.Date
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,12 +66,11 @@ class StoriesViewModelTest {
     private lateinit var subscriptionManager: SubscriptionManager
 
     @Mock
-    private lateinit var cachedSubscriptionStatus: SubscriptionStatus
-
-    @Mock
     private lateinit var userSetting: UserSetting<SubscriptionStatus?>
 
     private lateinit var cachedSubscriptionStatusFlow: MutableStateFlow<SubscriptionStatus>
+
+    private val cachedSubscriptionStatus = SubscriptionStatus.Free()
 
     @Before
     fun setup() {
@@ -226,7 +226,7 @@ class StoriesViewModelTest {
             .thenReturn(UserTier.Plus)
         initViewModel(listOf(plusStory1))
 
-        cachedSubscriptionStatusFlow.value = mock()
+        cachedSubscriptionStatusFlow.value = cachedSubscriptionStatus.copy(expiry = Date())
 
         verifyBlocking(endOfYearManager, times(2)) { downloadListeningHistory(anyOrNull()) }
         verifyBlocking(endOfYearManager, times(2)) { loadStories() }
@@ -239,7 +239,7 @@ class StoriesViewModelTest {
             .thenReturn(UserTier.Free)
         initViewModel(listOf(plusStory1))
 
-        cachedSubscriptionStatusFlow.value = mock()
+        cachedSubscriptionStatusFlow.value = cachedSubscriptionStatus.copy(expiry = Date())
 
         verifyBlocking(endOfYearManager, times(1)) { downloadListeningHistory(anyOrNull()) }
         verifyBlocking(endOfYearManager, times(1)) { loadStories() }
