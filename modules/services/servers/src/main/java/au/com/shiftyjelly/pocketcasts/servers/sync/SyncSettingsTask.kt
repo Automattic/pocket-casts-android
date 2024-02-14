@@ -372,7 +372,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "episodeGrouping" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastGroupingDefault,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGrouping::fromServerId),
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { PodcastGrouping.fromIndex(it) ?: PodcastGrouping.None },
                     )
                     "keepScreenAwake" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,

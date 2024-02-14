@@ -915,7 +915,7 @@ class PodcastSyncProcess(
         podcastSync.autoArchiveInactiveModified?.let { podcast.autoArchiveInactiveModified = it }
         podcastSync.autoArchiveEpisodeLimit?.let { podcast.autoArchiveEpisodeLimit = it }
         podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
-        podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) }
+        podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None }
         podcastSync.episodeGroupingModified?.let { podcast.groupingModified = it }
     }
 

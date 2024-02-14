@@ -34,7 +34,7 @@ class PodcastGroupingTypeConverterTest {
             4 to PodcastGrouping.Starred,
         )
 
-        val databaseValues = List(5) { it to converter.toPodcastGrouping(it) }.toMap()
+        val databaseValues = List(PodcastGrouping.All.size) { it to converter.fromInt(it) }.toMap()
 
         assertEquals(expected, databaseValues)
     }
@@ -48,14 +48,14 @@ class PodcastGroupingTypeConverterTest {
 
     @Test
     fun `decode null value`() {
-        val grouping = converter.toPodcastGrouping(null)
+        val grouping = converter.fromInt(null)
 
         assertEquals(PodcastGrouping.None, grouping)
     }
 
     @Test
     fun `decode unknown value`() {
-        val grouping = converter.toPodcastGrouping(Int.MIN_VALUE)
+        val grouping = converter.fromInt(Int.MIN_VALUE)
 
         assertEquals(PodcastGrouping.None, grouping)
     }

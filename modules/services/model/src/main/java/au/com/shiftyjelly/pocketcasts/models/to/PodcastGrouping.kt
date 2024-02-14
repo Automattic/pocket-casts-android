@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class PodcastGrouping(
     @StringRes val groupName: Int,
+    val index: Int,
     val serverId: Int,
     val sortFunction: ((PodcastEpisode) -> Int)?,
 ) {
@@ -18,13 +19,16 @@ sealed class PodcastGrouping(
         val All
             get() = listOf(None, Downloaded, Unplayed, Season, Starred)
 
-        fun fromServerId(id: Int) = All.find { it.serverId == id } ?: None
+        fun fromServerId(id: Int) = All.find { it.serverId == id }
+
+        fun fromIndex(index: Int) = All.find { it.index == index }
     }
 
     abstract fun groupTitles(index: Int, context: Context): String
 
     data object None : PodcastGrouping(
         groupName = LR.string.none,
+        index = 0,
         serverId = 0,
         sortFunction = null,
     ) {
@@ -35,6 +39,7 @@ sealed class PodcastGrouping(
 
     data object Downloaded : PodcastGrouping(
         groupName = LR.string.podcast_group_downloaded,
+        index = 1,
         serverId = 1,
         sortFunction = { if (it.isDownloaded || it.isDownloading || it.isQueued) 0 else 1 },
     ) {
@@ -51,6 +56,7 @@ sealed class PodcastGrouping(
 
     data object Unplayed : PodcastGrouping(
         groupName = LR.string.podcast_group_unplayed,
+        index = 2,
         serverId = 2,
         sortFunction = { if (it.isUnplayed || it.isInProgress) 0 else 1 },
     ) {
@@ -67,6 +73,7 @@ sealed class PodcastGrouping(
 
     data object Season : PodcastGrouping(
         groupName = LR.string.podcast_group_season,
+        index = 3,
         serverId = 3,
         sortFunction = { getSeasonGroupId(it) },
     ) {
@@ -101,6 +108,7 @@ sealed class PodcastGrouping(
 
     data object Starred : PodcastGrouping(
         groupName = LR.string.profile_navigation_starred,
+        index = 4,
         serverId = 4,
         sortFunction = { if (it.isStarred) 0 else 1 },
     ) {
