@@ -132,7 +132,7 @@ class PodcastSyncProcess(
             }
         }
         val syncUpNextObservable = downloadObservable
-            .andThen(syncSettings(lastSyncTime))
+            .andThen(syncSettings())
             .andThen(syncCloudFiles())
             .andThen(firstSyncChanges())
             .andThen(
