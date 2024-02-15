@@ -15,6 +15,7 @@ import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
 import com.pocketcasts.service.api.addToUpNextOrNull
 import com.pocketcasts.service.api.addToUpNextPositionOrNull
+import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
@@ -86,8 +87,8 @@ data class SyncUpdateResponse(
                     dateAdded = syncUserPodcast.dateAddedOrNull?.toDate(),
                     startFromSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
                     startFromModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
-                    skipLastSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
-                    skipLastModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
+                    skipLastSecs = syncUserPodcast.settings.autoSkipLastOrNull?.value?.value,
+                    skipLastModified = syncUserPodcast.settings.autoSkipLastOrNull?.modifiedAt?.toDate(),
                     addToUpNext = syncUserPodcast.settings.addToUpNextOrNull?.value?.value,
                     addToUpNextModified = syncUserPodcast.settings.addToUpNextOrNull?.modifiedAt?.toDate(),
                     addToUpNextPosition = syncUserPodcast.settings.addToUpNextPositionOrNull?.value?.value,
