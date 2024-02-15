@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -143,4 +145,9 @@ interface PodcastManager {
     suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 
     suspend fun findRandomPodcasts(limit: Int): List<Podcast>
+
+    suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive)
+    suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying)
+    suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive)
+    suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?)
 }

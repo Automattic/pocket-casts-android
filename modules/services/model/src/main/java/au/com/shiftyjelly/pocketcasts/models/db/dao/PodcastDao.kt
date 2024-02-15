@@ -9,6 +9,8 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -371,4 +373,16 @@ abstract class PodcastDao {
 
     @Query("SELECT * FROM podcasts ORDER BY random() LIMIT :limit")
     abstract suspend fun findRandomPodcasts(limit: Int): List<Podcast>
+
+    @Query("UPDATE podcasts SET override_global_archive = :enable, auto_archive_played_after = :afterPlaying, auto_archive_inactive_after = :inactive, override_global_archive_modified = :modified, auto_archive_played_after_modified = :modified, auto_archive_inactive_after_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive, modified: Date = Date())
+
+    @Query("UPDATE podcasts SET auto_archive_played_after = :value, auto_archive_played_after_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying, modified: Date = Date())
+
+    @Query("UPDATE podcasts SET auto_archive_inactive_after = :value, auto_archive_inactive_after_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive, modified: Date = Date())
+
+    @Query("UPDATE podcasts SET auto_archive_episode_limit = :value, auto_archive_episode_limit_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?, modified: Date = Date())
 }

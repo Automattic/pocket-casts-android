@@ -796,4 +796,20 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
     }
+
+    override suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive) {
+        podcastDao.updateArchiveSettings(uuid, enable, afterPlaying, inactive)
+    }
+
+    override suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying) {
+        podcastDao.updateArchiveAfterPlaying(uuid, value)
+    }
+
+    override suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive) {
+        podcastDao.updateArchiveAfterInactive(uuid, value)
+    }
+
+    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?) {
+        podcastDao.updateArchiveEpisodeLimit(uuid, value)
+    }
 }

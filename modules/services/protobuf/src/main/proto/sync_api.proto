@@ -75,6 +75,9 @@ message PodcastSettings {
   Int32Setting auto_start_from = 9;
   Int32Setting auto_skip_last = 10;
   Int32Setting episodes_sort_order = 11;
+  Int32Setting auto_archive_played = 12;
+  Int32Setting auto_archive_inactive = 13;
+  Int32Setting auto_archive_episode_limit = 14;
 }
 
 message SyncUserEpisode {
