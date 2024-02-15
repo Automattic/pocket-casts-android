@@ -3,7 +3,9 @@
 *   Bug Fixes:
     *   Fixed: The total remaining time was incorrectly displayed for some languages when large font sizes were set on the device in Up Next
         ([#1815](https://github.com/Automattic/pocket-casts-android/pull/1815))
-    * Fixed a bug where podcast setting screen could become unresponsive.
+    *   Fixed: The back button in the search was lacking a description, causing an accessibility issue.
+        ([#1846](https://github.com/Automattic/pocket-casts-android/pull/1846))
+    *   Fixed a bug where podcast setting screen could become unresponsive.
         ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
 
 7.57

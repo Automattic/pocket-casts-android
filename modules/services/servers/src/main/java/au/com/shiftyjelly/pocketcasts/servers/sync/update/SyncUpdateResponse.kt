@@ -15,6 +15,7 @@ import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
 import com.pocketcasts.service.api.addToUpNextOrNull
 import com.pocketcasts.service.api.addToUpNextPositionOrNull
+import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
@@ -24,6 +25,7 @@ import com.pocketcasts.service.api.episodesSortOrderOrNull
 import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
+import com.pocketcasts.service.api.notificationOrNull
 import com.pocketcasts.service.api.playbackEffectsOrNull
 import com.pocketcasts.service.api.playbackSpeedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
@@ -86,8 +88,8 @@ data class SyncUpdateResponse(
                     dateAdded = syncUserPodcast.dateAddedOrNull?.toDate(),
                     startFromSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
                     startFromModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
-                    skipLastSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
-                    skipLastModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
+                    skipLastSecs = syncUserPodcast.settings.autoSkipLastOrNull?.value?.value,
+                    skipLastModified = syncUserPodcast.settings.autoSkipLastOrNull?.modifiedAt?.toDate(),
                     addToUpNext = syncUserPodcast.settings.addToUpNextOrNull?.value?.value,
                     addToUpNextModified = syncUserPodcast.settings.addToUpNextOrNull?.modifiedAt?.toDate(),
                     addToUpNextPosition = syncUserPodcast.settings.addToUpNextPositionOrNull?.value?.value,
@@ -100,8 +102,8 @@ data class SyncUpdateResponse(
                     trimSilenceModified = syncUserPodcast.settings.trimSilenceOrNull?.modifiedAt?.toDate(),
                     useVolumeBoost = syncUserPodcast.settings.volumeBoostOrNull?.value?.value,
                     useVolumeBoostModified = syncUserPodcast.settings.volumeBoostOrNull?.modifiedAt?.toDate(),
-                    showNotifications = syncUserPodcast.settings.notification?.value?.value,
-                    showNotificationsModified = syncUserPodcast.settings.notification?.modifiedAt?.toDate(),
+                    showNotifications = syncUserPodcast.settings.notificationOrNull?.value?.value,
+                    showNotificationsModified = syncUserPodcast.settings.notificationOrNull?.modifiedAt?.toDate(),
                 )
         }
     }
