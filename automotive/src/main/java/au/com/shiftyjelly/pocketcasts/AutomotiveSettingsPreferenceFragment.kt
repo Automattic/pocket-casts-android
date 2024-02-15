@@ -64,7 +64,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun setupAutoPlay() {
         preferenceAutoPlay.setOnPreferenceChangeListener { _, newValue ->
-            settings.autoShowPlayed.set(newValue as Boolean, needsSync = false)
+            settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = true)
             true
         }
         settings.autoPlayNextEpisodeOnEmpty.flow
