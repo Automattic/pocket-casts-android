@@ -264,3 +264,10 @@ configurations.configureEach {
     exclude group: "io.sentry", module: "sentry-android-timber"
     exclude group: "io.sentry", module: "sentry-android-ndk"
 }
+
+for (taskName in gradle.startParameter.taskNames) {
+    if (taskName.contains("UnitTest")) {
+        tasks.matching { it.name.startsWith("ksp") || it.name.startsWith("hilt") }
+                .configureEach { enabled = false }
+    }
+}
