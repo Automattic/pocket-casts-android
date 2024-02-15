@@ -25,6 +25,7 @@ import com.pocketcasts.service.api.episodesSortOrderOrNull
 import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
+import com.pocketcasts.service.api.notificationOrNull
 import com.pocketcasts.service.api.playbackEffectsOrNull
 import com.pocketcasts.service.api.playbackSpeedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
@@ -101,8 +102,8 @@ data class SyncUpdateResponse(
                     trimSilenceModified = syncUserPodcast.settings.trimSilenceOrNull?.modifiedAt?.toDate(),
                     useVolumeBoost = syncUserPodcast.settings.volumeBoostOrNull?.value?.value,
                     useVolumeBoostModified = syncUserPodcast.settings.volumeBoostOrNull?.modifiedAt?.toDate(),
-                    showNotifications = syncUserPodcast.settings.notification?.value?.value,
-                    showNotificationsModified = syncUserPodcast.settings.notification?.modifiedAt?.toDate(),
+                    showNotifications = syncUserPodcast.settings.notificationOrNull?.value?.value,
+                    showNotificationsModified = syncUserPodcast.settings.notificationOrNull?.modifiedAt?.toDate(),
                 )
         }
     }
