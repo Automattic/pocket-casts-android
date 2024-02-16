@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -103,7 +104,7 @@ class ChaptersViewModel
         val chapters = buildChaptersWithState(
             chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
-            lastChangeFrom = playbackState.lastChangeFrom
+            lastChangeFrom = playbackState.lastChangeFrom,
         )
         return UiState(
             chapters = chapters,
@@ -111,7 +112,8 @@ class ChaptersViewModel
         )
     }
 
-    private fun buildChaptersWithState(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildChaptersWithState(
         chapters: Chapters,
         playbackPositionMs: Int,
         lastChangeFrom: String? = null,
