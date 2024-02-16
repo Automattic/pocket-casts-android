@@ -917,14 +917,22 @@ open class PlaybackManager @Inject constructor(
 
     fun skipToChapter(chapter: Chapter) {
         launch {
-            seekToTimeMsInternal(chapter.startTime)
+            if (chapter.selected) {
+                seekToTimeMsInternal(chapter.startTime)
+            } else {
+                skipToNextSelectedOrLastChapter()
+            }
         }
     }
 
     fun skipToChapter(index: Int) {
         launch {
             val chapter = playbackStateRelay.blockingFirst().chapters.getList().firstOrNull { it.index == index } ?: return@launch
-            seekToTimeMsInternal(chapter.startTime)
+            if (chapter.selected) {
+                seekToTimeMsInternal(chapter.startTime)
+            } else {
+                skipToNextSelectedOrLastChapter()
+            }
         }
     }
 
