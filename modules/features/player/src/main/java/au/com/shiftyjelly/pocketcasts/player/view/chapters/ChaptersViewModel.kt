@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -100,7 +101,7 @@ class ChaptersViewModel
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
         val chapters = buildChaptersWithState(
-            chapterList = playbackState.chapters.getList(),
+            chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
         )
         return UiState(
@@ -110,27 +111,32 @@ class ChaptersViewModel
     }
 
     private fun buildChaptersWithState(
-        chapterList: List<Chapter>,
+        chapters: Chapters,
         playbackPositionMs: Int,
     ): List<ChapterState> {
-        val chapters = mutableListOf<ChapterState>()
+        val chapterStates = mutableListOf<ChapterState>()
         var currentChapter: Chapter? = null
-        for (chapter in chapterList) {
+        for (chapter in chapters.getList()) {
             val chapterState = if (currentChapter != null) {
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
-                // the chapter currently playing
-                currentChapter = chapter
-                val progress = chapter.calculateProgress(playbackPositionMs)
-                ChapterState.Playing(chapter = chapter, progress = progress)
+                if (chapter.selected) {
+                    // the chapter currently playing
+                    currentChapter = chapter
+                    val progress = chapter.calculateProgress(playbackPositionMs)
+                    ChapterState.Playing(chapter = chapter, progress = progress)
+                } else {
+                    playbackManager.skipToNextSelectedOrLastChapter()
+                    ChapterState.NotPlayed(chapter)
+                }
             } else {
                 // a chapter that has been played
                 ChapterState.Played(chapter)
             }
-            chapters.add(chapterState)
+            chapterStates.add(chapterState)
         }
-        return chapters
+        return chapterStates
     }
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {

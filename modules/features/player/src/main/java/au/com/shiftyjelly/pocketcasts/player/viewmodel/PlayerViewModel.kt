@@ -617,10 +617,10 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun nextChapter() {
-        playbackManager.skipToNextSelectedChapter()
+        playbackManager.skipToNextSelectedOrLastChapter()
     }
 
     fun previousChapter() {
-        playbackManager.skipToPreviousSelectedChapter()
+        playbackManager.skipToPreviousSelectedOrLastChapter()
     }
 }

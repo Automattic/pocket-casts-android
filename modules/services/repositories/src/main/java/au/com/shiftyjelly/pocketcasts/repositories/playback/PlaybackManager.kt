@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -888,22 +887,30 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, sourceView)
     }
 
-    fun skipToNextSelectedChapter() {
+    fun skipToNextSelectedOrLastChapter() {
         launch {
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode = episode)
             playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
-            }
+            } ?: skipToEndOfLastChapter()
         }
     }
 
-    fun skipToPreviousSelectedChapter() {
+    fun skipToPreviousSelectedOrLastChapter() {
         launch {
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode)
             playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
+            }
+        }
+    }
+
+    private fun skipToEndOfLastChapter() {
+        launch {
+            playbackStateRelay.blockingFirst().chapters.lastChapter.let { chapter ->
+                seekToTimeMsInternal(chapter.endTime)
             }
         }
     }

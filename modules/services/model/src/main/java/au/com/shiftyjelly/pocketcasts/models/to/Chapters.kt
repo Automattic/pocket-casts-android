@@ -11,6 +11,9 @@ data class Chapters(private val items: List<Chapter> = emptyList()) {
     private val selectedItems: List<Chapter>
         get() = items.filter { it.selected }
 
+    val lastChapter: Chapter
+        get() = items[items.size - 1]
+
     fun getNextSelectedChapter(timeMs: Int): Chapter? {
         val currentTimeFinal = if (timeMs < 0) 0 else timeMs
         for (chapter in selectedItems) {
