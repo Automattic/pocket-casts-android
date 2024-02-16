@@ -479,7 +479,7 @@ platform :android do
 
   def release_is_hotfix?
     # Read the current release version from the .xcconfig file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_release_version)
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate and return whether the release version is a hotfix
     VERSION_CALCULATOR.release_is_hotfix?(version: current_version)
   end
@@ -500,7 +500,7 @@ platform :android do
   #
   def release_version_current
     # Read the current release version from `version.properties` and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Return the formatted release version
     VERSION_FORMATTER.release_version(current_version)
   end
@@ -509,7 +509,7 @@ platform :android do
   #
   def release_version_next
     # Read the current release version from `version.properties` and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate the next release version
     release_version_next = VERSION_CALCULATOR.next_release_version(version: current_version)
     # Return the formatted release version
@@ -520,7 +520,7 @@ platform :android do
   #
   def beta_version_current
     # Read the current release version from `version.properties` and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Return the formatted release version
     VERSION_FORMATTER.beta_version(current_version)
   end
@@ -530,7 +530,7 @@ platform :android do
   # It then bumps the build number so the -rc-1 can be appended to the code freeze version
   def beta_version_code_freeze
     # Read the current release version from the version.properties file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate the next major version number
     next_version = VERSION_CALCULATOR.next_release_version(version: current_version)
     # Calculate the next build number
@@ -543,7 +543,7 @@ platform :android do
   #
   def beta_version_next
     # Read the current release version from `version.properties` and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate the next beta version
     beta_version_next = VERSION_CALCULATOR.next_build_number(version: current_version)
     # Return the formatted release version

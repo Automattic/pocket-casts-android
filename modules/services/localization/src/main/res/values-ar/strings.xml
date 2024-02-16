@@ -36,10 +36,6 @@ Language: ar
     <string name="deselect_all_above">إلغاء تحديد الكل أعلاه</string>
     <string name="deselect_all_below">إلغاء تحديد الكل أدناه</string>
     <string name="edit">تعديل</string>
-    <string name="whats_new_autoplay_title">التشغيل التلقائي هنا!</string>
-    <string name="whats_new_autoplay_body">إذا بدأت حلقة بينما قائمة العناصر التالية فارغة، فإن التشغيل التلقائي سيستمر في تشغيل الحلقات من ذلك البودكاست أو تلك القائمة.</string>
-    <string name="whats_new_autoplay_enable_button">تمكينه الآن</string>
-    <string name="whats_new_autoplay_maybe_later_button">ربما لاحقًا</string>
     <string name="filters_download_limit_3">3 حلقات</string>
     <string name="settings_headphone_controls_action_next">الإجراء التالي</string>
     <string name="settings_headphone_controls_action_previous">الإجراء السابق</string>

@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 11:54:02+0000
+Translation-Revision-Date: 2024-02-14 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_plus_feature_slumber_studios_title">1 jaar lang exclusieve content van &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Verzilver je code</string>
+    <string name="whats_new_slumber_studios_body_free_user">Abonneer je op Plus en geniet 1 jaar lang van een abonnement op Slumber Studios-content, podcasts ontworpen voor de zoetste dromen. &lt;a href=\"https://slumberstudios.com/\"&gt;Meer informatie&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Als onderdeel van je Plus-abonnement kan je 1 jaar lang genieten van een abonnement op Slumber Studios-content met code %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Meer informatie&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_title">Droom groots</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">na je eerste jaar</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %s</string>
+    <string name="half_price_first_year">50% korting op je eerste jaar</string>
+    <string name="plus_offer_duration">%s aanbieding</string>
     <string name="report_subtitle">Opgepaste content melden</string>
     <string name="report">Melden</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- en Wear OS-apps</string>
@@ -105,10 +114,6 @@ Language: nl
     <string name="deselect_all">Alles deselecteren</string>
     <string name="deselect_all_above">Alles hierboven deselecteren</string>
     <string name="edit">Bewerk</string>
-    <string name="whats_new_autoplay_maybe_later_button">Misschien later</string>
-    <string name="whats_new_autoplay_enable_button">Nu inschakelen</string>
-    <string name="whats_new_autoplay_body">Als je een aflevering afspeelt wanneer de Wachtrij Hierna leeg is, blijft Automatisch afspelen afleveringen van die podcast of lijst afspelen.</string>
-    <string name="whats_new_autoplay_title">Automatisch afspelen is nu beschikbaar!</string>
     <string name="filters_download_limit_3">3 afleveringen</string>
     <string name="settings_title_headphone_controls">Koptelefoonbediening</string>
     <string name="settings_headphone_controls_summary">Pas de acties aan die via de vaakst voorkomende knoppen op koptelefoon worden uitgevoerd.</string>

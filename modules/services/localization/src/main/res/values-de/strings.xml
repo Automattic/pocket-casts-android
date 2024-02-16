@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-29 14:54:02+0000
+Translation-Revision-Date: 2024-02-15 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="onboarding_plus_feature_slumber_studios_title">1 Jahr exklusive Inhalte von &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Code einlösen</string>
+    <string name="whats_new_slumber_studios_body_free_user">Abonniere Plus und erhalte ein 1-Jahres-Abonnement für Slumber Studios-Inhalte, die Podcasts für süße Träume. &lt;a href=\"https://slumberstudios.com/\"&gt;Weitere Informationen&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Im Rahmen deines Plus-Abonnements erhältst du mit dem Code %1$s ein 1-Jahres-Abonnement für Slumber Studios-Inhalte. &lt;a href=\"https://slumberstudios.com/\"&gt;Weitere Informationen&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_title">Große Träume</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">nach deinem ersten Jahr</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Wiederkehrende Zahlung zum Preis von %s</string>
+    <string name="half_price_first_year">50 % Rabatt auf dein erstes Jahr</string>
+    <string name="plus_offer_duration">Angebot für %s</string>
     <string name="report_subtitle">Unangemessenen Inhalt melden</string>
     <string name="report">Melden</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- und Wear OS-Apps</string>
@@ -105,10 +114,6 @@ Language: de
     <string name="deselect_all">Alle abwählen</string>
     <string name="deselect_all_above">Alle oben angezeigten abwählen</string>
     <string name="edit">Bearbeiten</string>
-    <string name="whats_new_autoplay_maybe_later_button">Vielleicht später</string>
-    <string name="whats_new_autoplay_enable_button">Jetzt aktivieren</string>
-    <string name="whats_new_autoplay_body">Wenn du eine Folge startest, während deine „Als Nächstes“-Liste leer ist, spielt Autoplay weiter Folgen aus diesem Podcast oder aus dieser Liste ab.</string>
-    <string name="whats_new_autoplay_title">Autoplay ist da!</string>
     <string name="filters_download_limit_3">3 Folgen</string>
     <string name="settings_title_headphone_controls">Kopfhörersteuerungen</string>
     <string name="settings_headphone_controls_summary">Passe die Aktionen der gängigsten Kopfhörersteuerungen an.</string>

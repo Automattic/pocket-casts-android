@@ -105,10 +105,6 @@ Language: zh_CN
     <string name="deselect_all">全部不选</string>
     <string name="deselect_all_above">取消选择以上所有内容</string>
     <string name="edit">Edit</string>
-    <string name="whats_new_autoplay_maybe_later_button">稍后再说</string>
-    <string name="whats_new_autoplay_enable_button">立即启用</string>
-    <string name="whats_new_autoplay_body">如果您在“接下来播放”为空时播放节目，则自动播放会继续播放该播客或列表中的剧集。</string>
-    <string name="whats_new_autoplay_title">自动播放功能现已推出！</string>
     <string name="filters_download_limit_3"> 3 集</string>
     <string name="settings_title_headphone_controls">耳机控件</string>
     <string name="settings_headphone_controls_summary">自定义由常见耳机控件完成的操作。</string>

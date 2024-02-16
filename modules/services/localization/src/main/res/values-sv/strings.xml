@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 16:54:03+0000
+Translation-Revision-Date: 2024-02-13 17:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_plus_feature_slumber_studios_title">1 års exklusivt innehåll från &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Lös in din kod</string>
+    <string name="whats_new_slumber_studios_body_free_user">Prenumerera på Plus och få en 1-årig prenumeration på innehåll från Slumber Studios, podcasts utformade för ljuva drömmar. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Som en del av din Plus-prenumeration får du en 1-årig prenumeration på innehåll från Slumber Studios med koden %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_title">Dröm stort</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">efter ditt första år</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %s</string>
+    <string name="half_price_first_year">50 % rabatt på ditt första år</string>
+    <string name="plus_offer_duration">%s erbjudande</string>
     <string name="report_subtitle">Rapportera olämpligt innehåll</string>
     <string name="report">Rapportera</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- och Wear OS-appar</string>
@@ -105,10 +114,6 @@ Language: sv_SE
     <string name="deselect_all">Avmarkera alla </string>
     <string name="deselect_all_above">Avmarkera alla ovan</string>
     <string name="edit">Redigera</string>
-    <string name="whats_new_autoplay_maybe_later_button">Kanske senare</string>
-    <string name="whats_new_autoplay_enable_button">Aktivera det nu</string>
-    <string name="whats_new_autoplay_body">Om du startar ett avsnitt medan Nästa-kön är tom kommer Spela upp automatiskt att fortsätta spela upp avsnitt från den aktuella podcasten eller listan.</string>
-    <string name="whats_new_autoplay_title">Spela upp automatiskt är här.</string>
     <string name="filters_download_limit_3">3 avsnitt</string>
     <string name="settings_title_headphone_controls">Hörlurskontroller</string>
     <string name="settings_headphone_controls_summary">Anpassa åtgärder som utförs med de vanligaste hörlurskontrollerna.</string>

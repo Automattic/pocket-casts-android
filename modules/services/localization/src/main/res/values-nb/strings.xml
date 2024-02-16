@@ -35,10 +35,6 @@ Language: nb_NO
     <string name="deselect_all">Opphev valg av alle</string>
     <string name="deselect_all_below">Opphev valg av alle nedenfor</string>
     <string name="edit">Rediger</string>
-    <string name="whats_new_autoplay_title">Automatisk avspilling er her!</string>
-    <string name="whats_new_autoplay_body">Hvis du starter en episode mens Neste-køen er tom, fortsetter Automatisk avspilling å spille av episoder fra den podcasten eller listen.</string>
-    <string name="whats_new_autoplay_enable_button">Aktiver nå</string>
-    <string name="whats_new_autoplay_maybe_later_button">Kanskje senere</string>
     <string name="filters_download_limit_3">3 episoder</string>
     <string name="settings_headphone_controls_action_next">Neste handling</string>
     <string name="settings_headphone_controls_action_previous">Forrige handling</string>
