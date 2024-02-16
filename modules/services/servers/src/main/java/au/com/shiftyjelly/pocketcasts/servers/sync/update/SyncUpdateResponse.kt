@@ -91,6 +91,8 @@ data class SyncUpdateResponse(
         var autoArchiveEpisodeLimitModified: Date? = null,
         var episodeGrouping: Int? = null,
         var episodeGroupingModified: Date? = null,
+        var showArchived: Boolean? = null,
+        var showArchivedModified: Date? = null,
     ) {
         companion object {
             fun fromSyncUserPodcast(syncUserPodcast: SyncUserPodcast): PodcastSync =
@@ -129,6 +131,8 @@ data class SyncUpdateResponse(
                     autoArchiveEpisodeLimitModified = syncUserPodcast.settings.autoArchiveEpisodeLimitOrNull?.modifiedAt?.toDate(),
                     episodeGrouping = syncUserPodcast.settings.episodeGroupingOrNull?.value?.value,
                     episodeGroupingModified = syncUserPodcast.settings.episodesSortOrderOrNull?.modifiedAt?.toDate(),
+                    showArchived = syncUserPodcast.settings.showArchived?.value?.value,
+                    showArchivedModified = syncUserPodcast.settings.showArchived?.modifiedAt?.toDate(),
                 )
         }
     }

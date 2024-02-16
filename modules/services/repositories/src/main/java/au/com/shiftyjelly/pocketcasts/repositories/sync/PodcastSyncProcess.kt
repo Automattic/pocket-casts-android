@@ -917,6 +917,8 @@ class PodcastSyncProcess(
         podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
         podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None }
         podcastSync.episodeGroupingModified?.let { podcast.groupingModified = it }
+        podcastSync.showArchived?.let { podcast.showArchived = it }
+        podcastSync.showArchivedModified?.let { podcast.showNotificationsModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1133,6 +1135,12 @@ class PodcastSyncProcess(
                             value = int32Value { value = podcast.grouping.serverId }
                             modifiedAt = timestamp {
                                 seconds = podcast.groupingModified?.timeSecs() ?: lastSyncTime.epochSecond
+                            }
+                        }
+                        showArchived = boolSetting {
+                            value = boolValue { value = podcast.showArchived }
+                            modifiedAt = timestamp {
+                                seconds = podcast.showArchivedModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                     }
