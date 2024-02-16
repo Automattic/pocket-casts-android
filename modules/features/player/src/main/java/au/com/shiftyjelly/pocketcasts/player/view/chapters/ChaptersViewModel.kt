@@ -103,6 +103,7 @@ class ChaptersViewModel
         val chapters = buildChaptersWithState(
             chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
+            lastChangeFrom = playbackState.lastChangeFrom
         )
         return UiState(
             chapters = chapters,
@@ -113,6 +114,7 @@ class ChaptersViewModel
     private fun buildChaptersWithState(
         chapters: Chapters,
         playbackPositionMs: Int,
+        lastChangeFrom: String? = null,
     ): List<ChapterState> {
         val chapterStates = mutableListOf<ChapterState>()
         var currentChapter: Chapter? = null
@@ -127,7 +129,9 @@ class ChaptersViewModel
                     val progress = chapter.calculateProgress(playbackPositionMs)
                     ChapterState.Playing(chapter = chapter, progress = progress)
                 } else {
-                    playbackManager.skipToNextSelectedOrLastChapter()
+                    if (!listOf("onUserSeeking", "onSeekComplete").contains(lastChangeFrom)) {
+                        playbackManager.skipToNextSelectedOrLastChapter()
+                    }
                     ChapterState.NotPlayed(chapter)
                 }
             } else {
