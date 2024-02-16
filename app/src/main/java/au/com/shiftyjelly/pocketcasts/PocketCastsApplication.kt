@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
@@ -47,6 +48,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -92,6 +94,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
 
     @Inject lateinit var syncManager: SyncManager
+
+    @Inject lateinit var widgetManager: WidgetManager
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -249,6 +253,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
+
+        applicationScope.launch {
+            settings.useDynamicColorsForWidget.flow.collectLatest {
+                widgetManager.updateWidgetFromSettings(playbackManager)
+            }
+        }
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
     }

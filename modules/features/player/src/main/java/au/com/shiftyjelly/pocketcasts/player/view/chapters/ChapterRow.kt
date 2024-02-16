@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -47,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ChapterRow(
     state: ChaptersViewModel.ChapterState,
+    onSelectionChange: (Boolean, Chapter) -> Unit,
     onClick: () -> Unit,
     onUrlClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -75,6 +78,17 @@ fun ChapterRow(
                 .clickable { onClick() }
                 .padding(horizontal = 12.dp),
         ) {
+            if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
+                Checkbox(
+                    checked = state.chapter.selected,
+                    onCheckedChange = { selected ->
+                        onSelectionChange(selected, chapter)
+                    },
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+            }
             TextH50(
                 text = chapter.index.toString(),
                 color = textColor,
@@ -160,16 +174,19 @@ fun ChapterRowPreview() {
         Column {
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Played(chapter = chapter),
+                onSelectionChange = { _, _ -> },
                 onClick = {},
                 onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Playing(chapter = chapter, progress = 0.5f),
+                onSelectionChange = { _, _ -> },
                 onClick = {},
                 onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter),
+                onSelectionChange = { _, _ -> },
                 onClick = {},
                 onUrlClick = {},
             )

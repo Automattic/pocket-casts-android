@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -11,17 +12,20 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class ChaptersViewModel
@@ -40,10 +44,12 @@ class ChaptersViewModel
         val backgroundColor: Color,
     )
 
-    sealed class ChapterState(val chapter: Chapter) {
-        class Played(chapter: Chapter) : ChapterState(chapter)
-        class Playing(val progress: Float, chapter: Chapter) : ChapterState(chapter)
-        class NotPlayed(chapter: Chapter) : ChapterState(chapter)
+    sealed class ChapterState {
+        abstract val chapter: Chapter
+
+        data class Played(override val chapter: Chapter) : ChapterState()
+        data class Playing(val progress: Float, override val chapter: Chapter) : ChapterState()
+        data class NotPlayed(override val chapter: Chapter) : ChapterState()
     }
 
     private val _scrollToChapterState = MutableStateFlow<Chapter?>(null)
@@ -58,18 +64,26 @@ class ChaptersViewModel
     private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .observeOn(Schedulers.io())
 
-    val uiState = Observables.combineLatest(
-        upNextStateObservable,
-        playbackStateObservable,
-        this::combineUiState,
+    private val _uiState = MutableStateFlow(
+        UiState(backgroundColor = Color(theme.playerBackgroundColor(null))),
     )
-        .distinctUntilChanged()
-        .toFlowable(BackpressureStrategy.LATEST)
+    val uiState: StateFlow<UiState>
+        get() = _uiState
 
-    val defaultUiState = UiState(
-        chapters = emptyList(),
-        backgroundColor = Color(theme.playerBackgroundColor(null)),
-    )
+    init {
+        viewModelScope.launch {
+            combine(
+                upNextStateObservable.asFlow(),
+                playbackStateObservable.asFlow(),
+                this@ChaptersViewModel::combineUiState,
+            )
+                .distinctUntilChanged()
+                .stateIn(viewModelScope)
+                .collect {
+                    _uiState.value = it
+                }
+        }
+    }
 
     fun skipToChapter(chapter: Chapter) {
         launch {
@@ -77,12 +91,23 @@ class ChaptersViewModel
         }
     }
 
-    private fun combineUiState(upNextState: UpNextQueue.State, playbackState: PlaybackState): UiState {
+    private fun combineUiState(
+        upNextState: UpNextQueue.State,
+        playbackState: PlaybackState,
+    ): UiState {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
         val chapters = buildChaptersWithState(
-            chapterList = playbackState.chapters.getList(),
+            chapterList = playbackState.chapters.getList().map { chapter ->
+                // Map selected state from the UI state until we get it from the server
+                _uiState.value.chapters
+                    .find { it.hasChapter(chapter) }
+                    ?.chapter
+                    ?.let {
+                        chapter.copy(selected = it.selected)
+                    } ?: chapter
+            },
             playbackPositionMs = playbackState.positionMs,
         )
         return UiState(
@@ -114,4 +139,24 @@ class ChaptersViewModel
         }
         return chapters
     }
+
+    fun onSelectionChange(selected: Boolean, chapter: Chapter) {
+        _uiState.value = _uiState.value.copy(
+            chapters = _uiState.value.chapters.map { chapterState ->
+                if (chapterState.hasChapter(chapter)) {
+                    val updatedChapter = chapterState.chapter.copy(selected = selected)
+                    when (chapterState) {
+                        is ChapterState.Played -> chapterState.copy(chapter = updatedChapter)
+                        is ChapterState.Playing -> chapterState.copy(chapter = updatedChapter)
+                        is ChapterState.NotPlayed -> chapterState.copy(chapter = updatedChapter)
+                    }
+                } else {
+                    chapterState
+                }
+            },
+        )
+    }
+
+    private fun ChapterState.hasChapter(chapter: Chapter) =
+        this.chapter.index == chapter.index && this.chapter.title == chapter.title
 }

@@ -64,6 +64,6 @@ enum class ThemeSetting(
     )
 
     companion object {
-        fun fromServerId(id: Int) = entries.find { it.serverId == id } ?: LIGHT
+        fun fromServerId(id: Int) = entries.find { it.serverId == id }
     }
 }

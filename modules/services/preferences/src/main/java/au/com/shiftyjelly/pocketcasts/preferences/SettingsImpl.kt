@@ -8,6 +8,8 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -24,8 +26,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -58,6 +58,9 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -839,22 +842,22 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "autoArchivePlayedEpisodesIndex",
         defaultValue = getString("autoArchivePlayedEpisodes")?.let {
             // Use the old String setting if it exists before falling back to the default value
-            AutoArchiveAfterPlayingSetting.fromString(it, context)
-        } ?: AutoArchiveAfterPlayingSetting.defaultValue(context),
+            AutoArchiveAfterPlaying.fromString(it, context)
+        } ?: AutoArchiveAfterPlaying.defaultValue(context),
         sharedPrefs = sharedPreferences,
-        fromInt = { AutoArchiveAfterPlayingSetting.fromIndex(it) },
-        toInt = { it.toIndex() },
+        fromInt = { AutoArchiveAfterPlaying.fromIndex(it) ?: AutoArchiveAfterPlaying.defaultValue(context) },
+        toInt = { it.index },
     )
 
     override val autoArchiveInactive = UserSetting.PrefFromInt(
         sharedPrefKey = "autoArchiveInactiveIndex",
         defaultValue = getString("autoArchiveInactiveEpisodes")?.let {
             // Use the old String setting if it exists before falling back to the default value
-            AutoArchiveInactiveSetting.fromString(it, context)
-        } ?: AutoArchiveInactiveSetting.default,
+            AutoArchiveInactive.fromString(it, context)
+        } ?: AutoArchiveInactive.Default,
         sharedPrefs = sharedPreferences,
-        fromInt = { AutoArchiveInactiveSetting.fromIndex(it) },
-        toInt = { it.toIndex() },
+        fromInt = { AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default },
+        toInt = { it.index },
     )
 
     override fun getCustomStorageLimitGb(): Long {
@@ -971,18 +974,18 @@ class SettingsImpl @Inject constructor(
             sharedPrefKey = "default_podcast_grouping",
             defaultValue = default,
             sharedPrefs = sharedPreferences,
-            fromInt = { PodcastGrouping.All.getOrNull(it) ?: default },
-            toInt = { PodcastGrouping.All.indexOf(it) },
+            fromInt = { PodcastGrouping.fromIndex(it) ?: default },
+            toInt = { it.index },
         )
     }
 
-    override fun setCloudSortOrder(sortOrder: Settings.CloudSortOrder) {
-        setInt("cloud_sort_order", sortOrder.ordinal)
-    }
-
-    override fun getCloudSortOrder(): Settings.CloudSortOrder {
-        return Settings.CloudSortOrder.values().getOrNull(getInt("cloud_sort_order", 0)) ?: Settings.CloudSortOrder.NEWEST_OLDEST
-    }
+    override val cloudSortOrder = UserSetting.PrefFromInt(
+        sharedPrefKey = "cloud_sort_order",
+        defaultValue = Settings.CloudSortOrder.NEWEST_OLDEST,
+        sharedPrefs = sharedPreferences,
+        fromInt = { ordinal -> Settings.CloudSortOrder.entries.find { it.ordinal == ordinal } ?: Settings.CloudSortOrder.NEWEST_OLDEST },
+        toInt = Settings.CloudSortOrder::ordinal,
+    )
 
     override val cloudAddToUpNext = UserSetting.BoolPref(
         sharedPrefKey = "cloudUpNext",
@@ -1327,4 +1330,12 @@ class SettingsImpl @Inject constructor(
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
+
+    private val _themeReconfigurationEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    override val themeReconfigurationEvents: Flow<Unit>
+        get() = _themeReconfigurationEvents
+
+    override fun requestThemeReconfiguration() {
+        _themeReconfigurationEvents.tryEmit(Unit)
+    }
 }

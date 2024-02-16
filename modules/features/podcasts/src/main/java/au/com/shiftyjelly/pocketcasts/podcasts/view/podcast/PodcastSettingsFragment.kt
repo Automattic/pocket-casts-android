@@ -115,18 +115,6 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
     }
 
     override fun onDestroyView() {
-        preferenceFeedIssueDetected = null
-        preferenceNotifications = null
-        preferenceAutoDownload = null
-        preferenceAddToUpNext = null
-        preferenceAddToUpNextOrder = null
-        preferenceAddToUpNextGlobal = null
-        preferencePlaybackEffects = null
-        preferenceSkipFirst = null
-        preferenceAutoArchive = null
-        preferenceFilters = null
-        preferenceUnsubscribe = null
-        preferenceSkipLast = null
         toolbar = null
         super.onDestroyView()
     }

@@ -10,6 +10,7 @@ data class Chapter(
     val imagePath: String? = null,
     val mimeType: String? = null,
     var index: Int = 0,
+    val selected: Boolean = false,
 ) {
 
     val isImagePresent: Boolean

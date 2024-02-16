@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -12,8 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -149,13 +150,39 @@ interface Settings {
         }
     }
 
-    enum class CloudSortOrder {
-        NEWEST_OLDEST,
-        OLDEST_NEWEST,
-        A_TO_Z,
-        Z_TO_A,
-        SHORT_LONG,
-        LONG_SHORT,
+    enum class CloudSortOrder(
+        val analyticsValue: String,
+        val serverId: Int,
+    ) {
+        NEWEST_OLDEST(
+            analyticsValue = "newest_to_oldest",
+            serverId = 0,
+        ),
+        OLDEST_NEWEST(
+            analyticsValue = "oldest_to_newest",
+            serverId = 1,
+        ),
+        A_TO_Z(
+            analyticsValue = "title_a_to_z",
+            serverId = 2,
+        ),
+        Z_TO_A(
+            analyticsValue = "title_z_to_a",
+            serverId = 3,
+        ),
+        SHORT_LONG(
+            analyticsValue = "shortest_to_longest",
+            serverId = 4,
+        ),
+        LONG_SHORT(
+            analyticsValue = "longest_to_shortest",
+            serverId = 5,
+        ),
+        ;
+
+        companion object {
+            fun fromServerId(id: Int) = entries.find { it.serverId == id }
+        }
     }
 
     sealed class MediaNotificationControls(
@@ -333,8 +360,8 @@ interface Settings {
     val newEpisodeNotificationActions: UserSetting<List<NewEpisodeNotificationAction>>
 
     val autoArchiveIncludesStarred: UserSetting<Boolean>
-    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
-    val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
+    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlaying>
+    val autoArchiveInactive: UserSetting<AutoArchiveInactive>
 
     fun selectedFilter(): String?
     fun setSelectedFilter(filterUUID: String?)
@@ -362,8 +389,7 @@ interface Settings {
 
     val freeGiftAcknowledged: UserSetting<Boolean>
 
-    fun setCloudSortOrder(sortOrder: CloudSortOrder)
-    fun getCloudSortOrder(): CloudSortOrder
+    val cloudSortOrder: UserSetting<CloudSortOrder>
     val cloudAddToUpNext: UserSetting<Boolean>
     val deleteLocalFileAfterPlaying: UserSetting<Boolean>
     val deleteCloudFileAfterPlaying: UserSetting<Boolean>
@@ -477,4 +503,14 @@ interface Settings {
     val useDarkUpNextTheme: UserSetting<Boolean>
 
     val useDynamicColorsForWidget: UserSetting<Boolean>
+
+    // We need to have a trigger for requesting theme changes.
+    // It is needed because during the sync we apply updates
+    // to individual theme settings one by one.
+    //
+    // If we were to react to them this way and not as a whole
+    // it might lead to side effects such us resetting following
+    // system dark mode.
+    val themeReconfigurationEvents: Flow<Unit>
+    fun requestThemeReconfiguration()
 }

@@ -14,6 +14,6 @@ class FilesViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userEpisodes = userEpisodeManager
-        .observeUserEpisodesSorted(settings.getCloudSortOrder())
+        .observeUserEpisodesSorted(settings.cloudSortOrder.value)
         .asFlow()
 }

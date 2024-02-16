@@ -171,7 +171,7 @@ class PodcastViewModel
             .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
             .doOnNext {
                 if (it is UiState.Loaded) {
-                    val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
+                    val groups = it.podcast.grouping.formGroups(it.episodes, it.podcast, resources)
                     groupedEpisodes.postValue(groups)
                 } else {
                     groupedEpisodes.postValue(emptyList())
@@ -393,7 +393,7 @@ class PodcastViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
-        settings.podcastBookmarksSortType.set(order, needsSync = false)
+        settings.podcastBookmarksSortType.set(order, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
@@ -629,7 +629,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
         Flowable.combineLatest(
             episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
                 .map {
-                    val sortFunction = podcast.podcastGrouping.sortFunction
+                    val sortFunction = podcast.grouping.sortFunction
                     if (sortFunction != null) {
                         it.sortedByDescending(sortFunction)
                     } else {

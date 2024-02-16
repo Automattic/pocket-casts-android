@@ -1285,7 +1285,7 @@ open class PlaybackManager @Inject constructor(
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
         val allEpisodes: List<BaseEpisode> = when (val autoSource = settings.lastAutoPlaySource.value) {
             is AutoPlaySource.Downloads -> episodeManager.observeDownloadEpisodes().asFlow().firstOrNull()
-            is AutoPlaySource.Files -> cloudFilesManager.cloudFilesList.asFlow().firstOrNull()
+            is AutoPlaySource.Files -> cloudFilesManager.sortedCloudFiles.firstOrNull()
             is AutoPlaySource.Starred -> episodeManager.observeStarredEpisodes().asFlow().firstOrNull()
             // First check if it is a podcast uuid, then check if it is from a filter
             is AutoPlaySource.PodcastOrFilter -> podcastManager.findPodcastByUuid(autoSource.uuid)
@@ -1323,7 +1323,7 @@ open class PlaybackManager @Inject constructor(
         val episodes = episodeManager
             .findEpisodesByPodcastOrdered(podcast)
 
-        val modifiedEpisodes = when (podcast.podcastGrouping) {
+        val modifiedEpisodes = when (podcast.grouping) {
             PodcastGrouping.None,
             PodcastGrouping.Season,
             PodcastGrouping.Starred,
@@ -1350,7 +1350,7 @@ open class PlaybackManager @Inject constructor(
                 }
         }
 
-        return podcast.podcastGrouping
+        return podcast.grouping
             .formGroups(modifiedEpisodes, podcast, application.resources)
             .flatten()
     }

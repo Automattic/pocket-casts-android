@@ -11,12 +11,35 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-enum class HeadphoneAction(val analyticsValue: String) {
-    ADD_BOOKMARK("add_bookmark"),
-    SKIP_BACK("skip_back"),
-    SKIP_FORWARD("skip_forward"),
-    NEXT_CHAPTER("next_chapter"),
-    PREVIOUS_CHAPTER("previous_chapter"),
+enum class HeadphoneAction(
+    val analyticsValue: String,
+    val serverId: Int,
+) {
+    ADD_BOOKMARK(
+        analyticsValue = "add_bookmark",
+        serverId = 0,
+    ),
+    SKIP_BACK(
+        analyticsValue = "skip_back",
+        serverId = 1,
+    ),
+    SKIP_FORWARD(
+        analyticsValue = "skip_forward",
+        serverId = 2,
+    ),
+    NEXT_CHAPTER(
+        analyticsValue = "next_chapter",
+        serverId = 3,
+    ),
+    PREVIOUS_CHAPTER(
+        analyticsValue = "previous_chapter",
+        serverId = 4,
+    ),
+    ;
+
+    companion object {
+        fun fromServerId(id: Int) = entries.find { it.serverId == id }
+    }
 }
 
 class HeadphoneActionUserSetting(

@@ -4,16 +4,19 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
@@ -78,13 +81,13 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             changedSettings = ChangedNamedSettings(
                 autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting(lastSyncTime) { autoArchiveAfterPlaying, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = autoArchiveAfterPlaying.toIndex(),
+                        value = autoArchiveAfterPlaying.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting(lastSyncTime) { autoArchiveInactiveSetting, modifiedAt ->
+                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting(lastSyncTime) { AutoArchiveInactive, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = autoArchiveInactiveSetting.toIndex(),
+                        value = AutoArchiveInactive.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
@@ -204,6 +207,58 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
+                headphoneControlsNextAction = settings.headphoneControlsNextAction.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                headphoneControlsPreviousAction = settings.headphoneControlsPreviousAction.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                headphoneControlsPlayBookmarkConfirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                episodeBookmarksSortType = settings.episodeBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                playerBookmarksSortType = settings.playerBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                podcastBookmarksSortType = settings.podcastBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                useDarkUpNextTheme = settings.useDarkUpNextTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                useDynamicColorsForWidget = settings.useDynamicColorsForWidget.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                filesSortOrder = settings.cloudSortOrder.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                darkThemePreference = settings.darkThemePreference.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = value.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                lightThemePreference = settings.lightThemePreference.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = value.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                useSystemTheme = settings.useSystemTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
             ),
         )
 
@@ -212,15 +267,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             settings: Settings,
             response: ChangedNamedSettingsResponse,
         ) {
+            var isThemeChanged = false
+
             for ((key, changedSettingResponse) in response) {
                 when (key) {
                     "autoArchiveInactive" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveInactive,
-                        newSettingValue = run {
-                            val index = (changedSettingResponse.value as? Number)?.toInt()
-                            index?.let { AutoArchiveInactiveSetting.fromIndex(it) }
-                        },
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveInactive.fromServerId(it) ?: AutoArchiveInactive.Default },
                     )
                     "autoArchiveIncludesStarred" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -230,10 +284,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "autoArchivePlayed" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveAfterPlaying,
-                        newSettingValue = run {
-                            val index = (changedSettingResponse.value as? Number)?.toInt()
-                            index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
-                        },
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) },
                     )
                     "freeGiftAcknowledgement" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -321,7 +372,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "episodeGrouping" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastGroupingDefault,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGrouping::fromServerId),
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { PodcastGrouping.fromIndex(it) ?: PodcastGrouping.None },
                     )
                     "keepScreenAwake" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -411,8 +462,23 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "theme" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.theme,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(ThemeSetting::fromServerId),
-                    )
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
+                    ).also { isThemeChanged = it != null || isThemeChanged }
+                    "darkThemePreference" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.darkThemePreference,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.DARK },
+                    ).also { isThemeChanged = it != null || isThemeChanged }
+                    "lightThemePreference" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.lightThemePreference,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { ThemeSetting.fromServerId(it) ?: ThemeSetting.LIGHT },
+                    ).also { isThemeChanged = it != null || isThemeChanged }
+                    "useSystemTheme" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useSystemTheme,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    ).also { isThemeChanged = it != null || isThemeChanged }
                     "badges" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBadgeType,
@@ -457,8 +523,57 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.showArtworkOnLockScreen,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
+                    "headphoneControlsNextAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.headphoneControlsNextAction,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { HeadphoneAction.fromServerId(it) ?: HeadphoneAction.SKIP_FORWARD },
+                    )
+                    "headphoneControlsPreviousAction" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.headphoneControlsPreviousAction,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { HeadphoneAction.fromServerId(it) ?: HeadphoneAction.SKIP_BACK },
+                    )
+                    "headphoneControlsPlayBookmarkConfirmationSound" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.headphoneControlsPlayBookmarkConfirmationSound,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "episodeBookmarksSortType" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.episodeBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeDefault.fromServerId(it) ?: BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "playerBookmarksSortType" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.playerBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeDefault.fromServerId(it) ?: BookmarksSortTypeDefault.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "podcastBookmarksSortType" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.podcastBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForPodcast.fromServerId(it) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "useDarkUpNextTheme" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useDarkUpNextTheme,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "useDynamicColorsForWidget" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useDynamicColorsForWidget,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesSortOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudSortOrder,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
+                    )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
+            }
+
+            if (isThemeChanged) {
+                settings.requestThemeReconfiguration()
             }
         }
 

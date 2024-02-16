@@ -270,7 +270,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
                     adapter.notifyDataSetChanged()
@@ -279,7 +279,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiSelectSelectNone() {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     multiSelectHelper.deselectAllInList(episodes)
                     adapter.notifyDataSetChanged()
@@ -288,7 +288,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -301,7 +301,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -314,7 +314,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
-                val cloudFiles = viewModel.cloudFilesList.value
+                val cloudFiles = viewModel.uiState.value?.userEpisodes
                 if (cloudFiles != null) {
                     val startIndex = cloudFiles.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -326,7 +326,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
-                val cloudFiles = viewModel.cloudFilesList.value
+                val cloudFiles = viewModel.uiState.value?.userEpisodes
                 if (cloudFiles != null) {
                     val startIndex = cloudFiles.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -386,10 +386,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 titleId = LR.string.episode_sort_newest_to_oldest,
                 click = {
                     viewModel.changeSort(Settings.CloudSortOrder.NEWEST_OLDEST)
-                    analyticsTracker.track(
-                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.NEWEST_TO_OLDEST.analyticsValue),
-                    )
                 },
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.NEWEST_OLDEST),
             )
@@ -397,10 +393,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 titleId = LR.string.episode_sort_oldest_to_newest,
                 click = {
                     viewModel.changeSort(Settings.CloudSortOrder.OLDEST_NEWEST)
-                    analyticsTracker.track(
-                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.OLDEST_TO_NEWEST.analyticsValue),
-                    )
                 },
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.OLDEST_NEWEST),
             )
@@ -408,10 +400,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 titleId = LR.string.podcasts_sort_by_title,
                 click = {
                     viewModel.changeSort(Settings.CloudSortOrder.A_TO_Z)
-                    analyticsTracker.track(
-                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.TITLE_A_TO_Z.analyticsValue),
-                    )
                 },
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z),
             )
@@ -425,12 +413,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         } else {
             false
         }
-    }
-
-    enum class SortOrder(val analyticsValue: String) {
-        NEWEST_TO_OLDEST("newest_to_oldest"),
-        OLDEST_TO_NEWEST("oldest_to_newest"),
-        TITLE_A_TO_Z("title_a_to_z"),
     }
 
     companion object {

@@ -59,6 +59,18 @@ data class ChangedNamedSettings(
     @field:Json(name = "notificationActions") val notificationSettingActions: NamedChangedSettingString? = null,
     @field:Json(name = "playerShelf") val playerShelfItems: NamedChangedSettingString? = null,
     @field:Json(name = "showArtworkOnLockScreen") val showArtworkOnLockScreen: NamedChangedSettingBool? = null,
+    @field:Json(name = "headphoneControlsNextAction") val headphoneControlsNextAction: NamedChangedSettingInt? = null,
+    @field:Json(name = "headphoneControlsPreviousAction") val headphoneControlsPreviousAction: NamedChangedSettingInt? = null,
+    @field:Json(name = "headphoneControlsPlayBookmarkConfirmationSound") val headphoneControlsPlayBookmarkConfirmationSound: NamedChangedSettingBool? = null,
+    @field:Json(name = "episodeBookmarksSortType") val episodeBookmarksSortType: NamedChangedSettingInt? = null,
+    @field:Json(name = "playerBookmarksSortType") val playerBookmarksSortType: NamedChangedSettingInt? = null,
+    @field:Json(name = "podcastBookmarksSortType") val podcastBookmarksSortType: NamedChangedSettingInt? = null,
+    @field:Json(name = "useDarkUpNextTheme") val useDarkUpNextTheme: NamedChangedSettingBool? = null,
+    @field:Json(name = "useDynamicColorsForWidget") val useDynamicColorsForWidget: NamedChangedSettingBool? = null,
+    @field:Json(name = "filesSortOrder") val filesSortOrder: NamedChangedSettingInt? = null,
+    @field:Json(name = "darkThemePreference") val darkThemePreference: NamedChangedSettingInt? = null,
+    @field:Json(name = "lightThemePreference") val lightThemePreference: NamedChangedSettingInt? = null,
+    @field:Json(name = "useSystemTheme") val useSystemTheme: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
