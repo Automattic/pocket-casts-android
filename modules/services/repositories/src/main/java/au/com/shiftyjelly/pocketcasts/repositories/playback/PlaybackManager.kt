@@ -888,21 +888,21 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, sourceView)
     }
 
-    fun skipToNextChapter() {
+    fun skipToNextSelectedChapter() {
         launch {
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode = episode)
-            playbackStateRelay.blockingFirst().chapters.getNextChapter(currentTimeMs)?.let { chapter ->
+            playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
             }
         }
     }
 
-    fun skipToPreviousChapter() {
+    fun skipToPreviousSelectedChapter() {
         launch {
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode)
-            playbackStateRelay.blockingFirst().chapters.getPreviousChapter(currentTimeMs)?.let { chapter ->
+            playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
             }
         }

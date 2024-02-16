@@ -8,9 +8,12 @@ data class Chapters(private val items: List<Chapter> = emptyList()) {
     val size: Int
         get() = items.size
 
-    fun getNextChapter(timeMs: Int): Chapter? {
+    private val selectedItems: List<Chapter>
+        get() = items.filter { it.selected }
+
+    fun getNextSelectedChapter(timeMs: Int): Chapter? {
         val currentTimeFinal = if (timeMs < 0) 0 else timeMs
-        for (chapter in items) {
+        for (chapter in selectedItems) {
             if (chapter.startTime > currentTimeFinal) {
                 return chapter
             }
@@ -18,13 +21,13 @@ data class Chapters(private val items: List<Chapter> = emptyList()) {
         return null
     }
 
-    fun getPreviousChapter(timeMs: Int): Chapter? {
+    fun getPreviousSelectedChapter(timeMs: Int): Chapter? {
         if (items.isEmpty()) {
             return null
         }
         var foundChapter: Chapter? = null
         var lastChapter: Chapter? = null
-        for (chapter in items) {
+        for (chapter in selectedItems) {
             if (chapter.containsTime(timeMs)) {
                 if (foundChapter != null) {
                     lastChapter = foundChapter
