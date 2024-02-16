@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -21,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
@@ -79,7 +82,7 @@ class ChaptersViewModel
             )
                 .distinctUntilChanged()
                 .stateIn(viewModelScope)
-                .collect {
+                .collectLatest {
                     _uiState.value = it
                 }
         }
@@ -99,16 +102,9 @@ class ChaptersViewModel
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
         val chapters = buildChaptersWithState(
-            chapterList = playbackState.chapters.getList().map { chapter ->
-                // Map selected state from the UI state until we get it from the server
-                _uiState.value.chapters
-                    .find { it.hasChapter(chapter) }
-                    ?.chapter
-                    ?.let {
-                        chapter.copy(selected = it.selected)
-                    } ?: chapter
-            },
+            chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
+            lastChangeFrom = playbackState.lastChangeFrom,
         )
         return UiState(
             chapters = chapters,
@@ -116,47 +112,44 @@ class ChaptersViewModel
         )
     }
 
-    private fun buildChaptersWithState(
-        chapterList: List<Chapter>,
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildChaptersWithState(
+        chapters: Chapters,
         playbackPositionMs: Int,
+        lastChangeFrom: String? = null,
     ): List<ChapterState> {
-        val chapters = mutableListOf<ChapterState>()
+        val chapterStates = mutableListOf<ChapterState>()
         var currentChapter: Chapter? = null
-        for (chapter in chapterList) {
+        for (chapter in chapters.getList()) {
             val chapterState = if (currentChapter != null) {
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
-                // the chapter currently playing
-                currentChapter = chapter
-                val progress = chapter.calculateProgress(playbackPositionMs)
-                ChapterState.Playing(chapter = chapter, progress = progress)
+                if (chapter.selected) {
+                    // the chapter currently playing
+                    currentChapter = chapter
+                    val progress = chapter.calculateProgress(playbackPositionMs)
+                    ChapterState.Playing(chapter = chapter, progress = progress)
+                } else {
+                    if (!listOf(
+                            PlaybackManager.LastChangeFrom.OnUserSeeking.value,
+                            PlaybackManager.LastChangeFrom.OnSeekComplete.value,
+                        ).contains(lastChangeFrom)
+                    ) {
+                        playbackManager.skipToNextSelectedOrLastChapter()
+                    }
+                    ChapterState.NotPlayed(chapter)
+                }
             } else {
                 // a chapter that has been played
                 ChapterState.Played(chapter)
             }
-            chapters.add(chapterState)
+            chapterStates.add(chapterState)
         }
-        return chapters
+        return chapterStates
     }
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
-        _uiState.value = _uiState.value.copy(
-            chapters = _uiState.value.chapters.map { chapterState ->
-                if (chapterState.hasChapter(chapter)) {
-                    val updatedChapter = chapterState.chapter.copy(selected = selected)
-                    when (chapterState) {
-                        is ChapterState.Played -> chapterState.copy(chapter = updatedChapter)
-                        is ChapterState.Playing -> chapterState.copy(chapter = updatedChapter)
-                        is ChapterState.NotPlayed -> chapterState.copy(chapter = updatedChapter)
-                    }
-                } else {
-                    chapterState
-                }
-            },
-        )
+        playbackManager.toggleChapter(selected, chapter)
     }
-
-    private fun ChapterState.hasChapter(chapter: Chapter) =
-        this.chapter.index == chapter.index && this.chapter.title == chapter.title
 }
