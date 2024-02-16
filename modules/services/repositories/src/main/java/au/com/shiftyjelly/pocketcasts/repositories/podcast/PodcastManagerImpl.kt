@@ -502,11 +502,11 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateGrouping(podcast: Podcast, grouping: PodcastGrouping) {
-        podcastDao.updateGrouping(PodcastGrouping.All.indexOf(grouping), podcast.uuid)
+        podcastDao.updateGrouping(grouping, podcast.uuid)
     }
 
     override fun updateGroupingForAll(grouping: PodcastGrouping) {
-        podcastDao.updatePodcastGroupingForAll(PodcastGrouping.All.indexOf(grouping))
+        podcastDao.updatePodcastGroupingForAll(grouping)
     }
 
     override suspend fun markAllPodcastsUnsynced() {

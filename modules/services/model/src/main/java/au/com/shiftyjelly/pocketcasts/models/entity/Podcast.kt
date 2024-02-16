@@ -80,7 +80,7 @@ data class Podcast(
     @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,
     @ColumnInfo(name = "estimated_next_episode") var estimatedNextEpisode: Date? = null,
     @ColumnInfo(name = "episode_frequency") var episodeFrequency: String? = null,
-    @ColumnInfo(name = "grouping") var grouping: Int = PodcastGrouping.All.indexOf(PodcastGrouping.None),
+    @ColumnInfo(name = "grouping") var grouping: PodcastGrouping = PodcastGrouping.None,
     @ColumnInfo(name = "grouping_modified") var groupingModified: Date? = null,
     @ColumnInfo(name = "skip_last") var skipLastSecs: Int = 0,
     @ColumnInfo(name = "skip_last_modified") var skipLastModified: Date? = null,
@@ -144,9 +144,6 @@ data class Podcast(
 
     val isNotSynced: Boolean
         get() = syncStatus == SYNC_STATUS_NOT_SYNCED
-
-    val podcastGrouping: PodcastGrouping
-        get() = PodcastGrouping.All[grouping]
 
     val isSilenceRemoved: Boolean
         get() = trimMode != TrimMode.OFF

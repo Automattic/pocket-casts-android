@@ -24,6 +24,7 @@ import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
 import com.pocketcasts.service.api.durationOrNull
+import com.pocketcasts.service.api.episodeGroupingOrNull
 import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.episodesSortOrderOrNull
 import com.pocketcasts.service.api.folderOrNull
@@ -88,6 +89,8 @@ data class SyncUpdateResponse(
         var autoArchiveInactiveModified: Date? = null,
         var autoArchiveEpisodeLimit: Int? = null,
         var autoArchiveEpisodeLimitModified: Date? = null,
+        var episodeGrouping: Int? = null,
+        var episodeGroupingModified: Date? = null,
     ) {
         companion object {
             fun fromSyncUserPodcast(syncUserPodcast: SyncUserPodcast): PodcastSync =
@@ -124,6 +127,8 @@ data class SyncUpdateResponse(
                     autoArchiveInactiveModified = syncUserPodcast.settings.autoArchiveInactiveOrNull?.modifiedAt?.toDate(),
                     autoArchiveEpisodeLimit = syncUserPodcast.settings.autoArchiveEpisodeLimitOrNull?.value?.value,
                     autoArchiveEpisodeLimitModified = syncUserPodcast.settings.autoArchiveEpisodeLimitOrNull?.modifiedAt?.toDate(),
+                    episodeGrouping = syncUserPodcast.settings.episodeGroupingOrNull?.value?.value,
+                    episodeGroupingModified = syncUserPodcast.settings.episodesSortOrderOrNull?.modifiedAt?.toDate(),
                 )
         }
     }

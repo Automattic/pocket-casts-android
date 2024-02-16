@@ -1323,7 +1323,7 @@ open class PlaybackManager @Inject constructor(
         val episodes = episodeManager
             .findEpisodesByPodcastOrdered(podcast)
 
-        val modifiedEpisodes = when (podcast.podcastGrouping) {
+        val modifiedEpisodes = when (podcast.grouping) {
             PodcastGrouping.None,
             PodcastGrouping.Season,
             PodcastGrouping.Starred,
@@ -1350,7 +1350,7 @@ open class PlaybackManager @Inject constructor(
                 }
         }
 
-        return podcast.podcastGrouping
+        return podcast.grouping
             .formGroups(modifiedEpisodes, podcast, application.resources)
             .flatten()
     }

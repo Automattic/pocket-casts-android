@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -914,6 +915,8 @@ class PodcastSyncProcess(
         podcastSync.autoArchiveInactiveModified?.let { podcast.autoArchiveInactiveModified = it }
         podcastSync.autoArchiveEpisodeLimit?.let { podcast.autoArchiveEpisodeLimit = it }
         podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
+        podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None }
+        podcastSync.episodeGroupingModified?.let { podcast.groupingModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1124,6 +1127,12 @@ class PodcastSyncProcess(
                             value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
                             modifiedAt = timestamp {
                                 seconds = podcast.autoArchiveEpisodeLimitModified?.timeSecs() ?: lastSyncTime.epochSecond
+                            }
+                        }
+                        episodeGrouping = int32Setting {
+                            value = int32Value { value = podcast.grouping.serverId }
+                            modifiedAt = timestamp {
+                                seconds = podcast.groupingModified?.timeSecs() ?: lastSyncTime.epochSecond
                             }
                         }
                     }

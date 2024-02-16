@@ -974,8 +974,8 @@ class SettingsImpl @Inject constructor(
             sharedPrefKey = "default_podcast_grouping",
             defaultValue = default,
             sharedPrefs = sharedPreferences,
-            fromInt = { PodcastGrouping.All.getOrNull(it) ?: default },
-            toInt = { PodcastGrouping.All.indexOf(it) },
+            fromInt = { PodcastGrouping.fromIndex(it) ?: default },
+            toInt = { it.index },
         )
     }
 
