@@ -909,7 +909,7 @@ open class PlaybackManager @Inject constructor(
 
     private fun skipToEndOfLastChapter() {
         launch {
-            playbackStateRelay.blockingFirst().chapters.lastChapter.let { chapter ->
+            playbackStateRelay.blockingFirst().chapters.lastChapter?.let { chapter ->
                 seekToTimeMsInternal(chapter.endTime)
             }
         }
