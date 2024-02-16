@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
@@ -121,6 +122,7 @@ class ServersModule {
 
         fun provideMoshiBuilder(): Moshi.Builder {
             return Moshi.Builder()
+                .add(InstantAdapter())
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
                 .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
                 .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
