@@ -131,7 +131,11 @@ class ChaptersViewModel
                     val progress = chapter.calculateProgress(playbackPositionMs)
                     ChapterState.Playing(chapter = chapter, progress = progress)
                 } else {
-                    if (!listOf("onUserSeeking", "onSeekComplete").contains(lastChangeFrom)) {
+                    if (!listOf(
+                            PlaybackManager.LastChangeFrom.OnUserSeeking.value,
+                            PlaybackManager.LastChangeFrom.OnSeekComplete.value,
+                        ).contains(lastChangeFrom)
+                    ) {
                         playbackManager.skipToNextSelectedOrLastChapter()
                     }
                     ChapterState.NotPlayed(chapter)
