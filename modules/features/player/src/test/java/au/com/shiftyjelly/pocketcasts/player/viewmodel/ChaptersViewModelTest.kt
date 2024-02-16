@@ -51,7 +51,7 @@ class ChaptersViewModelTest {
     private lateinit var chaptersViewModel: ChaptersViewModel
 
     @Test
-    fun `given unselected chapter contains playback pos, then skip to next chapter`() = runTest {
+    fun `given unselected chapter contains playback pos, then skip to next selected chapter`() = runTest {
         val chapters = initChapters()
         initViewModel()
 
@@ -61,11 +61,31 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `given selected chapter contains playback pos, then do not skip to next chapter`() = runTest {
+    fun `given selected chapter contains playback pos, then do not skip to next selected chapter`() = runTest {
         val chapters = initChapters()
         initViewModel()
 
         chaptersViewModel.buildChaptersWithState(chapters, 50)
+
+        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
+    }
+
+    @Test
+    fun `given user seeking playback pos, then do not skip to next selected chapter`() = runTest {
+        val chapters = initChapters()
+        initViewModel()
+
+        chaptersViewModel.buildChaptersWithState(chapters, 150, lastChangeFrom = PlaybackManager.LastChangeFrom.OnUserSeeking.value)
+
+        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
+    }
+
+    @Test
+    fun `given seek complete, then do not skip to next selected chapter`() = runTest {
+        val chapters = initChapters()
+        initViewModel()
+
+        chaptersViewModel.buildChaptersWithState(chapters, 150, lastChangeFrom = PlaybackManager.LastChangeFrom.OnSeekComplete.value)
 
         verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
     }
