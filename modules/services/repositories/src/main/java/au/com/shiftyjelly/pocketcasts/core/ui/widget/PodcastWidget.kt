@@ -21,6 +21,13 @@ import timber.log.Timber
 @AndroidEntryPoint
 class PodcastWidget : AppWidgetProvider(), CoroutineScope {
 
+    companion object {
+        const val SKIP_FORWARD_REQUEST_CODE = 0
+        const val SKIP_FORWARD_ACTION = "SKIP_FORWARD_ACTION"
+        const val SKIP_BACKWARD_REQUEST_CODE = 1
+        const val SKIP_BACKWARD_ACTION = "SKIP_BACKWARD_ACTION"
+    }
+
     @Inject lateinit var widgetManager: WidgetManager
 
     @Inject lateinit var playbackManager: PlaybackManager
@@ -44,6 +51,13 @@ class PodcastWidget : AppWidgetProvider(), CoroutineScope {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         Timber.i("Widget onReceive called.")
+
+        if (intent.action != null) {
+            when (intent.action) {
+                SKIP_FORWARD_ACTION -> { playbackManager.skipForward() }
+                SKIP_BACKWARD_ACTION -> { playbackManager.skipBackward() }
+            }
+        }
     }
 
     override fun onEnabled(context: Context) {
