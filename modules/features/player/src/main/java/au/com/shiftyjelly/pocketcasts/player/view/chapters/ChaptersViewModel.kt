@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
@@ -79,7 +80,7 @@ class ChaptersViewModel
             )
                 .distinctUntilChanged()
                 .stateIn(viewModelScope)
-                .collect {
+                .collectLatest {
                     _uiState.value = it
                 }
         }
@@ -99,15 +100,7 @@ class ChaptersViewModel
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
         val chapters = buildChaptersWithState(
-            chapterList = playbackState.chapters.getList().map { chapter ->
-                // Map selected state from the UI state until we get it from the server
-                _uiState.value.chapters
-                    .find { it.hasChapter(chapter) }
-                    ?.chapter
-                    ?.let {
-                        chapter.copy(selected = it.selected)
-                    } ?: chapter
-            },
+            chapterList = playbackState.chapters.getList(),
             playbackPositionMs = playbackState.positionMs,
         )
         return UiState(
@@ -141,22 +134,6 @@ class ChaptersViewModel
     }
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
-        _uiState.value = _uiState.value.copy(
-            chapters = _uiState.value.chapters.map { chapterState ->
-                if (chapterState.hasChapter(chapter)) {
-                    val updatedChapter = chapterState.chapter.copy(selected = selected)
-                    when (chapterState) {
-                        is ChapterState.Played -> chapterState.copy(chapter = updatedChapter)
-                        is ChapterState.Playing -> chapterState.copy(chapter = updatedChapter)
-                        is ChapterState.NotPlayed -> chapterState.copy(chapter = updatedChapter)
-                    }
-                } else {
-                    chapterState
-                }
-            },
-        )
+        playbackManager.toggleChapter(selected, chapter)
     }
-
-    private fun ChapterState.hasChapter(chapter: Chapter) =
-        this.chapter.index == chapter.index && this.chapter.title == chapter.title
 }

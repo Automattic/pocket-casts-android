@@ -921,6 +921,27 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    fun toggleChapter(select: Boolean, chapter: Chapter) {
+        launch {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                val updatedItems = playbackState.chapters.getList().map {
+                    if (it.index == chapter.index) {
+                        it.copy(selected = select)
+                    } else {
+                        it
+                    }
+                }
+
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        chapters = playbackState.chapters.copy(items = updatedItems),
+                        lastChangeFrom = "onChapterSelectionToggled",
+                    ),
+                )
+            }
+        }
+    }
+
     fun clearUpNextAsync() {
         launch {
             upNextQueue.clearUpNext()
