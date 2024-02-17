@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -139,7 +140,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     fun setUpNext(upNextState: UpNextQueue.State, theme: Theme) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            loadArtwork(upNextState.podcast, upNextState.episode)
+            loadArtwork(upNextState.podcast, upNextState.episode, upNextState.useEpisodeArtwork)
 
             binding.episode = upNextState.episode
             binding.podcast = upNextState.podcast
@@ -219,12 +220,12 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
-    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode) {
+    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useEpisodeArtwork: UserSetting<Boolean>) {
         val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = binding.artwork
         imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
 
-        val artwork = getEpisodeArtwork(episode)
+        val artwork = getEpisodeArtwork(episode, useEpisodeArtwork)
         if (artwork == Artwork.None && podcast?.uuid != null) {
             loadPodcastArtwork(imageLoader, podcast)
         } else {
@@ -285,9 +286,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     companion object {
-        private fun getEpisodeArtwork(episode: BaseEpisode): Artwork {
+        private fun getEpisodeArtwork(episode: BaseEpisode, useEpisodeArtwork: UserSetting<Boolean>): Artwork {
             val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
-            return if (showNotesImageUrl != null) {
+            return if (showNotesImageUrl != null && useEpisodeArtwork.value) {
                 Artwork.Url(showNotesImageUrl)
             } else if (episode is UserEpisode) {
                 val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)

@@ -106,7 +106,7 @@ class UpNextQueueImpl @Inject constructor(
                 null
             }
 
-            state = UpNextQueue.State.Loaded(episode, podcast, episodes)
+            state = UpNextQueue.State.Loaded(episode, podcast, episodes, settings.useEpisodeArtwork)
         }
         return state
     }
