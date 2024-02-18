@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -195,7 +196,6 @@ open class PlaybackManager @Inject constructor(
         bookmarkManager = bookmarkManager,
     )
     var sleepAfterEpisode: Boolean = false
-
     var player: Player? = null
 
     val mediaSession: MediaSessionCompat
@@ -1281,6 +1281,12 @@ open class PlaybackManager @Inject constructor(
             .flatten()
     }
 
+    fun useSleep(episode: BaseEpisode?) {
+        launch {
+            sleep(episode)
+        }
+    }
+
     private suspend fun sleep(episode: BaseEpisode?) {
         sleepAfterEpisode = false
 
@@ -1508,11 +1514,15 @@ open class PlaybackManager @Inject constructor(
 
             else -> null
         }
-
         if (episode == null) {
             val nextEpisode = autoLoadEpisode(autoPlay = play)
             if (nextEpisode == null) {
                 Timber.d("Playback: No episode in upnext, shutting down")
+                if (SETimer.timerShouldStop()) {
+                    SETimer.stop(this, application,true)
+                } else if (SETimer.timerIsActive()) {
+                    SETimer.stop(this, application)
+                }
                 shutdown()
             }
             return
@@ -1725,8 +1735,8 @@ open class PlaybackManager @Inject constructor(
         episodeManager.updatePlaybackInteractionDate(episode)
 
         widgetManager.updateWidget(podcast, play, episode)
-
-        if (play) {
+        val shouldStopForSleep = SETimer.timerShouldStop()
+        if (play && !shouldStopForSleep) {
             if (sameEpisode && currentPositionMs != null) {
                 player?.seekToTimeMs(currentPositionMs)
             }
@@ -1734,6 +1744,9 @@ open class PlaybackManager @Inject constructor(
         } else {
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
+            if (shouldStopForSleep) {
+                SETimer.stop(this, application,true)
+            }
         }
     }
 

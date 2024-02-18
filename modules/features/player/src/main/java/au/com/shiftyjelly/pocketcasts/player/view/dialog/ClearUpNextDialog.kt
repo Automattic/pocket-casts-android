@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -43,11 +44,15 @@ class ClearUpNextDialog(
 
     fun showOrClear(fragmentManager: FragmentManager) {
         val episodeCount = playbackManager.upNextQueue.queueEpisodes.size
+        if (SETimer.timerIsActive()) {
+            SETimer.stop(playbackManager, requireContext())
+        }
         return if (episodeCount >= 3) {
             show(fragmentManager, "mini_player_clear_dialog")
         } else {
             clear()
         }
+
     }
 
     companion object {

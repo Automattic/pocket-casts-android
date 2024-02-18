@@ -18,8 +18,6 @@ android {
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode project.versionCode
-        versionName project.versionName
 
         buildConfigField "int", "VERSION_CODE", "${project.versionCode}"
         buildConfigField "String", "VERSION_NAME", "\"${project.versionName}\""
@@ -111,7 +109,6 @@ android {
         }
 
         debugProd {
-            debuggable true
 
             testCoverageEnabled false
             ext.alwaysUpdateBuildId = false
@@ -129,7 +126,6 @@ android {
 
         release {
             minifyEnabled true
-            debuggable false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "$rootProject.rootDir.absolutePath/app/proguard-rules.pro"
 
             buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD

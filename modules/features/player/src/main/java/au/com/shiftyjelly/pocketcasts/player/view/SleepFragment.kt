@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,6 +73,14 @@ class SleepFragment : BaseDialogFragment() {
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
             startTimerEndOfEpisode()
         }
+        binding.buttonAfterNEpisodes.setOnClickListener { startTimerByEpisode() }
+        binding.incEpisodeButton.setOnClickListener{ addEpisodeForTimer() }
+        binding.decEpisodeButton.setOnClickListener{ subtractEpisodeForTimer() }
+        if (viewModel.isMinEpisodeLimit()) {
+            binding.decEpisodeButton.alpha = .5f
+        } else if (viewModel.isMaxEpisodeLimit()) {
+            binding.incEpisodeButton.alpha = .5f
+        }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
@@ -81,6 +90,14 @@ class SleepFragment : BaseDialogFragment() {
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
             startTimerEndOfEpisode()
         }
+        binding.buttonAddEpisode.setOnClickListener { addEpisodeToTimer( eps = 1) }
+        binding.buttonAdd2Episodes.setOnClickListener{ addEpisodeToTimer( eps = 2) }
+        binding.buttonAddNEpisodes.setOnClickListener{ addEpisodeToTimer( eps = null) }
+        binding.buttonEndOfCurrentEpisode.setOnClickListener{
+            cancelEpisodeTimer(false)
+            startTimerEndOfEpisode()
+        }
+        binding.buttonCancelEpisodeTimer.setOnClickListener{ cancelEpisodeTimer() }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
 
@@ -109,6 +126,16 @@ class SleepFragment : BaseDialogFragment() {
                 binding.buttonCancelTime.setTextColor(tintColorStateList)
                 binding.buttonEndOfEpisode2.strokeColor = tintColorStateList
                 binding.buttonEndOfEpisode2.setTextColor(tintColorStateList)
+                binding.buttonAddEpisode.strokeColor = tintColorStateList
+                binding.buttonAddEpisode.setTextColor(tintColorStateList)
+                binding.buttonAdd2Episodes.strokeColor = tintColorStateList
+                binding.buttonAdd2Episodes.setTextColor(tintColorStateList)
+                binding.buttonAddNEpisodes.strokeColor = tintColorStateList
+                binding.buttonAddNEpisodes.setTextColor(tintColorStateList)
+                binding.buttonEndOfCurrentEpisode.strokeColor = tintColorStateList
+                binding.buttonEndOfCurrentEpisode.setTextColor(tintColorStateList)
+                binding.buttonCancelEpisodeTimer.strokeColor = tintColorStateList
+                binding.buttonCancelEpisodeTimer.setTextColor(tintColorStateList)
 
                 binding.sleepAnimation.post { // this only works the second time it's called unless it's in a post
                     binding.sleepAnimation.addValueCallback(KeyPath("**"), LottieProperty.COLOR) { tintColor }
@@ -173,11 +200,56 @@ class SleepFragment : BaseDialogFragment() {
         close()
     }
 
+    private fun startTimerByEpisode() {
+        viewModel.sleepTimerByEpisode()
+        viewModel.episodeSleepCount().let{ eps ->
+            binding?.root?.announceForAccessibility("Sleep timer set for $eps episode"+ if (eps!=1) "s" else "")
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(EPISODE_KEY to eps))
+        }
+        close()
+    }
+
+    private fun addEpisodeForTimer() {
+        viewModel.incEpisodesForTimer()
+        if (viewModel.isMaxEpisodeLimit()) {
+            binding?.incEpisodeButton?.alpha = .5f
+        } else if (!viewModel.isMinEpisodeLimit()) {
+            binding?.decEpisodeButton?.alpha = 1f
+        }
+    }
+
+    private fun subtractEpisodeForTimer() {
+        viewModel.decEpisodesForTimer()
+        if (viewModel.isMinEpisodeLimit()) {
+            binding?.decEpisodeButton?.alpha = .5f
+        } else if (!viewModel.isMaxEpisodeLimit()) {
+            binding?.incEpisodeButton?.alpha = 1f
+        }
+    }
+
+    private fun addEpisodeToTimer(eps: Int?) {
+        viewModel.extendEpisodeTimer(eps)
+        eps.let {
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED,
+                if ( it == null) mapOf(AMOUNT_KEY to viewModel.episodeSleepCount()) else mapOf(AMOUNT_KEY to it)
+            )
+        }
+    }
+
     private fun cancelTimer() {
         viewModel.cancelSleepTimer()
         binding?.root?.announceForAccessibility("Sleep timer cancelled")
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_CANCELLED)
         close()
+    }
+
+    private fun cancelEpisodeTimer(dismiss: Boolean = true) {
+        viewModel.cancelEpisodeTimer()
+        if (dismiss) {
+            binding?.root?.announceForAccessibility("Sleep timer cancelled")
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_CANCELLED)
+            close()
+        }
     }
 
     private fun close() {
@@ -188,5 +260,6 @@ class SleepFragment : BaseDialogFragment() {
         private const val TIME_KEY = "time" // in seconds
         private const val AMOUNT_KEY = "amount"
         private const val END_OF_EPISODE = "end_of_episode"
+        private const val EPISODE_KEY = "episode"
     }
 }
