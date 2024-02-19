@@ -405,7 +405,7 @@ class PodcastViewModel
 
     fun play(bookmark: Bookmark) {
         launch {
-            val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
             bookmarkEpisode?.let {
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
