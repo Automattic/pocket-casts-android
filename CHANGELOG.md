@@ -8,8 +8,10 @@
     *   Fixed a bug where podcast setting screen could become unresponsive.
         ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
 *   Updates:
-    *    Add toggle for podcast artwork embedded in an episode's show notes
-         ([#1854](https://github.com/Automattic/pocket-casts-android/pull/1854))
+    *   Add toggle for podcast artwork embedded in an episode's show notes
+        ([#1854](https://github.com/Automattic/pocket-casts-android/pull/1854))
+    *   Fixed: Widget uses custom Headphone controls instead of skipping.
+        ([#1853](https://github.com/Automattic/pocket-casts-android/pull/1853))
 
 7.57
 -----
