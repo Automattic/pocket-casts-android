@@ -1098,4 +1098,23 @@ class EpisodeManagerImpl @Inject constructor(
 
             return@withContext newDownloadUrl ?: episode.downloadUrl
         }
+
+    override suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String> {
+        return episodeDao.findDeselectedChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+    }
+
+    override suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
+        val deselectChaptersList = episodeDao.findDeselectedChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+        if (!deselectChaptersList.contains("$chapterIndex")) return
+        val chapters = deselectChaptersList.toMutableList()
+        chapters.remove(chapterIndex.toString())
+        episodeDao.updateDeselectedChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
+    }
+
+    override suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
+        val deselectChaptersList = episodeDao.findDeselectedChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+        if (deselectChaptersList.contains("$chapterIndex")) return
+        val chapters = deselectChaptersList + chapterIndex.toString()
+        episodeDao.updateDeselectedChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
+    }
 }

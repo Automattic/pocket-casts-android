@@ -101,6 +101,10 @@ interface UserEpisodeManager {
     suspend fun markAsPlayed(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun markAllAsUnplayed(episodes: List<UserEpisode>)
+
+    suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String>
+    suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
+    suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
 }
 
 object UploadProgressManager {
@@ -610,6 +614,25 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun markAllAsUnplayed(episodes: List<UserEpisode>) {
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.markAllUnplayed(it, System.currentTimeMillis()) }
+    }
+
+    override suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String> {
+        return userEpisodeDao.findDeselectChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+    }
+
+    override suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
+        val deselectChaptersList = userEpisodeDao.findDeselectChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+        if (!deselectChaptersList.contains("$chapterIndex")) return
+        val chapters = deselectChaptersList.toMutableList()
+        chapters.remove(chapterIndex.toString())
+        userEpisodeDao.updateDeselectChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
+    }
+
+    override suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
+        val deselectChaptersList = userEpisodeDao.findDeselectChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+        if (deselectChaptersList.contains("$chapterIndex")) return
+        val chapters = deselectChaptersList + chapterIndex.toString()
+        userEpisodeDao.updateDeselectChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
     }
 }
 

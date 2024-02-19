@@ -147,4 +147,8 @@ interface EpisodeManager {
     suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
+
+    suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String>
+    suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
+    suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
 }
