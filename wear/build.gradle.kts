@@ -72,7 +72,8 @@ android {
 }
 
 sentry {
-    includeProguardMapping = file("$rootDir/sentry.properties").exists()
+    includeProguardMapping = System.getenv()["CI"].toBoolean()
+            && !(project.properties["skipSentryProguardMappingUpload"]?.toString()?.toBoolean() ?: false)
     tracingInstrumentation {
         features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
     }
