@@ -94,7 +94,7 @@ dependencies {
 
 sentry {
     includeProguardMapping = System.getenv()["CI"].toBoolean()
-            && !(project.properties["skipSentryProguardMappingUpload"]?.toString()?.toBoolean() ?: false)
+            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
 }
 
 apply(plugin = "com.google.gms.google-services")
