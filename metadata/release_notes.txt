@@ -1,12 +1,9 @@
-
-*   Updates:
-    *   Warn when switching to metered network if warn before using data setting is enabled
-        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
-    *   Display episode artwork from podcast feed on Mini-player, Notification & Widget.
-        ([#1599](https://github.com/Automattic/pocket-casts-android/pull/1599))
 *   Bug Fixes:
-    *   Fixed starring episode from full-screen player does not prevent episode from being archived
-        ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
-    *   Fixed "Hide playback notification on pause" setting not representing its state correctly
-        ([#1769](https://github.com/Automattic/pocket-casts-android/pull/1769))
-
+    *   Fixed: The total remaining time was incorrectly displayed for some languages when large font sizes were set on the device in Up Next
+        ([#1815](https://github.com/Automattic/pocket-casts-android/pull/1815))
+    *   Fixed: The back button in the search was lacking a description, causing an accessibility issue.
+        ([#1846](https://github.com/Automattic/pocket-casts-android/pull/1846))
+    *   Fixed a bug where podcast setting screen could become unresponsive.
+        ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
+    *   Fixed: Widget uses custom Headphone controls instead of skipping.
+        ([#1853](https://github.com/Automattic/pocket-casts-android/pull/1853))
