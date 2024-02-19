@@ -938,6 +938,14 @@ open class PlaybackManager @Inject constructor(
 
     fun toggleChapter(select: Boolean, chapter: Chapter) {
         launch {
+            getCurrentEpisode()?.let { episode ->
+                if (select) {
+                    episodeManager.selectChapterForEpisodeId(chapter.index, episode.uuid)
+                } else {
+                    episodeManager.deselectChapterForEpisodeId(chapter.index, episode.uuid)
+                }
+            }
+
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val updatedItems = playbackState.chapters.getList().map {
                     if (it.index == chapter.index) {
@@ -1488,9 +1496,24 @@ open class PlaybackManager @Inject constructor(
                 chapters.getList().last().endTime = playbackState.durationMs
             }
 
+            val deselectedChapters = getCurrentEpisode()
+                ?.deselectedChapters
+                ?.split(",")
+                ?.map { it.toInt() }
+
+            val chaptersWithDeselectState = chapters.copy(
+                items = chapters.getList().map { chapter ->
+                    if (deselectedChapters?.contains(chapter.index) == true) {
+                        chapter.copy(selected = false)
+                    } else {
+                        chapter
+                    }
+                },
+            )
+
             playbackStateRelay.accept(
                 playbackState.copy(
-                    chapters = chapters,
+                    chapters = chaptersWithDeselectState,
                     embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
                     lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
                 ),
