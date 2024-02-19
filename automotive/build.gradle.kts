@@ -92,4 +92,9 @@ dependencies {
     implementation(project(":modules:features:shared"))
 }
 
+sentry {
+    includeProguardMapping = System.getenv()["CI"].toBoolean()
+            && !(project.properties["skipSentryProguardMappingUpload"]?.toString()?.toBoolean() ?: false)
+}
+
 apply(plugin = "com.google.gms.google-services")
