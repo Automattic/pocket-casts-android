@@ -49,3 +49,11 @@ steps:
     plugins: *common_plugins
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
+
+  - label: "Assemble release APK"
+    command: |
+      echo "--- ⚙️ Building release variant"
+      ./gradlew assembleRelease -PskipSentryProguardMappingUpload=true
+    plugins: *common_plugins
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"
