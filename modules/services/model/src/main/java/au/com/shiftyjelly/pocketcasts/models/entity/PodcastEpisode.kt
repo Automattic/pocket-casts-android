@@ -59,6 +59,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
     @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null,
     @ColumnInfo(name = "image_url") var imageUrl: String? = null,
+    @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: String? = null,
 ) : BaseEpisode, Serializable {
 
     sealed class EpisodeType {
