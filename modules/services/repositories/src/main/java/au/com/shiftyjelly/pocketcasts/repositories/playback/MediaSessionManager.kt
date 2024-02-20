@@ -439,17 +439,17 @@ class MediaSessionManager(
                             1.7 -> IR.drawable.auto_1_7
                             1.8 -> IR.drawable.auto_1_8
                             1.9 -> IR.drawable.auto_1_9
-                            2.0 -> IR.drawable.auto_2x
-                            2.1 -> IR.drawable.auto_2_1x
-                            2.2 -> IR.drawable.auto_2_2x
-                            2.3 -> IR.drawable.auto_2_3x
-                            2.4 -> IR.drawable.auto_2_4x
-                            2.5 -> IR.drawable.auto_2_5x
-                            2.6 -> IR.drawable.auto_2_6x
-                            2.7 -> IR.drawable.auto_2_7x
-                            2.8 -> IR.drawable.auto_2_8x
-                            2.9 -> IR.drawable.auto_2_9x
-                            3.0 -> IR.drawable.auto_3x
+                            2.0 -> IR.drawable.auto_2
+                            2.1 -> IR.drawable.auto_2_1
+                            2.2 -> IR.drawable.auto_2_2
+                            2.3 -> IR.drawable.auto_2_3
+                            2.4 -> IR.drawable.auto_2_4
+                            2.5 -> IR.drawable.auto_2_5
+                            2.6 -> IR.drawable.auto_2_6
+                            2.7 -> IR.drawable.auto_2_7
+                            2.8 -> IR.drawable.auto_2_8
+                            2.9 -> IR.drawable.auto_2_9
+                            3.0 -> IR.drawable.auto_3
                             else -> IR.drawable.auto_1
                         }
 
