@@ -616,13 +616,13 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL(
                 """
                     ALTER TABLE podcast_episodes
-                    ADD COLUMN deselected_chapters TEXT DEFAULT NULL
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
                 """.trimIndent(),
             )
             database.execSQL(
                 """
                     ALTER TABLE user_episodes
-                    ADD COLUMN deselected_chapters TEXT DEFAULT NULL
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
                 """.trimIndent(),
             )
         }

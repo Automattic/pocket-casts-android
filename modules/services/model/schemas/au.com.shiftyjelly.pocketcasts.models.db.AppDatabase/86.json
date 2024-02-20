@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 86,
-    "identityHash": "f6e225227034f2da7799bc27a28fea4c",
+    "identityHash": "a2debb6fe6151f943f6d1eca30ea7d89",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -124,7 +124,7 @@
       },
       {
         "tableName": "podcast_episodes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_description` TEXT NOT NULL, `published_date` INTEGER NOT NULL, `title` TEXT NOT NULL, `size_in_bytes` INTEGER NOT NULL, `episode_status` INTEGER NOT NULL, `file_type` TEXT, `duration` REAL NOT NULL, `download_url` TEXT, `downloaded_file_path` TEXT, `downloaded_error_details` TEXT, `play_error_details` TEXT, `played_up_to` REAL NOT NULL, `playing_status` INTEGER NOT NULL, `podcast_id` TEXT NOT NULL, `added_date` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `thumbnail_status` INTEGER NOT NULL, `last_download_attempt_date` INTEGER, `playing_status_modified` INTEGER, `played_up_to_modified` INTEGER, `duration_modified` INTEGER, `starred_modified` INTEGER, `archived` INTEGER NOT NULL, `archived_modified` INTEGER, `season` INTEGER, `number` INTEGER, `type` TEXT, `cleanTitle` TEXT, `last_playback_interaction_date` INTEGER, `last_playback_interaction_sync_status` INTEGER NOT NULL, `exclude_from_episode_limit` INTEGER NOT NULL, `download_task_id` TEXT, `last_archive_interaction_date` INTEGER, `image_url` TEXT, `deselected_chapters` TEXT, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `episode_description` TEXT NOT NULL, `published_date` INTEGER NOT NULL, `title` TEXT NOT NULL, `size_in_bytes` INTEGER NOT NULL, `episode_status` INTEGER NOT NULL, `file_type` TEXT, `duration` REAL NOT NULL, `download_url` TEXT, `downloaded_file_path` TEXT, `downloaded_error_details` TEXT, `play_error_details` TEXT, `played_up_to` REAL NOT NULL, `playing_status` INTEGER NOT NULL, `podcast_id` TEXT NOT NULL, `added_date` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `thumbnail_status` INTEGER NOT NULL, `last_download_attempt_date` INTEGER, `playing_status_modified` INTEGER, `played_up_to_modified` INTEGER, `duration_modified` INTEGER, `starred_modified` INTEGER, `archived` INTEGER NOT NULL, `archived_modified` INTEGER, `season` INTEGER, `number` INTEGER, `type` TEXT, `cleanTitle` TEXT, `last_playback_interaction_date` INTEGER, `last_playback_interaction_sync_status` INTEGER NOT NULL, `exclude_from_episode_limit` INTEGER NOT NULL, `download_task_id` TEXT, `last_archive_interaction_date` INTEGER, `image_url` TEXT, `deselected_chapters` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -346,7 +346,7 @@
             "fieldPath": "deselectedChapters",
             "columnName": "deselected_chapters",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -1377,7 +1377,7 @@
       },
       {
         "tableName": "user_episodes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `published_date` INTEGER NOT NULL, `episode_description` TEXT NOT NULL, `title` TEXT NOT NULL, `size_in_bytes` INTEGER NOT NULL, `episode_status` INTEGER NOT NULL, `file_type` TEXT, `duration` REAL NOT NULL, `download_url` TEXT, `played_up_to` REAL NOT NULL, `playing_status` INTEGER NOT NULL, `added_date` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `last_download_attempt_date` INTEGER, `archived` INTEGER NOT NULL, `download_task_id` TEXT, `downloaded_file_path` TEXT, `playing_status_modified` INTEGER, `played_up_to_modified` INTEGER, `artwork_url` TEXT, `play_error_details` TEXT, `server_status` INTEGER NOT NULL, `upload_error_details` TEXT, `downloaded_error_details` TEXT, `tint_color_index` INTEGER NOT NULL, `has_custom_image` INTEGER NOT NULL, `upload_task_id` TEXT, `deselected_chapters` TEXT, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `published_date` INTEGER NOT NULL, `episode_description` TEXT NOT NULL, `title` TEXT NOT NULL, `size_in_bytes` INTEGER NOT NULL, `episode_status` INTEGER NOT NULL, `file_type` TEXT, `duration` REAL NOT NULL, `download_url` TEXT, `played_up_to` REAL NOT NULL, `playing_status` INTEGER NOT NULL, `added_date` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `last_download_attempt_date` INTEGER, `archived` INTEGER NOT NULL, `download_task_id` TEXT, `downloaded_file_path` TEXT, `playing_status_modified` INTEGER, `played_up_to_modified` INTEGER, `artwork_url` TEXT, `play_error_details` TEXT, `server_status` INTEGER NOT NULL, `upload_error_details` TEXT, `downloaded_error_details` TEXT, `tint_color_index` INTEGER NOT NULL, `has_custom_image` INTEGER NOT NULL, `upload_task_id` TEXT, `deselected_chapters` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -1545,7 +1545,7 @@
             "fieldPath": "deselectedChapters",
             "columnName": "deselected_chapters",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -1612,7 +1612,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f6e225227034f2da7799bc27a28fea4c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2debb6fe6151f943f6d1eca30ea7d89')"
     ]
   }
 }

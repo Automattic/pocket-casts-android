@@ -41,7 +41,7 @@ sealed interface BaseEpisode {
     var playedUpToModified: Long?
     var playErrorDetails: String?
     var downloadErrorDetails: String?
-    var deselectedChapters: ChapterIndices?
+    var deselectedChapters: ChapterIndices
 
     // temporary variables
     var playing: Boolean

@@ -11,5 +11,5 @@ class ChapterIndicesConverter {
     }
 
     @TypeConverter
-    fun toString(indices: ChapterIndices) = indices.takeIf { it.isNotEmpty() }?.joinToString(",")
+    fun toString(indices: ChapterIndices) = indices.joinToString(",")
 }

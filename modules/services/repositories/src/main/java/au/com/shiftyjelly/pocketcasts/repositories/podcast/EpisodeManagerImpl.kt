@@ -1101,14 +1101,14 @@ class EpisodeManagerImpl @Inject constructor(
         }
 
     override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
-        val deselectedChapterIndices = episode.deselectedChapters ?: emptyList()
+        val deselectedChapterIndices = episode.deselectedChapters
         if (!deselectedChapterIndices.contains(chapterIndex)) return
         episode.deselectedChapters = ChapterIndices(deselectedChapterIndices - chapterIndex)
         episodeDao.update(episode)
     }
 
     override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
-        val deselectedChapterIndices = episode.deselectedChapters ?: emptyList()
+        val deselectedChapterIndices = episode.deselectedChapters
         if (deselectedChapterIndices.contains(chapterIndex)) return
         episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
         episodeDao.update(episode)
