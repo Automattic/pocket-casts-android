@@ -5,8 +5,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 
 class ChapterIndicesConverter {
     @TypeConverter
-    fun fromString(value: String?) = ChapterIndices.fromString(value)
+    fun fromString(value: String?): ChapterIndices {
+        val list = value?.split(",")?.mapNotNull { it.toIntOrNull() } ?: emptyList()
+        return ChapterIndices(list)
+    }
 
     @TypeConverter
-    fun toString(indices: ChapterIndices) = ChapterIndices.toString(indices)
+    fun toString(indices: ChapterIndices) = indices.takeIf { it.isNotEmpty() }?.joinToString(",")
 }
