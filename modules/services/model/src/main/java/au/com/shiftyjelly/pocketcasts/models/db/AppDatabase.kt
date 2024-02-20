@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.model.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.ChapterIndicesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
@@ -92,6 +93,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     AutoArchiveAfterPlayingTypeConverter::class,
     AutoArchiveInactiveTypeConverter::class,
     PodcastGroupingTypeConverter::class,
+    ChapterIndicesConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
