@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -102,9 +103,8 @@ interface UserEpisodeManager {
     suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun markAllAsUnplayed(episodes: List<UserEpisode>)
 
-    suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String>
-    suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
-    suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
+    suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode)
+    suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode)
 }
 
 object UploadProgressManager {
@@ -616,23 +616,18 @@ class UserEpisodeManagerImpl @Inject constructor(
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.markAllUnplayed(it, System.currentTimeMillis()) }
     }
 
-    override suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String> {
-        return userEpisodeDao.findDeselectChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+    override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters ?: emptyList()
+        if (!deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices.toMutableList().apply { remove(chapterIndex) })
+        userEpisodeDao.update(episode)
     }
 
-    override suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
-        val deselectChaptersList = userEpisodeDao.findDeselectChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
-        if (!deselectChaptersList.contains("$chapterIndex")) return
-        val chapters = deselectChaptersList.toMutableList()
-        chapters.remove(chapterIndex.toString())
-        userEpisodeDao.updateDeselectChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
-    }
-
-    override suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
-        val deselectChaptersList = userEpisodeDao.findDeselectChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
-        if (deselectChaptersList.contains("$chapterIndex")) return
-        val chapters = deselectChaptersList + chapterIndex.toString()
-        userEpisodeDao.updateDeselectChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
+    override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters ?: emptyList()
+        if (deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
+        userEpisodeDao.update(episode)
     }
 }
 

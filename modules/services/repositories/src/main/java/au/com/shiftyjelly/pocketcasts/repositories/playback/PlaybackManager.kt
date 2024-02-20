@@ -939,10 +939,25 @@ open class PlaybackManager @Inject constructor(
     fun toggleChapter(select: Boolean, chapter: Chapter) {
         launch {
             getCurrentEpisode()?.let { episode ->
-                if (select) {
-                    episodeManager.selectChapterForEpisodeId(chapter.index, episode.uuid)
-                } else {
-                    episodeManager.deselectChapterForEpisodeId(chapter.index, episode.uuid)
+                when (episode) {
+                    is PodcastEpisode -> {
+                        episodeManager.findByUuid(episode.uuid)?.let {
+                            if (select) {
+                                episodeManager.selectChapterIndexForEpisode(chapter.index, it)
+                            } else {
+                                episodeManager.deselectChapterIndexForEpisode(chapter.index, it)
+                            }
+                        }
+                    }
+                    is UserEpisode -> {
+                        userEpisodeManager.findEpisodeByUuid(episode.uuid)?.let {
+                            if (select) {
+                                userEpisodeManager.selectChapterIndexForEpisode(chapter.index, it)
+                            } else {
+                                userEpisodeManager.deselectChapterIndexForEpisode(chapter.index, it)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1496,14 +1511,9 @@ open class PlaybackManager @Inject constructor(
                 chapters.getList().last().endTime = playbackState.durationMs
             }
 
-            val deselectedChapters = getCurrentEpisode()
-                ?.deselectedChapters
-                ?.split(",")
-                ?.map { it.toInt() }
-
             val chaptersWithDeselectState = chapters.copy(
                 items = chapters.getList().map { chapter ->
-                    if (deselectedChapters?.contains(chapter.index) == true) {
+                    if (getCurrentEpisode()?.deselectedChapters?.contains(chapter.index) == true) {
                         chapter.copy(selected = false)
                     } else {
                         chapter

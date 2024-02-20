@@ -148,7 +148,6 @@ interface EpisodeManager {
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
 
-    suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String>
-    suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
-    suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String)
+    suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode)
+    suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode)
 }

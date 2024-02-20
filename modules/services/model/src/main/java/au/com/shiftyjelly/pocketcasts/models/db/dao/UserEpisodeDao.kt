@@ -143,10 +143,4 @@ abstract class UserEpisodeDao {
 
     @Query("UPDATE user_episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
-
-    @Query("SELECT deselected_chapters FROM podcast_episodes WHERE uuid = :uuid")
-    abstract suspend fun findDeselectChaptersByEpisodeId(uuid: String): String?
-
-    @Query("UPDATE podcast_episodes SET deselected_chapters = :deselectedChapters WHERE uuid = :uuid")
-    abstract suspend fun updateDeselectChaptersForEpisodeId(deselectedChapters: String, uuid: String)
 }

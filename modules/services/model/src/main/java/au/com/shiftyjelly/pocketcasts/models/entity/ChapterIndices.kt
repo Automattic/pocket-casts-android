@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
-class ChapterIndices(delegate: List<Int> = emptyList()) : List<Int> by delegate {
+data class ChapterIndices(private val delegate: List<Int> = emptyList()) : List<Int> by delegate {
     companion object {
         fun fromString(value: String?): ChapterIndices {
             val list = value?.split(",")?.map { it.toInt() } ?: emptyList()

@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -1099,22 +1100,17 @@ class EpisodeManagerImpl @Inject constructor(
             return@withContext newDownloadUrl ?: episode.downloadUrl
         }
 
-    override suspend fun findDeselectedChaptersByEpisodeId(episodeUuid: String): List<String> {
-        return episodeDao.findDeselectedChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
+    override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters ?: emptyList()
+        if (!deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices.toMutableList().apply { remove(chapterIndex) })
+        episodeDao.update(episode)
     }
 
-    override suspend fun selectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
-        val deselectChaptersList = episodeDao.findDeselectedChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
-        if (!deselectChaptersList.contains("$chapterIndex")) return
-        val chapters = deselectChaptersList.toMutableList()
-        chapters.remove(chapterIndex.toString())
-        episodeDao.updateDeselectedChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
-    }
-
-    override suspend fun deselectChapterForEpisodeId(chapterIndex: Int, episodeUuid: String) {
-        val deselectChaptersList = episodeDao.findDeselectedChaptersByEpisodeId(episodeUuid)?.split(",") ?: emptyList()
-        if (deselectChaptersList.contains("$chapterIndex")) return
-        val chapters = deselectChaptersList + chapterIndex.toString()
-        episodeDao.updateDeselectedChaptersForEpisodeId(chapters.joinToString(","), episodeUuid)
+    override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters ?: emptyList()
+        if (deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
+        episodeDao.update(episode)
     }
 }

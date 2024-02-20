@@ -425,10 +425,4 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun countEpisodesCompleted(fromEpochMs: Long, toEpochMs: Long): Int
-
-    @Query("SELECT deselected_chapters FROM podcast_episodes WHERE uuid = :uuid")
-    abstract suspend fun findDeselectedChaptersByEpisodeId(uuid: String): String?
-
-    @Query("UPDATE podcast_episodes SET deselected_chapters = :deselectedChapters WHERE uuid = :uuid")
-    abstract suspend fun updateDeselectedChaptersForEpisodeId(deselectedChapters: String, uuid: String)
 }
