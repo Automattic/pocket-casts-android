@@ -941,21 +941,17 @@ open class PlaybackManager @Inject constructor(
             getCurrentEpisode()?.let { episode ->
                 when (episode) {
                     is PodcastEpisode -> {
-                        episodeManager.findByUuid(episode.uuid)?.let {
-                            if (select) {
-                                episodeManager.selectChapterIndexForEpisode(chapter.index, it)
-                            } else {
-                                episodeManager.deselectChapterIndexForEpisode(chapter.index, it)
-                            }
+                        if (select) {
+                            episodeManager.selectChapterIndexForEpisode(chapter.index, episode)
+                        } else {
+                            episodeManager.deselectChapterIndexForEpisode(chapter.index, episode)
                         }
                     }
                     is UserEpisode -> {
-                        userEpisodeManager.findEpisodeByUuid(episode.uuid)?.let {
-                            if (select) {
-                                userEpisodeManager.selectChapterIndexForEpisode(chapter.index, it)
-                            } else {
-                                userEpisodeManager.deselectChapterIndexForEpisode(chapter.index, it)
-                            }
+                        if (select) {
+                            userEpisodeManager.selectChapterIndexForEpisode(chapter.index, episode)
+                        } else {
+                            userEpisodeManager.deselectChapterIndexForEpisode(chapter.index, episode)
                         }
                     }
                 }
