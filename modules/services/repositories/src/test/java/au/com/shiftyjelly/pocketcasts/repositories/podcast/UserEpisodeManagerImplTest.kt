@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -21,7 +21,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
-class EpisodeManagerImplTest {
+class UserEpisodeManagerImplTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
@@ -29,53 +29,51 @@ class EpisodeManagerImplTest {
     lateinit var appDatabase: AppDatabase
 
     @Mock
-    lateinit var episodeDao: EpisodeDao
+    lateinit var userEpisodeDao: UserEpisodeDao
 
     @Mock
-    lateinit var episode: PodcastEpisode
+    lateinit var userEpisode: UserEpisode
 
-    private lateinit var episodeManagerImpl: EpisodeManagerImpl
+    private lateinit var userEpisodeManagerImpl: UserEpisodeManagerImpl
 
     @Before
     fun setUp() = runTest {
-        whenever(appDatabase.episodeDao()).thenReturn(episodeDao)
-        episodeManagerImpl = EpisodeManagerImpl(
+        whenever(appDatabase.userEpisodeDao()).thenReturn(userEpisodeDao)
+        userEpisodeManagerImpl = UserEpisodeManagerImpl(
             appDatabase = appDatabase,
             settings = mock(),
-            fileStorage = mock(),
+            syncManager = mock(),
             downloadManager = mock(),
             context = mock(),
-            podcastCacheServerManager = mock(),
-            userEpisodeManager = mock(),
-            ioDispatcher = mock(),
+            subscriptionManager = mock(),
             episodeAnalytics = mock(),
         )
     }
 
     @Test
     fun `select chapter removes element`() = runTest {
-        whenever(episode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
+        whenever(userEpisode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
 
-        episodeManagerImpl.selectChapterIndexForEpisode(1, episode)
+        userEpisodeManagerImpl.selectChapterIndexForEpisode(1, userEpisode)
 
-        verify(episode).deselectedChapters = ChapterIndices(listOf(2, 3))
+        verify(userEpisode).deselectedChapters = ChapterIndices(listOf(2, 3))
     }
 
     @Test
     fun `deselect chapter adds element`() = runTest {
-        whenever(episode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2)))
+        whenever(userEpisode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2)))
 
-        episodeManagerImpl.deselectChapterIndexForEpisode(3, episode)
+        userEpisodeManagerImpl.deselectChapterIndexForEpisode(3, userEpisode)
 
-        verify(episode).deselectedChapters = ChapterIndices(listOf(1, 2, 3))
+        verify(userEpisode).deselectedChapters = ChapterIndices(listOf(1, 2, 3))
     }
 
     @Test
     fun `deselect chapter is not added twice`() = runTest {
-        whenever(episode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
+        whenever(userEpisode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
 
-        episodeManagerImpl.deselectChapterIndexForEpisode(3, episode)
+        userEpisodeManagerImpl.deselectChapterIndexForEpisode(3, userEpisode)
 
-        verify(episodeDao, never()).update(any())
+        verify(userEpisodeDao, never()).update(any())
     }
 }
