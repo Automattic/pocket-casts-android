@@ -938,6 +938,25 @@ open class PlaybackManager @Inject constructor(
 
     fun toggleChapter(select: Boolean, chapter: Chapter) {
         launch {
+            getCurrentEpisode()?.let { episode ->
+                when (episode) {
+                    is PodcastEpisode -> {
+                        if (select) {
+                            episodeManager.selectChapterIndexForEpisode(chapter.index, episode)
+                        } else {
+                            episodeManager.deselectChapterIndexForEpisode(chapter.index, episode)
+                        }
+                    }
+                    is UserEpisode -> {
+                        if (select) {
+                            userEpisodeManager.selectChapterIndexForEpisode(chapter.index, episode)
+                        } else {
+                            userEpisodeManager.deselectChapterIndexForEpisode(chapter.index, episode)
+                        }
+                    }
+                }
+            }
+
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val updatedItems = playbackState.chapters.getList().map {
                     if (it.index == chapter.index) {
@@ -1488,9 +1507,19 @@ open class PlaybackManager @Inject constructor(
                 chapters.getList().last().endTime = playbackState.durationMs
             }
 
+            val chaptersWithDeselectState = chapters.copy(
+                items = chapters.getList().map { chapter ->
+                    if (getCurrentEpisode()?.deselectedChapters?.contains(chapter.index) == true) {
+                        chapter.copy(selected = false)
+                    } else {
+                        chapter
+                    }
+                },
+            )
+
             playbackStateRelay.accept(
                 playbackState.copy(
-                    chapters = chapters,
+                    chapters = chaptersWithDeselectState,
                     embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
                     lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
                 ),

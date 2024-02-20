@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -101,6 +102,9 @@ interface UserEpisodeManager {
     suspend fun markAsPlayed(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun markAllAsUnplayed(episodes: List<UserEpisode>)
+
+    suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode)
+    suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode)
 }
 
 object UploadProgressManager {
@@ -610,6 +614,20 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun markAllAsUnplayed(episodes: List<UserEpisode>) {
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.markAllUnplayed(it, System.currentTimeMillis()) }
+    }
+
+    override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters
+        if (!deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices - chapterIndex)
+        userEpisodeDao.update(episode)
+    }
+
+    override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: UserEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters
+        if (deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
+        userEpisodeDao.update(episode)
     }
 }
 
