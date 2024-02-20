@@ -429,16 +429,16 @@ class MediaSessionManager(
                             0.7 -> IR.drawable.auto_0_7
                             0.8 -> IR.drawable.auto_0_8
                             0.9 -> IR.drawable.auto_0_9
-                            1.0 -> IR.drawable.auto_1x
-                            1.1 -> IR.drawable.auto_1_1x
-                            1.2 -> IR.drawable.auto_1_2x
-                            1.3 -> IR.drawable.auto_1_3x
-                            1.4 -> IR.drawable.auto_1_4x
-                            1.5 -> IR.drawable.auto_1_5x
-                            1.6 -> IR.drawable.auto_1_6x
-                            1.7 -> IR.drawable.auto_1_7x
-                            1.8 -> IR.drawable.auto_1_8x
-                            1.9 -> IR.drawable.auto_1_9x
+                            1.0 -> IR.drawable.auto_1
+                            1.1 -> IR.drawable.auto_1_1
+                            1.2 -> IR.drawable.auto_1_2
+                            1.3 -> IR.drawable.auto_1_3
+                            1.4 -> IR.drawable.auto_1_4
+                            1.5 -> IR.drawable.auto_1_5
+                            1.6 -> IR.drawable.auto_1_6
+                            1.7 -> IR.drawable.auto_1_7
+                            1.8 -> IR.drawable.auto_1_8
+                            1.9 -> IR.drawable.auto_1_9
                             2.0 -> IR.drawable.auto_2x
                             2.1 -> IR.drawable.auto_2_1x
                             2.2 -> IR.drawable.auto_2_2x
@@ -450,7 +450,7 @@ class MediaSessionManager(
                             2.8 -> IR.drawable.auto_2_8x
                             2.9 -> IR.drawable.auto_2_9x
                             3.0 -> IR.drawable.auto_3x
-                            else -> IR.drawable.auto_1x
+                            else -> IR.drawable.auto_1
                         }
 
                         stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
