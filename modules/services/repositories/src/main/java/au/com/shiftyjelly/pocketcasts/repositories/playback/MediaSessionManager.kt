@@ -735,7 +735,8 @@ class MediaSessionManager(
                 speed < 1.6 -> 1.6
                 speed < 1.8 -> 1.8
                 speed < 2 -> 2.0
-                speed == 2.0 -> 0.6
+                speed < 3 -> 3.0
+                speed == 3.0 -> 0.6
                 else -> 1.0
             }
 
