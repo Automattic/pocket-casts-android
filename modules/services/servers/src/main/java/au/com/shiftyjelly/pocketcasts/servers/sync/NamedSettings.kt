@@ -72,6 +72,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "darkThemePreference") val darkThemePreference: NamedChangedSettingInt? = null,
     @field:Json(name = "lightThemePreference") val lightThemePreference: NamedChangedSettingInt? = null,
     @field:Json(name = "useSystemTheme") val useSystemTheme: NamedChangedSettingBool? = null,
+    @field:Json(name = "filesAfterPlayingDeleteLocal") val deleteLocalFilesAfterPlayback: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
