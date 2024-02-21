@@ -329,7 +329,7 @@ interface Settings {
     val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
-    val useEpisodeArtwork: UserSetting<Boolean>
+    val useRssArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
