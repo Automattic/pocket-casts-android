@@ -3,6 +3,8 @@
 * Bug Fixes:
     *   Fixed an issue where bookmarks did not play when episodes where filtered out due to search queries.
         ([#1857](https://github.com/Automattic/pocket-casts-android/pull/1857))    
+    *   Fixed an issue where bookmarks on description could become unresponsive.
+        ([#1873](https://github.com/Automattic/pocket-casts-android/pull/1873))    
 
 7.58
 -----
