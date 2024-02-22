@@ -37,7 +37,7 @@ fun ChaptersPage(
         modifier = modifier
             .background(backgroundColor)
             .fillMaxSize()
-            .padding(top = 16.dp),
+            .padding(top = if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) 0.dp else 16.dp),
     ) {
         if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
             item {

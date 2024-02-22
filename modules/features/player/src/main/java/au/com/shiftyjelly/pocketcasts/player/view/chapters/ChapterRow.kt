@@ -71,7 +71,7 @@ fun ChapterRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onClick() }
-                .padding(horizontal = 12.dp),
+                .padding(end = 12.dp),
         ) {
             AnimatedVisibility(visible = isTogglingChapters) {
                 Checkbox(
@@ -85,6 +85,8 @@ fun ChapterRow(
             TextH50(
                 text = chapter.index.toString(),
                 color = textColor,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp),
             )
             Spacer(Modifier.width(8.dp))
             TextH50(
