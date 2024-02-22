@@ -74,6 +74,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "useSystemTheme") val useSystemTheme: NamedChangedSettingBool? = null,
     @field:Json(name = "filesAfterPlayingDeleteCloud") val deleteCloudFilesAfterPlayback: NamedChangedSettingBool? = null,
     @field:Json(name = "autoDownloadUnmeteredOnly") val autoDownloadUnmeteredOnly: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadOnlyWhenCharging") val autoDownloadOnlyWhenCharging: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
