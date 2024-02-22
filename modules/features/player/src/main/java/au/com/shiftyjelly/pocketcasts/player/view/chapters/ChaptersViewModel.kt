@@ -44,7 +44,9 @@ class ChaptersViewModel
 
     data class UiState(
         val chapters: List<ChapterState> = emptyList(),
+        val totalChaptersCount: Int = 0,
         val backgroundColor: Color,
+        val isTogglingChapters: Boolean = false,
     )
 
     sealed class ChapterState {
@@ -107,8 +109,14 @@ class ChaptersViewModel
             lastChangeFrom = playbackState.lastChangeFrom,
         )
         return UiState(
-            chapters = chapters,
+            chapters = if (_uiState.value.isTogglingChapters) {
+                chapters
+            } else {
+                chapters.filter { it.chapter.selected }
+            },
+            totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
+            isTogglingChapters = _uiState.value.isTogglingChapters,
         )
     }
 
@@ -151,5 +159,9 @@ class ChaptersViewModel
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
         playbackManager.toggleChapter(selected, chapter)
+    }
+
+    fun onSkipChaptersClick(show: Boolean) {
+        _uiState.value = _uiState.value.copy(isTogglingChapters = show)
     }
 }
