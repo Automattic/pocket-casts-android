@@ -436,11 +436,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.useEmbeddedArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "useRssArtwork" -> updateSettingIfPossible(
-                        changedSettingResponse = changedSettingResponse,
-                        setting = settings.useRssArtwork,
-                        newSettingValue = (changedSettingResponse.value as? Boolean),
-                    )
                     "privacyCrashReports" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.sendCrashReports,
