@@ -251,6 +251,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 useSystemTheme = settings.useSystemTheme.getSyncSetting(::NamedChangedSettingBool),
+                deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
                 deleteLocalFilesAfterPlayback = settings.deleteLocalFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
@@ -561,9 +562,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
                     )
+                    "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteCloudFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
                     "filesAfterPlayingDeleteLocal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.deleteLocalFileAfterPlaying,
+                        setting = settings.deleteLocalFileAfterPlaying, 
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
