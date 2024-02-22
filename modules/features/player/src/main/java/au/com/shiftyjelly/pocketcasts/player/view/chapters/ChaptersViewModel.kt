@@ -138,7 +138,7 @@ class ChaptersViewModel
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
-                if (chapter.selected) {
+                if (chapter.selected || !featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
                     val progress = chapter.calculateProgress(playbackPositionMs)

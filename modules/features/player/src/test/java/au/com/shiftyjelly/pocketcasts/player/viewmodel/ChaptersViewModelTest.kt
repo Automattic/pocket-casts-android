@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.jakewharton.rxrelay2.BehaviorRelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -47,6 +48,9 @@ class ChaptersViewModelTest {
 
     @Mock
     private lateinit var upNextQueue: UpNextQueue
+
+    @Mock
+    private lateinit var featureFlagWrapper: FeatureFlagWrapper
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
@@ -90,6 +94,16 @@ class ChaptersViewModelTest {
         verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
     }
 
+    @Test
+    fun `given feature flag off, then chapter is not skipped`() = runTest {
+        val chapters = initChapters()
+        initViewModel()
+
+        chaptersViewModel.buildChaptersWithState(chapters, 150)
+
+        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
+    }
+
     private fun initChapters() =
         Chapters(
             listOf(
@@ -112,6 +126,7 @@ class ChaptersViewModelTest {
             podcastManager = podcastManager,
             playbackManager = playbackManager,
             theme = theme,
+            featureFlagWrapper = featureFlagWrapper,
         )
     }
 }
