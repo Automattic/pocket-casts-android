@@ -49,7 +49,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setDeleteCloudFileAfterPlaying(enabled: Boolean) {
-        settings.deleteCloudFileAfterPlaying.set(enabled, needsSync = false)
+        settings.deleteCloudFileAfterPlaying.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED,
             mapOf("enabled" to enabled),
