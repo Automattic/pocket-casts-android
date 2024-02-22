@@ -65,7 +65,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setCloudAutoDownload(enabled: Boolean) {
-        settings.cloudAutoDownload.set(enabled, needsSync = false)
+        settings.cloudAutoDownload.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_DOWNLOAD_FROM_CLOUD_TOGGLED,
             mapOf("enabled" to enabled),
