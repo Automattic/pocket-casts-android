@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
-import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -39,19 +39,27 @@ import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.rx2.collect
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@AndroidEntryPoint
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs), CoroutineScope {
 
+    @Inject lateinit var settings: Settings
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
+    private val coroutineScope = CoroutineScope(coroutineContext)
 
     private val inflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -140,7 +148,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     fun setUpNext(upNextState: UpNextQueue.State, theme: Theme) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            loadArtwork(upNextState.podcast, upNextState.episode, upNextState.useRssArtwork)
+            loadArtwork(upNextState.podcast, upNextState.episode, settings.useRssArtwork.value)
+
+            coroutineScope.launch {
+                settings.useRssArtwork.flow.asObservable(coroutineContext).collect {
+                    loadArtwork(upNextState.podcast, upNextState.episode, it)
+                }
+            }
 
             binding.episode = upNextState.episode
             binding.podcast = upNextState.podcast
@@ -220,7 +234,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
-    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: UserSetting<Boolean>) {
+    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: Boolean) {
         val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = binding.artwork
         imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
@@ -286,9 +300,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     companion object {
-        private fun getEpisodeArtwork(episode: BaseEpisode, useRssArtwork: UserSetting<Boolean>): Artwork {
+        private fun getEpisodeArtwork(episode: BaseEpisode, useRssArtwork: Boolean): Artwork {
             val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
-            return if (showNotesImageUrl != null && useRssArtwork.value) {
+            return if (showNotesImageUrl != null && useRssArtwork) {
                 Artwork.Url(showNotesImageUrl)
             } else if (episode is UserEpisode) {
                 val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)

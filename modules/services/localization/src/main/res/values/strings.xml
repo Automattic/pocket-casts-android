@@ -1268,7 +1268,7 @@
     <string name="settings_use_dark_up_next_details">When enabled the Up Next will always use the dark theme, or will match the current theme when disabled</string>
     <string name="settings_use_dynamic_colors_widget">Use dynamic colors for widget</string>
     <string name="settings_use_dynamic_colors_widget_details">When enabled, widget colors will change based on the device theme colors.</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded MP3 artwork</string>
+    <string name="settings_use_embedded_podcast_artwork">Use embedded file artwork</string>
     <string name="settings_use_episode_podcast_artwork">Use embedded RSS artwork</string>
     <string name="settings_episode_artwork_details">Shows artwork from the episode\'s show notes (if it exists) instead of using the show\'s artwork. If both MP3 and RSS artwork are present, RSS artwork will be used.</string>
     <string name="settings_version">Version %1$s (%2$s)</string>

@@ -546,7 +546,7 @@ class SettingsImpl @Inject constructor(
 
     override val useRssArtwork = UserSetting.BoolPref(
         sharedPrefKey = "useRssArtwork",
-        defaultValue = false,
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 

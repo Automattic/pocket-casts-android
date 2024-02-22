@@ -195,6 +195,7 @@ open class PlaybackManager @Inject constructor(
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         playlistManager = playlistManager,
+        widgetManager = widgetManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,

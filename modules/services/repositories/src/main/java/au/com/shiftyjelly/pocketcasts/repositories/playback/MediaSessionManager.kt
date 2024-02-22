@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -58,6 +59,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -67,6 +69,7 @@ class MediaSessionManager(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
+    val widgetManager: WidgetManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -104,6 +107,8 @@ class MediaSessionManager(
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
     private var bookmarkHelper: BookmarkHelper
+
+    private var currentState: UpNextQueue.State = UpNextQueue.State.Empty
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -171,6 +176,15 @@ class MediaSessionManager(
             .doOnNext { updateUpNext(it) }
             .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
+        settings.useRssArtwork.flow.asObservable(coroutineContext)
+            .observeOn(Schedulers.io())
+            .doOnNext {
+                updateUpNext(currentState)
+                widgetManager.updateWidgetFromPlaybackState(playbackManager)
+            }
+            .subscribeBy(onError = { Timber.e(it) })
+            .addTo(disposables)
+
     }
 
     private fun observeCustomMediaActionsVisibility() {
@@ -290,6 +304,7 @@ class MediaSessionManager(
     }
 
     private fun updateUpNext(upNext: UpNextQueue.State) {
+        currentState = upNext
         try {
             mediaSession.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
@@ -299,7 +314,7 @@ class MediaSessionManager(
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
-                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)
+                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.useRssArtwork.value)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
@@ -399,7 +414,7 @@ class MediaSessionManager(
         mediaSession.setMetadata(nowPlaying)
 
         if (settings.showArtworkOnLockScreen.value) {
-            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
+            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.useRssArtwork.value)?.toString()
             nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
             if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 

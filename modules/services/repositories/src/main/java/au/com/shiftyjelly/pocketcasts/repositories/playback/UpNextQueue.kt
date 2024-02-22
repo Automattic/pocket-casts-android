@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -41,7 +40,7 @@ interface UpNextQueue {
         object Empty : State()
 
         // Loaded state includes the current episode as episode and the episodes in up next in queue. Queue does not include the currently playing episode
-        data class Loaded(val episode: BaseEpisode, val podcast: Podcast?, val queue: List<BaseEpisode>, val useRssArtwork: UserSetting<Boolean>) : State()
+        data class Loaded(val episode: BaseEpisode, val podcast: Podcast?, val queue: List<BaseEpisode>) : State()
 
         fun queueSize(): Int {
             return if (this is Loaded) queue.size else 0
@@ -77,12 +76,12 @@ interface UpNextQueue {
                     // If we have a podcast we need to observe its effects state as well to ensure it updates when the global override changes
                     episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
                         .combineLatest(podcastManager.observePodcastByUuid(state.podcast.uuid).distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects })
-                        .map<State> { State.Loaded(it.first, it.second, state.queue, state.useRssArtwork) }
+                        .map<State> { State.Loaded(it.first, it.second, state.queue) }
                         .onErrorReturn { State.Empty }
                         .toObservable()
                 } else {
                     episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
-                        .map<State> { State.Loaded(it, state.podcast, state.queue, state.useRssArtwork) }
+                        .map<State> { State.Loaded(it, state.podcast, state.queue) }
                         .onErrorReturn { State.Empty }
                         .toObservable()
                 }
