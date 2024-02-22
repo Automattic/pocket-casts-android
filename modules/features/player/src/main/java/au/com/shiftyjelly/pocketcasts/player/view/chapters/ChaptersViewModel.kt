@@ -46,7 +46,8 @@ class ChaptersViewModel
         get() = Dispatchers.Default
 
     data class UiState(
-        val chapters: List<ChapterState> = emptyList(),
+        val allChapters: List<ChapterState> = emptyList(),
+        val displayChapters: List<ChapterState> = emptyList(),
         val totalChaptersCount: Int = 0,
         val backgroundColor: Color,
         val isTogglingChapters: Boolean = false,
@@ -111,14 +112,12 @@ class ChaptersViewModel
             playbackPositionMs = playbackState.positionMs,
             lastChangeFrom = playbackState.lastChangeFrom,
         )
-        val shouldFilterChapters = featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS) &&
-            !_uiState.value.isTogglingChapters
         return UiState(
-            chapters = if (shouldFilterChapters) {
-                chapters.filter { it.chapter.selected }
-            } else {
-                chapters
-            },
+            allChapters = chapters,
+            displayChapters = getFilteredChaptersIfNeeded(
+                chapters = chapters,
+                isTogglingChapters = _uiState.value.isTogglingChapters,
+            ),
             totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
             isTogglingChapters = _uiState.value.isTogglingChapters,
@@ -166,7 +165,27 @@ class ChaptersViewModel
         playbackManager.toggleChapter(selected, chapter)
     }
 
-    fun onSkipChaptersClick(show: Boolean) {
-        _uiState.value = _uiState.value.copy(isTogglingChapters = show)
+    fun onSkipChaptersClick(checked: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            isTogglingChapters = checked,
+            displayChapters = getFilteredChaptersIfNeeded(
+                chapters = _uiState.value.allChapters,
+                isTogglingChapters = checked,
+            ),
+        )
+    }
+
+    private fun getFilteredChaptersIfNeeded(
+        chapters: List<ChapterState>,
+        isTogglingChapters: Boolean,
+    ): List<ChapterState> {
+        val shouldFilterChapters = featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS) &&
+            !isTogglingChapters
+
+        return if (shouldFilterChapters) {
+            chapters.filter { it.chapter.selected }
+        } else {
+            chapters
+        }
     }
 }
