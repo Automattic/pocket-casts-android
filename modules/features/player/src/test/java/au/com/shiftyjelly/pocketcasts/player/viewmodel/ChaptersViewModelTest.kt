@@ -12,10 +12,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
 import com.jakewharton.rxrelay2.BehaviorRelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,10 +52,14 @@ class ChaptersViewModelTest {
     @Mock
     private lateinit var upNextQueue: UpNextQueue
 
-    @Mock
-    private lateinit var featureFlagWrapper: FeatureFlagWrapper
-
     private lateinit var chaptersViewModel: ChaptersViewModel
+
+    @Before
+    fun setUp() {
+        FeatureFlag.initialize(
+            listOf(object : InMemoryFeatureProvider() {}),
+        )
+    }
 
     @Test
     fun `given unselected chapter contains playback pos, then skip to next selected chapter`() = runTest {
@@ -97,8 +103,9 @@ class ChaptersViewModelTest {
 
     @Test
     fun `given feature flag off, then chapter is not skipped`() = runTest {
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
         val chapters = initChapters()
-        initViewModel(featureEnabled = false)
+        initViewModel()
 
         chaptersViewModel.buildChaptersWithState(chapters, 150)
 
@@ -114,8 +121,7 @@ class ChaptersViewModelTest {
             ),
         )
 
-    private fun initViewModel(featureEnabled: Boolean = true) {
-        whenever(featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS)).thenReturn(featureEnabled)
+    private fun initViewModel() {
         whenever(playbackManager.playbackStateRelay)
             .thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
@@ -128,7 +134,6 @@ class ChaptersViewModelTest {
             podcastManager = podcastManager,
             playbackManager = playbackManager,
             theme = theme,
-            featureFlagWrapper = featureFlagWrapper,
         )
     }
 }

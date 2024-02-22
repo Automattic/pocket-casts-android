@@ -1,24 +1,27 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class ChaptersTest {
-
-    @Mock
-    private lateinit var featureFlagWrapper: FeatureFlagWrapper
+    @Before
+    fun setUp() {
+        FeatureFlag.initialize(
+            listOf(object : InMemoryFeatureProvider() {}),
+        )
+    }
 
     @Test
     fun `given feature flag true, then next chapter returned from selected chapters`() {
-        whenever(featureFlagWrapper.isEnabled(any())).thenReturn(true)
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
         val chapters = initChapters()
 
         val chapter = chapters.getNextSelectedChapter(150)
@@ -28,7 +31,7 @@ class ChaptersTest {
 
     @Test
     fun `given feature flag true, then prev chapter returned from selected chapters`() {
-        whenever(featureFlagWrapper.isEnabled(any())).thenReturn(true)
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
         val chapters = initChapters()
 
         val chapter = chapters.getPreviousSelectedChapter(350)
@@ -38,7 +41,7 @@ class ChaptersTest {
 
     @Test
     fun `given feature flag false, then next chapter returned from all chapters`() {
-        whenever(featureFlagWrapper.isEnabled(any())).thenReturn(false)
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
         val chapters = initChapters()
 
         val chapter = chapters.getNextSelectedChapter(150)
@@ -48,7 +51,7 @@ class ChaptersTest {
 
     @Test
     fun `given feature flag false, then prev chapter returned from all chapters`() {
-        whenever(featureFlagWrapper.isEnabled(any())).thenReturn(false)
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
         val chapters = initChapters()
 
         val chapter = chapters.getPreviousSelectedChapter(350)
@@ -65,7 +68,6 @@ class ChaptersTest {
                 Chapter("4", 301, 400, selected = false),
                 Chapter("5", 401, 500, selected = true),
             ),
-            featureFlagWrapper = featureFlagWrapper,
         )
     }
 }

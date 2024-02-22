@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -39,7 +39,6 @@ class ChaptersViewModel
     podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
-    private val featureFlagWrapper: FeatureFlagWrapper,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -137,7 +136,7 @@ class ChaptersViewModel
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
-                if (chapter.selected || !featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS)) {
+                if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
                     val progress = chapter.calculateProgress(playbackPositionMs)
@@ -179,7 +178,7 @@ class ChaptersViewModel
         chapters: List<ChapterState>,
         isTogglingChapters: Boolean,
     ): List<ChapterState> {
-        val shouldFilterChapters = featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS) &&
+        val shouldFilterChapters = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
             !isTogglingChapters
 
         return if (shouldFilterChapters) {
