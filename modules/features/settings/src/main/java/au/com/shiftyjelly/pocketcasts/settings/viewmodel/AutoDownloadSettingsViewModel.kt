@@ -34,7 +34,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun onUpNextChange(newValue: Boolean) {
-        settings.autoDownloadUpNext.set(newValue, needsSync = false)
+        settings.autoDownloadUpNext.set(newValue, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED,
             mapOf("enabled" to newValue),
