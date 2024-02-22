@@ -252,6 +252,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 },
                 useSystemTheme = settings.useSystemTheme.getSyncSetting(::NamedChangedSettingBool),
                 deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadUnmeteredOnly = settings.autoDownloadUnmeteredOnly.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadOnlyWhenCharging = settings.autoDownloadOnlyWhenCharging.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -564,6 +566,16 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.deleteCloudFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadUnmeteredOnly,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadOnlyWhenCharging" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadOnlyWhenCharging,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
