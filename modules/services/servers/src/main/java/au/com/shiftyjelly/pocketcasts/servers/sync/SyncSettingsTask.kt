@@ -569,7 +569,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                     "filesAfterPlayingDeleteLocal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.deleteLocalFileAfterPlaying, 
+                        setting = settings.deleteLocalFileAfterPlaying,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
