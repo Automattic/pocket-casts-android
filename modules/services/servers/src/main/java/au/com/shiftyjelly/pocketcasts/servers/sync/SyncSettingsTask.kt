@@ -259,6 +259,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 autoDownloadOnlyWhenCharging = settings.autoDownloadOnlyWhenCharging.getSyncSetting(::NamedChangedSettingBool),
                 autoDownloadUpNext = settings.autoDownloadUpNext.getSyncSetting(::NamedChangedSettingBool),
                 isPodcastBackgroundRefreshEnabled = settings.backgroundRefreshPodcasts.getSyncSetting(::NamedChangedSettingBool),
+                cloudDownloadUnmeteredOnly = settings.cloudDownloadOnlyOnWifi.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -606,6 +607,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "backgroundRefresh" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.backgroundRefreshPodcasts,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudDownloadOnlyOnWifi,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
