@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -37,6 +39,7 @@ class ChaptersViewModel
     podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
+    private val featureFlagWrapper: FeatureFlagWrapper,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -108,11 +111,13 @@ class ChaptersViewModel
             playbackPositionMs = playbackState.positionMs,
             lastChangeFrom = playbackState.lastChangeFrom,
         )
+        val shouldFilterChapters = featureFlagWrapper.isEnabled(Feature.DESELECT_CHAPTERS) &&
+            !_uiState.value.isTogglingChapters
         return UiState(
-            chapters = if (_uiState.value.isTogglingChapters) {
-                chapters
-            } else {
+            chapters = if (shouldFilterChapters) {
                 chapters.filter { it.chapter.selected }
+            } else {
+                chapters
             },
             totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
