@@ -479,7 +479,7 @@ open class PlaybackManager @Inject constructor(
         val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
 
         if (switchEpisode) {
-            deleteCachedEpisode(upNextQueue.currentEpisode)
+            cleanCachedEpisodes()
         }
 
         if (switchEpisode || isPlayerSwitchRequired()) {
@@ -1288,7 +1288,7 @@ open class PlaybackManager @Inject constructor(
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
             removeEpisodeFromQueue(episode, "finished", downloadManager)
 
-            deleteCachedEpisode(episode)
+            cleanCachedEpisodes()
 
             // mark as played
             episodeManager.updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
@@ -1674,8 +1674,6 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
-        addEpisodeToCache(episode)
-
         val podcast = findPodcastByEpisode(episode)
 
         cancelPauseTimer()
@@ -1895,6 +1893,8 @@ open class PlaybackManager @Inject constructor(
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
         }
+
+        addEpisodeToCache(episode)
     }
 
     private fun findPodcastByEpisode(episode: BaseEpisode): Podcast? {
@@ -2322,14 +2322,18 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(playbackState)
         }
     }
-    private fun addEpisodeToCache(episode: BaseEpisode) {
+    private suspend fun addEpisodeToCache(episode: BaseEpisode) {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
-            !episode.isDownloaded && !episode.isDownloading &&
+            isEpisodeEligibleToBeCached(episode) &&
             canCacheEpisodeByDeviceSettings()
         ) {
+            episodeManager.updateAutomaticallyCachedStatus(episode, automaticallyCached = true)
             downloadManager.addEpisodeToQueue(episode, "cache episode", false)
         }
     }
+
+    private fun isEpisodeEligibleToBeCached(episode: BaseEpisode): Boolean =
+        episode is PodcastEpisode && !episode.isDownloaded && !episode.isDownloading && !episode.isQueued
 
     private fun canCacheEpisodeByDeviceSettings(): Boolean {
         val internetConnectionCondition = !settings.autoDownloadUnmeteredOnly.value ||
@@ -2341,9 +2345,9 @@ open class PlaybackManager @Inject constructor(
         return internetConnectionCondition && chargingCondition
     }
 
-    private suspend fun deleteCachedEpisode(episode: BaseEpisode?) {
+    private suspend fun cleanCachedEpisodes() {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE)) {
-            episodeManager.deleteEpisodeFile(episode, this, disableAutoDownload = true)
+            episodeManager.cleanAutomaticallyCachedEpisodes(this)
         }
     }
 

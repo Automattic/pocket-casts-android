@@ -70,6 +70,8 @@ interface EpisodeManager {
     suspend fun updateImageUrls(updates: List<ImageUrlUpdate>)
     suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
     suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
+    suspend fun updateAutomaticallyCachedStatus(episode: BaseEpisode?, automaticallyCached: Boolean)
+    suspend fun cleanAutomaticallyCachedEpisodes(playbackManager: PlaybackManager)
     fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
     fun updateFileType(episode: BaseEpisode?, fileType: String)
     fun updateSizeInBytes(episode: BaseEpisode?, sizeInBytes: Long)
