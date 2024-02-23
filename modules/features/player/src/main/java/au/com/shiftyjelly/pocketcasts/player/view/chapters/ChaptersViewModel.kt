@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -43,8 +45,11 @@ class ChaptersViewModel
         get() = Dispatchers.Default
 
     data class UiState(
-        val chapters: List<ChapterState> = emptyList(),
+        val allChapters: List<ChapterState> = emptyList(),
+        val displayChapters: List<ChapterState> = emptyList(),
+        val totalChaptersCount: Int = 0,
         val backgroundColor: Color,
+        val isTogglingChapters: Boolean = false,
     )
 
     sealed class ChapterState {
@@ -107,8 +112,14 @@ class ChaptersViewModel
             lastChangeFrom = playbackState.lastChangeFrom,
         )
         return UiState(
-            chapters = chapters,
+            allChapters = chapters,
+            displayChapters = getFilteredChaptersIfNeeded(
+                chapters = chapters,
+                isTogglingChapters = _uiState.value.isTogglingChapters,
+            ),
+            totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
+            isTogglingChapters = _uiState.value.isTogglingChapters,
         )
     }
 
@@ -125,7 +136,7 @@ class ChaptersViewModel
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
-                if (chapter.selected) {
+                if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
                     val progress = chapter.calculateProgress(playbackPositionMs)
@@ -151,5 +162,29 @@ class ChaptersViewModel
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
         playbackManager.toggleChapter(selected, chapter)
+    }
+
+    fun onSkipChaptersClick(checked: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            isTogglingChapters = checked,
+            displayChapters = getFilteredChaptersIfNeeded(
+                chapters = _uiState.value.allChapters,
+                isTogglingChapters = checked,
+            ),
+        )
+    }
+
+    private fun getFilteredChaptersIfNeeded(
+        chapters: List<ChapterState>,
+        isTogglingChapters: Boolean,
+    ): List<ChapterState> {
+        val shouldFilterChapters = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+            !isTogglingChapters
+
+        return if (shouldFilterChapters) {
+            chapters.filter { it.chapter.selected }
+        } else {
+            chapters
+        }
     }
 }
