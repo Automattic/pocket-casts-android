@@ -42,7 +42,7 @@ fun convertibleToBitmap(
                     content.invoke()
                 }
             }
-        }
+        },
     )
 
     return {
@@ -51,7 +51,7 @@ fun convertibleToBitmap(
         createBitmapFromView(
             view = composeView,
             width = composeView.width,
-            height = availableHeight.toInt()
+            height = availableHeight.toInt(),
         )
     }
 }
@@ -59,12 +59,12 @@ fun convertibleToBitmap(
 fun createBitmapFromView(view: View, width: Int, height: Int): Bitmap {
     view.layoutParams = LinearLayoutCompat.LayoutParams(
         LinearLayoutCompat.LayoutParams.WRAP_CONTENT,
-        LinearLayoutCompat.LayoutParams.WRAP_CONTENT
+        LinearLayoutCompat.LayoutParams.WRAP_CONTENT,
     )
 
     view.measure(
         View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
-        View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY)
+        View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY),
     )
 
     view.layout(0, 0, width, height)

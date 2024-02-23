@@ -46,7 +46,7 @@ class EpisodeAnalytics @Inject constructor(
     ) {
         analyticsTracker.track(
             event,
-            AnalyticsProp.sourceAndToTopMap(source, toTop, episode)
+            AnalyticsProp.sourceAndToTopMap(source, toTop, episode),
         )
     }
 
@@ -93,7 +93,7 @@ class EpisodeAnalytics @Inject constructor(
         fun bulkToTopMap(eventSource: SourceView, count: Int, toTop: Boolean) = mapOf(
             source to eventSource.analyticsValue,
             this.count to count,
-            to_top to toTop
+            to_top to toTop,
         )
     }
 }

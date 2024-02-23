@@ -52,14 +52,14 @@ class AlbumArtContentProvider : ContentProvider() {
         projection: Array<String>?,
         selection: String?,
         selectionArgs: Array<String>?,
-        sortOrder: String?
+        sortOrder: String?,
     ): Cursor? = null
 
     override fun update(
         uri: Uri,
         values: ContentValues?,
         selection: String?,
-        selectionArgs: Array<String>?
+        selectionArgs: Array<String>?,
     ) = 0
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?) = 0

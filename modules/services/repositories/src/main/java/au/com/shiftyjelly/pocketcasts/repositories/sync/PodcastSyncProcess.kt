@@ -3,16 +3,22 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -32,10 +38,33 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.protobuf.Timestamp
+import com.google.protobuf.boolValue
+import com.google.protobuf.doubleValue
+import com.google.protobuf.int32Value
+import com.google.protobuf.int64Value
+import com.google.protobuf.stringValue
+import com.google.protobuf.timestamp
+import com.pocketcasts.service.api.Record
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUserDevice
+import com.pocketcasts.service.api.boolSetting
+import com.pocketcasts.service.api.doubleSetting
+import com.pocketcasts.service.api.int32Setting
+import com.pocketcasts.service.api.podcastSettings
+import com.pocketcasts.service.api.record
+import com.pocketcasts.service.api.syncUpdateRequest
+import com.pocketcasts.service.api.syncUserBookmark
+import com.pocketcasts.service.api.syncUserDevice
+import com.pocketcasts.service.api.syncUserEpisode
+import com.pocketcasts.service.api.syncUserFolder
+import com.pocketcasts.service.api.syncUserPlaylist
+import com.pocketcasts.service.api.syncUserPodcast
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -43,16 +72,18 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
+import java.time.Instant
+import java.util.Date
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxCompletable
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
-import java.util.Date
-import kotlin.coroutines.CoroutineContext
 
 class PodcastSyncProcess(
     val context: Context,
@@ -70,7 +101,6 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
-    var featureFlagWrapper: FeatureFlagWrapper
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -83,19 +113,22 @@ class PodcastSyncProcess(
             return Completable.complete()
         }
 
-        val lastModified = settings.getLastModified()
+        val lasSyncTimeString = settings.getLastModified()
+        val lastSyncTime = runCatching { Instant.parse(lasSyncTimeString) }
+            .onFailure { Timber.e(it, "Could not convert lastModified String to Long: $lasSyncTimeString") }
+            .getOrDefault(Instant.EPOCH)
 
-        val downloadObservable = if (lastModified == null) {
+        val downloadObservable = if (lastSyncTime == Instant.EPOCH) {
             performFullSync().andThen(syncUpNext())
         } else {
             if (settings.getHomeGridNeedsRefresh()) {
                 Timber.i("SyncProcess: Refreshing home grid")
                 performHomeGridRefresh()
                     .andThen(syncUpNext())
-                    .andThen(performIncrementalSync(lastModified))
+                    .andThen(performIncrementalSync(lastSyncTime))
             } else {
                 syncUpNext()
-                    .andThen(performIncrementalSync(lastModified))
+                    .andThen(performIncrementalSync(lastSyncTime))
             }
         }
         val syncUpNextObservable = downloadObservable
@@ -108,7 +141,7 @@ class PodcastSyncProcess(
                     Completable.complete()
                 } else {
                     syncPlayHistory()
-                }
+                },
             )
         return syncUpNextObservable
             .doOnError { throwable ->
@@ -120,13 +153,80 @@ class PodcastSyncProcess(
             }
     }
 
-    fun performIncrementalSync(lastModified: String): Completable {
+    @VisibleForTesting
+    fun performIncrementalSync(lastSyncTime: Instant): Completable =
+        if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
+            rxCompletable {
+                performIncrementalSyncSuspend(lastSyncTime)
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            oldPerformIncrementalSync(lastSyncTime)
+        }
+
+    private suspend fun performIncrementalSyncSuspend(lastSyncTime: Instant) {
+        val episodesToSync = episodeManager.findEpisodesToSync()
+        val syncUpdateRequest = getSyncUpdateRequest(lastSyncTime, episodesToSync)
+        if (BuildConfig.DEBUG) {
+            Timber.i("incremental sync request: $syncUpdateRequest")
+        }
+        val protobufResponse = syncManager.userSyncUpdate(syncUpdateRequest)
+        if (BuildConfig.DEBUG) {
+            Timber.i("incremental sync response: $protobufResponse")
+        }
+        val syncUpdateResponse = SyncUpdateResponse.fromProtobufSyncUpdateResponse(protobufResponse)
+        processServerResponse(
+            response = syncUpdateResponse,
+            episodes = episodesToSync,
+        ).await()
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
+    private fun oldPerformIncrementalSync(lastSyncTime: Instant): Completable {
         val uploadData = uploadChanges()
-        val uploadObservable = syncManager.syncUpdate(uploadData.first, lastModified)
-        val downloadObservable = uploadObservable.flatMap {
+        val uploadObservable = syncManager.syncUpdate(uploadData.first, lastSyncTime)
+        return uploadObservable.flatMap {
             processServerResponse(it, uploadData.second)
         }.ignoreElement()
-        return downloadObservable
+    }
+
+    private fun getSyncUpdateRequest(
+        lastSyncTime: Instant,
+        episodesToSync: List<PodcastEpisode>,
+    ): SyncUpdateRequest {
+        try {
+            return syncUpdateRequest {
+                deviceUtcTimeMs = System.currentTimeMillis()
+                lastModified = lastSyncTime.toEpochMilli()
+
+                val podcasts = podcastManager.findPodcastsToSync()
+                val podcastRecords = podcasts.map { toRecord(it) }
+                records.addAll(podcastRecords)
+
+                val episodeRecords = episodesToSync.map { toRecord(it) }
+                records.addAll(episodeRecords)
+
+                val folderRecords = folderManager.findFoldersToSync().map { toRecord(it) }
+                records.addAll(folderRecords)
+
+                val playlistRecords = playlistManager.findPlaylistsToSync().map { toRecord(it) }
+                records.addAll(playlistRecords)
+
+                val bookmarkRecords = bookmarkManager.findBookmarksToSync().map { toRecord(it) }
+                records.addAll(bookmarkRecords)
+
+                getSyncUserDevice()?.let { syncUserDevice ->
+                    val syncUserDeviceRecord = record {
+                        this.device = syncUserDevice
+                    }
+                    records.add(syncUserDeviceRecord)
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Unable to upload podcast to sync.")
+            throw PocketCastsSyncException(e)
+        }
     }
 
     private fun performFullSync(): Completable {
@@ -182,7 +282,8 @@ class PodcastSyncProcess(
                     Observable.just(uuid)
                         .subscribeOn(Schedulers.io())
                         .flatMapMaybe { importPodcast(serverPodcastsMap[it]) }
-                }, 5
+                },
+                5,
             )
             .ignoreElements()
         // update existing podcasts
@@ -221,9 +322,6 @@ class PodcastSyncProcess(
     }
 
     private suspend fun downloadAndImportBookmarks() {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         val bookmarks = syncManager.getBookmarks()
         importBookmarks(bookmarks)
     }
@@ -252,7 +350,7 @@ class PodcastSyncProcess(
             skipLastSecs = podcastResponse.autoSkipLast ?: podcast.skipLastSecs,
             folderUuid = podcastResponse.folderUuid,
             sortPosition = podcastResponse.sortPosition ?: podcast.sortPosition,
-            addedDate = addedDate
+            addedDate = addedDate,
         )
     }
 
@@ -275,7 +373,7 @@ class PodcastSyncProcess(
     private fun syncSettings(): Completable {
         return rxCompletable {
             val startTime = SystemClock.elapsedRealtime()
-            SyncSettingsTask.run(settings, syncManager)
+            SyncSettingsTask.run(context, settings, syncManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync settings - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         }
     }
@@ -291,6 +389,8 @@ class PodcastSyncProcess(
             }
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadChanges(): Pair<String, List<PodcastEpisode>> {
         val records = JSONArray()
         uploadPodcastChanges(records)
@@ -307,6 +407,7 @@ class PodcastSyncProcess(
         return Pair(data.toString(), episodes)
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadFolderChanges(records: JSONArray) {
         try {
             val folders = folderManager.findFoldersToSync()
@@ -338,6 +439,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadPlaylistChanges(records: JSONArray) {
         try {
             val playlists = playlistManager.findPlaylistsToSync()
@@ -388,6 +490,24 @@ class PodcastSyncProcess(
         }
     }
 
+    @VisibleForTesting
+    internal fun getSyncUserDevice(): SyncUserDevice? =
+        if (statsManager.isSynced(settings) || statsManager.isEmpty) {
+            null
+        } else {
+            syncUserDevice {
+                deviceId = stringValue { value = settings.getUniqueDeviceId() }
+                deviceType = int32Value { value = ANDROID_DEVICE_TYPE }
+                timeSilenceRemoval = int64Value { value = statsManager.timeSavedSilenceRemovalSecs }
+                timeSkipping = int64Value { value = statsManager.timeSavedSkippingSecs }
+                timeIntroSkipping = int64Value { value = statsManager.timeSavedSkippingIntroSecs }
+                timeVariableSpeed = int64Value { value = statsManager.timeSavedVariableSpeedSecs }
+                timeListened = int64Value { value = statsManager.totalListeningTimeSecs }
+                timesStartedAt = int64Value { value = statsManager.statsStartTimeSecs }
+            }
+        }
+
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadStatChanges(records: JSONArray) {
         if (statsManager.isSynced(settings) || statsManager.isEmpty) {
             return
@@ -419,11 +539,11 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadPodcastChanges(records: JSONArray) {
         try {
             val podcasts = podcastManager.findPodcastsToSync()
             for (podcast in podcasts) {
-
                 try {
                     val fields = JSONObject().apply {
                         put("uuid", podcast.uuid)
@@ -450,6 +570,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
             val episodes = episodeManager.findEpisodesToSync()
@@ -512,13 +633,12 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadBookmarksChanges(records: JSONArray) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         try {
             val bookmarks = bookmarkManager.findBookmarksToSync()
             bookmarks.forEach { bookmark ->
+                @Suppress("DEPRECATION")
                 uploadBookmarkChanges(bookmark, records)
             }
         } catch (e: Exception) {
@@ -527,6 +647,7 @@ class PodcastSyncProcess(
         }
     }
 
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     private fun uploadBookmarkChanges(bookmark: Bookmark, records: JSONArray) {
         try {
             val fields = JSONObject().apply {
@@ -592,7 +713,7 @@ class PodcastSyncProcess(
         return Completable.fromAction {
             val firstSync = settings.isFirstSyncRun()
             if (firstSync) {
-                fileStorage.fixBrokenFiles(episodeManager)
+                runBlocking { fileStorage.fixBrokenFiles(episodeManager) }
                 settings.setFirstSyncRun(false)
             }
         }
@@ -620,7 +741,7 @@ class PodcastSyncProcess(
                         .subscribeOn(Schedulers.computation())
                         .flatMap { importPodcast(it).toObservable() }
                 },
-                10
+                10,
             )
             .ignoreElements()
     }
@@ -643,9 +764,6 @@ class PodcastSyncProcess(
     }
 
     private suspend fun importBookmarks(bookmarks: List<Bookmark>) {
-        if (!featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            return
-        }
         for (bookmark in bookmarks) {
             importBookmark(bookmark)
         }
@@ -717,7 +835,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(sync: SyncUpdateResponse.PodcastSync): Maybe<Podcast> {
         val uuid = sync.uuid
-        if (uuid == null || uuid.isNullOrBlank()) {
+        if (uuid.isNullOrBlank()) {
             return Maybe.empty()
         }
 
@@ -736,11 +854,7 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
             return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false)
                 .doOnSuccess { podcast ->
-                    podcast.startFromSecs = podcastSync.startFromSecs ?: 0
-                    podcast.skipLastSecs = podcastSync.skipLastSecs ?: 0
-                    podcast.addedDate = podcastSync.dateAdded
-                    podcastSync.sortPosition?.let { podcast.sortPosition = it }
-                    podcastSync.folderUuid?.let { podcast.folderUuid = it }
+                    applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
                     podcastManager.updatePodcast(podcast)
                 }
                 .toMaybe()
@@ -755,12 +869,7 @@ class PodcastSyncProcess(
         if (podcastSync.subscribed) {
             podcast.syncStatus = Podcast.SYNC_STATUS_SYNCED
             podcast.isSubscribed = true
-            podcast.isSubscribed = podcastSync.subscribed
-            podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
-            podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
-            podcastSync.sortPosition?.let { podcast.sortPosition = it }
-            podcast.folderUuid = podcastSync.folderUuid
-            podcast.addedDate = podcastSync.dateAdded
+            applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
 
             podcastManager.updatePodcast(podcast)
         } else if (podcast.isSubscribed && !podcastSync.subscribed) { // Unsubscribed on the server but subscribed on device
@@ -768,6 +877,48 @@ class PodcastSyncProcess(
             podcastManager.unsubscribe(podcast.uuid, playbackManager)
         }
         return Maybe.just(podcast)
+    }
+
+    private fun applyPodcastSyncUpdatesToPodcast(podcast: Podcast, podcastSync: SyncUpdateResponse.PodcastSync) {
+        podcast.addedDate = podcastSync.dateAdded
+        podcast.folderUuid = podcastSync.folderUuid
+        podcastSync.sortPosition?.let { podcast.sortPosition = it }
+        podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
+        podcastSync.startFromModified?.let { podcast.startFromModified = it }
+        podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
+        podcastSync.skipLastModified?.let { podcast.skipLastModified = it }
+        podcastSync.addToUpNextLocalSetting?.let { podcast.autoAddToUpNext = it }
+        podcastSync.addToUpNextModifiedLocalSetting?.let { podcast.autoAddToUpNextModified = it }
+        podcastSync.useCustomPlaybackEffects?.let { podcast.overrideGlobalEffects = it }
+        podcastSync.useCustomPlaybackEffectsModified?.let { podcast.overrideGlobalEffectsModified = it }
+        podcastSync.playbackSpeed?.let { podcast.playbackSpeed = it }
+        podcastSync.playbackSpeedModified?.let { podcast.playbackSpeedModified = it }
+        podcastSync.trimSilence?.let {
+            podcast.trimMode = when (it) {
+                0 -> TrimMode.OFF
+                1 -> TrimMode.LOW
+                2 -> TrimMode.MEDIUM
+                3 -> TrimMode.HIGH
+                else -> TrimMode.OFF
+            }
+        }
+        podcastSync.trimSilenceModified?.let { podcast.trimModeModified = it }
+        podcastSync.useVolumeBoost?.let { podcast.isVolumeBoosted = it }
+        podcastSync.useVolumeBoostModified?.let { podcast.volumeBoostedModified = it }
+        podcastSync.showNotifications?.let { podcast.isShowNotifications = it }
+        podcastSync.showNotificationsModified?.let { podcast.showNotificationsModified = it }
+        podcastSync.autoArchive?.let { podcast.overrideGlobalArchive = it }
+        podcastSync.autoArchiveModified?.let { podcast.overrideGlobalArchiveModified = it }
+        podcastSync.autoArchivePlayed?.let { podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) }
+        podcastSync.autoArchivePlayedModified?.let { podcast.autoArchiveAfterPlayingModified = it }
+        podcastSync.autoArchiveInactive?.let { podcast.autoArchiveInactive = AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default }
+        podcastSync.autoArchiveInactiveModified?.let { podcast.autoArchiveInactiveModified = it }
+        podcastSync.autoArchiveEpisodeLimit?.let { podcast.autoArchiveEpisodeLimit = it }
+        podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
+        podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None }
+        podcastSync.episodeGroupingModified?.let { podcast.groupingModified = it }
+        podcastSync.showArchived?.let { podcast.showArchived = it }
+        podcastSync.showArchivedModified?.let { podcast.showNotificationsModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -863,5 +1014,247 @@ class PodcastSyncProcess(
         } else {
             bookmarkManager.upsertSynced(bookmark.copy(syncStatus = SyncStatus.SYNCED))
         }
+    }
+
+    companion object {
+
+        @VisibleForTesting
+        internal val ANDROID_DEVICE_TYPE = 2
+
+        @VisibleForTesting
+        internal fun toRecord(podcast: Podcast): Record =
+            record {
+                this.podcast = syncUserPodcast {
+                    podcast.addedDate?.toProtobufTimestamp()?.let { timestamp ->
+                        dateAdded = timestamp
+                    }
+
+                    folderUuid = stringValue {
+                        val folderUuid = podcast.folderUuid
+                        value = if (folderUuid.isNullOrEmpty()) {
+                            Folder.homeFolderUuid
+                        } else {
+                            folderUuid
+                        }
+                    }
+
+                    // In older versions of Pocket Casts it was possible to subscribe or delete
+                    // a podcast. Send both values to ensure we don't break backward compatibility.
+                    isDeleted = boolValue { value = !podcast.isSubscribed }
+                    subscribed = boolValue { value = podcast.isSubscribed }
+
+                    uuid = podcast.uuid
+
+                    settings = podcastSettings {
+                        autoStartFrom = int32Setting {
+                            value = int32Value { value = podcast.startFromSecs }
+                            modifiedAt = podcast.startFromModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoSkipLast = int32Setting {
+                            value = int32Value { value = podcast.skipLastSecs }
+                            modifiedAt = podcast.skipLastModified.toProtobufTimestampOrEpoch()
+                        }
+                        addToUpNext = boolSetting {
+                            value = boolValue { value = podcast.addToUpNextSyncSetting }
+                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                        }
+                        addToUpNextPosition = int32Setting {
+                            value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
+                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                        }
+                        playbackEffects = boolSetting {
+                            value = boolValue { value = podcast.overrideGlobalEffects }
+                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrEpoch()
+                        }
+                        playbackSpeed = doubleSetting {
+                            value = doubleValue { value = podcast.playbackSpeed }
+                            modifiedAt = podcast.playbackSpeedModified.toProtobufTimestampOrEpoch()
+                        }
+                        trimSilence = int32Setting {
+                            value = int32Value {
+                                value = when (podcast.trimMode) {
+                                    TrimMode.OFF -> 0
+                                    TrimMode.LOW -> 1
+                                    TrimMode.MEDIUM -> 2
+                                    TrimMode.HIGH -> 3
+                                }
+                            }
+                            modifiedAt = podcast.trimModeModified.toProtobufTimestampOrEpoch()
+                        }
+                        volumeBoost = boolSetting {
+                            value = boolValue { value = podcast.isVolumeBoosted }
+                            modifiedAt = podcast.volumeBoostedModified.toProtobufTimestampOrEpoch()
+                        }
+                        notification = boolSetting {
+                            value = boolValue { value = podcast.isShowNotifications }
+                            modifiedAt = podcast.showNotificationsModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchive = boolSetting {
+                            value = boolValue { value = podcast.overrideGlobalArchive }
+                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchivePlayed = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveAfterPlaying.serverId }
+                            modifiedAt = podcast.autoArchiveAfterPlayingModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchiveInactive = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveInactive.serverId }
+                            modifiedAt = podcast.autoArchiveInactiveModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchiveEpisodeLimit = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
+                            modifiedAt = podcast.autoArchiveEpisodeLimitModified.toProtobufTimestampOrEpoch()
+                        }
+                        episodeGrouping = int32Setting {
+                            value = int32Value { value = podcast.grouping.serverId }
+                            modifiedAt = podcast.groupingModified.toProtobufTimestampOrEpoch()
+                        }
+                        showArchived = boolSetting {
+                            value = boolValue { value = podcast.showArchived }
+                            modifiedAt = podcast.showArchivedModified.toProtobufTimestampOrEpoch()
+                        }
+                    }
+
+                    sortPosition = int32Value { value = podcast.sortPosition }
+                }
+            }
+
+        @VisibleForTesting
+        internal fun toRecord(episode: PodcastEpisode): Record =
+            record {
+                this.episode = syncUserEpisode {
+                    uuid = episode.uuid
+                    podcastUuid = episode.podcastUuid
+
+                    episode.playingStatusModified?.let { episodePlayingStatusModified ->
+                        playingStatus = int32Value { value = episode.playingStatus.toInt() }
+                        playingStatusModified = int64Value { value = episodePlayingStatusModified }
+                    }
+
+                    episode.starredModified?.let { episodeStarredModified ->
+                        starred = boolValue { value = episode.isStarred }
+                        starredModified = int64Value { value = episodeStarredModified }
+                    }
+
+                    episode.playedUpToModified?.let { episodePlayedUpToModified ->
+                        playedUpTo = int64Value { value = episode.playedUpTo.toLong() }
+                        playedUpToModified = int64Value { value = episodePlayedUpToModified }
+                    }
+
+                    episode.durationModified?.let { episodeDurationModified ->
+                        val episodeDuration = episode.duration
+                        if (episodeDuration != 0.0) {
+                            duration = int64Value { value = episodeDuration.toLong() }
+                            durationModified = int64Value { value = episodeDurationModified }
+                        }
+                    }
+
+                    episode.archivedModified?.let { episodeArchivedModified ->
+                        isDeleted = boolValue { value = episode.isArchived }
+                        isDeletedModified = int64Value { value = episodeArchivedModified }
+                    }
+                }
+            }
+
+        private fun toRecord(folder: Folder): Record =
+            record {
+                this.folder = syncUserFolder {
+                    folderUuid = folder.uuid
+                    isDeleted = folder.deleted
+                    name = folder.name
+                    color = folder.color
+                    sortPosition = folder.sortPosition
+                    podcastsSortType = folder.podcastsSortType.serverId
+                    dateAdded = folder.addedDate.toProtobufTimestamp()
+                }
+            }
+
+        private fun toRecord(playlist: Playlist): Record =
+            record {
+                this.playlist = syncUserPlaylist {
+                    uuid = playlist.uuid
+                    originalUuid = playlist.uuid // DO NOT REMOVE: server side this field is important, because it will remain the same upper/lower case
+                    isDeleted = boolValue { value = playlist.deleted }
+                    title = stringValue { value = playlist.title }
+                    allPodcasts = boolValue { value = playlist.allPodcasts }
+                    playlist.podcastUuids?.let {
+                        podcastUuids = stringValue { value = it }
+                    }
+                    audioVideo = int32Value { value = playlist.audioVideo }
+                    notDownloaded = boolValue { value = playlist.notDownloaded }
+                    downloaded = boolValue { value = playlist.downloaded }
+                    downloading = boolValue { value = playlist.downloading }
+                    finished = boolValue { value = playlist.finished }
+                    partiallyPlayed = boolValue { value = playlist.partiallyPlayed }
+                    unplayed = boolValue { value = playlist.unplayed }
+                    starred = boolValue { value = playlist.starred }
+                    manual = boolValue { value = playlist.manual }
+                    playlist.sortPosition?.let {
+                        sortPosition = int32Value { value = it }
+                    }
+                    sortType = int32Value { value = playlist.sortId }
+                    iconId = int32Value { value = playlist.iconId }
+                    filterHours = int32Value { value = playlist.filterHours }
+                    filterDuration = boolValue { value = playlist.filterDuration }
+                    longerThan = int32Value { value = playlist.longerThan }
+                    shorterThan = int32Value { value = playlist.shorterThan }
+                }
+            }
+
+        @VisibleForTesting
+        internal fun toRecord(bookmark: Bookmark): Record =
+            record {
+                this.bookmark = syncUserBookmark {
+                    bookmarkUuid = bookmark.uuid
+                    podcastUuid = bookmark.podcastUuid
+                    episodeUuid = bookmark.episodeUuid
+                    time = int32Value { value = bookmark.timeSecs }
+                    createdAt = bookmark.createdAt.toProtobufTimestamp()
+                    bookmark.titleModified?.let { bookmarkTitleModified ->
+                        title = stringValue { value = bookmark.title }
+                        titleModified = int64Value { value = bookmarkTitleModified }
+                    }
+                    bookmark.deletedModified?.let { bookmarkDeletedModified ->
+                        isDeleted = boolValue { value = bookmark.deleted }
+                        isDeletedModified = int64Value { value = bookmarkDeletedModified }
+                    }
+                }
+            }
+    }
+}
+
+private fun Date.toProtobufTimestamp(): Timestamp {
+    val instant = toInstant()
+    return timestamp {
+        seconds = instant.epochSecond
+        nanos = instant.nano
+    }
+}
+
+private fun Date?.toProtobufTimestampOrEpoch(): Timestamp {
+    val instant = this?.toInstant() ?: Instant.EPOCH
+    return timestamp {
+        seconds = instant.epochSecond
+        nanos = instant.nano
+    }
+}
+
+private val Podcast.addToUpNextSyncSetting get() = autoAddToUpNext != Podcast.AutoAddUpNext.OFF
+private val Podcast.addToUpNextPositionSyncSetting get() = when (autoAddToUpNext) {
+    Podcast.AutoAddUpNext.OFF, Podcast.AutoAddUpNext.PLAY_LAST -> 0
+    Podcast.AutoAddUpNext.PLAY_NEXT -> 1
+}
+private val SyncUpdateResponse.PodcastSync.addToUpNextLocalSetting get() = when (addToUpNext) {
+    false -> Podcast.AutoAddUpNext.OFF
+    true -> when (addToUpNextPosition) {
+        0 -> Podcast.AutoAddUpNext.PLAY_LAST
+        1 -> Podcast.AutoAddUpNext.PLAY_NEXT
+        else -> null
+    }
+    else -> null
+}
+private val SyncUpdateResponse.PodcastSync.addToUpNextModifiedLocalSetting get() = addToUpNextModified?.let { addModified ->
+    addToUpNextPositionModified?.let { positionModified ->
+        maxOf(addModified, positionModified)
     }
 }

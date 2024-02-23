@@ -3,19 +3,26 @@ package au.com.shiftyjelly.pocketcasts.models.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
+import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.DeleteColumn
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import au.com.shiftyjelly.pocketcasts.model.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.ChapterIndicesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
@@ -61,10 +68,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextChange::class,
         UpNextEpisode::class,
         UserEpisode::class,
-        PodcastRatings::class
+        PodcastRatings::class,
     ],
-    version = 79,
-    exportSchema = true
+    version = 86,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
+    ],
 )
 @TypeConverters(
     AnonymousBumpStat.CustomEventPropsTypeConverter::class,
@@ -80,6 +90,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     SyncStatusConverter::class,
     TrimModeTypeConverter::class,
     UserEpisodeServerStatusConverter::class,
+    AutoArchiveAfterPlayingTypeConverter::class,
+    AutoArchiveInactiveTypeConverter::class,
+    PodcastGroupingTypeConverter::class,
+    ChapterIndicesConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -371,7 +385,7 @@ abstract class AppDatabase : RoomDatabase() {
                     sync_modified INTEGER NOT NULL,
                     PRIMARY KEY(uuid)
                 );
-                """.trimIndent()
+                """.trimIndent(),
             )
             val podcastColumnNames = getColumnNames(database, "podcasts")
             if (!podcastColumnNames.contains("folder_uuid")) {
@@ -388,7 +402,7 @@ abstract class AppDatabase : RoomDatabase() {
                       custom_event_props TEXT NOT NULL,
                       PRIMARY KEY(name, event_time, custom_event_props)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -413,7 +427,7 @@ abstract class AppDatabase : RoomDatabase() {
                         episode_podcastTitle TEXT, 
                         episode_artworkUrl TEXT
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_term` ON search_history (`term`)")
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_podcast_uuid` ON search_history (`podcast_uuid`);")
@@ -430,7 +444,7 @@ abstract class AppDatabase : RoomDatabase() {
                         total INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -454,7 +468,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `sync_status` INTEGER NOT NULL, 
                         PRIMARY KEY(`uuid`)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
             database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
         }
@@ -469,7 +483,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `total` INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     )
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             database.execSQL(
@@ -477,7 +491,7 @@ abstract class AppDatabase : RoomDatabase() {
                     INSERT INTO `temp_podcast_ratings` (`podcast_uuid`, `average`, `total`)
                     SELECT `podcast_uuid`, `average`, `total` 
                     FROM `podcast_ratings`
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             database.execSQL("DROP TABLE `podcast_ratings`;")
@@ -489,7 +503,127 @@ abstract class AppDatabase : RoomDatabase() {
                 """
                     ALTER TABLE podcast_episodes
                     ADD COLUMN image_url TEXT
-                """.trimIndent()
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_79_80 = addMigration(79, 80) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN start_from_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN skip_last_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_80_81 = addMigration(80, 81) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_add_to_up_next_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN override_global_effects_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN playback_speed_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN volume_boosted_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN trim_silence_level_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        @DeleteColumn(
+            tableName = "podcasts",
+            columnName = "silence_removed",
+        )
+        class DeleteSilenceRemovedMigration : AutoMigrationSpec
+
+        val MIGRATION_82_83 = addMigration(82, 83) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN show_notifications_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_83_84 = addMigration(83, 84) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_played_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_inactive_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_episode_limit_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN grouping_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN show_archived_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_84_85 = addMigration(84, 85) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN override_global_archive_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_85_86 = addMigration(85, 86) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE user_episodes
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
+                """.trimIndent(),
             )
         }
 
@@ -533,8 +667,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 0,
                             "syncStatus" to 1,
                             "sortPosition" to 1,
-                            "filterHours" to 336
-                        )
+                            "filterHours" to 336,
+                        ),
                     )
                     // In Progress
                     database.insert(
@@ -560,8 +694,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 0,
                             "syncStatus" to 1,
                             "sortPosition" to 2,
-                            "filterHours" to 0
-                        )
+                            "filterHours" to 0,
+                        ),
                     )
                     // Starred
                     database.insert(
@@ -587,8 +721,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 1,
                             "syncStatus" to 1,
                             "sortPosition" to 3,
-                            "filterHours" to 0
-                        )
+                            "filterHours" to 0,
+                        ),
                     )
                 },
                 addMigration(9, 10) { database ->
@@ -598,7 +732,7 @@ abstract class AppDatabase : RoomDatabase() {
                             "playlist_id INTEGER," +
                             "episode_uuid VARCHAR," +
                             "position INTEGER" +
-                            ")"
+                            ")",
                     )
                     database.execSQL("ALTER TABLE podcast ADD COLUMN is_deleted INTEGER DEFAULT 0")
                     database.execSQL("ALTER TABLE podcast ADD COLUMN sync_status INTEGER DEFAULT 0")
@@ -862,6 +996,13 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_76_77,
                 MIGRATION_77_78,
                 MIGRATION_78_79,
+                MIGRATION_79_80,
+                MIGRATION_80_81,
+                // 81 to 82 added via auto migration
+                MIGRATION_82_83,
+                MIGRATION_83_84,
+                MIGRATION_84_85,
+                MIGRATION_85_86,
             )
         }
 

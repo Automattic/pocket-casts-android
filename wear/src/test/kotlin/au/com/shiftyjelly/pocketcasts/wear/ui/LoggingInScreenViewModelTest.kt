@@ -30,7 +30,7 @@ class LoggingInScreenViewModelTest {
         MockitoAnnotations.openMocks(this)
         testSubject = LoggingInScreenViewModel(
             settings = settings,
-            syncManager = syncManager
+            syncManager = syncManager,
         )
     }
 
@@ -53,7 +53,6 @@ class LoggingInScreenViewModelTest {
     @Test
     fun `shouldClose with minimum delay when state is CompleteButDelaying`() =
         runBlocking {
-
             LoggingInScreenViewModel.State.CompleteButDelaying("test@email.com")
 
             val result = testSubject.shouldClose(withMinimumDelay = true)

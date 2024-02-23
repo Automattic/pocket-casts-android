@@ -43,13 +43,15 @@ android {
         coreLibraryDesugaringEnabled true
     }
 
+    final javaVersion = JavaVersion.toVersion(libs.versions.java.get())
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility javaVersion
+        targetCompatibility javaVersion
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = javaVersion.toString()
         // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
         freeCompilerArgs += [
             "-opt-in=kotlin.RequiresOptIn"
@@ -171,6 +173,8 @@ dependencies {
     implementation libs.bundles.sentry
     implementation libs.bundles.work
 
+    implementation platform(libs.compose.bom)
+    androidTestImplementation platform(libs.compose.bom)
     implementation platform(libs.firebase.bom)
     implementation platform(libs.sentry.bom)
 
@@ -239,6 +243,7 @@ dependencies {
     androidTestImplementation libs.room.testing
     androidTestImplementation libs.uiautomator
     androidTestImplementation libs.work.test
+    androidTestImplementation libs.turbine
 
     testImplementation libs.arch.core
     testImplementation libs.coroutines.test

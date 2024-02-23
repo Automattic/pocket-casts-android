@@ -42,7 +42,7 @@ class AutomotiveLicensesFragment : Fragment() {
             showLicenseBadges = false,
             colors = LibraryDefaults.libraryColors(
                 backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.theme.colors.primaryText01
+                contentColor = MaterialTheme.theme.colors.primaryText01,
             ),
             itemContentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
             librariesBlock = { context ->
@@ -53,7 +53,7 @@ class AutomotiveLicensesFragment : Fragment() {
             onLibraryClick = { library ->
                 val website = library.website ?: return@LibrariesContainer
                 openUrl(website)
-            }
+            },
         )
     }
 }

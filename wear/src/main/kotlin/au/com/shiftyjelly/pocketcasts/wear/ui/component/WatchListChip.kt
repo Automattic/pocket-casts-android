@@ -35,7 +35,7 @@ fun WatchListChip(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = title,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
         },
         modifier = modifier,
@@ -68,7 +68,7 @@ fun WatchListChip(
     icon: (@Composable BoxScope.() -> Unit)? = null,
     secondaryLabel: String? = null,
     colors: ChipColors = ChipDefaults.secondaryChipColors(
-        secondaryContentColor = MaterialTheme.colors.onPrimary
+        secondaryContentColor = MaterialTheme.colors.onPrimary,
     ),
 ) {
     Chip(

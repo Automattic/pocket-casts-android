@@ -7,11 +7,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
+import java.io.File
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -31,7 +31,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 private const val CUSTOM_FOLDER_LABEL = "CustomFolder"
 private const val CUSTOM_FOLDER_NEW_PATH = "custom_folder_new_path"
@@ -42,9 +41,6 @@ private const val CUSTOM_FOLDER_NEW_LABEL = "CustomFolderNew"
 class StorageSettingsViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
-
-    @Mock
-    private lateinit var podcastManager: PodcastManager
 
     @Mock
     private lateinit var episodeManager: EpisodeManager
@@ -79,13 +75,12 @@ class StorageSettingsViewModelTest {
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.empty())
         viewModel = StorageSettingsViewModel(
-            podcastManager,
             episodeManager,
             fileStorage,
             fileUtil,
             settings,
             analyticsTracker,
-            context
+            context,
         )
     }
 
@@ -112,7 +107,7 @@ class StorageSettingsViewModelTest {
         val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL, "")
         startViewModelAndResumeFragment(folderLocations = listOf(folderLocation), sdkVersion = 28)
         val file = File(folderLocation.filePath)
-        whenever(fileStorage.baseStorageDirectory).thenReturn(file)
+        whenever(fileStorage.getOrCreateBaseStorageDir()).thenReturn(file)
         whenever(settings.usingCustomFolderStorage()).thenReturn(true)
 
         viewModel.state.value.storageChoiceState.onStateChange(folderLocation)
@@ -139,7 +134,7 @@ class StorageSettingsViewModelTest {
         val alertDialogResult = mutableListOf<StorageSettingsViewModel.AlertDialogState>()
         testCustomFolderChangeMovePodcastAlert(
             alertDialogResult,
-            permissionGranted = true
+            permissionGranted = true,
         ) {
             viewModel.state.value.storageFolderState.onStateChange(CUSTOM_FOLDER_NEW_PATH)
 
@@ -152,7 +147,7 @@ class StorageSettingsViewModelTest {
         val alertDialogResult = mutableListOf<StorageSettingsViewModel.AlertDialogState>()
         testCustomFolderChangeMovePodcastAlert(
             alertDialogResult,
-            permissionGranted = false
+            permissionGranted = false,
         ) {
             viewModel.state.value.storageFolderState.onStateChange(CUSTOM_FOLDER_NEW_PATH)
 
@@ -168,7 +163,7 @@ class StorageSettingsViewModelTest {
         viewModel.start(
             folderLocations = { folderLocations },
             permissionGranted = { permissionGranted },
-            sdkVersion = sdkVersion
+            sdkVersion = sdkVersion,
         )
         viewModel.onFragmentResume()
     }
@@ -177,16 +172,16 @@ class StorageSettingsViewModelTest {
     private fun testCustomFolderChangeMovePodcastAlert(
         alertDialogResult: MutableList<StorageSettingsViewModel.AlertDialogState>,
         permissionGranted: Boolean,
-        testBody: () -> Unit
+        testBody: () -> Unit,
     ) = runTest {
         val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL, "")
         startViewModelAndResumeFragment(
             folderLocations = listOf(folderLocation),
             sdkVersion = 28,
-            permissionGranted = permissionGranted
+            permissionGranted = permissionGranted,
         )
         val oldFile = File(folderLocation.filePath)
-        whenever(fileStorage.baseStorageDirectory).thenReturn(oldFile)
+        whenever(fileStorage.getOrCreateBaseStorageDir()).thenReturn(oldFile)
         whenever(settings.usingCustomFolderStorage()).thenReturn(true)
         createNewTemporaryCustomFolder()
         val collectJob = launch(UnconfinedTestDispatcher()) {

@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun NowPlayingChip(
     onClick: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<NowPlayingChipViewModel>()
 
     val state by viewModel.state.collectAsState()
@@ -55,7 +54,7 @@ fun NowPlayingChip(
         podcast = podcast,
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
-        onClick = onClick
+        onClick = onClick,
     )
 }
 
@@ -89,7 +88,7 @@ private fun Content(
                 }
                 rememberAsyncImagePainter(
                     model = imageRequest,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             } else {
                 nothingPainter
@@ -100,8 +99,8 @@ private fun Content(
                 Brush.linearGradient(
                     colors = listOf(
                         MaterialTheme.colors.surface,
-                        MaterialTheme.colors.surface.copy(alpha = 0f)
-                    )
+                        MaterialTheme.colors.surface.copy(alpha = 0f),
+                    ),
                 )
             } else {
                 SolidColor(MaterialTheme.colors.surface)
@@ -110,7 +109,7 @@ private fun Content(
             secondaryContentColor = MaterialTheme.colors.onSecondary,
         ),
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth() // This is needed for the backgroundImagePainter to work
+        modifier = Modifier.fillMaxWidth(), // This is needed for the backgroundImagePainter to work
     )
 }
 
@@ -122,7 +121,7 @@ private val nothingPainter = object : Painter() {
 @Composable
 private fun PlayingAnimation() {
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(IR.raw.nowplaying)
+        LottieCompositionSpec.RawRes(IR.raw.nowplaying),
     )
     LottieAnimation(
         composition = composition,
@@ -154,7 +153,7 @@ private fun Preview() {
             episode = PodcastEpisode(
                 title = "An Episode",
                 uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
-                publishedDate = Date()
+                publishedDate = Date(),
             ),
             isPlaying = false,
             onClick = {},

@@ -9,18 +9,18 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
+import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
 import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import coil.size.Size
-import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.io.File
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 open class PodcastImageLoader(
@@ -122,28 +122,44 @@ open class PodcastImageLoader(
     }
 
     fun loadEpisodeArtworkInto(
-        imageView: ImageView,
+        imageView: ImageView?,
+        target: coil.target.Target? = null,
+        size: Int? = null,
         episode: PodcastEpisode,
         coroutineScope: CoroutineScope,
     ) {
+        val loadPodcastImage: () -> ImageRequest = {
+            // If episode artwork image fails, try podcast image
+            val imageRequest = loadPodcastImageForEpisode(episode)
+            if (size != null) imageRequest.size(size)
+            if (target != null) {
+                imageRequest.target(target)
+            } else {
+                imageRequest.into(imageView!!)
+            }
+            imageRequest.build()
+        }
+
         if (episode.imageUrl != null) {
-            val episodeImageRequest = ImageRequest.Builder(context)
-                .data(episode.imageUrl)
-                .target(imageView)
-                .build()
-            val disposable = episodeImageRequest.context.imageLoader.enqueue(episodeImageRequest)
+            val imageBuilder = ImageRequest.Builder(context).data(episode.imageUrl)
+            if (size != null) imageBuilder.size(size)
+            if (target != null) imageBuilder.target(target)
+            if (imageView != null) imageBuilder.into(imageView)
+            val imageRequest = imageBuilder.build()
+
+            val disposable = imageRequest.context.imageLoader.enqueue(imageRequest)
             coroutineScope.launch {
-                val imageResult = disposable.job.await()
-                when (imageResult) {
+                when (disposable.job.await()) {
                     is SuccessResult -> { /* do nothing */ }
                     is ErrorResult -> {
-                        // If episode artwork image fails, try podcast image
-                        loadPodcastImageForEpisode(episode).into(imageView)
+                        val podcastRequest = loadPodcastImage()
+                        podcastRequest.context.imageLoader.enqueue(podcastRequest)
                     }
                 }
             }
         } else {
-            loadPodcastImageForEpisode(episode).into(imageView)
+            val podcastRequest = loadPodcastImage()
+            podcastRequest.context.imageLoader.enqueue(podcastRequest)
         }
     }
 

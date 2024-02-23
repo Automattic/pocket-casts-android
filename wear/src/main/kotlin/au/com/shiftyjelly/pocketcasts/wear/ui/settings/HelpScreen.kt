@@ -25,7 +25,6 @@ object HelpScreen {
 
 @Composable
 fun HelpScreen(columnState: ScalingLazyColumnState) {
-
     val viewModel = hiltViewModel<HelpScreenViewModel>()
     val state = viewModel.state.collectAsState().value
     val context = LocalContext.current
@@ -68,10 +67,6 @@ private fun ScalingLazyListScope.phoneAvailableContent(
             title = stringResource(LR.string.settings_help_contact_support),
             onClick = onEmailLogsToSupport,
         )
-    }
-
-    item {
-        Spacer(Modifier.height(8.dp))
     }
 }
 

@@ -12,13 +12,13 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -28,8 +28,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -49,7 +49,7 @@ class ChaptersFragment : BaseFragment() {
             AppTheme(Theme.ThemeType.DARK) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
-                val uiState by chaptersViewModel.uiState.subscribeAsState(chaptersViewModel.defaultUiState)
+                val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
                 val lazyListState = rememberLazyListState()
                 this@ChaptersFragment.lazyListState = lazyListState
 
@@ -68,10 +68,14 @@ class ChaptersFragment : BaseFragment() {
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     ChaptersPage(
                         lazyListState = lazyListState,
-                        chapters = uiState.chapters,
+                        chapters = uiState.displayChapters,
+                        totalChaptersCount = uiState.totalChaptersCount,
+                        onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
                         onChapterClick = ::onChapterClick,
                         onUrlClick = ::onUrlClick,
-                        backgroundColor = uiState.backgroundColor
+                        onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
+                        isTogglingChapters = uiState.isTogglingChapters,
+                        backgroundColor = uiState.backgroundColor,
                     )
                 }
             }

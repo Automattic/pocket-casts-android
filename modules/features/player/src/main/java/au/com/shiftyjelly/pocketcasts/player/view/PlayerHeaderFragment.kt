@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -16,13 +15,13 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
+import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
@@ -30,20 +29,22 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
+import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -53,8 +54,8 @@ import coil.load
 import coil.request.Disposable
 import coil.request.ErrorResult
 import coil.request.ImageRequest
+import coil.size.Scale
 import coil.size.Size
-import coil.transform.RoundedCornersTransformation
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -63,33 +64,34 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
-import kotlin.math.max
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Headers.Companion.headersOf
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val UPNEXT_DRAG_DISTANCE_MULTIPLIER = 1.85f // Open up next at a different rate than we are dragging
-private const val UPNEXT_HEIGHT_OPEN_THRESHOLD = 0.15f // We only have an open threshold because we only control swipe up, swipe down is the standard bottom sheet behaviour
-private const val UPNEXT_OUTLIER_THRESHOLD = 400.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
+private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var warningsHelper: WarningsHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var bookmarkFeature: BookmarkFeatureControl
 
     lateinit var imageLoader: PodcastImageLoaderThemed
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
-    private var skippedFirstTouch: Boolean = false
-    private var hasReceivedOnTouchDown = false
     private val sourceView = SourceView.PLAYER
 
     private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
@@ -146,24 +148,22 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
 
         val shelfViews = mapOf(
-            ShelfItem.Effects.id to binding.effects,
-            ShelfItem.Sleep.id to binding.sleep,
-            ShelfItem.Star.id to binding.star,
-            ShelfItem.Share.id to binding.share,
-            ShelfItem.Podcast.id to binding.podcast,
-            ShelfItem.Cast.id to binding.cast,
-            ShelfItem.Played.id to binding.played,
-            ShelfItem.Archive.id to binding.archive,
-            ShelfItem.Download.id to binding.download,
-            ShelfItem.Bookmark.id to binding.bookmark,
+            ShelfItem.Effects to binding.effects,
+            ShelfItem.Sleep to binding.sleep,
+            ShelfItem.Star to binding.star,
+            ShelfItem.Share to binding.share,
+            ShelfItem.Podcast to binding.podcast,
+            ShelfItem.Cast to binding.cast,
+            ShelfItem.Played to binding.played,
+            ShelfItem.Archive to binding.archive,
+            ShelfItem.Bookmark to binding.bookmark,
+            ShelfItem.Report to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            val visibleItems = it.first.subList(0, 4).map { it.id }
             binding.shelf.removeAllViews()
-            visibleItems.forEach { id ->
-                shelfViews[id]?.let { binding.shelf.addView(it) }
-            }
-
+            it.first.subList(0, 4)
+                .mapNotNull(shelfViews::get)
+                .forEach { itemView -> binding.shelf += itemView }
             binding.shelf.addView(binding.playerActions)
         }
 
@@ -183,20 +183,20 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Archive.analyticsValue)
             viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
         }
-        binding.download.setOnClickListener {
-            trackShelfAction(ShelfItem.Download.analyticsValue)
-            viewModel.downloadCurrentlyPlaying()
-        }
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
-            onAddBookmarkClick()
+            onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+        }
+        binding.report?.setOnClickListener {
+            trackShelfAction(ShelfItem.Report.analyticsValue)
+            openUrl(settings.getReportViolationUrl())
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
         with(binding.castButton) {
             CastButtonFactory.setUpMediaRouteButton(binding.root.context, this)
-            setAlwaysVisible(true)
+            visibility = View.VISIBLE
             updateColor(ThemeColor.playerContrast03(theme.activeTheme))
             setOnClickListener {
                 trackShelfAction(ShelfItem.Cast.analyticsValue)
@@ -204,7 +204,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
-        setupUpNextDrag(view, binding.topView)
+        setupUpNextDrag(binding)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
@@ -253,15 +253,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.star.setImageResource(starResource)
             binding.star.imageTintList = ColorStateList.valueOf(starTint)
 
-            val downloadResource = if (headerViewModel.downloadStatus == EpisodeStatusEnum.NOT_DOWNLOADED) {
-                IR.drawable.ic_download
-            } else if (headerViewModel.downloadStatus == EpisodeStatusEnum.DOWNLOADED) {
-                IR.drawable.ic_downloaded
-            } else {
-                IR.drawable.ic_cancel
-            }
-            binding.download.setImageResource(downloadResource)
-
             if (headerViewModel.isChaptersPresent) {
                 headerViewModel.chapter?.let {
                     binding.episodeTitle.setOnClickListener {
@@ -305,102 +296,35 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun setupUpNextDrag(view: View, topView: View?) {
-        val context = context ?: return
-        val swipeGesture = GestureDetectorCompat(
-            context,
+    private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
+        val flingGestureDetector = GestureDetectorCompat(
+            requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
+                override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
+                    val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
 
-                override fun onDown(e: MotionEvent) = true
-
-                override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-                    val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
-                        ?: return false
-                    if (!skippedFirstTouch) {
-                        // The first call is where the finger went down so like 600, after that its a delta.
-                        // We only want the delta.
-                        upNextBottomSheetBehavior.setPeekHeight(0, false)
-                        skippedFirstTouch = true
-                        return false
+                    return if (velocityY < 0 && abs(velocityY) >= UP_NEXT_FLING_VELOCITY_THRESHOLD && upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                        containerFragment.openUpNext()
+                        true
+                    } else {
+                        false
                     }
-
-                    // Bottom sheet is already at the bottom
-                    if (upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) {
-                        return false
-                    }
-
-                    // Filtering out large deltas to avoid jumps in scrolling
-                    if (abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) {
-                        return false
-                    }
-
-                    val newPeekHeight = max(upNextBottomSheetBehavior.peekHeight + (distanceY * UPNEXT_DRAG_DISTANCE_MULTIPLIER).toInt(), 0)
-                    if (newPeekHeight != upNextBottomSheetBehavior.peekHeight) {
-                        upNextBottomSheetBehavior.peekHeight = newPeekHeight // Expensive call
-
-                        (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(true)
-                    }
-
-                    return upNextBottomSheetBehavior.peekHeight != 0
                 }
-            }
+            },
         )
-
         @Suppress("ClickableViewAccessibility")
-        topView?.setOnTouchListener { _, event ->
-            // Check for down events from the top view because sometimes they don't make it to
-            // the NestedScrollView's OnTouchListener and the first event we pass to our
-            // swipe gesture handler must be a down event
-            if (!hasReceivedOnTouchDown && event.actionMasked == MotionEvent.ACTION_DOWN) {
-                swipeGesture.onTouchEvent(event)
-                hasReceivedOnTouchDown = true
-            }
-            false
-        }
-
-        view.setOnTouchListener { _, event ->
-            if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() != BottomSheetBehavior.STATE_EXPANDED) {
-                return@setOnTouchListener false
-            }
-
-            when (event.actionMasked) {
-
-                MotionEvent.ACTION_DOWN -> {
-                    hasReceivedOnTouchDown = true
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    skippedFirstTouch = false
-
-                    val playerContainerFragment = parentFragment as? PlayerContainerFragment
-                    val upNextBottomSheetBehavior =
-                        playerContainerFragment?.upNextBottomSheetBehavior
-                    if (upNextBottomSheetBehavior != null) {
-                        val peekHeight = upNextBottomSheetBehavior.peekHeight
-                        val cutOff =
-                            Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
-                        if (peekHeight > cutOff) {
-                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        } else {
-                            upNextBottomSheetBehavior.setPeekHeight(0, true)
-                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-                            if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
-                                (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(
-                                    false
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Only pass events to swipeGesture if a down event has been received to avoid
-            // this crash: https://github.com/Automattic/pocket-casts-android/issues/370
-            if (hasReceivedOnTouchDown) {
-                swipeGesture.onTouchEvent(event)
+        binding.root.setOnTouchListener { _, event ->
+            // This check is a workaround for a behavior between velocityY detected by flingGestureDetector and dragging player bottom sheet.
+            // When only the player is expanded and we fling down the velocityY should be positive indicating that direction.
+            // However, regardless of flinging up or down the velocityY is always negative because the player's view drags along
+            // with a finger and thus velocity computation "gets confused" because MotionEvent positions are relative to the view.
+            //
+            // Because the fling motion is detected only after we release the finger it means that the player bottom sheet
+            // is no longer in an expanded state but in a dragging or a collapsing state.
+            if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() == BottomSheetBehavior.STATE_EXPANDED) {
+                flingGestureDetector.onTouchEvent(event)
             } else {
-                Timber.w("Not passing touch event to swipe gesture handler")
                 false
             }
         }
@@ -427,7 +351,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         embeddedArtwork: PlayerViewModel.Artwork,
         imageView: ImageView,
     ): Disposable? {
-
         if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return null
 
         var disposable: Disposable? = null
@@ -437,7 +360,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             val imageBuilder: ImageRequest.Builder.() -> Unit = {
                 error(IR.drawable.defaultartwork_dark)
-                size(Size.ORIGINAL)
+                headers(headersOf("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER))
+                scale(Scale.FIT)
                 transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
             }
 
@@ -496,22 +420,19 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.starToggle()
     }
 
-    fun onAddBookmarkClick() {
-        if (Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
+    fun onAddBookmarkClick(source: OnboardingUpgradeSource) {
+        if (bookmarkFeature.isAvailable(settings.userTier)) {
             viewModel.buildBookmarkArguments { arguments ->
                 activityLauncher.launch(arguments.getIntent(requireContext()))
             }
         } else {
-            startUpsellFlow()
+            startUpsellFlow(source)
         }
     }
 
-    private fun startUpsellFlow() {
-        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
+    private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
-            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
@@ -607,7 +528,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun trackShelfAction(analyticsAction: String) {
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction),
         )
     }
 

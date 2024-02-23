@@ -8,9 +8,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -25,11 +28,6 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
-import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,9 +53,6 @@ class StatsViewModelTest {
     @Mock
     private lateinit var inAppReviewHelper: InAppReviewHelper
 
-    @Mock
-    private lateinit var featureFlag: FeatureFlagWrapper
-
     private lateinit var viewModel: StatsViewModel
 
     @Before
@@ -66,7 +61,6 @@ class StatsViewModelTest {
         whenever(mockResources.getString(anyInt())).thenReturn("")
         whenever(application.resources).thenReturn(mockResources)
         whenever(syncManager.isLoggedIn()).thenReturn(true)
-        whenever(featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)).thenReturn(true)
     }
 
     @Test
@@ -129,17 +123,6 @@ class StatsViewModelTest {
             assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
         }
 
-    @Test
-    fun `given feature disabled, when stats are loaded, then app review dialog is not shown`() =
-        runTest {
-            whenever(featureFlag.isEnabled(Feature.IN_APP_REVIEW_ENABLED)).thenReturn(false)
-            initViewModel(statsStartedAt = LocalDateTime.now().minusDays(8.toLong()))
-
-            viewModel.loadStats()
-
-            assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
-
     private suspend fun initViewModel(
         statsStartedAt: LocalDateTime = LocalDateTime.now().minusDays(8.toLong()),
         playedUpToSumInHours: Double = 3.0,
@@ -147,13 +130,13 @@ class StatsViewModelTest {
         whenever(statsManager.getServerStats()).thenReturn(
             StatsBundle(
                 values = emptyMap(),
-                startedAt = Date.from(statsStartedAt.atZone(ZoneId.systemDefault()).toInstant())
-            )
+                startedAt = Date.from(statsStartedAt.atZone(ZoneId.systemDefault()).toInstant()),
+            ),
         )
 
         whenever(episodeManager.calculatePlayedUptoSumInSecsWithinDays(7))
             .thenReturn(
-                TimeUnit.HOURS.toSeconds(playedUpToSumInHours.toLong()).toDouble()
+                TimeUnit.HOURS.toSeconds(playedUpToSumInHours.toLong()).toDouble(),
             )
 
         viewModel = StatsViewModel(
@@ -164,7 +147,6 @@ class StatsViewModelTest {
             application = application,
             ioDispatcher = UnconfinedTestDispatcher(),
             inAppReviewHelper = inAppReviewHelper,
-            featureFlag = featureFlag
         )
     }
 }

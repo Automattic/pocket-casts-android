@@ -93,6 +93,7 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
+    <string name="slumber_studios" translatable="false">Slumber&#160;Studios</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
@@ -153,6 +154,9 @@
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
     <string name="submit">Submit</string>
+    <string name="report">Report</string>
+    <string name="report_subtitle">Report inappropriate content</string>
+    <string name="widget">Widget</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -338,6 +342,18 @@
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
+
+    <!-- Chapters -->
+
+    <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to skip (to not be played) -->
+    <string name="skip_chapters">Skip chapters</string>
+    <!-- Indicates the number of chapters in a podcast episode. %d is the number of chapters. -->
+    <string name="number_of_chapters">%d chapters</string>
+    <!-- Singular indication of number of chapters -->
+    <string name="single_chapter">1 chapter</string>
+    <!-- %1$d is the number of total chapters. %2$d is the number of hidden chapters. -->
+    <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
+    <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
 
     <!-- Podcasts -->
 
@@ -955,7 +971,6 @@
     <string name="profile_time_free">%s free</string>
     <string name="profile_updates_ended">Updates ended: %s</string>
     <string name="profile_updates_ends">Updates end: %s</string>
-    <string name="profile_upgrade_to_plus">Upgrade to Plus</string>
     <string name="profile_upgrade_to_patron">Upgrade to Patron</string>
     <string name="profile_web_player">Web Player</string>
     <string name="profile_welcome_to_free">Welcome to Pocket Casts!</string>
@@ -967,19 +982,15 @@
     <!-- Plus -->
 
     <string name="plus_cloud_storage">Cloud Storage</string>
-    <string name="plus_cloud_storage_body">Speed up your lectures. Burn through other content. Be your own Podcast DJ.</string>
     <string name="plus_cloud_storage_limit">%dGB Cloud Storage</string>
     <string name="plus_create_marketing_features"><i>Almost</i> Everything</string>
-    <string name="plus_description_body">Get personal, and get distributed, all at once. Upload your personal audio files to our cloud servers, access your account via our web player, and make the app yours.</string>
-    <string name="plus_description_title">Enhanced Features For Advanced Listeners</string>
     <string name="plus_desktop_apps">Desktop Apps</string>
-    <string name="plus_desktop_apps_body">Take your podcasts to more places with our Windows, macOS and Web apps.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customization options.</string>
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
     <string name="plus_trial_duration_free">%s FREE</string>
     <string name="plus_trial_duration_free_trial">%s free trial</string>
+    <string name="plus_offer_duration">%s offer</string>
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
     <string name="plus_slash_month">%s / month</string>
@@ -1015,6 +1026,10 @@
     <string name="trial_start">Start my free trial</string>
     <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
+
+    <!-- Intro Offer -->
+
+    <string name="half_price_first_year">50% off your first year</string>
 
     <!-- Settings -->
 
@@ -1263,6 +1278,8 @@
     <string name="settings_use_android_light_dark_mode">Use Android Light/Dark Mode</string>
     <string name="settings_use_dark_up_next">Use Dark Up Next Theme</string>
     <string name="settings_use_dark_up_next_details">When enabled the Up Next will always use the dark theme, or will match the current theme when disabled</string>
+    <string name="settings_use_dynamic_colors_widget">Use dynamic colors for widget</string>
+    <string name="settings_use_dynamic_colors_widget_details">When enabled, widget colors will change based on the device theme colors.</string>
     <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
     <string name="settings_view">View</string>
@@ -1410,15 +1427,15 @@
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
-    <string name="whats_new_autoplay_title">Autoplay is here!</string>
-    <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
-    <string name="whats_new_autoplay_enable_button">Enable it now</string>
-    <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
     <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
     <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
     <string name="whats_new_bookmarks_enable_now_button">Enable it now</string>
     <string name="whats_new_bookmarks_try_now_button">Try it now</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Join us in the beta testing for bookmarks!</string>
+    <string name="whats_new_slumber_studios_title">Dream big</string>
+    <!-- %1$s is Slumber Studios promo code -->
+    <string name="whats_new_slumber_studios_body">As part of your Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Redeem your code</string>
 
     <!-- Errors -->
 
@@ -1693,9 +1710,7 @@
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
     <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
-    <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
@@ -1705,17 +1720,19 @@
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
     <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop &amp; web apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
-    <string name="onboarding_plus_feature_folders_title">Folders</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Folders &amp; Bookmarks</string>
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB Cloud Storage</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch Playback</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS apps</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra Themes &amp; App Icons</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
+    <!-- Do not translate Slumber Studios -->
+    <string name="onboarding_plus_feature_slumber_studios_title"><![CDATA[1 year of exclusive content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
     <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket&#160;Casts features</string>
     <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
@@ -1723,6 +1740,8 @@
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
     <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Recurring payment at %s</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">after your first year</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Can be canceled at any time.</string>
     <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>
     <string name="onboarding_welcome_get_you_listening_plus">Thank you, now let\'s get you listening!</string>

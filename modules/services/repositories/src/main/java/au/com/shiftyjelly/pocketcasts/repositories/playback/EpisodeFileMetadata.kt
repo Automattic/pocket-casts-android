@@ -12,13 +12,13 @@ import androidx.media3.extractor.metadata.id3.UrlLinkFrame
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import timber.log.Timber
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Collections
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import timber.log.Timber
 
 class EpisodeFileMetadata(val filenamePrefix: String? = null) {
 
@@ -118,7 +118,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             startTime = frame.startTimeMs,
             endTime = frame.endTimeMs,
             imagePath = imagePath,
-            mimeType = mimeType
+            mimeType = mimeType,
         )
     }
 

@@ -18,21 +18,6 @@ steps:
 
   - group: "Linters"
     steps:
-      - label: "☢️ Danger - PR Check"
-        command: .buildkite/commands/danger-pr-check.sh
-        plugins:
-          - docker#v5.8.0:
-              image: "public.ecr.aws/docker/library/ruby:3.2.2"
-              propagate-environment: true
-              environment:
-                - "DANGER_GITHUB_API_TOKEN"
-        if: "build.pull_request.id != null"
-        agents:
-          queue: "default"
-        retry:
-          manual:
-            permit_on_passed: true
-
       - label: 'Lint'
         command: |
           echo "--- 🧹 Linting"
@@ -64,3 +49,15 @@ steps:
     plugins: *common_plugins
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
+
+  - label: "Assemble release APK"
+    command: |
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+      echo "--- :closed_lock_with_key: Installing Secrets"
+      bundle exec fastlane run configure_apply
+      echo "--- ⚙️ Building release variant"
+      ./gradlew assembleRelease -PskipSentryProguardMappingUpload=true
+    plugins: *common_plugins
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"

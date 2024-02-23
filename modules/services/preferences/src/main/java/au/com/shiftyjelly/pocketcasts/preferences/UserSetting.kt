@@ -2,28 +2,37 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import java.time.Clock
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class UserSetting<T>(
-    protected val sharedPrefKey: String,
+    val sharedPrefKey: String,
     protected val sharedPrefs: SharedPreferences,
 ) {
 
-    private val needsSyncKey = "${sharedPrefKey}NeedsSync"
+    private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
-    var needsSync: Boolean
-        get() = sharedPrefs.getBoolean(needsSyncKey, false)
-        set(value) {
-            sharedPrefs.edit().run {
-                putBoolean(needsSyncKey, value)
-                apply()
-            }
-        }
+    private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
+
+    val modifiedAt get(): Instant = runCatching {
+        Instant.parse(getModifiedAtServerString())
+    }.getOrDefault(Instant.EPOCH)
+
+    /**
+     * Returns the value to sync. If sync is not needed or the modification timestamp is unknown
+     * it provides [Instant.EPOCH] as the modification timestamp.
+     */
+    fun <U> getSyncSetting(f: (T, Instant) -> U): U {
+        return f(value, modifiedAt)
+    }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
+    @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
     fun getSyncValue(): T? {
-        val needsSync = sharedPrefs.getBoolean(needsSyncKey, false)
+        val needsSync = getModifiedAtServerString() != null
         return if (needsSync) value else null
     }
 
@@ -34,8 +43,7 @@ abstract class UserSetting<T>(
     val flow: StateFlow<T> by lazy { _flow }
 
     // External callers should use [value] to get the current value if they can't
-    // listen to the flow for changes. This method is solely to be used to intitialize
-    // the flow.
+    // listen to the flow for changes.
     protected abstract fun get(): T
 
     val value: T
@@ -43,14 +51,32 @@ abstract class UserSetting<T>(
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
+    open fun set(
+        value: T,
+        needsSync: Boolean,
+        commit: Boolean = false,
+        clock: Clock = Clock.systemUTC(),
+    ) {
         persist(value, commit)
-        _flow.value = value
+        _flow.value = get()
+        val modifiedAt = if (needsSync) Instant.now(clock).toString() else null
+        updateModifiedAtServerString(modifiedAt)
+    }
 
-        // Since this parameter is defaulted to false, let's not let the default overwrite
-        // a previous request to sync.
-        if (needsSync) {
-            this.needsSync = true
+    // A null parameter reflects a setting that does not need to be synced
+    private fun updateModifiedAtServerString(modifiedAt: String?) {
+        if (modifiedAt != null) {
+            val parsable = runCatching { Instant.parse(modifiedAt) }.isSuccess
+            if (!parsable) {
+                // Only persist the string if it is parsable
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot set invalid modified at server string: $modifiedAt")
+                return
+            }
+        }
+
+        sharedPrefs.edit().run {
+            putString(modifiedAtKey, modifiedAt)
+            apply()
         }
     }
 
@@ -87,7 +113,7 @@ abstract class UserSetting<T>(
         defaultValue = defaultValue,
         sharedPrefs = sharedPrefs,
         fromInt = { it },
-        toInt = { it }
+        toInt = { it },
     )
 
     class StringPref(
@@ -220,7 +246,7 @@ abstract class UserSetting<T>(
             sharedPrefs.edit().run {
                 val commaSeparatedString = value.joinToString(
                     separator = ",",
-                    transform = toString
+                    transform = toString,
                 )
                 putString(sharedPrefKey, commaSeparatedString)
                 if (commit) {
@@ -252,7 +278,7 @@ abstract class UserSetting<T>(
         toString = { value ->
             val intValue = if (value <= 0) defaultValue else value
             intValue.toString()
-        }
+        },
     )
 
     // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
@@ -265,6 +291,7 @@ abstract class UserSetting<T>(
         sharedPrefs = sharedPrefs,
     ) {
         override fun get(): T = initialValue
-        override fun persist(value: T, commit: Boolean) {}
+        override fun persist(value: T, commit: Boolean) = Unit
+        override fun set(value: T, needsSync: Boolean, commit: Boolean, clock: Clock) = Unit
     }
 }

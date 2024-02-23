@@ -45,7 +45,6 @@ internal fun OnboardingCreateAccountPage(
     onBackPressed: () -> Unit,
     onAccountCreated: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
@@ -70,6 +69,7 @@ internal fun OnboardingCreateAccountPage(
     }
 
     val view = LocalView.current
+
     @Suppress("NAME_SHADOWING")
     val onAccountCreated = {
         UiUtil.hideKeyboard(view)
@@ -80,22 +80,21 @@ internal fun OnboardingCreateAccountPage(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .windowInsetsPadding(WindowInsets.ime)
+            .windowInsetsPadding(WindowInsets.ime),
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.create_account),
             onNavigationClick = {
                 viewModel.onBackPressed()
                 onBackPressed()
-            }
+            },
         )
 
         Column(
             Modifier
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             EmailAndPasswordFields(
                 email = state.email,
                 password = state.password,
@@ -107,7 +106,7 @@ internal fun OnboardingCreateAccountPage(
                 onUpdateEmail = viewModel::updateEmail,
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = true,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
 
             TextP40(
@@ -119,7 +118,7 @@ internal fun OnboardingCreateAccountPage(
                 },
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp),
             )
 
             state.errorMessage?.let { errorMessage ->
@@ -128,7 +127,7 @@ internal fun OnboardingCreateAccountPage(
                     color = MaterialTheme.theme.colors.support05,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = 16.dp),
                 )
             }
 

@@ -55,16 +55,20 @@ fun ThemedTopAppBar(
             if (title != null) {
                 Text(
                     text = title,
-                    color = textColor
+                    color = textColor,
                 )
             }
         },
         actions = actions,
         backgroundColor = backgroundColor,
         elevation = 0.dp,
-        modifier = if (bottomShadow) modifier
-            .zIndex(1f)
-            .shadow(4.dp) else modifier
+        modifier = if (bottomShadow) {
+            modifier
+                .zIndex(1f)
+                .shadow(4.dp)
+        } else {
+            modifier
+        },
     )
 }
 
@@ -77,12 +81,12 @@ fun NavigationIconButton(
 ) {
     IconButton(
         onClick = onNavigationClick,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Icon(
             navigationButton.image,
             stringResource(navigationButton.contentDescription),
-            tint = iconColor
+            tint = iconColor,
         )
     }
 }

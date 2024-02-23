@@ -12,7 +12,7 @@ abstract class SearchHistoryDao {
     @Query(
         "SELECT * FROM search_history " +
             "WHERE CASE when :showFolders then 1 else folder_uuid is NULL END " +
-            "ORDER BY modified DESC"
+            "ORDER BY modified DESC",
     )
     abstract suspend fun findAll(showFolders: Boolean): List<SearchHistoryItem>
 

@@ -30,7 +30,7 @@ class BookmarkViewHolder(
                         .pointerInput(data.bookmark.adapterId) {
                             detectTapGestures(
                                 onLongPress = { data.onBookmarkRowLongPress(data.bookmark) },
-                                onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) }
+                                onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) },
                             )
                         },
                     colors = BookmarkRowColors.Default,

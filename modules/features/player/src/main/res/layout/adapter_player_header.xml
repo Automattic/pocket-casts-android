@@ -436,9 +436,9 @@
                     style="@style/shelf_item" />
 
                 <ImageButton
-                    android:id="@+id/download"
-                    android:contentDescription="@string/download"
-                    app:srcCompat="@drawable/ic_download_32"
+                    android:id="@+id/report"
+                    android:contentDescription="@string/report"
+                    app:srcCompat="@drawable/ic_flag"
                     app:tint="?attr/player_contrast_03"
                     style="@style/shelf_item" />
 
@@ -455,16 +455,6 @@
                     app:tint="?attr/player_contrast_03" />
 
             </LinearLayout>
-
-               <View
-                android:id="@+id/topView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -18,7 +18,7 @@ class PromoCodeUpgradedFragment : BaseDialogFragment() {
         fun newInstance(codeDescription: String): PromoCodeUpgradedFragment {
             val instance = PromoCodeUpgradedFragment()
             instance.arguments = bundleOf(
-                ARG_DESCRIPTION to codeDescription
+                ARG_DESCRIPTION to codeDescription,
             )
             return instance
         }

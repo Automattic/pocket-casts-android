@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfTitleBindin
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -39,9 +40,9 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -50,6 +51,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
     private var items = emptyList<Any>()
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var settings: Settings
 
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -156,7 +158,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
 
     override fun onShelfItemTouchHelperFinished(position: Int) {
         trackShelfItemMovedEvent(position)
-        settings.setShelfItems(items.filterIsInstance<ShelfItem>().map { it.id })
+        settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), needsSync = true)
     }
 
     private fun sectionTitleAt(position: Int) =
@@ -182,8 +184,8 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
                     AnalyticsProp.Key.ACTION to title,
                     AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
                     AnalyticsProp.Key.MOVED_FROM to movedFrom,
-                    AnalyticsProp.Key.MOVED_TO to movedTo
-                )
+                    AnalyticsProp.Key.MOVED_TO to movedTo,
+                ),
             )
             dragStartPosition = null
         }
@@ -291,15 +293,15 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
         if (item is ShelfItem && holder is ItemViewHolder) {
             val binding = holder.binding
 
-            binding.lblTitle.setText(item.title(episode))
-            binding.imgIcon.setImageResource(item.iconRes(episode))
+            binding.lblTitle.setText(item.titleId(episode))
+            binding.imgIcon.setImageResource(item.iconId(episode))
             binding.dragHandle.isVisible = editable
 
             if (listener != null) {
                 holder.itemView.setOnClickListener { listener.invoke(item) }
             }
 
-            val subtitle = item.subtitle
+            val subtitle = item.subtitleId
             binding.lblSubtitle.isVisible = editable && subtitle != null && episode is UserEpisode
             if (subtitle != null) {
                 binding.lblSubtitle.setText(subtitle)

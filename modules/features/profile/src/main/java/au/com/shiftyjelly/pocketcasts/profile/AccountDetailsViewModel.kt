@@ -28,9 +28,9 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
+import timber.log.Timber
 
 @HiltViewModel
 class AccountDetailsViewModel
@@ -40,7 +40,7 @@ class AccountDetailsViewModel
     statsManager: StatsManager,
     private val settings: Settings,
     private val syncManager: SyncManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -52,9 +52,9 @@ class AccountDetailsViewModel
                 .mapNotNull {
                     Subscription.fromProductDetails(
                         productDetails = it,
-                        isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                            SubscriptionMapper.mapProductIdToTier(it.productId)
-                        )
+                        isOfferEligible = subscriptionManager.isOfferEligible(
+                            SubscriptionMapper.mapProductIdToTier(it.productId),
+                        ),
                     )
                 }
             Optional.of(subscriptionManager.getDefaultSubscription(subscriptions))
@@ -105,7 +105,7 @@ class AccountDetailsViewModel
     fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked)
+            mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked),
         )
         settings.marketingOptIn.set(isChecked, needsSync = true)
     }

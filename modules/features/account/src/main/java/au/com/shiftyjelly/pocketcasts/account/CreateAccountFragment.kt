@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
-import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountVerticalText
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
@@ -37,7 +37,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class CreateAccountFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
@@ -79,11 +81,12 @@ class CreateAccountFragment : BaseFragment() {
         viewModel.createAccountState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is CreateAccountState.ProductsLoaded -> {
-
                     val subscription = subscriptionManager.getDefaultSubscription(state.list)
                     val plusLabel = when (subscription) {
                         is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
-                        is Subscription.WithTrial -> binding.root.resources.getString(LR.string.pocket_casts_plus_short)
+                        is Subscription.Trial -> { binding.root.resources.getString(LR.string.pocket_casts_plus_short) }
+                        is Subscription.Intro -> { binding.root.resources.getString(LR.string.pocket_casts_plus) }
+                        else -> { binding.root.resources.getString(LR.string.pocket_casts_plus) }
                     }
                     binding.lblPlus.text = plusLabel
 
@@ -91,30 +94,32 @@ class CreateAccountFragment : BaseFragment() {
                         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                         setContent {
                             AppTheme(theme.activeTheme) {
-
                                 val emphasized = true
                                 when (subscription) {
-                                    is Subscription.Simple -> ProductAmountView(
+                                    is Subscription.Simple -> ProductAmountVerticalText(
                                         primaryText = subscription.recurringPricingPhase.formattedPrice,
                                         secondaryText = stringResource(subscription.recurringPricingPhase.perPeriod)
                                             .lowercase(Locale.getDefault()),
                                         horizontalAlignment = Alignment.End,
-                                        emphasized = emphasized
+                                        emphasized = emphasized,
                                     )
-                                    is Subscription.WithTrial -> {
+                                    is Subscription.Trial -> {
                                         val res = LocalContext.current.resources
                                         val primaryText = stringResource(
                                             LR.string.plus_trial_duration_free,
-                                            subscription.trialPricingPhase.periodValuePlural(res)
+                                            subscription.offerPricingPhase.periodValuePlural(res),
                                         )
-                                        ProductAmountView(
+                                        ProductAmountVerticalText(
                                             primaryText = primaryText,
-                                            secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
+                                            secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(
+                                                res,
+                                            ),
                                             horizontalAlignment = Alignment.End,
-                                            emphasized = emphasized
+                                            emphasized = emphasized,
                                         )
                                     }
                                     null -> { /* show nothing */ }
+                                    else -> { /* show nothing */ }
                                 }
                             }
                         }
@@ -140,8 +145,6 @@ class CreateAccountFragment : BaseFragment() {
             analyticsTracker.track(AnalyticsEvent.SELECT_ACCOUNT_TYPE_BUTTON_TAPPED, mapOf(KEY_ACCOUNT_TYPE to accountType))
             if (viewModel.subscriptionType.value == SubscriptionType.FREE) {
                 it.findNavController().navigate(R.id.action_createAccountFragment_to_createEmailFragment)
-            } else if (viewModel.subscriptionType.value == SubscriptionType.PLUS) {
-                it.findNavController().navigate(R.id.action_createAccountFragment_to_createFrequencyFragment)
             }
         }
     }

@@ -12,6 +12,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentCreateFilterBinding
@@ -33,11 +36,11 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.addAfterTextChanged
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -59,7 +62,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         fun newInstance(mode: Mode): CreateFilterFragment {
             return CreateFilterFragment().apply {
                 arguments = bundleOf(
-                    ARG_MODE to mode.string, ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid
+                    ARG_MODE to mode.string, ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid,
                 )
             }
         }
@@ -105,7 +108,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
                 viewModel.saveFilter(
                     iconIndex = selectedIconIndex,
                     colorIndex = colorAdapter.selectedIndex,
-                    isCreatingNewFilter = isCreate
+                    isCreatingNewFilter = isCreate,
                 )
                 viewModel.reset()
             }
@@ -168,38 +171,8 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
             }
         }
 
-        viewModel.playlist.observe(viewLifecycleOwner) { filter ->
-            if (filter.title.isEmpty()) {
-                txtName.setHint(LR.string.filters_filter_name)
-            } else {
-                txtNameInitialized = false
-                txtName.setText(filter.title)
-            }
-            txtNameInitialized = true
-
-            colorAdapter.setSelectedIndex(filter.colorIndex, fromUserInteraction = false)
-
-            selectedIconIndexInitialized = false
-            selectedIconIndex = filter.drawableIndex
-            selectedIconIndexInitialized = true
-
-            tintColor = filter.getColor(context)
-            updateIconViews()
-
-            binding.switchAutoDownload.isChecked = filter.autoDownload
-            viewModel.isAutoDownloadSwitchInitialized = true
-
-            binding.layoutDownloadLimit.isVisible = filter.autoDownload && !isCreate
-            binding.lblDownloadLimit.text = getString(LR.string.filters_auto_download_limit, filter.autodownloadLimit)
-        }
-
-        viewModel.colorIndex.observe(viewLifecycleOwner) {
-            val colorResId = Playlist.themeColors.getOrNull(it) ?: 0
-            val context = view.context
-            val tintColor = context.getThemeColor(colorResId)
-            binding.nameInputLayout.boxStrokeColor = tintColor
-            TextViewCompat.setCompoundDrawableTintList(txtName, ColorStateList.valueOf(tintColor))
-        }
+        observeColorIndex()
+        observePlaylist()
 
         if (isCreate) {
             binding.toolbarLayout.isVisible = false
@@ -221,7 +194,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
             switchAutoDownload.isChecked = !switchAutoDownload.isChecked
         }
         switchAutoDownload.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateAutodownload(isChecked)
+            viewModel.updateAutoDownload(isChecked)
             layoutDownloadLimit.isVisible = !isCreate && isChecked
         }
 
@@ -302,5 +275,48 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     private fun setDownloadLimit(limit: Int) {
         binding?.lblDownloadLimit?.text = getString(LR.string.filters_auto_download_limit, limit)
         viewModel.updateDownloadLimit(limit)
+    }
+
+    private fun observePlaylist() {
+        viewModel.playlist.observe(viewLifecycleOwner) { filter ->
+            if (binding == null) return@observe
+
+            if (filter.title.isEmpty()) {
+                binding!!.txtName.setHint(LR.string.filters_filter_name)
+            } else {
+                txtNameInitialized = false
+                binding!!.txtName.setText(filter.title)
+            }
+            txtNameInitialized = true
+
+            colorAdapter.setSelectedIndex(filter.colorIndex, fromUserInteraction = false)
+
+            selectedIconIndexInitialized = false
+            selectedIconIndex = filter.drawableIndex
+            selectedIconIndexInitialized = true
+
+            tintColor = filter.getColor(context)
+            updateIconViews()
+
+            binding!!.switchAutoDownload.isChecked = filter.autoDownload
+            viewModel.isAutoDownloadSwitchInitialized = true
+
+            binding!!.layoutDownloadLimit.isVisible = filter.autoDownload && !isCreate
+            binding!!.lblDownloadLimit.text = getString(LR.string.filters_auto_download_limit, filter.autodownloadLimit)
+        }
+    }
+
+    private fun observeColorIndex() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.colorIndex.collect {
+                    if (binding == null) return@collect
+                    val colorResId = Playlist.themeColors.getOrNull(it) ?: 0
+                    val tintColor = requireContext().getThemeColor(colorResId)
+                    binding!!.nameInputLayout.boxStrokeColor = tintColor
+                    TextViewCompat.setCompoundDrawableTintList(binding!!.txtName, ColorStateList.valueOf(tintColor))
+                }
+            }
+        }
     }
 }

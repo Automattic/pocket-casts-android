@@ -10,14 +10,14 @@ import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.ActionHelperC
 import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.InputControlPlayback
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ViewModelConfigControlPlayback @Inject constructor(
-    application: Application
+    application: Application,
 ) : ViewModelBase<InputControlPlayback, Unit, ActionHelperControlPlayback>(application), TaskerPluginConfig<InputControlPlayback> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputControlPlayback>) = ActionHelperControlPlayback(pluginConfig)
 
@@ -57,13 +57,13 @@ class ViewModelConfigControlPlayback @Inject constructor(
                         TrimMode.LOW -> LR.string.player_effects_trim_mild
                         TrimMode.MEDIUM -> LR.string.player_effects_trim_medium
                         TrimMode.HIGH -> LR.string.player_effects_trim_mad_max
-                    }
+                    },
                 )
             }
         },
         object : InputField<Boolean>(LR.string.set_volume_boost, IR.drawable.filter_volume, InputControlPlayback.PlaybackCommand.SetVolumeBoost, { volumeBoostEnabled }, { volumeBoostEnabled = it }) {
             override fun getPossibleValues() = MutableStateFlow(listOf(true, false))
-        }
+        },
     )
 
     fun setCommand(value: String?) {

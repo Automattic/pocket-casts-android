@@ -80,7 +80,7 @@ fun HorizontalPagerWrapper(
                         if (pageHeight > pagerHeight) {
                             pagerHeight = pageHeight
                         }
-                    }
+                    },
             ) {
                 content(index, pagerHeight)
             }
@@ -121,7 +121,7 @@ private fun PageIndicator(
                     .padding(4.dp)
                     .clip(CircleShape)
                     .background(circleColor)
-                    .size(8.dp)
+                    .size(8.dp),
             )
         }
     }

@@ -18,13 +18,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UploadProgressManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toUploadData
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
+import au.com.shiftyjelly.pocketcasts.servers.sync.ChangedNamedSettingsRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.ChangedNamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
-import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastListResponse
@@ -41,21 +42,23 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import java.io.File
+import java.net.HttpURLConnection
+import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.rx2.rxSingle
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.io.File
-import java.net.HttpURLConnection
-import javax.inject.Inject
-import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
@@ -182,7 +185,7 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun loginWithEmailAndPassword(
         email: String,
         password: String,
-        signInSource: SignInSource
+        signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, LoginIdentity.PocketCasts) {
         syncServerManager.login(email = email, password = password)
     }
@@ -273,7 +276,7 @@ class SyncManagerImpl @Inject constructor(
 
     override fun uploadImageToServer(
         episode: UserEpisode,
-        imageFile: File
+        imageFile: File,
     ): Completable =
         getCacheTokenOrLoginRxSingle { token ->
             val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
@@ -345,12 +348,19 @@ class SyncManagerImpl @Inject constructor(
 
 // Sync
 
-    override fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse> =
+    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
+    override fun syncUpdate(data: String, lastSyncTime: Instant): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> =
         getEmail()?.let { email ->
             getCacheTokenOrLoginRxSingle { token ->
-                syncServerManager.syncUpdate(email, data, lastModified, token)
+                @Suppress("DEPRECATION")
+                syncServerManager.syncUpdate(email, data, lastSyncTime, token)
             }
         } ?: Single.error(Exception("Not logged in"))
+
+    override suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse =
+        getCacheTokenOrLogin { token ->
+            syncServerManager.userSyncUpdate(token, request)
+        }
 
     override fun getLastSyncAt(): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->
@@ -395,9 +405,17 @@ class SyncManagerImpl @Inject constructor(
             syncServerManager.loadStats(token)
         }
 
-    override suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse =
+    @Suppress("DEPRECATION")
+    @Deprecated("This method can be removed when the sync settings feature flag is removed")
+    override suspend fun namedSettings(
+        request: au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest,
+    ): NamedSettingsResponse = getCacheTokenOrLogin { token ->
+        syncServerManager.namedSettings(request, token)
+    }
+
+    override suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest): ChangedNamedSettingsResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.namedSettings(request, token)
+            syncServerManager.changedNamedSettings(request, token)
         }
 
     override fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse> =
@@ -432,7 +450,6 @@ class SyncManagerImpl @Inject constructor(
         when (loginResult) {
             is LoginResult.Success -> {
                 when (signInSource) {
-
                     SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN_WATCH_FROM_PHONE)
 
@@ -446,20 +463,19 @@ class SyncManagerImpl @Inject constructor(
                             properties = mapOf(
                                 TRACKS_KEY_SOURCE to source,
                                 TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
-                            )
+                            ),
                         )
                 }
             }
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 when (signInSource) {
-
                     SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(
                             AnalyticsEvent.USER_SIGNIN_WATCH_FROM_PHONE_FAILED,
                             mapOf(
                                 TRACKS_KEY_ERROR_CODE to errorCodeValue,
-                            )
+                            ),
                         )
 
                     is SignInSource.UserInitiated ->
@@ -469,7 +485,7 @@ class SyncManagerImpl @Inject constructor(
                                 TRACKS_KEY_SOURCE to source,
                                 TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
                                 TRACKS_KEY_ERROR_CODE to errorCodeValue,
-                            )
+                            ),
                         )
                 }
             }
@@ -481,7 +497,7 @@ class SyncManagerImpl @Inject constructor(
             is LoginResult.Success -> {
                 analyticsTracker.track(
                     AnalyticsEvent.USER_ACCOUNT_CREATED,
-                    mapOf(TRACKS_KEY_SOURCE to "password") // This method is only used when creating an account with a password
+                    mapOf(TRACKS_KEY_SOURCE to "password"), // This method is only used when creating an account with a password
                 )
             }
             is LoginResult.Failed -> {
@@ -489,8 +505,8 @@ class SyncManagerImpl @Inject constructor(
                 analyticsTracker.track(
                     AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED,
                     mapOf(
-                        TRACKS_KEY_ERROR_CODE to errorCodeValue
-                    )
+                        TRACKS_KEY_ERROR_CODE to errorCodeValue,
+                    ),
                 )
             }
         }
@@ -499,7 +515,7 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun downloadTokens(
         email: String,
         refreshToken: RefreshToken,
-        signInType: AccountConstants.SignInType
+        signInType: AccountConstants.SignInType,
     ): LoginTokenResponse =
         when (signInType) {
             AccountConstants.SignInType.Password -> syncServerManager.login(email = email, password = refreshToken.value)
@@ -584,7 +600,7 @@ class SyncManagerImpl @Inject constructor(
             uuid = response.uuid,
             refreshToken = response.refreshToken,
             accessToken = response.accessToken,
-            loginIdentity = loginIdentity
+            loginIdentity = loginIdentity,
         )
         isLoggedInObservable.accept(true)
 

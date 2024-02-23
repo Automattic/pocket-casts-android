@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.settings.status.ServiceStatusChecker.Check
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,14 +21,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class StatusViewModel @Inject constructor(
     private val serviceStatusChecker: ServiceStatusChecker,
-    val support: Support
+    val support: Support,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -37,21 +37,21 @@ class StatusViewModel @Inject constructor(
             title = LR.string.settings_status_service_internet,
             summary = LR.string.settings_status_service_internet_summary,
             help = LR.string.settings_status_service_internet_help,
-            check = Internet
+            check = Internet,
         ),
         Service(
             title = LR.string.settings_status_service_refresh,
             summary = LR.string.settings_status_service_refresh_summary,
             help = LR.string.settings_status_service_ad_blocker_help_singular,
             helpArgs = listOf("refresh.pocketcasts.com"),
-            check = Urls(listOf("https://refresh.pocketcasts.com/health.html"))
+            check = Urls(listOf("https://refresh.pocketcasts.com/health.html")),
         ),
         Service(
             title = LR.string.settings_status_service_account,
             summary = LR.string.settings_status_service_account_summary,
             help = LR.string.settings_status_service_ad_blocker_help_singular,
             helpArgs = listOf("api.pocketcasts.com"),
-            check = Urls(listOf("https://api.pocketcasts.com/health"))
+            check = Urls(listOf("https://api.pocketcasts.com/health")),
         ),
         Service(
             title = LR.string.settings_status_service_discover,
@@ -61,18 +61,18 @@ class StatusViewModel @Inject constructor(
             check = Urls(
                 listOf(
                     "https://static.pocketcasts.com/discover/android/content.json",
-                    "https://cache.pocketcasts.com/mobile/podcast/full/e7a6f7d0-02f2-0133-1c51-059c869cc4eb"
-                )
-            )
+                    "https://cache.pocketcasts.com/mobile/podcast/full/e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
+                ),
+            ),
         ),
         Service(
             title = LR.string.settings_status_service_hosts,
             summary = LR.string.settings_status_service_hosts_summary,
             help = LR.string.settings_status_service_hosts_help,
             check = Urls(
-                listOf("https://dts.podtrac.com/redirect.mp3/static.pocketcasts.com/assets/feeds/status/episode1.mp3")
-            )
-        )
+                listOf("https://dts.podtrac.com/redirect.mp3/static.pocketcasts.com/assets/feeds/status/episode1.mp3"),
+            ),
+        ),
     )
 
     // Backing property to avoid state updates from other classes
@@ -139,7 +139,7 @@ data class Service(
     @StringRes val help: Int,
     val helpArgs: List<String> = emptyList(),
     val check: ServiceStatusChecker.Check,
-    val status: ServiceStatus = ServiceStatus.Queued
+    val status: ServiceStatus = ServiceStatus.Queued,
 ) {
 
     fun toSummary(context: Context): String {

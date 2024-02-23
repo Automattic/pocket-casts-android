@@ -2,17 +2,17 @@ package au.com.shiftyjelly.pocketcasts.utils
 
 import android.content.Context
 import android.graphics.Bitmap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class FileUtilWrapper @Inject constructor() {
     fun deleteDirectoryContents(path: String) {
-        FileUtil.deleteDirectoryContents(path)
+        FileUtil.deleteDirContents(path)
     }
 
     suspend fun saveBitmapToFile(

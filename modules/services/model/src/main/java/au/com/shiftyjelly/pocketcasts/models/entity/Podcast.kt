@@ -11,6 +11,8 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.Bundle
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -43,15 +45,20 @@ data class Podcast(
     @ColumnInfo(name = "episodes_to_keep") var episodesToKeep: Int = 0,
     @ColumnInfo(name = "override_global_settings") var overrideGlobalSettings: Boolean = false,
     @ColumnInfo(name = "override_global_effects") var overrideGlobalEffects: Boolean = false,
+    @ColumnInfo(name = "override_global_effects_modified") var overrideGlobalEffectsModified: Date? = null,
     @ColumnInfo(name = "start_from") var startFromSecs: Int = 0,
+    @ColumnInfo(name = "start_from_modified") var startFromModified: Date? = null,
     @ColumnInfo(name = "playback_speed") var playbackSpeed: Double = 1.0,
-    @ColumnInfo(name = "silence_removed") var isSilenceRemoved: Boolean = false,
+    @ColumnInfo(name = "playback_speed_modified") var playbackSpeedModified: Date? = null,
     @ColumnInfo(name = "volume_boosted") var isVolumeBoosted: Boolean = false,
+    @ColumnInfo(name = "volume_boosted_modified") var volumeBoostedModified: Date? = null,
     @ColumnInfo(name = "is_folder") var isFolder: Boolean = false,
     @ColumnInfo(name = "subscribed") var isSubscribed: Boolean = false,
     @ColumnInfo(name = "show_notifications") var isShowNotifications: Boolean = false,
+    @ColumnInfo(name = "show_notifications_modified") var showNotificationsModified: Date? = null,
     @ColumnInfo(name = "auto_download_status") var autoDownloadStatus: Int = 0,
     @ColumnInfo(name = "auto_add_to_up_next") var autoAddToUpNext: AutoAddUpNext = AutoAddUpNext.OFF,
+    @ColumnInfo(name = "auto_add_to_up_next_modified") var autoAddToUpNextModified: Date? = null,
     @ColumnInfo(name = "most_popular_color") var backgroundColor: Int = 0,
     @ColumnInfo(name = "primary_color") var tintColorForLightBg: Int = 0,
     @ColumnInfo(name = "secondary_color") var tintColorForDarkBg: Int = 0,
@@ -64,21 +71,29 @@ data class Podcast(
     @ColumnInfo(name = "sync_status") var syncStatus: Int = SYNC_STATUS_NOT_SYNCED,
     @ColumnInfo(name = "exclude_from_auto_archive") var excludeFromAutoArchive: Boolean = false, // Not used anymore
     @ColumnInfo(name = "override_global_archive") var overrideGlobalArchive: Boolean = false,
-    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: Int = 0,
-    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: Int = 0,
+    @ColumnInfo(name = "override_global_archive_modified") var overrideGlobalArchiveModified: Date? = null,
+    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
+    @ColumnInfo(name = "auto_archive_played_after_modified") var autoArchiveAfterPlayingModified: Date? = null,
+    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,
+    @ColumnInfo(name = "auto_archive_inactive_after_modified") var autoArchiveInactiveModified: Date? = null,
     @ColumnInfo(name = "auto_archive_episode_limit") var autoArchiveEpisodeLimit: Int? = null,
+    @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,
     @ColumnInfo(name = "estimated_next_episode") var estimatedNextEpisode: Date? = null,
     @ColumnInfo(name = "episode_frequency") var episodeFrequency: String? = null,
-    @ColumnInfo(name = "grouping") var grouping: Int = PodcastGrouping.All.indexOf(PodcastGrouping.None),
+    @ColumnInfo(name = "grouping") var grouping: PodcastGrouping = PodcastGrouping.None,
+    @ColumnInfo(name = "grouping_modified") var groupingModified: Date? = null,
     @ColumnInfo(name = "skip_last") var skipLastSecs: Int = 0,
+    @ColumnInfo(name = "skip_last_modified") var skipLastModified: Date? = null,
     @ColumnInfo(name = "show_archived") var showArchived: Boolean = false,
+    @ColumnInfo(name = "show_archived_modified") var showArchivedModified: Date? = null,
     @ColumnInfo(name = "trim_silence_level") var trimMode: TrimMode = TrimMode.OFF,
+    @ColumnInfo(name = "trim_silence_level_modified") var trimModeModified: Date? = null,
     @ColumnInfo(name = "refresh_available") var refreshAvailable: Boolean = false,
     @ColumnInfo(name = "folder_uuid") var folderUuid: String? = null,
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
-    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf()
+    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {
 
     constructor() : this(uuid = "")
@@ -86,7 +101,8 @@ data class Podcast(
     enum class AutoAddUpNext(val databaseInt: Int, val analyticsValue: String) {
         OFF(0, "off"),
         PLAY_LAST(1, "add_last"),
-        PLAY_NEXT(2, "add_first");
+        PLAY_NEXT(2, "add_first"),
+        ;
 
         companion object {
             fun fromDatabaseInt(int: Int?) = values().firstOrNull { it.databaseInt == int }
@@ -97,7 +113,7 @@ data class Podcast(
         // A holder of podcast substitutes when needed for UserEpisodes
         val userPodcast = Podcast(
             uuid = "da7aba5e-f11e-f11e-f11e-da7aba5ef11e",
-            title = "Custom Episode"
+            title = "Custom Episode",
         )
 
         const val SYNC_STATUS_NOT_SYNCED = 0
@@ -129,24 +145,19 @@ data class Podcast(
     val isNotSynced: Boolean
         get() = syncStatus == SYNC_STATUS_NOT_SYNCED
 
-    val podcastGrouping: PodcastGrouping
-        get() = PodcastGrouping.All[grouping]
+    val isSilenceRemoved: Boolean
+        get() = trimMode != TrimMode.OFF
 
     val isUsingEffects: Boolean
         get() = overrideGlobalEffects && (isSilenceRemoved || isVolumeBoosted || playbackSpeed != 1.0)
 
-    var playbackEffects: PlaybackEffects
+    val playbackEffects: PlaybackEffects
         get() {
             val effects = PlaybackEffects()
             effects.playbackSpeed = playbackSpeed
             effects.trimMode = trimMode
             effects.isVolumeBoosted = isVolumeBoosted
             return effects
-        }
-        set(effects) {
-            playbackSpeed = effects.playbackSpeed
-            trimMode = effects.trimMode
-            isVolumeBoosted = effects.isVolumeBoosted
         }
 
     enum class Licensing {

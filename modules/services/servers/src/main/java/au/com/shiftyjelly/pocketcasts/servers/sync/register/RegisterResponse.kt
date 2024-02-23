@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class RegisterResponse(
     @field:Json(name = "token") val token: AccessToken,
-    @field:Json(name = "uuid") val uuid: String
+    @field:Json(name = "uuid") val uuid: String,
 )

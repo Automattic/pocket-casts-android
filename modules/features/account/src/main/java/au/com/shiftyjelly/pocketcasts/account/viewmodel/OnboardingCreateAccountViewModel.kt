@@ -13,14 +13,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -29,15 +29,15 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
     private val podcastManager: PodcastManager,
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
 ) : AndroidViewModel(context as Application), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
     private val _stateFlow = MutableStateFlow(
         OnboardingCreateAccountState(
-            noNetworkErrorMessage = getApplication<Application>().getString(LR.string.log_in_no_network)
-        )
+            noNetworkErrorMessage = getApplication<Application>().getString(LR.string.log_in_no_network),
+        ),
     )
     val stateFlow: StateFlow<OnboardingCreateAccountState> = _stateFlow
 
@@ -90,7 +90,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                     _stateFlow.update {
                         it.copy(
                             isCallInProgress = false,
-                            serverErrorMessage = result.message
+                            serverErrorMessage = result.message,
                         )
                     }
                 }

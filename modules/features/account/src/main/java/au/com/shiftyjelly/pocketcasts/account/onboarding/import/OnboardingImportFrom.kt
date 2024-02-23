@@ -57,24 +57,22 @@ fun OnboardingImportFrom(
 
     Column(
         Modifier
-            .fillMaxHeight()
+            .fillMaxHeight(),
     ) {
-
         ThemedTopAppBar(
             onNavigationClick = onBackPressed,
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
         )
 
         Column(
             Modifier
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             Image(
                 painter = painterResource(drawableRes),
                 contentDescription = null,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp),
             )
 
             TextH10(title)
@@ -120,10 +118,10 @@ private fun NumberedList(vararg texts: String) {
                     .constrainAs(numberRef) {
                         top.linkTo(
                             anchor = if (index == 0) parent.top else textRefs[index - 1].bottom,
-                            margin = if (index == 0) 0.dp else 12.dp
+                            margin = if (index == 0) 0.dp else 12.dp,
                         )
                         start.linkTo(parent.start)
-                    }
+                    },
             )
 
             // Indented text
@@ -137,7 +135,7 @@ private fun NumberedList(vararg texts: String) {
                         end.linkTo(parent.end)
                         height = Dimension.wrapContent
                         width = Dimension.fillToConstraints
-                    }
+                    },
             )
         }
     }

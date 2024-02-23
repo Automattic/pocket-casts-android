@@ -20,12 +20,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfItem
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfItems
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -60,15 +59,17 @@ import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -124,7 +125,7 @@ class PlayerViewModel @Inject constructor(
         val bufferedUpToMs: Int = 0,
         val embeddedArtwork: Artwork = Artwork.None,
         val isUserEpisode: Boolean = false,
-        val theme: Theme.ThemeType = Theme.ThemeType.DARK
+        val theme: Theme.ThemeType = Theme.ThemeType.DARK,
     ) {
 
         val isChaptersPresent: Boolean = !chapters.isEmpty
@@ -187,7 +188,7 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
-        this::mergeListData
+        this::mergeListData,
     )
         .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
@@ -200,26 +201,15 @@ class PlayerViewModel @Inject constructor(
 
     private var playbackPositionMs: Int = 0
 
-    private val shelfObservable = settings.shelfItemsObservable.map { list ->
-        if (list.isEmpty()) {
-            ShelfItems.itemsList
-        } else {
-            // Add missing bookmark item if the feature flag is enabled
-            val updatedList = when {
-                list.contains(ShelfItem.Bookmark.id) -> list
-                FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) -> {
-                    list.toMutableList().apply {
-                        add(list.size - 1, ShelfItem.Bookmark.id)
-                    }
+    private val shelfObservable = settings.shelfItems.flow
+        .map { items ->
+            items.filter { item ->
+                when (item) {
+                    ShelfItem.Report -> FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
+                    else -> true
                 }
-                else -> list
             }
-            updatedList.mapNotNull { id ->
-                ShelfItems.itemForId(id)
-            }
-        }
-    }
-        .toFlowable(BackpressureStrategy.LATEST)
+        }.asFlowable(viewModelScope.coroutineContext)
 
     private val shelfUpNext = upNextStateObservable.distinctUntilChanged { t1, t2 ->
         val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -230,8 +220,7 @@ class PlayerViewModel @Inject constructor(
 
     private val trimmedShelfObservable = Flowables.combineLatest(shelfUpNext.toFlowable(BackpressureStrategy.LATEST), shelfObservable).map { (upNextState, shelf) ->
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
-        val isUserEpisode = episode is UserEpisode
-        val trimmedShelf = if (isUserEpisode) shelf.filter { it.shownWhen == ShelfItem.Shown.UserEpisodeOnly || it.shownWhen == ShelfItem.Shown.Always } else shelf.filter { it.shownWhen == ShelfItem.Shown.EpisodeOnly || it.shownWhen == ShelfItem.Shown.Always }
+        val trimmedShelf = shelf.filter { it.showIf(episode) }
         return@map Pair(trimmedShelf, episode)
     }
 
@@ -318,7 +307,7 @@ class PlayerViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { positionMs ->
                     playbackPositionMs = positionMs
-                }
+                },
             )
             .apply {
                 disposables.add(this)
@@ -344,7 +333,9 @@ class PlayerViewModel @Inject constructor(
         } else if (episode is UserEpisode) {
             val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)
             if (artworkUrl.startsWith("/")) Artwork.Path(artworkUrl) else Artwork.Url(artworkUrl)
-        } else Artwork.None
+        } else {
+            Artwork.None
+        }
 
         val podcastHeader: PlayerHeader
         if (episode == null) {
@@ -378,7 +369,7 @@ class PlayerViewModel @Inject constructor(
                 bufferedUpToMs = playbackState.bufferedMs,
                 embeddedArtwork = embeddedArtwork,
                 isUserEpisode = episode is UserEpisode,
-                theme = theme.activeTheme
+                theme = theme.activeTheme,
             )
         }
         val chapters = playbackState.chapters
@@ -406,7 +397,7 @@ class PlayerViewModel @Inject constructor(
             currentChapter = currentChapter,
             upNextExpanded = upNextExpanded,
             upNextEpisodes = upNextEpisodes,
-            upNextSummary = upNextFooter
+            upNextSummary = upNextFooter,
         )
     }
 
@@ -508,7 +499,7 @@ class PlayerViewModel @Inject constructor(
                 episodeUuid = episode.uuid,
                 timeSecs = timeSecs,
                 backgroundColor = backgroundColor,
-                tintColor = tintColor
+                tintColor = tintColor,
             )
             onSuccess(arguments)
         }
@@ -600,7 +591,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                settings.globalPlaybackEffects.set(effects)
+                settings.globalPlaybackEffects.set(effects, needsSync = true)
             }
             playbackManager.updatePlayerEffects(effects)
         }
@@ -619,17 +610,17 @@ class PlayerViewModel @Inject constructor(
             removeNowPlaying = false,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
-            context = context
+            context = context,
         )
         dialog.setForceDarkTheme(true)
         return dialog
     }
 
     fun nextChapter() {
-        playbackManager.skipToNextChapter()
+        playbackManager.skipToNextSelectedOrLastChapter()
     }
 
     fun previousChapter() {
-        playbackManager.skipToPreviousChapter()
+        playbackManager.skipToPreviousSelectedOrLastChapter()
     }
 }

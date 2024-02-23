@@ -12,6 +12,7 @@ import javax.inject.Inject
 class ShareListCreateActivity : AppCompatActivity() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var theme: Theme
 
     override fun onCreate(savedInstanceState: Bundle?) {

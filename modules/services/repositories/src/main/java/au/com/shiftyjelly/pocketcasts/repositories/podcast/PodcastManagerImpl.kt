@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -38,16 +40,16 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.sentry.Sentry
+import java.util.Calendar
+import java.util.Date
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.util.Calendar
-import java.util.Date
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class PodcastManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
@@ -59,7 +61,7 @@ class PodcastManagerImpl @Inject constructor(
     private val refreshServerManager: RefreshServerManager,
     private val syncManager: SyncManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
 ) : PodcastManager, CoroutineScope {
 
     companion object {
@@ -84,8 +86,8 @@ class PodcastManagerImpl @Inject constructor(
                     podcast.isShowNotifications = false
                     podcast.autoDownloadStatus = Podcast.AUTO_DOWNLOAD_OFF
                     podcast.autoAddToUpNext = Podcast.AutoAddUpNext.OFF
-                    podcast.autoArchiveAfterPlaying = 0
-                    podcast.autoArchiveInactive = 0
+                    podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.defaultValue(context)
+                    podcast.autoArchiveInactive = AutoArchiveInactive.Default
                     podcast.autoArchiveEpisodeLimit = null
                     podcast.overrideGlobalArchive = false
                     podcast.folderUuid = null
@@ -116,6 +118,9 @@ class PodcastManagerImpl @Inject constructor(
     override fun subscribeToPodcast(podcastUuid: String, sync: Boolean) {
         subscribeManager.subscribeOnQueue(podcastUuid, sync)
     }
+
+    override suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean): Podcast =
+        subscribeToPodcastSuspend(podcastUuid, sync)
 
     /**
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
@@ -205,7 +210,7 @@ class PodcastManagerImpl @Inject constructor(
             try {
                 LogBuffer.i(
                     LogBuffer.TAG_BACKGROUND_TASKS,
-                    "Refreshing podcast ${existingPodcast.uuid}"
+                    "Refreshing podcast ${existingPodcast.uuid}",
                 )
                 val updatedPodcast = cacheServerManager.getPodcastResponse(existingPodcast.uuid)
                     .map {
@@ -260,10 +265,10 @@ class PodcastManagerImpl @Inject constructor(
                         } else {
                             // don't add anything newer than the latest episode so it runs through the refresh logic (auto download, auto add to Up Next etc
                             if (!existingPodcast.isSubscribed || (
-                                mostRecentEpisode != null && newEpisode.publishedDate.before(
-                                        mostRecentEpisode.publishedDate
+                                    mostRecentEpisode != null && newEpisode.publishedDate.before(
+                                        mostRecentEpisode.publishedDate,
                                     )
-                                )
+                                    )
                             ) {
                                 newEpisode.podcastUuid = existingPodcast.uuid
                                 newEpisode.episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED
@@ -273,7 +278,7 @@ class PodcastManagerImpl @Inject constructor(
                                 val newEpisodeIs7DaysOld = if (mostRecentEpisode != null) {
                                     DateUtil.daysBetweenTwoDates(
                                         newEpisode.publishedDate,
-                                        mostRecentEpisode.publishedDate
+                                        mostRecentEpisode.publishedDate,
                                     ) >= 7
                                 } else {
                                     true
@@ -294,7 +299,7 @@ class PodcastManagerImpl @Inject constructor(
                         episodeManager.add(
                             insertEpisodes,
                             podcastUuid = existingPodcast.uuid,
-                            downloadMetaData = false
+                            downloadMetaData = false,
                         )
                     }
                     val episodeUuidsToDelete = existingEpisodes.map { it.uuid }
@@ -307,7 +312,7 @@ class PodcastManagerImpl @Inject constructor(
                             .filter {
                                 it.addedDate.before(twoWeeksAgo) && episodeManager.episodeCanBeCleanedUp(
                                     it,
-                                    playbackManager
+                                    playbackManager,
                                 )
                             }
                     if (episodesToDelete.isNotEmpty()) {
@@ -317,7 +322,7 @@ class PodcastManagerImpl @Inject constructor(
                     if (originalPodcast != existingPodcast) {
                         LogBuffer.i(
                             LogBuffer.TAG_BACKGROUND_TASKS,
-                            "Refresh required update for podcast ${existingPodcast.uuid}"
+                            "Refresh required update for podcast ${existingPodcast.uuid}",
                         )
                         updatePodcast(existingPodcast)
                     }
@@ -497,11 +502,11 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateGrouping(podcast: Podcast, grouping: PodcastGrouping) {
-        podcastDao.updateGrouping(PodcastGrouping.All.indexOf(grouping), podcast.uuid)
+        podcastDao.updateGrouping(grouping, podcast.uuid)
     }
 
     override fun updateGroupingForAll(grouping: PodcastGrouping) {
-        podcastDao.updatePodcastGroupingForAll(PodcastGrouping.All.indexOf(grouping))
+        podcastDao.updatePodcastGroupingForAll(grouping)
     }
 
     override suspend fun markAllPodcastsUnsynced() {
@@ -575,17 +580,6 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.insert(podcast)
     }
 
-    override fun getPodcastEpisodesListOrderBy(podcast: Podcast): String {
-        return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> "UPPER(title) ASC"
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> "UPPER(title) DESC"
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> "published_date ASC"
-            EpisodesSortType.EPISODES_SORT_BY_DATE_DESC -> "published_date DESC"
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> "duration ASC"
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> "duration DESC"
-        }
-    }
-
     override fun updatePodcast(podcast: Podcast) {
         podcastDao.update(podcast)
     }
@@ -595,6 +589,9 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun updateAllShowNotifications(showNotifications: Boolean) {
+        if (showNotifications) {
+            settings.notifyRefreshPodcast.set(true, needsSync = true)
+        }
         podcastDao.updateAllShowNotifications(showNotifications)
     }
 
@@ -614,7 +611,7 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun updateAutoAddToUpNextsIf(
         podcastUuids: List<String>,
         newValue: Podcast.AutoAddUpNext,
-        onlyIfValue: Podcast.AutoAddUpNext
+        onlyIfValue: Podcast.AutoAddUpNext,
     ) {
         podcastDao.updateAutoAddToUpNextsIf(podcastUuids, newValue.databaseInt, onlyIfValue.databaseInt)
     }
@@ -630,10 +627,8 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
-        val isOn = trimMode != TrimMode.OFF
         podcast.trimMode = trimMode
-        podcast.isSilenceRemoved = isOn
-        podcastDao.updateTrimSilenceMode(trimMode, isOn, podcast.uuid)
+        podcastDao.updateTrimSilenceMode(trimMode, podcast.uuid)
     }
 
     override fun updateVolumeBoosted(podcast: Podcast, override: Boolean) {
@@ -647,8 +642,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateEffects(podcast: Podcast, effects: PlaybackEffects) {
-        podcast.playbackEffects = effects
-        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode != TrimMode.OFF, podcast.uuid)
+        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
         updateTrimMode(podcast, effects.trimMode)
     }
 
@@ -658,7 +652,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
         if (show) {
-            settings.notifyRefreshPodcast.set(true)
+            settings.notifyRefreshPodcast.set(true, needsSync = true)
         }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }
@@ -726,7 +720,7 @@ class PodcastManagerImpl @Inject constructor(
                     " isQueued: " + episode.isQueued +
                     " isDownloaded: " + episode.isDownloaded +
                     " isDownloading: " + episode.isDownloading +
-                    " isFinished: " + episode.isFinished
+                    " isFinished: " + episode.isFinished,
             )
 
             if (autoDownload == null ||
@@ -772,7 +766,7 @@ class PodcastManagerImpl @Inject constructor(
             skipLastSecs = skipLastSecs,
             folderUuid = folderUuid,
             sortPosition = sortPosition,
-            addedDate = addedDate
+            addedDate = addedDate,
         )
     }
 
@@ -801,5 +795,21 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
+    }
+
+    override suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive) {
+        podcastDao.updateArchiveSettings(uuid, enable, afterPlaying, inactive)
+    }
+
+    override suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying) {
+        podcastDao.updateArchiveAfterPlaying(uuid, value)
+    }
+
+    override suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive) {
+        podcastDao.updateArchiveAfterInactive(uuid, value)
+    }
+
+    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?) {
+        podcastDao.updateArchiveEpisodeLimit(uuid, value)
     }
 }

@@ -11,6 +11,7 @@ import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 class WatchPhoneCommunication {
 
@@ -114,7 +114,6 @@ class WatchPhoneCommunication {
 
         fun handleMessage(messageEvent: MessageEvent) {
             when (messageEvent.path) {
-
                 emailLogsToSupport -> handleEmailLogsToSupportMessage(messageEvent)
 
                 else -> {
@@ -138,6 +137,7 @@ class WatchPhoneCommunication {
 enum class WatchMessageSendState {
     // a message being queued for delivery does not guarantee delivery
     QUEUED,
+
     // this occurs when attempting to queue a message for a node that is not available
     FAILED_TO_QUEUE,
 }

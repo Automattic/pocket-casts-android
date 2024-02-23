@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.servers.extensions
 
 import com.google.protobuf.Timestamp
-import timber.log.Timber
 import java.time.Instant
 import java.util.Date
+import timber.log.Timber
 
 fun Timestamp.toDate(): Date? {
     return try {

@@ -10,9 +10,9 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.NoSubscriptions
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
-import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
@@ -46,9 +46,9 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     private val _state = MutableStateFlow<OnboardingUpgradeBottomSheetState>(Loading)
     val state: StateFlow<OnboardingUpgradeBottomSheetState> = _state
         .map {
-            // If selected subscription has trialPricingPhase, update mostRecentlySelectedTrialPhase
-            (it as? Loaded)?.selectedSubscription?.trialPricingPhase?.let { trialPhase ->
-                it.copy(mostRecentlySelectedTrialPhase = trialPhase)
+            // If selected subscription has offerPricingPhase, update mostRecentlySelectedOfferPhase
+            (it as? Loaded)?.selectedSubscription?.offerPricingPhase?.let { offerPhase ->
+                it.copy(mostRecentlySelectedOfferPhase = offerPhase)
             } ?: it
         }.stateIn(viewModelScope, SharingStarted.Lazily, _state.value)
 
@@ -64,9 +64,9 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                             Subscription.fromProductDetails(
                                 productDetails = productDetailsState,
-                                isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
-                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
-                                )
+                                isOfferEligible = subscriptionManager.isOfferEligible(
+                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                ),
                             )
                         }
                     } ?: emptyList()
@@ -89,7 +89,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
             else -> {
                 LogBuffer.e(
                     LogBuffer.TAG_INVALID_STATE,
-                    "Updating selected subscription without any available subscriptions. This should never happen."
+                    "Updating selected subscription without any available subscriptions. This should never happen.",
                 )
             }
         }
@@ -98,6 +98,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     fun onClickSubscribe(
         activity: Activity,
         flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
     ) {
         (state.value as? Loaded)?.let { loadedState ->
@@ -106,7 +107,11 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
 
             analyticsTracker.track(
                 AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                mapOf(flowKey to flow.analyticsValue, selectedSubscriptionKey to subscription.productDetails.productId)
+                mapOf(
+                    flowKey to flow.analyticsValue,
+                    sourceKey to source.analyticsValue,
+                    selectedSubscriptionKey to subscription.productDetails.productId,
+                ),
             )
 
             viewModelScope.launch {
@@ -137,7 +142,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
             subscriptionManager.launchBillingFlow(
                 activity,
                 subscription.productDetails,
-                subscription.offerToken
+                subscription.offerToken,
             )
         }
     }
@@ -150,7 +155,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
         val defaultSelected = subscriptionManager.getDefaultSubscription(
             subscriptions = subscriptions,
             tier = lastSelectedTier,
-            frequency = lastSelectedFrequency
+            frequency = lastSelectedFrequency,
         )
         return if (defaultSelected == null) {
             NoSubscriptions
@@ -163,23 +168,36 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
         }
     }
 
-    fun onSelectPaymentFrequencyShown(flow: OnboardingFlow) {
+    fun onSelectPaymentFrequencyShown(
+        flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN,
-            mapOf(flowKey to flow.analyticsValue)
+            mapOf(
+                flowKey to flow.analyticsValue,
+                sourceKey to source.analyticsValue,
+            ),
         )
     }
 
-    fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow) {
+    fun onSelectPaymentFrequencyDismissed(
+        flow: OnboardingFlow,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED,
-            mapOf(flowKey to flow.analyticsValue)
+            mapOf(
+                flowKey to flow.analyticsValue,
+                sourceKey to source.analyticsValue,
+            ),
         )
     }
 
     companion object {
         const val flowKey = "flow"
         const val selectedSubscriptionKey = "product"
+        const val sourceKey = "source"
     }
 }
 
@@ -189,18 +207,18 @@ sealed class OnboardingUpgradeBottomSheetState {
     data class Loaded constructor(
         val subscriptions: List<Subscription>, // This list should never be empty
         val selectedSubscription: Subscription,
-        // Need to retain the most recently selected trial phase so that information is still available as
-        // it animates out of view after a subscription without a trial phase is selected
-        val mostRecentlySelectedTrialPhase: TrialSubscriptionPricingPhase? = null,
-        val purchaseFailed: Boolean = false
+        // Need to retain the most recently selected offer phase so that information is still available as
+        // it animates out of view after a subscription without a offer phase is selected
+        val mostRecentlySelectedOfferPhase: OfferSubscriptionPricingPhase? = null,
+        val purchaseFailed: Boolean = false,
     ) : OnboardingUpgradeBottomSheetState() {
-        val showTrialInfo = selectedSubscription.trialPricingPhase != null
+        val showTrialInfo = selectedSubscription.offerPricingPhase != null
         val upgradeButton = selectedSubscription.toUpgradeButton()
         init {
             if (subscriptions.isEmpty()) {
                 LogBuffer.e(
                     LogBuffer.TAG_INVALID_STATE,
-                    "Loaded subscription selection bottom sheet during onboarding with no subscriptions. This should never happen."
+                    "Loaded subscription selection bottom sheet during onboarding with no subscriptions. This should never happen.",
                 )
             }
         }

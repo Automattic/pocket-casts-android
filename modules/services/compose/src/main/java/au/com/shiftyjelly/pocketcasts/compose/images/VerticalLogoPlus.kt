@@ -24,13 +24,13 @@ fun VerticalLogoPlus(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.clearAndSetSemantics {
             contentDescription = pocketCastsPlusString
-        }
+        },
     ) {
         VerticalLogo()
         Image(
             painter = painterResource(IR.drawable.plus_logo),
             contentDescription = stringResource(LR.string.pocket_casts),
-            modifier = Modifier.padding(top = 15.dp)
+            modifier = Modifier.padding(top = 15.dp),
         )
     }
 }

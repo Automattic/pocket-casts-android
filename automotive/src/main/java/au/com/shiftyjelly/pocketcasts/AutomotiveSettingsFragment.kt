@@ -22,24 +22,32 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class AutomotiveSettingsFragment : Fragment(), CoroutineScope {
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var syncManager: SyncManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var folderManager: FolderManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var searchHistoryManager: SearchHistoryManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var upNextQueue: UpNextQueue
 
     private lateinit var binding: FragmentAutomotiveSettingsBinding
@@ -101,7 +109,7 @@ class AutomotiveSettingsFragment : Fragment(), CoroutineScope {
                         folderManager = folderManager,
                         searchHistoryManager = searchHistoryManager,
                         episodeManager = episodeManager,
-                        wasInitiatedByUser = false
+                        wasInitiatedByUser = false,
                     )
                     openSignInActivity()
                 }

@@ -7,13 +7,13 @@ import com.squareup.moshi.JsonClass
 data class UpNextSyncRequest(
     @field:Json(name = "deviceTime") val deviceTime: Long,
     @field:Json(name = "version") val version: String,
-    @field:Json(name = "upNext") val upNext: UpNext
+    @field:Json(name = "upNext") val upNext: UpNext,
 ) {
 
     @JsonClass(generateAdapter = true)
     data class UpNext(
         @field:Json(name = "serverModified") val serverModified: Long,
-        @field:Json(name = "changes") val changes: List<Change>
+        @field:Json(name = "changes") val changes: List<Change>,
     )
 
     @JsonClass(generateAdapter = true)
@@ -25,7 +25,7 @@ data class UpNextSyncRequest(
         @field:Json(name = "url") val url: String? = null,
         @field:Json(name = "published") val published: String? = null,
         @field:Json(name = "podcast") val podcast: String? = null,
-        @field:Json(name = "episodes") val episodes: List<ChangeEpisode>? = null
+        @field:Json(name = "episodes") val episodes: List<ChangeEpisode>? = null,
     )
 
     @JsonClass(generateAdapter = true)
@@ -34,6 +34,6 @@ data class UpNextSyncRequest(
         @field:Json(name = "title") val title: String?,
         @field:Json(name = "url") val url: String?,
         @field:Json(name = "podcast") val podcast: String?,
-        @field:Json(name = "published") val published: String?
+        @field:Json(name = "published") val published: String?,
     )
 }

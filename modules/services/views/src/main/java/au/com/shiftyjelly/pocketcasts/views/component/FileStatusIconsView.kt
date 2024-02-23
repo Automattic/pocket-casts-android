@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class FileStatusIconsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val disposables = CompositeDisposable()
@@ -224,9 +224,13 @@ class FileStatusIconsView @JvmOverloads constructor(
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
 
-                val statusColor = if (episodeGreyedOut) captionWithAlpha else context.getThemeColor(
-                    UR.attr.primary_text_02
-                )
+                val statusColor = if (episodeGreyedOut) {
+                    captionWithAlpha
+                } else {
+                    context.getThemeColor(
+                        UR.attr.primary_text_02,
+                    )
+                }
                 lblStatus.setTextColor(statusColor)
                 lblStatus.contentDescription = lblStatus.text.toString()
                 statusText = lblStatus.text.toString()
@@ -259,5 +263,5 @@ class FileStatusIconsView @JvmOverloads constructor(
 
 private data class EpisodeStreamProgress(
     val downloadProgress: Float,
-    val uploadProgress: Float
+    val uploadProgress: Float,
 )

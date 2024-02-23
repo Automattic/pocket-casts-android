@@ -66,15 +66,14 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
         // Allow for widescale experimental APIs in Alpha libraries we build upon
         freeCompilerArgs += "-opt-in=com.google.android.horologist.annotations.ExperimentalHorologistApi"
-        freeCompilerArgs += "-opt-in=com.google.android.horologist.media.ui.ExperimentalHorologistMediaUiApi"
     }
 }
 
 sentry {
-    includeProguardMapping = file("$rootDir/sentry.properties").exists()
+    includeProguardMapping = System.getenv()["CI"].toBoolean()
+            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
     tracingInstrumentation {
         features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
     }
@@ -83,6 +82,7 @@ sentry {
 dependencies {
     implementation(libs.wear.input)
     implementation(libs.wear.remote.interactions)
+    implementation(libs.wear.tooling.preview)
 
     // General Compose dependencies
     implementation(libs.compose.activity)
@@ -106,6 +106,7 @@ dependencies {
     implementation(project(":modules:services:servers"))
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
+    implementation(project(":modules:services:views"))
     testImplementation(project(":modules:services:sharedtest"))
 
     implementation(project(":modules:features:account"))

@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 interface EpisodeManager {
 
@@ -26,9 +26,6 @@ interface EpisodeManager {
     /** Find methods  */
 
     suspend fun findByUuid(uuid: String): PodcastEpisode?
-
-    @Deprecated("Use findByUuid suspended function instead")
-    fun findByUuidSync(uuid: String): PodcastEpisode?
 
     @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
@@ -150,4 +147,7 @@ interface EpisodeManager {
     suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
+
+    suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode)
+    suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode)
 }

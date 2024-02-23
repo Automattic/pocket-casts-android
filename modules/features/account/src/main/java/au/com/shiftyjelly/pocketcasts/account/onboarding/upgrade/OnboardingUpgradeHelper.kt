@@ -11,9 +11,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -21,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,7 +42,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
-import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
@@ -105,42 +100,9 @@ object OnboardingUpgradeHelper {
                         text = it,
                         textAlign = TextAlign.Center,
                         color = textColor,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.padding(top = 4.dp),
                     )
                 }
-            }
-        }
-    }
-
-    @Composable
-    fun PlusRowButton(
-        text: String,
-        onClick: () -> Unit,
-        modifier: Modifier = Modifier,
-    ) {
-        Button(
-            onClick = onClick,
-            shape = RoundedCornerShape(12.dp),
-            modifier = modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(all = 0.dp), // Remove content padding
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-        ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .background(plusGradientBrush)
-            ) {
-                Text(
-                    text = text,
-                    fontSize = 18.sp,
-                    modifier = Modifier
-                        .padding(6.dp)
-                        // add extra 8.dp extra padding to offset removal of button padding (see ButtonDefaults.ButtonVerticalPadding)
-                        .padding(8.dp)
-                        .align(Alignment.Center),
-                    textAlign = TextAlign.Center,
-                    color = Color.Black
-                )
             }
         }
     }
@@ -156,9 +118,7 @@ object OnboardingUpgradeHelper {
         selectedCheckMark: Boolean = false,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
-
         ConstraintLayout(modifier) {
-
             val buttonRef = createRef()
             Button(
                 onClick = onClick,
@@ -171,7 +131,6 @@ object OnboardingUpgradeHelper {
                     bottom.linkTo(parent.bottom)
                 },
             ) {
-
                 Box(Modifier.fillMaxWidth()) {
                     TextH30(
                         text = text,
@@ -179,7 +138,7 @@ object OnboardingUpgradeHelper {
                         modifier = Modifier
                             .brush(brush)
                             .padding(vertical = 6.dp, horizontal = 24.dp)
-                            .align(Alignment.Center)
+                            .align(Alignment.Center),
                     )
                     if (selectedCheckMark) {
                         Icon(
@@ -188,7 +147,7 @@ object OnboardingUpgradeHelper {
                             modifier = Modifier
                                 .brush(brush)
                                 .align(Alignment.CenterEnd)
-                                .width(24.dp)
+                                .width(24.dp),
                         )
                     }
                 }
@@ -199,7 +158,7 @@ object OnboardingUpgradeHelper {
                     buttonRef = buttonRef,
                     topText = it,
                     subscriptionTier = subscriptionTier,
-                    isSelected = true
+                    isSelected = true,
                 )
             }
         }
@@ -215,7 +174,6 @@ object OnboardingUpgradeHelper {
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
         ConstraintLayout(modifier) {
-
             val buttonRef = createRef()
             Button(
                 onClick = onClick,
@@ -234,7 +192,7 @@ object OnboardingUpgradeHelper {
                     color = unselectedColor,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp, horizontal = 24.dp)
+                        .padding(vertical = 6.dp, horizontal = 24.dp),
                 )
             }
 
@@ -270,14 +228,14 @@ object OnboardingUpgradeHelper {
             modifier = if (selected) {
                 modifier.background(
                     brush = brush,
-                    shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(4.dp),
                 )
             } else {
                 modifier.background(
                     color = unselectedColor,
-                    shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(4.dp),
                 )
-            }
+            },
         ) {
             TextP60(
                 text = topText,
@@ -286,7 +244,7 @@ object OnboardingUpgradeHelper {
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(
                     horizontal = 12.dp,
-                    vertical = 2.dp
+                    vertical = 2.dp,
                 ),
             )
         }
@@ -311,26 +269,11 @@ object OnboardingUpgradeHelper {
             topText = topText,
             subscriptionTier = subscriptionTier,
             selected = isSelected,
-            modifier = topTextModifier
+            modifier = topTextModifier,
         )
     }
 
     val backgroundColor = Color(0xFF121212)
-
-    @Composable
-    fun OldPlusBackground(
-        modifier: Modifier = Modifier,
-        content: @Composable () -> Unit,
-    ) {
-        Box(modifier) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                OldBlurredCanvasBackground()
-            } else {
-                ImageBackground(R.drawable.upgrade_background_glows)
-            }
-            content()
-        }
-    }
 
     @Composable
     fun UpgradeBackground(
@@ -360,7 +303,7 @@ object OnboardingUpgradeHelper {
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(width * 0.8f)
+                .blur(width * 0.8f),
         ) {
             drawRect(backgroundColor)
 
@@ -383,7 +326,7 @@ object OnboardingUpgradeHelper {
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(width * 0.5f)
+                .blur(width * 0.5f),
         ) {
             drawRect(backgroundColor)
 
@@ -399,37 +342,6 @@ object OnboardingUpgradeHelper {
     }
 
     @Composable
-    @RequiresApi(Build.VERSION_CODES.S) // Blur only works on Android >=12
-    private fun BoxScope.OldBlurredCanvasBackground() {
-        val screenHeight = LocalConfiguration.current.screenHeightDp
-        Canvas(
-            Modifier
-                .matchParentSize()
-                .blur(150.dp)
-        ) {
-
-            // Background
-            drawRect(backgroundColor)
-
-            drawCircle(
-                color = Color(0xFFFFD845),
-                radius = size.width * .5f,
-                center = Offset(size.width * .05f, screenHeight * .05f),
-            )
-
-            drawCircle(
-                color = Color(0xFFFFB626),
-                radius = size.width * .35f,
-                center = Offset(size.width * .95f, screenHeight * .18f),
-                alpha = 0.8f,
-            )
-
-            // Overlay
-            drawRect(Color(0xFF121212), alpha = 0.28f)
-        }
-    }
-
-    @Composable
     private fun BoxScope.ImageBackground(
         @DrawableRes backgroundGlowsRes: Int,
     ) {
@@ -439,27 +351,8 @@ object OnboardingUpgradeHelper {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .background(backgroundColor)
-                .matchParentSize()
+                .matchParentSize(),
         )
-    }
-
-    @Composable
-    fun IconRow(modifier: Modifier = Modifier) {
-        Row(modifier) {
-            Icon(
-                painter = painterResource(R.drawable.pocket_casts_white),
-                contentDescription = null,
-                tint = Color.White,
-            )
-
-            Spacer(Modifier.width(8.dp))
-
-            Icon(
-                painter = painterResource(R.drawable.plus_bw),
-                contentDescription = null,
-                tint = Color.White,
-            )
-        }
     }
 
     @Composable
@@ -474,7 +367,7 @@ object OnboardingUpgradeHelper {
         val text = stringResource(
             LR.string.onboarding_plus_continuing_agrees_to,
             privacyPolicyText,
-            termsAndConditionsText
+            termsAndConditionsText,
         )
         val uriHandler = LocalUriHandler.current
         ClickableTextHelper(
@@ -487,13 +380,13 @@ object OnboardingUpgradeHelper {
                     text = privacyPolicyText,
                     onClick = {
                         uriHandler.openUri(Settings.INFO_PRIVACY_URL)
-                    }
+                    },
                 ),
                 Clickable(
                     text = termsAndConditionsText,
                     onClick = {
                         uriHandler.openUri(Settings.INFO_TOS_URL)
-                    }
+                    },
                 ),
             ),
             modifier = modifier,

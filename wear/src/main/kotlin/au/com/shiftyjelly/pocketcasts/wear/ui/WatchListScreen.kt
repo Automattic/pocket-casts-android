@@ -7,9 +7,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
@@ -34,7 +34,6 @@ fun WatchListScreen(
     navigateToRoute: (String) -> Unit,
     toNowPlaying: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<WatchListScreenViewModel>()
     val state by viewModel.state.collectAsState()
     val upNextState = state.upNextQueue
@@ -47,7 +46,6 @@ fun WatchListScreen(
         columnState = columnState,
         modifier = Modifier.fillMaxWidth(),
     ) {
-
         item {
             // Need this to position the first chip correctly when the screen loads
             Spacer(Modifier)
@@ -69,7 +67,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onPodcastsClicked()
                     navigateToRoute(PodcastsScreen.routeHomeFolder)
-                }
+                },
             )
         }
 
@@ -80,7 +78,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onDownloadsClicked()
                     navigateToRoute(DownloadsScreen.route)
-                }
+                },
             )
         }
 
@@ -91,7 +89,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onFiltersClicked()
                     navigateToRoute(FiltersScreen.route)
-                }
+                },
             )
         }
 
@@ -102,7 +100,7 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onFilesClicked()
                     navigateToRoute(FilesScreen.route)
-                }
+                },
             )
         }
 
@@ -113,20 +111,20 @@ fun WatchListScreen(
                 onClick = {
                     viewModel.onSettingsClicked()
                     navigateToRoute(SettingsScreen.route)
-                }
+                },
             )
         }
     }
 }
 
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
 private fun WatchListPreview() {
     WearAppTheme {
         WatchListScreen(
             toNowPlaying = {},
             navigateToRoute = {},
-            columnState = ScalingLazyColumnState()
+            columnState = ScalingLazyColumnState(),
         )
     }
 }

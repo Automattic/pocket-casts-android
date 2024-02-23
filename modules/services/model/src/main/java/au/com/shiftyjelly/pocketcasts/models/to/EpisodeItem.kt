@@ -17,6 +17,6 @@ data class EpisodeItem(
             title = title,
             duration = duration,
             publishedDate = publishedAt,
-            podcastUuid = podcastUuid
+            podcastUuid = podcastUuid,
         )
 }

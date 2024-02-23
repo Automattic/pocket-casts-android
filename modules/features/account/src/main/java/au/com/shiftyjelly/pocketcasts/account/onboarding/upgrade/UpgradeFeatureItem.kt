@@ -2,27 +2,34 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 interface UpgradeFeatureItem {
     @get:DrawableRes val image: Int
+
     @get:StringRes val title: Int
+
     @get:StringRes val text: Int?
+
+    val isVisible: Boolean
 }
 
 enum class PlusUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int? = null,
+    override val isVisible: Boolean = true,
 ) : UpgradeFeatureItem {
     DesktopApps(
         image = IR.drawable.ic_desktop_apps,
-        title = LR.string.onboarding_plus_feature_desktop_apps_title,
+        title = LR.string.onboarding_plus_feature_desktop_and_web_apps_title,
     ),
     Folders(
         image = IR.drawable.ic_folders,
-        title = LR.string.onboarding_plus_feature_folders_title,
+        title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
     ),
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
@@ -39,6 +46,12 @@ enum class PlusUpgradeFeatureItem(
     UndyingGratitude(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_plus_feature_gratitude_title,
+        isVisible = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
+    ),
+    SlumberStudiosPromo(
+        image = IR.drawable.ic_slumber_studios,
+        title = LR.string.onboarding_plus_feature_slumber_studios_title,
+        isVisible = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
     ),
 }
 
@@ -46,6 +59,7 @@ enum class PatronUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int? = null,
+    override val isVisible: Boolean = true,
 ) : UpgradeFeatureItem {
     EverythingInPlus(
         image = IR.drawable.ic_check,
@@ -70,32 +84,5 @@ enum class PatronUpgradeFeatureItem(
     UndyingGratitude(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_patron_feature_gratitude_title,
-    ),
-}
-
-enum class OldPlusUpgradeFeatureItem(
-    override val image: Int,
-    override val title: Int,
-    override val text: Int,
-) : UpgradeFeatureItem {
-    DesktopApps(
-        image = IR.drawable.desktop_apps,
-        title = LR.string.onboarding_plus_feature_desktop_apps_title,
-        text = LR.string.onboarding_plus_feature_desktop_apps_text,
-    ),
-    Folders(
-        image = IR.drawable.folder,
-        title = LR.string.onboarding_plus_feature_folders_title,
-        text = LR.string.onboarding_plus_feature_folders_text,
-    ),
-    CloudStorage(
-        image = IR.drawable.cloud_storage,
-        title = LR.string.onboarding_plus_feature_cloud_storage_title,
-        text = LR.string.onboarding_plus_feature_cloud_storage_text,
-    ),
-    ThemesIcons(
-        image = IR.drawable.themes_icons,
-        title = LR.string.onboarding_plus_feature_themes_icons_title,
-        text = LR.string.onboarding_plus_feature_themes_icons_text,
     ),
 }

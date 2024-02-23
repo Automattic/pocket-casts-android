@@ -42,8 +42,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -64,16 +62,27 @@ class AccountDetailsFragment : BaseFragment() {
     }
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var folderManager: FolderManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var searchHistoryManager: SearchHistoryManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var syncManager: SyncManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
@@ -116,16 +125,14 @@ class AccountDetailsFragment : BaseFragment() {
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
             binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
-                !giftExpiring &&
-                FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+                !giftExpiring
 
             binding.userUpgradeComposeView?.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
                         val showUpgradeBanner = subscription != null && (signInState.isSignedInAsFree || giftExpiring)
-                        binding.dividerView15?.isVisible = showUpgradeBanner &&
-                            FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+                        binding.dividerView15?.isVisible = showUpgradeBanner
                         if (showUpgradeBanner) {
                             ProfileUpgradeBanner(
                                 onClick = {
@@ -133,7 +140,7 @@ class AccountDetailsFragment : BaseFragment() {
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
                                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
                                 },
-                                modifier = Modifier.padding(top = 16.dp)
+                                modifier = Modifier.padding(top = 16.dp),
                             )
                         }
                     }
@@ -299,7 +306,7 @@ class AccountDetailsFragment : BaseFragment() {
             folderManager = folderManager,
             searchHistoryManager = searchHistoryManager,
             episodeManager = episodeManager,
-            wasInitiatedByUser = true
+            wasInitiatedByUser = true,
         )
         activity?.finish()
     }

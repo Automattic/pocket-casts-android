@@ -9,14 +9,14 @@ import javax.inject.Inject
 @HiltViewModel
 class WatchListViewModel @Inject constructor(
     private val userManager: UserManager,
-    private val playbackManager: PlaybackManager
+    private val playbackManager: PlaybackManager,
 ) : ViewModel() {
     val signInState = userManager.getSignInState()
 
     fun signOut() {
         userManager.signOut(
             playbackManager = playbackManager,
-            wasInitiatedByUser = true
+            wasInitiatedByUser = true,
         )
     }
 }

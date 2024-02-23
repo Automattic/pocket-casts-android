@@ -5,18 +5,18 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class PlaylistUpdateAnalytics @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
 
     fun update(
         playlist: Playlist,
         userPlaylistUpdate: UserPlaylistUpdate?,
-        isCreatingFilter: Boolean
+        isCreatingFilter: Boolean,
     ) {
         when {
             isCreatingFilter -> sendPlaylistCreatedEvent(playlist)
@@ -29,7 +29,6 @@ class PlaylistUpdateAnalytics @Inject constructor(
 
     private fun sendPlaylistCreatedEvent(playlist: Playlist) {
         val properties = buildMap<String, Any> {
-
             put(Key.ALL_PODCASTS, playlist.allPodcasts)
             colorAnalyticsValue(playlist)?.let {
                 put(Key.COLOR, it)
@@ -112,11 +111,10 @@ class PlaylistUpdateAnalytics @Inject constructor(
     private fun sendPlaylistUpdateEvent(userPlaylistUpdate: UserPlaylistUpdate?) {
         userPlaylistUpdate?.properties?.map { playlistProperty ->
             when (playlistProperty) {
-
                 is FilterUpdatedEvent -> {
                     val properties = mapOf(
                         Key.GROUP to playlistProperty.groupValue,
-                        Key.SOURCE to userPlaylistUpdate.source.analyticsValue
+                        Key.SOURCE to userPlaylistUpdate.source.analyticsValue,
                     )
                     analyticsTracker.track(AnalyticsEvent.FILTER_UPDATED, properties)
                 }
@@ -124,7 +122,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
                 is PlaylistProperty.AutoDownload -> {
                     val properties = mapOf(
                         Key.SOURCE to userPlaylistUpdate.source.analyticsValue,
-                        Key.ENABLED to playlistProperty.enabled
+                        Key.ENABLED to playlistProperty.enabled,
                     )
                     analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED, properties)
                 }
@@ -148,7 +146,8 @@ class PlaylistUpdateAnalytics @Inject constructor(
 
                 PlaylistProperty.Color,
                 PlaylistProperty.FilterName,
-                PlaylistProperty.Icon -> { /* Do nothing. These are handled by the filter_edit_dismissed event. */ }
+                PlaylistProperty.Icon,
+                -> { /* Do nothing. These are handled by the filter_edit_dismissed event. */ }
             }
         }
     }

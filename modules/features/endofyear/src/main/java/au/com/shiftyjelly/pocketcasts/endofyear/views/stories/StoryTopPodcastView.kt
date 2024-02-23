@@ -40,7 +40,7 @@ fun StoryTopPodcastView(
         StoryBlurredBackground(
             Offset(
                 -LocalView.current.width * 0.75f,
-                LocalView.current.height * 0.3f
+                LocalView.current.height * 0.3f,
             ),
         )
         Column(
@@ -49,7 +49,7 @@ fun StoryTopPodcastView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.height(40.dp))
 
@@ -91,7 +91,7 @@ private fun PodcastCoverStack(
                     x = -(widthInDp * .53).dp,
                     y = -(heightInDp * .13).dp,
                 )
-                .alpha(0.3f)
+                .alpha(0.3f),
         )
         PodcastCoverOrEmpty(
             story = story,
@@ -102,7 +102,7 @@ private fun PodcastCoverStack(
                     x = -(widthInDp * .3).dp,
                     y = (heightInDp * .2).dp,
                 )
-                .alpha(0.5f)
+                .alpha(0.5f),
         )
         PodcastCoverOrEmpty(
             story = story,
@@ -113,7 +113,7 @@ private fun PodcastCoverStack(
                     x = (widthInDp * .3).dp,
                     y = (heightInDp * .23).dp,
                 )
-                .alpha(0.5f)
+                .alpha(0.5f),
         )
         PodcastCoverOrEmpty(
             story = story,
@@ -124,12 +124,12 @@ private fun PodcastCoverStack(
                     x = (widthInDp * .4).dp,
                     y = -(heightInDp * .11).dp,
                 )
-                .alpha(0.2f)
+                .alpha(0.2f),
         )
         PodcastCover(
             uuid = story.topPodcast.uuid,
             coverWidth = (widthInDp * .7).dp,
-            coverSize = CoverSize.BIG
+            coverSize = CoverSize.BIG,
         )
     }
 }
@@ -145,7 +145,7 @@ private fun PodcastCoverOrEmpty(
         PodcastCover(
             uuid = story.topPodcasts[index].uuid,
             coverWidth = coverWidth,
-            modifier = modifier
+            modifier = modifier,
         )
     } else {
         Unit
@@ -159,7 +159,7 @@ private fun PrimaryText(
 ) {
     val text = stringResource(
         id = R.string.end_of_year_story_top_podcast_title,
-        story.topPodcast.title
+        story.topPodcast.title,
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
@@ -172,12 +172,12 @@ private fun SecondaryText(
     val context = LocalContext.current
     val timeText = StatsHelper.secondsToFriendlyString(
         story.topPodcast.totalPlayedTime.toLong(),
-        context.resources
+        context.resources,
     )
     val text = stringResource(
         id = R.string.end_of_year_story_top_podcast_subtitle,
         story.topPodcast.numberOfPlayedEpisodes,
-        timeText
+        timeText,
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }

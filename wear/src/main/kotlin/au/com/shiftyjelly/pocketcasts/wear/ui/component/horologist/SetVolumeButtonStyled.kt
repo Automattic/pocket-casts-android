@@ -33,6 +33,6 @@ fun SetVolumeButtonStyled(
             else -> imageVolumeMax // volumeUiState == null || volumeUiState.isMax == true
         },
         iconRtlMode = IconRtlMode.Mirrored,
-        contentDescription = stringResource(R.string.horologist_set_volume_content_description)
+        contentDescription = stringResource(R.string.horologist_set_volume_content_description),
     )
 }

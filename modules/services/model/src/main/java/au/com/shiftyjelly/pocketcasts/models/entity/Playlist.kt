@@ -12,8 +12,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Entity(
     tableName = "filters",
     indices = [
-        Index(name = "filters_uuid", value = arrayOf("uuid"))
-    ]
+        Index(name = "filters_uuid", value = arrayOf("uuid")),
+    ],
 )
 data class Playlist(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
@@ -43,7 +43,7 @@ data class Playlist(
     @ColumnInfo(name = "filterDuration") var filterDuration: Boolean = false,
     @ColumnInfo(name = "longerThan") var longerThan: Int = 20,
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
-    @ColumnInfo(name = "draft") var draft: Boolean = false // Used when creating a new filter
+    @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
 ) : Serializable {
 
     constructor() : this(uuid = "")
@@ -158,7 +158,8 @@ data class Playlist(
         OLDEST_TO_NEWEST(1),
         SHORTEST_TO_LONGEST(2),
         LONGEST_TO_SHORTEST(3),
-        LAST_DOWNLOAD_ATTEMPT_DATE(100);
+        LAST_DOWNLOAD_ATTEMPT_DATE(100),
+        ;
 
         companion object {
             fun fromInt(value: Int) =

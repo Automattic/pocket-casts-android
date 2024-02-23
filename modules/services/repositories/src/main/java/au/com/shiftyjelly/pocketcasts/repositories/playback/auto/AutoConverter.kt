@@ -44,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class AutoMediaId(
     val episodeId: String,
-    val sourceId: String?
+    val sourceId: String?,
 ) {
     companion object {
         private const val DIVIDER = "#"
@@ -132,7 +132,9 @@ object AutoConverter {
     }
 
     fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context): Uri? {
-        val url = if (episode is UserEpisode) {
+        val url = if (episode is PodcastEpisode && (!episode.imageUrl.isNullOrBlank())) {
+            episode.imageUrl
+        } else if (episode is UserEpisode) {
             // the artwork for user uploaded episodes are stored on each episode
             episode.artworkUrl
         } else {
@@ -223,7 +225,7 @@ object AutoConverter {
 
         return bundleOf(
             EXTRA_DOWNLOAD_STATUS to downloadStatus,
-            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus
+            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus,
         )
     }
 }

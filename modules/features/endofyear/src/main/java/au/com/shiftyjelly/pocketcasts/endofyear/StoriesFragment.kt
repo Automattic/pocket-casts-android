@@ -72,7 +72,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                         onRetryClicked = {
                             viewModel.onRetryClicked()
                         },
-                        onUpsellClicked = ::onUpsellClicked
+                        onUpsellClicked = ::onUpsellClicked,
                     )
                 }
             }
@@ -104,7 +104,8 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         MODAL("modal"),
         PROFILE("profile"),
         USER_LOGIN("user_login"),
-        UNKNOWN("unknown");
+        UNKNOWN("unknown"),
+        ;
         companion object {
             fun fromString(source: String?) =
                 StoriesSource.values().find { it.value == source } ?: UNKNOWN

@@ -20,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import retrofit2.HttpException
 import java.util.Date
+import retrofit2.HttpException
 
 private const val TAG = "SyncHistoryTask"
 
@@ -66,7 +66,7 @@ class SyncHistoryTask @AssistedInject constructor(
                 podcast = episode.podcastUuid,
                 published = episode.publishedDate.switchInvalidForNow().toIsoString(),
                 title = episode.title,
-                url = episode.downloadUrl ?: ""
+                url = episode.downloadUrl ?: "",
             )
         }.toMutableList()
 
@@ -75,7 +75,7 @@ class SyncHistoryTask @AssistedInject constructor(
         if (wasHistoryCleared) {
             val change = HistorySyncChange(
                 action = 3,
-                modifiedAt = clearHistoryTime.toString()
+                modifiedAt = clearHistoryTime.toString(),
             )
             changes.add(change)
         }
@@ -84,7 +84,7 @@ class SyncHistoryTask @AssistedInject constructor(
             changes = changes,
             deviceTime = System.currentTimeMillis(),
             serverModified = settings.getHistoryServerModified(),
-            version = Settings.SYNC_HISTORY_VERSION
+            version = Settings.SYNC_HISTORY_VERSION,
         )
 
         try {
@@ -97,7 +97,7 @@ class SyncHistoryTask @AssistedInject constructor(
             if (response != null) {
                 historyManager.processServerResponse(
                     response = response,
-                    updateServerModified = true
+                    updateServerModified = true,
                 )
 
                 // Clear history if they have cleared it on the server

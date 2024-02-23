@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 class AccountActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: CreateAccountViewModel by viewModels()
     private lateinit var binding: AccountActivityBinding
@@ -62,9 +63,6 @@ class AccountActivity : AppCompatActivity() {
             val accountAuthenticatorResponse = IntentCompat.getParcelableExtra(intent, KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
             if (accountAuthenticatorResponse != null || navigateToSignIn) {
                 graph.setStartDestination(R.id.signInFragment)
-            } else if (isNewUpgradeInstance(intent)) {
-                viewModel.clearReadyForUpgrade()
-                graph.setStartDestination(R.id.createFrequencyFragment)
             } else if (isPromoCodeInstance(intent)) {
                 graph.setStartDestination(R.id.promoCodeFragment)
                 arguments.putString(PromoCodeFragment.ARG_PROMO_CODE, intent.getStringExtra(PROMO_CODE_VALUE))
@@ -111,7 +109,7 @@ class AccountActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val currentFragment = findNavController(R.id.nav_host_fragment).currentDestination
         currentFragment?.trackDismissed()
-        if (currentFragment?.id == R.id.createPayNowFragment || currentFragment?.id == R.id.createDoneFragment) {
+        if (currentFragment?.id == R.id.createDoneFragment) {
             finish()
             return
         }
@@ -131,17 +129,11 @@ class AccountActivity : AppCompatActivity() {
             R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
-            R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN
-            R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_SHOWN
             else -> null
         }
         val properties = when (id) {
-            R.id.createPayNowFragment -> {
-                val subscription = viewModel.subscription.value
-                subscription?.let { mapOf(PRODUCT_KEY to it.productDetails.productId) }
-            }
             R.id.createDoneFragment -> {
                 val source = when (viewModel.createAccountState.value) {
                     CreateAccountState.AccountCreated -> AccountUpdatedSource.CREATE_ACCOUNT.analyticsValue
@@ -163,8 +155,6 @@ class AccountActivity : AppCompatActivity() {
             R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
-            R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED
-            R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
             else -> null

@@ -22,24 +22,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.EarlyAccessState
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersionWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
+import java.util.Date
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
-import java.util.Date
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -54,9 +51,6 @@ class MainActivityViewModel
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val theme: Theme,
-    private val feature: FeatureWrapper,
-    private val featureFlag: FeatureFlagWrapper,
-    private val releaseVersion: ReleaseVersionWrapper,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
@@ -86,21 +80,8 @@ class MainActivityViewModel
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()
         val migratedVersion = settings.getMigratedVersionCode()
         if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-            var whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
-            val isBookmarksEnabled = featureFlag.isEnabled(feature.bookmarksFeature)
-            if (isBookmarksEnabled) {
-                val isUserEntitled = feature.isUserEntitled(feature.bookmarksFeature, settings.userTier)
-
-                val patronExclusiveAccessRelease = (feature.bookmarksFeature.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease
-                val relativeToEarlyPatronAccess = patronExclusiveAccessRelease?.let {
-                    releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-                }
-                val shouldShowWhatsNewWhenUserNotEntitled = patronExclusiveAccessRelease == null ||
-                    relativeToEarlyPatronAccess == EarlyAccessState.After
-
-                whatsNewShouldBeShown = whatsNewShouldBeShown &&
-                    (isUserEntitled || shouldShowWhatsNewWhenUserNotEntitled)
-            }
+            val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode) &&
+                FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)
             _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
         }
     }
@@ -115,7 +96,7 @@ class MainActivityViewModel
             Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
         }
         .toFlowable(BackpressureStrategy.LATEST)
-    val playbackState = playbackStateRx.toLiveData()
+    val playbackState = playbackStateRx.asFlow()
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val isSignedIn: Boolean
@@ -210,7 +191,7 @@ class MainActivityViewModel
                 bookmarkManager.deleteToSync(bookmarkUuid)
                 analyticsTracker.track(
                     AnalyticsEvent.BOOKMARK_DELETED,
-                    mapOf("source" to SourceView.NOTIFICATION_BOOKMARK.analyticsValue)
+                    mapOf("source" to SourceView.NOTIFICATION_BOOKMARK.analyticsValue),
                 )
             }
         }

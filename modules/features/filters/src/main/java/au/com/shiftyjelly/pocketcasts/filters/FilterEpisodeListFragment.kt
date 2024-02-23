@@ -32,11 +32,11 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
@@ -60,8 +60,8 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -91,13 +91,21 @@ class FilterEpisodeListFragment : BaseFragment() {
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
 
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var bookmarkManager: BookmarkManager
     private lateinit var imageLoader: PodcastImageLoader
 
@@ -120,7 +128,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
-            )
+            ),
         )
     }
 
@@ -181,7 +189,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         recyclerView.adapter = adapter
         listSavedState?.let { recyclerView.layoutManager?.onRestoreInstanceState(it) }
         setShowFilterOptions(showingFilterOptionsBeforeModal)
-        AutomaticUpNextSource.mostRecentList = viewModel.playlistUUID
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), needsSync = false)
     }
 
     override fun onDestroyView() {
@@ -228,7 +236,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             menu = R.menu.menu_filter,
             chromeCastButton = Shown(chromeCastAnalytics),
             navigationIcon = BackArrow,
-            toolbarColors = null
+            toolbarColors = null,
         )
 
         toolbar.setOnMenuItemClickListener { item ->
@@ -315,8 +323,8 @@ class FilterEpisodeListFragment : BaseFragment() {
             chipPodcasts.setOnClickListener {
                 (activity as FragmentHostListener).showModal(
                     PodcastOptionsFragment.newInstance(
-                        playlist
-                    )
+                        playlist,
+                    ),
                 )
             }
 
@@ -336,8 +344,8 @@ class FilterEpisodeListFragment : BaseFragment() {
             chipEpisodes.setOnClickListener {
                 (activity as FragmentHostListener).showModal(
                     EpisodeOptionsFragment.newInstance(
-                        playlist
-                    )
+                        playlist,
+                    ),
                 )
             }
 
@@ -352,8 +360,8 @@ class FilterEpisodeListFragment : BaseFragment() {
                 (activity as FragmentHostListener).showModal(
                     TimeOptionsFragment.newInstance(
                         playlist,
-                        TimeOptionsFragment.OptionsType.Time
-                    )
+                        TimeOptionsFragment.OptionsType.Time,
+                    ),
                 )
             }
 
@@ -367,8 +375,8 @@ class FilterEpisodeListFragment : BaseFragment() {
             chipDuration.setOnClickListener {
                 (activity as FragmentHostListener).showModal(
                     DurationOptionsFragment.newInstance(
-                        playlist
-                    )
+                        playlist,
+                    ),
                 )
             }
 
@@ -385,8 +393,8 @@ class FilterEpisodeListFragment : BaseFragment() {
                 (activity as FragmentHostListener).showModal(
                     TimeOptionsFragment.newInstance(
                         playlist,
-                        TimeOptionsFragment.OptionsType.Downloaded
-                    )
+                        TimeOptionsFragment.OptionsType.Downloaded,
+                    ),
                 )
             }
 
@@ -403,8 +411,8 @@ class FilterEpisodeListFragment : BaseFragment() {
                 (activity as FragmentHostListener).showModal(
                     TimeOptionsFragment.newInstance(
                         playlist,
-                        TimeOptionsFragment.OptionsType.AudioVideo
-                    )
+                        TimeOptionsFragment.OptionsType.AudioVideo,
+                    ),
                 )
             }
 
@@ -450,7 +458,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                         AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
                     } else {
                         AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
-                    }
+                    },
                 )
             }
 
@@ -547,7 +555,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             navigationIcon = BackArrow,
-            toolbarColors = colors
+            toolbarColors = colors,
         )
 
         binding.layoutFilterOptions.setBackgroundColor(colors.backgroundColor)
@@ -569,22 +577,22 @@ class FilterEpisodeListFragment : BaseFragment() {
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_newest_to_oldest,
                     click = { viewModel.changeSort(Playlist.SortOrder.NEWEST_TO_OLDEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST)
+                    checked = (it.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_oldest_to_newest,
                     click = { viewModel.changeSort(Playlist.SortOrder.OLDEST_TO_NEWEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.OLDEST_TO_NEWEST)
+                    checked = (it.sortOrder() == Playlist.SortOrder.OLDEST_TO_NEWEST),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_short_to_long,
                     click = { viewModel.changeSort(Playlist.SortOrder.SHORTEST_TO_LONGEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST)
+                    checked = (it.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_long_to_short,
                     click = { viewModel.changeSort(Playlist.SortOrder.LONGEST_TO_SHORTEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.LONGEST_TO_SHORTEST)
+                    checked = (it.sortOrder() == Playlist.SortOrder.LONGEST_TO_SHORTEST),
                 )
             dialog.show(parentFragmentManager, "sort_options")
         }

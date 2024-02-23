@@ -15,8 +15,8 @@ import java.util.Date
     tableName = "user_episodes",
     indices = [
         Index(name = "user_episode_last_download_attempt_date", value = arrayOf("last_download_attempt_date")),
-        Index(name = "user_episode_published_date", value = arrayOf("published_date"))
-    ]
+        Index(name = "user_episode_published_date", value = arrayOf("published_date")),
+    ],
 )
 data class UserEpisode(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") override var uuid: String,
@@ -45,7 +45,8 @@ data class UserEpisode(
     @ColumnInfo(name = "downloaded_error_details") override var downloadErrorDetails: String? = null,
     @ColumnInfo(name = "tint_color_index") var tintColorIndex: Int = 0,
     @ColumnInfo(name = "has_custom_image") var hasCustomImage: Boolean = false,
-    @ColumnInfo(name = "upload_task_id") var uploadTaskId: String? = null
+    @ColumnInfo(name = "upload_task_id") var uploadTaskId: String? = null,
+    @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: ChapterIndices = ChapterIndices(),
 ) : BaseEpisode, Serializable {
     // temporary variables
     @Ignore

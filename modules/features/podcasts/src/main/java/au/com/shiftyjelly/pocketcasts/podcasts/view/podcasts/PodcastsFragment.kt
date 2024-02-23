@@ -66,14 +66,16 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         fun newInstance(folderUuid: String): PodcastsFragment {
             return PodcastsFragment().apply {
                 arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid
+                    ARG_FOLDER_UUID to folderUuid,
                 )
             }
         }
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
@@ -130,7 +132,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 toolbar = toolbar,
                 title = folder?.name ?: getString(LR.string.podcasts),
                 toolbarColors = toolbarColors,
-                navigationIcon = navigationIcon
+                navigationIcon = navigationIcon,
             )
 
             toolbar.menu.findItem(R.id.folders_locked)?.run {

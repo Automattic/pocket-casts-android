@@ -1,5 +1,49 @@
+7.59
+-----
+* Bug Fixes:
+    *   Fixed an issue where bookmarks did not play when episodes where filtered out due to search queries.
+        ([#1857](https://github.com/Automattic/pocket-casts-android/pull/1857))    
+    *   Fixed an issue where bookmarks on description could become unresponsive.
+        ([#1873](https://github.com/Automattic/pocket-casts-android/pull/1873))    
+
+7.58
+-----
+*   Bug Fixes:
+    *   Fixed: The total remaining time was incorrectly displayed for some languages when large font sizes were set on the device in Up Next
+        ([#1815](https://github.com/Automattic/pocket-casts-android/pull/1815))
+    *   Fixed: The back button in the search was lacking a description, causing an accessibility issue.
+        ([#1846](https://github.com/Automattic/pocket-casts-android/pull/1846))
+    *   Fixed a bug where podcast setting screen could become unresponsive.
+        ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
+    *   Fixed: Widget uses custom Headphone controls instead of skipping.
+        ([#1853](https://github.com/Automattic/pocket-casts-android/pull/1853))
+7.57
+-----
+
 *   Updates:
-    *   Increase the maximum playback speed to 5.0
+    *   Warn when switching to metered network if warn before using data setting is enabled
+        ([#1640](https://github.com/Automattic/pocket-casts-android/pull/1640))
+    *   Display episode artwork from podcast feed on Mini-player, Notification & Widget.
+        ([#1599](https://github.com/Automattic/pocket-casts-android/pull/1599))
+*   Bug Fixes:
+    *   Fixed starring episode from full-screen player does not prevent episode from being archived
+        ([#1735](https://github.com/Automattic/pocket-casts-android/pull/1735))
+    *   Fixed "Hide playback notification on pause" setting not representing its state correctly
+        ([#1769](https://github.com/Automattic/pocket-casts-android/pull/1769))
+    *   Improved skipping behavior from bluetooth device 
+        ([#1818](https://github.com/Automattic/pocket-casts-android/pull/1818))
+
+7.56
+-----
+
+*   Updates:
+    *   Use fling motion instead of scroll motion to open UpNext bottom sheet
+        ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
+*   Bug Fixes:
+    *   Fixed incorrect podcast loading below the correct one on opening native podcast share url
+        ([#1696](https://github.com/Automattic/pocket-casts-android/pull/1696))
+    *   Fixed an issue where navigation and status bar could sometimes use incorrect theming with Up Next screen.
+        ([#1697](https://github.com/Automattic/pocket-casts-android/pull/1697))
 
 7.55
 -----
@@ -7,6 +51,13 @@
 *   Updates:
     *   Save selected tab on Player screen after screen rotation
         ([#1598](https://github.com/Automattic/pocket-casts-android/issues/1598))
+*   Bug Fixes:
+    *   Improve handling of user files on watch
+        ([#1638](https://github.com/Automattic/pocket-casts-android/pull/1638))
+    *   Fixed an issue with a missing accessibility label for the 'Up Next' screen
+        ([#1657](https://github.com/Automattic/pocket-casts-android/pull/1662))
+    *   Fixed an issue with incorrect playback speed shown on the media notification
+        ([#1648](https://github.com/Automattic/pocket-casts-android/pull/1666))
 
 7.54
 -----
@@ -28,8 +79,10 @@
         ([#1620](https://github.com/Automattic/pocket-casts-android/pull/1620))
     *   Fix tap to view action from bookmark added notification
         ([#1614](https://github.com/Automattic/pocket-casts-android/pull/1614))
+    *   Fix playback effects UI not updating on watch
+        ([#1643](https://github.com/Automattic/pocket-casts-android/pull/1643))
 *   Updates:
-    *   Display dynamic colors for widget
+    *   Support dynamic colors for widget
         ([#1588](https://github.com/Automattic/pocket-casts-android/pull/1588))
     *   Add theme support to Up Next screen
         ([#1605](https://github.com/Automattic/pocket-casts-android/pull/1605))

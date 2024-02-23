@@ -36,7 +36,7 @@ fun PlayPauseButtonStyled(
     backgroundColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.10f),
     playIcon: ImageVector = Icons.Default.PlayArrow,
     pauseIcon: ImageVector = Icons.Default.Pause,
-    progress: @Composable () -> Unit = {}
+    progress: @Composable () -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -44,7 +44,7 @@ fun PlayPauseButtonStyled(
             .fillMaxSize()
             .clip(CircleShape)
             .background(backgroundColor),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         progress()
 
@@ -56,7 +56,7 @@ fun PlayPauseButtonStyled(
                 colors = colors,
                 iconSize = iconSize,
                 tapTargetSize = tapTargetSize,
-                icon = pauseIcon
+                icon = pauseIcon,
             )
         } else {
             PlayButtonStyled(
@@ -66,7 +66,7 @@ fun PlayPauseButtonStyled(
                 colors = colors,
                 iconSize = iconSize,
                 tapTargetSize = tapTargetSize,
-                icon = playIcon
+                icon = playIcon,
             )
         }
     }

@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -39,7 +39,7 @@ class SettingsViewModel @Inject constructor(
             signInState = userManager.getSignInState().blockingFirst(),
             showDataWarning = settings.warnOnMeteredNetwork.value,
             refreshInBackground = settings.backgroundRefreshPodcasts.value,
-        )
+        ),
     )
     val state = _state.asStateFlow()
 
@@ -59,22 +59,30 @@ class SettingsViewModel @Inject constructor(
                     _state.update { it.copy(refreshState = refreshState) }
                 }
         }
+        viewModelScope.launch {
+            settings.warnOnMeteredNetwork.flow.collectLatest { warnOnMeteredNetwork ->
+                _state.update { it.copy(showDataWarning = warnOnMeteredNetwork) }
+            }
+        }
+        viewModelScope.launch {
+            settings.backgroundRefreshPodcasts.flow.collectLatest { refreshInBackground ->
+                _state.update { it.copy(refreshInBackground = refreshInBackground) }
+            }
+        }
     }
 
     fun setWarnOnMeteredNetwork(warnOnMeteredNetwork: Boolean) {
-        settings.warnOnMeteredNetwork.set(warnOnMeteredNetwork)
-        _state.update { it.copy(showDataWarning = warnOnMeteredNetwork) }
+        settings.warnOnMeteredNetwork.set(warnOnMeteredNetwork, needsSync = true)
     }
 
     fun setRefreshPodcastsInBackground(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked)
-        _state.update { it.copy(refreshInBackground = isChecked) }
+        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = false)
     }
 
     fun signOut() {
         userManager.signOut(
             playbackManager = playbackManager,
-            wasInitiatedByUser = true
+            wasInitiatedByUser = true,
         )
     }
 
