@@ -132,8 +132,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         binding.miniPlayer.setPlaybackState(playbackState)
     }
 
-    fun setUpNext(upNext: UpNextQueue.State, theme: Theme, shouldAnimateOnAttach: Boolean) {
-        binding.miniPlayer.setUpNext(upNext, theme)
+    fun setUpNext(upNext: UpNextQueue.State, theme: Theme, shouldAnimateOnAttach: Boolean, useRssArtwork: Boolean) {
+        binding.miniPlayer.setUpNext(upNext, theme, useRssArtwork)
 
         // only show the mini player when an episode is loaded
         if (upNext is UpNextQueue.State.Loaded) {

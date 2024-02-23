@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -39,27 +38,19 @@ import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
-import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
-import kotlinx.coroutines.rx2.collect
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@AndroidEntryPoint
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs), CoroutineScope {
 
-    @Inject lateinit var settings: Settings
-
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
-    private val coroutineScope = CoroutineScope(coroutineContext)
 
     private val inflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -146,15 +137,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
     }
 
-    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme) {
+    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useRssArtwork: Boolean) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            loadArtwork(upNextState.podcast, upNextState.episode, settings.useRssArtwork.value)
-
-            coroutineScope.launch {
-                settings.useRssArtwork.flow.asObservable(coroutineContext).collect {
-                    loadArtwork(upNextState.podcast, upNextState.episode, it)
-                }
-            }
+            loadArtwork(upNextState.podcast, upNextState.episode, useRssArtwork)
 
             binding.episode = upNextState.episode
             binding.podcast = upNextState.podcast

@@ -10,6 +10,23 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 
 interface UpNextQueue {
     val isEmpty: Boolean
@@ -71,6 +88,7 @@ interface UpNextQueue {
     fun getChangesObservableWithLiveCurrentEpisode(episodeManager: EpisodeManager, podcastManager: PodcastManager): Observable<State> {
         // the debounce prevents too many events being generated and just returns the latest
         return changesObservable.debounce(100, TimeUnit.MILLISECONDS).switchMap { state ->
+            Timber.i("switchMapRx: $state")
             if (state is State.Loaded) {
                 if (state.podcast != null) {
                     // If we have a podcast we need to observe its effects state as well to ensure it updates when the global override changes
@@ -87,6 +105,31 @@ interface UpNextQueue {
                 }
             } else {
                 Observable.just(state)
+            }
+        }
+    }
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    fun getChangesFlowWithLiveCurrentEpisode(episodeManager: EpisodeManager, podcastManager: PodcastManager): Flow<State> {
+        return changesObservable.asFlow().debounce(100).flatMapLatest { state ->
+            if (state is State.Loaded) {
+                if (state.podcast != null) {
+                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                        .combine<BaseEpisode, Podcast, State>(
+                            podcastManager
+                                .observePodcastByUuidFlow(state.podcast.uuid)
+                                .distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects }
+                        ) { episode, podcast ->
+                            State.Loaded(episode, podcast, state.queue)
+                        }
+                        .catch { emit(State.Empty) }
+                } else {
+                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                        .map<BaseEpisode, State> { State.Loaded(it, state.podcast, state.queue) }
+                        .catch { emit(State.Empty) }
+                }
+            } else {
+                flowOf(state)
             }
         }
     }
@@ -112,6 +155,23 @@ fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean
             Observable.just(inUpNext)
         } else {
             Observable.just(false)
+        }
+    }
+}
+
+fun <T, R> Flow<T>.switchMap(mapper: (value: T) -> Flow<R>): Flow<R> {
+    return flow {
+        coroutineScope {
+            var currentJob: Job? = null
+            collect { outerValue ->
+                val inner = mapper(outerValue)
+                currentJob?.cancelAndJoin()
+                currentJob = launch {
+                    inner.collect { value ->
+                        emit(value)
+                    }
+                }
+            }
         }
     }
 }

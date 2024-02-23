@@ -137,6 +137,9 @@ abstract class PodcastDao {
     abstract fun observeByUuid(uuid: String): Flowable<Podcast>
 
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
+    abstract fun observeByUuidFlow(uuid: String): Flow<Podcast>
+
+    @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<Podcast>
 
     @Query("SELECT * FROM podcasts WHERE uuid IN (:uuids)")
