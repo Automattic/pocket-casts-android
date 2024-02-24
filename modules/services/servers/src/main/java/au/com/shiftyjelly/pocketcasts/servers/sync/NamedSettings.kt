@@ -78,6 +78,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "cloudAutoDownload") val cloudAutoDownload: NamedChangedSettingBool? = null,
     @field:Json(name = "autoDownloadUnmeteredOnly") val autoDownloadUnmeteredOnly: NamedChangedSettingBool? = null,
     @field:Json(name = "autoDownloadOnlyWhenCharging") val autoDownloadOnlyWhenCharging: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadUpNext") val autoDownloadUpNext: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
