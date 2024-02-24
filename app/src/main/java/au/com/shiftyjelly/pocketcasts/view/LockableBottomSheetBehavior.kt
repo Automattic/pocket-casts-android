@@ -5,13 +5,12 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
 
 // StackOverflow: https://stackoverflow.com/questions/35794264/disabling-user-dragging-on-bottomsheet
 
 @Suppress("unused")
-class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
-    constructor() : super()
+class LockableBottomSheetBehavior<V : View> : ViewPager2AwareBottomSheetBehavior<V> {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
     var swipeEnabled = true

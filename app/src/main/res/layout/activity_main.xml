@@ -32,7 +32,7 @@
             android:elevation="8dp"
             android:visibility="gone"
             app:behavior_peekHeight="@dimen/miniPlayerPeekHeight"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+            app:layout_behavior="com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"
