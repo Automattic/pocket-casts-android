@@ -252,6 +252,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 },
                 useSystemTheme = settings.useSystemTheme.getSyncSetting(::NamedChangedSettingBool),
                 deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                deleteLocalFilesAfterPlayback = settings.deleteLocalFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
                 cloudAutoUpload = settings.cloudAutoUpload.getSyncSetting(::NamedChangedSettingBool),
                 cloudAutoDownload = settings.cloudAutoDownload.getSyncSetting(::NamedChangedSettingBool),
                 autoDownloadUnmeteredOnly = settings.autoDownloadUnmeteredOnly.getSyncSetting(::NamedChangedSettingBool),
@@ -568,6 +569,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.deleteCloudFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesAfterPlayingDeleteLocal" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteLocalFileAfterPlaying,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "cloudAutoUpload" -> updateSettingIfPossible(
