@@ -68,10 +68,13 @@ class ChaptersFragment : BaseFragment() {
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     ChaptersPage(
                         lazyListState = lazyListState,
-                        chapters = uiState.chapters,
+                        chapters = uiState.displayChapters,
+                        totalChaptersCount = uiState.totalChaptersCount,
                         onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
                         onChapterClick = ::onChapterClick,
                         onUrlClick = ::onUrlClick,
+                        onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
+                        isTogglingChapters = uiState.isTogglingChapters,
                         backgroundColor = uiState.backgroundColor,
                     )
                 }

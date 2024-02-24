@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-data class Chapters(private val items: List<Chapter> = emptyList()) {
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+
+data class Chapters(
+    private val items: List<Chapter> = emptyList(),
+) {
 
     val isEmpty: Boolean
         get() = items.isEmpty()
@@ -16,7 +21,8 @@ data class Chapters(private val items: List<Chapter> = emptyList()) {
 
     fun getNextSelectedChapter(timeMs: Int): Chapter? {
         val currentTimeFinal = if (timeMs < 0) 0 else timeMs
-        for (chapter in selectedItems) {
+        val items = if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) selectedItems else items
+        for (chapter in items) {
             if (chapter.startTime > currentTimeFinal) {
                 return chapter
             }
@@ -30,7 +36,8 @@ data class Chapters(private val items: List<Chapter> = emptyList()) {
         }
         var foundChapter: Chapter? = null
         var lastChapter: Chapter? = null
-        for (chapter in selectedItems) {
+        val items = if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) selectedItems else items
+        for (chapter in items) {
             if (chapter.containsTime(timeMs)) {
                 if (foundChapter != null) {
                     lastChapter = foundChapter

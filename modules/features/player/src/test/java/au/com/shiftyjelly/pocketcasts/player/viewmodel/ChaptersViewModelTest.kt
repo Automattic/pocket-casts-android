@@ -11,9 +11,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
 import com.jakewharton.rxrelay2.BehaviorRelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,6 +53,13 @@ class ChaptersViewModelTest {
     private lateinit var upNextQueue: UpNextQueue
 
     private lateinit var chaptersViewModel: ChaptersViewModel
+
+    @Before
+    fun setUp() {
+        FeatureFlag.initialize(
+            listOf(object : InMemoryFeatureProvider() {}),
+        )
+    }
 
     @Test
     fun `given unselected chapter contains playback pos, then skip to next selected chapter`() = runTest {
@@ -86,6 +97,17 @@ class ChaptersViewModelTest {
         initViewModel()
 
         chaptersViewModel.buildChaptersWithState(chapters, 150, lastChangeFrom = PlaybackManager.LastChangeFrom.OnSeekComplete.value)
+
+        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
+    }
+
+    @Test
+    fun `given feature flag off, then chapter is not skipped`() = runTest {
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
+        val chapters = initChapters()
+        initViewModel()
+
+        chaptersViewModel.buildChaptersWithState(chapters, 150)
 
         verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
     }

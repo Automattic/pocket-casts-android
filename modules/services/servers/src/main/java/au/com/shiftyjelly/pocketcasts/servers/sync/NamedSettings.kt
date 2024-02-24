@@ -73,6 +73,12 @@ data class ChangedNamedSettings(
     @field:Json(name = "lightThemePreference") val lightThemePreference: NamedChangedSettingInt? = null,
     @field:Json(name = "useSystemTheme") val useSystemTheme: NamedChangedSettingBool? = null,
     @field:Json(name = "filesAfterPlayingDeleteCloud") val deleteCloudFilesAfterPlayback: NamedChangedSettingBool? = null,
+    @field:Json(name = "filesAfterPlayingDeleteLocal") val deleteLocalFilesAfterPlayback: NamedChangedSettingBool? = null,
+    @field:Json(name = "cloudAutoUpload") val cloudAutoUpload: NamedChangedSettingBool? = null,
+    @field:Json(name = "cloudAutoDownload") val cloudAutoDownload: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadUnmeteredOnly") val autoDownloadUnmeteredOnly: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadOnlyWhenCharging") val autoDownloadOnlyWhenCharging: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadUpNext") val autoDownloadUpNext: NamedChangedSettingBool? = null,
     @field:Json(name = "backgroundRefresh") val isPodcastBackgroundRefreshEnabled: NamedChangedSettingBool? = null,
 )
 
