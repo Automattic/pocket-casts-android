@@ -2325,7 +2325,8 @@ open class PlaybackManager @Inject constructor(
     private suspend fun addEpisodeToCache(episode: BaseEpisode) {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
             isEpisodeEligibleToBeCached(episode) &&
-            canCacheEpisodeByDeviceSettings()
+            canCacheEpisodeByDeviceSettings() &&
+            !Util.isAutomotive(application) && !Util.isWearOs(application)
         ) {
             episodeManager.updateAutomaticallyCachedStatus(episode, automaticallyCached = true)
             downloadManager.addEpisodeToQueue(episode, "cache episode", false)
@@ -2346,7 +2347,9 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun cleanCachedEpisodes() {
-        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE)) {
+        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
+            !Util.isAutomotive(application) && !Util.isWearOs(application)
+        ) {
             episodeManager.cleanAutomaticallyCachedEpisodes(this)
         }
     }
