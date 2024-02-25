@@ -3,7 +3,10 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -16,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
 import com.jakewharton.rxrelay2.BehaviorRelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -23,6 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -50,7 +55,12 @@ class ChaptersViewModelTest {
     private lateinit var theme: Theme
 
     @Mock
+    private lateinit var settings: Settings
+
+    @Mock
     private lateinit var upNextQueue: UpNextQueue
+
+    private val cachedSubscriptionStatus = SubscriptionStatus.Free()
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
@@ -128,12 +138,16 @@ class ChaptersViewModelTest {
             .thenReturn(BehaviorRelay.create<UpNextQueue.State>().toSerialized())
         whenever(playbackManager.upNextQueue)
             .thenReturn(upNextQueue)
+        val userSetting = mock<UserSetting<SubscriptionStatus?>>()
+        whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
+        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         chaptersViewModel = ChaptersViewModel(
             episodeManager = episodeManager,
             podcastManager = podcastManager,
             playbackManager = playbackManager,
             theme = theme,
+            settings = settings,
         )
     }
 }
