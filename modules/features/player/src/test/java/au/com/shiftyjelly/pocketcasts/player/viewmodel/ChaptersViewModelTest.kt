@@ -12,16 +12,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
 import com.jakewharton.rxrelay2.BehaviorRelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,6 +40,9 @@ class ChaptersViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var episodeManager: EpisodeManager
@@ -63,13 +65,6 @@ class ChaptersViewModelTest {
     private val cachedSubscriptionStatus = SubscriptionStatus.Free()
 
     private lateinit var chaptersViewModel: ChaptersViewModel
-
-    @Before
-    fun setUp() {
-        FeatureFlag.initialize(
-            listOf(object : InMemoryFeatureProvider() {}),
-        )
-    }
 
     @Test
     fun `given unselected chapter contains playback pos, then skip to next selected chapter`() = runTest {
