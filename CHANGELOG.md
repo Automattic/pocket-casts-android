@@ -1,5 +1,8 @@
 7.59
 -----
+*   Updates:
+    *   Navigate to a podcast when a podcast title in the player tapped.
+        ([#1875](https://github.com/Automattic/pocket-casts-android/pull/1875))
 * Bug Fixes:
     *   Fixed an issue where bookmarks did not play when episodes where filtered out due to search queries.
         ([#1857](https://github.com/Automattic/pocket-casts-android/pull/1857))    
