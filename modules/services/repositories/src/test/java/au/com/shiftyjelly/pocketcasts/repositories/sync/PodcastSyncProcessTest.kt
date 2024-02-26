@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -314,6 +315,7 @@ class PodcastSyncProcessTest {
         autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
         autoArchiveEpisodeLimit: Int = 0,
         podcastGrouping: PodcastGrouping = PodcastGrouping.None,
+        episodesSortType: EpisodesSortType = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
     ) = mock<Podcast> {
         on { this.addedDate } doReturn Date(addedDateSinceEpoch.toMillis())
         on { this.folderUuid } doReturn folderUuid
@@ -332,6 +334,7 @@ class PodcastSyncProcessTest {
         on { this.autoArchiveInactive } doReturn autoArchiveInactive
         on { this.autoArchiveEpisodeLimit } doReturn autoArchiveEpisodeLimit
         on { this.grouping } doReturn podcastGrouping
+        on { this.episodesSortType } doReturn episodesSortType
     }
 
     private fun mockPodcastEpisode(

@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -911,6 +912,8 @@ class PodcastSyncProcess(
         podcast.addedDate = podcastSync.dateAdded
         podcast.folderUuid = podcastSync.folderUuid
         podcastSync.sortPosition?.let { podcast.sortPosition = it }
+        podcastSync.episodesSortOrder?.let { podcast.episodesSortType = EpisodesSortType.fromServerId(it) ?: EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC }
+        podcastSync.episodesSortOrderModified?.let { podcast.episodesSortTypeModified = it }
         podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
         podcastSync.startFromModified?.let { podcast.startFromModified = it }
         podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
@@ -1085,6 +1088,10 @@ class PodcastSyncProcess(
                         addToUpNext = boolSetting {
                             value = boolValue { value = podcast.addToUpNextSyncSetting }
                             modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                        }
+                        episodesSortOrder = int32Setting {
+                            value = int32Value { value = podcast.episodesSortType.serverId }
+                            modifiedAt = podcast.episodesSortTypeModified.toProtobufTimestampOrEpoch()
                         }
                         addToUpNextPosition = int32Setting {
                             value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
