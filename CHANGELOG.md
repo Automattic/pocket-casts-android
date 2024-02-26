@@ -22,6 +22,7 @@
         ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
     *   Fixed: Widget uses custom Headphone controls instead of skipping.
         ([#1853](https://github.com/Automattic/pocket-casts-android/pull/1853))
+
 7.57
 -----
 
