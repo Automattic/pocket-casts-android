@@ -203,6 +203,8 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
                 const val MOVED_FROM = "moved_from"
                 const val MOVED_TO = "moved_to"
                 const val POSITION = "position"
+                const val SOURCE = "source"
+                const val EPISODE_UUID = "episode_uuid"
             }
             object Value {
                 const val SHELF = "shelf"
