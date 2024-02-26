@@ -84,7 +84,11 @@ class ChaptersViewModel
         .observeOn(Schedulers.io())
 
     private val _uiState = MutableStateFlow(
-        UiState(backgroundColor = Color(theme.playerBackgroundColor(null))),
+        UiState(
+            backgroundColor = Color(theme.playerBackgroundColor(null)),
+            userTier = settings.userTier,
+            canSkipChapters = canSkipChapters(settings.userTier),
+        ),
     )
     val uiState: StateFlow<UiState>
         get() = _uiState
@@ -127,19 +131,23 @@ class ChaptersViewModel
             playbackPositionMs = playbackState.positionMs,
             lastChangeFrom = playbackState.lastChangeFrom,
         )
-        val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+        val currentUserTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+        val lastUserTier = _uiState.value.userTier
+        val canSkipChapters = canSkipChapters(currentUserTier)
+        val isTogglingChapters = ((lastUserTier != currentUserTier) && canSkipChapters) || _uiState.value.isTogglingChapters
+
         return UiState(
             allChapters = chapters,
             displayChapters = getFilteredChaptersIfNeeded(
                 chapters = chapters,
-                isTogglingChapters = _uiState.value.isTogglingChapters,
-                userTier = userTier,
+                isTogglingChapters = isTogglingChapters,
+                userTier = currentUserTier,
             ),
             totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
-            isTogglingChapters = _uiState.value.isTogglingChapters,
-            userTier = userTier,
-            canSkipChapters = canSkipChapters(userTier),
+            isTogglingChapters = isTogglingChapters,
+            userTier = currentUserTier,
+            canSkipChapters = canSkipChapters,
         )
     }
 
