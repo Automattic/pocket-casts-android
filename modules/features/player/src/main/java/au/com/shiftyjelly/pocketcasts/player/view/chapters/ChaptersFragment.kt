@@ -24,12 +24,19 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -63,6 +70,16 @@ class ChaptersFragment : BaseFragment() {
                         // still get the scrollTo behavior.
                         chaptersViewModel.setScrollToChapter(null)
                     }
+                }
+
+                LaunchedEffect(Unit) {
+                    chaptersViewModel
+                        .navigationState
+                        .collectLatest { event ->
+                            when (event) {
+                                is NavigationState.StartUpsell -> startUpsell()
+                            }
+                        }
                 }
 
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
@@ -103,5 +120,15 @@ class ChaptersFragment : BaseFragment() {
 
     private fun showPlayer() {
         (parentFragment as? PlayerContainerFragment)?.openPlayer()
+    }
+
+    private fun startUpsell() {
+        val source = OnboardingUpgradeSource.SKIP_CHAPTERS
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = source,
+            showPatronOnly = Feature.DESELECT_CHAPTERS.tier == FeatureTier.Patron ||
+                Feature.DESELECT_CHAPTERS.isCurrentlyExclusiveToPatron(),
+        )
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }
