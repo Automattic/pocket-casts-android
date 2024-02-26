@@ -686,5 +686,5 @@ private val NewEpisodeNotificationAction.notificationAction: String get() = when
     NewEpisodeNotificationAction.PlayNext -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_NEXT
     NewEpisodeNotificationAction.PlayLast -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_LAST
     NewEpisodeNotificationAction.Archive -> NotificationBroadcastReceiver.INTENT_ACTION_ARCHIVE
-    NewEpisodeNotificationAction.Download -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_DOWNLOADED
+    NewEpisodeNotificationAction.Download -> NotificationBroadcastReceiver.INTENT_ACTION_DOWNLOAD_EPISODE
 }
