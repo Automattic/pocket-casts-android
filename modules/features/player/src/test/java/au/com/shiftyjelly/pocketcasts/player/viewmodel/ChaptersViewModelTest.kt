@@ -1,9 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -17,10 +21,15 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.jakewharton.rxrelay2.BehaviorRelay
+import io.reactivex.Observable
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,7 +71,17 @@ class ChaptersViewModelTest {
     @Mock
     private lateinit var upNextQueue: UpNextQueue
 
-    private val cachedSubscriptionStatus = SubscriptionStatus.Free()
+    private val freeSubscriptionStatus = SubscriptionStatus.Free()
+
+    private val paidSubscriptionStatus = SubscriptionStatus.Paid(
+        expiry = Date(),
+        autoRenew = false,
+        index = 0,
+        platform = SubscriptionPlatform.GIFT,
+        tier = SubscriptionTier.PATRON,
+        type = SubscriptionType.PLUS,
+    )
+    private val cachedSubscriptionStatusFlow: MutableStateFlow<SubscriptionStatus> = MutableStateFlow(freeSubscriptionStatus)
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
@@ -117,6 +136,34 @@ class ChaptersViewModelTest {
         verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
     }
 
+    @Test
+    fun `given user not entitled to feature, when user taps skip chapters, then upsell starts`() = runTest {
+        initViewModel()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().canSkipChapters)
+            chaptersViewModel.navigationState.test {
+                chaptersViewModel.onSkipChaptersClick(true)
+                assertTrue(awaitItem() is ChaptersViewModel.NavigationState.StartUpsell)
+            }
+        }
+    }
+
+    @Test
+    fun `given user entitled to feature, when user taps skip chapters, then upsell does not start`() = runTest {
+        initViewModel()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().canSkipChapters)
+            cachedSubscriptionStatusFlow.value = paidSubscriptionStatus
+            assertTrue(awaitItem().canSkipChapters)
+            chaptersViewModel.navigationState.test {
+                chaptersViewModel.onSkipChaptersClick(true)
+                expectNoEvents()
+            }
+        }
+    }
+
     private fun initChapters() =
         Chapters(
             listOf(
@@ -128,13 +175,16 @@ class ChaptersViewModelTest {
 
     private fun initViewModel() {
         whenever(playbackManager.playbackStateRelay)
-            .thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
+            .thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized().apply { accept(PlaybackState()) })
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
-            .thenReturn(BehaviorRelay.create<UpNextQueue.State>().toSerialized())
+            .thenReturn(Observable.just(UpNextQueue.State.Empty))
         whenever(playbackManager.upNextQueue)
             .thenReturn(upNextQueue)
+        whenever(settings.userTier)
+            .thenReturn(UserTier.Free)
+
         val userSetting = mock<UserSetting<SubscriptionStatus?>>()
-        whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
+        whenever(userSetting.flow).thenReturn(cachedSubscriptionStatusFlow)
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         chaptersViewModel = ChaptersViewModel(
