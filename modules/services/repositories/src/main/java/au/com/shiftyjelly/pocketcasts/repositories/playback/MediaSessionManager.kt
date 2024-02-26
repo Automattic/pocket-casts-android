@@ -424,32 +424,32 @@ class MediaSessionManager(
                 MediaNotificationControls.PlaybackSpeed -> {
                     if (playbackManager.isAudioEffectsAvailable()) {
                         val drawableId = when (playbackState.playbackSpeed.roundedSpeed()) {
-                            0.5 -> IR.drawable.auto_0_5
-                            0.6 -> IR.drawable.auto_0_6
-                            0.7 -> IR.drawable.auto_0_7
-                            0.8 -> IR.drawable.auto_0_8
-                            0.9 -> IR.drawable.auto_0_9
-                            1.0 -> IR.drawable.auto_1
-                            1.1 -> IR.drawable.auto_1_1
-                            1.2 -> IR.drawable.auto_1_2
-                            1.3 -> IR.drawable.auto_1_3
-                            1.4 -> IR.drawable.auto_1_4
-                            1.5 -> IR.drawable.auto_1_5
-                            1.6 -> IR.drawable.auto_1_6
-                            1.7 -> IR.drawable.auto_1_7
-                            1.8 -> IR.drawable.auto_1_8
-                            1.9 -> IR.drawable.auto_1_9
-                            2.0 -> IR.drawable.auto_2
-                            2.1 -> IR.drawable.auto_2_1
-                            2.2 -> IR.drawable.auto_2_2
-                            2.3 -> IR.drawable.auto_2_3
-                            2.4 -> IR.drawable.auto_2_4
-                            2.5 -> IR.drawable.auto_2_5
-                            2.6 -> IR.drawable.auto_2_6
-                            2.7 -> IR.drawable.auto_2_7
-                            2.8 -> IR.drawable.auto_2_8
-                            2.9 -> IR.drawable.auto_2_9
-                            3.0 -> IR.drawable.auto_3
+                            in 0.0..<0.55 -> IR.drawable.auto_0_5
+                            in 0.55..<0.65 -> IR.drawable.auto_0_6
+                            in 0.65..<0.75 -> IR.drawable.auto_0_7
+                            in 0.75..<0.85 -> IR.drawable.auto_0_8
+                            in 0.85..<0.95 -> IR.drawable.auto_0_9
+                            in 0.95..<1.05 -> IR.drawable.auto_1
+                            in 1.05..<1.15 -> IR.drawable.auto_1_1
+                            in 1.15..<1.25 -> IR.drawable.auto_1_2
+                            in 1.25..<1.35 -> IR.drawable.auto_1_3
+                            in 1.35..<1.45 -> IR.drawable.auto_1_4
+                            in 1.45..<1.55 -> IR.drawable.auto_1_5
+                            in 1.55..<1.65 -> IR.drawable.auto_1_6
+                            in 1.65..<1.75 -> IR.drawable.auto_1_7
+                            in 1.75..<1.85 -> IR.drawable.auto_1_8
+                            in 1.85..<1.95 -> IR.drawable.auto_1_9
+                            in 1.95..<2.05 -> IR.drawable.auto_2
+                            in 2.05..<2.15 -> IR.drawable.auto_2_1
+                            in 2.15..<2.25 -> IR.drawable.auto_2_2
+                            in 2.25..<2.35 -> IR.drawable.auto_2_3
+                            in 2.35..<2.45 -> IR.drawable.auto_2_4
+                            in 2.45..<2.55 -> IR.drawable.auto_2_5
+                            in 2.55..<2.65 -> IR.drawable.auto_2_6
+                            in 2.65..<2.75 -> IR.drawable.auto_2_7
+                            in 2.75..<2.85 -> IR.drawable.auto_2_8
+                            in 2.85..<2.95 -> IR.drawable.auto_2_9
+                            in 2.95..<3.05 -> IR.drawable.auto_3
                             else -> IR.drawable.auto_1
                         }
 
@@ -726,17 +726,17 @@ class MediaSessionManager(
 
     private fun changePlaybackSpeed() {
         launch {
-            val speed = playbackManager.getPlaybackSpeed()
-            val newSpeed = when {
-                speed < 0.8 -> 0.8
-                speed < 1.0 -> 1.0
-                speed < 1.2 -> 1.2
-                speed < 1.4 -> 1.4
-                speed < 1.6 -> 1.6
-                speed < 1.8 -> 1.8
-                speed < 2 -> 2.0
-                speed < 3 -> 3.0
-                speed == 3.0 -> 0.6
+            val newSpeed = when (playbackManager.getPlaybackSpeed()) {
+                in 0.0..<0.60 -> 0.6
+                in 0.60..<0.80 -> 0.8
+                in 0.80..<1.00 -> 1.0
+                in 1.00..<1.20 -> 1.2
+                in 1.20..<1.40 -> 1.4
+                in 1.40..<1.60 -> 1.6
+                in 1.60..<1.80 -> 1.8
+                in 1.80..<2.00 -> 2.0
+                in 2.00..<3.00 -> 3.0
+                in 3.00..<3.05 -> 0.6
                 else -> 1.0
             }
 
