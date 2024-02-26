@@ -58,7 +58,10 @@ class ChaptersViewModel
         val isTogglingChapters: Boolean = false,
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
-    )
+    ) {
+        val showSubscriptionIcon
+            get() = !isTogglingChapters && !canSkipChapters
+    }
 
     sealed class ChapterState {
         abstract val chapter: Chapter

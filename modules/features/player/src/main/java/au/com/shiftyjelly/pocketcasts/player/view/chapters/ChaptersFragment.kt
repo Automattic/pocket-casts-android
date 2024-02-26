@@ -92,6 +92,7 @@ class ChaptersFragment : BaseFragment() {
                         onUrlClick = ::onUrlClick,
                         onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
                         isTogglingChapters = uiState.isTogglingChapters,
+                        showSubscriptionIcon = uiState.showSubscriptionIcon,
                         backgroundColor = uiState.backgroundColor,
                     )
                 }
