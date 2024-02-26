@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -15,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -22,8 +25,10 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -39,6 +44,7 @@ class ChaptersViewModel
     podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
+    private val settings: Settings,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -50,7 +56,12 @@ class ChaptersViewModel
         val totalChaptersCount: Int = 0,
         val backgroundColor: Color,
         val isTogglingChapters: Boolean = false,
-    )
+        val userTier: UserTier = UserTier.Free,
+        val canSkipChapters: Boolean = false,
+    ) {
+        val showSubscriptionIcon
+            get() = !isTogglingChapters && !canSkipChapters
+    }
 
     sealed class ChapterState {
         abstract val chapter: Chapter
@@ -73,16 +84,24 @@ class ChaptersViewModel
         .observeOn(Schedulers.io())
 
     private val _uiState = MutableStateFlow(
-        UiState(backgroundColor = Color(theme.playerBackgroundColor(null))),
+        UiState(
+            backgroundColor = Color(theme.playerBackgroundColor(null)),
+            userTier = settings.userTier,
+            canSkipChapters = canSkipChapters(settings.userTier),
+        ),
     )
     val uiState: StateFlow<UiState>
         get() = _uiState
+
+    private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
+    val navigationState = _navigationState.asSharedFlow()
 
     init {
         viewModelScope.launch {
             combine(
                 upNextStateObservable.asFlow(),
                 playbackStateObservable.asFlow(),
+                settings.cachedSubscriptionStatus.flow,
                 this@ChaptersViewModel::combineUiState,
             )
                 .distinctUntilChanged()
@@ -102,6 +121,7 @@ class ChaptersViewModel
     private fun combineUiState(
         upNextState: UpNextQueue.State,
         playbackState: PlaybackState,
+        cachedSubscriptionStatus: SubscriptionStatus?,
     ): UiState {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val backgroundColor = theme.playerBackgroundColor(podcast)
@@ -111,15 +131,23 @@ class ChaptersViewModel
             playbackPositionMs = playbackState.positionMs,
             lastChangeFrom = playbackState.lastChangeFrom,
         )
+        val currentUserTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+        val lastUserTier = _uiState.value.userTier
+        val canSkipChapters = canSkipChapters(currentUserTier)
+        val isTogglingChapters = ((lastUserTier != currentUserTier) && canSkipChapters) || _uiState.value.isTogglingChapters
+
         return UiState(
             allChapters = chapters,
             displayChapters = getFilteredChaptersIfNeeded(
                 chapters = chapters,
-                isTogglingChapters = _uiState.value.isTogglingChapters,
+                isTogglingChapters = isTogglingChapters,
+                userTier = currentUserTier,
             ),
             totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
-            isTogglingChapters = _uiState.value.isTogglingChapters,
+            isTogglingChapters = isTogglingChapters,
+            userTier = currentUserTier,
+            canSkipChapters = canSkipChapters,
         )
     }
 
@@ -165,20 +193,28 @@ class ChaptersViewModel
     }
 
     fun onSkipChaptersClick(checked: Boolean) {
-        _uiState.value = _uiState.value.copy(
-            isTogglingChapters = checked,
-            displayChapters = getFilteredChaptersIfNeeded(
-                chapters = _uiState.value.allChapters,
+        if (_uiState.value.canSkipChapters) {
+            _uiState.value = _uiState.value.copy(
                 isTogglingChapters = checked,
-            ),
-        )
+                displayChapters = getFilteredChaptersIfNeeded(
+                    chapters = _uiState.value.allChapters,
+                    isTogglingChapters = checked,
+                    userTier = _uiState.value.userTier,
+                ),
+            )
+        } else {
+            viewModelScope.launch {
+                _navigationState.emit(NavigationState.StartUpsell)
+            }
+        }
     }
 
     private fun getFilteredChaptersIfNeeded(
         chapters: List<ChapterState>,
         isTogglingChapters: Boolean,
+        userTier: UserTier,
     ): List<ChapterState> {
-        val shouldFilterChapters = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+        val shouldFilterChapters = canSkipChapters(userTier) &&
             !isTogglingChapters
 
         return if (shouldFilterChapters) {
@@ -186,5 +222,12 @@ class ChaptersViewModel
         } else {
             chapters
         }
+    }
+
+    private fun canSkipChapters(userTier: UserTier) = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+        Feature.isUserEntitled(Feature.DESELECT_CHAPTERS, userTier)
+
+    sealed class NavigationState {
+        data object StartUpsell : NavigationState()
     }
 }

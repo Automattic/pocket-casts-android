@@ -29,6 +29,7 @@ fun ChaptersPage(
     onUrlClick: (String) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
+    showSubscriptionIcon: Boolean,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
 ) {
@@ -46,6 +47,7 @@ fun ChaptersPage(
                     hiddenChaptersCount = totalChaptersCount - chapters.filter { it.chapter.selected }.size,
                     onSkipChaptersClick = onSkipChaptersClick,
                     isTogglingChapters = isTogglingChapters,
+                    showSubscriptionIcon = showSubscriptionIcon,
                 )
             }
         }
