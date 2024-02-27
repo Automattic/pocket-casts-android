@@ -354,6 +354,7 @@
     <!-- %1$d is the number of total chapters. %2$d is the number of hidden chapters. -->
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
+    <string name="select_one_chapter_message">Please select at least one chapter</string>
 
     <!-- Podcasts -->
 

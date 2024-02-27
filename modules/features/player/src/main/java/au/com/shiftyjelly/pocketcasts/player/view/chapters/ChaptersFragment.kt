@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
@@ -15,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.activityViewModels
@@ -59,6 +61,7 @@ class ChaptersFragment : BaseFragment() {
                 val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
                 val lazyListState = rememberLazyListState()
                 this@ChaptersFragment.lazyListState = lazyListState
+                val context = LocalContext.current
 
                 val scrollToChapter by chaptersViewModel.scrollToChapterState.collectAsState()
                 LaunchedEffect(scrollToChapter) {
@@ -79,6 +82,18 @@ class ChaptersFragment : BaseFragment() {
                             when (event) {
                                 is NavigationState.StartUpsell -> startUpsell()
                             }
+                        }
+                }
+
+                LaunchedEffect(Unit) {
+                    chaptersViewModel
+                        .snackbarMessage
+                        .collectLatest { message ->
+                            Toast.makeText(
+                                context,
+                                context.getString(message),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                         }
                 }
 
