@@ -98,7 +98,7 @@ fun ChapterRow(
                     .padding(vertical = 16.dp),
             )
             Spacer(Modifier.width(4.dp))
-            if (chapter.url != null) {
+            if (chapter.url != null && !isTogglingChapters) {
                 LinkButton(
                     textColor = textColor,
                     onClick = onUrlClick,
