@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import java.util.Date
 import kotlinx.coroutines.flow.Flow
 
 interface PodcastManager {
@@ -98,7 +97,6 @@ interface PodcastManager {
     suspend fun updateShowArchived(podcast: Podcast, showArchived: Boolean)
     suspend fun updateAllShowArchived(showArchived: Boolean)
     suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
-    suspend fun updateSyncData(podcast: Podcast, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
 
     fun markPodcastAsSynced(podcast: Podcast)
     fun markPodcastAsNotSynced(podcast: Podcast)

@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
@@ -232,6 +233,23 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         if (result is ErrorResult && headerViewModel.podcastUuid != null) {
                             loadArtwork(headerViewModel.podcastUuid, binding.artwork)
                         }
+                    }
+                }
+            }
+
+            binding.podcastTitle?.let { podcastTitle ->
+                podcastTitle.setOnClickListener {
+                    val podcastUuid = headerViewModel.podcastUuid ?: return@setOnClickListener
+                    analyticsTracker.track(
+                        AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+                        mapOf(
+                            AnalyticsProp.Key.EPISODE_UUID to headerViewModel.episodeUuid,
+                            AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+                        ),
+                    )
+                    (activity as? FragmentHostListener)?.let { listener ->
+                        listener.closePlayer()
+                        listener.openPodcastPage(podcastUuid)
                     }
                 }
             }

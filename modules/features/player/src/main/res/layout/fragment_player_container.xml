@@ -104,7 +104,7 @@
         android:elevation="8dp"
         android:translationZ="200dp"
         app:behavior_peekHeight="0dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+        app:layout_behavior="com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior" />
 
     <au.com.shiftyjelly.pocketcasts.views.tour.TourView
         android:id="@+id/tourView"

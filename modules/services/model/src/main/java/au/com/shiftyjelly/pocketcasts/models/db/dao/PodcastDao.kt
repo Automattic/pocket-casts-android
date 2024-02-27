@@ -359,9 +359,6 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE subscribed = 1")
     abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
-    abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
-
     @Query(
         """
          SELECT DISTINCT podcast_episodes.uuid as episodeId, podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg, SUM(podcast_episodes.played_up_to) as totalPlayedTime, COUNT(podcast_episodes.uuid) as numberOfPlayedEpisodes
