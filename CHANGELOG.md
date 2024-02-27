@@ -29,7 +29,6 @@
         ([#1846](https://github.com/Automattic/pocket-casts-android/pull/1846))
     *   Fixed a bug where podcast setting screen could become unresponsive.
         ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
-*   Updates:
     *   Fixed: Widget uses custom Headphone controls instead of skipping.
         ([#1853](https://github.com/Automattic/pocket-casts-android/pull/1853))
 
