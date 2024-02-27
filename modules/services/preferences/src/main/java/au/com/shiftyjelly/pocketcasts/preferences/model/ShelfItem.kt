@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.preferences.model
 
-import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -10,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 enum class ShelfItem(
     val id: String,
     val titleId: (BaseEpisode?) -> Int,
-    @StringRes val subtitleId: Int? = null,
+    val subtitleId: (BaseEpisode?) -> Int? = { null },
     val iconId: (BaseEpisode?) -> Int,
     val showIf: (BaseEpisode?) -> Boolean = { true },
     val analyticsValue: String,
@@ -30,7 +29,7 @@ enum class ShelfItem(
     Star(
         id = "star",
         titleId = { if (it is PodcastEpisode && it.isStarred) LR.string.unstar_episode else LR.string.star_episode },
-        subtitleId = LR.string.player_actions_hidden_for_custom,
+        subtitleId = { episode -> LR.string.player_actions_hidden_for_custom.takeIf { episode is UserEpisode } },
         iconId = { if (it is PodcastEpisode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
         showIf = { it is PodcastEpisode },
         analyticsValue = "star_episode",
@@ -38,7 +37,7 @@ enum class ShelfItem(
     Share(
         id = "share",
         titleId = { LR.string.podcast_share_episode },
-        subtitleId = LR.string.player_actions_hidden_for_custom,
+        subtitleId = { episode -> LR.string.player_actions_hidden_for_custom.takeIf { episode is UserEpisode } },
         iconId = { IR.drawable.ic_share },
         showIf = { it is PodcastEpisode },
         analyticsValue = "share_episode",
@@ -70,15 +69,16 @@ enum class ShelfItem(
     Archive(
         id = "archive",
         titleId = { if (it is UserEpisode) LR.string.delete else LR.string.archive },
-        subtitleId = LR.string.player_actions_show_as_delete_for_custom,
+        subtitleId = { episode -> LR.string.player_actions_show_as_delete_for_custom.takeIf { episode is UserEpisode } },
         iconId = { if (it is UserEpisode) IR.drawable.ic_delete else IR.drawable.ic_archive },
         analyticsValue = "archive",
     ),
     Report(
         id = "report",
         titleId = { LR.string.report },
-        subtitleId = LR.string.report_subtitle,
+        subtitleId = { if (it is PodcastEpisode) LR.string.report_subtitle else LR.string.player_actions_hidden_for_custom },
         iconId = { IR.drawable.ic_flag },
+        showIf = { it is PodcastEpisode },
         analyticsValue = "report",
     ),
     ;
