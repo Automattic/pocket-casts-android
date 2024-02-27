@@ -591,4 +591,5 @@ enum class AnalyticsEvent(val key: String) {
     DESELECT_CHAPTERS_TOGGLED_OFF("deselect_chapters_toggled_off"),
     DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
     DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
+    PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped")
 }
