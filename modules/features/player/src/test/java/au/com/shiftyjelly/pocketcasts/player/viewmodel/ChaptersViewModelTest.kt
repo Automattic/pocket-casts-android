@@ -192,6 +192,7 @@ class ChaptersViewModelTest {
                 chaptersViewModel.onSelectionChange(false, chapters.getList().first { it.selected })
                 assertTrue(awaitItem() == LR.string.select_one_chapter_message)
             }
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -234,6 +235,7 @@ class ChaptersViewModelTest {
             playbackManager = playbackManager,
             theme = theme,
             settings = settings,
+            analyticsTracker = mock(),
         )
     }
 }
