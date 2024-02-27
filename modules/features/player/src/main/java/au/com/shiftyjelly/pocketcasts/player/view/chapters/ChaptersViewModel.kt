@@ -59,6 +59,7 @@ class ChaptersViewModel
         val isTogglingChapters: Boolean = false,
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
+        val podcast: Podcast? = null,
     ) {
         val showSubscriptionIcon
             get() = !isTogglingChapters && !canSkipChapters
@@ -152,6 +153,7 @@ class ChaptersViewModel
             isTogglingChapters = isTogglingChapters,
             userTier = currentUserTier,
             canSkipChapters = canSkipChapters,
+            podcast = playbackState.podcast,
         )
     }
 
