@@ -142,8 +142,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -236,7 +236,7 @@ class MainActivity :
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+        get() = Dispatchers.Default
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: BottomNavigator
@@ -756,8 +756,7 @@ class MainActivity :
         val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
         val useRssArtworkChanges = settings.useRssArtwork.flow
 
-        combine(upNextQueueChanges, useRssArtworkChanges) { upNextQueue, useRssArtwork ->
-            Timber.i("useRssArtwork combined, $useRssArtwork")
+        val combinedFlow = combine(upNextQueueChanges, useRssArtworkChanges) { upNextQueue, useRssArtwork ->
             upNextQueue to useRssArtwork
         }
             .onEach { (upNextQueue, useRssArtwork) ->
@@ -765,11 +764,16 @@ class MainActivity :
                     upNext = upNextQueue,
                     theme = theme,
                     shouldAnimateOnAttach = !showMiniPlayerImmediately,
-                    useRssArtwork = useRssArtwork
+                    useRssArtwork = useRssArtwork,
                 )
             }
             .catch { Timber.e(it) }
-            .launchIn(this)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combinedFlow.collect()
+            }
+        }
 
         viewModel.signInState.observe(this) { signinState ->
             val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus

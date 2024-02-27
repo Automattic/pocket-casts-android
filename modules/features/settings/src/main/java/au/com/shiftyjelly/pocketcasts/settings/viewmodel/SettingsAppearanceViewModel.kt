@@ -144,7 +144,7 @@ class SettingsAppearanceViewModel @Inject constructor(
         settings.useRssArtwork.set(value, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED,
-            mapOf("enabled" to value)
+            mapOf("enabled" to value),
         )
     }
 
