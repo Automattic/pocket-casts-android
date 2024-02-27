@@ -236,7 +236,7 @@ class MainActivity :
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
+        get() = Dispatchers.Main
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: BottomNavigator
@@ -756,7 +756,10 @@ class MainActivity :
         val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
         val useRssArtworkChanges = settings.useRssArtwork.flow
 
-        combine(upNextQueueChanges, useRssArtworkChanges) { upNextQueue, useRssArtwork -> upNextQueue to useRssArtwork }
+        combine(upNextQueueChanges, useRssArtworkChanges) { upNextQueue, useRssArtwork ->
+            Timber.i("useRssArtwork combined, $useRssArtwork")
+            upNextQueue to useRssArtwork
+        }
             .onEach { (upNextQueue, useRssArtwork) ->
                 binding.playerBottomSheet.setUpNext(
                     upNext = upNextQueue,

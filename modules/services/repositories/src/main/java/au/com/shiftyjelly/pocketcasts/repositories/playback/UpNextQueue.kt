@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 
 interface UpNextQueue {
     val isEmpty: Boolean
