@@ -64,6 +64,7 @@ class ChaptersViewModel
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
         val podcast: Podcast? = null,
+        val isSkippingToNextChapter: Boolean = false,
     ) {
         val showSubscriptionIcon
             get() = !isTogglingChapters && !canSkipChapters
@@ -160,6 +161,7 @@ class ChaptersViewModel
             userTier = currentUserTier,
             canSkipChapters = canSkipChapters,
             podcast = playbackState.podcast,
+            isSkippingToNextChapter = _uiState.value.isSkippingToNextChapter,
         )
     }
 
@@ -179,6 +181,7 @@ class ChaptersViewModel
                 if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
+                    _uiState.value = _uiState.value.copy(isSkippingToNextChapter = false)
                     val progress = chapter.calculateProgress(playbackPositionMs)
                     ChapterState.Playing(chapter = chapter, progress = progress)
                 } else {
@@ -187,7 +190,10 @@ class ChaptersViewModel
                             PlaybackManager.LastChangeFrom.OnSeekComplete.value,
                         ).contains(lastChangeFrom)
                     ) {
-                        playbackManager.skipToNextSelectedOrLastChapter()
+                        if (!_uiState.value.isSkippingToNextChapter) {
+                            _uiState.value = _uiState.value.copy(isSkippingToNextChapter = true)
+                            playbackManager.skipToNextSelectedOrLastChapter()
+                        }
                     }
                     ChapterState.NotPlayed(chapter)
                 }
