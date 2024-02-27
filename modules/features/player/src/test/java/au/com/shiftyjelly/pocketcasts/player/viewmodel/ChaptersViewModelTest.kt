@@ -39,6 +39,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -84,6 +85,21 @@ class ChaptersViewModelTest {
     private val cachedSubscriptionStatusFlow: MutableStateFlow<SubscriptionStatus> = MutableStateFlow(freeSubscriptionStatus)
 
     private lateinit var chaptersViewModel: ChaptersViewModel
+
+    private val chaptersTwoSelectedOneUnselected = Chapters(
+        listOf(
+            Chapter("1", 0, 100, selected = true),
+            Chapter("2", 101, 200, selected = false),
+            Chapter("3", 201, 300, selected = true),
+        ),
+    )
+
+    private val chaptersOneSelectedOneUnselected = Chapters(
+        listOf(
+            Chapter("1", 0, 100, selected = true),
+            Chapter("2", 101, 200, selected = false),
+        ),
+    )
 
     @Test
     fun `given unselected chapter contains playback pos, then skip to next selected chapter`() = runTest {
@@ -164,18 +180,43 @@ class ChaptersViewModelTest {
         }
     }
 
-    private fun initChapters() =
-        Chapters(
-            listOf(
-                Chapter("1", 0, 100, selected = true),
-                Chapter("2", 101, 200, selected = false),
-                Chapter("3", 201, 300, selected = true),
-            ),
-        )
+    @Test
+    fun `given only one chapter unselected, when chapter is unselected, then select at least one chapter message shown`() = runTest {
+        val chapters = initChapters(chaptersOneSelectedOneUnselected)
+        initViewModel(chapters = chapters)
 
-    private fun initViewModel() {
+        chaptersViewModel.uiState.test {
+            cachedSubscriptionStatusFlow.value = paidSubscriptionStatus
+            skipItems(2)
+            chaptersViewModel.snackbarMessage.test {
+                chaptersViewModel.onSelectionChange(false, chapters.getList().first { it.selected })
+                assertTrue(awaitItem() == LR.string.select_one_chapter_message)
+            }
+        }
+    }
+
+    @Test
+    fun `given more than one chapter unselected, when chapter is unselected, then select at least one chapter message not shown`() = runTest {
+        val chapters = initChapters(chaptersTwoSelectedOneUnselected)
+        initViewModel(chapters = chapters)
+
+        chaptersViewModel.uiState.test {
+            cachedSubscriptionStatusFlow.value = paidSubscriptionStatus
+            skipItems(2)
+            chaptersViewModel.snackbarMessage.test {
+                chaptersViewModel.onSelectionChange(false, chapters.getList().first { it.selected })
+                expectNoEvents()
+            }
+        }
+    }
+
+    private fun initChapters(chapters: Chapters = chaptersTwoSelectedOneUnselected) = chapters
+
+    private fun initViewModel(
+        chapters: Chapters = Chapters(),
+    ) {
         whenever(playbackManager.playbackStateRelay)
-            .thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized().apply { accept(PlaybackState()) })
+            .thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized().apply { accept(PlaybackState(chapters = chapters)) })
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
             .thenReturn(Observable.just(UpNextQueue.State.Empty))
         whenever(playbackManager.upNextQueue)

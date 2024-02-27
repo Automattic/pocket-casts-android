@@ -15,6 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.activityViewModels
@@ -29,10 +31,12 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.delay
@@ -59,6 +63,8 @@ class ChaptersFragment : BaseFragment() {
                 val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
                 val lazyListState = rememberLazyListState()
                 this@ChaptersFragment.lazyListState = lazyListState
+                val context = LocalContext.current
+                val currentView = LocalView.current
 
                 val scrollToChapter by chaptersViewModel.scrollToChapterState.collectAsState()
                 LaunchedEffect(scrollToChapter) {
@@ -79,6 +85,17 @@ class ChaptersFragment : BaseFragment() {
                             when (event) {
                                 is NavigationState.StartUpsell -> startUpsell()
                             }
+                        }
+                }
+
+                LaunchedEffect(Unit) {
+                    chaptersViewModel
+                        .snackbarMessage
+                        .collectLatest { message ->
+                            Snackbar.make(currentView, context.getString(message), Snackbar.LENGTH_SHORT)
+                                .setBackgroundTint(ThemeColor.playerContrast01(Theme.ThemeType.DARK))
+                                .setTextColor(ThemeColor.playerBackground01(Theme.ThemeType.DARK, theme.playerBackgroundColor(uiState.podcast)))
+                                .show()
                         }
                 }
 

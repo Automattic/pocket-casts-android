@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ChaptersViewModel
@@ -58,6 +59,7 @@ class ChaptersViewModel
         val isTogglingChapters: Boolean = false,
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
+        val podcast: Podcast? = null,
     ) {
         val showSubscriptionIcon
             get() = !isTogglingChapters && !canSkipChapters
@@ -95,6 +97,9 @@ class ChaptersViewModel
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
+
+    private val _snackbarMessage: MutableSharedFlow<Int> = MutableSharedFlow()
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -148,6 +153,7 @@ class ChaptersViewModel
             isTogglingChapters = isTogglingChapters,
             userTier = currentUserTier,
             canSkipChapters = canSkipChapters,
+            podcast = playbackState.podcast,
         )
     }
 
@@ -189,7 +195,14 @@ class ChaptersViewModel
     }
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
-        playbackManager.toggleChapter(selected, chapter)
+        val selectedChapters = _uiState.value.allChapters.filter { it.chapter.selected }
+        if (!selected && selectedChapters.size == 1) {
+            viewModelScope.launch {
+                _snackbarMessage.emit(LR.string.select_one_chapter_message)
+            }
+        } else {
+            playbackManager.toggleChapter(selected, chapter)
+        }
     }
 
     fun onSkipChaptersClick(checked: Boolean) {

@@ -113,7 +113,7 @@ private fun TextButton(
         TextH50(
             text = text,
             textAlign = TextAlign.End,
-            color = MaterialTheme.theme.colors.primaryText01,
+            color = MaterialTheme.theme.colors.playerContrast01,
         )
 
         if (showSubscriptionIcon) {
