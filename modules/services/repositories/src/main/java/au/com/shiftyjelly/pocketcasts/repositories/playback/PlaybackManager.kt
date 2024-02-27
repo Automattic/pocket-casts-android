@@ -1803,6 +1803,9 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        val podcastEpisode = episode as? PodcastEpisode
+        val isCached = podcastEpisode?.isAutomaticallyCached ?: false && FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE)
+
         var posUpdatedOnPlayerReset = false
         // We want to make sure we get the current position at the last possible moment before changing/resetting the player
         val currentPositionMs = if (
@@ -1811,10 +1814,8 @@ open class PlaybackManager @Inject constructor(
         ) {
             // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
-                Timber.d("Resetting player")
                 val playerPositionMs = player?.getCurrentPositionMs()
-
-                if (sameEpisode && playerPositionMs != null) {
+                if (sameEpisode && playerPositionMs != null && !isCached) {
                     val playerPositionSeconds = playerPositionMs / 1000.0
                     // Make sure that the episode is updated with the latest position before resetting the player.
                     // This helps avoid having the audio jump "back" a second or so when the currently playing episode
@@ -1822,8 +1823,12 @@ open class PlaybackManager @Inject constructor(
                     episodeManager.updatePlayedUpTo(episode, playerPositionSeconds, forceUpdate = true)
                     posUpdatedOnPlayerReset = true
                 }
-
-                resetPlayer()
+                // This is to avoid unnecessary player resets for cached episodes
+                // when switching from streaming to downloaded episode.
+                if (!isCached || (isPlayerSwitchRequired() && FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE))) {
+                    Timber.d("Resetting player")
+                    resetPlayer()
+                }
                 playerPositionMs
             } else {
                 Timber.d("Stopping player")
