@@ -32,7 +32,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.toLiveData
 import androidx.mediarouter.media.MediaControlIntent
 import androidx.mediarouter.media.MediaRouteSelector
 import androidx.mediarouter.media.MediaRouter
@@ -130,9 +129,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -144,6 +141,10 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -752,21 +753,26 @@ class MainActivity :
             }
         }
 
-        val upNextQueueObservable =
-            playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
-                episodeManager,
-                podcastManager,
-            )
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .toFlowable(BackpressureStrategy.LATEST)
-        observeUpNext = upNextQueueObservable.toLiveData()
-        observeUpNext.observe(this) { upNext ->
-            binding.playerBottomSheet.setUpNext(
-                upNext = upNext,
-                theme = theme,
-                shouldAnimateOnAttach = !showMiniPlayerImmediately,
-            )
+        val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
+        val useRssArtworkChanges = settings.useRssArtwork.flow
+
+        val combinedFlow = combine(upNextQueueChanges, useRssArtworkChanges) { upNextQueue, useRssArtwork ->
+            upNextQueue to useRssArtwork
+        }
+            .onEach { (upNextQueue, useRssArtwork) ->
+                binding.playerBottomSheet.setUpNext(
+                    upNext = upNextQueue,
+                    theme = theme,
+                    shouldAnimateOnAttach = !showMiniPlayerImmediately,
+                    useRssArtwork = useRssArtwork,
+                )
+            }
+            .catch { Timber.e(it) }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combinedFlow.collect()
+            }
         }
 
         viewModel.signInState.observe(this) { signinState ->

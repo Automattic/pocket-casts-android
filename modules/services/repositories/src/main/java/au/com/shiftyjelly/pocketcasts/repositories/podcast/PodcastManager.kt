@@ -27,6 +27,7 @@ interface PodcastManager {
     suspend fun findPodcastByUuidSuspend(uuid: String): Podcast?
     fun findPodcastByUuidRx(uuid: String): Maybe<Podcast>
     fun observePodcastByUuid(uuid: String): Flowable<Podcast>
+    fun observePodcastByUuidFlow(uuid: String): Flow<Podcast>
     fun observePodcastSubscriptions(): Flowable<List<String>>
 
     fun findSubscribed(): List<Podcast>

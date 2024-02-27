@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -461,7 +460,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             // find the podcast
             val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) else Podcast.userPodcast
             // convert to a media item
-            if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+            if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useRssArtwork = settings.useRssArtwork.value)
         }
     }
 
@@ -511,12 +510,12 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             folderManager.getHomeFolder().mapNotNull { item ->
                 when (item) {
                     is FolderItem.Folder -> convertFolderToMediaItem(this, item.folder)
-                    is FolderItem.Podcast -> convertPodcastToMediaItem(podcast = item.podcast, context = this)
+                    is FolderItem.Podcast -> convertPodcastToMediaItem(podcast = item.podcast, context = this, useRssArtwork = settings.useRssArtwork.value)
                 }
             }
         } else {
             podcastManager.findSubscribedSorted().mapNotNull { podcast ->
-                convertPodcastToMediaItem(podcast = podcast, context = this)
+                convertPodcastToMediaItem(podcast = podcast, context = this, useRssArtwork = settings.useRssArtwork.value)
             }
         }
     }
@@ -524,7 +523,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaBrowserCompat.MediaItem> {
         return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
             folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
-                convertPodcastToMediaItem(podcast = podcast, context = this)
+                convertPodcastToMediaItem(podcast = podcast, context = this, useRssArtwork = settings.useRssArtwork.value)
             }
         } else {
             emptyList()
@@ -542,7 +541,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             if (topEpisodes.isNotEmpty()) {
                 for (episode in topEpisodes) {
                     podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)?.let { parentPodcast ->
-                        episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid))
+                        episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid, useRssArtwork = settings.useRssArtwork.value))
                     }
                 }
             }
@@ -560,7 +559,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                     episodes.sortBy { it.episodeType !is PodcastEpisode.EpisodeType.Trailer } // Bring trailers to the top
                 }
                 episodes.forEach { episode ->
-                    episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, podcast, groupTrailers = !podcast.isSubscribed))
+                    episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, podcast, groupTrailers = !podcast.isSubscribed, useRssArtwork = settings.useRssArtwork.value))
                 }
             }
         }
@@ -570,14 +569,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
         return userEpisodeManager.findUserEpisodes().map {
-            AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast)
+            AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast, useRssArtwork = settings.useRssArtwork.value)
         }
     }
 
     protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
-                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useRssArtwork = settings.useRssArtwork.value)
             }
         }
     }
@@ -585,7 +584,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
         return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
-                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useRssArtwork = settings.useRssArtwork.value)
             }
         }
     }
@@ -627,6 +626,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         // merge the local and remote podcasts
         val podcasts = (localPodcasts + serverPodcasts).distinctBy { it.uuid }
         // convert podcasts to the media browser format
-        return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
+        return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast, useRssArtwork = settings.useRssArtwork.value) }
     }
 }

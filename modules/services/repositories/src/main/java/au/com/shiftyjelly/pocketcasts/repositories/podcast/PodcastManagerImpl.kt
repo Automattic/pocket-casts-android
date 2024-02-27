@@ -410,6 +410,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observeByUuid(uuid)
     }
 
+    override fun observePodcastByUuidFlow(uuid: String): Flow<Podcast> {
+        return podcastDao.observeByUuidFlow(uuid)
+    }
+
     override fun findByUuids(uuids: Collection<String>): List<Podcast> {
         return podcastDao.findByUuids(uuids.toTypedArray())
     }

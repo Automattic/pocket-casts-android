@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -57,6 +58,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -67,6 +73,7 @@ class MediaSessionManager(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
+    val widgetManager: WidgetManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -160,17 +167,19 @@ class MediaSessionManager(
         observePlaybackState()
         observeCustomMediaActionsVisibility()
         observeMediaNotificationControls()
-        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-            // ignore the playing episode progress updates, but update when the media player read the duration from the file.
+
+        val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
             .distinctUntilChanged { stateOne, stateTwo ->
                 UpNextQueue.State.isEqualWithEpisodeCompare(stateOne, stateTwo) { episodeOne, episodeTwo ->
                     episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
                 }
             }
-            .observeOn(Schedulers.io())
-            .doOnNext { updateUpNext(it) }
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
+        val useRssArtworkChanges = settings.useRssArtwork.flow
+
+        combine(upNextQueueChanges, useRssArtworkChanges) { queueState, useRssArtwork -> queueState to useRssArtwork }
+            .onEach { (queueState, useRssArtwork) -> updateUpNext(queueState, useRssArtwork) }
+            .catch { Timber.e(it) }
+            .launchIn(this)
     }
 
     private fun observeCustomMediaActionsVisibility() {
@@ -289,17 +298,17 @@ class MediaSessionManager(
         }
     }
 
-    private fun updateUpNext(upNext: UpNextQueue.State) {
+    private fun updateUpNext(upNext: UpNextQueue.State, useRssArtwork: Boolean) {
         try {
             mediaSession.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
-                updateMetadata(upNext.episode)
+                updateMetadata(upNext.episode, useRssArtwork)
 
                 val items = upNext.queue.map { episode ->
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
-                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)
+                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.useRssArtwork.value)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
@@ -312,7 +321,7 @@ class MediaSessionManager(
                 }
                 mediaSession.setQueue(items)
             } else {
-                updateMetadata(null)
+                updateMetadata(null, useRssArtwork)
                 mediaSession.setQueue(emptyList())
 
                 val playbackStateCompat = getPlaybackStateCompat(PlaybackState(state = PlaybackState.State.EMPTY), currentEpisode = null)
@@ -371,7 +380,7 @@ class MediaSessionManager(
             ).addTo(disposables)
     }
 
-    private fun updateMetadata(episode: BaseEpisode?) {
+    private fun updateMetadata(episode: BaseEpisode?, useRssArtwork: Boolean) {
         if (episode == null) {
             Timber.i("MediaSession metadata. Nothing Playing.")
             mediaSession.setMetadata(NOTHING_PLAYING)
@@ -399,7 +408,7 @@ class MediaSessionManager(
         mediaSession.setMetadata(nowPlaying)
 
         if (settings.showArtworkOnLockScreen.value) {
-            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
+            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, useRssArtwork)?.toString()
             nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
             if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 
