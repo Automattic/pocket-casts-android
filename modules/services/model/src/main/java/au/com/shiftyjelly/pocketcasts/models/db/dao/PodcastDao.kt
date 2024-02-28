@@ -137,6 +137,9 @@ abstract class PodcastDao {
     abstract fun observeByUuid(uuid: String): Flowable<Podcast>
 
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
+    abstract fun observeByUuidFlow(uuid: String): Flow<Podcast>
+
+    @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<Podcast>
 
     @Query("SELECT * FROM podcasts WHERE uuid IN (:uuids)")
@@ -294,8 +297,8 @@ abstract class PodcastDao {
         updateTrimSilenceMode(trimMode, uuid, modified)
     }
 
-    @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType WHERE uuid = :uuid")
-    abstract fun updateEpisodesSortType(episodesSortType: EpisodesSortType, uuid: String)
+    @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType, episodes_sort_order_modified = :modified, sync_status = 0  WHERE uuid = :uuid")
+    abstract fun updateEpisodesSortType(episodesSortType: EpisodesSortType, uuid: String, modified: Date = Date())
 
     @Query("UPDATE podcasts SET show_notifications = :show, show_notifications_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract fun updateShowNotifications(show: Boolean, uuid: String, modified: Date = Date())
@@ -355,9 +358,6 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE subscribed = 1")
     abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping, modified: Date = Date())
-
-    @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
-    abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
 
     @Query(
         """

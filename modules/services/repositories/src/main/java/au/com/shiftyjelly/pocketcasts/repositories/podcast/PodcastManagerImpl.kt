@@ -410,6 +410,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observeByUuid(uuid)
     }
 
+    override fun observePodcastByUuidFlow(uuid: String): Flow<Podcast> {
+        return podcastDao.observeByUuidFlow(uuid)
+    }
+
     override fun findByUuids(uuids: Collection<String>): List<Podcast> {
         return podcastDao.findByUuids(uuids.toTypedArray())
     }
@@ -757,17 +761,6 @@ class PodcastManagerImpl @Inject constructor(
             return
         }
         podcastDao.updateFolderUuid(folderUuid, podcastUuids)
-    }
-
-    override suspend fun updateSyncData(podcast: Podcast, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date) {
-        podcastDao.updateSyncData(
-            uuid = podcast.uuid,
-            startFromSecs = startFromSecs,
-            skipLastSecs = skipLastSecs,
-            folderUuid = folderUuid,
-            sortPosition = sortPosition,
-            addedDate = addedDate,
-        )
     }
 
     override suspend fun updatePodcastPositions(podcasts: List<Podcast>) {

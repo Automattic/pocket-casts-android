@@ -30,6 +30,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
     val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow
     val useEmbeddedArtwork = settings.useEmbeddedArtwork.flow
+    val useRssArtwork = settings.useRssArtwork.flow
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)
@@ -135,6 +136,14 @@ class SettingsAppearanceViewModel @Inject constructor(
         settings.useEmbeddedArtwork.set(value, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
+            mapOf("enabled" to value),
+        )
+    }
+
+    fun updateUseRssArtwork(value: Boolean) {
+        settings.useRssArtwork.set(value, needsSync = true)
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED,
             mapOf("enabled" to value),
         )
     }

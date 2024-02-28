@@ -1,6 +1,21 @@
 7.59
 -----
-
+*   Updates:
+    *   Navigate to a podcast when a podcast title in the player tapped.
+        ([#1875](https://github.com/Automattic/pocket-casts-android/pull/1875))
+    *   Enable updating playback speed in the media notification from 2x to 3x, 3x to 0.6x, 0.6x to 0.8x, and 0.8x to 1.0x.
+        ([#1862](https://github.com/Automattic/pocket-casts-android/pull/1862))
+    *   Add toggle for podcast artwork embedded in an episode's show notes
+        ([#1854](https://github.com/Automattic/pocket-casts-android/pull/1854))
+* Bug Fixes:
+    *   Fixed an issue where bookmarks did not play when episodes where filtered out due to search queries.
+        ([#1857](https://github.com/Automattic/pocket-casts-android/pull/1857))    
+    *   Fixed an issue where bookmarks on description could become unresponsive.
+        ([#1873](https://github.com/Automattic/pocket-casts-android/pull/1873))        
+    *   Fixed an issue where bookmarks could display incorrect timestamps.
+        ([#1876](https://github.com/Automattic/pocket-casts-android/pull/1876))
+    *   Fixed: Notification center doesn't display playback speed below 1x
+        ([#1862](https://github.com/Automattic/pocket-casts-android/pull/1862))
 
 7.58
 -----
@@ -13,6 +28,7 @@
         ([#1845](https://github.com/Automattic/pocket-casts-android/pull/1845))
     *   Fixed: Widget uses custom Headphone controls instead of skipping.
         ([#1853](https://github.com/Automattic/pocket-casts-android/pull/1853))
+
 7.57
 -----
 

@@ -76,7 +76,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setRefreshPodcastsInBackground(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = false)
+        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = true)
     }
 
     fun signOut() {

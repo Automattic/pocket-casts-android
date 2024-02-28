@@ -172,7 +172,7 @@ class StorageSettingsViewModel
     }
 
     private fun onBackgroundRefreshCheckedChange(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = false)
+        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = true)
         updateBackgroundRefreshState()
     }
 

@@ -4,6 +4,7 @@ import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.android.billingclient.api.ProductDetails
 
@@ -104,6 +105,12 @@ sealed interface Subscription {
                 UserTier.Free -> UNKNOWN
                 UserTier.Plus -> PLUS
                 UserTier.Patron -> PATRON
+            }
+
+            fun fromFeatureTier(feature: Feature) = when (feature.tier) {
+                FeatureTier.Free -> UNKNOWN
+                is FeatureTier.Plus -> if (feature.isCurrentlyExclusiveToPatron()) PATRON else PLUS
+                FeatureTier.Patron -> PATRON
             }
         }
     }

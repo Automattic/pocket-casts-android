@@ -13,6 +13,7 @@ import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.SyncUserFolder
 import com.pocketcasts.service.api.SyncUserPlaylist
 import com.pocketcasts.service.api.SyncUserPodcast
+import com.pocketcasts.service.api.UserPodcastResponse
 import com.pocketcasts.service.api.addToUpNextOrNull
 import com.pocketcasts.service.api.addToUpNextPositionOrNull
 import com.pocketcasts.service.api.autoArchiveEpisodeLimitOrNull
@@ -59,10 +60,11 @@ data class SyncUpdateResponse(
     data class PodcastSync(
         var uuid: String? = null,
         var subscribed: Boolean = false,
-        var episodesSortOrder: Int? = null,
         var folderUuid: String? = null,
         var sortPosition: Int? = null,
         var dateAdded: Date? = null,
+        var episodesSortOrder: Int? = null,
+        var episodesSortOrderModified: Date? = null,
         var startFromSecs: Int? = null,
         var startFromModified: Date? = null,
         var skipLastSecs: Int? = null,
@@ -99,10 +101,11 @@ data class SyncUpdateResponse(
                 PodcastSync(
                     uuid = syncUserPodcast.uuid,
                     subscribed = syncUserPodcast.subscribedOrNull?.value ?: false,
-                    episodesSortOrder = syncUserPodcast.episodesSortOrderOrNull?.value,
                     folderUuid = syncUserPodcast.folderUuidOrNull?.value,
                     sortPosition = syncUserPodcast.sortPositionOrNull?.value,
                     dateAdded = syncUserPodcast.dateAddedOrNull?.toDate(),
+                    episodesSortOrder = syncUserPodcast.settings.episodesSortOrderOrNull?.value?.value,
+                    episodesSortOrderModified = syncUserPodcast.settings.episodesSortOrderOrNull?.modifiedAt?.toDate(),
                     startFromSecs = syncUserPodcast.settings.autoStartFromOrNull?.value?.value,
                     startFromModified = syncUserPodcast.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
                     skipLastSecs = syncUserPodcast.settings.autoSkipLastOrNull?.value?.value,
@@ -134,6 +137,46 @@ data class SyncUpdateResponse(
                     showArchived = syncUserPodcast.settings.showArchived?.value?.value,
                     showArchivedModified = syncUserPodcast.settings.showArchived?.modifiedAt?.toDate(),
                 )
+
+            fun fromUserPodcastResponse(response: UserPodcastResponse) = PodcastSync(
+                uuid = response.uuid,
+                subscribed = true,
+                folderUuid = response.folderUuidOrNull?.value,
+                sortPosition = response.sortPositionOrNull?.value,
+                dateAdded = response.dateAddedOrNull?.toDate(),
+                episodesSortOrder = response.settings.episodesSortOrderOrNull?.value?.value,
+                episodesSortOrderModified = response.settings.episodesSortOrderOrNull?.modifiedAt?.toDate(),
+                startFromSecs = response.settings.autoStartFromOrNull?.value?.value,
+                startFromModified = response.settings.autoStartFromOrNull?.modifiedAt?.toDate(),
+                skipLastSecs = response.settings.autoSkipLastOrNull?.value?.value,
+                skipLastModified = response.settings.autoSkipLastOrNull?.modifiedAt?.toDate(),
+                addToUpNext = response.settings.addToUpNextOrNull?.value?.value,
+                addToUpNextModified = response.settings.addToUpNextOrNull?.modifiedAt?.toDate(),
+                addToUpNextPosition = response.settings.addToUpNextPositionOrNull?.value?.value,
+                addToUpNextPositionModified = response.settings.addToUpNextPositionOrNull?.modifiedAt?.toDate(),
+                useCustomPlaybackEffects = response.settings.playbackEffectsOrNull?.value?.value,
+                useCustomPlaybackEffectsModified = response.settings.playbackEffectsOrNull?.modifiedAt?.toDate(),
+                playbackSpeed = response.settings.playbackSpeedOrNull?.value?.value,
+                playbackSpeedModified = response.settings.playbackSpeedOrNull?.modifiedAt?.toDate(),
+                trimSilence = response.settings.trimSilenceOrNull?.value?.value,
+                trimSilenceModified = response.settings.trimSilenceOrNull?.modifiedAt?.toDate(),
+                useVolumeBoost = response.settings.volumeBoostOrNull?.value?.value,
+                useVolumeBoostModified = response.settings.volumeBoostOrNull?.modifiedAt?.toDate(),
+                showNotifications = response.settings.notificationOrNull?.value?.value,
+                showNotificationsModified = response.settings.notificationOrNull?.modifiedAt?.toDate(),
+                autoArchive = response.settings.autoArchiveOrNull?.value?.value,
+                autoArchiveModified = response.settings.autoArchiveOrNull?.modifiedAt?.toDate(),
+                autoArchivePlayed = response.settings.autoArchivePlayedOrNull?.value?.value,
+                autoArchivePlayedModified = response.settings.autoArchivePlayedOrNull?.modifiedAt?.toDate(),
+                autoArchiveInactive = response.settings.autoArchiveInactiveOrNull?.value?.value,
+                autoArchiveInactiveModified = response.settings.autoArchiveInactiveOrNull?.modifiedAt?.toDate(),
+                autoArchiveEpisodeLimit = response.settings.autoArchiveEpisodeLimitOrNull?.value?.value,
+                autoArchiveEpisodeLimitModified = response.settings.autoArchiveEpisodeLimitOrNull?.modifiedAt?.toDate(),
+                episodeGrouping = response.settings.episodeGroupingOrNull?.value?.value,
+                episodeGroupingModified = response.settings.episodesSortOrderOrNull?.modifiedAt?.toDate(),
+                showArchived = response.settings.showArchived?.value?.value,
+                showArchivedModified = response.settings.showArchived?.modifiedAt?.toDate(),
+            )
         }
     }
 

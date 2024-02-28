@@ -241,7 +241,7 @@ interface Settings {
 
         data object PlaybackSpeed : MediaNotificationControls(
             controlName = LR.string.playback_speed,
-            iconRes = IR.drawable.auto_1x,
+            iconRes = IR.drawable.auto_1,
             key = PLAYBACK_SPEED_KEY,
             serverId = "playback_speed",
         )
@@ -329,6 +329,7 @@ interface Settings {
     val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
+    val useRssArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 

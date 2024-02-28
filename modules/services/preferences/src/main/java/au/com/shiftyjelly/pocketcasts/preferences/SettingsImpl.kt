@@ -544,6 +544,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val useRssArtwork = UserSetting.BoolPref(
+        sharedPrefKey = "useRssArtwork",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val globalPlaybackEffects = object : UserSetting<PlaybackEffects>(
         sharedPrefKey = "globalPlaybackEffects",
         sharedPrefs = sharedPreferences,

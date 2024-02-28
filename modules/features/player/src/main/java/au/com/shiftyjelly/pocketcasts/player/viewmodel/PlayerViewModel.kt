@@ -188,6 +188,7 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
+        settings.useRssArtwork.flow.asObservable(coroutineContext),
         this::mergeListData,
     )
         .distinctUntilChanged()
@@ -314,7 +315,7 @@ class PlayerViewModel @Inject constructor(
             }
     }
 
-    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects): ListData {
+    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, useRssArtwork: Boolean): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -326,7 +327,7 @@ class PlayerViewModel @Inject constructor(
         val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
         val embeddedPath = playbackState.embeddedArtworkPath
 
-        val embeddedArtwork: Artwork = if (showNotesImageUrl != null) {
+        val embeddedArtwork: Artwork = if (showNotesImageUrl != null && useRssArtwork) {
             Artwork.Url(showNotesImageUrl)
         } else if (embeddedPath != null) {
             Artwork.Path(embeddedPath)
