@@ -241,7 +241,7 @@ platform :android do
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
-  lane :finalize_hotfix_release do
+  lane :finalize_hotfix_release do |options|
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
