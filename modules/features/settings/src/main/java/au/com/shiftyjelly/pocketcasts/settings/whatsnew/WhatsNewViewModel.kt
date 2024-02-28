@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -38,41 +40,36 @@ class WhatsNewViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.cachedSubscriptionStatus.flow
-                .stateIn(viewModelScope)
-                .collect {
-                    if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)) {
-                        updateStateForSlumberStudiosPromo()
-                    } else {
-                        updateStateForBookmarks()
-                    }
+            settings.cachedSubscriptionStatus.flow.stateIn(viewModelScope).collect {
+                if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)) {
+                    updateStateForSlumberStudiosPromo(it)
+                } else {
+                    updateStateForBookmarks()
                 }
+            }
         }
     }
 
-    private fun updateStateForSlumberStudiosPromo() {
-        when (val userTier = settings.userTier) {
-            UserTier.Plus, UserTier.Patron -> {
-                _state.value = UiState.Loaded(
-                    feature = WhatsNewFeature.SlumberStudiosPromo(
-                        promoCode = settings.getSlumberStudiosPromoCode(),
-                        message = LR.string.whats_new_slumber_studios_body,
-                    ),
-                    fullModel = true,
-                    tier = userTier,
-                )
-            }
-
-            UserTier.Free -> {
-                _state.value = UiState.Loaded(
-                    feature = WhatsNewFeature.SlumberStudiosPromo(
-                        message = LR.string.whats_new_slumber_studios_body_free_user,
-                        isUserEntitled = false,
-                    ),
-                    fullModel = true,
-                    tier = userTier,
-                )
-            }
+    private fun updateStateForSlumberStudiosPromo(subscriptionStatus: SubscriptionStatus?) {
+        val userTier = settings.userTier
+        if (isEligibleForSlumberStudiosPromo(subscriptionStatus)) {
+            _state.value = UiState.Loaded(
+                feature = WhatsNewFeature.SlumberStudiosPromo(
+                    promoCode = settings.getSlumberStudiosPromoCode(),
+                    message = LR.string.whats_new_slumber_studios_body,
+                ),
+                fullModel = true,
+                tier = userTier,
+            )
+        } else {
+            _state.value = UiState.Loaded(
+                feature = WhatsNewFeature.SlumberStudiosPromo(
+                    message = LR.string.whats_new_slumber_studios_body_free_user,
+                    isUserEntitled = false,
+                ),
+                fullModel = true,
+                tier = userTier,
+            )
         }
     }
 
@@ -148,6 +145,11 @@ class WhatsNewViewModel @Inject constructor(
             _navigationState.emit(target)
         }
     }
+
+    private fun isEligibleForSlumberStudiosPromo(subscriptionStatus: SubscriptionStatus?) =
+        (subscriptionStatus as? SubscriptionStatus.Paid)?.let { paidSubscription ->
+            paidSubscription.isLifetimePlus || paidSubscription.frequency == SubscriptionFrequency.YEARLY
+        } ?: false
 
     sealed class UiState {
         data object Loading : UiState()
