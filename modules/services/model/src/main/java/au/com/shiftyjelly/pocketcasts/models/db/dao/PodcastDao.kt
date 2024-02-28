@@ -9,6 +9,9 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -154,11 +157,11 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE uuid = :uuid")
     abstract fun updateSyncStatus(syncStatus: Int, uuid: String)
 
-    @Query("UPDATE podcasts SET show_archived = :showArchived WHERE uuid = :uuid")
-    abstract suspend fun updateShowArchived(uuid: String, showArchived: Boolean)
+    @Query("UPDATE podcasts SET show_archived = :showArchived, show_archived_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateShowArchived(uuid: String, showArchived: Boolean, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET show_archived = :showArchived")
-    abstract suspend fun updateAllShowArchived(showArchived: Boolean)
+    @Query("UPDATE podcasts SET show_archived = :showArchived, show_archived_modified = :modified, sync_status = 0")
+    abstract suspend fun updateAllShowArchived(showArchived: Boolean, modified: Date = Date())
 
     @Query("UPDATE podcasts SET folder_uuid = :folderUuid, sync_status = 0 WHERE uuid IN (:podcastUuids)")
     abstract suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
@@ -347,11 +350,11 @@ abstract class PodcastDao {
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid AND episode_status = :episodeStatus")
     abstract fun countEpisodesInPodcastWithStatus(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int
 
-    @Query("UPDATE podcasts SET grouping = :grouping WHERE uuid = :uuid")
-    abstract fun updateGrouping(grouping: Int, uuid: String)
+    @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateGrouping(grouping: PodcastGrouping, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET grouping = :grouping WHERE subscribed = 1")
-    abstract fun updatePodcastGroupingForAll(grouping: Int)
+    @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE subscribed = 1")
+    abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping, modified: Date = Date())
 
     @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
     abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
@@ -371,4 +374,16 @@ abstract class PodcastDao {
 
     @Query("SELECT * FROM podcasts ORDER BY random() LIMIT :limit")
     abstract suspend fun findRandomPodcasts(limit: Int): List<Podcast>
+
+    @Query("UPDATE podcasts SET override_global_archive = :enable, auto_archive_played_after = :afterPlaying, auto_archive_inactive_after = :inactive, override_global_archive_modified = :modified, auto_archive_played_after_modified = :modified, auto_archive_inactive_after_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive, modified: Date = Date())
+
+    @Query("UPDATE podcasts SET auto_archive_played_after = :value, auto_archive_played_after_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying, modified: Date = Date())
+
+    @Query("UPDATE podcasts SET auto_archive_inactive_after = :value, auto_archive_inactive_after_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive, modified: Date = Date())
+
+    @Query("UPDATE podcasts SET auto_archive_episode_limit = :value, auto_archive_episode_limit_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
+    abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?, modified: Date = Date())
 }

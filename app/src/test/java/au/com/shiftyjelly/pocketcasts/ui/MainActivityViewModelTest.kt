@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.ui
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -23,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -79,12 +79,11 @@ class MainActivityViewModelTest {
     lateinit var bookmark: Bookmark
 
     @Mock
-    lateinit var episode: BaseEpisode
-
-    @Mock
     lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var viewModel: MainActivityViewModel
+
+    private val episode = UserEpisode(uuid = TEST_EPISODE_UUID, publishedDate = Date())
 
     @Before
     fun setup() = runTest {
@@ -125,7 +124,6 @@ class MainActivityViewModelTest {
     @Test
     fun `given episode for bookmark is current playing, when bookmark viewed from notification, then bookmarks on player shown`() = runTest {
         whenever(bookmark.episodeUuid).thenReturn(TEST_EPISODE_UUID)
-        whenever(episode.uuid).thenReturn(TEST_EPISODE_UUID)
         whenever(bookmarkManager.findBookmark(anyString(), eq(false))).thenReturn(bookmark)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         initViewModel()
@@ -215,7 +213,7 @@ class MainActivityViewModelTest {
             Flowable.just(
                 SignInState.SignedIn(
                     email = "",
-                    subscriptionStatus = mock<SubscriptionStatus>(),
+                    subscriptionStatus = SubscriptionStatus.Free(),
                 ),
             ),
         )

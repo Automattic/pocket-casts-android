@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -129,7 +128,7 @@ class SubscribeManager @Inject constructor(
         // set subscribed to true and update the sync status
         val updateObservable = podcastDao.updateSubscribedRx(subscribed = true, uuid = podcastUuid)
             .andThen(podcastDao.updateSyncStatusRx(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
-            .andThen(Completable.fromAction { podcastDao.updateGrouping(PodcastGrouping.All.indexOf(settings.podcastGroupingDefault.value), podcastUuid) })
+            .andThen(Completable.fromAction { podcastDao.updateGrouping(settings.podcastGroupingDefault.value, podcastUuid) })
             .andThen(rxCompletable { podcastDao.updateShowArchived(podcastUuid, settings.showArchivedDefault.value) })
         // return the final podcast
         val findObservable = podcastDao.findByUuidRx(podcastUuid)
@@ -143,7 +142,7 @@ class SubscribeManager @Inject constructor(
                 // mark sync status
                 podcast.syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED
                 podcast.isSubscribed = subscribed
-                podcast.grouping = PodcastGrouping.All.indexOf(settings.podcastGroupingDefault.value)
+                podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
             }
         // add the podcast

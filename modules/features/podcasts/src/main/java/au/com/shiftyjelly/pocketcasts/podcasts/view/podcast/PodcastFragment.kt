@@ -322,7 +322,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private val showGroupingOptions = {
-        val selected = viewModel.podcast.value?.podcastGrouping ?: PodcastGrouping.None
+        val selected = viewModel.podcast.value?.grouping ?: PodcastGrouping.None
         var dialog = OptionsDialog()
         PodcastGrouping.All.forEach { grouping ->
             dialog = dialog.addCheckedOption(titleId = grouping.groupName, checked = grouping == selected, click = { viewModel.updatePodcastGrouping(grouping) })
@@ -397,7 +397,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun selectedGroupStringId(): Int {
-        return viewModel.podcast.value?.podcastGrouping?.groupName ?: PodcastGrouping.None.groupName
+        return viewModel.podcast.value?.grouping?.groupName ?: PodcastGrouping.None.groupName
     }
 
     private fun selectedSortOrderStringId(): Int {

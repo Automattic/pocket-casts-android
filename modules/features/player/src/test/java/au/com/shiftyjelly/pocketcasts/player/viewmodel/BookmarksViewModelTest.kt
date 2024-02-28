@@ -4,8 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import java.util.Date
 import java.util.UUID
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -61,12 +62,6 @@ class BookmarksViewModelTest {
     private lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     @Mock
-    private lateinit var episode: BaseEpisode
-
-    @Mock
-    private lateinit var cachedSubscriptionStatus: SubscriptionStatus
-
-    @Mock
     private lateinit var settings: Settings
 
     @Mock
@@ -82,7 +77,10 @@ class BookmarksViewModelTest {
     private lateinit var bookmarkFeature: BookmarkFeatureControl
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
+
     private val episodeUuid = UUID.randomUUID().toString()
+    private val episode = UserEpisode(episodeUuid, publishedDate = Date())
+    private val cachedSubscriptionStatus = SubscriptionStatus.Free()
 
     @Before
     fun setUp() = runTest {

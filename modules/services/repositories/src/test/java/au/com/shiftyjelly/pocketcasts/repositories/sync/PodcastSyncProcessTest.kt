@@ -3,12 +3,14 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import java.time.Duration
-import java.time.Instant
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,7 +51,6 @@ class PodcastSyncProcessTest {
                 trimMode = TrimMode.HIGH,
                 isVolumeBoosted = true,
             ),
-            Instant.now(),
         ).podcast
 
         assertEquals(addedDateSinceEpoch.seconds, record.dateAdded.seconds)
@@ -69,7 +70,6 @@ class PodcastSyncProcessTest {
     fun podcastToRecord_subscribed() {
         val record = PodcastSyncProcess.toRecord(
             mockPodcast(isSubscribed = true),
-            Instant.now(),
         ).podcast
 
         assertFalse(record.isDeleted.value)
@@ -80,7 +80,6 @@ class PodcastSyncProcessTest {
     fun podcastToRecord_unsubscribed() {
         val record = PodcastSyncProcess.toRecord(
             mockPodcast(isSubscribed = false),
-            Instant.now(),
         ).podcast
 
         assertTrue(record.isDeleted.value)
@@ -310,6 +309,11 @@ class PodcastSyncProcessTest {
         playbackSpeed: Double = 1.0,
         trimMode: TrimMode = TrimMode.OFF,
         isVolumeBoosted: Boolean = false,
+        overrideGlobalArchive: Boolean = false,
+        autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
+        autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
+        autoArchiveEpisodeLimit: Int = 0,
+        podcastGrouping: PodcastGrouping = PodcastGrouping.None,
     ) = mock<Podcast> {
         on { this.addedDate } doReturn Date(addedDateSinceEpoch.toMillis())
         on { this.folderUuid } doReturn folderUuid
@@ -323,6 +327,11 @@ class PodcastSyncProcessTest {
         on { this.playbackSpeed } doReturn playbackSpeed
         on { this.trimMode } doReturn trimMode
         on { this.isVolumeBoosted } doReturn isVolumeBoosted
+        on { this.overrideGlobalArchive } doReturn overrideGlobalArchive
+        on { this.autoArchiveAfterPlaying } doReturn autoArchiveAfterPlaying
+        on { this.autoArchiveInactive } doReturn autoArchiveInactive
+        on { this.autoArchiveEpisodeLimit } doReturn autoArchiveEpisodeLimit
+        on { this.grouping } doReturn podcastGrouping
     }
 
     private fun mockPodcastEpisode(

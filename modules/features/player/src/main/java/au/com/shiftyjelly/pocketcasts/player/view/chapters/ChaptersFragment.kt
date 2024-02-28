@@ -12,13 +12,13 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -49,7 +49,7 @@ class ChaptersFragment : BaseFragment() {
             AppTheme(Theme.ThemeType.DARK) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
-                val uiState by chaptersViewModel.uiState.subscribeAsState(chaptersViewModel.defaultUiState)
+                val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
                 val lazyListState = rememberLazyListState()
                 this@ChaptersFragment.lazyListState = lazyListState
 
@@ -69,6 +69,7 @@ class ChaptersFragment : BaseFragment() {
                     ChaptersPage(
                         lazyListState = lazyListState,
                         chapters = uiState.chapters,
+                        onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
                         onChapterClick = ::onChapterClick,
                         onUrlClick = ::onUrlClick,
                         backgroundColor = uiState.backgroundColor,

@@ -326,11 +326,11 @@ class MediaSessionManager(
     private fun observePlaybackState() {
         val ignoreStates = listOf(
             // ignore buffer position because it isn't displayed in the media session
-            "updateBufferPosition",
+            PlaybackManager.LastChangeFrom.OnUpdateBufferPosition.value,
             // ignore the playback progress updates as the media session can calculate this without being sent it every second
-            "updateCurrentPosition",
+            PlaybackManager.LastChangeFrom.OnUpdateCurrentPosition.value,
             // ignore the user seeking as the event onBufferingStateChanged will update the buffering state
-            "onUserSeeking",
+            PlaybackManager.LastChangeFrom.OnUserSeeking.value,
         )
 
         var previousEpisode: BaseEpisode? = null

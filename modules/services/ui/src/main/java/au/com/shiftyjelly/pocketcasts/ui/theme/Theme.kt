@@ -253,7 +253,7 @@ class Theme @Inject constructor(private val settings: Settings) {
 
             updateTheme(activity, theme)
         } else {
-            updateTheme(activity, activeTheme)
+            updateTheme(activity, getThemeFromPreferences())
         }
     }
 
@@ -281,15 +281,15 @@ class Theme @Inject constructor(private val settings: Settings) {
         ThemeType.fromThemeSetting(settings.lightThemePreference.value)
 
     private fun setPreferredDarkThemeToPreferences(theme: ThemeType) {
-        settings.darkThemePreference.set(theme.themeSetting, needsSync = false)
+        settings.darkThemePreference.set(theme.themeSetting, needsSync = true)
     }
 
     private fun setPreferredLightThemeToPreferences(theme: ThemeType) {
-        settings.lightThemePreference.set(theme.themeSetting, needsSync = false)
+        settings.lightThemePreference.set(theme.themeSetting, needsSync = true)
     }
 
     fun setUseSystemTheme(value: Boolean, activity: AppCompatActivity?) {
-        settings.useSystemTheme.set(value, commit = true, needsSync = false)
+        settings.useSystemTheme.set(value, commit = true, needsSync = true)
 
         if (value && activity != null) {
             setupThemeForConfig(activity, activity.resources.configuration)

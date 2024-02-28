@@ -65,7 +65,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -618,10 +617,10 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun nextChapter() {
-        playbackManager.skipToNextChapter()
+        playbackManager.skipToNextSelectedOrLastChapter()
     }
 
     fun previousChapter() {
-        playbackManager.skipToPreviousChapter()
+        playbackManager.skipToPreviousSelectedOrLastChapter()
     }
 }

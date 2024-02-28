@@ -110,7 +110,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, needsSync = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -126,7 +126,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, needsSync = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -143,7 +143,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onApplicationUpgrade(VERSION_CODE_AFTER_FIRST_INSTALL)
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
-        verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
     }
 }

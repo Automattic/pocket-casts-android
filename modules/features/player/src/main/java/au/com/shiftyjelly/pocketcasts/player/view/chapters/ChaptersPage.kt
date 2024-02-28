@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 fun ChaptersPage(
     lazyListState: LazyListState,
     chapters: List<ChaptersViewModel.ChapterState>,
+    onSelectionChange: (Boolean, Chapter) -> Unit,
     onChapterClick: (Chapter, Boolean) -> Unit,
     onUrlClick: (String) -> Unit,
     backgroundColor: Color,
@@ -34,6 +35,7 @@ fun ChaptersPage(
         itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->
             ChapterRow(
                 state = state,
+                onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter, state is ChaptersViewModel.ChapterState.Playing) },
                 onUrlClick = { onUrlClick(state.chapter.url.toString()) },
             )
