@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfItemBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfTitleBinding
@@ -303,8 +302,8 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
                 holder.itemView.setOnClickListener { listener.invoke(item) }
             }
 
-            val subtitle = item.subtitleId
-            binding.lblSubtitle.isVisible = editable && subtitle != null && episode is UserEpisode
+            val subtitle = item.subtitleId(episode)
+            binding.lblSubtitle.isVisible = editable && subtitle != null
             if (subtitle != null) {
                 binding.lblSubtitle.setText(subtitle)
             }
