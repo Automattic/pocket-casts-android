@@ -1823,9 +1823,9 @@ open class PlaybackManager @Inject constructor(
                     episodeManager.updatePlayedUpTo(episode, playerPositionSeconds, forceUpdate = true)
                     posUpdatedOnPlayerReset = true
                 }
-                // This is to avoid unnecessary player resets for cached episodes
-                // when switching from streaming to downloaded episode.
-                if (!isCached || (isPlayerSwitchRequired() && FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE))) {
+                val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
+                // This is to avoid unnecessary player resets for cached episodes when switching from streaming to downloaded episode.
+                if (!isCached || ((isPlayerSwitchRequired() || switchEpisode) && FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE))) {
                     Timber.d("Resetting player")
                     resetPlayer()
                 }
