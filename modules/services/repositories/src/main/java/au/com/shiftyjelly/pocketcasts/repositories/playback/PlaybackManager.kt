@@ -1890,7 +1890,7 @@ open class PlaybackManager @Inject constructor(
         widgetManager.updateWidget(podcast, play, episode)
 
         if (play) {
-            if (sameEpisode && currentPositionMs != null) {
+            if (sameEpisode && currentPositionMs != null && !isCached) {
                 player?.seekToTimeMs(currentPositionMs)
             }
             play(sourceView, posUpdatedOnPlayerReset)
