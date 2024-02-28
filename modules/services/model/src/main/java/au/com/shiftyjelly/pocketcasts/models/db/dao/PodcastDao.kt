@@ -297,8 +297,8 @@ abstract class PodcastDao {
         updateTrimSilenceMode(trimMode, uuid, modified)
     }
 
-    @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType WHERE uuid = :uuid")
-    abstract fun updateEpisodesSortType(episodesSortType: EpisodesSortType, uuid: String)
+    @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType, episodes_sort_order_modified = :modified, sync_status = 0  WHERE uuid = :uuid")
+    abstract fun updateEpisodesSortType(episodesSortType: EpisodesSortType, uuid: String, modified: Date = Date())
 
     @Query("UPDATE podcasts SET show_notifications = :show, show_notifications_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract fun updateShowNotifications(show: Boolean, uuid: String, modified: Date = Date())
