@@ -41,7 +41,7 @@ class WhatsNewViewModel @Inject constructor(
             settings.cachedSubscriptionStatus.flow
                 .stateIn(viewModelScope)
                 .collect {
-                    if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)) {
+                    if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)) {
                         updateStateForSlumberStudiosPromo()
                     } else {
                         updateStateForBookmarks()

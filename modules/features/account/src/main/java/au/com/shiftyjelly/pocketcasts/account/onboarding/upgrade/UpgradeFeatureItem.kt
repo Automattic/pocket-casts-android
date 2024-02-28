@@ -48,13 +48,13 @@ enum class PlusUpgradeFeatureItem(
     UndyingGratitude(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_plus_feature_gratitude_title,
-        isYearlyFeature = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
+        isYearlyFeature = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
     ),
     SlumberStudiosPromo(
         image = IR.drawable.ic_slumber_studios,
         title = LR.string.onboarding_plus_feature_slumber_studios_title,
         isMonthlyFeature = false,
-        isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
+        isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
     ),
 }
 
