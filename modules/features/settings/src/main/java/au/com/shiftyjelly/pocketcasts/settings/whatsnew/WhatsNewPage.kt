@@ -84,7 +84,11 @@ fun WhatsNewPage(
     LaunchedEffect(Unit) {
         viewModel.navigationState
             .collect { navigationState ->
-                onConfirm(navigationState)
+                if (navigationState is WhatsNewViewModel.NavigationState.SlumberStudiosClose) {
+                    onClose()
+                } else {
+                    onConfirm(navigationState)
+                }
             }
     }
 }
