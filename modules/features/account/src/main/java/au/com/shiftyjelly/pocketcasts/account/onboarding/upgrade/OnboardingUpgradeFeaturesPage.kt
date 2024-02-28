@@ -267,6 +267,7 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val featureCardsState = state.featureCardsState
+    val currentSubscriptionFrequency = state.currentSubscriptionFrequency
     HorizontalPagerWrapper(
         pageCount = featureCardsState.featureCards.size,
         initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
@@ -278,6 +279,7 @@ fun FeatureCards(
         FeatureCard(
             subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
+            subscriptionFrequency = currentSubscriptionFrequency,
             upgradeButton = upgradeButton,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
@@ -293,6 +295,7 @@ private fun FeatureCard(
     card: UpgradeFeatureCard,
     upgradeButton: UpgradeButton,
     subscription: Subscription,
+    subscriptionFrequency: SubscriptionFrequency,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -372,7 +375,7 @@ private fun FeatureCard(
 
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
-                card.featureItems.forEach {
+                card.featureItems(subscriptionFrequency).forEach {
                     UpgradeFeatureItem(it)
                 }
                 Spacer(modifier = Modifier.weight(1f))

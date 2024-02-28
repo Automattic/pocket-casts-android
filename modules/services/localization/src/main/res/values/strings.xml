@@ -1421,8 +1421,8 @@
     <string name="whats_new_bookmarks_try_now_button">Try it now</string>
     <string name="whats_new_slumber_studios_title">Dream big</string>
     <!-- %1$s is Slumber Studios promo code -->
-    <string name="whats_new_slumber_studios_body">As part of your Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
-    <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_body">As part of your Yearly Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus Yearly and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
     <string name="whats_new_slumber_studios_redeem_now_button">Redeem your code</string>
 
     <!-- Errors -->

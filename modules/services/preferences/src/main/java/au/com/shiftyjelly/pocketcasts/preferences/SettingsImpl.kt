@@ -881,7 +881,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getSlumberStudiosPromoCode(): String {
-        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_PROMO_CODE)
+        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
     }
 
     private fun getRemoteConfigLong(key: String): Long {

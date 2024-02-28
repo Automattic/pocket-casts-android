@@ -14,14 +14,16 @@ interface UpgradeFeatureItem {
 
     @get:StringRes val text: Int?
 
-    val isVisible: Boolean
+    val isYearlyFeature: Boolean
+    val isMonthlyFeature: Boolean
 }
 
 enum class PlusUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int? = null,
-    override val isVisible: Boolean = true,
+    override val isYearlyFeature: Boolean = true,
+    override val isMonthlyFeature: Boolean = true,
 ) : UpgradeFeatureItem {
     DesktopApps(
         image = IR.drawable.ic_desktop_apps,
@@ -46,12 +48,13 @@ enum class PlusUpgradeFeatureItem(
     UndyingGratitude(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_plus_feature_gratitude_title,
-        isVisible = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
+        isYearlyFeature = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
     ),
     SlumberStudiosPromo(
         image = IR.drawable.ic_slumber_studios,
         title = LR.string.onboarding_plus_feature_slumber_studios_title,
-        isVisible = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO),
+        isMonthlyFeature = false,
+        isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
     ),
 }
 
@@ -59,7 +62,8 @@ enum class PatronUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int? = null,
-    override val isVisible: Boolean = true,
+    override val isYearlyFeature: Boolean = true,
+    override val isMonthlyFeature: Boolean = true,
 ) : UpgradeFeatureItem {
     EverythingInPlus(
         image = IR.drawable.ic_check,
