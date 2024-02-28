@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -77,6 +78,7 @@ fun ProfileUpgradeBannerView(
             card = featureCardsState.featureCards[index],
             button = requireNotNull(state.upgradeButtons.find { it.subscription.tier == currentTier }),
             onClick = onClick,
+            subscriptionFrequency = state.featureCardsState.currentFrequency,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
@@ -91,6 +93,7 @@ private fun FeatureCard(
     card: UpgradeFeatureCard,
     button: UpgradeButton,
     onClick: () -> Unit,
+    subscriptionFrequency: SubscriptionFrequency,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -122,7 +125,7 @@ private fun FeatureCard(
                 subscription = button.subscription,
             )
 
-            card.featureItems.forEach {
+            card.featureItems(subscriptionFrequency).forEach {
                 UpgradeFeatureItem(
                     item = it,
                     color = MaterialTheme.theme.colors.primaryText01,

@@ -18,9 +18,10 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
             firebaseRemoteConfig
                 .getString(FirebaseConfig.REPORT_VIOLATION_URL)
                 .isNotEmpty()
-        Feature.SLUMBER_STUDIOS_PROMO ->
+
+        Feature.SLUMBER_STUDIOS_YEARLY_PROMO ->
             firebaseRemoteConfig
-                .getString(FirebaseConfig.SLUMBER_STUDIOS_PROMO_CODE)
+                .getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
                 .isNotEmpty()
         else -> firebaseRemoteConfig.getBoolean(feature.key)
     }
