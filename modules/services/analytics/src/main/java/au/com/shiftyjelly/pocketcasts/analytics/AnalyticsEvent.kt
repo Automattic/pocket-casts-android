@@ -586,4 +586,11 @@ enum class AnalyticsEvent(val key: String) {
 
     /* App Store Review */
     APP_STORE_REVIEW_REQUESTED("app_store_review_requested"),
+
+    /* Deselect Chapters */
+    DESELECT_CHAPTERS_TOGGLED_ON("deselect_chapters_toggled_on"),
+    DESELECT_CHAPTERS_TOGGLED_OFF("deselect_chapters_toggled_off"),
+    DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
+    DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
+    PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
 }

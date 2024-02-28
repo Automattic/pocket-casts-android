@@ -902,6 +902,7 @@ open class PlaybackManager @Inject constructor(
             val currentTimeMs = getCurrentTimeMs(episode = episode)
             playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
+                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             } ?: skipToEndOfLastChapter()
         }
     }
@@ -912,6 +913,7 @@ open class PlaybackManager @Inject constructor(
             val currentTimeMs = getCurrentTimeMs(episode)
             playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
+                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             }
         }
     }
@@ -920,6 +922,7 @@ open class PlaybackManager @Inject constructor(
         launch {
             playbackStateRelay.blockingFirst().chapters.lastChapter?.let { chapter ->
                 seekToTimeMsInternal(chapter.endTime)
+                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             }
         }
     }

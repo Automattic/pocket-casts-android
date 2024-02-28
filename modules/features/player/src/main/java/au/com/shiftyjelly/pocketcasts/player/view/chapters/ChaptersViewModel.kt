@@ -4,6 +4,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -46,6 +49,7 @@ class ChaptersViewModel
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -60,6 +64,7 @@ class ChaptersViewModel
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
         val podcast: Podcast? = null,
+        val isSkippingToNextChapter: Boolean = false,
     ) {
         val showSubscriptionIcon
             get() = !isTogglingChapters && !canSkipChapters
@@ -100,6 +105,8 @@ class ChaptersViewModel
 
     private val _snackbarMessage: MutableSharedFlow<Int> = MutableSharedFlow()
     val snackbarMessage = _snackbarMessage.asSharedFlow()
+
+    private var numberOfDeselectedChapters = 0
 
     init {
         viewModelScope.launch {
@@ -154,6 +161,7 @@ class ChaptersViewModel
             userTier = currentUserTier,
             canSkipChapters = canSkipChapters,
             podcast = playbackState.podcast,
+            isSkippingToNextChapter = _uiState.value.isSkippingToNextChapter,
         )
     }
 
@@ -173,6 +181,7 @@ class ChaptersViewModel
                 if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
+                    _uiState.value = _uiState.value.copy(isSkippingToNextChapter = false)
                     val progress = chapter.calculateProgress(playbackPositionMs)
                     ChapterState.Playing(chapter = chapter, progress = progress)
                 } else {
@@ -181,7 +190,10 @@ class ChaptersViewModel
                             PlaybackManager.LastChangeFrom.OnSeekComplete.value,
                         ).contains(lastChangeFrom)
                     ) {
-                        playbackManager.skipToNextSelectedOrLastChapter()
+                        if (!_uiState.value.isSkippingToNextChapter) {
+                            _uiState.value = _uiState.value.copy(isSkippingToNextChapter = true)
+                            playbackManager.skipToNextSelectedOrLastChapter()
+                        }
                     }
                     ChapterState.NotPlayed(chapter)
                 }
@@ -202,6 +214,7 @@ class ChaptersViewModel
             }
         } else {
             playbackManager.toggleChapter(selected, chapter)
+            trackChapterSelectionToggled(selected)
         }
     }
 
@@ -215,6 +228,7 @@ class ChaptersViewModel
                     userTier = _uiState.value.userTier,
                 ),
             )
+            trackSkipChaptersToggled(checked)
         } else {
             viewModelScope.launch {
                 _navigationState.emit(NavigationState.StartUpsell)
@@ -239,6 +253,48 @@ class ChaptersViewModel
 
     private fun canSkipChapters(userTier: UserTier) = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
         Feature.isUserEntitled(Feature.DESELECT_CHAPTERS, userTier)
+
+    private fun trackChapterSelectionToggled(selected: Boolean) {
+        val currentEpisode = playbackManager.getCurrentEpisode()
+        analyticsTracker.track(
+            if (selected) {
+                AnalyticsEvent.DESELECT_CHAPTERS_CHAPTER_SELECTED
+            } else {
+                AnalyticsEvent.DESELECT_CHAPTERS_CHAPTER_DESELECTED
+            },
+            Analytics.chapterSelectionToggled(currentEpisode),
+        )
+    }
+
+    private fun trackSkipChaptersToggled(checked: Boolean) {
+        val selectedChaptersCount = _uiState.value.allChapters.filter { it.chapter.selected }.size
+        if (checked) {
+            numberOfDeselectedChapters = selectedChaptersCount
+            analyticsTracker.track(AnalyticsEvent.DESELECT_CHAPTERS_TOGGLED_ON)
+        } else {
+            numberOfDeselectedChapters -= selectedChaptersCount
+            analyticsTracker.track(
+                AnalyticsEvent.DESELECT_CHAPTERS_TOGGLED_OFF,
+                Analytics.skipChaptersToggled(numberOfDeselectedChapters),
+            )
+        }
+    }
+
+    private object Analytics {
+        private const val EPISODE_UUID = "episode_uuid"
+        private const val PODCAST_UUID = "podcast_uuid"
+        private const val NUMBER_OF_DESELECTED_CHAPTERS = "number_of_deselected_chapters"
+        private const val UNKNOWN = "unknown"
+
+        fun chapterSelectionToggled(episode: BaseEpisode?) =
+            mapOf(
+                EPISODE_UUID to (episode?.uuid ?: UNKNOWN),
+                PODCAST_UUID to (episode?.podcastOrSubstituteUuid ?: UNKNOWN),
+            )
+
+        fun skipChaptersToggled(count: Int) =
+            mapOf(NUMBER_OF_DESELECTED_CHAPTERS to count)
+    }
 
     sealed class NavigationState {
         data object StartUpsell : NavigationState()
