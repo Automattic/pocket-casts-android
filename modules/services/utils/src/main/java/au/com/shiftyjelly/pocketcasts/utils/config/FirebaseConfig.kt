@@ -8,7 +8,7 @@ object FirebaseConfig {
     const val EPISODE_SEARCH_DEBOUNCE_MS = "episode_search_debounce_ms"
     const val CLOUD_STORAGE_LIMIT = "custom_storage_limit_gb"
     const val REPORT_VIOLATION_URL = "report_violation_url"
-    const val SLUMBER_STUDIOS_PROMO_CODE = "slumber_studios_promo_code"
+    const val SLUMBER_STUDIOS_YEARLY_PROMO_CODE = "slumber_studios_yearly_promo_code"
     val defaults = mapOf(
         PERIODIC_SAVE_TIME_MS to 60000L,
         PODCAST_SEARCH_DEBOUNCE_MS to 2000L,

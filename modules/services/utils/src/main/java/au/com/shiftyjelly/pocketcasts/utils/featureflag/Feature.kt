@@ -51,9 +51,9 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    SLUMBER_STUDIOS_PROMO(
-        key = "slumber_studios_promo",
-        title = "Slumber Studios Promo",
+    SLUMBER_STUDIOS_YEARLY_PROMO(
+        key = "slumber_studios_yearly_promo_code",
+        title = "Slumber Studios Yearly Promo",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
@@ -64,7 +64,7 @@ enum class Feature(
         title = "Deselect Chapters",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     CACHE_PLAYING_EPISODE(

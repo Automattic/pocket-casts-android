@@ -81,7 +81,7 @@ class MainActivityViewModel
         val migratedVersion = settings.getMigratedVersionCode()
         if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
             val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode) &&
-                FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_PROMO)
+                FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)
             _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
         }
     }
