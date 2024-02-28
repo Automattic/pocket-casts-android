@@ -50,6 +50,11 @@ sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
     fun pricePerPeriod(res: Resources): String
     override fun priceSlashPeriod(res: Resources): String
     fun thenPriceSlashPeriod(res: Resources): String
+
+    fun toSubscriptionFrequency() = when (this) {
+        is SubscriptionPricingPhase.Months -> SubscriptionFrequency.MONTHLY
+        is SubscriptionPricingPhase.Years -> SubscriptionFrequency.YEARLY
+    }
 }
 
 sealed interface SubscriptionPricingPhase {
