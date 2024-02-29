@@ -137,7 +137,7 @@ class WhatsNewViewModel @Inject constructor(
                         UserTier.Patron -> LR.string.whats_new_deselect_chapters_patron_message
                         UserTier.Plus, UserTier.Free -> LR.string.whats_new_deselect_chapters_plus_message
                     },
-                    isUserEntitled = true
+                    isUserEntitled = true,
                 ),
                 fullModel = true,
                 tier = userTier,

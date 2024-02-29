@@ -77,7 +77,7 @@ fun WhatsNewPage(
                         is WhatsNewFeature.DeselectChapters ->
                             DeselectChaptersHeader(
                                 onClose = onClose,
-                                fullModal = uiState.fullModel
+                                fullModal = uiState.fullModel,
                             )
                     }
                 },
@@ -230,7 +230,8 @@ private fun Message(
     state: UiState.Loaded,
 ) = when (state.feature) {
     is WhatsNewFeature.Bookmarks,
-    is WhatsNewFeature.DeselectChapters -> TextP40(
+    is WhatsNewFeature.DeselectChapters,
+    -> TextP40(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
         color = MaterialTheme.theme.colors.primaryText02,
@@ -318,7 +319,7 @@ private fun WhatsNewDeselectChaptersPreview(
                     isUserEntitled = true,
                 ),
                 tier = UserTier.Plus,
-                fullModel = true
+                fullModel = true,
             ),
             header = { DeselectChaptersHeader(onClose = {}) },
             onConfirm = {},

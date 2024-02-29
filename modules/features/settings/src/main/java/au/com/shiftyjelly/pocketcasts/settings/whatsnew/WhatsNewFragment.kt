@@ -102,7 +102,7 @@ class WhatsNewFragment : BaseFragment() {
             is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
             is NavigationState.SlumberStudiosRedeemPromoCode -> redeemSlumberStudiosPromoCode()
             is NavigationState.SlumberStudiosClose -> Unit // It will not be sent to confirm action in real world scenario
-            is NavigationState.DeselectChapterClose ->  {
+            is NavigationState.DeselectChapterClose -> {
                 activity?.onBackPressed()
             }
         }
@@ -125,7 +125,7 @@ class WhatsNewFragment : BaseFragment() {
             source = source,
             showPatronOnly = when (source) {
                 OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS -> FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-                        Subscription.SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == Subscription.SubscriptionTier.PATRON
+                    Subscription.SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == Subscription.SubscriptionTier.PATRON
                 else -> false
             },
         )

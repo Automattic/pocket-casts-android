@@ -39,7 +39,7 @@ sealed class UpgradeFeatureCard(
             source: OnboardingUpgradeSource,
         ) = when {
             (
-                    source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
+                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
                     FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
                     SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS
                 )
