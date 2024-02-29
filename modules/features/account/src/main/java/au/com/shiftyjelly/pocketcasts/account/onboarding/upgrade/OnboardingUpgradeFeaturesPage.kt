@@ -119,6 +119,7 @@ internal fun OnboardingUpgradeFeaturesPage(
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
             UpgradeLayout(
                 state = loadedState,
+                source = source,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
                 onNotNowPressed = onNotNowPressed,
@@ -141,6 +142,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 @Composable
 private fun UpgradeLayout(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
@@ -205,7 +207,7 @@ private fun UpgradeLayout(
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
-                                text = stringResource(state.currentFeatureCard.titleRes),
+                                text = stringResource(state.currentFeatureCard.titleRes(source)),
                                 color = Color.White,
                                 maxFontSize = 22.sp,
                                 lineHeight = 30.sp,

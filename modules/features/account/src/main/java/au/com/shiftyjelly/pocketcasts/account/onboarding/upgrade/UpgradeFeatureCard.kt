@@ -6,19 +6,24 @@ import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard.PATRON.getTitleForSource as getTitleForSourcePatron
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard.PLUS.getTitleForSource as getTitleForSourcePlus
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-enum class UpgradeFeatureCard(
-    @StringRes val titleRes: Int,
+sealed class UpgradeFeatureCard(
+    val titleRes: (OnboardingUpgradeSource) -> Int,
     @StringRes val shortNameRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
     @DrawableRes val iconRes: Int,
     val featureItems: (SubscriptionFrequency) -> List<UpgradeFeatureItem>,
     val subscriptionTier: SubscriptionTier,
 ) {
-    PLUS(
-        titleRes = LR.string.onboarding_plus_features_title,
+    data object PLUS : UpgradeFeatureCard(
+        titleRes = { source -> getTitleForSourcePlus(source) },
         shortNameRes = LR.string.pocket_casts_plus_short,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         iconRes = IR.drawable.ic_plus,
@@ -29,9 +34,23 @@ enum class UpgradeFeatureCard(
             }
         },
         subscriptionTier = SubscriptionTier.PLUS,
-    ),
-    PATRON(
-        titleRes = LR.string.onboarding_patron_features_title,
+    ) {
+        fun getTitleForSource(
+            source: OnboardingUpgradeSource,
+        ) = when {
+            (
+                source == OnboardingUpgradeSource.SKIP_CHAPTERS &&
+                    FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+                    SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS
+                )
+            -> LR.string.skip_chapters_plus_prompt
+
+            else -> LR.string.onboarding_plus_features_title
+        }
+    }
+
+    data object PATRON : UpgradeFeatureCard(
+        titleRes = { source -> getTitleForSourcePatron(source) },
         shortNameRes = LR.string.pocket_casts_patron_short,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         iconRes = IR.drawable.ic_patron,
@@ -42,7 +61,20 @@ enum class UpgradeFeatureCard(
             }
         },
         subscriptionTier = SubscriptionTier.PATRON,
-    ),
+    ) {
+        fun getTitleForSource(
+            source: OnboardingUpgradeSource,
+        ) = when {
+            (
+                source == OnboardingUpgradeSource.SKIP_CHAPTERS &&
+                    FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+                    SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON
+                )
+            -> LR.string.skip_chapters_patron_prompt
+
+            else -> LR.string.onboarding_patron_features_title
+        }
+    }
 }
 
 data class FeatureCardsState(
