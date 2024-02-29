@@ -32,7 +32,7 @@ enum class Feature(
         title = "Settings Sync",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     REPORT_VIOLATION(
