@@ -708,7 +708,6 @@ Language: en_GB
     <string name="settings_website_link">website link</string>
     <string name="settings_view">View</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>
     <string name="settings_use_android_light_dark_mode">Use Android Light/Dark Mode</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>

@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-13 20:54:03+0000
+Translation-Revision-Date: 2024-02-27 20:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 глава • Скрыто: %d</string>
+    <string name="number_of_chapters_summary_plural">Глав: %1$d • Скрыто: %2$d</string>
+    <string name="single_chapter">1 глава</string>
+    <string name="number_of_chapters">Глав: %d</string>
+    <string name="skip_chapters">Пропустить главы</string>
     <string name="onboarding_plus_feature_slumber_studios_title">Эксклюзивный контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Использовать код</string>
-    <string name="whats_new_slumber_studios_body_free_user">Подпишитесь на Plus и получите в качестве бонуса годовую подписку на контент Slumber Studios — подкасты, которые подарят вам самые сладкие сны. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Примените код %1$s и получайте удовольствие, пользуясь годовой подпиской на контент Slumber Studios в качестве бонуса за подписку на Plus. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
     <string name="whats_new_slumber_studios_title">Мечтайте о большем</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">по окончании первого года</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
@@ -784,7 +787,6 @@ Language: ru
     <string name="settings_website_link">ссылка на веб-сайт</string>
     <string name="settings_view">Просмотреть</string>
     <string name="settings_version">Версия%1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Использовать встроенную тему подкаста</string>
     <string name="settings_use_android_light_dark_mode">Использовать светлый/тёмный режим Android</string>
     <string name="settings_up_next_tap_summary">Если функция включена, элемент очереди «Следующие» будет воспроизводиться при нажатии. При долгом нажатии появятся настройки выпуска.</string>
     <string name="settings_up_next_tap">Воспроизводить выпуск из очереди «Следующие» по нажатию</string>

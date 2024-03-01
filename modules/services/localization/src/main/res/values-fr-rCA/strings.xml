@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-14 09:54:03+0000
+Translation-Revision-Date: 2024-02-26 17:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 chapitre • %d masqué</string>
+    <string name="number_of_chapters_summary_plural">%1$d chapitres • %2$d masqués</string>
+    <string name="single_chapter">1 chapitre</string>
+    <string name="number_of_chapters">%d chapitres</string>
+    <string name="skip_chapters">Sauter les chapitres</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 an de contenu exclusif de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Échanger votre code</string>
-    <string name="whats_new_slumber_studios_body_free_user">Abonnez-vous à Plus et profitez d’un abonnement d’un an au contenu de Slumber Studios, des podcasts conçus pour vous emmener dans les bras de Morphée. &lt;a href=\"https://slumberstudios.com/\"&gt;Lire la suite&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Dans le cadre votre abonnement Plus, profitez d’un abonnement d’un an au contenu de Slumber Studios grâce au code %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Lire la suite&lt;/a&gt;.</string>
     <string name="whats_new_slumber_studios_title">Faites de grands rêves</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">après votre première année</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Paiements récurrents de %s</string>
@@ -784,7 +787,6 @@ Language: fr
     <string name="settings_website_link">lien de site Web</string>
     <string name="settings_view">Voir</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Utiliser les illustrations de podcast intégrées</string>
     <string name="settings_use_android_light_dark_mode">Utiliser le mode clair/sombre d’Android</string>
     <string name="settings_up_next_tap_summary">S’il est activé, un appui sur un élément dans votre file d’attente déclenche sa lecture. Une pression prolongée affiche les options de l’épisode.</string>
     <string name="settings_up_next_tap">Lire le prochain épisode par une pression</string>

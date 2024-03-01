@@ -693,7 +693,6 @@ Language: nb_NO
     <string name="settings_website_link">Kobling til nettsted</string>
     <string name="settings_view">Vis</string>
     <string name="settings_version">Versjon %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Bruk innebygd podcast-grafikk</string>
     <string name="settings_use_android_light_dark_mode">Bruk lys/mørk Android-modus</string>
     <string name="settings_up_next_tap_summary">Hvis på, vil det spilles av ved å trykke på et element i Neste-køen. Et langt trykk viser episodealternativene.</string>
     <string name="settings_up_next_tap">Spill av Neste-episode ved trykking</string>

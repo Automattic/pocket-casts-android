@@ -694,7 +694,6 @@ Language: ar
     <string name="settings_website_link">رابط موقع الويب</string>
     <string name="settings_view">عرض</string>
     <string name="settings_version">الإصدار ⁦%1$s⁩ (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">استخدام العمل الفني لبث صوتي مُضمَّن</string>
     <string name="settings_use_android_light_dark_mode">استخدام الوضع الفاتح/الداكن الخاص بنظام تشغيل Android</string>
     <string name="settings_up_next_tap_summary">إذا كان قيد التشغيل، فسيؤدي النقر على عنصر ما في قائمة انتظارك التالية إلى تشغيله. سيؤدي الضغط مطولاً إلى إظهار خيارات الحلقة.</string>
     <string name="settings_up_next_tap">تشغيل الحلقة التالية</string>
