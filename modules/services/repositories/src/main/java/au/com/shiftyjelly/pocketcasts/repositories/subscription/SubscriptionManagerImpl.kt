@@ -55,6 +55,8 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 
+private const val SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET = -1
+
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
@@ -347,12 +349,12 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductDetailsParamsList(productDetailsParamsList)
 
             settings.cachedSubscriptionStatus.value?.let { subscriptionStatus ->
-                if (
-                    shouldAllowUpgradePlan(
-                        subscribedPlanStatus = subscriptionStatus,
-                        newPlanDetails = productDetails,
-                    )
-                ) {
+                val replacementMode = getSubscriptionReplacementMode(
+                    subscribedPlanStatus = subscriptionStatus,
+                    newPlanDetails = productDetails,
+                )
+
+                if (replacementMode != SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET) {
                     val purchasesResult = getPurchases()
                     if (purchasesResult == null) {
                         LogBuffer.e(
@@ -367,9 +369,8 @@ class SubscriptionManagerImpl @Inject constructor(
                         billingFlowParams = billingFlowParams.setSubscriptionUpdateParams(
                             BillingFlowParams.SubscriptionUpdateParams.newBuilder()
                                 .setOldPurchaseToken(existingPurchase.purchaseToken)
-                                /* User is changing subscription entitlement, proration rate applied at runtime (https://rb.gy/e876y)
-                                   Also, since upgrading to a more expensive tier, recommended replacement mode is CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
-                                .setSubscriptionReplacementMode(BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE)
+                                /* User is changing subscription entitlement, proration rate applied at runtime (https://rb.gy/e876y) */
+                                .setSubscriptionReplacementMode(replacementMode)
                                 .build(),
                         )
                     }
@@ -444,13 +445,39 @@ class SubscriptionManagerImpl @Inject constructor(
         }
 }
 
-private fun shouldAllowUpgradePlan(
+private fun getSubscriptionReplacementMode(
     subscribedPlanStatus: SubscriptionStatus,
     newPlanDetails: ProductDetails,
-) = subscribedPlanStatus is SubscriptionStatus.Paid &&
-    subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
-    subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-    newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)
+) = when {
+    /* Since upgrading to a more expensive tier, recommended replacement mode is CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
+    subscribedPlanStatus is SubscriptionStatus.Paid &&
+        subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
+        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
+        newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)
+    -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE
+
+    /* Since upgrading from shorter to longer billing period within same Plus tier, recommended replacement mode is CHARGE_FULL_PRICE (https://rb.gy/8h4adz) */
+    subscribedPlanStatus is SubscriptionStatus.Paid &&
+        subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
+        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
+        subscribedPlanStatus.frequency == SubscriptionFrequency.MONTHLY &&
+        newPlanDetails.productId == PLUS_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+
+    /* Since upgrading from shorter to longer billing period within same Patron tier, recommended replacement mode is CHARGE_FULL_PRICE (https://rb.gy/8h4adz) */
+    subscribedPlanStatus is SubscriptionStatus.Paid &&
+        subscribedPlanStatus.tier == SubscriptionTier.PATRON &&
+        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
+        subscribedPlanStatus.frequency == SubscriptionFrequency.MONTHLY &&
+        newPlanDetails.productId == PATRON_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+
+    /* Since downgrading to less expensive plan, recommended replacement mode is DEFERRED (https://rb.gy/8y0wx0) */
+    subscribedPlanStatus is SubscriptionStatus.Paid &&
+        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
+        subscribedPlanStatus.frequency == SubscriptionFrequency.YEARLY &&
+        newPlanDetails.productId in listOf(PLUS_MONTHLY_PRODUCT_ID, PATRON_MONTHLY_PRODUCT_ID) -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.DEFERRED
+
+    else -> SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET
+}
 
 sealed class ProductDetailsState {
     data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
