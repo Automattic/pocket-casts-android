@@ -133,11 +133,18 @@
                 android:text="@{viewModel.title}"
                 android:textColor="#FFFFFFFF"
                 android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/podcastTitle"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/subtitleBarrier"
                 app:layout_constraintEnd_toStartOf="@+id/nextChapter"
                 app:layout_constraintStart_toEndOf="@+id/previousChapter"
                 tools:text="@tools:sample/lorem" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/subtitleBarrier"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                app:barrierAllowsGoneWidgets="true"
+                app:barrierDirection="top"
+                app:constraint_referenced_ids="podcastTitle,chapterSummary" />
 
             <TextView
                 android:id="@+id/podcastTitle"
@@ -146,17 +153,17 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:text="@{viewModel.podcastTitle}"
-                android:visibility="@{viewModel.podcastTitle != null}"
                 android:textColor="?attr/player_contrast_02"
                 android:textSize="14sp"
+                android:visibility="@{viewModel.podcastTitle != null}"
                 app:layout_constraintBottom_toTopOf="@+id/chapterSummary"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/nextChapter"
                 app:layout_constraintStart_toEndOf="@+id/previousChapter"
                 tools:text="Invisibilia" />
@@ -168,13 +175,14 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center"
                 android:text="@{viewModel.chapterSummary}"
                 android:textAppearance="?attr/textCaption"
                 android:visibility="@{viewModel.isChaptersPresent}"
                 app:layout_constraintBottom_toTopOf="@+id/seekBar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/nextChapter"
+                app:layout_constraintStart_toEndOf="@+id/previousChapter"
                 tools:text="@tools:sample/lorem" />
 
             <ImageButton

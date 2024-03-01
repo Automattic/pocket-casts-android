@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -121,6 +123,36 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
+        SubscriptionTier.UNKNOWN -> Unit
+    }
+}
+
+@Composable
+fun SubscriptionIconForTier(
+    tier: SubscriptionTier,
+    iconSize: Dp = 16.dp,
+) {
+    when (tier) {
+        SubscriptionTier.PLUS -> Icon(
+            painter = painterResource(IR.drawable.ic_plus),
+            contentDescription = stringResource(LR.string.pocket_casts_plus_short),
+            tint = SubscriptionTierColor.plusGold,
+            modifier = Modifier
+                .size(iconSize),
+        )
+
+        SubscriptionTier.PATRON -> Icon(
+            painter = painterResource(IR.drawable.ic_patron),
+            contentDescription = stringResource(LR.string.pocket_casts_patron_short),
+            tint = if (MaterialTheme.theme.isLight) {
+                SubscriptionTierColor.patronPurple
+            } else {
+                SubscriptionTierColor.patronPurpleLight
+            },
+            modifier = Modifier
+                .size(iconSize),
+        )
+
         SubscriptionTier.UNKNOWN -> Unit
     }
 }

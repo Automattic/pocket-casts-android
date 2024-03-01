@@ -251,6 +251,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 useSystemTheme = settings.useSystemTheme.getSyncSetting(::NamedChangedSettingBool),
+                deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                deleteLocalFilesAfterPlayback = settings.deleteLocalFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                cloudAutoUpload = settings.cloudAutoUpload.getSyncSetting(::NamedChangedSettingBool),
+                cloudAutoDownload = settings.cloudAutoDownload.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadUnmeteredOnly = settings.autoDownloadUnmeteredOnly.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadOnlyWhenCharging = settings.autoDownloadOnlyWhenCharging.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadUpNext = settings.autoDownloadUpNext.getSyncSetting(::NamedChangedSettingBool),
+                isPodcastBackgroundRefreshEnabled = settings.backgroundRefreshPodcasts.getSyncSetting(::NamedChangedSettingBool),
+                cloudDownloadUnmeteredOnly = settings.cloudDownloadOnlyOnWifi.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -559,6 +568,51 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
+                    )
+                    "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteCloudFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesAfterPlayingDeleteLocal" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteLocalFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudAutoUpload" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudAutoUpload,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudAutoDownload" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudAutoDownload,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadUnmeteredOnly,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadOnlyWhenCharging" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadOnlyWhenCharging,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadUpNext" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadUpNext,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "backgroundRefresh" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.backgroundRefreshPodcasts,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudDownloadOnlyOnWifi,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }

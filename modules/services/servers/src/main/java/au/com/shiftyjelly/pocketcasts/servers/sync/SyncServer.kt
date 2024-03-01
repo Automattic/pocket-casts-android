@@ -16,6 +16,8 @@ import com.pocketcasts.service.api.BookmarkRequest
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
+import com.pocketcasts.service.api.UserPodcastListRequest
+import com.pocketcasts.service.api.UserPodcastListResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
@@ -93,8 +95,9 @@ interface SyncServer {
     @POST("/user/podcast/episodes")
     fun getPodcastEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastEpisodesRequest): Single<PodcastEpisodesResponse>
 
+    @Headers("Content-Type: application/octet-stream")
     @POST("/user/podcast/list")
-    fun getPodcastList(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<PodcastListResponse>
+    suspend fun getPodcastList(@Header("Authorization") authorization: String, @Body request: UserPodcastListRequest): UserPodcastListResponse
 
     @POST("/user/playlist/list")
     fun getFilterList(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<FilterListResponse>

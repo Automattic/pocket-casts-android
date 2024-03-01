@@ -137,9 +137,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
     }
 
-    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme) {
+    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useRssArtwork: Boolean) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            loadArtwork(upNextState.podcast, upNextState.episode)
+            loadArtwork(upNextState.podcast, upNextState.episode, useRssArtwork)
 
             binding.episode = upNextState.episode
             binding.podcast = upNextState.podcast
@@ -219,12 +219,12 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
-    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode) {
+    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: Boolean) {
         val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = binding.artwork
         imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
 
-        val artwork = getEpisodeArtwork(episode)
+        val artwork = getEpisodeArtwork(episode, useRssArtwork)
         if (artwork == Artwork.None && podcast?.uuid != null) {
             loadPodcastArtwork(imageLoader, podcast)
         } else {
@@ -285,9 +285,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     companion object {
-        private fun getEpisodeArtwork(episode: BaseEpisode): Artwork {
+        private fun getEpisodeArtwork(episode: BaseEpisode, useRssArtwork: Boolean): Artwork {
             val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
-            return if (showNotesImageUrl != null) {
+            return if (showNotesImageUrl != null && useRssArtwork) {
                 Artwork.Url(showNotesImageUrl)
             } else if (episode is UserEpisode) {
                 val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)

@@ -343,6 +343,19 @@
     <string name="player_open_full_size_player">Activate to open full size player</string>
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
 
+    <!-- Chapters -->
+
+    <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to skip (to not be played) -->
+    <string name="skip_chapters">Skip chapters</string>
+    <!-- Indicates the number of chapters in a podcast episode. %d is the number of chapters. -->
+    <string name="number_of_chapters">%d chapters</string>
+    <!-- Singular indication of number of chapters -->
+    <string name="single_chapter">1 chapter</string>
+    <!-- %1$d is the number of total chapters. %2$d is the number of hidden chapters. -->
+    <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
+    <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
+    <string name="select_one_chapter_message">Please select at least one chapter</string>
+
     <!-- Podcasts -->
 
     <string name="podcasts">Podcasts</string>
@@ -1268,7 +1281,9 @@
     <string name="settings_use_dark_up_next_details">When enabled the Up Next will always use the dark theme, or will match the current theme when disabled</string>
     <string name="settings_use_dynamic_colors_widget">Use dynamic colors for widget</string>
     <string name="settings_use_dynamic_colors_widget_details">When enabled, widget colors will change based on the device theme colors.</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>
+    <string name="settings_use_embedded_podcast_artwork">Use embedded file artwork</string>
+    <string name="settings_use_episode_podcast_artwork">Use embedded RSS artwork</string>
+    <string name="settings_episode_artwork_details">Shows artwork from the episode\'s show notes (if it exists) instead of using the show\'s artwork. If both file and RSS artwork are present, RSS artwork will be used.</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
     <string name="settings_view">View</string>
     <string name="settings_website_link">website link</string>
