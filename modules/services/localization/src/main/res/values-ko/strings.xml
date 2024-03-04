@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 09:54:03+0000
+Translation-Revision-Date: 2024-02-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>
+    <string name="number_of_chapters_summary_plural">%1$d개 챕터 • %2$d개 숨김</string>
+    <string name="single_chapter">1개 챕터</string>
+    <string name="number_of_chapters">%d개 챕터</string>
+    <string name="skip_chapters">챕터 건너뛰기</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;의 1년 독점 콘텐츠</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">코드 사용</string>
+    <string name="whats_new_slumber_studios_title">큰 꿈 꾸기</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">첫해 이후</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">반복 결제: %s</string>
+    <string name="half_price_first_year">첫해 50% 할인</string>
+    <string name="plus_offer_duration">%s 행사</string>
     <string name="report_subtitle">부적절한 콘텐츠 신고</string>
     <string name="report">보고서</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 및 Wear OS 앱</string>
@@ -105,10 +117,6 @@ Language: ko_KR
     <string name="deselect_all">모두 선택 해제</string>
     <string name="deselect_all_above">위 항목 모두 선택 해제</string>
     <string name="edit">수정</string>
-    <string name="whats_new_autoplay_maybe_later_button">나중에 시작</string>
-    <string name="whats_new_autoplay_enable_button">지금 활성화</string>
-    <string name="whats_new_autoplay_body">다음 차례가 비어 있는 동안 에피소드를 시작하면 자동 재생을 통해 해당 팟캐스트 또는 목록에 있는 에피소드가 계속 재생됩니다.</string>
-    <string name="whats_new_autoplay_title">이제 자동 재생이 가능합니다!</string>
     <string name="filters_download_limit_3">에피소드 3개</string>
     <string name="settings_title_headphone_controls">헤드폰 제어 기능</string>
     <string name="settings_headphone_controls_summary">가장 일반적인 헤드폰 제어 기능으로 수행한 작업을 사용자 정의하세요.</string>
@@ -779,7 +787,6 @@ Language: ko_KR
     <string name="settings_website_link">웹사이트 링크</string>
     <string name="settings_view">보기</string>
     <string name="settings_version">버전 %1$s(%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">임베드한 팟캐스트 아트워크 사용</string>
     <string name="settings_use_android_light_dark_mode">Android 밝게/어둡게 모드 사용</string>
     <string name="settings_up_next_tap_summary">켜진 경우, 다음 차례 대기열의 아이템을 누르면 해당 아이템이 재생됩니다. 길게 누르면 에피소드 옵션이 표시됩니다.</string>
     <string name="settings_up_next_tap">탭에서 다음 차례 에피소드 재생</string>

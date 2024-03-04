@@ -8,6 +8,8 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -24,8 +26,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -544,6 +544,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val useRssArtwork = UserSetting.BoolPref(
+        sharedPrefKey = "useRssArtwork",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val globalPlaybackEffects = object : UserSetting<PlaybackEffects>(
         sharedPrefKey = "globalPlaybackEffects",
         sharedPrefs = sharedPreferences,
@@ -842,22 +848,22 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "autoArchivePlayedEpisodesIndex",
         defaultValue = getString("autoArchivePlayedEpisodes")?.let {
             // Use the old String setting if it exists before falling back to the default value
-            AutoArchiveAfterPlayingSetting.fromString(it, context)
-        } ?: AutoArchiveAfterPlayingSetting.defaultValue(context),
+            AutoArchiveAfterPlaying.fromString(it, context)
+        } ?: AutoArchiveAfterPlaying.defaultValue(context),
         sharedPrefs = sharedPreferences,
-        fromInt = { AutoArchiveAfterPlayingSetting.fromIndex(it) },
-        toInt = { it.toIndex() },
+        fromInt = { AutoArchiveAfterPlaying.fromIndex(it) ?: AutoArchiveAfterPlaying.defaultValue(context) },
+        toInt = { it.index },
     )
 
     override val autoArchiveInactive = UserSetting.PrefFromInt(
         sharedPrefKey = "autoArchiveInactiveIndex",
         defaultValue = getString("autoArchiveInactiveEpisodes")?.let {
             // Use the old String setting if it exists before falling back to the default value
-            AutoArchiveInactiveSetting.fromString(it, context)
-        } ?: AutoArchiveInactiveSetting.default,
+            AutoArchiveInactive.fromString(it, context)
+        } ?: AutoArchiveInactive.Default,
         sharedPrefs = sharedPreferences,
-        fromInt = { AutoArchiveInactiveSetting.fromIndex(it) },
-        toInt = { it.toIndex() },
+        fromInt = { AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default },
+        toInt = { it.index },
     )
 
     override fun getCustomStorageLimitGb(): Long {
@@ -881,7 +887,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getSlumberStudiosPromoCode(): String {
-        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_PROMO_CODE)
+        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
     }
 
     private fun getRemoteConfigLong(key: String): Long {
@@ -974,8 +980,8 @@ class SettingsImpl @Inject constructor(
             sharedPrefKey = "default_podcast_grouping",
             defaultValue = default,
             sharedPrefs = sharedPreferences,
-            fromInt = { PodcastGrouping.All.getOrNull(it) ?: default },
-            toInt = { PodcastGrouping.All.indexOf(it) },
+            fromInt = { PodcastGrouping.fromIndex(it) ?: default },
+            toInt = { it.index },
         )
     }
 

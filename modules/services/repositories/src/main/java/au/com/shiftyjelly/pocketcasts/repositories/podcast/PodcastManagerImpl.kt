@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -84,8 +86,8 @@ class PodcastManagerImpl @Inject constructor(
                     podcast.isShowNotifications = false
                     podcast.autoDownloadStatus = Podcast.AUTO_DOWNLOAD_OFF
                     podcast.autoAddToUpNext = Podcast.AutoAddUpNext.OFF
-                    podcast.autoArchiveAfterPlaying = 0
-                    podcast.autoArchiveInactive = 0
+                    podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.defaultValue(context)
+                    podcast.autoArchiveInactive = AutoArchiveInactive.Default
                     podcast.autoArchiveEpisodeLimit = null
                     podcast.overrideGlobalArchive = false
                     podcast.folderUuid = null
@@ -408,6 +410,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observeByUuid(uuid)
     }
 
+    override fun observePodcastByUuidFlow(uuid: String): Flow<Podcast> {
+        return podcastDao.observeByUuidFlow(uuid)
+    }
+
     override fun findByUuids(uuids: Collection<String>): List<Podcast> {
         return podcastDao.findByUuids(uuids.toTypedArray())
     }
@@ -500,11 +506,11 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateGrouping(podcast: Podcast, grouping: PodcastGrouping) {
-        podcastDao.updateGrouping(PodcastGrouping.All.indexOf(grouping), podcast.uuid)
+        podcastDao.updateGrouping(grouping, podcast.uuid)
     }
 
     override fun updateGroupingForAll(grouping: PodcastGrouping) {
-        podcastDao.updatePodcastGroupingForAll(PodcastGrouping.All.indexOf(grouping))
+        podcastDao.updatePodcastGroupingForAll(grouping)
     }
 
     override suspend fun markAllPodcastsUnsynced() {
@@ -757,17 +763,6 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateFolderUuid(folderUuid, podcastUuids)
     }
 
-    override suspend fun updateSyncData(podcast: Podcast, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date) {
-        podcastDao.updateSyncData(
-            uuid = podcast.uuid,
-            startFromSecs = startFromSecs,
-            skipLastSecs = skipLastSecs,
-            folderUuid = folderUuid,
-            sortPosition = sortPosition,
-            addedDate = addedDate,
-        )
-    }
-
     override suspend fun updatePodcastPositions(podcasts: List<Podcast>) {
         podcastDao.updateSortPositions(podcasts)
     }
@@ -793,5 +788,21 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
+    }
+
+    override suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive) {
+        podcastDao.updateArchiveSettings(uuid, enable, afterPlaying, inactive)
+    }
+
+    override suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying) {
+        podcastDao.updateArchiveAfterPlaying(uuid, value)
+    }
+
+    override suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive) {
+        podcastDao.updateArchiveAfterInactive(uuid, value)
+    }
+
+    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?) {
+        podcastDao.updateArchiveEpisodeLimit(uuid, value)
     }
 }

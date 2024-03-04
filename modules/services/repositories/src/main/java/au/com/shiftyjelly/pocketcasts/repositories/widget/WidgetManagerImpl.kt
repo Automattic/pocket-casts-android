@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import android.widget.RemoteViews
@@ -221,13 +222,23 @@ class WidgetManagerImpl @Inject constructor(
         return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE)
     }
 
-    private fun getSkipBackIntent(): PendingIntent? {
-        return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-    }
+    private fun getSkipBackIntent(): PendingIntent? = PendingIntent.getBroadcast(
+        context,
+        PodcastWidget.SKIP_BACKWARD_REQUEST_CODE,
+        Intent(context, PodcastWidget::class.java).apply {
+            action = PodcastWidget.SKIP_BACKWARD_ACTION
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+    )
 
-    private fun getSkipForwardIntent(): PendingIntent? {
-        return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
-    }
+    private fun getSkipForwardIntent(): PendingIntent? = PendingIntent.getBroadcast(
+        context,
+        PodcastWidget.SKIP_FORWARD_REQUEST_CODE,
+        Intent(context, PodcastWidget::class.java).apply {
+            action = PodcastWidget.SKIP_FORWARD_ACTION
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+    )
 
     private fun getRemoteViewsLayoutId() = if (settings.useDynamicColorsForWidget.value) {
         R.layout.widget_dynamic_colors_theme

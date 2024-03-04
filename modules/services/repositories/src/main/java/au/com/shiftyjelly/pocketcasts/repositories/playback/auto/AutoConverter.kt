@@ -68,8 +68,8 @@ object AutoConverter {
     private const val THUMBNAIL_IMAGE_SIZE = 200
     private const val FULL_IMAGE_SIZE = 800
 
-    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
-        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context)
+    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, useRssArtwork: Boolean, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
+        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context, useRssArtwork)
 
         val extrasForEpisode = extrasForEpisode(episode)
         if (groupTrailers) {
@@ -89,9 +89,9 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(episodeDesc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
     }
 
-    fun convertPodcastToMediaItem(podcast: Podcast, context: Context): MediaBrowserCompat.MediaItem? {
+    fun convertPodcastToMediaItem(podcast: Podcast, context: Context, useRssArtwork: Boolean): MediaBrowserCompat.MediaItem? {
         return try {
-            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context)
+            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context, showRssArtwork = useRssArtwork)
 
             val podcastDesc = MediaDescriptionCompat.Builder()
                 .setTitle(podcast.title)
@@ -131,8 +131,8 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context): Uri? {
-        val url = if (episode is PodcastEpisode && (!episode.imageUrl.isNullOrBlank())) {
+    fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context, showRssArtwork: Boolean): Uri? {
+        val url = if (episode is PodcastEpisode && (!episode.imageUrl.isNullOrBlank()) && showRssArtwork) {
             episode.imageUrl
         } else if (episode is UserEpisode) {
             // the artwork for user uploaded episodes are stored on each episode

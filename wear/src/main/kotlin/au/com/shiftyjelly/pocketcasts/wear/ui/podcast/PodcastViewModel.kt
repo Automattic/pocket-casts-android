@@ -48,7 +48,7 @@ class PodcastViewModel @Inject constructor(
                 episodeManager.observeEpisodesByPodcastOrderedRx(it)
                     .asFlow()
                     .map { podcastEpisodes ->
-                        val sortFunction = podcast.podcastGrouping.sortFunction
+                        val sortFunction = podcast.grouping.sortFunction
                         if (sortFunction != null) {
                             podcastEpisodes.sortedByDescending(sortFunction)
                         } else {

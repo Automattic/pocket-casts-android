@@ -207,6 +207,14 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtUseEmbeddedArtwork.isChecked = !binding.swtUseEmbeddedArtwork.isChecked
         }
 
+        binding.swtUseRssArtwork.isChecked = viewModel.useRssArtwork.value
+        binding.swtUseRssArtwork.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateUseRssArtwork(isChecked)
+        }
+        binding.btnUseRssArtwork.setOnClickListener {
+            binding.swtUseRssArtwork.isChecked = !binding.swtUseRssArtwork.isChecked
+        }
+
         binding.lblRefreshAllPodcastArtwork.setOnClickListener {
             refreshArtwork()
         }

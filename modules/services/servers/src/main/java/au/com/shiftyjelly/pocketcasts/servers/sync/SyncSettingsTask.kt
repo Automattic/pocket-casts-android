@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -35,13 +35,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
     companion object {
         suspend fun run(
             context: Context,
-            lastSyncTime: Instant,
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
         ): Result {
             try {
                 if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
-                    syncSettings(context, settings, namedSettingsCall, lastSyncTime)
+                    syncSettings(context, settings, namedSettingsCall)
                 } else {
                     @Suppress("DEPRECATION")
                     oldSyncSettings(settings, namedSettingsCall)
@@ -60,7 +59,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             context: Context,
             settings: Settings,
             namedSettingsCall: NamedSettingsCaller,
-            lastSyncTime: Instant,
         ) {
             if (!FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "syncSettings method should never be called if settings sync flag is not enabled")
@@ -68,197 +66,200 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return
             }
 
-            val request = changedNamedSettingsRequest(context, lastSyncTime, settings)
+            val request = changedNamedSettingsRequest(context, settings)
             val response = namedSettingsCall.changedNamedSettings(request)
             processChangedNameSettingsResponse(context, settings, response)
         }
 
         private fun changedNamedSettingsRequest(
             context: Context,
-            lastSyncTime: Instant,
             settings: Settings,
         ) = ChangedNamedSettingsRequest(
             changedSettings = ChangedNamedSettings(
-                autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting(lastSyncTime) { autoArchiveAfterPlaying, modifiedAt ->
+                autoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = autoArchiveAfterPlaying.toIndex(),
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting(lastSyncTime) { autoArchiveInactiveSetting, modifiedAt ->
+                autoArchiveInactive = settings.autoArchiveInactive.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = autoArchiveInactiveSetting.toIndex(),
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                autoArchiveIncludesStarred = settings.autoArchiveIncludesStarred.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                gridOrder = settings.podcastsSortType.getSyncSetting(lastSyncTime) { podcastSortType, modifiedAt ->
+                autoArchiveIncludesStarred = settings.autoArchiveIncludesStarred.getSyncSetting(::NamedChangedSettingBool),
+                freeGiftAcknowledgement = settings.freeGiftAcknowledged.getSyncSetting(::NamedChangedSettingBool),
+                gridOrder = settings.podcastsSortType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = podcastSortType.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                gridLayout = settings.podcastGridLayout.getSyncSetting(lastSyncTime) { type, modifiedAt ->
+                gridLayout = settings.podcastGridLayout.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = type.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                marketingOptIn = settings.marketingOptIn.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                skipBack = settings.skipBackInSecs.getSyncSetting(lastSyncTime, ::NamedChangedSettingInt),
-                skipForward = settings.skipForwardInSecs.getSyncSetting(lastSyncTime, ::NamedChangedSettingInt),
-                playbackSpeed = settings.globalPlaybackEffects.getSyncSetting(lastSyncTime) { effects, modifiedAt ->
-                    NamedChangedSettingDouble(effects.playbackSpeed, modifiedAt)
+                marketingOptIn = settings.marketingOptIn.getSyncSetting(::NamedChangedSettingBool),
+                skipBack = settings.skipBackInSecs.getSyncSetting(::NamedChangedSettingInt),
+                skipForward = settings.skipForwardInSecs.getSyncSetting(::NamedChangedSettingInt),
+                playbackSpeed = settings.globalPlaybackEffects.getSyncSetting { setting, modifiedAt ->
+                    NamedChangedSettingDouble(setting.playbackSpeed, modifiedAt)
                 },
-                trimSilence = settings.globalPlaybackEffects.getSyncSetting(lastSyncTime) { effects, modifiedAt ->
-                    NamedChangedSettingInt(effects.trimMode.serverId, modifiedAt)
+                trimSilence = settings.globalPlaybackEffects.getSyncSetting { setting, modifiedAt ->
+                    NamedChangedSettingInt(setting.trimMode.serverId, modifiedAt)
                 },
-                volumeBoost = settings.globalPlaybackEffects.getSyncSetting(lastSyncTime) { effects, modifiedAt ->
-                    NamedChangedSettingBool(effects.isVolumeBoosted, modifiedAt)
+                volumeBoost = settings.globalPlaybackEffects.getSyncSetting { setting, modifiedAt ->
+                    NamedChangedSettingBool(setting.isVolumeBoosted, modifiedAt)
                 },
-                rowAction = settings.streamingMode.getSyncSetting(lastSyncTime) { mode, modifiedAt ->
+                rowAction = settings.streamingMode.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = if (mode) 0 else 1,
+                        value = if (setting) 0 else 1,
                         modifiedAt = modifiedAt,
                     )
                 },
-                upNextSwipe = settings.upNextSwipe.getSyncSetting(lastSyncTime) { action, modifiedAt ->
+                upNextSwipe = settings.upNextSwipe.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = action.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                episodeGrouping = settings.podcastGroupingDefault.getSyncSetting(lastSyncTime) { type, modifiedAt ->
+                episodeGrouping = settings.podcastGroupingDefault.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = type.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                showCustomMediaActions = settings.customMediaActionsVisibility.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                mediaActionsOrder = settings.mediaControlItems.getSyncSetting(lastSyncTime) { items, modifiedAt ->
+                showCustomMediaActions = settings.customMediaActionsVisibility.getSyncSetting(::NamedChangedSettingBool),
+                mediaActionsOrder = settings.mediaControlItems.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingString(
-                        value = items.joinToString(separator = ",", transform = Settings.MediaNotificationControls::serverId),
+                        value = setting.joinToString(separator = ",", transform = Settings.MediaNotificationControls::serverId),
                         modifiedAt = modifiedAt,
                     )
                 },
-                keepScreenAwake = settings.keepScreenAwake.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                openPlayerAutomatically = settings.openPlayerAutomatically.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                showArchived = settings.showArchivedDefault.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                intelligentResumption = settings.intelligentPlaybackResumption.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                autoPlayEnabled = settings.autoPlayNextEpisodeOnEmpty.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                hideNotificationOnPause = settings.hideNotificationOnPause.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                playUpNextOnTap = settings.tapOnUpNextShouldPlay.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                playOverNotifications = settings.playOverNotification.getSyncSetting(lastSyncTime) { mode, modifiedAt ->
+                keepScreenAwake = settings.keepScreenAwake.getSyncSetting(::NamedChangedSettingBool),
+                openPlayerAutomatically = settings.openPlayerAutomatically.getSyncSetting(::NamedChangedSettingBool),
+                showArchived = settings.showArchivedDefault.getSyncSetting(::NamedChangedSettingBool),
+                intelligentResumption = settings.intelligentPlaybackResumption.getSyncSetting(::NamedChangedSettingBool),
+                autoPlayEnabled = settings.autoPlayNextEpisodeOnEmpty.getSyncSetting(::NamedChangedSettingBool),
+                hideNotificationOnPause = settings.hideNotificationOnPause.getSyncSetting(::NamedChangedSettingBool),
+                playUpNextOnTap = settings.tapOnUpNextShouldPlay.getSyncSetting(::NamedChangedSettingBool),
+                playOverNotifications = settings.playOverNotification.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = mode.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                autoUpNextLimit = settings.autoAddUpNextLimit.getSyncSetting(lastSyncTime, ::NamedChangedSettingInt),
-                autoUpNextLimitReached = settings.autoAddUpNextLimitBehaviour.getSyncSetting(lastSyncTime) { behaviour, modifiedAt ->
+                autoUpNextLimit = settings.autoAddUpNextLimit.getSyncSetting(::NamedChangedSettingInt),
+                autoUpNextLimitReached = settings.autoAddUpNextLimitBehaviour.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = behaviour.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                warnDataUsage = settings.warnOnMeteredNetwork.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                showPodcastNotifications = settings.notifyRefreshPodcast.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                collectAnalytics = settings.collectAnalytics.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                sendCrashReports = settings.sendCrashReports.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                linkCrashReportsToUser = settings.linkCrashReportsToUser.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                addFileToUpNextAutomatically = settings.cloudAddToUpNext.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                theme = settings.theme.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                warnDataUsage = settings.warnOnMeteredNetwork.getSyncSetting(::NamedChangedSettingBool),
+                showPodcastNotifications = settings.notifyRefreshPodcast.getSyncSetting(::NamedChangedSettingBool),
+                collectAnalytics = settings.collectAnalytics.getSyncSetting(::NamedChangedSettingBool),
+                sendCrashReports = settings.sendCrashReports.getSyncSetting(::NamedChangedSettingBool),
+                linkCrashReportsToUser = settings.linkCrashReportsToUser.getSyncSetting(::NamedChangedSettingBool),
+                addFileToUpNextAutomatically = settings.cloudAddToUpNext.getSyncSetting(::NamedChangedSettingBool),
+                theme = settings.theme.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = value.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                podcastBadges = settings.podcastBadgeType.getSyncSetting(lastSyncTime) { type, modifiedAt ->
+                podcastBadges = settings.podcastBadgeType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = type.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                autoShowPlayed = settings.autoShowPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                autoSubscribeToPlayed = settings.autoSubscribeToPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                autoPlayLastSource = settings.lastAutoPlaySource.getSyncSetting(lastSyncTime) { source, modifiedAt ->
+                autoShowPlayed = settings.autoShowPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
+                autoSubscribeToPlayed = settings.autoSubscribeToPlayed.takeIf { Util.isAutomotive(context) }?.getSyncSetting(::NamedChangedSettingBool),
+                autoPlayLastSource = settings.lastAutoPlaySource.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingString(
-                        value = source.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                useEmbeddedArtwork = settings.useEmbeddedArtwork.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                notificationSettingActions = settings.newEpisodeNotificationActions.getSyncSetting(lastSyncTime) { actions, modifiedAt ->
+                useEmbeddedArtwork = settings.useEmbeddedArtwork.getSyncSetting(::NamedChangedSettingBool),
+                notificationSettingActions = settings.newEpisodeNotificationActions.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingString(
-                        value = actions.joinToString(separator = ",", transform = NewEpisodeNotificationAction::serverId),
+                        value = setting.joinToString(separator = ",", transform = NewEpisodeNotificationAction::serverId),
                         modifiedAt = modifiedAt,
                     )
                 },
-                playerShelfItems = settings.shelfItems.getSyncSetting(lastSyncTime) { items, modifiedAt ->
+                playerShelfItems = settings.shelfItems.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingString(
-                        value = items.joinToString(separator = ",", transform = ShelfItem::serverId),
+                        value = setting.joinToString(separator = ",", transform = ShelfItem::serverId),
                         modifiedAt = modifiedAt,
                     )
                 },
-                showArtworkOnLockScreen = settings.showArtworkOnLockScreen.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
-                    NamedChangedSettingBool(
-                        value = setting,
-                        modifiedAt = modifiedAt,
-                    )
-                },
-                headphoneControlsNextAction = settings.headphoneControlsNextAction.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                showArtworkOnLockScreen = settings.showArtworkOnLockScreen.getSyncSetting(::NamedChangedSettingBool),
+                headphoneControlsNextAction = settings.headphoneControlsNextAction.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                headphoneControlsPreviousAction = settings.headphoneControlsPreviousAction.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                headphoneControlsPreviousAction = settings.headphoneControlsPreviousAction.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                headphoneControlsPlayBookmarkConfirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                episodeBookmarksSortType = settings.episodeBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                headphoneControlsPlayBookmarkConfirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.getSyncSetting(::NamedChangedSettingBool),
+                episodeBookmarksSortType = settings.episodeBookmarksSortType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                playerBookmarksSortType = settings.playerBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                playerBookmarksSortType = settings.playerBookmarksSortType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                podcastBookmarksSortType = settings.podcastBookmarksSortType.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                podcastBookmarksSortType = settings.podcastBookmarksSortType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                useDarkUpNextTheme = settings.useDarkUpNextTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                useDynamicColorsForWidget = settings.useDynamicColorsForWidget.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
-                filesSortOrder = settings.cloudSortOrder.getSyncSetting(lastSyncTime) { setting, modifiedAt ->
+                useDarkUpNextTheme = settings.useDarkUpNextTheme.getSyncSetting(::NamedChangedSettingBool),
+                useDynamicColorsForWidget = settings.useDynamicColorsForWidget.getSyncSetting(::NamedChangedSettingBool),
+                filesSortOrder = settings.cloudSortOrder.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                darkThemePreference = settings.darkThemePreference.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                darkThemePreference = settings.darkThemePreference.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = value.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                lightThemePreference = settings.lightThemePreference.getSyncSetting(lastSyncTime) { value, modifiedAt ->
+                lightThemePreference = settings.lightThemePreference.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
-                        value = value.serverId,
+                        value = setting.serverId,
                         modifiedAt = modifiedAt,
                     )
                 },
-                useSystemTheme = settings.useSystemTheme.getSyncSetting(lastSyncTime, ::NamedChangedSettingBool),
+                useSystemTheme = settings.useSystemTheme.getSyncSetting(::NamedChangedSettingBool),
+                deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                deleteLocalFilesAfterPlayback = settings.deleteLocalFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                cloudAutoUpload = settings.cloudAutoUpload.getSyncSetting(::NamedChangedSettingBool),
+                cloudAutoDownload = settings.cloudAutoDownload.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadUnmeteredOnly = settings.autoDownloadUnmeteredOnly.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadOnlyWhenCharging = settings.autoDownloadOnlyWhenCharging.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadUpNext = settings.autoDownloadUpNext.getSyncSetting(::NamedChangedSettingBool),
+                isPodcastBackgroundRefreshEnabled = settings.backgroundRefreshPodcasts.getSyncSetting(::NamedChangedSettingBool),
+                cloudDownloadUnmeteredOnly = settings.cloudDownloadOnlyOnWifi.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -274,10 +275,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "autoArchiveInactive" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveInactive,
-                        newSettingValue = run {
-                            val index = (changedSettingResponse.value as? Number)?.toInt()
-                            index?.let { AutoArchiveInactiveSetting.fromIndex(it) }
-                        },
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveInactive.fromServerId(it) ?: AutoArchiveInactive.Default },
                     )
                     "autoArchiveIncludesStarred" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -287,10 +285,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "autoArchivePlayed" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveAfterPlaying,
-                        newSettingValue = run {
-                            val index = (changedSettingResponse.value as? Number)?.toInt()
-                            index?.let { AutoArchiveAfterPlayingSetting.fromIndex(it) }
-                        },
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) },
                     )
                     "freeGiftAcknowledgement" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -378,7 +373,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "episodeGrouping" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastGroupingDefault,
-                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGrouping::fromServerId),
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { PodcastGrouping.fromIndex(it) ?: PodcastGrouping.None },
                     )
                     "keepScreenAwake" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -574,6 +569,51 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
                     )
+                    "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteCloudFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesAfterPlayingDeleteLocal" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteLocalFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudAutoUpload" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudAutoUpload,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudAutoDownload" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudAutoDownload,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadUnmeteredOnly,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadOnlyWhenCharging" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadOnlyWhenCharging,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadUpNext" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadUpNext,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "backgroundRefresh" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.backgroundRefreshPodcasts,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudDownloadOnlyOnWifi,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
                 }
             }
@@ -598,7 +638,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return null
             }
 
-            val serverModifiedAtInstant = try {
+            val serverModifiedAt = try {
                 Instant.parse(changedSettingResponse.modifiedAt)
             } catch (e: DateTimeParseException) {
                 LogBuffer.e(
@@ -608,10 +648,8 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 return null
             }
 
-            val localModifiedAt = setting.getModifiedAt()
-            // Don't exit early if we don't have a local modifiedAt time since
-            // we don't know the local value is newer than the server value.
-            if (localModifiedAt != null && localModifiedAt.isAfter(serverModifiedAtInstant)) {
+            val localModifiedAt = setting.modifiedAt
+            if (localModifiedAt > serverModifiedAt) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
                 return null
             }
@@ -670,8 +708,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
     lateinit var namedSettingsCaller: NamedSettingsCaller
 
     override suspend fun doWork(): Result {
-        val lastSyncTime = runCatching { Instant.parse(settings.getLastModified()) }.getOrDefault(Instant.EPOCH)
-        return run(context, lastSyncTime, settings, namedSettingsCaller)
+        return run(context, settings, namedSettingsCaller)
     }
 }
 

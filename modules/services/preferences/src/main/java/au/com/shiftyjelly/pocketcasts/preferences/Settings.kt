@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -12,8 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -61,7 +61,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9117
+        const val WHATS_NEW_VERSION_CODE = 9118
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -241,7 +241,7 @@ interface Settings {
 
         data object PlaybackSpeed : MediaNotificationControls(
             controlName = LR.string.playback_speed,
-            iconRes = IR.drawable.auto_1x,
+            iconRes = IR.drawable.auto_1,
             key = PLAYBACK_SPEED_KEY,
             serverId = "playback_speed",
         )
@@ -329,6 +329,7 @@ interface Settings {
     val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
+    val useRssArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
@@ -360,8 +361,8 @@ interface Settings {
     val newEpisodeNotificationActions: UserSetting<List<NewEpisodeNotificationAction>>
 
     val autoArchiveIncludesStarred: UserSetting<Boolean>
-    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
-    val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
+    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlaying>
+    val autoArchiveInactive: UserSetting<AutoArchiveInactive>
 
     fun selectedFilter(): String?
     fun setSelectedFilter(filterUUID: String?)

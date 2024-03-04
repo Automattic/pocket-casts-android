@@ -391,7 +391,7 @@ class PodcastAdapter(
         podcast: Podcast,
         context: Context,
     ) {
-        val grouping = podcast.podcastGrouping
+        val grouping = podcast.grouping
         val groupingFunction = grouping.sortFunction
         val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
         if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {

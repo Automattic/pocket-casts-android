@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.time.Instant
 
 @JsonClass(generateAdapter = true)
 @Deprecated("This class can be removed when the sync settings feature flag is removed")
@@ -71,30 +72,39 @@ data class ChangedNamedSettings(
     @field:Json(name = "darkThemePreference") val darkThemePreference: NamedChangedSettingInt? = null,
     @field:Json(name = "lightThemePreference") val lightThemePreference: NamedChangedSettingInt? = null,
     @field:Json(name = "useSystemTheme") val useSystemTheme: NamedChangedSettingBool? = null,
+    @field:Json(name = "filesAfterPlayingDeleteCloud") val deleteCloudFilesAfterPlayback: NamedChangedSettingBool? = null,
+    @field:Json(name = "filesAfterPlayingDeleteLocal") val deleteLocalFilesAfterPlayback: NamedChangedSettingBool? = null,
+    @field:Json(name = "cloudAutoUpload") val cloudAutoUpload: NamedChangedSettingBool? = null,
+    @field:Json(name = "cloudAutoDownload") val cloudAutoDownload: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadUnmeteredOnly") val autoDownloadUnmeteredOnly: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadOnlyWhenCharging") val autoDownloadOnlyWhenCharging: NamedChangedSettingBool? = null,
+    @field:Json(name = "autoDownloadUpNext") val autoDownloadUpNext: NamedChangedSettingBool? = null,
+    @field:Json(name = "backgroundRefresh") val isPodcastBackgroundRefreshEnabled: NamedChangedSettingBool? = null,
+    @field:Json(name = "cloudDownloadUnmeteredOnly") val cloudDownloadUnmeteredOnly: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingInt(
     @field:Json(name = "value") val value: Int,
-    @field:Json(name = "modified_at") val modifiedAt: String,
+    @field:Json(name = "modified_at") val modifiedAt: Instant,
 )
 
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingBool(
     @field:Json(name = "value") val value: Boolean,
-    @field:Json(name = "modified_at") val modifiedAt: String,
+    @field:Json(name = "modified_at") val modifiedAt: Instant,
 )
 
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingDouble(
     @field:Json(name = "value") val value: Double,
-    @field:Json(name = "modified_at") val modifiedAt: String,
+    @field:Json(name = "modified_at") val modifiedAt: Instant,
 )
 
 @JsonClass(generateAdapter = true)
 data class NamedChangedSettingString(
     @field:Json(name = "value") val value: String,
-    @field:Json(name = "modified_at") val modifiedAt: String,
+    @field:Json(name = "modified_at") val modifiedAt: Instant,
 )
 
 @Suppress("DEPRECATION")

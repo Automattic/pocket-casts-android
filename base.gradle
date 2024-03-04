@@ -242,6 +242,7 @@ dependencies {
     androidTestImplementation libs.room.testing
     androidTestImplementation libs.uiautomator
     androidTestImplementation libs.work.test
+    androidTestImplementation libs.turbine
 
     testImplementation libs.arch.core
     testImplementation libs.coroutines.test

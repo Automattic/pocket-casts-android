@@ -438,6 +438,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_APP_ICON_CHANGED("settings_appearance_app_icon_changed"),
     SETTINGS_APPEARANCE_REFRESH_ALL_ARTWORK_TAPPED("settings_appearance_refresh_all_artwork_tapped"),
     SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED("settings_appearance_use_embedded_artwork_toggled"),
+    SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED("settings_appearance_use_episode_artwork_toggled"),
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
     SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED("settings_appearance_use_dark_up_next_toggled"),
     SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED("settings_appearance_use_dynamic_colors_widget_toggled"),
@@ -585,4 +586,11 @@ enum class AnalyticsEvent(val key: String) {
 
     /* App Store Review */
     APP_STORE_REVIEW_REQUESTED("app_store_review_requested"),
+
+    /* Deselect Chapters */
+    DESELECT_CHAPTERS_TOGGLED_ON("deselect_chapters_toggled_on"),
+    DESELECT_CHAPTERS_TOGGLED_OFF("deselect_chapters_toggled_off"),
+    DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
+    DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
+    PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
 }

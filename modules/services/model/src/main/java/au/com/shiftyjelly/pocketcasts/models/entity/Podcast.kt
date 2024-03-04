@@ -11,6 +11,8 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.Bundle
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -38,6 +40,7 @@ data class Podcast(
     @ColumnInfo(name = "author") var author: String = "",
     @ColumnInfo(name = "sort_order") var sortPosition: Int = 0,
     @ColumnInfo(name = "episodes_sort_order") var episodesSortType: EpisodesSortType = EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
+    @ColumnInfo(name = "episodes_sort_order_modified") var episodesSortTypeModified: Date? = null,
     @ColumnInfo(name = "latest_episode_date") var latestEpisodeDate: Date? = null,
     // TODO remove this later in a separate PR as it is no longer used
     @ColumnInfo(name = "episodes_to_keep") var episodesToKeep: Int = 0,
@@ -69,15 +72,21 @@ data class Podcast(
     @ColumnInfo(name = "sync_status") var syncStatus: Int = SYNC_STATUS_NOT_SYNCED,
     @ColumnInfo(name = "exclude_from_auto_archive") var excludeFromAutoArchive: Boolean = false, // Not used anymore
     @ColumnInfo(name = "override_global_archive") var overrideGlobalArchive: Boolean = false,
-    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: Int = 0,
-    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: Int = 0,
+    @ColumnInfo(name = "override_global_archive_modified") var overrideGlobalArchiveModified: Date? = null,
+    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
+    @ColumnInfo(name = "auto_archive_played_after_modified") var autoArchiveAfterPlayingModified: Date? = null,
+    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,
+    @ColumnInfo(name = "auto_archive_inactive_after_modified") var autoArchiveInactiveModified: Date? = null,
     @ColumnInfo(name = "auto_archive_episode_limit") var autoArchiveEpisodeLimit: Int? = null,
+    @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,
     @ColumnInfo(name = "estimated_next_episode") var estimatedNextEpisode: Date? = null,
     @ColumnInfo(name = "episode_frequency") var episodeFrequency: String? = null,
-    @ColumnInfo(name = "grouping") var grouping: Int = PodcastGrouping.All.indexOf(PodcastGrouping.None),
+    @ColumnInfo(name = "grouping") var grouping: PodcastGrouping = PodcastGrouping.None,
+    @ColumnInfo(name = "grouping_modified") var groupingModified: Date? = null,
     @ColumnInfo(name = "skip_last") var skipLastSecs: Int = 0,
     @ColumnInfo(name = "skip_last_modified") var skipLastModified: Date? = null,
     @ColumnInfo(name = "show_archived") var showArchived: Boolean = false,
+    @ColumnInfo(name = "show_archived_modified") var showArchivedModified: Date? = null,
     @ColumnInfo(name = "trim_silence_level") var trimMode: TrimMode = TrimMode.OFF,
     @ColumnInfo(name = "trim_silence_level_modified") var trimModeModified: Date? = null,
     @ColumnInfo(name = "refresh_available") var refreshAvailable: Boolean = false,
@@ -136,9 +145,6 @@ data class Podcast(
 
     val isNotSynced: Boolean
         get() = syncStatus == SYNC_STATUS_NOT_SYNCED
-
-    val podcastGrouping: PodcastGrouping
-        get() = PodcastGrouping.All[grouping]
 
     val isSilenceRemoved: Boolean
         get() = trimMode != TrimMode.OFF

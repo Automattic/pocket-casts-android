@@ -14,16 +14,16 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -355,6 +355,24 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateAutomaticallyCachedStatus(
+        episode: BaseEpisode?,
+        automaticallyCached: Boolean,
+    ) {
+        if (episode == null || episode is UserEpisode) return
+        (episode as PodcastEpisode).isAutomaticallyCached = automaticallyCached
+        episodeDao.updateAutomaticallyCachedStatus(automaticallyCached, episode.uuid)
+    }
+
+    override suspend fun cleanAutomaticallyCachedEpisodes(playbackManager: PlaybackManager) {
+        val episodes = episodeDao.findAutomaticallyCachedEpisodes()
+        episodes?.forEach { episode ->
+            episode.isAutomaticallyCached = false
+            updateAutomaticallyCachedStatus(episode, automaticallyCached = false)
+            deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, removeFromUpNext = false)
+        }
+    }
+
     override fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean) {
         episode ?: return
         episode.downloadedFilePath = filePath
@@ -616,7 +634,7 @@ class EpisodeManagerImpl @Inject constructor(
             // check if we are meant to archive after episode is played
             val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
             val podcastOverrideSettings = podcast.overrideGlobalArchive
-            val podcastArchiveAfterPlaying = AutoArchiveAfterPlayingSetting.fromIndex(podcast.autoArchiveAfterPlaying)
+            val podcastArchiveAfterPlaying = podcast.autoArchiveAfterPlaying
 
             val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
 
@@ -634,10 +652,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    private fun shouldArchiveBasedOnSettings(podcastOverrideSettings: Boolean, podcastArchiveAfterPlaying: AutoArchiveAfterPlayingSetting) =
+    private fun shouldArchiveBasedOnSettings(podcastOverrideSettings: Boolean, podcastArchiveAfterPlaying: AutoArchiveAfterPlaying) =
         (
-            (!podcastOverrideSettings && settings.autoArchiveAfterPlaying.value == AutoArchiveAfterPlayingSetting.AfterPlaying) ||
-                (podcastArchiveAfterPlaying == AutoArchiveAfterPlayingSetting.AfterPlaying)
+            (!podcastOverrideSettings && settings.autoArchiveAfterPlaying.value == AutoArchiveAfterPlaying.AfterPlaying) ||
+                (podcastArchiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying)
             )
 
     @Suppress("NAME_SHADOWING")
@@ -647,7 +665,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         for ((podcastUuid, episodes) in episodesByPodcast) {
             val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: continue
-            val podcastArchiveAfterPlaying = AutoArchiveAfterPlayingSetting.fromIndex(podcast.autoArchiveAfterPlaying)
+            val podcastArchiveAfterPlaying = podcast.autoArchiveAfterPlaying
             val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcast.overrideGlobalSettings, podcastArchiveAfterPlaying)
 
             if (shouldArchiveBasedOnSettings) {
@@ -904,7 +922,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?) {
         val now = Date()
 
-        val podcastArchivePlaying = AutoArchiveAfterPlayingSetting.fromIndex(podcast.autoArchiveAfterPlaying)
+        val podcastArchivePlaying = podcast.autoArchiveAfterPlaying
         val autoArchiveSetting = if (podcast.overrideGlobalArchive) podcastArchivePlaying else settings.autoArchiveAfterPlaying.value
         val autoArchiveAfterPlayingTime = autoArchiveSetting.timeSeconds * 1000L
 
@@ -924,7 +942,7 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
 
-        val podcastInactiveSetting = AutoArchiveInactiveSetting.fromIndex(podcast.autoArchiveInactive)
+        val podcastInactiveSetting = podcast.autoArchiveInactive
         val inactiveSetting = if (podcast.overrideGlobalArchive) podcastInactiveSetting else settings.autoArchiveInactive.value
 
         val inactiveTime = inactiveSetting.timeSeconds * 1000L
@@ -1099,4 +1117,18 @@ class EpisodeManagerImpl @Inject constructor(
 
             return@withContext newDownloadUrl ?: episode.downloadUrl
         }
+
+    override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters
+        if (!deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices - chapterIndex)
+        episodeDao.update(episode)
+    }
+
+    override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
+        val deselectedChapterIndices = episode.deselectedChapters
+        if (deselectedChapterIndices.contains(chapterIndex)) return
+        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
+        episodeDao.update(episode)
+    }
 }

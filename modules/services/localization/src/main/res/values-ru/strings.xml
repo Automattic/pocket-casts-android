@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 14:54:03+0000
+Translation-Revision-Date: 2024-02-27 20:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 глава • Скрыто: %d</string>
+    <string name="number_of_chapters_summary_plural">Глав: %1$d • Скрыто: %2$d</string>
+    <string name="single_chapter">1 глава</string>
+    <string name="number_of_chapters">Глав: %d</string>
+    <string name="skip_chapters">Пропустить главы</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">Эксклюзивный контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Использовать код</string>
+    <string name="whats_new_slumber_studios_title">Мечтайте о большем</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">по окончании первого года</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
+    <string name="half_price_first_year">Скидка 50 % на первый год</string>
+    <string name="plus_offer_duration">Предложение %s</string>
     <string name="report_subtitle">Пожаловаться на нежелательный контент</string>
     <string name="report">Пожаловаться</string>
     <string name="onboarding_plus_feature_watch_playback">Приложения для Apple Watch и Wear OS</string>
@@ -105,10 +117,6 @@ Language: ru
     <string name="deselect_all">Снять выделение</string>
     <string name="deselect_all_above">Отменить выбор всех выше</string>
     <string name="edit">Править</string>
-    <string name="whats_new_autoplay_maybe_later_button">Возможно, позже</string>
-    <string name="whats_new_autoplay_enable_button">Включить</string>
-    <string name="whats_new_autoplay_body">Если в очереди «Следующие» ничего нет, то после выпуска, который вы слушаете, автоматически запустится другой из этого подкаста или списка.</string>
-    <string name="whats_new_autoplay_title">А вот и автовоспроизведение!</string>
     <string name="filters_download_limit_3">3 выпуска</string>
     <string name="settings_title_headphone_controls">Элементы управления наушников</string>
     <string name="settings_headphone_controls_summary">Настройте действия для основных элементов управления наушников.</string>
@@ -779,7 +787,6 @@ Language: ru
     <string name="settings_website_link">ссылка на веб-сайт</string>
     <string name="settings_view">Просмотреть</string>
     <string name="settings_version">Версия%1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Использовать встроенную тему подкаста</string>
     <string name="settings_use_android_light_dark_mode">Использовать светлый/тёмный режим Android</string>
     <string name="settings_up_next_tap_summary">Если функция включена, элемент очереди «Следующие» будет воспроизводиться при нажатии. При долгом нажатии появятся настройки выпуска.</string>
     <string name="settings_up_next_tap">Воспроизводить выпуск из очереди «Следующие» по нажатию</string>

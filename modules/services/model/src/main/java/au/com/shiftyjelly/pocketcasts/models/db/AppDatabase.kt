@@ -13,12 +13,16 @@ import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import au.com.shiftyjelly.pocketcasts.model.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.ChapterIndicesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
@@ -66,7 +70,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
     ],
-    version = 83,
+    version = 88,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -86,6 +90,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     SyncStatusConverter::class,
     TrimModeTypeConverter::class,
     UserEpisodeServerStatusConverter::class,
+    AutoArchiveAfterPlayingTypeConverter::class,
+    AutoArchiveInactiveTypeConverter::class,
+    PodcastGroupingTypeConverter::class,
+    ChapterIndicesConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -562,6 +570,81 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_83_84 = addMigration(83, 84) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_played_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_inactive_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_episode_limit_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN grouping_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN show_archived_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_84_85 = addMigration(84, 85) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN override_global_archive_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_85_86 = addMigration(85, 86) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE user_episodes
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_86_87 = addMigration(86, 87) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN automatically_cached INTEGER NOT NULL DEFAULT 0
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_87_88 = addMigration(87, 88) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN episodes_sort_order_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -935,6 +1018,11 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_80_81,
                 // 81 to 82 added via auto migration
                 MIGRATION_82_83,
+                MIGRATION_83_84,
+                MIGRATION_84_85,
+                MIGRATION_85_86,
+                MIGRATION_86_87,
+                MIGRATION_87_88,
             )
         }
 

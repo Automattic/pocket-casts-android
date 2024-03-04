@@ -122,6 +122,7 @@ internal fun OnboardingUpgradeFeaturesPage(
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
             UpgradeLayout(
                 state = loadedState,
+                source = source,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
                 onNotNowPressed = onNotNowPressed,
@@ -144,6 +145,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 @Composable
 private fun UpgradeLayout(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
@@ -208,7 +210,7 @@ private fun UpgradeLayout(
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
-                                text = stringResource(state.currentFeatureCard.titleRes),
+                                text = stringResource(state.currentFeatureCard.titleRes(source)),
                                 color = Color.White,
                                 maxFontSize = 22.sp,
                                 lineHeight = 30.sp,
@@ -270,6 +272,7 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val featureCardsState = state.featureCardsState
+    val currentSubscriptionFrequency = state.currentSubscriptionFrequency
     HorizontalPagerWrapper(
         pageCount = featureCardsState.featureCards.size,
         initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
@@ -281,6 +284,7 @@ fun FeatureCards(
         FeatureCard(
             subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
+            subscriptionFrequency = currentSubscriptionFrequency,
             upgradeButton = upgradeButton,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
@@ -296,6 +300,7 @@ private fun FeatureCard(
     card: UpgradeFeatureCard,
     upgradeButton: UpgradeButton,
     subscription: Subscription,
+    subscriptionFrequency: SubscriptionFrequency,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -375,7 +380,7 @@ private fun FeatureCard(
 
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
-                card.featureItems.forEach {
+                card.featureItems(subscriptionFrequency).forEach {
                     UpgradeFeatureItem(it)
                 }
                 Spacer(modifier = Modifier.weight(1f))

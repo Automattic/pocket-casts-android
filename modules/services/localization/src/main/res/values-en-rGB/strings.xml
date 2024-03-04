@@ -49,10 +49,6 @@ Language: en_GB
     <string name="deselect_all">Deselect all</string>
     <string name="deselect_all_above">Deselect all above</string>
     <string name="edit">Edit</string>
-    <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
-    <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
-    <string name="whats_new_autoplay_enable_button">Enable it now</string>
-    <string name="whats_new_autoplay_title">Autoplay is here!</string>
     <string name="filters_download_limit_3">3 episodes</string>
     <string name="settings_title_headphone_controls">Headphone controls</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Play a confirmation sound after creating a bookmark with your headphones.</string>
@@ -712,7 +708,6 @@ Language: en_GB
     <string name="settings_website_link">website link</string>
     <string name="settings_view">View</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>
     <string name="settings_use_android_light_dark_mode">Use Android Light/Dark Mode</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>

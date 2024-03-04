@@ -1,16 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -18,14 +28,18 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ChaptersViewModel
@@ -34,15 +48,27 @@ class ChaptersViewModel
     podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
+    private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
     data class UiState(
-        val chapters: List<ChapterState> = emptyList(),
+        val allChapters: List<ChapterState> = emptyList(),
+        val displayChapters: List<ChapterState> = emptyList(),
+        val totalChaptersCount: Int = 0,
         val backgroundColor: Color,
-    )
+        val isTogglingChapters: Boolean = false,
+        val userTier: UserTier = UserTier.Free,
+        val canSkipChapters: Boolean = false,
+        val podcast: Podcast? = null,
+        val isSkippingToNextChapter: Boolean = false,
+    ) {
+        val showSubscriptionIcon
+            get() = !isTogglingChapters && !canSkipChapters
+    }
 
     sealed class ChapterState {
         abstract val chapter: Chapter
@@ -65,21 +91,34 @@ class ChaptersViewModel
         .observeOn(Schedulers.io())
 
     private val _uiState = MutableStateFlow(
-        UiState(backgroundColor = Color(theme.playerBackgroundColor(null))),
+        UiState(
+            backgroundColor = Color(theme.playerBackgroundColor(null)),
+            userTier = settings.userTier,
+            canSkipChapters = canSkipChapters(settings.userTier),
+        ),
     )
     val uiState: StateFlow<UiState>
         get() = _uiState
+
+    private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
+    val navigationState = _navigationState.asSharedFlow()
+
+    private val _snackbarMessage: MutableSharedFlow<Int> = MutableSharedFlow()
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
+
+    private var numberOfDeselectedChapters = 0
 
     init {
         viewModelScope.launch {
             combine(
                 upNextStateObservable.asFlow(),
                 playbackStateObservable.asFlow(),
+                settings.cachedSubscriptionStatus.flow,
                 this@ChaptersViewModel::combineUiState,
             )
                 .distinctUntilChanged()
                 .stateIn(viewModelScope)
-                .collect {
+                .collectLatest {
                     _uiState.value = it
                 }
         }
@@ -94,69 +133,170 @@ class ChaptersViewModel
     private fun combineUiState(
         upNextState: UpNextQueue.State,
         playbackState: PlaybackState,
+        cachedSubscriptionStatus: SubscriptionStatus?,
     ): UiState {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val backgroundColor = theme.playerBackgroundColor(podcast)
 
         val chapters = buildChaptersWithState(
-            chapterList = playbackState.chapters.getList().map { chapter ->
-                // Map selected state from the UI state until we get it from the server
-                _uiState.value.chapters
-                    .find { it.hasChapter(chapter) }
-                    ?.chapter
-                    ?.let {
-                        chapter.copy(selected = it.selected)
-                    } ?: chapter
-            },
+            chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
+            lastChangeFrom = playbackState.lastChangeFrom,
         )
+        val currentUserTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+        val lastUserTier = _uiState.value.userTier
+        val canSkipChapters = canSkipChapters(currentUserTier)
+        val isTogglingChapters = ((lastUserTier != currentUserTier) && canSkipChapters) || _uiState.value.isTogglingChapters
+
         return UiState(
-            chapters = chapters,
+            allChapters = chapters,
+            displayChapters = getFilteredChaptersIfNeeded(
+                chapters = chapters,
+                isTogglingChapters = isTogglingChapters,
+                userTier = currentUserTier,
+            ),
+            totalChaptersCount = chapters.size,
             backgroundColor = Color(backgroundColor),
+            isTogglingChapters = isTogglingChapters,
+            userTier = currentUserTier,
+            canSkipChapters = canSkipChapters,
+            podcast = playbackState.podcast,
+            isSkippingToNextChapter = _uiState.value.isSkippingToNextChapter,
         )
     }
 
-    private fun buildChaptersWithState(
-        chapterList: List<Chapter>,
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildChaptersWithState(
+        chapters: Chapters,
         playbackPositionMs: Int,
+        lastChangeFrom: String? = null,
     ): List<ChapterState> {
-        val chapters = mutableListOf<ChapterState>()
+        val chapterStates = mutableListOf<ChapterState>()
         var currentChapter: Chapter? = null
-        for (chapter in chapterList) {
+        for (chapter in chapters.getList()) {
             val chapterState = if (currentChapter != null) {
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
             } else if (chapter.containsTime(playbackPositionMs)) {
-                // the chapter currently playing
-                currentChapter = chapter
-                val progress = chapter.calculateProgress(playbackPositionMs)
-                ChapterState.Playing(chapter = chapter, progress = progress)
+                if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
+                    // the chapter currently playing
+                    currentChapter = chapter
+                    _uiState.value = _uiState.value.copy(isSkippingToNextChapter = false)
+                    val progress = chapter.calculateProgress(playbackPositionMs)
+                    ChapterState.Playing(chapter = chapter, progress = progress)
+                } else {
+                    if (!listOf(
+                            PlaybackManager.LastChangeFrom.OnUserSeeking.value,
+                            PlaybackManager.LastChangeFrom.OnSeekComplete.value,
+                        ).contains(lastChangeFrom)
+                    ) {
+                        if (!_uiState.value.isSkippingToNextChapter) {
+                            _uiState.value = _uiState.value.copy(isSkippingToNextChapter = true)
+                            playbackManager.skipToNextSelectedOrLastChapter()
+                        }
+                    }
+                    ChapterState.NotPlayed(chapter)
+                }
             } else {
                 // a chapter that has been played
                 ChapterState.Played(chapter)
             }
-            chapters.add(chapterState)
+            chapterStates.add(chapterState)
         }
-        return chapters
+        return chapterStates
     }
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
-        _uiState.value = _uiState.value.copy(
-            chapters = _uiState.value.chapters.map { chapterState ->
-                if (chapterState.hasChapter(chapter)) {
-                    val updatedChapter = chapterState.chapter.copy(selected = selected)
-                    when (chapterState) {
-                        is ChapterState.Played -> chapterState.copy(chapter = updatedChapter)
-                        is ChapterState.Playing -> chapterState.copy(chapter = updatedChapter)
-                        is ChapterState.NotPlayed -> chapterState.copy(chapter = updatedChapter)
-                    }
-                } else {
-                    chapterState
-                }
+        val selectedChapters = _uiState.value.allChapters.filter { it.chapter.selected }
+        if (!selected && selectedChapters.size == 1) {
+            viewModelScope.launch {
+                _snackbarMessage.emit(LR.string.select_one_chapter_message)
+            }
+        } else {
+            playbackManager.toggleChapter(selected, chapter)
+            trackChapterSelectionToggled(selected)
+        }
+    }
+
+    fun onSkipChaptersClick(checked: Boolean) {
+        if (_uiState.value.canSkipChapters) {
+            _uiState.value = _uiState.value.copy(
+                isTogglingChapters = checked,
+                displayChapters = getFilteredChaptersIfNeeded(
+                    chapters = _uiState.value.allChapters,
+                    isTogglingChapters = checked,
+                    userTier = _uiState.value.userTier,
+                ),
+            )
+            trackSkipChaptersToggled(checked)
+        } else {
+            viewModelScope.launch {
+                _navigationState.emit(NavigationState.StartUpsell)
+            }
+        }
+    }
+
+    private fun getFilteredChaptersIfNeeded(
+        chapters: List<ChapterState>,
+        isTogglingChapters: Boolean,
+        userTier: UserTier,
+    ): List<ChapterState> {
+        val shouldFilterChapters = canSkipChapters(userTier) &&
+            !isTogglingChapters
+
+        return if (shouldFilterChapters) {
+            chapters.filter { it.chapter.selected }
+        } else {
+            chapters
+        }
+    }
+
+    private fun canSkipChapters(userTier: UserTier) = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+        Feature.isUserEntitled(Feature.DESELECT_CHAPTERS, userTier)
+
+    private fun trackChapterSelectionToggled(selected: Boolean) {
+        val currentEpisode = playbackManager.getCurrentEpisode()
+        analyticsTracker.track(
+            if (selected) {
+                AnalyticsEvent.DESELECT_CHAPTERS_CHAPTER_SELECTED
+            } else {
+                AnalyticsEvent.DESELECT_CHAPTERS_CHAPTER_DESELECTED
             },
+            Analytics.chapterSelectionToggled(currentEpisode),
         )
     }
 
-    private fun ChapterState.hasChapter(chapter: Chapter) =
-        this.chapter.index == chapter.index && this.chapter.title == chapter.title
+    private fun trackSkipChaptersToggled(checked: Boolean) {
+        val selectedChaptersCount = _uiState.value.allChapters.filter { it.chapter.selected }.size
+        if (checked) {
+            numberOfDeselectedChapters = selectedChaptersCount
+            analyticsTracker.track(AnalyticsEvent.DESELECT_CHAPTERS_TOGGLED_ON)
+        } else {
+            numberOfDeselectedChapters -= selectedChaptersCount
+            analyticsTracker.track(
+                AnalyticsEvent.DESELECT_CHAPTERS_TOGGLED_OFF,
+                Analytics.skipChaptersToggled(numberOfDeselectedChapters),
+            )
+        }
+    }
+
+    private object Analytics {
+        private const val EPISODE_UUID = "episode_uuid"
+        private const val PODCAST_UUID = "podcast_uuid"
+        private const val NUMBER_OF_DESELECTED_CHAPTERS = "number_of_deselected_chapters"
+        private const val UNKNOWN = "unknown"
+
+        fun chapterSelectionToggled(episode: BaseEpisode?) =
+            mapOf(
+                EPISODE_UUID to (episode?.uuid ?: UNKNOWN),
+                PODCAST_UUID to (episode?.podcastOrSubstituteUuid ?: UNKNOWN),
+            )
+
+        fun skipChaptersToggled(count: Int) =
+            mapOf(NUMBER_OF_DESELECTED_CHAPTERS to count)
+    }
+
+    sealed class NavigationState {
+        data object StartUpsell : NavigationState()
+    }
 }

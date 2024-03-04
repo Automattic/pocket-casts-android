@@ -9,9 +9,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -27,15 +32,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.FolderResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -47,14 +49,19 @@ import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
 import com.google.protobuf.stringValue
 import com.google.protobuf.timestamp
+import com.pocketcasts.service.api.PodcastFolder
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUserDevice
+import com.pocketcasts.service.api.UserPodcastResponse
 import com.pocketcasts.service.api.boolSetting
+import com.pocketcasts.service.api.dateAddedOrNull
 import com.pocketcasts.service.api.doubleSetting
+import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.int32Setting
 import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
+import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
 import com.pocketcasts.service.api.syncUserBookmark
 import com.pocketcasts.service.api.syncUserDevice
@@ -77,6 +84,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.rx2.rxSingle
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -129,7 +137,7 @@ class PodcastSyncProcess(
             }
         }
         val syncUpNextObservable = downloadObservable
-            .andThen(syncSettings(lastSyncTime))
+            .andThen(syncSettings())
             .andThen(syncCloudFiles())
             .andThen(firstSyncChanges())
             .andThen(
@@ -198,7 +206,7 @@ class PodcastSyncProcess(
                 lastModified = lastSyncTime.toEpochMilli()
 
                 val podcasts = podcastManager.findPodcastsToSync()
-                val podcastRecords = podcasts.map { toRecord(it, lastSyncTime) }
+                val podcastRecords = podcasts.map { toRecord(it) }
                 records.addAll(podcastRecords)
 
                 val episodeRecords = episodesToSync.map { toRecord(it) }
@@ -243,11 +251,11 @@ class PodcastSyncProcess(
         val localPodcasts = podcastManager.findSubscribedRx()
         val localFolderUuids = folderManager.findFoldersSingle().map { it.map { folder -> folder.uuid } }
         // get all the users podcast uuids from the server
-        val serverHomeFolder = syncManager.getHomeFolder()
+        val serverHomeFolder = rxSingle { syncManager.getHomeFolder() }
         return Singles.zip(serverHomeFolder, localPodcasts, localFolderUuids)
             .flatMapCompletable { (serverHomeFolder, localPodcasts, localFolderUuids) ->
-                importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcasts ?: emptyList(), localPodcasts = localPodcasts)
-                    .andThen(importFoldersFullSync(serverFolders = serverHomeFolder.folders ?: emptyList(), localFolderUuids = localFolderUuids))
+                importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcastsList, localPodcasts = localPodcasts)
+                    .andThen(importFoldersFullSync(serverFolders = serverHomeFolder.foldersList, localFolderUuids = localFolderUuids))
             }
     }
 
@@ -262,7 +270,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun importPodcastsFullSync(serverPodcasts: List<PodcastResponse>, localPodcasts: List<Podcast>): Completable {
+    private fun importPodcastsFullSync(serverPodcasts: List<UserPodcastResponse>, localPodcasts: List<Podcast>): Completable {
         val localUuids = localPodcasts.map { podcast -> podcast.uuid }.toSet()
         val localPodcastsMap = localPodcasts.associateBy { it.uuid }
         val serverUuids = serverPodcasts.map { it.uuid }.toSet()
@@ -295,7 +303,7 @@ class PodcastSyncProcess(
         return markMissingNotSynced.andThen(subscribeToPodcasts).andThen(updatePodcasts)
     }
 
-    private fun importFoldersFullSync(serverFolders: List<FolderResponse>, localFolderUuids: List<String>): Completable {
+    private fun importFoldersFullSync(serverFolders: List<PodcastFolder>, localFolderUuids: List<String>): Completable {
         val serverUuids = serverFolders.map { it.folderUuid }
         val serverMissingUuids = localFolderUuids - serverUuids
         // delete the local folders that aren't on the server
@@ -313,6 +321,23 @@ class PodcastSyncProcess(
         return deleteLocalFolders.andThen(upsertServerFolders)
     }
 
+    private fun PodcastFolder.toFolder(): Folder? {
+        val dateAdded = dateAdded?.toDate()
+        if (folderUuid == null || name == null || dateAdded == null) {
+            return null
+        }
+        return Folder(
+            uuid = folderUuid,
+            name = name,
+            color = color,
+            addedDate = dateAdded,
+            sortPosition = sortPosition,
+            podcastsSortType = PodcastsSortType.fromServerId(podcastsSortType),
+            deleted = false,
+            syncModified = Folder.SYNC_MODIFIED_FROM_SERVER,
+        )
+    }
+
     private fun downloadAndImportFilters(): Completable {
         return syncManager.getFilters()
             .flatMapCompletable { filters -> importFilters(filters) }
@@ -323,7 +348,7 @@ class PodcastSyncProcess(
         importBookmarks(bookmarks)
     }
 
-    private fun importPodcast(podcastResponse: PodcastResponse?): Maybe<Podcast> {
+    private fun importPodcast(podcastResponse: UserPodcastResponse?): Maybe<Podcast> {
         val podcastUuid = podcastResponse?.uuid ?: return Maybe.empty()
         return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
@@ -332,23 +357,30 @@ class PodcastSyncProcess(
             .onErrorComplete()
     }
 
-    private fun updatePodcastSyncValues(podcast: Podcast?, podcastResponse: PodcastResponse?): Completable = rxCompletable {
+    private fun updatePodcastSyncValues(podcast: Podcast?, podcastResponse: UserPodcastResponse?): Completable = rxCompletable {
         if (podcast == null || podcastResponse == null) {
             return@rxCompletable
         }
-        // use the oldest local or server added date
-        val serverAddedDate = podcastResponse.dateAdded?.parseIsoDate() ?: Date()
-        val localAddedDate = podcast.addedDate
-        val addedDate = if (localAddedDate == null || serverAddedDate < localAddedDate) serverAddedDate else localAddedDate
 
-        podcastManager.updateSyncData(
-            podcast = podcast,
-            startFromSecs = podcastResponse.autoStartFrom ?: podcast.startFromSecs,
-            skipLastSecs = podcastResponse.autoSkipLast ?: podcast.skipLastSecs,
-            folderUuid = podcastResponse.folderUuid,
-            sortPosition = podcastResponse.sortPosition ?: podcast.sortPosition,
-            addedDate = addedDate,
-        )
+        if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
+            applyPodcastSyncUpdatesToPodcast(podcast, SyncUpdateResponse.PodcastSync.fromUserPodcastResponse(podcastResponse))
+        } else {
+            // use the oldest local or server added date
+            val serverAddedDate = podcastResponse.dateAddedOrNull?.toDate() ?: Date()
+            val localAddedDate = podcast.addedDate
+            val resolvedAddedDate = if (localAddedDate == null || serverAddedDate < localAddedDate) serverAddedDate else localAddedDate
+
+            podcast.apply {
+                startFromSecs = podcastResponse.autoStartFrom
+                skipLastSecs = podcastResponse.autoSkipLast
+                folderUuid = podcastResponse.folderUuidOrNull?.value
+                sortPosition = podcastResponse.sortPositionOrNull?.value ?: podcast.sortPosition
+                addedDate = resolvedAddedDate
+            }
+        }
+
+        podcast.folderUuid = podcast.folderUuid.takeIf { it != Folder.homeFolderUuid }
+        podcastManager.updatePodcast(podcast)
     }
 
     private fun syncUpNext(): Completable {
@@ -367,10 +399,10 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun syncSettings(lastSyncTime: Instant): Completable {
+    private fun syncSettings(): Completable {
         return rxCompletable {
             val startTime = SystemClock.elapsedRealtime()
-            SyncSettingsTask.run(context, lastSyncTime, settings, syncManager)
+            SyncSettingsTask.run(context, settings, syncManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync settings - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         }
     }
@@ -880,6 +912,8 @@ class PodcastSyncProcess(
         podcast.addedDate = podcastSync.dateAdded
         podcast.folderUuid = podcastSync.folderUuid
         podcastSync.sortPosition?.let { podcast.sortPosition = it }
+        podcastSync.episodesSortOrder?.let { podcast.episodesSortType = EpisodesSortType.fromServerId(it) ?: EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC }
+        podcastSync.episodesSortOrderModified?.let { podcast.episodesSortTypeModified = it }
         podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
         podcastSync.startFromModified?.let { podcast.startFromModified = it }
         podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
@@ -904,6 +938,18 @@ class PodcastSyncProcess(
         podcastSync.useVolumeBoostModified?.let { podcast.volumeBoostedModified = it }
         podcastSync.showNotifications?.let { podcast.isShowNotifications = it }
         podcastSync.showNotificationsModified?.let { podcast.showNotificationsModified = it }
+        podcastSync.autoArchive?.let { podcast.overrideGlobalArchive = it }
+        podcastSync.autoArchiveModified?.let { podcast.overrideGlobalArchiveModified = it }
+        podcastSync.autoArchivePlayed?.let { podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) }
+        podcastSync.autoArchivePlayedModified?.let { podcast.autoArchiveAfterPlayingModified = it }
+        podcastSync.autoArchiveInactive?.let { podcast.autoArchiveInactive = AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default }
+        podcastSync.autoArchiveInactiveModified?.let { podcast.autoArchiveInactiveModified = it }
+        podcastSync.autoArchiveEpisodeLimit?.let { podcast.autoArchiveEpisodeLimit = it }
+        podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
+        podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None }
+        podcastSync.episodeGroupingModified?.let { podcast.groupingModified = it }
+        podcastSync.showArchived?.let { podcast.showArchived = it }
+        podcastSync.showArchivedModified?.let { podcast.showNotificationsModified = it }
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1007,11 +1053,11 @@ class PodcastSyncProcess(
         internal val ANDROID_DEVICE_TYPE = 2
 
         @VisibleForTesting
-        internal fun toRecord(podcast: Podcast, lastSyncTime: Instant): Record =
+        internal fun toRecord(podcast: Podcast): Record =
             record {
                 this.podcast = syncUserPodcast {
-                    podcast.addedDate?.toInstant()?.epochSecond?.let { epochSecond ->
-                        dateAdded = timestamp { seconds = epochSecond }
+                    podcast.addedDate?.toProtobufTimestamp()?.let { timestamp ->
+                        dateAdded = timestamp
                     }
 
                     folderUuid = stringValue {
@@ -1033,39 +1079,31 @@ class PodcastSyncProcess(
                     settings = podcastSettings {
                         autoStartFrom = int32Setting {
                             value = int32Value { value = podcast.startFromSecs }
-                            modifiedAt = timestamp {
-                                seconds = podcast.startFromModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.startFromModified.toProtobufTimestampOrEpoch()
                         }
                         autoSkipLast = int32Setting {
                             value = int32Value { value = podcast.skipLastSecs }
-                            modifiedAt = timestamp {
-                                seconds = podcast.skipLastModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.skipLastModified.toProtobufTimestampOrEpoch()
                         }
                         addToUpNext = boolSetting {
                             value = boolValue { value = podcast.addToUpNextSyncSetting }
-                            modifiedAt = timestamp {
-                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                        }
+                        episodesSortOrder = int32Setting {
+                            value = int32Value { value = podcast.episodesSortType.serverId }
+                            modifiedAt = podcast.episodesSortTypeModified.toProtobufTimestampOrEpoch()
                         }
                         addToUpNextPosition = int32Setting {
                             value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
-                            modifiedAt = timestamp {
-                                seconds = podcast.autoAddToUpNextModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
                         }
                         playbackEffects = boolSetting {
                             value = boolValue { value = podcast.overrideGlobalEffects }
-                            modifiedAt = timestamp {
-                                seconds = podcast.overrideGlobalEffectsModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrEpoch()
                         }
                         playbackSpeed = doubleSetting {
                             value = doubleValue { value = podcast.playbackSpeed }
-                            modifiedAt = timestamp {
-                                seconds = podcast.playbackSpeedModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.playbackSpeedModified.toProtobufTimestampOrEpoch()
                         }
                         trimSilence = int32Setting {
                             value = int32Value {
@@ -1076,21 +1114,39 @@ class PodcastSyncProcess(
                                     TrimMode.HIGH -> 3
                                 }
                             }
-                            modifiedAt = timestamp {
-                                seconds = podcast.trimModeModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.trimModeModified.toProtobufTimestampOrEpoch()
                         }
                         volumeBoost = boolSetting {
                             value = boolValue { value = podcast.isVolumeBoosted }
-                            modifiedAt = timestamp {
-                                seconds = podcast.volumeBoostedModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.volumeBoostedModified.toProtobufTimestampOrEpoch()
                         }
                         notification = boolSetting {
                             value = boolValue { value = podcast.isShowNotifications }
-                            modifiedAt = timestamp {
-                                seconds = podcast.showNotificationsModified?.timeSecs() ?: lastSyncTime.epochSecond
-                            }
+                            modifiedAt = podcast.showNotificationsModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchive = boolSetting {
+                            value = boolValue { value = podcast.overrideGlobalArchive }
+                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchivePlayed = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveAfterPlaying.serverId }
+                            modifiedAt = podcast.autoArchiveAfterPlayingModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchiveInactive = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveInactive.serverId }
+                            modifiedAt = podcast.autoArchiveInactiveModified.toProtobufTimestampOrEpoch()
+                        }
+                        autoArchiveEpisodeLimit = int32Setting {
+                            value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
+                            modifiedAt = podcast.autoArchiveEpisodeLimitModified.toProtobufTimestampOrEpoch()
+                        }
+                        episodeGrouping = int32Setting {
+                            value = int32Value { value = podcast.grouping.serverId }
+                            modifiedAt = podcast.groupingModified.toProtobufTimestampOrEpoch()
+                        }
+                        showArchived = boolSetting {
+                            value = boolValue { value = podcast.showArchived }
+                            modifiedAt = podcast.showArchivedModified.toProtobufTimestampOrEpoch()
                         }
                     }
 
@@ -1202,10 +1258,21 @@ class PodcastSyncProcess(
     }
 }
 
-private fun Date.toProtobufTimestamp(): Timestamp =
-    timestamp {
-        seconds = toInstant().epochSecond
+private fun Date.toProtobufTimestamp(): Timestamp {
+    val instant = toInstant()
+    return timestamp {
+        seconds = instant.epochSecond
+        nanos = instant.nano
     }
+}
+
+private fun Date?.toProtobufTimestampOrEpoch(): Timestamp {
+    val instant = this?.toInstant() ?: Instant.EPOCH
+    return timestamp {
+        seconds = instant.epochSecond
+        nanos = instant.nano
+    }
+}
 
 private val Podcast.addToUpNextSyncSetting get() = autoAddToUpNext != Podcast.AutoAddUpNext.OFF
 private val Podcast.addToUpNextPositionSyncSetting get() = when (autoAddToUpNext) {

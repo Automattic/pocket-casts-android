@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-29 20:54:03+0000
+Translation-Revision-Date: 2024-02-27 20:54:05+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
+    <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d oculto</string>
+    <string name="single_chapter">1 capítulo</string>
+    <string name="number_of_chapters">%d capítulos</string>
+    <string name="skip_chapters">Pular capítulos</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">Um ano de conteúdo exclusivo do &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Resgate seu código</string>
+    <string name="whats_new_slumber_studios_title">Sonhe alto</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">depois do primeiro ano</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Pagamento recorrente em %s</string>
+    <string name="half_price_first_year">50% de desconto no primeiro ano</string>
+    <string name="plus_offer_duration">%s de desconto</string>
     <string name="report_subtitle">Denunciar conteúdo inapropriado</string>
     <string name="report">Denunciar</string>
     <string name="onboarding_plus_feature_watch_playback">Aplicativos para Wear OS e Apple Watch</string>
@@ -105,10 +117,6 @@ Language: pt_BR
     <string name="deselect_all">Desmarcar todos</string>
     <string name="deselect_all_above">Desmarcar tudo acima</string>
     <string name="edit">Editar</string>
-    <string name="whats_new_autoplay_maybe_later_button">Talvez depois</string>
-    <string name="whats_new_autoplay_enable_button">Ativar agora</string>
-    <string name="whats_new_autoplay_body">Se você começar um episódio e a fila de Próximos estiver vazia, os episódios desse podcast ou lista vão ser reproduzidos automaticamente.</string>
-    <string name="whats_new_autoplay_title">Chegou a reprodução automática</string>
     <string name="filters_download_limit_3">3 episódios</string>
     <string name="settings_title_headphone_controls">Controles do fone</string>
     <string name="settings_headphone_controls_summary">Personalize as ações dos controles de fone mais comuns.</string>
@@ -779,7 +787,6 @@ Language: pt_BR
     <string name="settings_website_link">link do site</string>
     <string name="settings_view">Visualizar</string>
     <string name="settings_version">Versão %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Usar arte incorporada do podcast</string>
     <string name="settings_use_android_light_dark_mode">Usar modo claro/escuro do Android</string>
     <string name="settings_up_next_tap_summary">Se esta opção estiver ativa, um item na sua lista de Próximos será reproduzido ao tocar nele. Manter pressionado exibirá as opções do episódio.</string>
     <string name="settings_up_next_tap">Reproduzir lista de Próximos com toque</string>

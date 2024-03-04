@@ -171,7 +171,7 @@ class PodcastViewModel
             .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
             .doOnNext {
                 if (it is UiState.Loaded) {
-                    val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
+                    val groups = it.podcast.grouping.formGroups(it.episodes, it.podcast, resources)
                     groupedEpisodes.postValue(groups)
                 } else {
                     groupedEpisodes.postValue(emptyList())
@@ -405,7 +405,7 @@ class PodcastViewModel
 
     fun play(bookmark: Bookmark) {
         launch {
-            val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
             bookmarkEpisode?.let {
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
@@ -629,7 +629,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
         Flowable.combineLatest(
             episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
                 .map {
-                    val sortFunction = podcast.podcastGrouping.sortFunction
+                    val sortFunction = podcast.grouping.sortFunction
                     if (sortFunction != null) {
                         it.sortedByDescending(sortFunction)
                     } else {

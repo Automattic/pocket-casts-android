@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 09:54:03+0000
+Translation-Revision-Date: 2024-02-27 13:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>
+    <string name="number_of_chapters_summary_plural">%1$d 個章節 • %2$d 個章節已隱藏</string>
+    <string name="single_chapter">1 個章節</string>
+    <string name="number_of_chapters">%d 個章節</string>
+    <string name="skip_chapters">略過章節</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">1 年份的 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 獨家內容</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">兌換代碼</string>
+    <string name="whats_new_slumber_studios_title">大膽作夢</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">首年訂閱後</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">於 %s定期付款</string>
+    <string name="half_price_first_year">首年享五折優惠</string>
+    <string name="plus_offer_duration">%s優惠</string>
     <string name="report_subtitle">檢舉不當內容</string>
     <string name="report">檢舉</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 和穿戴式裝置 OS</string>
@@ -105,10 +117,6 @@ Language: zh_TW
     <string name="deselect_all">取消全選</string>
     <string name="deselect_all_above">取消選取上方所有項目</string>
     <string name="edit">編輯</string>
-    <string name="whats_new_autoplay_maybe_later_button">稍後再說</string>
-    <string name="whats_new_autoplay_enable_button">立即啟用</string>
-    <string name="whats_new_autoplay_body">如果你開始播放單集時「接下來播放」沒有任何內容，自動播放功能會繼續播放來自同一個 Podcast 或清單的單集。</string>
-    <string name="whats_new_autoplay_title">我們推出自動播放功能了！</string>
     <string name="filters_download_limit_3">3 集</string>
     <string name="settings_title_headphone_controls">耳機控制項</string>
     <string name="settings_headphone_controls_summary">自訂常用耳機控制項執行的動作。</string>
@@ -779,7 +787,6 @@ Language: zh_TW
     <string name="settings_website_link">網站連結</string>
     <string name="settings_view">檢視</string>
     <string name="settings_version">版本 %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">使用內嵌 Podcast 封面圖片</string>
     <string name="settings_use_android_light_dark_mode">使用 Android 淺色/深色模式</string>
     <string name="settings_up_next_tap_summary">若啟用，點選「接下來播放」佇列中的項目將開始播放。 長按將顯示單集選項。</string>
     <string name="settings_up_next_tap">點選「接下來播放」即可播放單集</string>

@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 16:54:03+0000
+Translation-Revision-Date: 2024-02-27 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
+    <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d ocultos</string>
+    <string name="single_chapter">1 capítulo</string>
+    <string name="number_of_chapters">%d capítulos</string>
+    <string name="skip_chapters">Omitir capítulos</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">Un año de contenido exclusivo de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Canjea tu código</string>
+    <string name="whats_new_slumber_studios_title">Sueña a lo grande</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">tras tu primer año</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Pago recurrente en %s</string>
+    <string name="half_price_first_year">50 % de descuento en tu primer año</string>
+    <string name="plus_offer_duration">Oferta %s</string>
     <string name="report_subtitle">Informar de contenido inapropiado</string>
     <string name="report">Informe</string>
     <string name="onboarding_plus_feature_watch_playback">Aplicaciones para Apple Watch y Wear OS</string>
@@ -105,10 +117,6 @@ Language: es
     <string name="deselect_all">Anular todas las selecciones</string>
     <string name="deselect_all_above">Anular la selección de todo lo anterior</string>
     <string name="edit">Editar</string>
-    <string name="whats_new_autoplay_maybe_later_button">Quizá más tarde</string>
-    <string name="whats_new_autoplay_enable_button">Activar esta opción ahora</string>
-    <string name="whats_new_autoplay_body">Si empiezas a escuchar un episodio sin que haya más en cola, la reproducción automática continuará reproduciendo episodios de ese pódcast o lista.</string>
-    <string name="whats_new_autoplay_title">¡Ya puedes disfrutar de la reproducción automática!</string>
     <string name="filters_download_limit_3">Tres episodios</string>
     <string name="settings_title_headphone_controls">Controles de los auriculares</string>
     <string name="settings_headphone_controls_summary">Personaliza las acciones que llevan a cabo los controles más habituales de los auriculares.</string>
@@ -779,7 +787,6 @@ Language: es
     <string name="settings_website_link">enlace del sitio web</string>
     <string name="settings_view">Ver</string>
     <string name="settings_version">Versión %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Utilizar carátula del podcast integrada</string>
     <string name="settings_use_android_light_dark_mode">Usar el modo oscuro o claro de Android</string>
     <string name="settings_up_next_tap_summary">Si se activa esta opción, se reproducirá el elemento cuando lo toques en la cola de A continuación. Si lo mantienes pulsado, se mostrarán las opciones del episodio.</string>
     <string name="settings_up_next_tap">Reproducir episodio de A continuación al tocar</string>

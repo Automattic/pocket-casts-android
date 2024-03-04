@@ -46,8 +46,9 @@
                     android:layout_marginTop="6dp"
                     android:layout_marginStart="6dp"
                     android:src="@drawable/ic_arrow_back_24dp"
-                    android:tint="?attr/secondary_icon_01"
-                    android:background="?android:attr/actionBarItemBackground" />
+                    android:background="?android:attr/actionBarItemBackground"
+                    android:contentDescription="@string/back"
+                    app:tint="?attr/secondary_icon_01" />
 
             </FrameLayout>
 

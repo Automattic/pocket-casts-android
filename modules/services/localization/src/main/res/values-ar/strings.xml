@@ -36,10 +36,6 @@ Language: ar
     <string name="deselect_all_above">إلغاء تحديد الكل أعلاه</string>
     <string name="deselect_all_below">إلغاء تحديد الكل أدناه</string>
     <string name="edit">تعديل</string>
-    <string name="whats_new_autoplay_title">التشغيل التلقائي هنا!</string>
-    <string name="whats_new_autoplay_body">إذا بدأت حلقة بينما قائمة العناصر التالية فارغة، فإن التشغيل التلقائي سيستمر في تشغيل الحلقات من ذلك البودكاست أو تلك القائمة.</string>
-    <string name="whats_new_autoplay_enable_button">تمكينه الآن</string>
-    <string name="whats_new_autoplay_maybe_later_button">ربما لاحقًا</string>
     <string name="filters_download_limit_3">3 حلقات</string>
     <string name="settings_headphone_controls_action_next">الإجراء التالي</string>
     <string name="settings_headphone_controls_action_previous">الإجراء السابق</string>
@@ -698,7 +694,6 @@ Language: ar
     <string name="settings_website_link">رابط موقع الويب</string>
     <string name="settings_view">عرض</string>
     <string name="settings_version">الإصدار ⁦%1$s⁩ (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">استخدام العمل الفني لبث صوتي مُضمَّن</string>
     <string name="settings_use_android_light_dark_mode">استخدام الوضع الفاتح/الداكن الخاص بنظام تشغيل Android</string>
     <string name="settings_up_next_tap_summary">إذا كان قيد التشغيل، فسيؤدي النقر على عنصر ما في قائمة انتظارك التالية إلى تشغيله. سيؤدي الضغط مطولاً إلى إظهار خيارات الحلقة.</string>
     <string name="settings_up_next_tap">تشغيل الحلقة التالية</string>

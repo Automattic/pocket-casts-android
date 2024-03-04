@@ -34,7 +34,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun onUpNextChange(newValue: Boolean) {
-        settings.autoDownloadUpNext.set(newValue, needsSync = false)
+        settings.autoDownloadUpNext.set(newValue, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED,
             mapOf("enabled" to newValue),
@@ -63,7 +63,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun onDownloadOnlyOnUnmeteredChange(enabled: Boolean) {
-        settings.autoDownloadUnmeteredOnly.set(enabled, needsSync = false)
+        settings.autoDownloadUnmeteredOnly.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED,
             mapOf("enabled" to enabled),
@@ -73,7 +73,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun getAutoDownloadUnmeteredOnly() = settings.autoDownloadUnmeteredOnly.value
 
     fun onDownloadOnlyWhenChargingChange(enabled: Boolean) {
-        settings.autoDownloadOnlyWhenCharging.set(enabled, needsSync = false)
+        settings.autoDownloadOnlyWhenCharging.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_ONLY_WHEN_CHARGING_TOGGLED,
             mapOf("enabled" to enabled),

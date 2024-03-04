@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 11:54:02+0000
+Translation-Revision-Date: 2024-02-28 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1個のチャプター • %d個が非表示</string>
+    <string name="number_of_chapters_summary_plural">%1$d個のチャプター • %2$d個が非表示</string>
+    <string name="single_chapter">1個のチャプター</string>
+    <string name="number_of_chapters">%d個のチャプター</string>
+    <string name="skip_chapters">チャプターをスキップ</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; の限定コンテンツを1年間聴取可能</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">コードを引き換える</string>
+    <string name="whats_new_slumber_studios_title">次年度以降の</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">夢は大きく</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
+    <string name="half_price_first_year">初年度は50% オフ</string>
+    <string name="plus_offer_duration">%s のオファー</string>
     <string name="report_subtitle">不適切なコンテンツを報告する</string>
     <string name="report">報告</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch アプリと Wear OS アプリ</string>
@@ -105,10 +117,6 @@ Language: ja_JP
     <string name="deselect_all">すべて選択解除</string>
     <string name="deselect_all_above">以上すべての選択を解除</string>
     <string name="edit">編集する</string>
-    <string name="whats_new_autoplay_maybe_later_button">後で確認する</string>
-    <string name="whats_new_autoplay_enable_button">すぐに有効化</string>
-    <string name="whats_new_autoplay_body">「次のエピソード待機リスト」が空の間にエピソードを開始すると、自動再生によってそのポッドキャストまたはリストからエピソードが再生され続けます。</string>
-    <string name="whats_new_autoplay_title">自動再生機能が登場</string>
     <string name="filters_download_limit_3">3エピソード</string>
     <string name="settings_title_headphone_controls">ヘッドフォン操作</string>
     <string name="settings_headphone_controls_summary">よく使用されるヘッドフォン操作で実行されるアクションをカスタマイズします。</string>
@@ -779,7 +787,6 @@ Language: ja_JP
     <string name="settings_website_link">サイトのリンク</string>
     <string name="settings_view">表示</string>
     <string name="settings_version">バージョン%1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">埋め込みポッドキャストアートワークを使用</string>
     <string name="settings_use_android_light_dark_mode">Android のライト / ダークモードを使用</string>
     <string name="settings_up_next_tap_summary">オンにすると、次のエピソード待機リストでアイテムをタップすることでアイテムが再生されます。 長押しするとエピソードオプションが表示されます。</string>
     <string name="settings_up_next_tap">タップして次のエピソードを再生</string>
