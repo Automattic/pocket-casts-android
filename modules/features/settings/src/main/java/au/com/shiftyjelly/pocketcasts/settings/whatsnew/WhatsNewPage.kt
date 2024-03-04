@@ -73,6 +73,12 @@ fun WhatsNewPage(
                                 onClose = onClose,
                                 fullModal = uiState.fullModel,
                             )
+
+                        is WhatsNewFeature.DeselectChapters ->
+                            DeselectChaptersHeader(
+                                onClose = onClose,
+                                fullModal = uiState.fullModel,
+                            )
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -223,7 +229,9 @@ private fun WhatsNewPageLoaded(
 private fun Message(
     state: UiState.Loaded,
 ) = when (state.feature) {
-    is WhatsNewFeature.Bookmarks -> TextP40(
+    is WhatsNewFeature.Bookmarks,
+    is WhatsNewFeature.DeselectChapters,
+    -> TextP40(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
         color = MaterialTheme.theme.colors.primaryText02,
@@ -269,6 +277,8 @@ private fun getButtonTitle(
         state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
         else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
     }
+
+    is WhatsNewFeature.DeselectChapters -> stringResource(state.feature.confirmButtonTitle)
 }
 
 @Composable
@@ -289,6 +299,29 @@ private fun WhatsNewSlumberStudiosPreview(
                 tier = UserTier.Plus,
             ),
             header = { SlumberStudiosHeader(onClose = {}) },
+            onConfirm = {},
+            onClose = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun WhatsNewDeselectChaptersPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        WhatsNewPageLoaded(
+            state = UiState.Loaded(
+                feature = WhatsNewFeature.DeselectChapters(
+                    message = LR.string.whats_new_deselect_chapters_subscribe_to_plus_message,
+                    confirmButtonTitle = LR.string.upgrade_to_plus,
+                    isUserEntitled = true,
+                ),
+                tier = UserTier.Plus,
+                fullModel = true,
+            ),
+            header = { DeselectChaptersHeader(onClose = {}) },
             onConfirm = {},
             onClose = {},
         )

@@ -211,6 +211,7 @@ private fun Content(
                 OnboardingUpgradeSource.SKIP_CHAPTERS,
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
+                OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

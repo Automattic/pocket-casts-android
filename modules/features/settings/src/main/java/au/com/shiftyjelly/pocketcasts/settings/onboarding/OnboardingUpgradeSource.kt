@@ -18,5 +18,6 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     SKIP_CHAPTERS("skip_chapters"),
     SETTINGS("settings"),
     SLUMBER_STUDIOS("slumber_studios"),
+    WHATS_NEW_SKIP_CHAPTERS("what_new_skip_chapters"),
     UNKNOWN("unknown"),
 }
