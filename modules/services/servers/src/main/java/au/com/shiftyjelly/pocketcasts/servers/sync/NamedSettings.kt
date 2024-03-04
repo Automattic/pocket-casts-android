@@ -81,6 +81,7 @@ data class ChangedNamedSettings(
     @field:Json(name = "autoDownloadUpNext") val autoDownloadUpNext: NamedChangedSettingBool? = null,
     @field:Json(name = "backgroundRefresh") val isPodcastBackgroundRefreshEnabled: NamedChangedSettingBool? = null,
     @field:Json(name = "cloudDownloadUnmeteredOnly") val cloudDownloadUnmeteredOnly: NamedChangedSettingBool? = null,
+    @field:Json(name = "useRssArtwork") val useRssArtwork: NamedChangedSettingBool? = null,
 )
 
 @JsonClass(generateAdapter = true)
