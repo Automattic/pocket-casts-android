@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-14 11:54:07+0000
+Translation-Revision-Date: 2024-02-28 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1個のチャプター • %d個が非表示</string>
+    <string name="number_of_chapters_summary_plural">%1$d個のチャプター • %2$d個が非表示</string>
+    <string name="single_chapter">1個のチャプター</string>
+    <string name="number_of_chapters">%d個のチャプター</string>
+    <string name="skip_chapters">チャプターをスキップ</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; の限定コンテンツを1年間聴取可能</string>
     <string name="whats_new_slumber_studios_redeem_now_button">コードを引き換える</string>
-    <string name="whats_new_slumber_studios_body_free_user">Plus の購読を開始すると、夢の実現に役立つポッドキャスト、Slumber Studios のコンテンツを1年間購読できます。 &lt;a href=\"https://slumberstudios.com/\"&gt;さらに詳しく&lt;/a&gt;。</string>
-    <string name="whats_new_slumber_studios_body">Plus 購読の一環として、Slumber Studios のコンテンツを1年間購読できます。コード %1$s をお使いください。 &lt;a href=\"https://slumberstudios.com/\"&gt;さらに詳しく&lt;/a&gt;。</string>
     <string name="whats_new_slumber_studios_title">次年度以降の</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">夢は大きく</string>
     <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
@@ -784,7 +787,6 @@ Language: ja_JP
     <string name="settings_website_link">サイトのリンク</string>
     <string name="settings_view">表示</string>
     <string name="settings_version">バージョン%1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">埋め込みポッドキャストアートワークを使用</string>
     <string name="settings_use_android_light_dark_mode">Android のライト / ダークモードを使用</string>
     <string name="settings_up_next_tap_summary">オンにすると、次のエピソード待機リストでアイテムをタップすることでアイテムが再生されます。 長押しするとエピソードオプションが表示されます。</string>
     <string name="settings_up_next_tap">タップして次のエピソードを再生</string>
