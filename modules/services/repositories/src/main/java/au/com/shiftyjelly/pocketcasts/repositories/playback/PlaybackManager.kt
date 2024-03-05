@@ -59,13 +59,10 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -478,11 +475,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
-
-        if (switchEpisode) {
-            cleanCachedEpisodes()
-        }
-
         if (switchEpisode || isPlayerSwitchRequired()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Player switch required. Different episode: $switchEpisode")
             pause(transientLoss = true)
@@ -1292,8 +1284,6 @@ open class PlaybackManager @Inject constructor(
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
             removeEpisodeFromQueue(episode, "finished", downloadManager)
 
-            cleanCachedEpisodes()
-
             // mark as played
             episodeManager.updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
 
@@ -1897,8 +1887,6 @@ open class PlaybackManager @Inject constructor(
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
         }
-
-        addEpisodeToCache(episode)
     }
 
     private fun findPodcastByEpisode(episode: BaseEpisode): Podcast? {
@@ -2324,37 +2312,6 @@ open class PlaybackManager @Inject constructor(
                 lastChangeFrom = LastChangeFrom.OnUpdatePausedPlaybackState.value,
             )
             playbackStateRelay.accept(playbackState)
-        }
-    }
-    private suspend fun addEpisodeToCache(episode: BaseEpisode) {
-        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
-            isEpisodeEligibleToBeCached(episode) &&
-            canCacheEpisodeByDeviceSettings() &&
-            !Util.isAutomotive(application) && !Util.isWearOs(application)
-        ) {
-            episodeManager.updateAutomaticallyCachedStatus(episode, automaticallyCached = true)
-            downloadManager.addEpisodeToQueue(episode, "cache episode", false)
-        }
-    }
-
-    private fun isEpisodeEligibleToBeCached(episode: BaseEpisode): Boolean =
-        episode is PodcastEpisode && !episode.isDownloaded && !episode.isDownloading && !episode.isQueued
-
-    private fun canCacheEpisodeByDeviceSettings(): Boolean {
-        val internetConnectionCondition = !settings.autoDownloadUnmeteredOnly.value ||
-            (settings.autoDownloadUnmeteredOnly.value && !Network.isActiveNetworkMetered(application))
-
-        val chargingCondition = !settings.autoDownloadOnlyWhenCharging.value ||
-            (settings.autoDownloadOnlyWhenCharging.value && Power.isCharging(application))
-
-        return internetConnectionCondition && chargingCondition
-    }
-
-    private suspend fun cleanCachedEpisodes() {
-        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
-            !Util.isAutomotive(application) && !Util.isWearOs(application)
-        ) {
-            episodeManager.cleanAutomaticallyCachedEpisodes(this)
         }
     }
 

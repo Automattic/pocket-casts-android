@@ -223,12 +223,6 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET automatically_cached = :automaticallyCached WHERE uuid = :uuid")
-    abstract suspend fun updateAutomaticallyCachedStatus(automaticallyCached: Boolean, uuid: String)
-
-    @Query("SELECT * FROM podcast_episodes WHERE automatically_cached = 1")
-    abstract suspend fun findAutomaticallyCachedEpisodes(): List<PodcastEpisode>?
-
     @Query("UPDATE podcast_episodes SET play_error_details = :playErrorDetails WHERE uuid = :uuid")
     abstract fun updatePlayErrorDetails(playErrorDetails: String?, uuid: String)
 

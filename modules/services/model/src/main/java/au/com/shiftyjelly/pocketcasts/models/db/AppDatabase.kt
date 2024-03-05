@@ -70,10 +70,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
     ],
-    version = 88,
+    version = 89,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
+        AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
     ],
 )
 @TypeConverters(
@@ -644,6 +645,12 @@ abstract class AppDatabase : RoomDatabase() {
                 """.trimIndent(),
             )
         }
+
+        @DeleteColumn(
+            tableName = "podcast_episodes",
+            columnName = "automatically_cached",
+        )
+        class DeleteAutomaticallyCachedMigration : AutoMigrationSpec
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
