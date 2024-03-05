@@ -46,7 +46,7 @@ fun HorizontalPagerWrapper(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable (Int, Int) -> Unit = { _, _ -> },
 ) {
-    val pagerState = rememberPagerState(initialPage = initialPage)
+    val pagerState = rememberPagerState(initialPage = initialPage) { pageCount }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { index ->
@@ -57,7 +57,6 @@ fun HorizontalPagerWrapper(
     var pagerHeight by remember { mutableStateOf(0) }
     Column(modifier = modifier) {
         HorizontalPager(
-            pageCount = pageCount,
             state = pagerState,
             pageSize = pageSize,
             contentPadding = contentPadding,

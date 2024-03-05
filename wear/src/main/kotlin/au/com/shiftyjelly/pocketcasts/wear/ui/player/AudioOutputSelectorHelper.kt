@@ -1,36 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
+import au.com.shiftyjelly.pocketcasts.wear.di.IsEmulator
+import com.google.android.horologist.audio.AudioOutput
 import com.google.android.horologist.audio.SystemAudioRepository
 import com.google.android.horologist.media3.audio.AudioOutputSelector
-import com.google.android.horologist.media3.rules.PlaybackRules
 import javax.inject.Inject
-import javax.inject.Singleton
 import timber.log.Timber
 
-@Singleton
 class AudioOutputSelectorHelper @Inject constructor(
-    private val audioOutputRepository: SystemAudioRepository,
+    private val audioRepository: SystemAudioRepository,
     private val audioOutputSelector: AudioOutputSelector,
-    private val playbackRules: PlaybackRules,
+    @IsEmulator private val isEmulator: Boolean,
 ) {
-    suspend fun attemptPlay(play: () -> Unit) {
-        val currentAudioOutput = audioOutputRepository.audioOutput.value
+    suspend fun attemptPlay(action: () -> Unit) {
+        val currentAudioOutput = audioRepository.audioOutput.value
 
-        val canPlayWithCurrentOutput = playbackRules.canPlayWithOutput(currentAudioOutput)
-
-        if (canPlayWithCurrentOutput) {
-            play()
+        if (currentAudioOutput.isOutputAllowed) {
+            action()
         } else {
-            val newAudioOutput = audioOutputSelector.selectNewOutput(currentAudioOutput)
-
-            val canPlayWithNewOutput =
-                newAudioOutput != null && playbackRules.canPlayWithOutput(newAudioOutput)
-
-            if (canPlayWithNewOutput) {
-                play()
+            val newAudioOutput = audioOutputSelector.selectNewOutput(currentAudioOutput) ?: AudioOutput.None
+            if (newAudioOutput.isOutputAllowed) {
+                action()
             } else {
                 Timber.e("Cannot play audio on output $newAudioOutput")
             }
         }
     }
+
+    private val AudioOutput.isOutputAllowed get() = isEmulator || this is AudioOutput.BluetoothHeadset
 }

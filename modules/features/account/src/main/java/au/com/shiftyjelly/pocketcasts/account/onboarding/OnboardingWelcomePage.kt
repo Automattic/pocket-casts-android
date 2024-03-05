@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -47,6 +48,9 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
+import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
+import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.Confetti
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -58,24 +62,23 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingWelcomePage(
-    activeTheme: Theme.ThemeType,
+    theme: Theme.ThemeType,
     flow: OnboardingFlow,
     isSignedInAsPlusOrPatron: Boolean,
     onDone: () -> Unit,
     onContinueToDiscover: () -> Unit,
     onImportTapped: () -> Unit,
     onBackPressed: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingWelcomeViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
-    val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
@@ -83,10 +86,9 @@ fun OnboardingWelcomePage(
     }
 
     LaunchedEffect(Unit) {
-        systemUiController.apply {
-            setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !activeTheme.darkTheme)
-            setNavigationBarColor(Color.Transparent, darkIcons = !activeTheme.darkTheme)
-        }
+        val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f)) { theme.darkTheme }
+        val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
 
     BackHandler {

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -109,7 +110,7 @@ private fun Content(
             secondaryContentColor = MaterialTheme.colors.onSecondary,
         ),
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(), // This is needed for the backgroundImagePainter to work
+        modifier = Modifier.height(ChipDefaults.Height).fillMaxWidth(), // This is needed for the backgroundImagePainter to work
     )
 }
 

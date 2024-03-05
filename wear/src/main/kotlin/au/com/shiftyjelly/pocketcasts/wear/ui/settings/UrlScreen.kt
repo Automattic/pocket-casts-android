@@ -30,6 +30,7 @@ object UrlScreenRoutes {
 }
 
 fun NavGraphBuilder.settingsUrlScreens() {
+    @Suppress("DEPRECATION")
     scrollable(UrlScreenRoutes.termsOfService) {
         UrlScreen(
             title = stringResource(LR.string.settings_about_terms_of_serivce),
@@ -39,6 +40,7 @@ fun NavGraphBuilder.settingsUrlScreens() {
         )
     }
 
+    @Suppress("DEPRECATION")
     scrollable(UrlScreenRoutes.privacy) {
         UrlScreen(
             title = stringResource(id = LR.string.settings_about_privacy_policy),
