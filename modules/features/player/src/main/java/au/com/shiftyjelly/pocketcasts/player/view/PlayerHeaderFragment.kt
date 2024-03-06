@@ -318,6 +318,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
             binding.videoView.isVisible = headerViewModel.isVideoVisible()
             binding.episodeTitle.text = headerViewModel.episodeTitle
+            binding.podcastTitle?.text = headerViewModel.podcastTitle
+            binding.podcastTitle?.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
             binding.chapterSummary.text = headerViewModel.chapterSummary
             binding.chapterSummary.isVisible = headerViewModel.isChaptersPresent
             binding.executePendingBindings()
