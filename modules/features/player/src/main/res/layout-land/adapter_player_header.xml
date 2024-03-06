@@ -20,7 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:theme="@style/PlayerTheme"
-            android:background="@{viewModel.backgroundColor}"
             android:clipChildren="false"
             android:clipToPadding="false">
 

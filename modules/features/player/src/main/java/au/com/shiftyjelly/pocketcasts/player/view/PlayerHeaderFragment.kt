@@ -310,6 +310,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
 
+            binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
             binding.executePendingBindings()
         }
     }

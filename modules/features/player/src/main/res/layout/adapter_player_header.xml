@@ -21,7 +21,6 @@
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:background="@{viewModel.backgroundColor}"
             android:theme="@style/PlayerTheme">
 
             <ImageView
