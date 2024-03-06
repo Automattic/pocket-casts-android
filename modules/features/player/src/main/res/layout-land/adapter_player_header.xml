@@ -151,13 +151,10 @@
                 android:layout_height="44dp"
                 android:src="@drawable/ic_chapter_skipforward"
                 android:layout_marginEnd="8dp"
-                android:alpha="@{viewModel.isLastChapter ? 0.5f : 1f}"
-                android:enabled="@{!viewModel.isLastChapter}"
                 android:contentDescription="@string/player_action_next_chapter"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/episodeTitle"
                 app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
-                android:visibility="@{viewModel.isChaptersPresent}"
                 android:background="?android:attr/actionBarItemBackground" />
 
             <au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle

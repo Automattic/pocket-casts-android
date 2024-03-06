@@ -192,12 +192,9 @@
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:layout_marginEnd="8dp"
-                android:alpha="@{viewModel.isLastChapter ? 0.5f : 1f}"
                 android:background="?android:attr/actionBarItemBackground"
                 android:contentDescription="@string/player_action_next_chapter"
-                android:enabled="@{!viewModel.isLastChapter}"
                 android:src="@drawable/ic_chapter_skipforward"
-                android:visibility="@{viewModel.isChaptersPresent}"
                 app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/episodeTitle" />

@@ -325,6 +325,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.previousChapter.alpha = if (headerViewModel.isFirstChapter) 0.5f else 1f
             binding.previousChapter.isEnabled = !headerViewModel.isFirstChapter
             binding.previousChapter.isVisible = headerViewModel.isChaptersPresent
+            binding.nextChapter.alpha = if (headerViewModel.isLastChapter) 0.5f else 1f
+            binding.nextChapter.isEnabled = !headerViewModel.isLastChapter
+            binding.nextChapter.isVisible = headerViewModel.isChaptersPresent
             binding.executePendingBindings()
         }
     }
