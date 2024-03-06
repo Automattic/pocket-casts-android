@@ -125,7 +125,6 @@
                 android:includeFontPadding="false"
                 android:lineSpacingMultiplier="1.2"
                 android:maxLines="2"
-                android:text="@{viewModel.title}"
                 android:textColor="#FFFFFFFF"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toTopOf="@+id/subtitleBarrier"
