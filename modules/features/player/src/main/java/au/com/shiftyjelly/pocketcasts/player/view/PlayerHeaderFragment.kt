@@ -311,6 +311,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
 
             binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
+            binding.artwork.isVisible = headerViewModel.isPodcastArtworkVisible()
             binding.executePendingBindings()
         }
     }

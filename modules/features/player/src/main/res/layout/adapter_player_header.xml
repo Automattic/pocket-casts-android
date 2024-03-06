@@ -32,7 +32,6 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:importantForAccessibility="no"
-                android:visibility="@{viewModel.isPodcastArtworkVisible()}"
                 android:clickable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toTopOf="@+id/episodeTitle"

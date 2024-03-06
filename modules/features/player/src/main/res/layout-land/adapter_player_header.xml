@@ -38,7 +38,6 @@
                 app:layout_constraintHeight_max="192dp"
                 android:background="@drawable/round_corners_8dp"
                 android:outlineProvider="background"
-                android:visibility="@{viewModel.isPodcastArtworkVisible()}"
                 tools:src="@tools:sample/avatars"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
