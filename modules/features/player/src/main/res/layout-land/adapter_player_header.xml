@@ -68,7 +68,6 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center_vertical"
-                app:showIfPresent="@{viewModel.chapter.url}"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"

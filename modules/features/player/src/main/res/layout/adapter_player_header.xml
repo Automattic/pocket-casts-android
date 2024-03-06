@@ -85,10 +85,10 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_link_back"
                 app:layout_constraintEnd_toEndOf="@+id/artworkEndBarrier"
-                app:layout_constraintTop_toTopOf="@+id/artworkTopBarrier"
-                app:showIfPresent="@{viewModel.chapter.url}" />
+                app:layout_constraintTop_toTopOf="@+id/artworkTopBarrier" />
 
             <ImageView
+                android:id="@+id/chapterUrlFront"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:scaleType="fitCenter"
@@ -96,8 +96,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/chapterUrl"
                 app:layout_constraintEnd_toEndOf="@+id/chapterUrl"
                 app:layout_constraintStart_toStartOf="@+id/chapterUrl"
-                app:layout_constraintTop_toTopOf="@+id/chapterUrl"
-                app:showIfPresent="@{viewModel.chapter.url}" />
+                app:layout_constraintTop_toTopOf="@+id/chapterUrl" />
 
             <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
                 android:id="@+id/videoView"

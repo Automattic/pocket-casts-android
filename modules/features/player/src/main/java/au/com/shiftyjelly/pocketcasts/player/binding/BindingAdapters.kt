@@ -27,6 +27,10 @@ object BindingAdapters {
         view.visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
     }
 
+    fun View.showIfPresent(url: HttpUrl?) {
+        visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
+    }
+
     @BindingAdapter("backgroundTint")
     @JvmStatic
     fun setBackgroundTint(view: View, color: Int) {
