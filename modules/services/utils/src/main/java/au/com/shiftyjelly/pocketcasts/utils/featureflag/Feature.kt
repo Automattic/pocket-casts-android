@@ -72,7 +72,7 @@ enum class Feature(
         title = "Cache playing episode",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
     ;
