@@ -99,8 +99,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
 
-        binding.lifecycleOwner = viewLifecycleOwner
-
         if (adapter == null) {
             adapter = FolderAdapter(this, settings, context, theme)
         }
