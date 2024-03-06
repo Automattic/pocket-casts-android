@@ -309,6 +309,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             binding.archive.setImageResource(if (headerViewModel.isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
             binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
+            binding.chapterProgressCircle.isVisible = headerViewModel.isChaptersPresent
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
 
             binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)

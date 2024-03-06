@@ -161,7 +161,6 @@
                 android:id="@+id/chapterProgressCircle"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:visibility="@{viewModel.isChaptersPresent}"
                 app:layout_constraintStart_toStartOf="@+id/nextChapter"
                 app:layout_constraintEnd_toEndOf="@+id/nextChapter"
                 app:layout_constraintTop_toTopOf="@+id/nextChapter"
