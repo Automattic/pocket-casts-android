@@ -187,13 +187,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/episodeTitle"
                 app:layout_constraintBottom_toTopOf="@+id/largePlayButton"
-                app:layout_constraintTop_toBottomOf="@id/chapterSummary"
-                app:duration="@{viewModel.durationMs}"
-                app:position="@{viewModel.positionMs}"
-                app:theme="@{viewModel.theme}"
-                app:tintColor="@{viewModel.iconTintColor}"
-                app:bufferedUpTo="@{viewModel.bufferedUpToMs}"
-                app:isBuffering="@{viewModel.isBuffering}" />
+                app:layout_constraintTop_toBottomOf="@id/chapterSummary" />
 
             <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
                 android:id="@+id/largePlayButton"

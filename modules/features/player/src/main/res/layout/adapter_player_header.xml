@@ -226,16 +226,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                app:bufferedUpTo="@{viewModel.bufferedUpToMs}"
-                app:duration="@{viewModel.durationMs}"
-                app:isBuffering="@{viewModel.isBuffering}"
                 app:layout_constraintBottom_toTopOf="@+id/largePlayButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintWidth_percent="@dimen/seekbar_width_percentage"
-                app:position="@{viewModel.positionMs}"
-                app:theme="@{viewModel.theme}"
-                app:tintColor="@{viewModel.iconTintColor}" />
+                app:layout_constraintWidth_percent="@dimen/seekbar_width_percentage" />
 
             <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
                 android:id="@+id/largePlayButton"

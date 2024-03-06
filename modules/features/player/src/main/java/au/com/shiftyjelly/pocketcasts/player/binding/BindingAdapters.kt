@@ -66,14 +66,12 @@ object BindingAdapters {
         seekBar.setTintColor(playbackState.podcast?.tintColorForDarkBg, Theme.ThemeType.DARK)
     }
 
-    @BindingAdapter("duration", "position", "tintColor", "bufferedUpTo", "isBuffering", "theme")
-    @JvmStatic
-    fun setSeekBarState(seekBar: PlayerSeekBar, durationMs: Int, positionMs: Int, tintColor: Int, bufferedUpTo: Int, isBuffering: Boolean, theme: Theme.ThemeType) {
-        seekBar.setDurationMs(durationMs)
-        seekBar.setCurrentTimeMs(positionMs)
-        seekBar.setTintColor(tintColor, theme)
-        seekBar.isBuffering = isBuffering
-        seekBar.bufferedUpToInSecs = bufferedUpTo / 1000
+    fun PlayerSeekBar.setSeekBarState(durationMs: Int, positionMs: Int, tintColor: Int, bufferedUpTo: Int, isBuffering: Boolean, theme: Theme.ThemeType) {
+        setDurationMs(durationMs)
+        setCurrentTimeMs(positionMs)
+        setTintColor(tintColor, theme)
+        this.isBuffering = isBuffering
+        bufferedUpToInSecs = bufferedUpTo / 1000
     }
 
     @BindingAdapter("play")

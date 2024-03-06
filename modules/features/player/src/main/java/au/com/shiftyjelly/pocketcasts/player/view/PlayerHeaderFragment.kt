@@ -73,6 +73,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Headers.Companion.headersOf
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.showIfPresent
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -329,6 +330,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.nextChapter.alpha = if (headerViewModel.isLastChapter) 0.5f else 1f
             binding.nextChapter.isEnabled = !headerViewModel.isLastChapter
             binding.nextChapter.isVisible = headerViewModel.isChaptersPresent
+            binding.seekBar.setSeekBarState(
+                durationMs = headerViewModel.durationMs,
+                positionMs = headerViewModel.positionMs,
+                tintColor = headerViewModel.iconTintColor,
+                bufferedUpTo = headerViewModel.bufferedUpToMs,
+                isBuffering = headerViewModel.isBuffering,
+                theme = headerViewModel.theme,
+            )
             binding.executePendingBindings()
         }
     }
