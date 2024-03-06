@@ -312,6 +312,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
             binding.artwork.isVisible = headerViewModel.isPodcastArtworkVisible()
+            binding.chapterArtwork.isVisible = headerViewModel.isChapterArtworkVisible()
             binding.executePendingBindings()
         }
     }
