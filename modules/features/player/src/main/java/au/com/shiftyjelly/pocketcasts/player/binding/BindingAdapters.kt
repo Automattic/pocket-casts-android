@@ -84,5 +84,4 @@ object BindingAdapters {
             view.progress = 0.5f
         }
     }
-
 }

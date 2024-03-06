@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import android.graphics.Outline
 import android.view.View
 import android.view.ViewOutlineProvider
@@ -13,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object ViewDataBindings {
 
