@@ -316,6 +316,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.chapterArtwork.isVisible = headerViewModel.isChapterArtworkVisible()
             binding.chapterUrl.showIfPresent(headerViewModel.chapter?.url)
             binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
+            binding.videoView.isVisible = headerViewModel.isVideoVisible()
             binding.executePendingBindings()
         }
     }
