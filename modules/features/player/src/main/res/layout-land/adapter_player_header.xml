@@ -139,13 +139,10 @@
                 android:layout_height="44dp"
                 android:src="@drawable/ic_chapter_skipbackwards"
                 android:layout_marginStart="8dp"
-                android:alpha="@{viewModel.isFirstChapter ? 0.5f : 1f}"
-                android:enabled="@{!viewModel.isFirstChapter}"
                 app:layout_constraintStart_toStartOf="@id/episodeTitle"
                 app:layout_constraintTop_toTopOf="@+id/episodeTitle"
                 app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
                 android:contentDescription="@string/player_action_previous_chapter"
-                android:visibility="@{viewModel.isChaptersPresent}"
                 android:background="?android:attr/actionBarItemBackground" />
 
             <ImageButton

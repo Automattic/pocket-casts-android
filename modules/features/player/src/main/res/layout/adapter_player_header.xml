@@ -180,12 +180,9 @@
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:layout_marginStart="8dp"
-                android:alpha="@{viewModel.isFirstChapter ? 0.5f : 1f}"
                 android:background="?android:attr/actionBarItemBackground"
                 android:contentDescription="@string/player_action_previous_chapter"
-                android:enabled="@{!viewModel.isFirstChapter}"
                 android:src="@drawable/ic_chapter_skipbackwards"
-                android:visibility="@{viewModel.isChaptersPresent}"
                 app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/episodeTitle" />

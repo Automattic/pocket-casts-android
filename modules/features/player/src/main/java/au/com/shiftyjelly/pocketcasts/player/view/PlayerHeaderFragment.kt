@@ -322,6 +322,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.podcastTitle?.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
             binding.chapterSummary.text = headerViewModel.chapterSummary
             binding.chapterSummary.isVisible = headerViewModel.isChaptersPresent
+            binding.previousChapter.alpha = if (headerViewModel.isFirstChapter) 0.5f else 1f
+            binding.previousChapter.isEnabled = !headerViewModel.isFirstChapter
+            binding.previousChapter.isVisible = headerViewModel.isChaptersPresent
             binding.executePendingBindings()
         }
     }
