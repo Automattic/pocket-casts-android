@@ -122,8 +122,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         imageLoader.radiusPx = 8.dpToPx(view.context)
         imageLoader.shouldScale = false
 
-        binding.viewModel = PlayerViewModel.PlayerHeader()
-
         binding.skipBack.setOnClickListener {
             onSkipBack()
             (it as LottieAnimationView).playAnimation()
@@ -213,7 +211,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
-            binding.viewModel = headerViewModel
 
             binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
 
@@ -345,7 +342,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.skipBack.toCircle(true)
             binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
             binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
-            binding.executePendingBindings()
         }
     }
 
