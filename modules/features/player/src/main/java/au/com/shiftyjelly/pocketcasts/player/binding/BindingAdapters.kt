@@ -21,12 +21,6 @@ object BindingAdapters {
         view.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
-    @BindingAdapter("showIfPresent")
-    @JvmStatic
-    fun setShowIfPresent(view: View, url: HttpUrl?) {
-        view.visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
-    }
-
     fun View.showIfPresent(url: HttpUrl?) {
         visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
     }
