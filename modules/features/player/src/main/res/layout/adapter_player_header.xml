@@ -290,7 +290,6 @@
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/skip_back"
                 android:scaleType="centerInside"
-                app:circle="@{true}"
                 app:layout_constraintBottom_toBottomOf="@+id/largePlayButton"
                 app:layout_constraintEnd_toStartOf="@+id/largePlayButton"
                 app:layout_constraintStart_toStartOf="parent"

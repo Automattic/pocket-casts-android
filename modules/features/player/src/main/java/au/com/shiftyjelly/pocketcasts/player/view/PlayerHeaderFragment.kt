@@ -24,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -50,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import coil.load
 import coil.request.Disposable
@@ -73,8 +76,6 @@ import kotlinx.coroutines.launch
 import okhttp3.Headers.Companion.headersOf
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setSeekBarState
-import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.showIfPresent
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
@@ -339,6 +340,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 theme = headerViewModel.theme,
             )
             binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
+            binding.skipBack.toCircle(true)
             binding.executePendingBindings()
         }
     }
