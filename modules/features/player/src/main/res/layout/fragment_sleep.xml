@@ -317,7 +317,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:text="@{viewModel.sleepTimeLeftText}"
                 android:textSize="60sp"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -93,6 +93,10 @@ class SleepFragment : BaseDialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        viewModel.sleepTimeLeftText.observe(viewLifecycleOwner) { sleepTime ->
+            binding?.sleepTime?.text = sleepTime
+        }
+
         viewModel.sleepCustomTimeText.observe(viewLifecycleOwner) { customTimeText ->
             binding?.labelCustom?.text = customTimeText
         }
