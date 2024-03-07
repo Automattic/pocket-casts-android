@@ -264,7 +264,6 @@
                 android:textColor="#FFFFFF"
                 android:importantForAccessibility="no"
                 android:textSize="15sp"
-                android:text="@{``+viewModel.skipBackwardInSecs}"
                 tools:text="15"
                 app:layout_constraintStart_toStartOf="@+id/skipBack"
                 app:layout_constraintEnd_toEndOf="@+id/skipBack"

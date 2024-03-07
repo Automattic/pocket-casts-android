@@ -341,6 +341,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             )
             binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
             binding.skipBack.toCircle(true)
+            binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
             binding.executePendingBindings()
         }
     }

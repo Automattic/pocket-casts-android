@@ -306,7 +306,6 @@
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"
                 android:paddingTop="8dp"
-                android:text="@{``+viewModel.skipBackwardInSecs}"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="@+id/skipBack"
