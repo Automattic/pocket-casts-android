@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -90,6 +91,11 @@ class SleepFragment : BaseDialogFragment() {
     @Suppress("DEPRECATION")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
+            binding?.sleepSetup?.isVisible = !isSleepRunning
+            binding?.sleepRunning?.isVisible = isSleepRunning
+        }
 
         viewModel.playingEpisodeLive.observe(
             viewLifecycleOwner,

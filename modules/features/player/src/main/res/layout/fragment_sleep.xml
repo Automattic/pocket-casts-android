@@ -25,7 +25,6 @@
                 android:id="@+id/sleepSetup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{!safeUnbox(viewModel.isSleepRunning)}"
                 app:constraint_referenced_ids="sleepTitle,labelMins5,buttonMins5,separator1,labelMins15,buttonMins15,separator2,labelMins30,buttonMins30,separator3,labelMins60,buttonMins60,separator4,labelEndOfEpisode,buttonEndOfEpisode,separator5,labelCustom,buttonCustom,customMinusButton,customPlusButton"
                 tools:ignore="MissingConstraints" />
 
@@ -33,7 +32,6 @@
                 android:id="@+id/sleepRunning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning)}"
                 app:constraint_referenced_ids="sleepAnimation"
                 tools:ignore="MissingConstraints" />
 
