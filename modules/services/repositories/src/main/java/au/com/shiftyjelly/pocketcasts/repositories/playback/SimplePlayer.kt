@@ -294,18 +294,17 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             }
         }
 
-        val cacheDataSourceFactory: CacheDataSource.Factory? =
-            simpleCache?.let {
-                CacheDataSource.Factory()
-                    .setCache(it)
-                    .setUpstreamDataSourceFactory(httpDataSourceFactory)
-            }
+        val sourceFactory = simpleCache?.let {
+            CacheDataSource.Factory()
+                .setCache(it)
+                .setUpstreamDataSourceFactory(httpDataSourceFactory)
+        } ?: dataSourceFactory
 
         val mediaItem = MediaItem.fromUri(uri)
         val source = if (isHLS) {
-            HlsMediaSource.Factory(cacheDataSourceFactory ?: dataSourceFactory)
+            HlsMediaSource.Factory(sourceFactory)
         } else {
-            ProgressiveMediaSource.Factory(cacheDataSourceFactory ?: dataSourceFactory, extractorsFactory)
+            ProgressiveMediaSource.Factory(sourceFactory, extractorsFactory)
         }.createMediaSource(mediaItem)
 
         player.setMediaSource(source)
