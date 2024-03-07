@@ -67,7 +67,16 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    CACHE_PLAYING_EPISODE(
+        key = "cache_playing_episode",
+        title = "Cache playing episode",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     ;
+
     companion object {
 
         fun isUserEntitled(

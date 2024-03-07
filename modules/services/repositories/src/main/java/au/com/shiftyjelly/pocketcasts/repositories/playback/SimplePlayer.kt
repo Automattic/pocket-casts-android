@@ -16,8 +16,12 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
@@ -31,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -39,6 +45,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val context: Context, override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit) : LocalPlayer(onPlayerEvent) {
+    companion object {
+        private const val MAX_DEVICE_CACHE_SIZE_BYTES = 50 * 1024 * 1024
+    }
     private val reducedBufferManufacturers = listOf("mercedes-benz")
     private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
     private val bufferTimeMinMillis = TimeUnit.MINUTES.toMillis(2).toInt()
@@ -58,6 +67,9 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     override var isPip: Boolean = false
 
     private var videoChangedListener: VideoChangedListener? = null
+
+    private var databaseProvider: StandaloneDatabaseProvider? = null
+    private var simpleCache: SimpleCache? = null
 
     @Volatile
     private var prepared = false
@@ -103,19 +115,24 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         prepare()
     }
 
+    @OptIn(UnstableApi::class)
     override fun handleStop() {
         try {
             player?.stop()
         } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Play failed to stop.")
         }
 
         try {
             player?.release()
         } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Play failed to release.")
         }
 
         player = null
         prepared = false
+        databaseProvider?.close()
+        simpleCache?.release()
 
         videoChangedListener?.videoNeedsReset()
     }
@@ -265,13 +282,31 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             }
         } ?: return
 
+        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) && location is EpisodeLocation.Stream) {
+            databaseProvider ?: run { databaseProvider = StandaloneDatabaseProvider(context) }
+
+            simpleCache ?: run {
+                simpleCache = SimpleCache(
+                    File(context.cacheDir, "podcasts-cache"),
+                    LeastRecentlyUsedCacheEvictor(MAX_DEVICE_CACHE_SIZE_BYTES.toLong()),
+                    databaseProvider!!,
+                )
+            }
+        }
+
+        val sourceFactory = simpleCache?.let {
+            CacheDataSource.Factory()
+                .setCache(it)
+                .setUpstreamDataSourceFactory(httpDataSourceFactory)
+        } ?: dataSourceFactory
+
         val mediaItem = MediaItem.fromUri(uri)
         val source = if (isHLS) {
-            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+            HlsMediaSource.Factory(sourceFactory)
         } else {
-            ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(mediaItem)
-        }
+            ProgressiveMediaSource.Factory(sourceFactory, extractorsFactory)
+        }.createMediaSource(mediaItem)
+
         player.setMediaSource(source)
         player.prepare()
 
