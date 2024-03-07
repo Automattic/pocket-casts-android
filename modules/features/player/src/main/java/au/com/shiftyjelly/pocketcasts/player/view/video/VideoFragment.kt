@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setPlaybackState
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel
@@ -38,9 +39,6 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentVideoBinding.inflate(inflater, container, false)
         this.binding = binding
-
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
 
         // video under the status and navigation bar
         setupSystemUi()
@@ -83,13 +81,14 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
             }
         }
 
-        viewModel.playbackState.observe(viewLifecycleOwner) {
+        viewModel.playbackState.observe(viewLifecycleOwner) { playbackState ->
             val newPlayer = (playbackManager.player as? SimplePlayer)?.exoPlayer
 
             // setPlayer returns straight away if the player is the same so calling this too much doesn't matter.
             // This ensures while the full screen player is visible, the surface isn't set from somewhere else causing
             // this player to appear blank.
             binding.videoView.player = newPlayer
+            binding.seekBar.setPlaybackState(playbackState)
         }
 
         viewModel.controlsVisible.observe(viewLifecycleOwner) { visible ->
