@@ -93,6 +93,10 @@ class SleepFragment : BaseDialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        viewModel.sleepCustomTimeText.observe(viewLifecycleOwner) { customTimeText ->
+            binding?.labelCustom?.text = customTimeText
+        }
+
         viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
             binding?.sleepSetup?.isVisible = !isSleepRunning
             binding?.sleepRunning?.isVisible = isSleepRunning
