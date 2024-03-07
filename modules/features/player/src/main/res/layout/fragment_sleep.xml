@@ -39,7 +39,6 @@
                 android:id="@+id/sleepRunningTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; !safeUnbox(viewModel.isSleepAtEndOfEpisode)}"
                 app:constraint_referenced_ids="sleepTime,buttonAdd1Minute,buttonAdd5Minute,buttonEndOfEpisode2,buttonCancelTime"
                 tools:ignore="MissingConstraints" />
 
@@ -47,7 +46,6 @@
                 android:id="@+id/sleepRunningEndOfEpisode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; safeUnbox(viewModel.isSleepAtEndOfEpisode)}"
                 app:constraint_referenced_ids="sleepingEndOfEpisode,buttonCancelEndOfEpisode"
                 tools:ignore="MissingConstraints" />
 

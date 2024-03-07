@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -96,6 +97,12 @@ class SleepFragment : BaseDialogFragment() {
             binding?.sleepSetup?.isVisible = !isSleepRunning
             binding?.sleepRunning?.isVisible = isSleepRunning
         }
+
+        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisode)
+            .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisode) ->
+                binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode
+                binding?.sleepRunningEndOfEpisode?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
+            }
 
         viewModel.playingEpisodeLive.observe(
             viewLifecycleOwner,
