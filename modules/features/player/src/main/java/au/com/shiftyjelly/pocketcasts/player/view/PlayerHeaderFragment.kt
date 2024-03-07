@@ -338,6 +338,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
+            binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
             binding.executePendingBindings()
         }
     }

@@ -232,7 +232,6 @@
                 android:textColor="#FFFFFF"
                 android:importantForAccessibility="no"
                 android:textSize="15sp"
-                android:text="@{``+viewModel.skipForwardInSecs}"
                 tools:text="30"
                 app:layout_constraintStart_toStartOf="@+id/skipForward"
                 app:layout_constraintEnd_toEndOf="@+id/skipForward"
