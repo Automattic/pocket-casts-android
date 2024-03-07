@@ -64,8 +64,6 @@ class SleepFragment : BaseDialogFragment() {
         val binding = FragmentSleepBinding.inflate(inflater, container, false)
         this.binding = binding
 
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
         binding.buttonMins5.setOnClickListener { startTimer(mins = 5) }
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
