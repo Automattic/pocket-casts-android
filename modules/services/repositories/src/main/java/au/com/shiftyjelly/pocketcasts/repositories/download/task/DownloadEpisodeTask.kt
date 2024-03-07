@@ -449,6 +449,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     tempDownloadMetaDataFile.delete() // at this point we have the file, don't need the metadata about it anymore
                     val fullDownloadFile = File(pathToSaveTo)
                     try {
+                        episodeDownloadError.fileSize = tempDownloadFile.length()
                         FileUtil.copy(tempDownloadFile, fullDownloadFile)
                     } catch (exception: IOException) {
                         episodeDownloadError.reason = EpisodeDownloadError.Reason.StorageIssue
@@ -602,7 +603,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val statusCode = response.code
         episodeDownloadError.httpStatusCode = statusCode
         episodeDownloadError.contentType = response.header("Content-Type") ?: "Missing"
-        episodeDownloadError.tlsCipherSuite = response.handshake?.cipherSuite?.javaName.orEmpty()
+        episodeDownloadError.tlsCipherSuite = response.handshake?.cipherSuite?.javaName?.uppercase().orEmpty()
         if (statusCode in 400..599) {
             val responseReason = response.message
             val message = if (statusCode == 404) {
