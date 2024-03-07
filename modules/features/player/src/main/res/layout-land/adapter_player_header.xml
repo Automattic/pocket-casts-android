@@ -213,7 +213,6 @@
                 android:scaleType="centerInside"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 tools:src="@tools:sample/avatars"
-                app:circle="@{true}"
                 android:contentDescription="@string/skip_forward"
                 app:layout_constraintBottom_toBottomOf="@+id/largePlayButton"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -340,6 +340,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
+            binding.skipForward.toCircle(true)
             binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
             binding.skipBack.toCircle(true)
             binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()

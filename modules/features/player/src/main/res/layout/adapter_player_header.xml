@@ -255,7 +255,6 @@
                 android:contentDescription="@string/skip_forward"
                 android:scaleType="centerInside"
                 android:scaleX="-1"
-                app:circle="@{true}"
                 app:layout_constraintBottom_toBottomOf="@+id/largePlayButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/largePlayButton"
