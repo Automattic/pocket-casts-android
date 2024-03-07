@@ -71,6 +71,15 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.bulkToTopMap(source, count, toTop))
     }
 
+    fun trackEpisodeDownloadFailure(error: EpisodeDownloadError) {
+        if (downloadEpisodeUuidQueue.contains(error.episodeUuid)) {
+            downloadEpisodeUuidQueue.remove(error.episodeUuid)
+        } else {
+            return
+        }
+        analyticsTracker.track(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, error.toProperties())
+    }
+
     private object AnalyticsProp {
         private const val source = "source"
         private const val episode_uuid = "episode_uuid"
