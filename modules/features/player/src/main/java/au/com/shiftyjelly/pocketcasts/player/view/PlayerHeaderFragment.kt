@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.playIfTrue
 import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
@@ -342,6 +343,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
             binding.skipBack.toCircle(true)
             binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
+            binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
             binding.executePendingBindings()
         }
     }

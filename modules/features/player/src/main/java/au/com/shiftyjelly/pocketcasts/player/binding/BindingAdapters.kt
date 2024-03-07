@@ -80,4 +80,15 @@ object BindingAdapters {
             view.progress = 0.5f
         }
     }
+
+    fun LottieAnimationView.playIfTrue(play: Boolean?) {
+        if (play != null && play) {
+            if (!isAnimating) {
+                playAnimation()
+            }
+        } else {
+            pauseAnimation()
+            progress = 0.5f
+        }
+    }
 }

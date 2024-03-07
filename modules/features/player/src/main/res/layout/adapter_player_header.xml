@@ -355,8 +355,7 @@
                     android:scaleType="centerInside"
                     app:lottie_loop="true"
                     app:lottie_progress="0.5"
-                    app:lottie_rawRes="@raw/sleep_button"
-                    app:play="@{viewModel.isSleepRunning}" />
+                    app:lottie_rawRes="@raw/sleep_button" />
 
                 <ImageButton
                     android:id="@+id/star"
