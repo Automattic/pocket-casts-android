@@ -25,6 +25,7 @@ import com.airbnb.lottie.LottieAnimationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 
 @AndroidEntryPoint
 class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
@@ -80,6 +81,8 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
                 it.startActivity(intent)
             }
         }
+        binding.skipBack.toCircle(true)
+        binding.skipForward.toCircle(true)
 
         viewModel.playbackState.observe(viewLifecycleOwner) { playbackState ->
             val newPlayer = (playbackManager.player as? SimplePlayer)?.exoPlayer
