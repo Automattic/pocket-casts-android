@@ -1198,6 +1198,11 @@ class PodcastSyncProcess(
                         isDeleted = boolValue { value = episode.isArchived }
                         isDeletedModified = int64Value { value = episodeArchivedModified }
                     }
+
+                    episode.deselectedChaptersModified?.let {
+                        deselectedChapters = episode.deselectedChapters.joinToString(",")
+                        deselectedChaptersModified = int64Value { value = it }
+                    }
                 }
             }
 
