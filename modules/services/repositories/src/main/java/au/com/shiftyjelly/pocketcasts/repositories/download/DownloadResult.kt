@@ -15,7 +15,7 @@ class DownloadResult private constructor(
         }
 
         fun failedResult(episodeDownloadError: EpisodeDownloadError, errorMessage: String?): DownloadResult {
-            return DownloadResult(success = false, episodeUuid = episodeDownloadError.episodeUuid, error = episodeDownloadError, errorMessage = errorMessage)
+            return DownloadResult(success = false, episodeUuid = episodeDownloadError.episodeUuid.orEmpty(), error = episodeDownloadError, errorMessage = errorMessage)
         }
     }
 }

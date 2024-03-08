@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.CONTENT_TYPE_KEY
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.EXPECTED_CONTENT_LENGTH_KEY
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.FILE_SIZE_KEY
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.HTTP_STATUS_CODE_KEY
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.IS_CELLULAR_KEY
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.IS_PROXY_KEY
@@ -26,6 +27,7 @@ class EpisodeDownloadErrorTest {
             contentType = "content type",
             expectedContentLength = 30,
             responseBodyBytesReceived = 40,
+            fileSize = 50,
             tlsCipherSuite = "tls cipher suite",
             isCellular = true,
             isProxy = false,
@@ -40,10 +42,20 @@ class EpisodeDownloadErrorTest {
             CONTENT_TYPE_KEY to "content type",
             EXPECTED_CONTENT_LENGTH_KEY to 30L,
             RESPONSE_BODY_BYTES_RECEIVED_KEY to 40L,
+            FILE_SIZE_KEY to 50L,
             TLS_CIPHER_SUITE_KEY to "tls cipher suite",
             IS_CELLULAR_KEY to true,
             IS_PROXY_KEY to false,
         )
+
+        assertEquals(expected, error.toProperties())
+    }
+
+    @Test
+    fun `skip null properties during conversion`() {
+        val error = EpisodeDownloadError(reason = EpisodeDownloadError.Reason.Unknown)
+
+        val expected = mapOf(REASON_KEY to EpisodeDownloadError.Reason.Unknown.analyticsValue)
 
         assertEquals(expected, error.toProperties())
     }
@@ -59,6 +71,7 @@ class EpisodeDownloadErrorTest {
             CONTENT_TYPE_KEY to "content type",
             EXPECTED_CONTENT_LENGTH_KEY to 30L,
             RESPONSE_BODY_BYTES_RECEIVED_KEY to 40L,
+            FILE_SIZE_KEY to 50L,
             TLS_CIPHER_SUITE_KEY to "tls cipher suite",
             IS_CELLULAR_KEY to true,
             IS_PROXY_KEY to false,
@@ -73,10 +86,20 @@ class EpisodeDownloadErrorTest {
             contentType = "content type",
             expectedContentLength = 30,
             responseBodyBytesReceived = 40,
+            fileSize = 50,
             tlsCipherSuite = "tls cipher suite",
             isCellular = true,
             isProxy = false,
         )
+
+        assertEquals(expected, EpisodeDownloadError.fromProperties(properties))
+    }
+
+    @Test
+    fun `handle null properties during creation`() {
+        val properties = mapOf(REASON_KEY to EpisodeDownloadError.Reason.Unknown.analyticsValue)
+
+        val expected = EpisodeDownloadError(reason = EpisodeDownloadError.Reason.Unknown)
 
         assertEquals(expected, EpisodeDownloadError.fromProperties(properties))
     }
