@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
+import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
@@ -67,6 +68,8 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
 
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
+
+    @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
     override fun onCreate() {
         super.onCreate()
@@ -145,6 +148,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
         AnalyticsTracker.refreshMetadata()
+        downloadStatisticsReporter.setup()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
