@@ -26,10 +26,14 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
+import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -179,7 +183,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                             fragment.listener = this
                         }
                         adapter?.onChangeRegion = onChangeRegion
-                        adapter?.submitList(content)
+
+                        val sortedContent = sortContent(content)
+
+                        adapter?.submitList(sortedContent)
                     }
                     is DiscoverState.Error -> {
                         binding.errorLayout.isVisible = true
@@ -197,7 +204,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             },
         )
     }
-
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
 
@@ -213,6 +219,20 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         if (visible) {
             FirebaseAnalyticsTracker.navigatedToDiscover()
         }
+    }
+    private fun sortContent(content: List<Any>): MutableList<Any> {
+        val mutableContentList = content.toMutableList()
+
+        if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
+            val categoriesIndex = mutableContentList.indexOfFirst { it is DiscoverRow && it.type is ListType.Categories }
+
+            if (categoriesIndex != -1) {
+                val categoriesItem = mutableContentList.removeAt(categoriesIndex)
+                mutableContentList.add(0, categoriesItem)
+            }
+        }
+
+        return mutableContentList
     }
 
     companion object {
