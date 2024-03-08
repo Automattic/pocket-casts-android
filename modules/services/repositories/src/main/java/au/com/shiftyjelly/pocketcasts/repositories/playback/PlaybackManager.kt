@@ -960,35 +960,35 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
             }
-            withContext(Dispatchers.Main) {
-                playbackStateRelay.blockingFirst().let { playbackState ->
-                    val updatedItems = playbackState.chapters.getList().map {
-                        if (it.index == chapter.index) {
-                            it.copy(selected = select)
-                        } else {
-                            it
-                        }
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                val updatedItems = playbackState.chapters.getList().map {
+                    if (it.index == chapter.index) {
+                        it.copy(selected = select)
+                    } else {
+                        it
                     }
-
-                    playbackStateRelay.accept(
-                        playbackState.copy(
-                            chapters = playbackState.chapters.copy(items = updatedItems),
-                            lastChangeFrom = LastChangeFrom.OnChapterSelectionToggled.value,
-                        ),
-                    )
                 }
+
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        chapters = playbackState.chapters.copy(items = updatedItems),
+                        lastChangeFrom = LastChangeFrom.OnChapterSelectionToggled.value,
+                    ),
+                )
             }
         }
     }
 
     fun updatePlaybackStateDeselectedChapterIndices() {
-        playbackStateRelay.blockingFirst().let { playbackState ->
-            playbackStateRelay.accept(
-                playbackState.copy(
-                    chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
-                    lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
-                ),
-            )
+        launch {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
+                        lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
+                    ),
+                )
+            }
         }
     }
 
