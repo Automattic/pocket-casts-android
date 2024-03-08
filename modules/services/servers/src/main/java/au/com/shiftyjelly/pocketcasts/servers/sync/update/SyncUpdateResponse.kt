@@ -202,7 +202,7 @@ data class SyncUpdateResponse(
                     playingStatus = syncUserEpisode.playingStatusOrNull?.value?.let {
                         EpisodePlayingStatus.fromInt(it)
                     } ?: EpisodePlayingStatus.NOT_PLAYED,
-                    deselectedChapters = ChapterIndices(syncUserEpisode.deselectedChapters?.split(",")?.mapNotNull { it.toIntOrNull() } ?: emptyList()),
+                    deselectedChapters = ChapterIndices.fromString(syncUserEpisode.deselectedChapters),
                     deselectedChaptersModified = syncUserEpisode.deselectedChaptersModified.value,
                 )
         }

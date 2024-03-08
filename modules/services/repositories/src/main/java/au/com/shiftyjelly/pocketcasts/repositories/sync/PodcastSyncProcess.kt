@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -652,7 +653,7 @@ class PodcastSyncProcess(
             fields.put("user_podcast_uuid", episode.podcastUuid)
 
             episode.deselectedChaptersModified?.let { deselectedChaptersModified ->
-                fields.put("deselected_chapters", episode.deselectedChapters.joinToString(","))
+                fields.put("deselected_chapters", ChapterIndices.toString(episode.deselectedChapters))
                 fields.put("deselected_chapters_modified", deselectedChaptersModified)
             }
 
@@ -1200,7 +1201,7 @@ class PodcastSyncProcess(
                     }
 
                     episode.deselectedChaptersModified?.let {
-                        deselectedChapters = episode.deselectedChapters.joinToString(",")
+                        deselectedChapters = ChapterIndices.toString(episode.deselectedChapters)
                         deselectedChaptersModified = int64Value { value = it }
                     }
                 }

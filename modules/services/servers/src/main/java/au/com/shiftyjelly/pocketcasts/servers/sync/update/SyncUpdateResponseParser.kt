@@ -129,7 +129,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
         if (reader.peek() == JsonReader.Token.NULL) {
             return reader.nextNull()
         }
-        return ChapterIndices(reader.nextString()?.split(",")?.mapNotNull { it.toIntOrNull() } ?: emptyList())
+        return ChapterIndices.fromString(reader.nextString())
     }
 
     private fun readPodcast(reader: JsonReader, response: SyncUpdateResponse) {
