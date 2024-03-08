@@ -60,6 +60,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null,
     @ColumnInfo(name = "image_url") var imageUrl: String? = null,
     @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: ChapterIndices = ChapterIndices(),
+    @ColumnInfo(name = "deselected_chapters_modified") override var deselectedChaptersModified: Long? = null,
 ) : BaseEpisode, Serializable {
 
     sealed class EpisodeType {

@@ -47,6 +47,7 @@ data class UserEpisode(
     @ColumnInfo(name = "has_custom_image") var hasCustomImage: Boolean = false,
     @ColumnInfo(name = "upload_task_id") var uploadTaskId: String? = null,
     @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: ChapterIndices = ChapterIndices(),
+    @ColumnInfo(name = "deselected_chapters_modified") override var deselectedChaptersModified: Long? = null,
 ) : BaseEpisode, Serializable {
     // temporary variables
     @Ignore
