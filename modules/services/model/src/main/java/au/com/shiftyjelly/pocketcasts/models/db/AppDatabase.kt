@@ -646,7 +646,7 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
-        val MIGRATION_89_90 = addMigration(88, 89) { database ->
+        val MIGRATION_89_90 = addMigration(89, 90) { database ->
             database.execSQL(
                 """
                     ALTER TABLE podcast_episodes
