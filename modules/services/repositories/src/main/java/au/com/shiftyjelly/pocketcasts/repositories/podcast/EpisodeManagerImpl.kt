@@ -1104,6 +1104,7 @@ class EpisodeManagerImpl @Inject constructor(
         val deselectedChapterIndices = episode.deselectedChapters
         if (!deselectedChapterIndices.contains(chapterIndex)) return
         episode.deselectedChapters = ChapterIndices(deselectedChapterIndices - chapterIndex)
+        episode.deselectedChaptersModified = System.currentTimeMillis()
         episodeDao.update(episode)
     }
 
@@ -1111,6 +1112,7 @@ class EpisodeManagerImpl @Inject constructor(
         val deselectedChapterIndices = episode.deselectedChapters
         if (deselectedChapterIndices.contains(chapterIndex)) return
         episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
+        episode.deselectedChaptersModified = System.currentTimeMillis()
         episodeDao.update(episode)
     }
 }
