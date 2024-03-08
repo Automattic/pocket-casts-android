@@ -255,6 +255,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation libs.okHttp.mockwebserver
     testImplementation libs.turbine
+    testImplementation libs.lifecycle.runtime.testing
 
     coreLibraryDesugaring libs.desugar.jdk
 }

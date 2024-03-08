@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -431,4 +432,18 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun countEpisodesCompleted(fromEpochMs: Long, toEpochMs: Long): Int
+
+    @Query(
+        """
+        SELECT 
+          COUNT(*) AS count, 
+          MAX(last_download_attempt_date) AS newest_timestamp,
+          MIN(last_download_attempt_date) AS oldest_timestamp 
+        FROM 
+          podcast_episodes
+        WHERE
+          episode_status IS 3;
+        """,
+    )
+    abstract suspend fun getFailedDownloadsStatistics(): EpisodeDownloadFailureStatistics
 }

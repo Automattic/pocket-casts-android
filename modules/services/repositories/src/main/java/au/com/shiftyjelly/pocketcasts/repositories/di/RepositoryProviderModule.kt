@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import dagger.Module
@@ -42,4 +44,9 @@ class RepositoryProviderModule {
     @ApplicationScope
     fun coroutineScope(): CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    @Provides
+    @Singleton
+    @ProcessLifecycle
+    fun processLifecycle(): LifecycleOwner = ProcessLifecycleOwner.get()
 }
