@@ -1202,7 +1202,7 @@ class PodcastSyncProcess(
 
                     episode.deselectedChaptersModified?.let {
                         deselectedChapters = ChapterIndices.toString(episode.deselectedChapters)
-                        deselectedChaptersModified = int64Value { value = it }
+                        deselectedChaptersModified = int64Value { value = it.time }
                     }
                 }
             }
