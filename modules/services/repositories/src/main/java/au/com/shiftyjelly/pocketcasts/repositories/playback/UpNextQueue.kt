@@ -46,6 +46,7 @@ interface UpNextQueue {
     suspend fun removeAllIncludingChanges()
     fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable
     fun contains(uuid: String): Boolean
+    fun updateCurrentEpisodeState(state: State)
 
     sealed class State {
         object Empty : State()
@@ -113,16 +114,32 @@ interface UpNextQueue {
                                 .observePodcastByUuidFlow(state.podcast.uuid)
                                 .distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects },
                         ) { episode, podcast ->
-                            State.Loaded(episode, podcast, state.queue)
+                            val loadedState = State.Loaded(episode, podcast, state.queue)
+                            updateCurrentEpisodeStateIfNeeded(episode, loadedState)
+                            loadedState
                         }
                         .catch { emit(State.Empty) }
                 } else {
                     episodeManager.observeEpisodeByUuid(state.episode.uuid)
-                        .map<BaseEpisode, State> { State.Loaded(it, state.podcast, state.queue) }
+                        .map<BaseEpisode, State> {
+                            val loadedState = State.Loaded(it, state.podcast, state.queue)
+                            updateCurrentEpisodeStateIfNeeded(it, loadedState)
+                            loadedState
+                        }
                         .catch { emit(State.Empty) }
                 }
             } else {
                 flowOf(state)
+            }
+        }
+    }
+
+    fun updateCurrentEpisodeStateIfNeeded(episodeFromDb: BaseEpisode, state: State) {
+        currentEpisode?.let { currentEpisode ->
+            if (episodeFromDb.uuid == currentEpisode.uuid &&
+                episodeFromDb.deselectedChapters.sorted() != currentEpisode.deselectedChapters.sorted()
+            ) {
+                updateCurrentEpisodeState(state)
             }
         }
     }
