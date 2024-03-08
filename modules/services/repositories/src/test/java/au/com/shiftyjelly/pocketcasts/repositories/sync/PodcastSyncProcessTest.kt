@@ -90,6 +90,7 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_hasFields() {
+        val date = Date()
         val record = PodcastSyncProcess.toRecord(
             mockPodcastEpisode(
                 uuid = "uuid",
@@ -100,7 +101,7 @@ class PodcastSyncProcessTest {
                 playedUpTo = 12.0,
                 durationModified = 444,
                 duration = 13.0,
-                deselectedChaptersModified = 555,
+                deselectedChaptersModified = date,
                 deselectedChapters = ChapterIndices(listOf(1, 2)),
             ),
         ).episode
@@ -117,7 +118,7 @@ class PodcastSyncProcessTest {
         assertEquals(444, record.durationModified.value)
         assertEquals(13, record.duration.value)
 
-        assertEquals(555, record.deselectedChaptersModified.value)
+        assertEquals(date.time, record.deselectedChaptersModified.value)
         assertEquals("1,2", record.deselectedChapters)
     }
 
@@ -356,7 +357,7 @@ class PodcastSyncProcessTest {
         isStarred: Boolean = false,
         archiveModified: Long? = null,
         isArchived: Boolean = false,
-        deselectedChaptersModified: Long? = null,
+        deselectedChaptersModified: Date? = null,
         deselectedChapters: ChapterIndices = ChapterIndices(),
     ) = mock<PodcastEpisode> {
         on { this.uuid } doReturn uuid
