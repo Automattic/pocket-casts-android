@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesRedesignBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowChangeRegionBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
@@ -345,6 +346,11 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
+    class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+        init {
+            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
+        }
+    }
 
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
@@ -361,6 +367,7 @@ internal class DiscoverAdapter(
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
             R.layout.row_change_region -> ChangeRegionViewHolder(RowChangeRegionBinding.inflate(inflater, parent, false))
             R.layout.row_categories -> CategoriesViewHolder(RowCategoriesBinding.inflate(inflater, parent, false))
+            R.layout.row_categories_redesign -> CategoriesRedesignViewHolder(RowCategoriesRedesignBinding.inflate(inflater, parent, false))
             R.layout.row_single_podcast -> SinglePodcastViewHolder(RowSinglePodcastBinding.inflate(inflater, parent, false))
             R.layout.row_single_episode -> SingleEpisodeViewHolder(RowSingleEpisodeBinding.inflate(inflater, parent, false))
             R.layout.row_collection_list -> CollectionListViewHolder(RowCollectionListBinding.inflate(inflater, parent, false))
@@ -396,7 +403,7 @@ internal class DiscoverAdapter(
                         }
                     }
                     is ListType.Categories -> {
-                        return R.layout.row_categories
+                        return if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) R.layout.row_categories_redesign else R.layout.row_categories
                     }
                     else -> {}
                 }
@@ -481,6 +488,20 @@ internal class DiscoverAdapter(
                 }
                 is CategoriesViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
+                    val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
+                    holder.recyclerView?.adapter = adapter
+                    holder.loadSingle(
+                        service.getCategoriesList(row.source),
+                        onSuccess = { categories ->
+                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+
+                            adapter.submitList(sortedCategories) {
+                                onRestoreInstanceState(holder)
+                            }
+                        },
+                    )
+                }
+                is CategoriesRedesignViewHolder -> {
                     val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
                     holder.recyclerView?.adapter = adapter
                     holder.loadSingle(
