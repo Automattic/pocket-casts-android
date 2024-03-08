@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync.update
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -187,6 +188,8 @@ data class SyncUpdateResponse(
         var playedUpTo: Double? = null,
         var duration: Double? = null,
         var playingStatus: EpisodePlayingStatus? = null,
+        var deselectedChapters: ChapterIndices? = null,
+        var deselectedChaptersModified: Long? = null,
     ) {
         companion object {
             fun fromSyncUserEpisode(syncUserEpisode: SyncUserEpisode): EpisodeSync =

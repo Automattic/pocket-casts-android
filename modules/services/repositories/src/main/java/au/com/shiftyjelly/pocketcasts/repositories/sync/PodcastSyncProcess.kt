@@ -651,6 +651,11 @@ class PodcastSyncProcess(
             }
             fields.put("user_podcast_uuid", episode.podcastUuid)
 
+            episode.deselectedChaptersModified?.let { deselectedChaptersModified ->
+                fields.put("deselected_chapters", episode.deselectedChapters.joinToString(","))
+                fields.put("deselected_chapters_modified", deselectedChaptersModified)
+            }
+
             val record = JSONObject().apply {
                 put("fields", fields)
                 put("type", "UserEpisode")
@@ -1031,6 +1036,11 @@ class PodcastSyncProcess(
                         playbackManager.seekIfPlayingToTimeMs(episode.uuid, (playedUpTo * 1000).toInt())
                     }
                 }
+            }
+
+            sync.deselectedChapters?.let {
+                episode.deselectedChapters = it
+                episode.deselectedChaptersModified = null
             }
 
             episodeManager.update(episode)

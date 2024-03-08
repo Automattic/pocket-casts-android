@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync.update
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -104,6 +105,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "duration" -> episode.duration = reader.nextDoubleOrNull()
                 "playing_status" -> episode.playingStatus = readPlayingStatus(reader)
                 "is_deleted" -> episode.isArchived = reader.nextBooleanOrNull()
+                "deselected_chapters" -> episode.deselectedChapters = readDeselectedChapters(reader)
                 else -> reader.skipValue()
             }
         }
@@ -121,6 +123,13 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
             3 -> EpisodePlayingStatus.COMPLETED
             else -> null
         }
+    }
+
+    private fun readDeselectedChapters(reader: JsonReader): ChapterIndices? {
+        if (reader.peek() == JsonReader.Token.NULL) {
+            return reader.nextNull()
+        }
+        return ChapterIndices(reader.nextString()?.split(",")?.mapNotNull { it.toIntOrNull() } ?: emptyList())
     }
 
     private fun readPodcast(reader: JsonReader, response: SyncUpdateResponse) {
