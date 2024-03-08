@@ -78,7 +78,7 @@ enum class Feature(
     CATEGORIES_REDESIGN(
         key = "CATEGORIES_REDESIGN",
         title = "Categories Redesign and Ads in Categories",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
