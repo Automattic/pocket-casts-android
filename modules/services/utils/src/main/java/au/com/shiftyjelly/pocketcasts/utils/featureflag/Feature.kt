@@ -75,6 +75,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
+    CATEGORIES_REDESIGN(
+        key = "CATEGORIES_REDESIGN",
+        title = "Categories Redesign and Ads in Categories",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
     ;
 
     companion object {
