@@ -121,6 +121,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.skipForward.imageTintList = tintColorStateList
         binding.miniPlayButton.backgroundTintList = tintColorStateList
         binding.skipBack.imageTintList = tintColorStateList
+        binding.upNextButton.imageTintList = tintColorStateList
 
         val colorStateList = ThemeColor.podcastUi02(theme.activeTheme, tintColor)
         binding.miniPlayerTint.setBackgroundColor(colorStateList)
