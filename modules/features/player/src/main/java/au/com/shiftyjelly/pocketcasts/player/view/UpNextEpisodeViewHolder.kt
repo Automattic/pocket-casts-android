@@ -145,6 +145,7 @@ class UpNextEpisodeViewHolder(
 
     private fun bindEpisode(episode: BaseEpisode) {
         binding.title.text = episode.title
+        binding.downloaded.isVisible = episode.isDownloaded
     }
 
     fun clearDisposable() {
