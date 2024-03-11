@@ -32,7 +32,7 @@ enum class Feature(
         title = "Settings Sync",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     REPORT_VIOLATION(
@@ -71,6 +71,14 @@ enum class Feature(
         key = "cache_playing_episode",
         title = "Cache playing episode",
         defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
+    CATEGORIES_REDESIGN(
+        key = "CATEGORIES_REDESIGN",
+        title = "Categories Redesign and Ads in Categories",
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,

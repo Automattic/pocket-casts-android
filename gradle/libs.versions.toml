@@ -14,23 +14,17 @@
 #    https://github.com/google/horologist/blob/main/gradle/libs.versions.toml
 #    wear-compose = Wear Compose Version
 #    horologist = Horologist Version
-#
-# 4. Check the Compose and Accompanist versions are compatible.
-#    https://github.com/google/accompanist
-#    compose = Compose Version from compose-bom
-#    accompanist = Accompanist Version
 
 [versions]
 aboutlibraries = "10.5.0"
-accompanist = "0.30.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
 android-application = "8.2.2"
 billing = "6.0.1"
-coil = "2.2.1"
-compose = "2023.04.01" # uses compose version 1.4.2, see https://developer.android.com/jetpack/compose/bom/bom-mapping
+coil = "2.5.0"
+compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
-compose-kotlin-compiler = "1.5.2"
+compose-kotlin-compiler = "1.5.9"
 coroutines = "1.6.4"
 espresso = "3.4.0"
 firebase = "30.5.0"
@@ -38,13 +32,13 @@ glide = "4.13.2"
 google-services = "4.3.14"
 hilt = "2.50"
 hilt-compiler = "1.1.0"
-horologist = "0.4.17"
-kotlin = "1.9.0"
-kotlin-coroutines = "1.6.4"
-ksp = "1.9.0-1.0.13"
+horologist = "0.5.21"
+kotlin = "1.9.22"
+kotlin-coroutines = "1.7.3"
+ksp = "1.9.22-1.0.17"
 lifecycle = "2.6.0"
-lottie = "5.2.0"
-media3 = "1.1.1"
+lottie = "6.3.0"
+media3 = "1.2.1"
 mockito = "4.0.0"
 mockito-android = "4.6.1"
 moshi = "1.13.0"
@@ -58,7 +52,7 @@ sentry = "6.28.0"
 sentry-plugin = "3.10.0"
 showkase = "1.0.2"
 test = "1.5.0"
-wear-compose = "1.2.1"
+wear-compose = "1.3.0"
 work = "2.8.1"
 java = "17"
 
@@ -66,10 +60,6 @@ java = "17"
 # About Libraries
 aboutLibraries-compose = "com.mikepenz:aboutlibraries-compose:10.5.0"
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
-
-# Accompanist
-accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 # Billing
 billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
@@ -92,7 +82,7 @@ compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-ui-util = { module = "androidx.compose.ui:ui-util" }
-compose-activity = "androidx.activity:activity-compose:1.5.1"
+compose-activity = "androidx.activity:activity-compose:1.8.2"
 compose-constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
 # Coroutines
@@ -288,11 +278,6 @@ wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 aboutlibraries = [
     "aboutlibraries-core",
     "aboutLibraries-compose"
-]
-
-accompanist = [
-    "accompanist-flowlayout",
-    "accompanist-systemuicontroller"
 ]
 
 billing = [

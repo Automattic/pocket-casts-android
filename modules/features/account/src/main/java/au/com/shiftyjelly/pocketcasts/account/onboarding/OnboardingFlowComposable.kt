@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.Onboard
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -28,26 +29,29 @@ fun OnboardingFlowComposable(
     exitOnboarding: (OnboardingExitInfo) -> Unit,
     completeOnboardingToDiscover: () -> Unit,
     signInState: SignInState,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     navController: NavHostController = rememberNavController(),
 ) {
     if (flow is OnboardingFlow.PlusAccountUpgrade) {
         Content(
-            theme = theme,
+            theme,
             flow = flow,
             exitOnboarding = exitOnboarding,
             completeOnboardingToDiscover = completeOnboardingToDiscover,
             signInState = signInState,
             navController = navController,
+            onUpdateSystemBars = onUpdateSystemBars,
         )
     } else {
         AppThemeWithBackground(theme) {
             Content(
-                theme = theme,
+                theme,
                 flow = flow,
                 exitOnboarding = exitOnboarding,
                 completeOnboardingToDiscover = completeOnboardingToDiscover,
                 signInState = signInState,
                 navController = navController,
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
     }
@@ -61,6 +65,7 @@ private fun Content(
     completeOnboardingToDiscover: () -> Unit,
     signInState: SignInState,
     navController: NavHostController,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val startDestination = when (flow) {
         OnboardingFlow.LoggedOut,
@@ -85,10 +90,10 @@ private fun Content(
     }
 
     NavHost(navController, startDestination) {
-        importFlowGraph(theme, navController, flow)
+        importFlowGraph(theme, navController, flow, onUpdateSystemBars)
 
         onboardingRecommendationsFlowGraph(
-            theme = theme,
+            theme,
             flow = flow,
             onBackPressed = { exitOnboarding(OnboardingExitInfo()) },
             onComplete = {
@@ -101,6 +106,7 @@ private fun Content(
                 )
             },
             navController = navController,
+            onUpdateSystemBars = onUpdateSystemBars,
         )
 
         composable(OnboardingNavRoute.logInOrSignUp) {
@@ -137,6 +143,7 @@ private fun Content(
                         onLoginToExistingAccount(flow, exitOnboarding, navController)
                     }
                 },
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
@@ -145,6 +152,7 @@ private fun Content(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
                 onAccountCreated = onAccountCreated,
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
@@ -156,6 +164,7 @@ private fun Content(
                     onLoginToExistingAccount(flow, exitOnboarding, navController)
                 },
                 onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
@@ -164,6 +173,7 @@ private fun Content(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
                 onCompleted = { exitOnboarding(OnboardingExitInfo()) },
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
@@ -237,12 +247,13 @@ private fun Content(
                         exitOnboarding(OnboardingExitInfo())
                     }
                 },
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
         composable(OnboardingNavRoute.welcome) {
             OnboardingWelcomePage(
-                activeTheme = theme,
+                theme = theme,
                 flow = flow,
                 isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
                 onDone = { exitOnboarding(OnboardingExitInfo()) },
@@ -256,6 +267,7 @@ private fun Content(
                         navController.popBackStack()
                     }
                 },
+                onUpdateSystemBars = onUpdateSystemBars,
             )
         }
     }

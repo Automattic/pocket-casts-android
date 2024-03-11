@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalFoundationApi::class)
+@file:Suppress("DEPRECATION")
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
@@ -11,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.wear.compose.material.SwipeToDismissBoxState
-import androidx.wear.compose.material.edgeSwipeToDismiss
+import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import androidx.wear.compose.foundation.edgeSwipeToDismiss
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
@@ -39,7 +40,7 @@ fun NowPlayingPager(
     navController: NavController,
     pagerState: PagerState = rememberPagerState { NowPlayingPager.pageCount },
     swipeToDismissState: SwipeToDismissBoxState,
-    scrollableScaffoldContext: ScrollableScaffoldContext? = null,
+    @Suppress("DEPRECATION") scrollableScaffoldContext: ScrollableScaffoldContext? = null,
     firstPageContent: @Composable () -> Unit,
 ) {
     val defaultTimeTextMode = remember { scrollableScaffoldContext?.timeTextMode }
@@ -60,6 +61,7 @@ fun NowPlayingPager(
         scrollableScaffoldContext?.timeTextMode = if (pagerState.currentPage == 0) {
             defaultTimeTextMode
         } else {
+            @Suppress("DEPRECATION")
             NavScaffoldViewModel.TimeTextMode.Off
         }
     }

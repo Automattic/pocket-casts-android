@@ -355,24 +355,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateAutomaticallyCachedStatus(
-        episode: BaseEpisode?,
-        automaticallyCached: Boolean,
-    ) {
-        if (episode == null || episode is UserEpisode) return
-        (episode as PodcastEpisode).isAutomaticallyCached = automaticallyCached
-        episodeDao.updateAutomaticallyCachedStatus(automaticallyCached, episode.uuid)
-    }
-
-    override suspend fun cleanAutomaticallyCachedEpisodes(playbackManager: PlaybackManager) {
-        val episodes = episodeDao.findAutomaticallyCachedEpisodes()
-        episodes?.forEach { episode ->
-            episode.isAutomaticallyCached = false
-            updateAutomaticallyCachedStatus(episode, automaticallyCached = false)
-            deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, removeFromUpNext = false)
-        }
-    }
-
     override fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean) {
         episode ?: return
         episode.downloadedFilePath = filePath

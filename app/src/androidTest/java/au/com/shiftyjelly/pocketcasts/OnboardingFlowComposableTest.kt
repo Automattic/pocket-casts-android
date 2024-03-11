@@ -48,6 +48,7 @@ class OnboardingFlowComposableTest {
                 completeOnboardingToDiscover = completeOnboardingToDiscover,
                 signInState = signInState,
                 navController = navController,
+                onUpdateSystemBars = {},
             )
         }
 

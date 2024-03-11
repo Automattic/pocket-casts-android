@@ -24,6 +24,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.playIfTrue
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -50,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import coil.load
 import coil.request.Disposable
@@ -117,8 +121,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         imageLoader = PodcastImageLoaderThemed(view.context)
         imageLoader.radiusPx = 8.dpToPx(view.context)
         imageLoader.shouldScale = false
-
-        binding.viewModel = PlayerViewModel.PlayerHeader()
 
         binding.skipBack.setOnClickListener {
             onSkipBack()
@@ -209,7 +211,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
-            binding.viewModel = headerViewModel
 
             binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
 
@@ -308,9 +309,39 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             binding.archive.setImageResource(if (headerViewModel.isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
             binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
+            binding.chapterProgressCircle.isVisible = headerViewModel.isChaptersPresent
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
 
-            binding.executePendingBindings()
+            binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
+            binding.artwork.isVisible = headerViewModel.isPodcastArtworkVisible()
+            binding.chapterArtwork.isVisible = headerViewModel.isChapterArtworkVisible()
+            binding.chapterUrl.showIfPresent(headerViewModel.chapter?.url)
+            binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
+            binding.videoView.isVisible = headerViewModel.isVideoVisible()
+            binding.episodeTitle.text = headerViewModel.episodeTitle
+            binding.podcastTitle?.text = headerViewModel.podcastTitle
+            binding.podcastTitle?.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
+            binding.chapterSummary.text = headerViewModel.chapterSummary
+            binding.chapterSummary.isVisible = headerViewModel.isChaptersPresent
+            binding.previousChapter.alpha = if (headerViewModel.isFirstChapter) 0.5f else 1f
+            binding.previousChapter.isEnabled = !headerViewModel.isFirstChapter
+            binding.previousChapter.isVisible = headerViewModel.isChaptersPresent
+            binding.nextChapter.alpha = if (headerViewModel.isLastChapter) 0.5f else 1f
+            binding.nextChapter.isEnabled = !headerViewModel.isLastChapter
+            binding.nextChapter.isVisible = headerViewModel.isChaptersPresent
+            binding.seekBar.setSeekBarState(
+                durationMs = headerViewModel.durationMs,
+                positionMs = headerViewModel.positionMs,
+                tintColor = headerViewModel.iconTintColor,
+                bufferedUpTo = headerViewModel.bufferedUpToMs,
+                isBuffering = headerViewModel.isBuffering,
+                theme = headerViewModel.theme,
+            )
+            binding.skipForward.toCircle(true)
+            binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
+            binding.skipBack.toCircle(true)
+            binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
+            binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
         }
     }
 

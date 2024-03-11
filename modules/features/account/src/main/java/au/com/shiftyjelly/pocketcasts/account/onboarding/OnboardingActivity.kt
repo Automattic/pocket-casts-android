@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
@@ -50,12 +51,17 @@ class OnboardingActivity : AppCompatActivity() {
                     theme.setupThemeForConfig(this, resources.configuration)
                 }
 
+                enableEdgeToEdge()
+
                 OnboardingFlowComposable(
                     theme = theme.activeTheme,
                     flow = onboardingFlow,
                     exitOnboarding = { viewModel.onExitOnboarding(it) },
                     completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.DoneGoToDiscover) },
                     signInState = currentSignInState,
+                    onUpdateSystemBars = { value ->
+                        enableEdgeToEdge(value.statusBarStyle, value.navigationBarStyle)
+                    },
                 )
             }
         }

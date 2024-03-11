@@ -339,7 +339,6 @@ class EpisodeViewModel @Inject constructor(
             showStreamingConfirmation()
         } else {
             playAttempt?.cancel()
-
             playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
@@ -348,7 +347,6 @@ class EpisodeViewModel @Inject constructor(
         val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
         if (confirmedStreaming && !playbackManager.isPlaying()) {
             playAttempt?.cancel()
-
             playAttempt = applicationScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }

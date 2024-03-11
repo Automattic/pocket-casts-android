@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -33,7 +33,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingForgotPasswordViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
+import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailField
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -41,8 +44,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.androidbrowserhelper.trusted.Utils.setStatusBarColor
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -50,6 +51,7 @@ fun OnboardingForgotPasswordPage(
     theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
     onCompleted: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingForgotPasswordViewModel>()
     val state by viewModel.stateFlow.collectAsState()
@@ -68,7 +70,6 @@ fun OnboardingForgotPasswordPage(
         )
     }
 
-    val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
@@ -77,10 +78,10 @@ fun OnboardingForgotPasswordPage(
 
     LaunchedEffect(Unit) {
         emailFocusRequester.requestFocus()
-        systemUiController.apply {
-            setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
-            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
-        }
+        // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+        val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.secondaryUi01) { theme.darkTheme }
+        val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
     BackHandler {
         viewModel.onBackPressed()
@@ -150,6 +151,7 @@ private fun OnboardingForgotPasswordPreview(
             theme = themeType,
             onBackPressed = {},
             onCompleted = {},
+            onUpdateSystemBars = {},
         )
     }
 }
