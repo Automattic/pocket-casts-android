@@ -141,7 +141,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         if (upNextState is UpNextQueue.State.Loaded) {
             loadArtwork(upNextState.podcast, upNextState.episode, useRssArtwork)
 
-            binding.episode = upNextState.episode
             binding.podcast = upNextState.podcast
 
             val podcast = upNextState.podcast
