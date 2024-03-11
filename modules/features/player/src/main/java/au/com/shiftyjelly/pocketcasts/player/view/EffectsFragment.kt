@@ -191,8 +191,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = viewModel.effectsLive.value?.effects ?: return
-        val podcast = viewModel.effectsLive.value?.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
             trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
@@ -214,8 +213,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onButtonChecked(group: MaterialButtonToggleGroup, checkedId: Int, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = viewModel.effectsLive.value?.effects ?: return
-        val podcast = viewModel.effectsLive.value?.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (group.id == binding.trimToggleGroup.id && isChecked) {
             val index = trimToggleGroupButtonIds.indexOf(checkedId)
@@ -230,8 +228,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onClick(view: View) {
         val binding = binding ?: return
-        val effects = viewModel.effectsLive.value?.effects ?: return
-        val podcast = viewModel.effectsLive.value?.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         when (view.id) {
             binding.btnSpeedUp.id -> changePlaybackSpeed(effects, podcast, effects.playbackSpeed + 0.1)
