@@ -55,6 +55,8 @@ class UpNextEpisodeViewHolder(
     private val elevatedBackground = ContextCompat.getColor(binding.root.context, R.color.elevatedBackground)
     private val selectedBackground = ContextCompat.getColor(binding.root.context, R.color.selectedBackground)
 
+    private var episodeInstance: BaseEpisode? = null
+
     override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     var disposable: Disposable? = null
@@ -141,6 +143,7 @@ class UpNextEpisodeViewHolder(
     }
 
     private fun bindEpisode(episode: BaseEpisode) {
+        episodeInstance = episode
         binding.title.text = episode.title
         binding.downloaded.isVisible = episode.isDownloaded
         binding.info.setEpisodeTimeLeft(episode)
@@ -153,7 +156,7 @@ class UpNextEpisodeViewHolder(
     override val episodeRow: ViewGroup
         get() = binding.itemContainer
     override val episode: BaseEpisode?
-        get() = null
+        get() = episodeInstance
     override val positionAdapter: Int
         get() = bindingAdapterPosition
     override val leftRightIcon1: ImageView
