@@ -139,7 +139,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:paddingBottom="2dp"
-                android:text="@{episode.title}"
                 android:textColor="?attr/primary_text_01"
                 android:textAppearance="@style/DarkSubtitle1"
                 app:layout_constraintBottom_toTopOf="@+id/info"
