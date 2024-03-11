@@ -104,7 +104,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     fun setPlaybackState(playbackState: PlaybackState) {
-        binding.playbackState = playbackState
         // set the progress bar values as we need the max to be set before progress or the initial state doesn't work
         with(binding.progressBar) {
             max = playbackState.durationMs
