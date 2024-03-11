@@ -82,7 +82,7 @@ class UpNextAdapter(
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
             R.layout.adapter_up_next_footer -> HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_footer, parent, false))
-            R.layout.adapter_up_next_playing -> PlayingViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_playing, parent, false))
+            R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
             else -> throw IllegalStateException("Unknown view type in up next")
         }
     }
@@ -180,7 +180,6 @@ class UpNextAdapter(
             binding.title.text = playingState.episode.title
             binding.downloaded.isVisible = playingState.episode.isDownloaded
             binding.info.setEpisodeTimeLeft(playingState.episode)
-            binding.playingState = playingState
             binding.date.text = playingState.episode.getSummaryText(
                 dateFormatter = dateFormatter,
                 tintColor = ThemeColor.primaryText02(theme),
@@ -188,7 +187,6 @@ class UpNextAdapter(
                 context = binding.date.context,
             )
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
-            binding.executePendingBindings()
 
             if (loadedUuid != playingState.episode.uuid) {
                 imageLoader.radiusPx = 3.dpToPx(itemView.context)
