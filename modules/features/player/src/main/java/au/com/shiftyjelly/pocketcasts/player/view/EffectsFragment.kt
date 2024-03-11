@@ -63,7 +63,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEffectsBinding.inflate(inflater, container, false)
-        binding?.lifecycleOwner = viewLifecycleOwner
 
         viewModel.effectsLive.value?.let { update(it) } // Make sure the window is the correct size before opening or else it won't expand properly
         viewModel.effectsLive.observe(viewLifecycleOwner) { podcastEffectsPair ->
@@ -123,8 +122,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding.switchVolume.setOnCheckedChangeListener(this)
 
         binding.btnClear.setOnClickListener(this)
-
-        binding.executePendingBindings()
     }
 
     @Suppress("DEPRECATION")
