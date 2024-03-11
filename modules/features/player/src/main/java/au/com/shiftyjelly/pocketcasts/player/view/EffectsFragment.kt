@@ -96,7 +96,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         imageLoader.load(podcast).into(binding.podcastEffectsImage)
 
-        binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
+        binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
 
         binding.btnSpeedUp.setOnClickListener(this)
         binding.btnSpeedDown.setOnClickListener(this)
@@ -161,10 +161,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         val speed = amount.roundedSpeed()
         effects.playbackSpeed = speed
         updatedSpeed = speed
-        binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
+        binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
-        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.playbackSpeedString}")
+        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
     }
 
     private fun updateTrimState() {

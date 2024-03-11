@@ -4,9 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable
-            name="playbackSpeedString"
-            type="String" />
     </data>
 
     <FrameLayout
@@ -81,7 +78,6 @@
                     android:paddingBottom="4dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="@{playbackSpeedString}"
                     android:textColor="?attr/player_contrast_01"
                     app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
                     app:layout_constraintRight_toLeftOf="@id/btnSpeedUp"
