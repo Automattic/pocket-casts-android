@@ -5,9 +5,6 @@
 
     <data>
         <variable
-            name="effects"
-            type="au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects" />
-        <variable
             name="podcast"
             type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
         <variable

@@ -92,7 +92,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         val binding = binding ?: return
 
-        binding.effects = effects
         binding.podcast = podcast
 
         imageLoader.load(podcast).into(binding.podcastEffectsImage)
@@ -192,7 +191,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
+        val effects = viewModel.effectsLive.value?.effects ?: return
         val podcast = binding.podcast ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
@@ -215,7 +214,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onButtonChecked(group: MaterialButtonToggleGroup, checkedId: Int, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
+        val effects = viewModel.effectsLive.value?.effects ?: return
         val podcast = binding.podcast ?: return
 
         if (group.id == binding.trimToggleGroup.id && isChecked) {
@@ -231,7 +230,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onClick(view: View) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
+        val effects = viewModel.effectsLive.value?.effects ?: return
         val podcast = binding.podcast ?: return
 
         when (view.id) {
