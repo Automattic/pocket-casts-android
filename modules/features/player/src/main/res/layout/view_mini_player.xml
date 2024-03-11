@@ -19,7 +19,6 @@
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/round_corners_2dp"
-        app:clipToOutline="@{true}"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
