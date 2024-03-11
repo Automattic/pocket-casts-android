@@ -156,7 +156,6 @@
                 android:layout_marginEnd="6dp"
                 android:src="@drawable/ic_downloaded"
                 app:tint="?attr/support_02"
-                android:visibility="@{episode.isDownloaded()}"
                 app:layout_constraintBottom_toBottomOf="@+id/info"
                 app:layout_constraintEnd_toStartOf="@+id/info"
                 app:layout_constraintStart_toEndOf="@+id/image"
