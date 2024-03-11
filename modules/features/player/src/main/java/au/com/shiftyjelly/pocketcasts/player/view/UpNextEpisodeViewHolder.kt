@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -40,7 +41,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
 
 class UpNextEpisodeViewHolder(
     val binding: AdapterUpNextBinding,
@@ -100,18 +100,14 @@ class UpNextEpisodeViewHolder(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {
-                binding.episode = it
-                binding.executePendingBindings()
                 bindEpisode(it)
             }
             .subscribeBy(onError = { Timber.e(it) })
 
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
-        binding.episode = episode
         bindEpisode(episode)
         binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
-        binding.executePendingBindings()
         binding.reorder.setOnTouchListener { _, event ->
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 listener?.onUpNextEpisodeStartDrag(this)
@@ -157,7 +153,7 @@ class UpNextEpisodeViewHolder(
     override val episodeRow: ViewGroup
         get() = binding.itemContainer
     override val episode: BaseEpisode?
-        get() = binding.episode
+        get() = null
     override val positionAdapter: Int
         get() = bindingAdapterPosition
     override val leftRightIcon1: ImageView
