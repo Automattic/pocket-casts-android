@@ -691,7 +691,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             lifecycleOwner = viewLifecycleOwner,
             multiSelectHelper = this,
             menuRes = null,
-            fragmentManager = parentFragmentManager,
+            activity = requireActivity(),
         )
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)

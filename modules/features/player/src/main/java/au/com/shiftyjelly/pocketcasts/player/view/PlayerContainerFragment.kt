@@ -223,7 +223,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             lifecycleOwner = viewLifecycleOwner,
             multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
-            fragmentManager = parentFragmentManager,
+            activity = requireActivity(),
         )
     }
 

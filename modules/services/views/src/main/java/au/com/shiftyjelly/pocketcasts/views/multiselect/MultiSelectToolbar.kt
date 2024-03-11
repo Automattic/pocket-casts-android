@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -38,7 +39,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
         lifecycleOwner: LifecycleOwner,
         multiSelectHelper: MultiSelectHelper<T>,
         @MenuRes menuRes: Int?,
-        fragmentManager: FragmentManager,
+        activity: FragmentActivity,
     ) {
         setBackgroundColor(context.getThemeColor(UR.attr.support_01))
         if (menuRes != null) {
@@ -94,11 +95,11 @@ class MultiSelectToolbar @JvmOverloads constructor(
                         AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN,
                         AnalyticsProp.sourceMap(multiSelectHelper.source),
                     )
-                    showOverflowBottomSheet(fragmentManager, multiSelectHelper)
+                    showOverflowBottomSheet(activity.supportFragmentManager, multiSelectHelper)
                 }
                 true
             } else {
-                multiSelectHelper.onMenuItemSelected(itemId = it.itemId, resources = resources, fragmentManager = fragmentManager)
+                multiSelectHelper.onMenuItemSelected(itemId = it.itemId, resources = resources, activity = activity)
             }
         }
 
