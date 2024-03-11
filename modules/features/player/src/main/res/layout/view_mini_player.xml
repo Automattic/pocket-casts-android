@@ -68,7 +68,6 @@
             android:scaleType="centerInside"
             android:clickable="false"
             android:contentDescription="@string/skip_back"
-            app:tint="@{tintColor}"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"
             app:layout_constraintEnd_toStartOf="@+id/miniPlayButton"
             app:layout_constraintTop_toTopOf="parent"
