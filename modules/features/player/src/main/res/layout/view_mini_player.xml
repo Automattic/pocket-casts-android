@@ -81,7 +81,6 @@
             android:scaleType="centerInside"
             android:clickable="false"
             android:contentDescription="@string/player_up_next"
-            app:tint="@{tintColor}"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
