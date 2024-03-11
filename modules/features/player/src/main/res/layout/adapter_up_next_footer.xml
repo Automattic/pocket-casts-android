@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="episodeCount" type="int" />
     </data>
 
     <LinearLayout
@@ -47,7 +46,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:enabled="@{episodeCount > 0}"
                 android:text="@string/player_up_next_clear_queue"
                 android:textColor="@color/player_button_text_color" />
 

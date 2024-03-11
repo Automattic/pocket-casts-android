@@ -153,7 +153,7 @@ class UpNextAdapter(
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
-                episodeCount = header.episodeCount
+                btnClear.isEnabled = header.episodeCount > 0
                 emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
