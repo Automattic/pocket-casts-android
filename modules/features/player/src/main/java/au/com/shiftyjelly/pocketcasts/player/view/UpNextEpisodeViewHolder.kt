@@ -101,12 +101,14 @@ class UpNextEpisodeViewHolder(
             .doOnNext {
                 binding.episode = it
                 binding.executePendingBindings()
+                bindEpisode(it)
             }
             .subscribeBy(onError = { Timber.e(it) })
 
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         binding.episode = episode
+        bindEpisode(episode)
         binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
         binding.executePendingBindings()
         binding.reorder.setOnTouchListener { _, event ->
@@ -139,6 +141,10 @@ class UpNextEpisodeViewHolder(
             rightMargin = if (isMultiSelecting) -binding.checkbox.marginLeft else 0.dpToPx(itemView.context)
             width = if (isMultiSelecting) 16.dpToPx(itemView.context) else 52.dpToPx(itemView.context)
         }
+    }
+
+    private fun bindEpisode(episode: BaseEpisode) {
+        binding.title.text = episode.title
     }
 
     fun clearDisposable() {
