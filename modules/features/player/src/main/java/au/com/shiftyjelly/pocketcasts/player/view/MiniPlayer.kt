@@ -224,6 +224,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: Boolean) {
         val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = binding.artwork
+        imageView.clipToOutline = true
         imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
 
         val artwork = getEpisodeArtwork(episode, useRssArtwork)
