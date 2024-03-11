@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="upNextCount" type="int"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -97,9 +96,7 @@
             android:letterSpacing="-0.05"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:text="@{`` + upNextCount}"
             android:textColor="?attr/primary_ui_01"
-            android:visibility="@{upNextCount > 0}"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
