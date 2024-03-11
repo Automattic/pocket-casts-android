@@ -174,6 +174,8 @@ class UpNextAdapter(
         fun bind(playingState: UpNextPlaying) {
             Timber.d("Playing state episode: ${playingState.episode.playedUpTo}")
             binding.chapterProgress.theme = theme
+            binding.chapterProgress.progress = playingState.progressPercent
+            binding.chapterProgress.isVisible = playingState.progressPercent > 0
             binding.playingState = playingState
             binding.date.text = playingState.episode.getSummaryText(
                 dateFormatter = dateFormatter,
