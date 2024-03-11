@@ -53,7 +53,6 @@
             android:background="@drawable/mini_player_play_background"
             android:scaleType="centerInside"
             android:clickable="false"
-            app:backgroundTint="@{tintColor}"
             app:lottie_rawRes="@raw/mini_player_play_button"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"
             app:layout_constraintEnd_toEndOf="parent"
