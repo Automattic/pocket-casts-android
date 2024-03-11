@@ -176,6 +176,7 @@ class UpNextAdapter(
             binding.chapterProgress.theme = theme
             binding.chapterProgress.progress = playingState.progressPercent
             binding.chapterProgress.isVisible = playingState.progressPercent > 0
+            binding.title.text = playingState.episode.title
             binding.playingState = playingState
             binding.date.text = playingState.episode.getSummaryText(
                 dateFormatter = dateFormatter,

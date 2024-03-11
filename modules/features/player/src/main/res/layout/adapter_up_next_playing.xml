@@ -59,7 +59,6 @@
             android:textAppearance="@style/DarkSubtitle1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{playingState.episode.title}"
             android:paddingBottom="2dp"
             android:gravity="center_vertical"
             app:layout_constraintVertical_chainStyle="packed"
