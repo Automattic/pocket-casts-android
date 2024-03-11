@@ -21,11 +21,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 import com.airbnb.lottie.LottieAnimationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 
 @AndroidEntryPoint
 class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
