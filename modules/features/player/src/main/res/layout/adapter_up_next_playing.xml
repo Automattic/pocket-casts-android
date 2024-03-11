@@ -90,7 +90,6 @@
             app:layout_constraintEnd_toStartOf="@+id/reorder"
             app:layout_constraintStart_toEndOf="@+id/downloaded"
             app:layout_constraintTop_toBottomOf="@+id/title"
-            app:timeLeft="@{playingState.episode}"
             tools:text="Episode description"
             style="@style/UpNextRowSummary"
             android:textColor="?attr/primary_text_02"

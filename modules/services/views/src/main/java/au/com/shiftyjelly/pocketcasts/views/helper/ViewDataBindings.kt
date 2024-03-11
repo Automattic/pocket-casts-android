@@ -91,6 +91,21 @@ object ViewDataBindings {
         }
     }
 
+    fun TextView.setEpisodeTimeLeft(episode: BaseEpisode) {
+        if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.MISSING) {
+            text = resources.getString(LR.string.podcast_episode_file_not_uploaded)
+        } else {
+            val timeLeft = TimeHelper.getTimeLeft(
+                currentTimeMs = episode.playedUpToMs,
+                durationMs = episode.durationMs.toLong(),
+                inProgress = episode.isInProgress,
+                context = context,
+            )
+            text = timeLeft.text
+            contentDescription = timeLeft.description
+        }
+    }
+
     @BindingAdapter("timeLong")
     @JvmStatic
     fun setTimeLong(textView: TextView, time: Int) {
