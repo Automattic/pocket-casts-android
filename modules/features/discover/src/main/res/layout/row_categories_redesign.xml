@@ -18,8 +18,7 @@
         android:focusable="true"
         android:contentDescription="@string/search_podcasts_or_add_url"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp">
+        android:paddingEnd="16dp">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -35,12 +34,14 @@
             android:textColor="?attr/primary_icon_02"
             android:maxLines="1"
             android:ellipsize="end"
-            app:autoSizeTextType="uniform"
-            android:text="@string/search_podcasts_or_add_url"/>
+            android:text="@string/search_podcasts_or_add_url"
+            app:autoSizeTextType="uniform" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rowRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp" />
+
 </LinearLayout>

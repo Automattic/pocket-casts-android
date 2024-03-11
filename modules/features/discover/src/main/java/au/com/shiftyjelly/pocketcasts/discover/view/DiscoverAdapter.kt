@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -348,7 +349,7 @@ internal class DiscoverAdapter(
     }
     class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
         init {
-            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
+            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
         }
     }
 
@@ -502,18 +503,21 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
+                    val adapter = CategoriesListRowRedesignAdapter(listener::onPodcastListClicked)
                     holder.recyclerView?.adapter = adapter
                     holder.loadSingle(
                         service.getCategoriesList(row.source),
                         onSuccess = { categories ->
-                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+                            val context = holder.itemView.context
+                            val allCategories = DiscoverCategory(-1, context.getString(LR.string.discover_all_categories), "", "")
+                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.take(7)
 
-                            adapter.submitList(sortedCategories) {
+                            adapter.submitList(listOf(allCategories) + sortedCategories) {
                                 onRestoreInstanceState(holder)
                             }
                         },
                     )
+                    holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
                 is SinglePodcastViewHolder -> {
                     holder.loadFlowable(
