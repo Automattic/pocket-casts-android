@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
         <variable name="tintColor" type="int"/>
         <variable name="upNextCount" type="int"/>
     </data>

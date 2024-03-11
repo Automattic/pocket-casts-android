@@ -140,8 +140,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         if (upNextState is UpNextQueue.State.Loaded) {
             loadArtwork(upNextState.podcast, upNextState.episode, useRssArtwork)
 
-            binding.podcast = upNextState.podcast
-
             val podcast = upNextState.podcast
             if (podcast != null) {
                 updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
