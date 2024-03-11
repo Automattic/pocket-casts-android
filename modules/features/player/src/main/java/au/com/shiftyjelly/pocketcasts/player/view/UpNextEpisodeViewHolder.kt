@@ -40,6 +40,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
 
 class UpNextEpisodeViewHolder(
     val binding: AdapterUpNextBinding,
@@ -146,6 +147,7 @@ class UpNextEpisodeViewHolder(
     private fun bindEpisode(episode: BaseEpisode) {
         binding.title.text = episode.title
         binding.downloaded.isVisible = episode.isDownloaded
+        binding.info.setEpisodeTimeLeft(episode)
     }
 
     fun clearDisposable() {

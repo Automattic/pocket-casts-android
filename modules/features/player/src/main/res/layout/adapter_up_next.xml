@@ -173,7 +173,6 @@
                 app:layout_constraintEnd_toStartOf="@+id/reorder"
                 app:layout_constraintStart_toEndOf="@+id/downloaded"
                 app:layout_constraintTop_toBottomOf="@+id/title"
-                app:timeLeft="@{episode}"
                 tools:text="Episode description" />
 
             <ImageButton
