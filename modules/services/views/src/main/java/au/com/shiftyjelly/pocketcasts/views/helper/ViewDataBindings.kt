@@ -36,6 +36,18 @@ object ViewDataBindings {
         }
     }
 
+    fun View.toCircle(circle: Boolean) {
+        if (!circle) {
+            return
+        }
+        clipToOutline = true
+        outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setOval(0, 0, view.width, view.height)
+            }
+        }
+    }
+
     @BindingAdapter("clipToOutline")
     @JvmStatic
     fun setClipToOutline(view: View, clip: Boolean) {

@@ -21,10 +21,8 @@ object BindingAdapters {
         view.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
-    @BindingAdapter("showIfPresent")
-    @JvmStatic
-    fun setShowIfPresent(view: View, url: HttpUrl?) {
-        view.visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
+    fun View.showIfPresent(url: HttpUrl?) {
+        visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
     }
 
     @BindingAdapter("backgroundTint")
@@ -62,14 +60,12 @@ object BindingAdapters {
         seekBar.setTintColor(playbackState.podcast?.tintColorForDarkBg, Theme.ThemeType.DARK)
     }
 
-    @BindingAdapter("duration", "position", "tintColor", "bufferedUpTo", "isBuffering", "theme")
-    @JvmStatic
-    fun setSeekBarState(seekBar: PlayerSeekBar, durationMs: Int, positionMs: Int, tintColor: Int, bufferedUpTo: Int, isBuffering: Boolean, theme: Theme.ThemeType) {
-        seekBar.setDurationMs(durationMs)
-        seekBar.setCurrentTimeMs(positionMs)
-        seekBar.setTintColor(tintColor, theme)
-        seekBar.isBuffering = isBuffering
-        seekBar.bufferedUpToInSecs = bufferedUpTo / 1000
+    fun PlayerSeekBar.setSeekBarState(durationMs: Int, positionMs: Int, tintColor: Int, bufferedUpTo: Int, isBuffering: Boolean, theme: Theme.ThemeType) {
+        setDurationMs(durationMs)
+        setCurrentTimeMs(positionMs)
+        setTintColor(tintColor, theme)
+        this.isBuffering = isBuffering
+        bufferedUpToInSecs = bufferedUpTo / 1000
     }
 
     @BindingAdapter("play")
@@ -82,6 +78,17 @@ object BindingAdapters {
         } else {
             view.pauseAnimation()
             view.progress = 0.5f
+        }
+    }
+
+    fun LottieAnimationView.playIfTrue(play: Boolean?) {
+        if (play != null && play) {
+            if (!isAnimating) {
+                playAnimation()
+            }
+        } else {
+            pauseAnimation()
+            progress = 0.5f
         }
     }
 }
