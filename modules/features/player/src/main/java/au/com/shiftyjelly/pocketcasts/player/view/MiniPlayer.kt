@@ -114,7 +114,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun updateTintColor(tintColor: Int, theme: Theme) {
-        binding.tintColor = ThemeColor.podcastIcon03(theme.activeTheme, tintColor)
         val tintColorStateList: ColorStateList =
             ColorStateList.valueOf(ThemeColor.podcastIcon03(theme.activeTheme, tintColor))
 
