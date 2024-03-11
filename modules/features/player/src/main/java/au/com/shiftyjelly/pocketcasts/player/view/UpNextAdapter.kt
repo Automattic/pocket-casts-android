@@ -155,7 +155,7 @@ class UpNextAdapter(
             with(binding) {
                 episodeCount = header.episodeCount
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
-                totalTime = root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 executePendingBindings()
             }

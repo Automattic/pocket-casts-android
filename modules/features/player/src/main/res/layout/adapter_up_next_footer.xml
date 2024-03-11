@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="totalTime" type="String" />
         <variable name="episodeCount" type="int" />
     </data>
 
@@ -38,7 +37,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@{totalTime}"
                 android:textColor="?attr/primary_text_02"
                 tools:text="23 min." />
 
