@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -20,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -74,7 +74,7 @@ class UpNextAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.adapter_up_next -> UpNextEpisodeViewHolder(
-                binding = DataBindingUtil.inflate(inflater, R.layout.adapter_up_next, parent, false),
+                binding = AdapterUpNextBinding.inflate(inflater, parent, false),
                 listener = listener,
                 dateFormatter = dateFormatter,
                 imageLoader = imageLoader,
