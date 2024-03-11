@@ -17,8 +17,6 @@
             android:id="@+id/chapterProgress"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:progress="@{playingState.progressPercent}"
-            app:show="@{playingState.progressPercent > 0}"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
