@@ -81,7 +81,7 @@ class UpNextAdapter(
                 episodeManager = episodeManager,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
-            R.layout.adapter_up_next_footer -> HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_footer, parent, false))
+            R.layout.adapter_up_next_footer -> HeaderViewHolder(AdapterUpNextFooterBinding.inflate(inflater, parent, false))
             R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
             else -> throw IllegalStateException("Unknown view type in up next")
         }
@@ -158,7 +158,6 @@ class UpNextAdapter(
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                executePendingBindings()
             }
         }
     }

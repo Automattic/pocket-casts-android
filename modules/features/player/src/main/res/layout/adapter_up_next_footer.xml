@@ -1,92 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/upNextFooter"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <data>
-    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp">
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="lblUpNextTime,btnClear"
+            app:flow_wrapMode="chain"
+            app:flow_horizontalStyle="spread_inside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/lblUpNextTime"
+            style="@style/P60"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="?attr/primary_text_02"
+            tools:text="23 min." />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClear"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/player_up_next_clear_queue"
+            android:textColor="@color/player_button_text_color" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/upNextFooter"
+        android:id="@+id/emptyUpNextContainer"
+        android:background="@drawable/up_next_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_horizontal">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp">
-
-            <androidx.constraintlayout.helper.widget.Flow
-                android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="lblUpNextTime,btnClear"
-                app:flow_wrapMode="chain"
-                app:flow_horizontalStyle="spread_inside"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/lblUpNextTime"
-                style="@style/P60"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textColor="?attr/primary_text_02"
-                tools:text="23 min." />
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnClear"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/player_up_next_clear_queue"
-                android:textColor="@color/player_button_text_color" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <LinearLayout
-            android:id="@+id/emptyUpNextContainer"
-            android:background="@drawable/up_next_card"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/emptyTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="20dp"
-            android:gravity="center_horizontal">
+            android:layout_marginTop="24dp"
+            android:text="@string/player_up_next_empty"
+            android:textAppearance="?attr/textH2"
+            android:textColor="?attr/primary_text_01"/>
 
-            <TextView
-                android:id="@+id/emptyTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/player_up_next_empty"
-                android:textAppearance="?attr/textH2"
-                android:textColor="?attr/primary_text_01"/>
-
-            <TextView
-                android:id="@+id/emptyDesc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/player_up_next_empty_desc"
-                android:textAppearance="?attr/textSubtitle2"
-                android:textColor="?attr/primary_text_02"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="6sp"
-                android:layout_marginTop="12dp"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="50dp"
-                android:layout_marginBottom="37dp" />
-        </LinearLayout>
-
+        <TextView
+            android:id="@+id/emptyDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/player_up_next_empty_desc"
+            android:textAppearance="?attr/textSubtitle2"
+            android:textColor="?attr/primary_text_02"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="6sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="37dp" />
     </LinearLayout>
 
-</layout>
+</LinearLayout>
