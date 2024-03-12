@@ -8,16 +8,19 @@
         <item name="android:textSize">@dimen/player_tab_text_size</item>
     </style>
 
-    <style name="MinutePreset" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="SleepTimer.MinutePreset" parent="DarkSubtitle1">
         <item name="cornerRadius">10dp</item>
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
+        <item name="android:background">@drawable/border_solid</item>
+        <item name="android:layout_marginTop">20dp</item>
         <item name="android:layout_marginStart">4dp</item>
         <item name="android:layout_marginEnd">4dp</item>
-        <item name="android:minWidth">60dp</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">?attr/player_contrast_01</item>
-
-
+        <item name="android:textSize">14sp</item>
+        <item name="android:minWidth">70dp</item>
     </style>
+
+    <style name="SleepTimer.CustomPreset" parent="SleepTimer.MinutePreset">
+        <item name="android:background">@drawable/border_dashed</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
 </resources>

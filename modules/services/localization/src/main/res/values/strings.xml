@@ -308,6 +308,7 @@
     <string name="player_sleep_1_episode_left">Sleeping after this episode</string>
     <string name="player_sleep_2_episodes_left">Sleeping after next episode</string>
     <string name="player_sleep_n_episodes_left">Sleeping after %d episodes</string>
+    <string name="player_sleep_chapter_timer_coming">Sleep Timer for chapters coming soon</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>

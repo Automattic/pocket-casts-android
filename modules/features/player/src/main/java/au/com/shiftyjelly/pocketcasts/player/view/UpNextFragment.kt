@@ -368,8 +368,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             .forEach { episodeItemTouchHelper?.clearView(recyclerView, it) }
     }
 
-    override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
-        if (settings.tapOnUpNextShouldPlay.value) {
+    private fun onEpisodesActionsInteraction(episodeUuid: String, podcastUuid: String?, shouldPlayOnTap: Boolean){
+        if (shouldPlayOnTap) {
             playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
         } else {
             (activity as? FragmentHostListener)?.openEpisodeDialog(
@@ -381,17 +381,12 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
     }
 
+    override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
+        onEpisodesActionsInteraction(episodeUuid, podcastUuid, settings.tapOnUpNextShouldPlay.value)
+    }
+
     override fun onEpisodeActionsLongPress(episodeUuid: String, podcastUuid: String?) {
-        if (settings.tapOnUpNextShouldPlay.value) {
-            (activity as? FragmentHostListener)?.openEpisodeDialog(
-                episodeUuid = episodeUuid,
-                source = EpisodeViewSource.UP_NEXT,
-                podcastUuid = podcastUuid,
-                forceDark = true
-            )
-        } else {
-            playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
-        }
+        onEpisodesActionsInteraction(episodeUuid, podcastUuid, !settings.tapOnUpNextShouldPlay.value)
     }
 
     override fun onUpNextEpisodeMove(fromPosition: Int, toPosition: Int) {

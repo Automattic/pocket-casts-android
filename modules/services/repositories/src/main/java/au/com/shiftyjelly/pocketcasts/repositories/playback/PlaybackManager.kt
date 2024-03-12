@@ -1188,7 +1188,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         val autoPlay = !shouldSleepAfterEpisode && wasPlaying
-
+        SETimer.reduceCountIfActive()
         var nextEpisode = getCurrentEpisode()
         if (nextEpisode == null) {
             nextEpisode = autoLoadEpisode(autoPlay)
@@ -1518,7 +1518,7 @@ open class PlaybackManager @Inject constructor(
             val nextEpisode = autoLoadEpisode(autoPlay = play)
             if (nextEpisode == null) {
                 Timber.d("Playback: No episode in upnext, shutting down")
-                if (SETimer.timerShouldStop()) {
+                if (SETimer.timerShouldStop()){
                     SETimer.stop(this, application,true)
                 } else if (SETimer.timerIsActive()) {
                     SETimer.stop(this, application)

@@ -446,6 +446,7 @@ class PlayerViewModel @Inject constructor(
     fun playEpisode(uuid: String, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
+            SETimer.reduceCountIfActive()
             playbackManager.playNow(episode = episode, sourceView = sourceView)
         }
     }
@@ -469,6 +470,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextEpisodeClick() {
+        SETimer.reduceCountIfActive()
         playbackManager.playNextInQueue(sourceView = source)
     }
 
