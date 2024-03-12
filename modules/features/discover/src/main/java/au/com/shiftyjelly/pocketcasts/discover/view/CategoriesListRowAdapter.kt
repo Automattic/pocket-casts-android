@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryRedesignBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import coil.load
 
@@ -38,7 +40,7 @@ class CategoriesListRowAdapter(val onPodcastListClick: (NetworkLoadableList) -> 
         holder.itemView.setOnClickListener { onPodcastListClick(category) }
     }
 }
-class CategoriesListRowRedesignAdapter(val onPodcastListClick: (NetworkLoadableList) -> Unit) : ListAdapter<DiscoverCategory, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_DIFF) {
+class CategoriesListRowRedesignAdapter(val onPodcastListClick: (NetworkLoadableList) -> Unit, val onAllCategoriesClick: (View) -> Unit) : ListAdapter<DiscoverCategory, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_DIFF) {
 
     class CategoriesRedesignViewHolder(val binding: ItemCategoryRedesignBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -51,6 +53,13 @@ class CategoriesListRowRedesignAdapter(val onPodcastListClick: (NetworkLoadableL
         val category = getItem(position)
         holder.binding.categoryChip.text = category.name
         holder.binding.categoryChip.contentDescription = category.name
-        holder.itemView.setOnClickListener { onPodcastListClick(category) }
+
+        holder.itemView.setOnClickListener {
+            if (category.id == ALL_CATEGORIES_ID) {
+                onAllCategoriesClick(it)
+            } else {
+                onPodcastListClick(category)
+            }
+        }
     }
 }

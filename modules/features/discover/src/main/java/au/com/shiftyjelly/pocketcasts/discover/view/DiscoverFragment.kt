@@ -129,6 +129,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
+    override fun onAllCategoriesClicked(categories: List<DiscoverCategory>) {
+        CategoriesBottomSheet(categories).show(childFragmentManager, "categories_bottom_sheet")
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentDiscoverBinding.inflate(inflater, container, false)
 

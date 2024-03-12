@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -108,6 +109,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
+        fun onAllCategoriesClicked(categories: List<DiscoverCategory>)
     }
 
     val loadPodcastList = { s: String ->
@@ -503,16 +505,20 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    val adapter = CategoriesListRowRedesignAdapter(listener::onPodcastListClicked)
+                    var discoverCategories = emptyList<DiscoverCategory>()
+                    val adapter = CategoriesListRowRedesignAdapter(
+                        onPodcastListClick = listener::onPodcastListClicked,
+                        onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
+                    )
                     holder.recyclerView?.adapter = adapter
                     holder.loadSingle(
                         service.getCategoriesList(row.source),
                         onSuccess = { categories ->
                             val context = holder.itemView.context
-                            val allCategories = DiscoverCategory(-1, context.getString(LR.string.discover_all_categories), "", "")
-                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.take(7)
+                            val allCategories = DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), "", "")
+                            discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
 
-                            adapter.submitList(listOf(allCategories) + sortedCategories) {
+                            adapter.submitList(listOf(allCategories) + discoverCategories.take(7)) {
                                 onRestoreInstanceState(holder)
                             }
                         },
