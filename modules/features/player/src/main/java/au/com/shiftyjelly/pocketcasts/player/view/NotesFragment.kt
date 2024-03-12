@@ -78,7 +78,6 @@ class NotesFragment : BaseFragment() {
         }
 
         binding = FragmentNotesBinding.inflate(inflater, container, false)
-        binding?.lifecycleOwner = viewLifecycleOwner
 
         binding?.progressBar?.apply {
             setIndicatorColor(ThemeColor.playerContrast03(theme.activeTheme))
@@ -97,8 +96,6 @@ class NotesFragment : BaseFragment() {
             val notes = if (state is ShowNotesState.Loaded) state.showNotes else ""
             loadShowNotes(notes)
         }
-
-        binding?.viewModel = viewModel
 
         return binding?.root
     }
