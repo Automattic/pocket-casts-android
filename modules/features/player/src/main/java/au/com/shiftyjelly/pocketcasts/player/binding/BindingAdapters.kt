@@ -49,15 +49,13 @@ object BindingAdapters {
         return if (visible) View.VISIBLE else View.GONE
     }
 
-    @BindingAdapter("playbackState")
-    @JvmStatic
-    fun setSeekBarPlaybackState(seekBar: PlayerSeekBar, playbackState: PlaybackState?) {
+    fun PlayerSeekBar.setPlaybackState(playbackState: PlaybackState?) {
         if (playbackState == null) {
             return
         }
-        seekBar.setDurationMs(playbackState.durationMs)
-        seekBar.setCurrentTimeMs(playbackState.positionMs)
-        seekBar.setTintColor(playbackState.podcast?.tintColorForDarkBg, Theme.ThemeType.DARK)
+        setDurationMs(playbackState.durationMs)
+        setCurrentTimeMs(playbackState.positionMs)
+        setTintColor(playbackState.podcast?.tintColorForDarkBg, Theme.ThemeType.DARK)
     }
 
     fun PlayerSeekBar.setSeekBarState(durationMs: Int, positionMs: Int, tintColor: Int, bufferedUpTo: Int, isBuffering: Boolean, theme: Theme.ThemeType) {
