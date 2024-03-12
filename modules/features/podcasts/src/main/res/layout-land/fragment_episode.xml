@@ -82,8 +82,6 @@
                 android:drawableRight="@drawable/ic_chevron_right"
                 android:drawablePadding="8dp"
                 android:gravity="start"
-                android:text="@{podcast.title}"
-                android:textColor="@{podcastColor}"
                 app:layout_constraintLeft_toLeftOf="@id/lblTitle"
                 app:layout_constraintTop_toBottomOf="@+id/lblTitle"
                 tools:text="Invisibilia" />

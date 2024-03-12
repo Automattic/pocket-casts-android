@@ -229,6 +229,8 @@ class EpisodeFragment : BaseFragment() {
                         binding.progressBar.progress = state.episode.playedPercentage
                         binding.lblDate.setLongStyleDate(state.episode.publishedDate)
                         binding.podcast = state.podcast
+                        binding.lblAuthor.text = state.podcast.title
+                        binding.lblAuthor.setTextColor(state.podcastColor)
                         binding.tintColor = iconColor
                         binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)
 

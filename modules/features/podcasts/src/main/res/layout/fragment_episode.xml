@@ -84,8 +84,6 @@
                 android:drawableRight="@drawable/ic_chevron_right"
                 android:drawablePadding="8dp"
                 android:gravity="center"
-                android:text="@{podcast.title}"
-                android:textColor="@{podcastColor}"
                 android:paddingStart="@dimen/episode_card_edge_padding"
                 android:paddingEnd="@dimen/episode_card_edge_padding"
                 app:layout_constraintLeft_toLeftOf="parent"
