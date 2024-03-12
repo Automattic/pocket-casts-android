@@ -12,6 +12,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/discover_select_categories"
+        android:contentDescription="@string/discover_select_categories"
         android:textAllCaps="true"
         android:textAppearance="@style/C50"
         android:textColor="@color/select_categories_tittle_color" />
