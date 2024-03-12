@@ -6,23 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import coil.load
-
-private val CATEGORY_DIFF = object : DiffUtil.ItemCallback<DiscoverCategory>() {
-    override fun areItemsTheSame(oldItem: DiscoverCategory, newItem: DiscoverCategory): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: DiscoverCategory, newItem: DiscoverCategory): Boolean {
-        return oldItem.hashCode() == newItem.hashCode()
-    }
-}
 
 class CategoriesBottomSheetAdapter(val onCategoryClick: (NetworkLoadableList) -> Unit) : ListAdapter<DiscoverCategory, CategoriesBottomSheetAdapter.CategoryViewHolder>(CATEGORY_DIFF) {
     class CategoryViewHolder(val itemView: View) : RecyclerView.ViewHolder(itemView) {

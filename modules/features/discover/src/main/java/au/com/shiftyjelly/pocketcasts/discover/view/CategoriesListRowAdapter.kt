@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.A
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import coil.load
 
-private val CATEGORY_DIFF = object : DiffUtil.ItemCallback<DiscoverCategory>() {
+val CATEGORY_DIFF = object : DiffUtil.ItemCallback<DiscoverCategory>() {
     override fun areItemsTheSame(oldItem: DiscoverCategory, newItem: DiscoverCategory): Boolean {
         return oldItem == newItem
     }
