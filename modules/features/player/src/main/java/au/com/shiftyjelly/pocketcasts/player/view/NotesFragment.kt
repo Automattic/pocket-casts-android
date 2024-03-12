@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setLongStyleDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -69,6 +70,7 @@ class NotesFragment : BaseFragment() {
 
             binding?.root?.setBackgroundColor(it.second)
             binding?.showNotes?.setBackgroundColor(it.second)
+            binding?.date?.setLongStyleDate(it.first.publishedDate)
         }
 
         binding = FragmentNotesBinding.inflate(inflater, container, false)
