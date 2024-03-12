@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -20,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
@@ -73,15 +74,15 @@ class UpNextAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.adapter_up_next -> UpNextEpisodeViewHolder(
-                binding = DataBindingUtil.inflate(inflater, R.layout.adapter_up_next, parent, false),
+                binding = AdapterUpNextBinding.inflate(inflater, parent, false),
                 listener = listener,
                 dateFormatter = dateFormatter,
                 imageLoader = imageLoader,
                 episodeManager = episodeManager,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
-            R.layout.adapter_up_next_footer -> HeaderViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_footer, parent, false))
-            R.layout.adapter_up_next_playing -> PlayingViewHolder(DataBindingUtil.inflate(inflater, R.layout.adapter_up_next_playing, parent, false))
+            R.layout.adapter_up_next_footer -> HeaderViewHolder(AdapterUpNextFooterBinding.inflate(inflater, parent, false))
+            R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
             else -> throw IllegalStateException("Unknown view type in up next")
         }
     }
@@ -152,11 +153,11 @@ class UpNextAdapter(
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
-                episodeCount = header.episodeCount
+                btnClear.isEnabled = header.episodeCount > 0
+                emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
-                totalTime = root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                executePendingBindings()
             }
         }
     }
@@ -174,7 +175,11 @@ class UpNextAdapter(
         fun bind(playingState: UpNextPlaying) {
             Timber.d("Playing state episode: ${playingState.episode.playedUpTo}")
             binding.chapterProgress.theme = theme
-            binding.playingState = playingState
+            binding.chapterProgress.progress = playingState.progressPercent
+            binding.chapterProgress.isVisible = playingState.progressPercent > 0
+            binding.title.text = playingState.episode.title
+            binding.downloaded.isVisible = playingState.episode.isDownloaded
+            binding.info.setEpisodeTimeLeft(playingState.episode)
             binding.date.text = playingState.episode.getSummaryText(
                 dateFormatter = dateFormatter,
                 tintColor = ThemeColor.primaryText02(theme),
@@ -182,7 +187,6 @@ class UpNextAdapter(
                 context = binding.date.context,
             )
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
-            binding.executePendingBindings()
 
             if (loadedUuid != playingState.episode.uuid) {
                 imageLoader.radiusPx = 3.dpToPx(itemView.context)

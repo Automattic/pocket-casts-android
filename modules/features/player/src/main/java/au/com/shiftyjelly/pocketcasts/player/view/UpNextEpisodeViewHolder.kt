@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -53,6 +54,8 @@ class UpNextEpisodeViewHolder(
     RowSwipeable {
     private val elevatedBackground = ContextCompat.getColor(binding.root.context, R.color.elevatedBackground)
     private val selectedBackground = ContextCompat.getColor(binding.root.context, R.color.selectedBackground)
+
+    private var episodeInstance: BaseEpisode? = null
 
     override lateinit var swipeButtonLayout: SwipeButtonLayout
 
@@ -99,16 +102,14 @@ class UpNextEpisodeViewHolder(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {
-                binding.episode = it
-                binding.executePendingBindings()
+                bindEpisode(it)
             }
             .subscribeBy(onError = { Timber.e(it) })
 
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
-        binding.episode = episode
+        bindEpisode(episode)
         binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
-        binding.executePendingBindings()
         binding.reorder.setOnTouchListener { _, event ->
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 listener?.onUpNextEpisodeStartDrag(this)
@@ -141,6 +142,13 @@ class UpNextEpisodeViewHolder(
         }
     }
 
+    private fun bindEpisode(episode: BaseEpisode) {
+        episodeInstance = episode
+        binding.title.text = episode.title
+        binding.downloaded.isVisible = episode.isDownloaded
+        binding.info.setEpisodeTimeLeft(episode)
+    }
+
     fun clearDisposable() {
         disposable?.dispose()
     }
@@ -148,7 +156,7 @@ class UpNextEpisodeViewHolder(
     override val episodeRow: ViewGroup
         get() = binding.itemContainer
     override val episode: BaseEpisode?
-        get() = binding.episode
+        get() = episodeInstance
     override val positionAdapter: Int
         get() = bindingAdapterPosition
     override val leftRightIcon1: ImageView
