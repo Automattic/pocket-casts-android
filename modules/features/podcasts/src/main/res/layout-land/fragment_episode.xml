@@ -231,7 +231,6 @@
                 android:layout_height="3dp"
                 android:indeterminate="false"
                 android:max="100"
-                android:progress="@{episode.playedPercentage}"
                 android:progressDrawable="@drawable/progress_bar"
                 app:layout_constraintBottom_toBottomOf="@id/bottomDivider"
                 app:layout_constraintLeft_toLeftOf="parent"
