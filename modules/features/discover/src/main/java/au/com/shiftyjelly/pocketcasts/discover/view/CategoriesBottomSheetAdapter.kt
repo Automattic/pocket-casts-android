@@ -40,6 +40,7 @@ class CategoriesBottomSheetAdapter(val onCategoryClick: (NetworkLoadableList) ->
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = getItem(position)
         holder.categoryName.text = category.name
+        holder.categoryName.contentDescription = category.name
         holder.categoryIcon.load(category.icon)
         holder.itemCategoryLayout.setOnClickListener { onCategoryClick(category) }
     }
