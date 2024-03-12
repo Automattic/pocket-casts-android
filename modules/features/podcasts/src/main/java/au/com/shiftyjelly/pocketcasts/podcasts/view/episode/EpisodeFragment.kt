@@ -225,7 +225,6 @@ class EpisodeFragment : BaseFragment() {
                             ),
                         )
 
-                        binding.episode = state.episode
                         binding.lblTitle.text = state.episode.title
                         binding.progressBar.progress = state.episode.playedPercentage
                         binding.lblDate.setLongStyleDate(state.episode.publishedDate)
