@@ -84,7 +84,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    app:timeLong="@{viewModel.episode.durationMs}"
                     tools:text="23 minutes"
                     style="@style/DarkSubtitle2"
                     android:textColor="?attr/player_contrast_02" />
