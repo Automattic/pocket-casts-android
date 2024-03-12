@@ -1,6 +1,5 @@
-package au.com.shiftyjelly.pocketcasts.models
+package au.com.shiftyjelly.pocketcasts.models.converter
 
-import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
 import java.time.Instant
 import java.util.Date
 import junit.framework.TestCase.assertEquals

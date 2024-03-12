@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -69,6 +70,24 @@ class EpisodeAnalytics @Inject constructor(
         toTop: Boolean,
     ) {
         analyticsTracker.track(event, AnalyticsProp.bulkToTopMap(source, count, toTop))
+    }
+
+    fun trackEpisodeDownloadFailure(error: EpisodeDownloadError) {
+        if (downloadEpisodeUuidQueue.contains(error.episodeUuid)) {
+            downloadEpisodeUuidQueue.remove(error.episodeUuid)
+        } else {
+            return
+        }
+        analyticsTracker.track(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, error.toProperties())
+    }
+
+    fun trackStaleEpisodeDownloads(data: EpisodeDownloadFailureStatistics) {
+        val properties = buildMap {
+            put("failed_download_count", data.count)
+            data.newestTimestamp?.let { put("newest_failed_download", it.toString()) }
+            data.oldestTimestamp?.let { put("oldest_failed_download", it.toString()) }
+        }
+        analyticsTracker.track(AnalyticsEvent.EPISODE_DOWNLOAD_STALE, properties)
     }
 
     private object AnalyticsProp {

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 
 object Network {
@@ -51,6 +52,38 @@ object Network {
         }
         return false
     }
+
+    @Suppress("DEPRECATION")
+    fun isCellularConnection(context: Context): Boolean {
+        val connectivityManager = getConnectivityManager(context)
+        val networks = connectivityManager.allNetworks
+
+        for (index in networks.indices) {
+            val network = networks[index]
+            val networkInfo = connectivityManager.getNetworkInfo(network) ?: continue
+            if (networkInfo.type == ConnectivityManager.TYPE_MOBILE && networkInfo.isConnected) {
+                return true
+            }
+        }
+        return false
+    }
+
+    @Suppress("DEPRECATION")
+    fun isVpnConnection(context: Context): Boolean {
+        val connectivityManager = getConnectivityManager(context)
+        val networks = connectivityManager.allNetworks
+
+        for (index in networks.indices) {
+            val network = networks[index]
+            val networkInfo = connectivityManager.getNetworkInfo(network) ?: continue
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: continue
+            if (networkInfo.isConnected && networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun getConnectivityManager(context: Context): ConnectivityManager {
         return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }

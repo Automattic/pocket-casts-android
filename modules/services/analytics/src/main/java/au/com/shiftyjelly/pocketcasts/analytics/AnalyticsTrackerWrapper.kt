@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 open class AnalyticsTrackerWrapper @Inject constructor() {
 
-    fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
+    open fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         AnalyticsTracker.track(event, properties)
     }
 
