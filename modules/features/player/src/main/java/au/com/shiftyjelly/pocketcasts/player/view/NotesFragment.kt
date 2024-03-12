@@ -66,11 +66,12 @@ class NotesFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) {
-            viewModel.loadEpisode(it.first, it.second)
+            val (episode, backgroundColor) = it
+            viewModel.loadEpisode(episode, backgroundColor)
 
-            binding?.root?.setBackgroundColor(it.second)
-            binding?.showNotes?.setBackgroundColor(it.second)
-            binding?.date?.setLongStyleDate(it.first.publishedDate)
+            binding?.root?.setBackgroundColor(backgroundColor)
+            binding?.showNotes?.setBackgroundColor(backgroundColor)
+            binding?.date?.setLongStyleDate(episode.publishedDate)
         }
 
         binding = FragmentNotesBinding.inflate(inflater, container, false)
