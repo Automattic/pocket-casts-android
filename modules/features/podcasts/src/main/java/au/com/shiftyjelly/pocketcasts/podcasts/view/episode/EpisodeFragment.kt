@@ -225,6 +225,7 @@ class EpisodeFragment : BaseFragment() {
                         )
 
                         binding.episode = state.episode
+                        binding.lblTitle.text = state.episode.title
                         binding.podcast = state.podcast
                         binding.tintColor = iconColor
                         binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)

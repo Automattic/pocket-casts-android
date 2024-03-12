@@ -72,7 +72,6 @@
                 android:layout_marginStart="@dimen/episode_card_edge_padding"
                 android:layout_marginEnd="@dimen/episode_card_edge_padding"
                 android:gravity="center"
-                android:text="@{episode.title}"
                 android:textColor="?attr/primary_text_01"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"

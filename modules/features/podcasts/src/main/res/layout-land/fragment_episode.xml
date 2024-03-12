@@ -71,7 +71,6 @@
                 android:layout_marginStart="@dimen/episode_card_edge_padding"
                 android:layout_marginEnd="@dimen/episode_card_edge_padding"
                 android:gravity="start"
-                android:text="@{episode.title}"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toRightOf="@id/episodeArt"
                 app:layout_constraintRight_toRightOf="parent"
