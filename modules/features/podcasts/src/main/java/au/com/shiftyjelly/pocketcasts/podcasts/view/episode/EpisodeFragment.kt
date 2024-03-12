@@ -230,8 +230,6 @@ class EpisodeFragment : BaseFragment() {
                         binding.lblDate.setLongStyleDate(state.episode.publishedDate)
                         binding.lblAuthor.text = state.podcast.title
                         binding.lblAuthor.setTextColor(state.podcastColor)
-                        binding.tintColor = iconColor
-                        binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)
 
                         binding.btnDownload.tintColor = iconColor
                         binding.btnAddToUpNext.tintColor = iconColor
