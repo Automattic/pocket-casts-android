@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setLongStyleDate
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -227,6 +228,7 @@ class EpisodeFragment : BaseFragment() {
                         binding.episode = state.episode
                         binding.lblTitle.text = state.episode.title
                         binding.progressBar.progress = state.episode.playedPercentage
+                        binding.lblDate.setLongStyleDate(state.episode.publishedDate)
                         binding.podcast = state.podcast
                         binding.tintColor = iconColor
                         binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)

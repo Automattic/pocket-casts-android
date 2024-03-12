@@ -74,6 +74,10 @@ object ViewDataBindings {
         }
     }
 
+    fun TextView.setLongStyleDate(date: Date?) {
+        text = date?.toLocalizedFormatLongStyle().orEmpty()
+    }
+
     @BindingAdapter("timeLeft")
     @JvmStatic
     fun setTimeLeft(textView: TextView, episode: BaseEpisode) {
