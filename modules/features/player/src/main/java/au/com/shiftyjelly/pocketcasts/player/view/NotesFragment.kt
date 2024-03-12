@@ -72,6 +72,7 @@ class NotesFragment : BaseFragment() {
 
             binding?.root?.setBackgroundColor(backgroundColor)
             binding?.showNotes?.setBackgroundColor(backgroundColor)
+            binding?.title?.text = episode.title
             binding?.date?.setLongStyleDate(episode.publishedDate)
             binding?.time?.applyTimeLong(episode.durationMs)
         }

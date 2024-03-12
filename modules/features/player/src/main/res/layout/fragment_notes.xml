@@ -30,7 +30,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginTop="8dp"
-                android:text="@{viewModel.episode.title}"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:textColor="?attr/player_contrast_01"
