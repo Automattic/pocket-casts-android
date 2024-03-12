@@ -130,7 +130,12 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onAllCategoriesClicked(categories: List<DiscoverCategory>) {
-        CategoriesBottomSheet(categories).show(childFragmentManager, "categories_bottom_sheet")
+        CategoriesBottomSheet(
+            categories,
+            onCategoryClick = {
+                onPodcastListClicked(it)
+            },
+        ).show(childFragmentManager, "categories_bottom_sheet")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
