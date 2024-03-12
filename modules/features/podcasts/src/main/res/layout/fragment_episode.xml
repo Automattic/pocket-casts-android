@@ -6,10 +6,6 @@
     <data>
 
         <variable
-            name="podcast"
-            type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
-
-        <variable
             name="tintColor"
             type="int" />
 
