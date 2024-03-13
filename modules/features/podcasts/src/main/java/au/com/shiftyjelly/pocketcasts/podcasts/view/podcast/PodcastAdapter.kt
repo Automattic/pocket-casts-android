@@ -72,6 +72,7 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 
 private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
@@ -268,6 +269,8 @@ class PodcastAdapter(
         holder.binding.top.chevron.isEnabled = headerExpanded
         holder.binding.top.settings.isVisible = podcast.isSubscribed
         holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
+        holder.binding.top.subscribedButton.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribedButton.toCircle(true)
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
 

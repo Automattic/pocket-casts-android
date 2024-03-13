@@ -180,11 +180,9 @@
             android:tooltipText="@string/unsubscribe"
             android:scaleType="center"
             app:tint="?attr/primary_interactive_02"
-            app:circle="@{true}"
             app:cornerRadius="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header"
-            app:show="@{podcast.isSubscribed}"
             app:srcCompat="@drawable/ic_tick_small" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
