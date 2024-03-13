@@ -30,7 +30,6 @@
                 android:layout_marginStart="@dimen/episode_card_edge_padding"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_chevron"
-                android:tint="@{toolbarTintColor}"
                 android:contentDescription="@string/close"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
