@@ -73,11 +73,9 @@
             android:tooltipText="@string/folders"
             android:focusable="true"
             android:scaleType="center"
-            android:src="@drawable/ic_folder"
             app:tint="?attr/primary_icon_02"
             app:layout_constraintEnd_toStartOf="@+id/notifications"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:show="@{podcast.isSubscribed &amp;&amp; isPlusOrPatronUser}" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <ImageView
             android:id="@+id/notifications"

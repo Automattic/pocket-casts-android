@@ -68,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -244,12 +245,17 @@ class PodcastAdapter(
     }
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
+        val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
         holder.binding.podcast = podcast
+        holder.binding.top.folders.setImageResource(
+            if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
+        )
+        holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
         holder.binding.expanded = headerExpanded
         holder.binding.top.chevron.isEnabled = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
-        holder.binding.isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+        holder.binding.isPlusOrPatronUser = isPlusOrPatronUser
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
