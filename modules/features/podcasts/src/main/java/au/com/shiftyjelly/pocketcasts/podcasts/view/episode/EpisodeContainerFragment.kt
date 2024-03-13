@@ -227,7 +227,7 @@ class EpisodeContainerFragment :
             lifecycleOwner = viewLifecycleOwner,
             multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
-            fragmentManager = parentFragmentManager,
+            activity = requireActivity(),
         )
     }
 
