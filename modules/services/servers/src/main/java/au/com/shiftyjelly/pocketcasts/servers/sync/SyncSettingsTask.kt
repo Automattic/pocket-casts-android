@@ -278,7 +278,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.autoArchiveInactive,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveInactive.fromServerId(it) ?: AutoArchiveInactive.Default },
                     )
-                    "autoArchiveIncludesStarred" -> updateSettingIfPossible(
+                    "autoArchiveIncludesStarredGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveIncludesStarred,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
@@ -301,7 +301,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             PodcastsSortType.fromServerId(serverId)
                         },
                     )
-                    "gridLayout" -> updateSettingIfPossible(
+                    "gridLayoutGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastGridLayout,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGridLayoutType::fromServerId),
@@ -339,7 +339,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             }
                         },
                     )
-                    "volumeBoost" -> updateSettingIfPossible(
+                    "volumeBoostGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.globalPlaybackEffects,
                         newSettingValue = (changedSettingResponse.value as? Boolean)?.let { newValue ->
@@ -348,7 +348,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             }
                         },
                     )
-                    "rowAction" -> updateSettingIfPossible(
+                    "rowActionGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.streamingMode,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
@@ -441,7 +441,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.collectAnalytics,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "useEmbeddedArtwork" -> updateSettingIfPossible(
+                    "useEmbeddedArtworkGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.useEmbeddedArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
@@ -456,7 +456,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.linkCrashReportsToUser,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "filesAutoUpNext" -> updateSettingIfPossible(
+                    "filesAutoUpNextGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.cloudAddToUpNext,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
@@ -481,7 +481,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.useSystemTheme,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     ).also { isThemeChanged = it != null || isThemeChanged }
-                    "badges" -> updateSettingIfPossible(
+                    "badgesGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBadgeType,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(BadgeType::fromServerId),
@@ -513,7 +513,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             ?.split(',')
                             ?.mapNotNull(NewEpisodeNotificationAction::fromServerId),
                     )
-                    "playerShelf" -> updateSettingIfPossible(
+                    "playerShelfGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.shelfItems,
                         newSettingValue = (changedSettingResponse.value as? String)
@@ -570,12 +570,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
                     )
-                    "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
+                    "filesAfterPlayingDeleteCloudGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.deleteCloudFileAfterPlaying,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "filesAfterPlayingDeleteLocal" -> updateSettingIfPossible(
+                    "filesAfterPlayingDeleteLocalGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.deleteLocalFileAfterPlaying,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
