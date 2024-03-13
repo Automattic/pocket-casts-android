@@ -247,32 +247,10 @@ class PodcastAdapter(
     }
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
-        val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
         holder.binding.podcast = podcast
-        holder.binding.top.folders.setImageResource(
-            if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
-        )
-        holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
-        with(holder.binding.top.notifications) {
-            val notificationsIconText =
-                context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
-            contentDescription = notificationsIconText
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                tooltipText = notificationsIconText
-            }
-            setImageResource(
-                if (podcast.isShowNotifications) R.drawable.ic_notifications_on else R.drawable.ic_notifications_off,
-            )
-            isVisible = podcast.isSubscribed
-        }
         holder.binding.expanded = headerExpanded
-        holder.binding.top.chevron.isEnabled = headerExpanded
-        holder.binding.top.settings.isVisible = podcast.isSubscribed
-        holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
-        holder.binding.top.subscribedButton.isVisible = podcast.isSubscribed
-        holder.binding.top.subscribedButton.toCircle(true)
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-        holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
+        bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
@@ -299,6 +277,32 @@ class PodcastAdapter(
         holder.binding.podcastHeader.contentDescription = podcast.title
 
         holder.binding.executePendingBindings()
+    }
+
+    private fun bindHeaderTop(holder: PodcastViewHolder) {
+        val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+        holder.binding.top.chevron.isEnabled = headerExpanded
+        holder.binding.top.settings.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
+        holder.binding.top.subscribedButton.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribedButton.toCircle(true)
+        holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
+        holder.binding.top.folders.setImageResource(
+            if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
+        )
+        holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
+        with(holder.binding.top.notifications) {
+            val notificationsIconText =
+                context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
+            contentDescription = notificationsIconText
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                tooltipText = notificationsIconText
+            }
+            setImageResource(
+                if (podcast.isShowNotifications) R.drawable.ic_notifications_on else R.drawable.ic_notifications_off,
+            )
+            isVisible = podcast.isSubscribed
+        }
     }
 
     private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
