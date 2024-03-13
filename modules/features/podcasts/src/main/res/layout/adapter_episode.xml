@@ -138,12 +138,12 @@
                     android:accessibilityHeading="true"
                     android:accessibilityTraversalBefore="@id/date"/>
                 <ImageView
+                    android:id="@+id/star"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_starred_row"
                     app:tint="?attr/support_08"
-                    android:layout_gravity="center"
-                    app:show="@{episode.isStarred}"/>
+                    android:layout_gravity="center" />
             </LinearLayout>
 
             <LinearLayout

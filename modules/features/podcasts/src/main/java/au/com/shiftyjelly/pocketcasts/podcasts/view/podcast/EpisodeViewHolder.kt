@@ -158,6 +158,7 @@ class EpisodeViewHolder constructor(
             updateTimeLeft(textView = binding.lblStatus, episode = episode)
         }
         binding.episode = episode
+        binding.star.isVisible = episode.isStarred
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         binding.playButton.listener = playButtonListener
