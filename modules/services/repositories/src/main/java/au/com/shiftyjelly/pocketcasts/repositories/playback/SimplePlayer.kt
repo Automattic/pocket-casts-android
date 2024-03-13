@@ -209,6 +209,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         val player = ExoPlayer.Builder(context, renderer)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
+            .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .build()
