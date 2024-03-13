@@ -33,8 +33,8 @@ class CategoriesBottomSheetAdapter(
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCategoryBinding.inflate(inflater, parent, false)
 
-        return CategoryViewHolder(binding) {
-            onCategoryClick(getItem(it))
+        return CategoryViewHolder(binding) { position ->
+            onCategoryClick(getItem(position))
         }
     }
 

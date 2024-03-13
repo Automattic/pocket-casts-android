@@ -4,9 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/categoryChip"
     style="@style/H40"
+    android:clickable="true"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginEnd="8dp"
     android:backgroundTint="?attr/primary_ui_01"
     app:chipStrokeColor="@color/coolgrey_50"
-    app:chipStrokeWidth="1dp" />
+    app:chipStrokeWidth="1dp"
+    android:focusable="true" />

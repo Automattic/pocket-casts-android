@@ -40,26 +40,46 @@ class CategoriesListRowAdapter(val onPodcastListClick: (NetworkLoadableList) -> 
         holder.itemView.setOnClickListener { onPodcastListClick(category) }
     }
 }
-class CategoriesListRowRedesignAdapter(val onPodcastListClick: (NetworkLoadableList) -> Unit, val onAllCategoriesClick: (View) -> Unit) : ListAdapter<DiscoverCategory, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_DIFF) {
+class CategoriesListRowRedesignAdapter(
+    val onPodcastListClick: (NetworkLoadableList) -> Unit,
+    val onAllCategoriesClick: (View) -> Unit,
+) : ListAdapter<DiscoverCategory, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_DIFF) {
 
-    class CategoriesRedesignViewHolder(val binding: ItemCategoryRedesignBinding) : RecyclerView.ViewHolder(binding.root)
+    class CategoriesRedesignViewHolder(
+        val binding: ItemCategoryRedesignBinding,
+        onItemClicked: (Int, View) -> Unit,
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriesRedesignViewHolder {
+        init {
+            binding.categoryChip.setOnClickListener { view ->
+                onItemClicked(bindingAdapterPosition, view)
+            }
+        }
+
+        fun bind(category: DiscoverCategory) {
+            binding.categoryChip.text = category.name
+            binding.categoryChip.contentDescription = category.name
+        }
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CategoriesRedesignViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCategoryRedesignBinding.inflate(inflater, parent, false)
-        return CategoriesRedesignViewHolder(binding)
-    }
-    override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
-        val category = getItem(position)
-        holder.binding.categoryChip.text = category.name
-        holder.binding.categoryChip.contentDescription = category.name
 
-        holder.itemView.setOnClickListener {
+        return CategoriesRedesignViewHolder(binding) { position, view ->
+            val category = getItem(position)
             if (category.id == ALL_CATEGORIES_ID) {
-                onAllCategoriesClick(it)
+                onAllCategoriesClick(view)
             } else {
                 onPodcastListClick(category)
             }
         }
+    }
+
+    override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
+        holder.bind(getItem(position))
     }
 }
