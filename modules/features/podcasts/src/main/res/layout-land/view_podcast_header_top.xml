@@ -86,8 +86,6 @@
             android:clickable="true"
             android:focusable="true"
             app:tint="?attr/primary_icon_02"
-            app:show="@{podcast.isSubscribed}"
-            android:src="@{podcast.isShowNotifications() ? @drawable/ic_notifications_on : @drawable/ic_notifications_off}"
             android:scaleType="center"
             app:layout_constraintEnd_toStartOf="@+id/settings"
             app:layout_constraintBottom_toBottomOf="parent" />

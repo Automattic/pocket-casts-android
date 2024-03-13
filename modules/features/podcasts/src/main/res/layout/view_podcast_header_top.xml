@@ -90,15 +90,11 @@
             android:layout_marginEnd="8dp"
             android:background="?android:attr/actionBarItemBackground"
             android:clickable="true"
-            android:contentDescription="@{podcast.isShowNotifications() ? @string/podcast_notifications_on : @string/podcast_notifications_off}"
-            android:tooltipText="@{podcast.isShowNotifications() ? @string/podcast_notifications_on : @string/podcast_notifications_off}"
             android:focusable="true"
             android:scaleType="center"
-            android:src="@{podcast.isShowNotifications() ? @drawable/ic_notifications_on : @drawable/ic_notifications_off}"
             app:tint="?attr/primary_icon_02"
             app:layout_constraintEnd_toStartOf="@+id/settings"
-            app:layout_constraintTop_toBottomOf="@+id/header"
-            app:show="@{podcast.isSubscribed}" />
+            app:layout_constraintTop_toBottomOf="@+id/header" />
 
         <ImageView
             android:id="@+id/settings"

@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -251,6 +252,18 @@ class PodcastAdapter(
             if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
         )
         holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
+        with(holder.binding.top.notifications) {
+            val notificationsIconText =
+                context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
+            contentDescription = notificationsIconText
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                tooltipText = notificationsIconText
+            }
+            setImageResource(
+                if (podcast.isShowNotifications) R.drawable.ic_notifications_on else R.drawable.ic_notifications_off,
+            )
+            isVisible = podcast.isSubscribed
+        }
         holder.binding.expanded = headerExpanded
         holder.binding.top.chevron.isEnabled = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
