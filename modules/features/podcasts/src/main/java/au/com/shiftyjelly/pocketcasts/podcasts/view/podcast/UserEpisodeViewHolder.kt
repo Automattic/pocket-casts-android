@@ -59,6 +59,10 @@ class UserEpisodeViewHolder(
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val userBookmarksObservable: Observable<List<Bookmark>>,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
+
+    private var episodeInstance: BaseEpisode? = null
+    private var isUpNext: Boolean? = null
+
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
     override val leftRightIcon1: ImageView
@@ -70,7 +74,7 @@ class UserEpisodeViewHolder(
     override val rightLeftIcon2: ImageView
         get() = binding.rightLeftIcon2
     override val episode: BaseEpisode?
-        get() = binding.episode
+        get() = episodeInstance
     override val positionAdapter: Int
         get() = bindingAdapterPosition
     override val rightToLeftSwipeLayout: ViewGroup
@@ -96,7 +100,7 @@ class UserEpisodeViewHolder(
 
     override val leftIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() {
-            return if (binding.inUpNext == true) {
+            return if (isUpNext == true) {
                 listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_upnext_remove, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
             } else {
                 val addToUpNextIcon = when (upNextAction) {
@@ -132,20 +136,17 @@ class UserEpisodeViewHolder(
         isSelected: Boolean = false,
         bookmarksAvailable: Boolean = false,
     ) {
+        episodeInstance = episode
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
-        binding.playButtonType = playButtonType
-        binding.episode = episode
         binding.video.isVisible = episode.isVideo
-        binding.tintColor = tintColor
         binding.date.text = dateFormatter.format(episode.publishedDate)
         binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid = null)
         binding.playButton.listener = playButtonListener
-        binding.executePendingBindings()
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
@@ -190,8 +191,10 @@ class UserEpisodeViewHolder(
             .doOnTerminate { UploadProgressManager.stopObservingUpload(episode.uuid, uploadConsumer) }
             .doOnNext { (_, playbackState, isInUpNext) ->
                 episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
-                binding.playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
-                binding.inUpNext = isInUpNext
+                val observedPlayButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
+                binding.playButton.setButtonType(episode, observedPlayButtonType, tintColor, fromListUuid = null)
+
+                this.isUpNext = isInUpNext
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
 
@@ -202,8 +205,6 @@ class UserEpisodeViewHolder(
 
                 val textColor = if (episodeGreyedOut) captionWithAlpha else context.getThemeColor(UR.attr.primary_text_01)
                 titleTextView.setTextColor(textColor)
-
-                binding.executePendingBindings()
 
                 val status = binding.fileStatusIconsView.statusText
                 episodeRow.contentDescription = "${titleTextView.text} ${dateTextView.text} $status"
