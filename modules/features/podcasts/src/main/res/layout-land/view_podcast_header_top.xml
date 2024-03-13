@@ -119,7 +119,6 @@
             android:paddingEnd="48dp"
             android:paddingStart="48dp"
             android:gravity="center_vertical"
-            app:show="@{!podcast.isSubscribed}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
