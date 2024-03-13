@@ -317,6 +317,7 @@ class EpisodeContainerFragment :
             toolbarTintColor = iconColor
             btnFav.imageTintList = ColorStateList.valueOf(iconColor)
             btnClose.imageTintList = ColorStateList.valueOf(iconColor)
+            btnShare.imageTintList = ColorStateList.valueOf(iconColor)
             tabLayout.tabTextColors = ColorStateList.valueOf(iconColor)
             tabLayout.setSelectedTabIndicatorColor(iconColor)
             btnShare.setOnClickListener { state.onShareClicked() }

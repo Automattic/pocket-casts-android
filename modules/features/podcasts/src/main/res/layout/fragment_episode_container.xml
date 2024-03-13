@@ -59,7 +59,6 @@
                 android:layout_marginEnd="@dimen/episode_card_edge_padding"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_share"
-                android:tint="@{toolbarTintColor}"
                 android:contentDescription="@string/podcast_share_episode"
                 app:layout_constraintBottom_toBottomOf="@+id/btnClose"
                 app:layout_constraintEnd_toEndOf="parent"
