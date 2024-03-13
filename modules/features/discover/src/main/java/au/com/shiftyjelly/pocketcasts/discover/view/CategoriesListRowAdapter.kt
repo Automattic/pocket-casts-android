@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryBinding
-import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryRedesignBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
@@ -56,19 +56,19 @@ class CategoriesListRowRedesignAdapter(
 ) : ListAdapter<DiscoverCategory, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_DIFF) {
 
     class CategoriesRedesignViewHolder(
-        val binding: ItemCategoryRedesignBinding,
+        val binding: CategoryPillBinding,
         onItemClicked: (Int, View) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.categoryChip.setOnClickListener { view ->
+            binding.categoryName.setOnClickListener { view ->
                 onItemClicked(bindingAdapterPosition, view)
             }
         }
 
         fun bind(category: DiscoverCategory) {
-            binding.categoryChip.text = category.name
-            binding.categoryChip.contentDescription = category.name
+            binding.categoryName.text = category.name
+            binding.categoryName.contentDescription = category.name
         }
     }
 
@@ -77,7 +77,7 @@ class CategoriesListRowRedesignAdapter(
         viewType: Int,
     ): CategoriesRedesignViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemCategoryRedesignBinding.inflate(inflater, parent, false)
+        val binding = CategoryPillBinding.inflate(inflater, parent, false)
 
         return CategoriesRedesignViewHolder(binding) { position, view ->
             val category = getItem(position)
