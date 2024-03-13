@@ -313,7 +313,9 @@ class EpisodeContainerFragment :
         binding?.apply {
             val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
             episode = state.episode
+            btnFav.setImageResource(if (state.episode.isStarred) R.drawable.ic_star_filled else R.drawable.ic_star)
             toolbarTintColor = iconColor
+            btnFav.imageTintList = ColorStateList.valueOf(iconColor)
             tabLayout.tabTextColors = ColorStateList.valueOf(iconColor)
             tabLayout.setSelectedTabIndicatorColor(iconColor)
             btnShare.setOnClickListener { state.onShareClicked() }

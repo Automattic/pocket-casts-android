@@ -72,8 +72,6 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="10dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@{episode.starred ? @drawable/ic_star_filled : @drawable/ic_star}"
-                android:tint="@{toolbarTintColor}"
                 app:layout_constraintBottom_toBottomOf="@+id/btnClose"
                 app:layout_constraintEnd_toStartOf="@+id/btnShare"
                 app:layout_constraintTop_toTopOf="@+id/btnClose" />
