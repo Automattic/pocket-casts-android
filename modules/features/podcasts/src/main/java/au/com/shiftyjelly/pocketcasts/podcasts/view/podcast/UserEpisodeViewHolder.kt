@@ -140,6 +140,7 @@ class UserEpisodeViewHolder(
         val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
         binding.playButtonType = playButtonType
         binding.episode = episode
+        binding.video.isVisible = episode.isVideo
         binding.tintColor = tintColor
         binding.publishedDate = dateFormatter.format(episode.publishedDate)
         binding.playButton.listener = playButtonListener

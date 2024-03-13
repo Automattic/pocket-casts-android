@@ -153,13 +153,13 @@
                 app:layout_constraintRight_toLeftOf="@+id/playButton"
                 android:accessibilityTraversalAfter="@+id/lblTitle">
                 <ImageView
+                    android:id="@+id/video"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_video_small_fill"
                     android:paddingEnd="4dp"
                     android:layout_gravity="center"
-                    app:tint="?attr/support_01"
-                    app:show="@{episode.isVideo}"/>
+                    app:tint="?attr/support_01" />
                 <TextView
                     android:id="@+id/date"
                     android:layout_width="0dp"
