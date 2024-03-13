@@ -1,137 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/PlayerTheme"
+    android:background="#000000"
+    android:scrollbars="vertical"
+    android:fillViewport="true" >
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="au.com.shiftyjelly.pocketcasts.player.viewmodel.NotesViewModel" />
-    </data>
-
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:theme="@style/PlayerTheme"
-        android:background="#000000"
-        android:scrollbars="vertical"
-        android:fillViewport="true" >
+        android:orientation="vertical"
+        android:paddingTop="0dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="?attr/player_contrast_01"
+            style="@style/H20" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="0dp">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                app:srcCompat="@drawable/ic_calendar"
+                app:tint="?attr/player_contrast_02" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginTop="8dp"
-                android:text="@{viewModel.episode.title}"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textColor="?attr/player_contrast_01"
-                style="@style/H20" />
+                tools:text="16th November"
+                style="@style/DarkSubtitle2"
+                android:textColor="?attr/player_contrast_02" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:layout_gravity="center_vertical"
+                app:tint="?attr/player_contrast_02"
+                app:srcCompat="@drawable/ic_duration" />
 
-                <ImageView
-                    android:layout_width="17dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="center_vertical"
-                    app:srcCompat="@drawable/ic_calendar"
-                    app:tint="?attr/player_contrast_02" />
-
-                <Space
-                    android:layout_width="8dp"
-                    android:layout_height="match_parent" />
-
-                <TextView
-                    android:id="@+id/date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    app:mediumDate="@{viewModel.episode.publishedDate}"
-                    tools:text="16th November"
-                    style="@style/DarkSubtitle2"
-                    android:textColor="?attr/player_contrast_02" />
-
-                <Space
-                    android:layout_width="8dp"
-                    android:layout_height="match_parent" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    app:tint="?attr/player_contrast_02"
-                    app:srcCompat="@drawable/ic_duration" />
-
-                <Space
-                    android:layout_width="8dp"
-                    android:layout_height="match_parent" />
-
-                <TextView
-                    android:id="@+id/time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    app:timeLong="@{viewModel.episode.durationMs}"
-                    tools:text="23 minutes"
-                    style="@style/DarkSubtitle2"
-                    android:textColor="?attr/player_contrast_02" />
-            </LinearLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:orientation="vertical">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?attr/player_contrast_05" />
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/progressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminate="true"
-                    android:visibility="gone" />
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/showNotes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp" />
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/showNotesErrorText"
-                style="@style/DarkBody2"
-                android:layout_width="match_parent"
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:visibility="gone" />
-
+                android:layout_gravity="center_vertical"
+                tools:text="23 minutes"
+                style="@style/DarkSubtitle2"
+                android:textColor="?attr/player_contrast_02" />
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
 
-</layout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/player_contrast_05" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/showNotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+        <TextView
+            android:id="@+id/showNotesErrorText"
+            style="@style/DarkBody2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
