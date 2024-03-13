@@ -5,7 +5,6 @@
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
         <variable name="expanded" type="boolean" />
         <variable name="tintColor" type="int"/>
-        <variable name="headerColor" type="int"/>
         <variable name="isPlusOrPatronUser" type="boolean"/>
     </data>
 
@@ -18,7 +17,6 @@
             android:id="@+id/top"
             layout="@layout/view_podcast_header_top"
             app:podcast="@{podcast}"
-            app:headerColor="@{headerColor}"
             app:expanded="@{expanded}"
             app:isPlusOrPatronUser="@{isPlusOrPatronUser}"/>
 

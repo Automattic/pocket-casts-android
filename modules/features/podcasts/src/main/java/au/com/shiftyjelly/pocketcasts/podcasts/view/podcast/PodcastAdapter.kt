@@ -247,7 +247,7 @@ class PodcastAdapter(
         holder.binding.podcast = podcast
         holder.binding.expanded = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-        holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
+        holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
         holder.binding.isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
 
         holder.binding.bottom.ratings.setContent {

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
-        <variable name="headerColor" type="int"/>
         <variable name="expanded" type="boolean" />
         <variable name="isPlusOrPatronUser" type="boolean" />
     </data>
@@ -20,7 +19,6 @@
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="@dimen/podcast_header_height"
-            android:background="@{headerColor}"
             android:contentDescription="@string/podcasts_show_podcast_details"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
