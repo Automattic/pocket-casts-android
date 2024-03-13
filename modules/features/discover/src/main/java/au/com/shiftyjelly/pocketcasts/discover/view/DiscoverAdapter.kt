@@ -42,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -107,6 +109,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
+        fun onAllCategoriesClicked(categories: List<DiscoverCategory>)
     }
 
     val loadPodcastList = { s: String ->
@@ -348,7 +351,7 @@ internal class DiscoverAdapter(
     }
     class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
         init {
-            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
+            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
         }
     }
 
@@ -502,18 +505,25 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
+                    var discoverCategories = emptyList<DiscoverCategory>()
+                    val adapter = CategoriesListRowRedesignAdapter(
+                        onPodcastListClick = listener::onPodcastListClicked,
+                        onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
+                    )
                     holder.recyclerView?.adapter = adapter
                     holder.loadSingle(
                         service.getCategoriesList(row.source),
                         onSuccess = { categories ->
-                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+                            val context = holder.itemView.context
+                            val allCategories = DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = "")
+                            discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
 
-                            adapter.submitList(sortedCategories) {
+                            adapter.submitList(listOf(allCategories) + getMostPopularCategories(discoverCategories)) {
                                 onRestoreInstanceState(holder)
                             }
                         },
                     )
+                    holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
                 is SinglePodcastViewHolder -> {
                     holder.loadFlowable(
@@ -704,6 +714,14 @@ internal class DiscoverAdapter(
                 savedState[holder.itemId] = holder.onSaveInstanceState()
             }
         }
+    }
+    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<DiscoverCategory> {
+        // True Crime, Comedy, Culture, History, Fiction, Technology
+        val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
+
+        return categories
+            .filter { it.id in mostPopularCategoriesId }
+            .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
     }
 
     private fun trackListImpression(listUuid: String) {
