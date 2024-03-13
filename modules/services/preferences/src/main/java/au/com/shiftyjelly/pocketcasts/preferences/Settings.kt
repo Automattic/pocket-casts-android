@@ -380,6 +380,7 @@ interface Settings {
 
     // Firebase remote config
     fun getPeriodicSaveTimeMs(): Long
+    fun getPlayerReleaseTimeOutMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String
