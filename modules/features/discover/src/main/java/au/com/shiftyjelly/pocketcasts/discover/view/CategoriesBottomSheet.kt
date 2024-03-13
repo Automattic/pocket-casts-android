@@ -27,8 +27,7 @@ class CategoriesBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerView: RecyclerView =
             view.findViewById(au.com.shiftyjelly.pocketcasts.discover.R.id.categoriesRecyclerView)
-        recyclerView.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.layoutManager = LinearLayoutManager(view.context)
 
         val adapter = CategoriesBottomSheetAdapter {
             onCategoryClick(it)
