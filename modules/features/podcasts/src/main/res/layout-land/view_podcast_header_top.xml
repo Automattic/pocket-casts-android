@@ -98,7 +98,6 @@
             android:clickable="true"
             android:focusable="true"
             app:tint="?attr/primary_icon_02"
-            app:show="@{podcast.isSubscribed}"
             app:srcCompat="@drawable/ic_settings_small"
             android:scaleType="center"
             app:layout_constraintEnd_toEndOf="parent"

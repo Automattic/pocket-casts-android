@@ -110,7 +110,6 @@
             app:tint="?attr/primary_icon_02"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header"
-            app:show="@{podcast.isSubscribed}"
             app:srcCompat="@drawable/ic_settings_small"
             tools:visibility="visible" />
 

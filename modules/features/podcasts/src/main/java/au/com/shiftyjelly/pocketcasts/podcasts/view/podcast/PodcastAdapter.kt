@@ -266,6 +266,7 @@ class PodcastAdapter(
         }
         holder.binding.expanded = headerExpanded
         holder.binding.top.chevron.isEnabled = headerExpanded
+        holder.binding.top.settings.isVisible = podcast.isSubscribed
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
 
