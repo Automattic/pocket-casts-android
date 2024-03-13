@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
-        <variable name="expanded" type="boolean" />
         <variable name="isPlusOrPatronUser" type="boolean" />
     </data>
 
@@ -30,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:contentDescription="@string/expand_details"
-            android:enabled="@{expanded}"
             android:rotation="180"
             android:scaleType="center"
             android:stateListAnimator="@animator/rotate_chevron"
