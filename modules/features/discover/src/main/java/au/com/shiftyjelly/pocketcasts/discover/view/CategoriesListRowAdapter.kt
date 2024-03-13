@@ -24,20 +24,30 @@ val CATEGORY_DIFF = object : DiffUtil.ItemCallback<DiscoverCategory>() {
 }
 
 class CategoriesListRowAdapter(val onPodcastListClick: (NetworkLoadableList) -> Unit) : ListAdapter<DiscoverCategory, CategoriesListRowAdapter.CategoryViewHolder>(CATEGORY_DIFF) {
-
-    class CategoryViewHolder(val binding: ItemCategoryBinding) : RecyclerView.ViewHolder(binding.root)
-
+    class CategoryViewHolder(
+        val binding: ItemCategoryBinding,
+        onItemClicked: (Int) -> Unit,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.itemCategoryLinear.setOnClickListener {
+                onItemClicked(bindingAdapterPosition)
+            }
+        }
+        fun bind(category: DiscoverCategory) {
+            binding.lblTitle.text = category.name
+            binding.imageView.load(category.icon)
+        }
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCategoryBinding.inflate(inflater, parent, false)
-        return CategoryViewHolder(binding)
-    }
 
+        return CategoryViewHolder(binding) { position ->
+            onPodcastListClick(getItem(position))
+        }
+    }
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        val category = getItem(position)
-        holder.binding.lblTitle.text = category.name
-        holder.binding.imageView.load(category.icon)
-        holder.itemView.setOnClickListener { onPodcastListClick(category) }
+        holder.bind(getItem(position))
     }
 }
 class CategoriesListRowRedesignAdapter(
