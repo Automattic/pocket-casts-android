@@ -159,6 +159,7 @@ class EpisodeViewHolder constructor(
         }
         binding.episode = episode
         binding.star.isVisible = episode.isStarred
+        binding.video.isVisible = episode.isVideo
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         binding.playButton.listener = playButtonListener
