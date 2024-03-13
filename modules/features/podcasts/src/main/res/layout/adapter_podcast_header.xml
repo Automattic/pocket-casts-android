@@ -18,7 +18,6 @@
             android:id="@+id/top"
             layout="@layout/view_podcast_header_top"
             app:podcast="@{podcast}"
-            app:tintColor="@{tintColor}"
             app:headerColor="@{headerColor}"
             app:expanded="@{expanded}"
             app:isPlusOrPatronUser="@{isPlusOrPatronUser}"/>
