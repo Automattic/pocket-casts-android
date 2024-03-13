@@ -14,8 +14,7 @@
 
         <include
             android:id="@+id/top"
-            layout="@layout/view_podcast_header_top"
-            app:podcast="@{podcast}" />
+            layout="@layout/view_podcast_header_top" />
 
         <include
             android:id="@+id/bottom"

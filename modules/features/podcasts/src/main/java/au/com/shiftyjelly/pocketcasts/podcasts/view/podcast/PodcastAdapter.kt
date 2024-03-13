@@ -595,7 +595,7 @@ class PodcastAdapter(
             interpolator = FastOutSlowInInterpolator()
         }
 
-        val constraintLayout = binding.top.root as ConstraintLayout
+        val constraintLayout = binding.top.root
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout)
         constraintSet.constrainPercentWidth(R.id.artworkContainer, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
