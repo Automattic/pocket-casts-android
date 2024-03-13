@@ -216,7 +216,7 @@ class EpisodeViewHolder constructor(
                 val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
                 binding.imgUpNext.isVisible = combinedData.isInUpNext
-                binding.hasBookmarks = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid) && bookmarksAvailable
+                binding.imgBookmark.isVisible = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid) && bookmarksAvailable
 
                 imgIcon.isVisible = false
                 progressCircle.isVisible = false
