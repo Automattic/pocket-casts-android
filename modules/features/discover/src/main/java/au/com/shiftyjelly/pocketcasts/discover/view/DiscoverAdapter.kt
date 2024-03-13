@@ -91,7 +91,6 @@ private const val INITIAL_PREFETCH_COUNT = 1
 private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
-
 internal class DiscoverAdapter(
     val service: ListRepository,
     val staticServerManager: StaticServerManagerImpl,
@@ -515,7 +514,7 @@ internal class DiscoverAdapter(
                         service.getCategoriesList(row.source),
                         onSuccess = { categories ->
                             val context = holder.itemView.context
-                            val allCategories = DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = "")
+                            val allCategories = CategoryPillRow(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
                             discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
 
                             adapter.submitList(listOf(allCategories) + getMostPopularCategories(discoverCategories)) {
@@ -715,13 +714,26 @@ internal class DiscoverAdapter(
             }
         }
     }
-    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<DiscoverCategory> {
+    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<CategoryPillRow> {
         // True Crime, Comedy, Culture, History, Fiction, Technology
         val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
 
-        return categories
+        val sortedCategories = categories
             .filter { it.id in mostPopularCategoriesId }
             .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
+
+        return sortedCategories.map {
+            CategoryPillRow(
+                discoverCategory = DiscoverCategory(
+                    id = it.id,
+                    name = it.name,
+                    icon = it.icon,
+                    curated = it.curated,
+                    source = it.source,
+                ),
+                isSelected = true,
+            )
+        }
     }
 
     private fun trackListImpression(listUuid: String) {
