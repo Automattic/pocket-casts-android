@@ -268,7 +268,6 @@ class PodcastAdapter(
         holder.binding.top.chevron.isEnabled = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
-        holder.binding.isPlusOrPatronUser = isPlusOrPatronUser
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
