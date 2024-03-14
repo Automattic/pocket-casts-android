@@ -34,7 +34,9 @@ class WhatsNewViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settings.cachedSubscriptionStatus.flow.stateIn(viewModelScope).collect { subscriptionStatus ->
-                if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)) {
+                if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
+                    updateStateForDeselectChapters()
+                } else if (FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)) {
                     val previousUserTier = (_state.value as? UiState.Loaded)?.tier
                     // Close what's new if plan changed but user is not eligible for slumber studios promo
                     // This is done so that user doesn't subscribe from the what's new to yearly plan now and gets subscribed to two plans
