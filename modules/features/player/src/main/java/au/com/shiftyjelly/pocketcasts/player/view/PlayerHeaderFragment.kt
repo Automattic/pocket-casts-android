@@ -24,9 +24,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.playIfTrue
-import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setSeekBarState
-import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.showIfPresent
+import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.playIfTrue
+import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract

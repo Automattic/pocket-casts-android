@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.lottie.LottieAnimationView
 import okhttp3.HttpUrl
 
-object BindingAdapters {
+object ViewExtensions {
 
     fun View.showIfPresent(url: HttpUrl?) {
         visibility = if (url?.toString().isNullOrEmpty()) View.GONE else View.VISIBLE
