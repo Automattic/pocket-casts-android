@@ -103,6 +103,7 @@ class ChaptersFragment : BaseFragment() {
                     ChaptersPage(
                         lazyListState = lazyListState,
                         chapters = uiState.displayChapters,
+                        showHeader = uiState.showHeader,
                         totalChaptersCount = uiState.totalChaptersCount,
                         onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
                         onChapterClick = ::onChapterClick,
