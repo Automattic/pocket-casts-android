@@ -266,6 +266,9 @@ class PodcastAdapter(
         holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
         holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()
         holder.binding.bottom.linkImage.isVisible = podcast.getShortUrl().isNotBlank()
+        holder.binding.bottom.linkText.text = podcast.getShortUrl()
+        holder.binding.bottom.linkText.setTextColor(tintColor)
+        holder.binding.bottom.linkText.isVisible = podcast.getShortUrl().isNotBlank()
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
