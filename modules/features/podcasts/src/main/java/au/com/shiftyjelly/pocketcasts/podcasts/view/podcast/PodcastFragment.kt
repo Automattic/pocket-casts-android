@@ -778,7 +778,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 statusBarColor = StatusBarColor.Custom(backgroundColor, true)
                 updateStatusBar()
-
             },
         )
 
