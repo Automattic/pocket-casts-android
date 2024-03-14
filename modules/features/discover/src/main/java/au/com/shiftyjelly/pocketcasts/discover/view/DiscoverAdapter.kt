@@ -108,7 +108,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onAllCategoriesClicked(categories: List<DiscoverCategory>)
+        fun onAllCategoriesClicked(categories: List<DiscoverCategory>, onCategorySelectionCancel: () -> Unit)
     }
 
     val loadPodcastList = { s: String ->
@@ -511,8 +511,12 @@ internal class DiscoverAdapter(
                             val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
                             val discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
                             val adapter = CategoriesListRowRedesignAdapter(
-                                onPodcastListClick = { listener.onPodcastListClicked(it) },
-                                onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
+                                onCategoryClick = {
+                                    listener.onPodcastListClicked(it)
+                                },
+                                onAllCategoriesClick = { onCategorySelectionCancel ->
+                                    listener.onAllCategoriesClicked(discoverCategories, onCategorySelectionCancel)
+                                },
                                 categories = (listOf(allCategories) + getMostPopularCategories(discoverCategories)).toMutableList(),
                             )
 

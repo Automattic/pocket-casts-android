@@ -16,8 +16,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 
 @SuppressLint("NotifyDataSetChanged")
 class CategoriesListRowRedesignAdapter(
-    private val onPodcastListClick: (NetworkLoadableList) -> Unit,
-    private val onAllCategoriesClick: (View) -> Unit,
+    private val onCategoryClick: (NetworkLoadableList) -> Unit,
+    private val onAllCategoriesClick: (() -> Unit) -> Unit,
     private val categories: List<CategoryPill>,
 ) : RecyclerView.Adapter<CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>() {
     companion object {
@@ -28,50 +28,51 @@ class CategoriesListRowRedesignAdapter(
 
     class CategoriesRedesignViewHolder(
         val binding: CategoryPillBinding,
-        private val onItemClicked: (Int, View) -> Unit,
+        private val onItemClicked: (Int) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.categoryPill.setOnClickListener { view ->
-                onItemClicked(bindingAdapterPosition, view)
+            binding.categoryPill.setOnClickListener {
+                onItemClicked(bindingAdapterPosition)
             }
         }
-
         fun bind(category: CategoryPill, context: Context) {
-            if (category.isSelected) {
-                if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
-                    setUpClearFilter(context)
-                } else {
-                    setUpCategory(context, category, category.isSelected)
-                }
+            if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
+                setUpAllCategoriesAndClear(context, category)
             } else {
-                setUpCategory(context, category, isSelected = false)
+                setUpCategories(context, category)
             }
         }
-
-        private fun setUpCategory(context: Context, category: CategoryPill, isSelected: Boolean) {
-            if (isSelected) {
+        private fun setUpAllCategoriesAndClear(context: Context, category: CategoryPill) {
+            if (category.isSelected) {
+                binding.categoryName.visibility = View.GONE
+                binding.categoryIcon.visibility = View.VISIBLE
+                binding.categoryIcon.setImageResource(R.drawable.ic_arrow_close)
+                binding.categoryIcon.contentDescription =
+                    getString(context, au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all)
+                binding.categoryPill.background =
+                    getDrawable(context, R.drawable.category_clear_all_pill_background)
+            } else {
+                binding.categoryName.visibility = View.VISIBLE
+                binding.categoryIcon.visibility = View.VISIBLE
+                binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
+                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
+                binding.categoryName.text = category.discoverCategory.name
+                binding.categoryName.contentDescription = category.discoverCategory.name
+            }
+        }
+        private fun setUpCategories(context: Context, category: CategoryPill) {
+            if (category.isSelected) {
                 binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_selected_background)
                 binding.categoryName.setTextColor(Color.WHITE)
             } else {
                 binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
                 binding.categoryName.setTextAppearance(au.com.shiftyjelly.pocketcasts.ui.R.style.H40)
             }
-
             binding.categoryName.text = category.discoverCategory.name
             binding.categoryName.contentDescription = category.discoverCategory.name
             binding.categoryName.visibility = View.VISIBLE
             binding.categoryIcon.visibility = View.GONE
-        }
-
-        private fun setUpClearFilter(context: Context) {
-            binding.categoryName.visibility = View.GONE
-            binding.categoryIcon.visibility = View.VISIBLE
-            binding.categoryIcon.setImageResource(R.drawable.ic_arrow_close)
-            binding.categoryIcon.contentDescription =
-                getString(context, au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all)
-            binding.categoryPill.background =
-                getDrawable(context, R.drawable.category_clear_all_pill_background)
         }
     }
 
@@ -81,17 +82,20 @@ class CategoriesListRowRedesignAdapter(
     ): CategoriesRedesignViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = CategoryPillBinding.inflate(inflater, parent, false)
-        return CategoriesRedesignViewHolder(binding) { position, view ->
+        return CategoriesRedesignViewHolder(binding) { position ->
             val category = currentCategories[position]
             if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
                 if (category.isSelected) {
                     clearCategoryFilter()
                 } else {
-                    onAllCategoriesClick(view)
+                    binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
+                    onAllCategoriesClick onCategorySelectionCancel@{
+                        binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
+                    }
                 }
             } else {
                 selectCategory(position)
-                onPodcastListClick(category.discoverCategory)
+                onCategoryClick(category.discoverCategory)
             }
         }
     }

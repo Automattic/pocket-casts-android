@@ -129,12 +129,11 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
-    override fun onAllCategoriesClicked(categories: List<DiscoverCategory>) {
+    override fun onAllCategoriesClicked(categories: List<DiscoverCategory>, onCategorySelectionCancel: () -> Unit) {
         CategoriesBottomSheet(
             categories,
-            onCategoryClick = {
-                onPodcastListClicked(it)
-            },
+            onCategoryClick = { onPodcastListClicked(it) },
+            onCategorySelectionCancel = onCategorySelectionCancel,
         ).show(childFragmentManager, "categories_bottom_sheet")
     }
 
