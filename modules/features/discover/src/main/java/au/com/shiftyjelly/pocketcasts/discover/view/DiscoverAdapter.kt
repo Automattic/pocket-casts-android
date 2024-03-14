@@ -504,22 +504,19 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    var discoverCategories = emptyList<DiscoverCategory>()
-                    val adapter = CategoriesListRowRedesignAdapter(
-                        onPodcastListClick = listener::onPodcastListClicked,
-                        onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
-                    )
-                    holder.recyclerView?.adapter = adapter
                     holder.loadSingle(
                         service.getCategoriesList(row.source),
                         onSuccess = { categories ->
                             val context = holder.itemView.context
-                            val allCategories = CategoryPillRow(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
-                            discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+                            val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
+                            val discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+                            val adapter = CategoriesListRowRedesignAdapter(
+                                onPodcastListClick = { listener.onPodcastListClicked(it) },
+                                onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
+                                categories = (listOf(allCategories) + getMostPopularCategories(discoverCategories)).toMutableList(),
+                            )
 
-                            adapter.submitList(listOf(allCategories) + getMostPopularCategories(discoverCategories)) {
-                                onRestoreInstanceState(holder)
-                            }
+                            holder.binding.rowRecyclerView.adapter = adapter
                         },
                     )
                     holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
@@ -714,7 +711,7 @@ internal class DiscoverAdapter(
             }
         }
     }
-    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<CategoryPillRow> {
+    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<CategoryPill> {
         // True Crime, Comedy, Culture, History, Fiction, Technology
         val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
 
@@ -723,7 +720,7 @@ internal class DiscoverAdapter(
             .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
 
         return sortedCategories.map {
-            CategoryPillRow(
+            CategoryPill(
                 discoverCategory = DiscoverCategory(
                     id = it.id,
                     name = it.name,
@@ -731,7 +728,6 @@ internal class DiscoverAdapter(
                     curated = it.curated,
                     source = it.source,
                 ),
-                isSelected = true,
             )
         }
     }
