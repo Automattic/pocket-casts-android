@@ -86,6 +86,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -1153,7 +1154,10 @@ open class PlaybackManager @Inject constructor(
                     event.message
                 }
                 Sentry.withScope { scope ->
-                    episode?.uuid?.let { scope.setTag("episodeUuid", it) }
+                    episode?.let {
+                        scope.setTag("episodeUuid", it.uuid)
+                        scope.setTag("playedUpTo", it.playedUpTo.roundToInt().toString())
+                    }
                     SentryHelper.recordException(
                         message = "Illegal playback state encountered",
                         throwable = event.error ?: IllegalStateException(event.message),
