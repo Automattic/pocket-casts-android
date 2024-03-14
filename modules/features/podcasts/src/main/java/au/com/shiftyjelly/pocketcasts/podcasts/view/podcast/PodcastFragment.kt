@@ -297,22 +297,22 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         val dialog = OptionsDialog()
             .addCheckedOption(
                 titleId = LR.string.episode_sort_newest_to_oldest,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
                 click = sortEpisodesNewestToOldest,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_oldest_to_newest,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC,
                 click = sortEpisodesOldestToNewest,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_short_to_long,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC,
                 click = sortEpisodesLengthShortToLong,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_long_to_short,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC,
                 click = sortEpisodesLengthLongToShort,
             )
         activity?.supportFragmentManager?.let {
@@ -653,8 +653,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         binding.btnRetry.setOnClickListener {
             loadData()
-            binding.error = null
-            binding.executePendingBindings()
         }
 
         binding.episodesRecyclerView.requestFocus()
@@ -770,14 +768,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         viewModel.podcast.observe(
             viewLifecycleOwner,
             Observer<Podcast> { podcast ->
-                val binding = binding ?: return@Observer
-
-                binding.podcast = podcast
-
                 val backgroundColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-                binding.headerColor = backgroundColor
-                binding.toolbar.setBackgroundColor(backgroundColor)
-                binding.headerBackgroundPlaceholder.setBackgroundColor(backgroundColor)
+                binding?.toolbar?.setBackgroundColor(backgroundColor)
+                binding?.headerBackgroundPlaceholder?.setBackgroundColor(backgroundColor)
 
                 adapter?.setPodcast(podcast)
 
@@ -786,12 +779,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 statusBarColor = StatusBarColor.Custom(backgroundColor, true)
                 updateStatusBar()
 
-                binding.executePendingBindings()
             },
         )
 
         viewModel.tintColor.observe(viewLifecycleOwner) { tintColor ->
-            binding?.tintColor = tintColor
             adapter?.setTint(tintColor)
         }
 
