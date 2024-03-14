@@ -301,8 +301,6 @@ class PodcastAdapter(
         }
 
         holder.binding.podcastHeader.contentDescription = podcast.title
-
-        holder.binding.executePendingBindings()
     }
 
     private fun bindHeaderTop(holder: PodcastViewHolder) {
