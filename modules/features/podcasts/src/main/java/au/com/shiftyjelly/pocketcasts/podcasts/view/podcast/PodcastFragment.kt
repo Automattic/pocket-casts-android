@@ -837,7 +837,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     adapter?.setError()
                     binding?.loading?.visibility = View.GONE
                     binding?.errorContainer?.visibility = View.VISIBLE
-                    binding?.error = getString(LR.string.podcast_load_error)
+                    binding?.errorMessage?.text = getString(LR.string.podcast_load_error)
 
                     if (BuildConfig.DEBUG) {
                         UiUtil.displayAlertError(requireContext(), state.errorMessage, null)

@@ -90,10 +90,10 @@
                     android:clipToPadding="false"
                     android:padding="16dp">
                     <TextView
+                        android:id="@+id/errorMessage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="@{error}"
                         style="?attr/textBody1"
                         android:layout_marginBottom="8dp"/>
                     <com.google.android.material.button.MaterialButton
