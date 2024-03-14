@@ -796,8 +796,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is PodcastViewModel.UiState.Loading -> Unit
+                is PodcastViewModel.UiState.Loading -> {
+                    binding?.loading?.visibility = View.VISIBLE
+                }
                 is PodcastViewModel.UiState.Loaded -> {
+                    binding?.loading?.visibility = View.GONE
                     addPaddingForEpisodeSearch(state.episodes)
                     when (state.showTab) {
                         PodcastTab.EPISODES -> {
@@ -830,6 +833,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
                 is PodcastViewModel.UiState.Error -> {
                     adapter?.setError()
+                    binding?.loading?.visibility = View.GONE
                     binding?.error = getString(LR.string.podcast_load_error)
 
                     if (BuildConfig.DEBUG) {

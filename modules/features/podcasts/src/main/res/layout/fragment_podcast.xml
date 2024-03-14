@@ -78,8 +78,7 @@
                     android:id="@+id/loading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="@{podcast == null &amp;&amp; error == null}"/>
+                    android:layout_gravity="center" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
