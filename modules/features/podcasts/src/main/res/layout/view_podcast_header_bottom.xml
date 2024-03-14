@@ -26,8 +26,6 @@
             android:layout_marginTop="6dp"
             android:includeFontPadding="false"
             android:lineSpacingMultiplier="1.1"
-            app:readMore="@{3}"
-            android:text="@{podcast.title}"
             android:textAppearance="?attr/textH2"
             android:textColor="?attr/primary_text_01"
             app:layout_constraintStart_toStartOf="parent"

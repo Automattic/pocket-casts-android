@@ -72,6 +72,7 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.podcasts.helper.BindingAdapters.readMore
 
 private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
@@ -249,6 +250,8 @@ class PodcastAdapter(
         holder.binding.podcast = podcast
         holder.binding.bottom.root.isVisible = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        holder.binding.bottom.title.text = podcast.title
+        holder.binding.bottom.title.readMore(3)
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
