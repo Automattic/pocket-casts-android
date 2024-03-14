@@ -147,7 +147,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="schedule_image,schedule_text"
-            android:visibility="@{podcast.displayableFrequency(context.resources) != null}"
             android:id="@+id/frequency_group"
             tools:ignore="MissingConstraints" />
 

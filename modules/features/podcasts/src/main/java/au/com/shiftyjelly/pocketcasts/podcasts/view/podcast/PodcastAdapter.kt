@@ -269,6 +269,9 @@ class PodcastAdapter(
         holder.binding.bottom.linkText.text = podcast.getShortUrl()
         holder.binding.bottom.linkText.setTextColor(tintColor)
         holder.binding.bottom.linkText.isVisible = podcast.getShortUrl().isNotBlank()
+        with(holder.binding.bottom.frequencyGroup) {
+            isVisible = podcast.displayableFrequency(context.resources) != null
+        }
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
