@@ -312,9 +312,12 @@ class EpisodeContainerFragment :
     override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {
         binding?.apply {
             val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
-            episode = state.episode
-            toolbarTintColor = iconColor
-            tabLayout.tabTextColors = ColorStateList.valueOf(iconColor)
+            val iconTint = ColorStateList.valueOf(iconColor)
+            btnFav.setImageResource(if (state.episode.isStarred) R.drawable.ic_star_filled else R.drawable.ic_star)
+            btnFav.imageTintList = iconTint
+            btnClose.imageTintList = iconTint
+            btnShare.imageTintList = iconTint
+            tabLayout.tabTextColors = iconTint
             tabLayout.setSelectedTabIndicatorColor(iconColor)
             btnShare.setOnClickListener { state.onShareClicked() }
             btnFav.contentDescription = getString(if (state.episode.isStarred) LR.string.podcast_episode_starred else LR.string.podcast_episode_unstarred)
