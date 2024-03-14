@@ -100,7 +100,6 @@
             android:layout_marginBottom="16dp"
             app:tint="?attr/primary_icon_02"
             android:visibility="gone"
-            app:showIfPresent="@{podcast.author}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/author_text"
             app:layout_constraintTop_toTopOf="@+id/author_text"

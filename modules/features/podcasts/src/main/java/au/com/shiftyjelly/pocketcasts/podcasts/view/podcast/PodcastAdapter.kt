@@ -264,6 +264,7 @@ class PodcastAdapter(
         holder.binding.bottom.description.readMore(3)
         holder.binding.bottom.authorText.text = podcast.author
         holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
+        holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
