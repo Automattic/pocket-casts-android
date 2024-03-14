@@ -224,7 +224,6 @@
             android:textAppearance="?attr/textBody1"
             android:ellipsize="end"
             android:lines="1"
-            android:text="@{podcast.displayableNextEpisodeDate(context)}"
             android:textColor="?attr/primary_text_01"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/next_image"

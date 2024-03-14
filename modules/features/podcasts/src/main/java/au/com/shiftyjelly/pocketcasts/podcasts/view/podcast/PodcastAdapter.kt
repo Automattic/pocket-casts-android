@@ -255,6 +255,9 @@ class PodcastAdapter(
         with(holder.binding.bottom.category) {
             text = podcast.getFirstCategory(context.resources)
         }
+        with(holder.binding.bottom.nextText) {
+            text = podcast.displayableNextEpisodeDate(context)
+        }
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
