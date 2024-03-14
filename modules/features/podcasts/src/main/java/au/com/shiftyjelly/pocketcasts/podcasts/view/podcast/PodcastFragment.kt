@@ -560,6 +560,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         val context = binding.root.context
         val headerColor = context.getThemeColor(UR.attr.support_09)
         binding.headerColor = headerColor
+        binding.toolbar.setBackgroundColor(headerColor)
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
@@ -775,6 +776,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 val backgroundColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
                 binding.headerColor = backgroundColor
+                binding.toolbar.setBackgroundColor(backgroundColor)
 
                 adapter?.setPodcast(podcast)
 
