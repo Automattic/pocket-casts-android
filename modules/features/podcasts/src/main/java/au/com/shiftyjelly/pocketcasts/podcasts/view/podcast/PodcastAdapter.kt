@@ -275,6 +275,9 @@ class PodcastAdapter(
         with(holder.binding.bottom.scheduleText) {
             text = podcast.displayableFrequency(context.resources)
         }
+        with(holder.binding.bottom.nextGroup) {
+            isVisible = podcast.displayableNextEpisodeDate(context) != null
+        }
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {

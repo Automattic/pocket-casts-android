@@ -184,7 +184,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="next_image,next_text"
-            android:visibility="@{podcast.displayableNextEpisodeDate(context) != null}"
             android:id="@+id/next_group"
             tools:ignore="MissingConstraints" />
 
