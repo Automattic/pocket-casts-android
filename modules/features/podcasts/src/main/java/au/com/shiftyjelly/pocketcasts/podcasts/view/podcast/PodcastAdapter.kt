@@ -252,6 +252,9 @@ class PodcastAdapter(
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.bottom.title.text = podcast.title
         holder.binding.bottom.title.readMore(3)
+        with(holder.binding.bottom.category) {
+            text = podcast.getFirstCategory(context.resources)
+        }
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
