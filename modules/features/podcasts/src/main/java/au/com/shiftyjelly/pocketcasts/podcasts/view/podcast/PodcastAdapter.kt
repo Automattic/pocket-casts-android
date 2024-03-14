@@ -31,6 +31,7 @@ import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -52,9 +53,11 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -68,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import java.util.Date
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -108,6 +112,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
 }
 
 class PodcastAdapter(
+    private val context: Context,
     val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
     val upNextQueue: UpNextQueue,
@@ -159,6 +164,8 @@ class PodcastAdapter(
     )
     data class BookmarkItemData(
         val bookmark: Bookmark,
+        val episode: BaseEpisode,
+        val useRssArtwork: Boolean,
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
@@ -196,6 +203,8 @@ class PodcastAdapter(
             notifyDataSetChanged()
         }
 
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
+
     init {
         setHasStableIds(true)
     }
@@ -219,6 +228,8 @@ class PodcastAdapter(
                 downloadProgressUpdates = downloadManager.progressUpdateRelay,
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
+                imageRequestFactory = imageRequestFactory.smallSize(),
+                settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
         }
@@ -257,18 +268,16 @@ class PodcastAdapter(
             }
         }
 
-        val context = holder.itemView.context
-        val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = holder.binding.top.artwork
         // stopping the artwork flickering when Glide reloads the image
         if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
             holder.lastImagePodcastUuid = podcast.uuid
-            imageLoader.loadLargeImage(podcast, imageView)
+            imageRequestFactory.create(podcast).loadInto(imageView)
         }
 
         imageView.setOnLongClickListener {
             onArtworkLongClicked {
-                imageLoader.loadLargeImage(podcast, imageView)
+                imageRequestFactory.create(podcast).loadInto(imageView)
             }
             true
         }
@@ -487,6 +496,7 @@ class PodcastAdapter(
 
     fun setBookmarks(
         bookmarks: List<Bookmark>,
+        episodes: List<BaseEpisode>,
         searchTerm: String,
         context: Context,
     ) {
@@ -521,6 +531,7 @@ class PodcastAdapter(
                         bookmarks.map {
                             BookmarkItemData(
                                 bookmark = it,
+                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: NoOpEpisode,
                                 onBookmarkPlayClicked = onBookmarkPlayClicked,
                                 onBookmarkRowLongPress = onBookmarkRowLongPress,
                                 onBookmarkRowClick = { bookmark, adapterPosition ->
@@ -533,6 +544,7 @@ class PodcastAdapter(
                                         bookmark,
                                     )
                                 },
+                                useRssArtwork = settings.useRssArtwork.value,
                             )
                         },
                     )
@@ -799,4 +811,6 @@ class PodcastAdapter(
             set.start()
         }
     }
+
+    private val NoOpEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
 }

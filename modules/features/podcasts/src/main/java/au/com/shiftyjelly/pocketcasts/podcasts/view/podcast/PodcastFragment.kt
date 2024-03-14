@@ -592,6 +592,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         playButtonListener.source = SourceView.PODCAST_SCREEN
         if (adapter == null) {
             adapter = PodcastAdapter(
+                context = requireContext(),
                 downloadManager = downloadManager,
                 playbackManager = playbackManager,
                 upNextQueue = upNextQueue,
@@ -814,6 +815,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         PodcastTab.BOOKMARKS -> {
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
+                                episodes = state.episodes,
                                 searchTerm = state.searchBookmarkTerm,
                                 context = requireContext(),
                             )

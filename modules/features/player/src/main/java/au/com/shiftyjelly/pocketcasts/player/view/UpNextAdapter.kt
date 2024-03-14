@@ -25,13 +25,13 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBin
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -45,8 +45,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class UpNextAdapter(
     context: Context,
-    val
-    imageLoader: PodcastImageLoader,
     val episodeManager: EpisodeManager,
     val listener: UpNextListener,
     val multiSelectHelper: MultiSelectEpisodesHelper,
@@ -57,6 +55,7 @@ class UpNextAdapter(
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 3).themed()
 
     var isPlaying: Boolean = false
         set(value) {
@@ -77,9 +76,10 @@ class UpNextAdapter(
                 binding = AdapterUpNextBinding.inflate(inflater, parent, false),
                 listener = listener,
                 dateFormatter = dateFormatter,
-                imageLoader = imageLoader,
+                imageRequestFactory = imageRequestFactory,
                 episodeManager = episodeManager,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                settings = settings,
             )
             R.layout.adapter_up_next_footer -> HeaderViewHolder(AdapterUpNextFooterBinding.inflate(inflater, parent, false))
             R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
@@ -189,8 +189,7 @@ class UpNextAdapter(
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
 
             if (loadedUuid != playingState.episode.uuid) {
-                imageLoader.radiusPx = 3.dpToPx(itemView.context)
-                imageLoader.load(playingState.episode).into(binding.image)
+                imageRequestFactory.create(playingState.episode, settings.useRssArtwork.value).loadInto(binding.image)
                 loadedUuid = playingState.episode.uuid
             }
 

@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
@@ -17,6 +17,9 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.executeBlocking
+import coil.imageLoader
+import coil.request.CachePolicy
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
@@ -47,7 +50,7 @@ class SubscribeManager @Inject constructor(
     private val uuidsInQueue = HashSet<String>()
     private val podcastDao = appDatabase.podcastDao()
     private val episodeDao = appDatabase.episodeDao()
-    private val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = true)
 
     data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean)
 
@@ -100,7 +103,13 @@ class SubscribeManager @Inject constructor(
     }
 
     private fun cacheArtwork(podcast: Podcast): Completable {
-        return Completable.fromAction { imageLoader.cacheSubscribedArtwork(podcast) }.onErrorComplete()
+        return Completable.fromAction {
+            val request = imageRequestFactory.create(podcast)
+                .newBuilder()
+                .memoryCachePolicy(CachePolicy.DISABLED)
+                .build()
+            context.imageLoader.executeBlocking(request)
+        }.onErrorComplete()
     }
 
     fun isSubscribingToPodcast(podcastUuid: String): Boolean {

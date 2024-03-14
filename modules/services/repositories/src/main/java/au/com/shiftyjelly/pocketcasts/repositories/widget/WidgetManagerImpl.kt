@@ -16,7 +16,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -39,6 +41,8 @@ class WidgetManagerImpl @Inject constructor(
     override val coroutineContext: CoroutineContext get() = Dispatchers.IO
 
     private var remoteViewsLayoutId: Int = getRemoteViewsLayoutId()
+
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = true, placeholderType = PlaceholderType.Small).smallSize()
 
     override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?) {
         when (Util.getAppPlatform(context)) {
@@ -185,20 +189,7 @@ class WidgetManagerImpl @Inject constructor(
             views,
             R.id.widget_artwork,
         )
-        val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
-        if (playingEpisode is PodcastEpisode) {
-            imageLoader.smallPlaceholder().loadEpisodeArtworkInto(
-                imageView = null,
-                target = target,
-                size = 128,
-                episode = playingEpisode,
-                coroutineScope = this,
-            )
-        } else if (playingEpisode is UserEpisode) {
-            imageLoader.smallPlaceholder().loadForTarget(playingEpisode, 128, target)
-        } else if (podcast != null) {
-            imageLoader.smallPlaceholder().loadForTarget(podcast, 128, target)
-        }
+        imageRequestFactory.create(playingEpisode, settings.useRssArtwork.value).loadInto(target)
     }
 
     private fun showPlayButton(playing: Boolean, views: RemoteViews) {
