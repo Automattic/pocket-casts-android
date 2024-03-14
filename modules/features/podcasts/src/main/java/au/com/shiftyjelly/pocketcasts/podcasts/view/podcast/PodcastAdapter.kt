@@ -272,6 +272,9 @@ class PodcastAdapter(
         with(holder.binding.bottom.frequencyGroup) {
             isVisible = podcast.displayableFrequency(context.resources) != null
         }
+        with(holder.binding.bottom.scheduleText) {
+            text = podcast.displayableFrequency(context.resources)
+        }
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {

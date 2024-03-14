@@ -173,7 +173,6 @@
             android:lineSpacingMultiplier="1.2"
             android:maxLines="3"
             android:textAppearance="?attr/textBody1"
-            android:text="@{podcast.displayableFrequency(context.resources)}"
             android:textColor="?attr/primary_text_01"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/schedule_image"
