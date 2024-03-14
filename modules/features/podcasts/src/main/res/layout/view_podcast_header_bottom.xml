@@ -1,252 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    tools:visibility="visible"
+    android:paddingBottom="8dp"
+    android:clipToPadding="false"
+    android:background="?attr/primary_ui_02">
 
-    <data>
-        <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
-        <variable name="tintColor" type="int" />
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.1"
+        android:textAppearance="?attr/textH2"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem/random" />
+
+    <TextView
+        android:id="@+id/category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:includeFontPadding="false"
+        android:textAppearance="?attr/textSubtitle2"
+        android:textColor="?attr/primary_text_02"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        tools:text="@tools:sample/lorem" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/ratings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/category"/>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="18dp"
+        android:autoLink="all"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.3"
+        android:textAppearance="?attr/textBody1"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ratings"
+        tools:text="@tools:sample/lorem/random" />
+
+    <TextView
+        android:id="@+id/author_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.2"
+        android:maxLines="2"
+        android:textAppearance="?attr/textBody1"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/author_image"
+        app:layout_constraintTop_toTopOf="@+id/panel"
+        tools:text="@tools:sample/lorem" />
+
+    <ImageView
+        android:id="@+id/author_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:tint="?attr/primary_icon_02"
         android:visibility="gone"
-        tools:visibility="visible"
-        android:paddingBottom="8dp"
-        android:clipToPadding="false"
-        android:background="?attr/primary_ui_02">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/author_text"
+        app:layout_constraintTop_toTopOf="@+id/author_text"
+        app:srcCompat="@drawable/ic_author" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="6dp"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.1"
-            android:textAppearance="?attr/textH2"
-            android:textColor="?attr/primary_text_01"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@tools:sample/lorem/random" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/author_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="author_text,author_image" />
 
-        <TextView
-            android:id="@+id/category"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:includeFontPadding="false"
-            android:textAppearance="?attr/textSubtitle2"
-            android:textColor="?attr/primary_text_02"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title"
-            tools:text="@tools:sample/lorem" />
+    <ImageView
+        android:id="@+id/link_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="12dp"
+        app:tint="?attr/primary_icon_02"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/author_barrier"
+        app:srcCompat="@drawable/ic_link" />
 
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/ratings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/category"/>
+    <TextView
+        android:id="@+id/link_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.2"
+        android:maxLines="1"
+        android:padding="8dp"
+        android:textAppearance="?attr/textBody1"
+        android:background="?android:attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/link_image"
+        app:layout_constraintStart_toEndOf="@+id/link_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/link_image"
+        tools:text="@tools:sample/lorem" />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="18dp"
-            android:autoLink="all"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.3"
-            android:textAppearance="?attr/textBody1"
-            android:textColor="?attr/primary_text_01"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ratings"
-            tools:text="@tools:sample/lorem/random" />
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="schedule_image,schedule_text"
+        android:id="@+id/frequency_group"
+        tools:ignore="MissingConstraints" />
 
-        <TextView
-            android:id="@+id/author_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="2"
-            android:textAppearance="?attr/textBody1"
-            android:textColor="?attr/primary_text_01"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/author_image"
-            app:layout_constraintTop_toTopOf="@+id/panel"
-            tools:text="@tools:sample/lorem" />
+    <ImageView
+        android:id="@+id/schedule_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="12dp"
+        app:tint="?attr/primary_icon_02"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/link_image"
+        app:srcCompat="@drawable/ic_schedule" />
 
-        <ImageView
-            android:id="@+id/author_image"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:tint="?attr/primary_icon_02"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/author_text"
-            app:layout_constraintTop_toTopOf="@+id/author_text"
-            app:srcCompat="@drawable/ic_author" />
+    <TextView
+        android:id="@+id/schedule_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.2"
+        android:maxLines="3"
+        android:textAppearance="?attr/textBody1"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/schedule_image"
+        app:layout_constraintBottom_toBottomOf="@+id/schedule_image"
+        app:layout_constraintTop_toTopOf="@+id/schedule_image"
+        tools:text="@tools:sample/lorem" />
 
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/author_barrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="author_text,author_image" />
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="next_image,next_text"
+        android:id="@+id/next_group"
+        tools:ignore="MissingConstraints" />
 
-        <ImageView
-            android:id="@+id/link_image"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="12dp"
-            app:tint="?attr/primary_icon_02"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/author_barrier"
-            app:srcCompat="@drawable/ic_link" />
+    <ImageView
+        android:id="@+id/next_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp"
+        app:tint="?attr/primary_icon_02"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/schedule_image"
+        app:srcCompat="@drawable/ic_nextepisode" />
 
-        <TextView
-            android:id="@+id/link_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="24dp"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="1"
-            android:padding="8dp"
-            android:textAppearance="?attr/textBody1"
-            android:background="?android:attr/selectableItemBackground"
-            app:layout_constraintBottom_toBottomOf="@+id/link_image"
-            app:layout_constraintStart_toEndOf="@+id/link_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/link_image"
-            tools:text="@tools:sample/lorem" />
+    <TextView
+        android:id="@+id/next_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.2"
+        android:textAppearance="?attr/textBody1"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/next_image"
+        app:layout_constraintBottom_toBottomOf="@+id/next_image"
+        app:layout_constraintTop_toTopOf="@+id/next_image"
+        tools:text="@tools:sample/lorem" />
 
-        <androidx.constraintlayout.widget.Group
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="schedule_image,schedule_text"
-            android:id="@+id/frequency_group"
-            tools:ignore="MissingConstraints" />
+    <View
+        android:id="@+id/panel_padding"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/next_image"/>
 
-        <ImageView
-            android:id="@+id/schedule_image"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="12dp"
-            app:tint="?attr/primary_icon_02"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/link_image"
-            app:srcCompat="@drawable/ic_schedule" />
+    <View
+        android:id="@+id/panel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/panel_only_border"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:layout_constraintBottom_toBottomOf="@+id/panel_padding" />
 
-        <TextView
-            android:id="@+id/schedule_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginStart="16dp"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="3"
-            android:textAppearance="?attr/textBody1"
-            android:textColor="?attr/primary_text_01"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/schedule_image"
-            app:layout_constraintBottom_toBottomOf="@+id/schedule_image"
-            app:layout_constraintTop_toTopOf="@+id/schedule_image"
-            tools:text="@tools:sample/lorem" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="?attr/primary_ui_05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/next_image"
+        android:layout_marginTop="36dp"/>
 
-        <androidx.constraintlayout.widget.Group
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="next_image,next_text"
-            android:id="@+id/next_group"
-            tools:ignore="MissingConstraints" />
-
-        <ImageView
-            android:id="@+id/next_image"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
-            app:tint="?attr/primary_icon_02"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/schedule_image"
-            app:srcCompat="@drawable/ic_nextepisode" />
-
-        <TextView
-            android:id="@+id/next_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginStart="16dp"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.2"
-            android:textAppearance="?attr/textBody1"
-            android:ellipsize="end"
-            android:lines="1"
-            android:textColor="?attr/primary_text_01"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/next_image"
-            app:layout_constraintBottom_toBottomOf="@+id/next_image"
-            app:layout_constraintTop_toTopOf="@+id/next_image"
-            tools:text="@tools:sample/lorem" />
-
-        <View
-            android:id="@+id/panel_padding"
-            android:layout_width="wrap_content"
-            android:layout_height="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/next_image"/>
-
-        <View
-            android:id="@+id/panel"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/panel_only_border"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/description"
-            app:layout_constraintBottom_toBottomOf="@+id/panel_padding" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_height"
-            android:background="?attr/primary_ui_05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/next_image"
-            android:layout_marginTop="36dp"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>
