@@ -81,11 +81,11 @@
                     android:layout_gravity="center" />
 
                 <LinearLayout
+                    android:id="@+id/errorContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_gravity="center"
-                    android:visibility="@{error != null}"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:padding="16dp">
