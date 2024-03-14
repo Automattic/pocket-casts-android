@@ -247,6 +247,35 @@ class PodcastAdapter(
     }
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
+        bindHeaderBottom(holder)
+        bindHeaderTop(holder)
+
+        holder.binding.bottom.ratings.setContent {
+            AppTheme(theme.activeTheme) {
+                StarRatingView(fragmentManager, ratingsViewModel)
+            }
+        }
+
+        val context = holder.itemView.context
+        val imageLoader = PodcastImageLoaderThemed(context)
+        val imageView = holder.binding.top.artwork
+        // stopping the artwork flickering when Glide reloads the image
+        if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
+            holder.lastImagePodcastUuid = podcast.uuid
+            imageLoader.loadLargeImage(podcast, imageView)
+        }
+
+        imageView.setOnLongClickListener {
+            onArtworkLongClicked {
+                imageLoader.loadLargeImage(podcast, imageView)
+            }
+            true
+        }
+
+        holder.binding.podcastHeader.contentDescription = podcast.title
+    }
+
+    private fun bindHeaderBottom(holder: PodcastViewHolder) {
         holder.binding.bottom.root.isVisible = headerExpanded
         val tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.bottom.title.text = podcast.title
@@ -276,31 +305,6 @@ class PodcastAdapter(
         with(holder.binding.bottom.nextGroup) {
             isVisible = podcast.displayableNextEpisodeDate(context) != null
         }
-        bindHeaderTop(holder)
-
-        holder.binding.bottom.ratings.setContent {
-            AppTheme(theme.activeTheme) {
-                StarRatingView(fragmentManager, ratingsViewModel)
-            }
-        }
-
-        val context = holder.itemView.context
-        val imageLoader = PodcastImageLoaderThemed(context)
-        val imageView = holder.binding.top.artwork
-        // stopping the artwork flickering when Glide reloads the image
-        if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
-            holder.lastImagePodcastUuid = podcast.uuid
-            imageLoader.loadLargeImage(podcast, imageView)
-        }
-
-        imageView.setOnLongClickListener {
-            onArtworkLongClicked {
-                imageLoader.loadLargeImage(podcast, imageView)
-            }
-            true
-        }
-
-        holder.binding.podcastHeader.contentDescription = podcast.title
     }
 
     private fun bindHeaderTop(holder: PodcastViewHolder) {
