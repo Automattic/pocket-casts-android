@@ -249,7 +249,8 @@ class PodcastAdapter(
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
         holder.binding.podcast = podcast
         holder.binding.bottom.root.isVisible = headerExpanded
-        holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        val tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        holder.binding.tintColor = tintColor
         holder.binding.bottom.title.text = podcast.title
         holder.binding.bottom.title.readMore(3)
         with(holder.binding.bottom.category) {
@@ -258,6 +259,9 @@ class PodcastAdapter(
         with(holder.binding.bottom.nextText) {
             text = podcast.displayableNextEpisodeDate(context)
         }
+        holder.binding.bottom.description.text = podcast.podcastDescription
+        holder.binding.bottom.description.setLinkTextColor(tintColor)
+        holder.binding.bottom.description.readMore(3)
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
