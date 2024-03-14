@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.distinctUntilChanged
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -92,6 +93,11 @@ class BookmarksFragment : BaseFragment() {
                 // https://stackoverflow.com/a/70195667/193545
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     val listData = playerViewModel.listDataLive.asFlow()
+                        // ignore the episode progress
+                        .distinctUntilChanged { t1, t2 ->
+                            t1.podcastHeader.episodeUuid == t2.podcastHeader.episodeUuid &&
+                                t1.podcastHeader.isPlaying == t2.podcastHeader.isPlaying
+                        }
                         .collectAsState(initial = null)
 
                     val episodeUuid = episodeUuid(listData)
