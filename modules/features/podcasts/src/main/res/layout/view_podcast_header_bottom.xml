@@ -119,7 +119,6 @@
             android:layout_marginStart="36dp"
             android:layout_marginTop="12dp"
             app:tint="?attr/primary_icon_02"
-            app:showIfPresent="@{podcast.shortUrl}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/author_barrier"
             app:srcCompat="@drawable/ic_link" />
