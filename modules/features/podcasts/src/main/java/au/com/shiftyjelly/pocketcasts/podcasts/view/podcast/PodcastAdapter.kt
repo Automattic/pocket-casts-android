@@ -247,7 +247,7 @@ class PodcastAdapter(
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
         holder.binding.podcast = podcast
-        holder.binding.expanded = headerExpanded
+        holder.binding.bottom.root.isVisible = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         bindHeaderTop(holder)
 
@@ -658,7 +658,7 @@ class PodcastAdapter(
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
-    internal class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
+    internal inner class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
 
         var lastImagePodcastUuid: String? = null
 
@@ -790,7 +790,7 @@ class PodcastAdapter(
             set.playSequentially(fadeInButton, widthAndTickSet)
             set.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    if (binding.expanded) {
+                    if (headerExpanded) {
                         adapter.onHeaderClicked(binding)
                     }
                     adapter.onSubscribeClicked()

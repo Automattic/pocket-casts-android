@@ -5,7 +5,6 @@
 
     <data>
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
-        <variable name="expanded" type="boolean" />
         <variable name="tintColor" type="int" />
     </data>
 
@@ -16,8 +15,7 @@
         tools:visibility="visible"
         android:paddingBottom="8dp"
         android:clipToPadding="false"
-        android:background="?attr/primary_ui_02"
-        app:show="@{expanded}">
+        android:background="?attr/primary_ui_02">
 
         <TextView
             android:id="@+id/title"

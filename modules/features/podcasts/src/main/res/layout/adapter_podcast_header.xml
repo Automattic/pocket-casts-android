@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
-        <variable name="expanded" type="boolean" />
         <variable name="tintColor" type="int"/>
     </data>
 
@@ -20,8 +19,7 @@
             android:id="@+id/bottom"
             layout="@layout/view_podcast_header_bottom"
             app:podcast="@{podcast}"
-            app:tintColor="@{tintColor}"
-            app:expanded="@{expanded}" />
+            app:tintColor="@{tintColor}" />
 
     </LinearLayout>
 </layout>
