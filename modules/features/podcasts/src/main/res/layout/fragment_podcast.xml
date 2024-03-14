@@ -62,8 +62,7 @@
                 <View
                     android:id="@+id/headerBackgroundPlaceholder"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/podcast_header_height"
-                    android:background="@{headerColor}" />
+                    android:layout_height="@dimen/podcast_header_height" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/episodesRecyclerView"
