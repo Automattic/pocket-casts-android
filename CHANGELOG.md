@@ -1,6 +1,8 @@
 7.60
 -----
-
+*   Updates:
+    *   Navigate to a podcast when a podcast title in the player tapped.
+        ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
 
 7.59
 -----
