@@ -47,7 +47,7 @@ object BindingAdapters {
         }
     }
 
-    fun TextView.readMore(collapsedLines: Int)  {
+    fun TextView.readMore(collapsedLines: Int) {
         maxLines = collapsedLines
         ellipsize = TextUtils.TruncateAt.END
         setOnClickListener {

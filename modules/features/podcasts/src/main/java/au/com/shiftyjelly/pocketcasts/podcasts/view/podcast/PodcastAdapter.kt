@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.helper.BindingAdapters.readMore
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
@@ -72,7 +73,6 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.podcasts.helper.BindingAdapters.readMore
 
 private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
