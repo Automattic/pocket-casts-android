@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -18,7 +19,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -63,11 +63,13 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -247,8 +249,7 @@ class PodcastAdapter(
         holder.binding.podcast = podcast
         holder.binding.expanded = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-        holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-        holder.binding.isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+        bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
@@ -275,6 +276,32 @@ class PodcastAdapter(
         holder.binding.podcastHeader.contentDescription = podcast.title
 
         holder.binding.executePendingBindings()
+    }
+
+    private fun bindHeaderTop(holder: PodcastViewHolder) {
+        val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+        holder.binding.top.chevron.isEnabled = headerExpanded
+        holder.binding.top.settings.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
+        holder.binding.top.subscribedButton.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribedButton.toCircle(true)
+        holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
+        holder.binding.top.folders.setImageResource(
+            if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
+        )
+        holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
+        with(holder.binding.top.notifications) {
+            val notificationsIconText =
+                context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
+            contentDescription = notificationsIconText
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                tooltipText = notificationsIconText
+            }
+            setImageResource(
+                if (podcast.isShowNotifications) R.drawable.ic_notifications_on else R.drawable.ic_notifications_off,
+            )
+            isVisible = podcast.isSubscribed
+        }
     }
 
     private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
@@ -571,7 +598,7 @@ class PodcastAdapter(
             interpolator = FastOutSlowInInterpolator()
         }
 
-        val constraintLayout = binding.top.root as ConstraintLayout
+        val constraintLayout = binding.top.root
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout)
         constraintSet.constrainPercentWidth(R.id.artworkContainer, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
