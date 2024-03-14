@@ -86,8 +86,6 @@
             android:maxLines="2"
             android:textAppearance="?attr/textBody1"
             android:textColor="?attr/primary_text_01"
-            android:text="@{podcast.author}"
-            app:showIfPresent="@{podcast.author}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/author_image"
             app:layout_constraintTop_toTopOf="@+id/panel"
