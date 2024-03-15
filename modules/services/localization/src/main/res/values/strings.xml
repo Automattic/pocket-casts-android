@@ -1432,6 +1432,9 @@
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
+    <string name="settings_advanced_battery_consumption">Battery Consumption</string>
+    <string name="settings_advanced_audio_offload">Audio Offload</string>
+    <string name="settings_advanced_audio_offload_summary">Audio offload allows audio processing to be offloaded from the CPU to a dedicated signal processor and helps in battery saving.</string>
     <string name="whats_new_slumber_studios_title">Dream big</string>
     <!-- %1$s is Slumber Studios promo code -->
     <string name="whats_new_slumber_studios_body">As part of your Yearly Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>

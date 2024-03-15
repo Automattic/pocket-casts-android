@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AdvancedSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
@@ -84,6 +83,13 @@ fun AdvancedSettingsView(
             ) {
                 SyncOnMeteredRow(state.backgroundSyncOnMeteredState)
             }
+
+            SettingSection(
+                heading = stringResource(LR.string.settings_advanced_battery_consumption),
+                indent = false,
+            ) {
+                AudioOffloadRow(state.audioOffloadEnabledState)
+            }
         }
     }
 }
@@ -106,6 +112,24 @@ private fun SyncOnMeteredRow(
     )
 }
 
+@Composable
+private fun AudioOffloadRow(
+    state: AdvancedSettingsViewModel.State.AudioOffloadEnabledState,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_advanced_audio_offload),
+        secondaryText = stringResource(LR.string.settings_advanced_audio_offload_summary),
+        toggle = SettingRowToggle.Switch(state.isChecked, state.isEnabled),
+        indent = false,
+        modifier = modifier.toggleable(
+            value = state.isChecked,
+            role = Role.Switch,
+            onValueChange = { state.onCheckedChange(it) },
+        ),
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun AdvancedSettingsPreview(
@@ -115,6 +139,11 @@ private fun AdvancedSettingsPreview(
         AdvancedSettingsView(
             state = AdvancedSettingsViewModel.State(
                 backgroundSyncOnMeteredState = AdvancedSettingsViewModel.State.BackgroundSyncOnMeteredState(
+                    isChecked = true,
+                    isEnabled = true,
+                    onCheckedChange = {},
+                ),
+                audioOffloadEnabledState = AdvancedSettingsViewModel.State.AudioOffloadEnabledState(
                     isChecked = true,
                     isEnabled = true,
                     onCheckedChange = {},

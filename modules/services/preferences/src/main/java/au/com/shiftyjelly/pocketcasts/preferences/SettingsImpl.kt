@@ -175,6 +175,14 @@ class SettingsImpl @Inject constructor(
         setBoolean(Settings.PREFERENCE_SYNC_ON_METERED, shouldSyncOnMetered)
     }
 
+    override fun audioOffloadEnabled(): Boolean {
+        return getBoolean(Settings.PREFERENCE_AUDIO_OFFLOAD_ENABLED, false)
+    }
+
+    override fun setAudioOffloadEnabled(enable: Boolean) {
+        setBoolean(Settings.PREFERENCE_AUDIO_OFFLOAD_ENABLED, enable)
+    }
+
     override fun getWorkManagerNetworkTypeConstraint(): NetworkType =
         if (syncOnMeteredNetwork()) {
             NetworkType.CONNECTED

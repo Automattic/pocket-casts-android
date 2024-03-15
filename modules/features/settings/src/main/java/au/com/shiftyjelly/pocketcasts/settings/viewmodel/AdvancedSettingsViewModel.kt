@@ -38,6 +38,12 @@ class AdvancedSettingsViewModel
                 }
             },
         ),
+        audioOffloadEnabledState = State.AudioOffloadEnabledState(
+            isChecked = settings.audioOffloadEnabled(),
+            onCheckedChange = {
+                onAudioOffloadCheckedChange(it)
+            },
+        ),
     )
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
@@ -56,17 +62,37 @@ class AdvancedSettingsViewModel
         )
     }
 
+    private fun onAudioOffloadCheckedChange(isChecked: Boolean) {
+        settings.setAudioOffloadEnabled(isChecked)
+        updateAudioOffloadEnabledState()
+    }
+
+    private fun updateAudioOffloadEnabledState() {
+        mutableState.value = mutableState.value.copy(
+            audioOffloadEnabledState = mutableState.value.audioOffloadEnabledState.copy(
+                isChecked = settings.audioOffloadEnabled(),
+            ),
+        )
+    }
+
     fun onShown() {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_SHOWN)
     }
 
     data class State(
         val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState,
+        val audioOffloadEnabledState: AudioOffloadEnabledState,
     ) {
 
         data class BackgroundSyncOnMeteredState(
             val isChecked: Boolean,
             val isEnabled: Boolean,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
+        data class AudioOffloadEnabledState(
+            val isChecked: Boolean,
+            val isEnabled: Boolean = true,
             val onCheckedChange: (Boolean) -> Unit,
         )
     }
