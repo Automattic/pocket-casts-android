@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -79,6 +80,10 @@ fun ChapterRow(
                     onCheckedChange = { selected ->
                         onSelectionChange(selected, chapter)
                     },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.theme.colors.playerContrast01,
+                        uncheckedColor = MaterialTheme.theme.colors.playerContrast02,
+                    ),
                 )
                 Spacer(Modifier.width(8.dp))
             }
@@ -98,7 +103,7 @@ fun ChapterRow(
                     .padding(vertical = 16.dp),
             )
             Spacer(Modifier.width(4.dp))
-            if (chapter.url != null) {
+            if (chapter.url != null && !isTogglingChapters) {
                 LinkButton(
                     textColor = textColor,
                     onClick = onUrlClick,

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -12,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -62,8 +64,6 @@ class SleepFragment : BaseDialogFragment() {
         val binding = FragmentSleepBinding.inflate(inflater, container, false)
         this.binding = binding
 
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
         binding.buttonMins5.setOnClickListener { startTimer(mins = 5) }
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
@@ -90,6 +90,25 @@ class SleepFragment : BaseDialogFragment() {
     @Suppress("DEPRECATION")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        viewModel.sleepTimeLeftText.observe(viewLifecycleOwner) { sleepTime ->
+            binding?.sleepTime?.text = sleepTime
+        }
+
+        viewModel.sleepCustomTimeText.observe(viewLifecycleOwner) { customTimeText ->
+            binding?.labelCustom?.text = customTimeText
+        }
+
+        viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
+            binding?.sleepSetup?.isVisible = !isSleepRunning
+            binding?.sleepRunning?.isVisible = isSleepRunning
+        }
+
+        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisode)
+            .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisode) ->
+                binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode
+                binding?.sleepRunningEndOfEpisode?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
+            }
 
         viewModel.playingEpisodeLive.observe(
             viewLifecycleOwner,

@@ -544,6 +544,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val useRssArtwork = UserSetting.BoolPref(
+        sharedPrefKey = "useRssArtwork",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val globalPlaybackEffects = object : UserSetting<PlaybackEffects>(
         sharedPrefKey = "globalPlaybackEffects",
         sharedPrefs = sharedPreferences,
@@ -868,6 +874,10 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.PERIODIC_SAVE_TIME_MS)
     }
 
+    override fun getPlayerReleaseTimeOutMs(): Long {
+        return getRemoteConfigLong(FirebaseConfig.PLAYER_RELEASE_TIME_OUT_MS)
+    }
+
     override fun getPodcastSearchDebounceMs(): Long {
         return getRemoteConfigLong(FirebaseConfig.PODCAST_SEARCH_DEBOUNCE_MS)
     }
@@ -881,7 +891,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getSlumberStudiosPromoCode(): String {
-        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_PROMO_CODE)
+        return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
     }
 
     private fun getRemoteConfigLong(key: String): Long {

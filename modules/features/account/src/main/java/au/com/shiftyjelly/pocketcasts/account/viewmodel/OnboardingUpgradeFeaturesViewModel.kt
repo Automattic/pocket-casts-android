@@ -12,11 +12,9 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -103,6 +101,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     featureCardsState = FeatureCardsState(
                         subscriptions = updatedSubscriptions,
                         currentFeatureCard = currentFeatureCard,
+                        currentFrequency = currentSubscriptionFrequency,
                     ),
                     currentSubscription = selectedSubscription,
                     currentFeatureCard = currentFeatureCard,
@@ -257,9 +256,4 @@ sealed class OnboardingUpgradeFeaturesState {
         val currentUpgradeButton: UpgradeButton
             get() = currentSubscription.toUpgradeButton()
     }
-}
-
-private fun RecurringSubscriptionPricingPhase.toSubscriptionFrequency() = when (this) {
-    is SubscriptionPricingPhase.Months -> SubscriptionFrequency.MONTHLY
-    is SubscriptionPricingPhase.Years -> SubscriptionFrequency.YEARLY
 }

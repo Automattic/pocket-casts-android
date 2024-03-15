@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -64,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeature
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
@@ -76,7 +79,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val MAX_OFFER_BADGE_TEXT_LENGTH = 23
@@ -90,6 +92,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     onClickSubscribe: () -> Unit,
     onNotNowPressed: () -> Unit,
     canUpgrade: Boolean,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
@@ -111,7 +114,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     }
 
     val scrollState = rememberScrollState()
-    SetStatusBarBackground(scrollState)
+    SetStatusBarBackground(scrollState, onUpdateSystemBars)
 
     when (state) {
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
@@ -119,6 +122,7 @@ internal fun OnboardingUpgradeFeaturesPage(
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
             UpgradeLayout(
                 state = loadedState,
+                source = source,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
                 onNotNowPressed = onNotNowPressed,
@@ -141,6 +145,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 @Composable
 private fun UpgradeLayout(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
@@ -205,7 +210,7 @@ private fun UpgradeLayout(
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
-                                text = stringResource(state.currentFeatureCard.titleRes),
+                                text = stringResource(state.currentFeatureCard.titleRes(source)),
                                 color = Color.White,
                                 maxFontSize = 22.sp,
                                 lineHeight = 30.sp,
@@ -267,6 +272,7 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val featureCardsState = state.featureCardsState
+    val currentSubscriptionFrequency = state.currentSubscriptionFrequency
     HorizontalPagerWrapper(
         pageCount = featureCardsState.featureCards.size,
         initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
@@ -278,6 +284,7 @@ fun FeatureCards(
         FeatureCard(
             subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
+            subscriptionFrequency = currentSubscriptionFrequency,
             upgradeButton = upgradeButton,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
@@ -293,6 +300,7 @@ private fun FeatureCard(
     card: UpgradeFeatureCard,
     upgradeButton: UpgradeButton,
     subscription: Subscription,
+    subscriptionFrequency: SubscriptionFrequency,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -372,7 +380,7 @@ private fun FeatureCard(
 
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
-                card.featureItems.forEach {
+                card.featureItems(subscriptionFrequency).forEach {
                     UpgradeFeatureItem(it)
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -420,8 +428,10 @@ private fun UpgradeButton(
 }
 
 @Composable
-private fun SetStatusBarBackground(scrollState: ScrollState) {
-    val systemUiController = rememberSystemUiController()
+private fun SetStatusBarBackground(
+    scrollState: ScrollState,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+) {
     val hasScrolled = scrollState.value > 0
 
     val scrimAlpha: Float by animateFloatAsState(
@@ -431,16 +441,15 @@ private fun SetStatusBarBackground(scrollState: ScrollState) {
     )
 
     val statusBarBackground = if (scrimAlpha > 0) {
-        OnboardingUpgradeHelper.backgroundColor.copy(alpha = scrimAlpha)
+        OnboardingUpgradeHelper.backgroundColor.copy(alpha = scrimAlpha).toArgb()
     } else {
-        Color.Transparent
+        Color.Transparent.toArgb()
     }
 
     LaunchedEffect(statusBarBackground) {
-        systemUiController.apply {
-            setStatusBarColor(statusBarBackground, darkIcons = false)
-            setNavigationBarColor(Color.Transparent, darkIcons = false)
-        }
+        val statusBar = SystemBarStyle.dark(statusBarBackground)
+        val navigationBar = SystemBarStyle.dark(Color.Transparent.toArgb())
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
 }
 

@@ -51,21 +51,37 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    SLUMBER_STUDIOS_PROMO(
-        key = "slumber_studios_promo",
-        title = "Slumber Studios Promo",
+    SLUMBER_STUDIOS_YEARLY_PROMO(
+        key = "slumber_studios_yearly_promo_code",
+        title = "Slumber Studios Yearly Promo",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     DESELECT_CHAPTERS(
-        key = "deselect_chapters",
+        key = "deselect_chapters_enabled",
         title = "Deselect Chapters",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(null),
+        defaultValue = true,
+        tier = FeatureTier.Plus(ReleaseVersion(7, 60)),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+    ),
+    CACHE_PLAYING_EPISODE(
+        key = "cache_playing_episode",
+        title = "Cache playing episode",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
+    CATEGORIES_REDESIGN(
+        key = "CATEGORIES_REDESIGN",
+        title = "Categories Redesign and Ads in Categories",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
     ),
     ;
 

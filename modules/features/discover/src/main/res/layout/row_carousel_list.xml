@@ -20,6 +20,7 @@
         android:background="@drawable/search_background"
         android:foreground="?attr/selectableItemBackground"
         android:layout_margin="16dp"
+        android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
         android:contentDescription="@string/search_podcasts_or_add_url"

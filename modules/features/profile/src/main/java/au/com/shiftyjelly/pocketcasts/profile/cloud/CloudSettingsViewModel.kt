@@ -41,7 +41,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setDeleteLocalFileAfterPlaying(enabled: Boolean) {
-        settings.deleteLocalFileAfterPlaying.set(enabled, needsSync = false)
+        settings.deleteLocalFileAfterPlaying.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED,
             mapOf("enabled" to enabled),
@@ -73,7 +73,7 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setCloudOnlyWifi(enabled: Boolean) {
-        settings.cloudDownloadOnlyOnWifi.set(enabled, needsSync = false)
+        settings.cloudDownloadOnlyOnWifi.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED,
             mapOf("enabled" to enabled),

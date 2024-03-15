@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -138,7 +137,6 @@ fun NowPlayingScreen(
                             pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
                             seekIconSize = 35.dp,
                             seekIconAlign = Alignment.CenterHorizontally,
-                            seekTapTargetSize = DpSize(50.dp, 60.dp),
                             progressColor = MaterialTheme.colors.onPrimary,
                             trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
                             backgroundColor = Color.Transparent,

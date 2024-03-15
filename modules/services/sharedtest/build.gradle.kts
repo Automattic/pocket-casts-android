@@ -24,4 +24,5 @@ dependencies {
     implementation(libs.junit) {
         exclude(group = "org.hamcrest")
     }
+    implementation(project(":modules:services:utils"))
 }

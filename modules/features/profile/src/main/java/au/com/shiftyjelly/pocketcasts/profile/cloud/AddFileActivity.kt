@@ -685,7 +685,10 @@ class AddFileActivity :
     @UnstableApi
     private fun preparePlayer(uri: Uri) {
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(0, 0, 0, 0).build()
-        val player = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
+        val player = ExoPlayer.Builder(this)
+            .setLoadControl(loadControl)
+            .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
+            .build()
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 val episodeMetadata = EpisodeFileMetadata()

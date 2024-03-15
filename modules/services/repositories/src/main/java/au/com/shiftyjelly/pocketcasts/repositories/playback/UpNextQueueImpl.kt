@@ -78,7 +78,7 @@ class UpNextQueueImpl @Inject constructor(
 
     override fun setup() {
         val initState = updateState()
-        (changesObservable as Relay).accept(initState)
+        updateCurrentEpisodeState(initState)
 
         // listen for user changes and send to server
         changesObservable.observeOn(Schedulers.io())
@@ -109,6 +109,10 @@ class UpNextQueueImpl @Inject constructor(
             state = UpNextQueue.State.Loaded(episode, podcast, episodes)
         }
         return state
+    }
+
+    override fun updateCurrentEpisodeState(state: UpNextQueue.State) {
+        (changesObservable as Relay).accept(state)
     }
 
     private fun saveChanges(action: UpNextAction) {
@@ -142,7 +146,7 @@ class UpNextQueueImpl @Inject constructor(
         }
 
         val state = updateState()
-        (changesObservable as Relay).accept(state)
+        updateCurrentEpisodeState(state)
 
         action._onAdd?.invoke()
     }

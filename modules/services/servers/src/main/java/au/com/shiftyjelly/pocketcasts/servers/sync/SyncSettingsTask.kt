@@ -252,10 +252,15 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 },
                 useSystemTheme = settings.useSystemTheme.getSyncSetting(::NamedChangedSettingBool),
                 deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
+                deleteLocalFilesAfterPlayback = settings.deleteLocalFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
                 cloudAutoUpload = settings.cloudAutoUpload.getSyncSetting(::NamedChangedSettingBool),
                 cloudAutoDownload = settings.cloudAutoDownload.getSyncSetting(::NamedChangedSettingBool),
                 autoDownloadUnmeteredOnly = settings.autoDownloadUnmeteredOnly.getSyncSetting(::NamedChangedSettingBool),
                 autoDownloadOnlyWhenCharging = settings.autoDownloadOnlyWhenCharging.getSyncSetting(::NamedChangedSettingBool),
+                autoDownloadUpNext = settings.autoDownloadUpNext.getSyncSetting(::NamedChangedSettingBool),
+                isPodcastBackgroundRefreshEnabled = settings.backgroundRefreshPodcasts.getSyncSetting(::NamedChangedSettingBool),
+                cloudDownloadUnmeteredOnly = settings.cloudDownloadOnlyOnWifi.getSyncSetting(::NamedChangedSettingBool),
+                useRssArtwork = settings.useRssArtwork.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -273,7 +278,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.autoArchiveInactive,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { AutoArchiveInactive.fromServerId(it) ?: AutoArchiveInactive.Default },
                     )
-                    "autoArchiveIncludesStarred" -> updateSettingIfPossible(
+                    "autoArchiveIncludesStarredGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoArchiveIncludesStarred,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
@@ -296,7 +301,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             PodcastsSortType.fromServerId(serverId)
                         },
                     )
-                    "gridLayout" -> updateSettingIfPossible(
+                    "gridLayoutGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastGridLayout,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(PodcastGridLayoutType::fromServerId),
@@ -334,7 +339,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             }
                         },
                     )
-                    "volumeBoost" -> updateSettingIfPossible(
+                    "volumeBoostGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.globalPlaybackEffects,
                         newSettingValue = (changedSettingResponse.value as? Boolean)?.let { newValue ->
@@ -343,7 +348,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             }
                         },
                     )
-                    "rowAction" -> updateSettingIfPossible(
+                    "rowActionGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.streamingMode,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { it == 0 },
@@ -436,7 +441,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.collectAnalytics,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "useEmbeddedArtwork" -> updateSettingIfPossible(
+                    "useEmbeddedArtworkGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.useEmbeddedArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
@@ -451,7 +456,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.linkCrashReportsToUser,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
-                    "filesAutoUpNext" -> updateSettingIfPossible(
+                    "filesAutoUpNextGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.cloudAddToUpNext,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
@@ -476,7 +481,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.useSystemTheme,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     ).also { isThemeChanged = it != null || isThemeChanged }
-                    "badges" -> updateSettingIfPossible(
+                    "badgesGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBadgeType,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let(BadgeType::fromServerId),
@@ -508,7 +513,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             ?.split(',')
                             ?.mapNotNull(NewEpisodeNotificationAction::fromServerId),
                     )
-                    "playerShelf" -> updateSettingIfPossible(
+                    "playerShelfGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.shelfItems,
                         newSettingValue = (changedSettingResponse.value as? String)
@@ -565,9 +570,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         setting = settings.cloudSortOrder,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { Settings.CloudSortOrder.fromServerId(it) ?: Settings.CloudSortOrder.NEWEST_OLDEST },
                     )
-                    "filesAfterPlayingDeleteCloud" -> updateSettingIfPossible(
+                    "filesAfterPlayingDeleteCloudGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.deleteCloudFileAfterPlaying,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "filesAfterPlayingDeleteLocalGlobal" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.deleteLocalFileAfterPlaying,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "cloudAutoUpload" -> updateSettingIfPossible(
@@ -588,6 +598,26 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "autoDownloadOnlyWhenCharging" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.autoDownloadOnlyWhenCharging,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "autoDownloadUpNext" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.autoDownloadUpNext,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "backgroundRefresh" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.backgroundRefreshPodcasts,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "cloudDownloadUnmeteredOnly" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.cloudDownloadOnlyOnWifi,
+                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                    )
+                    "useRssArtwork" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.useRssArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")

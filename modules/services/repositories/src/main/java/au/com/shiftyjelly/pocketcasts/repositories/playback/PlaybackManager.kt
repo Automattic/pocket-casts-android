@@ -86,6 +86,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -195,6 +196,7 @@ open class PlaybackManager @Inject constructor(
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         playlistManager = playlistManager,
+        widgetManager = widgetManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,
@@ -893,6 +895,7 @@ open class PlaybackManager @Inject constructor(
             val currentTimeMs = getCurrentTimeMs(episode = episode)
             playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
+                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             } ?: skipToEndOfLastChapter()
         }
     }
@@ -903,6 +906,7 @@ open class PlaybackManager @Inject constructor(
             val currentTimeMs = getCurrentTimeMs(episode)
             playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
+                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             }
         }
     }
@@ -911,6 +915,7 @@ open class PlaybackManager @Inject constructor(
         launch {
             playbackStateRelay.blockingFirst().chapters.lastChapter?.let { chapter ->
                 seekToTimeMsInternal(chapter.endTime)
+                trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             }
         }
     }
@@ -956,7 +961,6 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
             }
-
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val updatedItems = playbackState.chapters.getList().map {
                     if (it.index == chapter.index) {
@@ -970,6 +974,19 @@ open class PlaybackManager @Inject constructor(
                     playbackState.copy(
                         chapters = playbackState.chapters.copy(items = updatedItems),
                         lastChangeFrom = LastChangeFrom.OnChapterSelectionToggled.value,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun updatePlaybackStateDeselectedChapterIndices() {
+        launch {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
+                        lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
                     ),
                 )
             }
@@ -1149,7 +1166,10 @@ open class PlaybackManager @Inject constructor(
                     event.message
                 }
                 Sentry.withScope { scope ->
-                    episode?.uuid?.let { scope.setTag("episodeUuid", it) }
+                    episode?.let {
+                        scope.setTag("episodeUuid", it.uuid)
+                        scope.setTag("playedUpTo", it.playedUpTo.roundToInt().toString())
+                    }
                     SentryHelper.recordException(
                         message = "Illegal playback state encountered",
                         throwable = event.error ?: IllegalStateException(event.message),
@@ -1507,15 +1527,7 @@ open class PlaybackManager @Inject constructor(
                 chapters.getList().last().endTime = playbackState.durationMs
             }
 
-            val chaptersWithDeselectState = chapters.copy(
-                items = chapters.getList().map { chapter ->
-                    if (getCurrentEpisode()?.deselectedChapters?.contains(chapter.index) == true) {
-                        chapter.copy(selected = false)
-                    } else {
-                        chapter
-                    }
-                },
-            )
+            val chaptersWithDeselectState = chapters.updateDeselectedState(getCurrentEpisode())
 
             playbackStateRelay.accept(
                 playbackState.copy(
@@ -2381,6 +2393,7 @@ open class PlaybackManager @Inject constructor(
         OnInit("Init"),
         OnBufferingStateChanged("onBufferingStateChanged"),
         OnChapterSelectionToggled("onChapterSelectionToggled"),
+        OnChapterIndicesUpdated("onChapterIndicesUpdated"),
         OnCompletion("onCompletion"),
         OnDurationAvailable("onDurationAvailable"),
         OnEffectsChanged("effectsChanged"),

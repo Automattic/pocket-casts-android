@@ -544,7 +544,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
         }
-        multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
+        multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity())
     }
 
     private fun updateUIColors(@ColorInt color: Int) {

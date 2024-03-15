@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.helper
 
-import android.content.res.ColorStateList
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +8,9 @@ import androidx.databinding.BindingAdapter
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButtonType
-import com.google.android.material.button.MaterialButton
 
 object BindingAdapters {
 
@@ -29,26 +26,10 @@ object BindingAdapters {
         view.visibility = if (string.isNullOrBlank()) View.GONE else View.VISIBLE
     }
 
-    @BindingAdapter(value = ["backgroundTintInt"])
-    @JvmStatic
-    fun setBackgroundTintInt(button: MaterialButton, tintColor: Int) {
-        button.backgroundTintList = ColorStateList.valueOf(tintColor)
-    }
-
     @BindingAdapter(value = ["episode", "buttonType", "color", "fromListUuid"])
     @JvmStatic
     fun setupPlayButton(button: PlayButton, episode: BaseEpisode, buttonType: PlayButtonType, color: Int, fromListUuid: String?) {
         button.setButtonType(episode, buttonType, color, fromListUuid)
-    }
-
-    @BindingAdapter("shortTime")
-    @JvmStatic
-    fun setShortTime(textView: TextView, duration: Double?) {
-        if (duration == null) {
-            textView.text = null
-        } else {
-            textView.text = TimeHelper.getTimeDurationShortString(timeMs = duration.toLong() * 1000, context = textView.context)
-        }
     }
 
     @BindingAdapter("readMore")
@@ -63,6 +44,19 @@ object BindingAdapters {
             }
             TransitionManager.beginDelayedTransition(textView.parent as ViewGroup, transition)
             textView.maxLines = if (textView.maxLines > collapsedLines) collapsedLines else Int.MAX_VALUE
+        }
+    }
+
+    fun TextView.readMore(collapsedLines: Int) {
+        maxLines = collapsedLines
+        ellipsize = TextUtils.TruncateAt.END
+        setOnClickListener {
+            val transition = ChangeBounds().apply {
+                duration = 200
+                interpolator = FastOutSlowInInterpolator()
+            }
+            TransitionManager.beginDelayedTransition(parent as ViewGroup, transition)
+            maxLines = if (maxLines > collapsedLines) collapsedLines else Int.MAX_VALUE
         }
     }
 }

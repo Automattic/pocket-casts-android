@@ -354,6 +354,9 @@
     <!-- %1$d is the number of total chapters. %2$d is the number of hidden chapters. -->
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
+    <string name="select_one_chapter_message">Please select at least one chapter</string>
+    <string name="skip_chapters_plus_prompt">Skip chapters and more with Pocket Casts Plus</string>
+    <string name="skip_chapters_patron_prompt">Skip chapters and more with Pocket Casts Patron</string>
 
     <!-- Podcasts -->
 
@@ -1280,7 +1283,9 @@
     <string name="settings_use_dark_up_next_details">When enabled the Up Next will always use the dark theme, or will match the current theme when disabled</string>
     <string name="settings_use_dynamic_colors_widget">Use dynamic colors for widget</string>
     <string name="settings_use_dynamic_colors_widget_details">When enabled, widget colors will change based on the device theme colors.</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>
+    <string name="settings_use_embedded_podcast_artwork">Use embedded file artwork</string>
+    <string name="settings_use_episode_podcast_artwork">Use embedded RSS artwork</string>
+    <string name="settings_episode_artwork_details">Shows artwork from the episode\'s show notes (if it exists) instead of using the show\'s artwork. If both file and RSS artwork are present, RSS artwork will be used.</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
     <string name="settings_view">View</string>
     <string name="settings_website_link">website link</string>
@@ -1427,15 +1432,25 @@
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
-    <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
-    <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
-    <string name="whats_new_bookmarks_enable_now_button">Enable it now</string>
-    <string name="whats_new_bookmarks_try_now_button">Try it now</string>
     <string name="whats_new_slumber_studios_title">Dream big</string>
     <!-- %1$s is Slumber Studios promo code -->
-    <string name="whats_new_slumber_studios_body">As part of your Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
-    <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_body">As part of your Yearly Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
+    <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus Yearly and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
     <string name="whats_new_slumber_studios_redeem_now_button">Redeem your code</string>
+    <!-- Skip Chapters what's new message for Patron users. Don't translate "Patron" -->
+    <string name="whats_new_deselect_chapters_patron_message">As part of your Patron subscription, you can now select and skip chapters in any episode that supports them.</string>
+    <!-- Skip Chapters what's new message for Plus users. Don't translate "Plus" -->
+    <string name="whats_new_deselect_chapters_plus_message">As part of your Plus subscription, you can now select and skip chapters in any episode that supports them.</string>
+    <!-- Skip Chapters what's new message to subscribe to Plus. Don't translate "Plus" -->
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Subscribe to Plus now so you can select and skip chapters in any episode that supports them.</string>
+    <!-- Skip Chapters what's new message to subscribe to Patron. Don't translate "Patron" -->
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Subscribe to Patron now so you can select and skip chapters in any episode that supports them.</string>
+    <!-- Used in a button meaning that the user understood the message. -->
+    <string name="whats_new_got_it_button">Got it</string>
+    <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
+    <string name="upgrade_to_plus">Upgrade to Plus</string>
+    <!-- Button title to upgrade to Patron. Don't translate "Patron" -->
+    <string name="upgrade_to_patron">Upgrade to Patron</string>
 
     <!-- Errors -->
 
@@ -1550,6 +1565,8 @@
     <string name="discover_button_play_episode">Play Episode</string>
     <string name="discover_button_play_trailer">Play Trailer</string>
     <string name="discover_sponsored">Sponsored</string>
+    <string name="discover_all_categories">All categories</string>
+    <string name="discover_select_categories">Select a category</string>
 
     <!-- Server errors -->
 

@@ -100,6 +100,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                             featureCardsState = FeatureCardsState(
                                 subscriptions = filteredSubscriptions,
                                 currentFeatureCard = currentTier.toUpgradeFeatureCard(),
+                                currentFrequency = defaultSubscription.recurringPricingPhase.toSubscriptionFrequency(),
                             ),
                             upgradeButtons = upgradeButtons,
                         )

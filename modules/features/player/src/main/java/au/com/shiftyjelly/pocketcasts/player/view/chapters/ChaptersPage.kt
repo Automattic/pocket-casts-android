@@ -15,20 +15,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChaptersPage(
     lazyListState: LazyListState,
     chapters: List<ChaptersViewModel.ChapterState>,
+    showHeader: Boolean,
     totalChaptersCount: Int,
     onSelectionChange: (Boolean, Chapter) -> Unit,
     onChapterClick: (Chapter, Boolean) -> Unit,
     onUrlClick: (String) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
+    showSubscriptionIcon: Boolean,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
 ) {
@@ -37,15 +37,16 @@ fun ChaptersPage(
         modifier = modifier
             .background(backgroundColor)
             .fillMaxSize()
-            .padding(top = if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) 0.dp else 16.dp),
+            .padding(top = if (showHeader) 0.dp else 16.dp),
     ) {
-        if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
+        if (showHeader) {
             item {
                 ChaptersHeader(
                     totalChaptersCount = totalChaptersCount,
                     hiddenChaptersCount = totalChaptersCount - chapters.filter { it.chapter.selected }.size,
                     onSkipChaptersClick = onSkipChaptersClick,
                     isTogglingChapters = isTogglingChapters,
+                    showSubscriptionIcon = showSubscriptionIcon,
                 )
             }
         }

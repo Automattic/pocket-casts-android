@@ -10,6 +10,17 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.rx2.asFlow
 
 interface UpNextQueue {
     val isEmpty: Boolean
@@ -35,6 +46,7 @@ interface UpNextQueue {
     suspend fun removeAllIncludingChanges()
     fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable
     fun contains(uuid: String): Boolean
+    fun updateCurrentEpisodeState(state: State)
 
     sealed class State {
         object Empty : State()
@@ -87,6 +99,47 @@ interface UpNextQueue {
                 }
             } else {
                 Observable.just(state)
+            }
+        }
+    }
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    fun getChangesFlowWithLiveCurrentEpisode(episodeManager: EpisodeManager, podcastManager: PodcastManager): Flow<State> {
+        return changesObservable.asFlow().debounce(100).flatMapLatest { state ->
+            if (state is State.Loaded) {
+                if (state.podcast != null) {
+                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                        .combine<BaseEpisode, Podcast, State>(
+                            podcastManager
+                                .observePodcastByUuidFlow(state.podcast.uuid)
+                                .distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects },
+                        ) { episode, podcast ->
+                            val loadedState = State.Loaded(episode, podcast, state.queue)
+                            updateCurrentEpisodeStateIfNeeded(episode, loadedState)
+                            loadedState
+                        }
+                        .catch { emit(State.Empty) }
+                } else {
+                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                        .map<BaseEpisode, State> {
+                            val loadedState = State.Loaded(it, state.podcast, state.queue)
+                            updateCurrentEpisodeStateIfNeeded(it, loadedState)
+                            loadedState
+                        }
+                        .catch { emit(State.Empty) }
+                }
+            } else {
+                flowOf(state)
+            }
+        }
+    }
+
+    fun updateCurrentEpisodeStateIfNeeded(episodeFromDb: BaseEpisode, state: State) {
+        currentEpisode?.let { currentEpisode ->
+            if (episodeFromDb.uuid == currentEpisode.uuid &&
+                episodeFromDb.deselectedChapters != currentEpisode.deselectedChapters
+            ) {
+                updateCurrentEpisodeState(state)
             }
         }
     }

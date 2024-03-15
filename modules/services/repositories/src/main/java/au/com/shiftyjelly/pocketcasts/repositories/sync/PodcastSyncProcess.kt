@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -15,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -30,15 +33,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.FolderResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -50,14 +50,19 @@ import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
 import com.google.protobuf.stringValue
 import com.google.protobuf.timestamp
+import com.pocketcasts.service.api.PodcastFolder
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUserDevice
+import com.pocketcasts.service.api.UserPodcastResponse
 import com.pocketcasts.service.api.boolSetting
+import com.pocketcasts.service.api.dateAddedOrNull
 import com.pocketcasts.service.api.doubleSetting
+import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.int32Setting
 import com.pocketcasts.service.api.podcastSettings
 import com.pocketcasts.service.api.record
+import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
 import com.pocketcasts.service.api.syncUserBookmark
 import com.pocketcasts.service.api.syncUserDevice
@@ -80,6 +85,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.rx2.rxSingle
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -246,11 +252,11 @@ class PodcastSyncProcess(
         val localPodcasts = podcastManager.findSubscribedRx()
         val localFolderUuids = folderManager.findFoldersSingle().map { it.map { folder -> folder.uuid } }
         // get all the users podcast uuids from the server
-        val serverHomeFolder = syncManager.getHomeFolder()
+        val serverHomeFolder = rxSingle { syncManager.getHomeFolder() }
         return Singles.zip(serverHomeFolder, localPodcasts, localFolderUuids)
             .flatMapCompletable { (serverHomeFolder, localPodcasts, localFolderUuids) ->
-                importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcasts ?: emptyList(), localPodcasts = localPodcasts)
-                    .andThen(importFoldersFullSync(serverFolders = serverHomeFolder.folders ?: emptyList(), localFolderUuids = localFolderUuids))
+                importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcastsList, localPodcasts = localPodcasts)
+                    .andThen(importFoldersFullSync(serverFolders = serverHomeFolder.foldersList, localFolderUuids = localFolderUuids))
             }
     }
 
@@ -265,7 +271,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun importPodcastsFullSync(serverPodcasts: List<PodcastResponse>, localPodcasts: List<Podcast>): Completable {
+    private fun importPodcastsFullSync(serverPodcasts: List<UserPodcastResponse>, localPodcasts: List<Podcast>): Completable {
         val localUuids = localPodcasts.map { podcast -> podcast.uuid }.toSet()
         val localPodcastsMap = localPodcasts.associateBy { it.uuid }
         val serverUuids = serverPodcasts.map { it.uuid }.toSet()
@@ -298,7 +304,7 @@ class PodcastSyncProcess(
         return markMissingNotSynced.andThen(subscribeToPodcasts).andThen(updatePodcasts)
     }
 
-    private fun importFoldersFullSync(serverFolders: List<FolderResponse>, localFolderUuids: List<String>): Completable {
+    private fun importFoldersFullSync(serverFolders: List<PodcastFolder>, localFolderUuids: List<String>): Completable {
         val serverUuids = serverFolders.map { it.folderUuid }
         val serverMissingUuids = localFolderUuids - serverUuids
         // delete the local folders that aren't on the server
@@ -316,6 +322,23 @@ class PodcastSyncProcess(
         return deleteLocalFolders.andThen(upsertServerFolders)
     }
 
+    private fun PodcastFolder.toFolder(): Folder? {
+        val dateAdded = dateAdded?.toDate()
+        if (folderUuid == null || name == null || dateAdded == null) {
+            return null
+        }
+        return Folder(
+            uuid = folderUuid,
+            name = name,
+            color = color,
+            addedDate = dateAdded,
+            sortPosition = sortPosition,
+            podcastsSortType = PodcastsSortType.fromServerId(podcastsSortType),
+            deleted = false,
+            syncModified = Folder.SYNC_MODIFIED_FROM_SERVER,
+        )
+    }
+
     private fun downloadAndImportFilters(): Completable {
         return syncManager.getFilters()
             .flatMapCompletable { filters -> importFilters(filters) }
@@ -326,7 +349,7 @@ class PodcastSyncProcess(
         importBookmarks(bookmarks)
     }
 
-    private fun importPodcast(podcastResponse: PodcastResponse?): Maybe<Podcast> {
+    private fun importPodcast(podcastResponse: UserPodcastResponse?): Maybe<Podcast> {
         val podcastUuid = podcastResponse?.uuid ?: return Maybe.empty()
         return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
@@ -335,23 +358,30 @@ class PodcastSyncProcess(
             .onErrorComplete()
     }
 
-    private fun updatePodcastSyncValues(podcast: Podcast?, podcastResponse: PodcastResponse?): Completable = rxCompletable {
+    private fun updatePodcastSyncValues(podcast: Podcast?, podcastResponse: UserPodcastResponse?): Completable = rxCompletable {
         if (podcast == null || podcastResponse == null) {
             return@rxCompletable
         }
-        // use the oldest local or server added date
-        val serverAddedDate = podcastResponse.dateAdded?.parseIsoDate() ?: Date()
-        val localAddedDate = podcast.addedDate
-        val addedDate = if (localAddedDate == null || serverAddedDate < localAddedDate) serverAddedDate else localAddedDate
 
-        podcastManager.updateSyncData(
-            podcast = podcast,
-            startFromSecs = podcastResponse.autoStartFrom ?: podcast.startFromSecs,
-            skipLastSecs = podcastResponse.autoSkipLast ?: podcast.skipLastSecs,
-            folderUuid = podcastResponse.folderUuid,
-            sortPosition = podcastResponse.sortPosition ?: podcast.sortPosition,
-            addedDate = addedDate,
-        )
+        if (FeatureFlag.isEnabled(Feature.SETTINGS_SYNC)) {
+            applyPodcastSyncUpdatesToPodcast(podcast, SyncUpdateResponse.PodcastSync.fromUserPodcastResponse(podcastResponse))
+        } else {
+            // use the oldest local or server added date
+            val serverAddedDate = podcastResponse.dateAddedOrNull?.toDate() ?: Date()
+            val localAddedDate = podcast.addedDate
+            val resolvedAddedDate = if (localAddedDate == null || serverAddedDate < localAddedDate) serverAddedDate else localAddedDate
+
+            podcast.apply {
+                startFromSecs = podcastResponse.autoStartFrom
+                skipLastSecs = podcastResponse.autoSkipLast
+                folderUuid = podcastResponse.folderUuidOrNull?.value
+                sortPosition = podcastResponse.sortPositionOrNull?.value ?: podcast.sortPosition
+                addedDate = resolvedAddedDate
+            }
+        }
+
+        podcast.folderUuid = podcast.folderUuid.takeIf { it != Folder.homeFolderUuid }
+        podcastManager.updatePodcast(podcast)
     }
 
     private fun syncUpNext(): Completable {
@@ -622,6 +652,11 @@ class PodcastSyncProcess(
             }
             fields.put("user_podcast_uuid", episode.podcastUuid)
 
+            episode.deselectedChaptersModified?.let { deselectedChaptersModified ->
+                fields.put("deselected_chapters", ChapterIndices.toString(episode.deselectedChapters))
+                fields.put("deselected_chapters_modified", deselectedChaptersModified)
+            }
+
             val record = JSONObject().apply {
                 put("fields", fields)
                 put("type", "UserEpisode")
@@ -883,6 +918,8 @@ class PodcastSyncProcess(
         podcast.addedDate = podcastSync.dateAdded
         podcast.folderUuid = podcastSync.folderUuid
         podcastSync.sortPosition?.let { podcast.sortPosition = it }
+        podcastSync.episodesSortOrder?.let { podcast.episodesSortType = EpisodesSortType.fromServerId(it) ?: EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC }
+        podcastSync.episodesSortOrderModified?.let { podcast.episodesSortTypeModified = it }
         podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
         podcastSync.startFromModified?.let { podcast.startFromModified = it }
         podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
@@ -1002,6 +1039,11 @@ class PodcastSyncProcess(
                 }
             }
 
+            sync.deselectedChapters?.let {
+                episode.deselectedChapters = it
+                episode.deselectedChaptersModified = null
+            }
+
             episodeManager.update(episode)
 
             episode
@@ -1057,6 +1099,10 @@ class PodcastSyncProcess(
                         addToUpNext = boolSetting {
                             value = boolValue { value = podcast.addToUpNextSyncSetting }
                             modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                        }
+                        episodesSortOrder = int32Setting {
+                            value = int32Value { value = podcast.episodesSortType.serverId }
+                            modifiedAt = podcast.episodesSortTypeModified.toProtobufTimestampOrEpoch()
                         }
                         addToUpNextPosition = int32Setting {
                             value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
@@ -1152,6 +1198,11 @@ class PodcastSyncProcess(
                     episode.archivedModified?.let { episodeArchivedModified ->
                         isDeleted = boolValue { value = episode.isArchived }
                         isDeletedModified = int64Value { value = episodeArchivedModified }
+                    }
+
+                    episode.deselectedChaptersModified?.let {
+                        deselectedChapters = ChapterIndices.toString(episode.deselectedChapters)
+                        deselectedChaptersModified = int64Value { value = it.time }
                     }
                 }
             }

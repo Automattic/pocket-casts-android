@@ -8,6 +8,7 @@ import com.google.android.horologist.compose.navscaffold.scrollable
 fun NavGraphBuilder.settingsRoutes(navController: NavController) {
     settingsUrlScreens()
 
+    @Suppress("DEPRECATION")
     scrollable(SettingsScreen.route) {
         SettingsScreen(
             scrollState = it.columnState,
@@ -18,10 +19,12 @@ fun NavGraphBuilder.settingsRoutes(navController: NavController) {
         )
     }
 
+    @Suppress("DEPRECATION")
     scrollable(PrivacySettingsScreen.route) {
         PrivacySettingsScreen(scrollState = it.columnState)
     }
 
+    @Suppress("DEPRECATION")
     scrollable(WearAboutScreen.route) {
         WearAboutScreen(
             columnState = it.columnState,
@@ -30,6 +33,7 @@ fun NavGraphBuilder.settingsRoutes(navController: NavController) {
         )
     }
 
+    @Suppress("DEPRECATION")
     scrollable(HelpScreen.route) {
         HelpScreen(columnState = it.columnState)
     }

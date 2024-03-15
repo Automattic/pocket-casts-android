@@ -1,12 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -88,6 +90,7 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_hasFields() {
+        val date = Date()
         val record = PodcastSyncProcess.toRecord(
             mockPodcastEpisode(
                 uuid = "uuid",
@@ -98,6 +101,8 @@ class PodcastSyncProcessTest {
                 playedUpTo = 12.0,
                 durationModified = 444,
                 duration = 13.0,
+                deselectedChaptersModified = date,
+                deselectedChapters = ChapterIndices(listOf(1, 2)),
             ),
         ).episode
 
@@ -112,6 +117,9 @@ class PodcastSyncProcessTest {
 
         assertEquals(444, record.durationModified.value)
         assertEquals(13, record.duration.value)
+
+        assertEquals(date.time, record.deselectedChaptersModified.value)
+        assertEquals("1,2", record.deselectedChapters)
     }
 
     @Test
@@ -314,6 +322,7 @@ class PodcastSyncProcessTest {
         autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
         autoArchiveEpisodeLimit: Int = 0,
         podcastGrouping: PodcastGrouping = PodcastGrouping.None,
+        episodesSortType: EpisodesSortType = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
     ) = mock<Podcast> {
         on { this.addedDate } doReturn Date(addedDateSinceEpoch.toMillis())
         on { this.folderUuid } doReturn folderUuid
@@ -332,6 +341,7 @@ class PodcastSyncProcessTest {
         on { this.autoArchiveInactive } doReturn autoArchiveInactive
         on { this.autoArchiveEpisodeLimit } doReturn autoArchiveEpisodeLimit
         on { this.grouping } doReturn podcastGrouping
+        on { this.episodesSortType } doReturn episodesSortType
     }
 
     private fun mockPodcastEpisode(
@@ -347,6 +357,8 @@ class PodcastSyncProcessTest {
         isStarred: Boolean = false,
         archiveModified: Long? = null,
         isArchived: Boolean = false,
+        deselectedChaptersModified: Date? = null,
+        deselectedChapters: ChapterIndices = ChapterIndices(),
     ) = mock<PodcastEpisode> {
         on { this.uuid } doReturn uuid
         on { this.podcastUuid } doReturn podcastUuid
@@ -365,6 +377,9 @@ class PodcastSyncProcessTest {
 
         on { this.archivedModified } doReturn archiveModified
         on { this.isArchived } doReturn isArchived
+
+        on { this.deselectedChaptersModified } doReturn deselectedChaptersModified
+        on { this.deselectedChapters } doReturn deselectedChapters
     }
 
     private fun mockBookmark(

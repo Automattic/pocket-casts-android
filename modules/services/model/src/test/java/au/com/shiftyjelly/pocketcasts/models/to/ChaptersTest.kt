@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -12,12 +12,8 @@ import org.mockito.junit.MockitoJUnitRunner
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class ChaptersTest {
-    @Before
-    fun setUp() {
-        FeatureFlag.initialize(
-            listOf(object : InMemoryFeatureProvider() {}),
-        )
-    }
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Test
     fun `given feature flag true, then next chapter returned from selected chapters`() {

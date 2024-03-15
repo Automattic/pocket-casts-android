@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-14 15:54:03+0000
+Translation-Revision-Date: 2024-02-27 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 hoofdstuk • %d verborgen</string>
+    <string name="number_of_chapters_summary_plural">%1$d hoofdstukken • %2$d verborgen</string>
+    <string name="single_chapter">1 hoofdstuk</string>
+    <string name="number_of_chapters">%d hoofdstukken</string>
+    <string name="skip_chapters">Hoofdstukken overslaan</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 jaar lang exclusieve content van &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Verzilver je code</string>
-    <string name="whats_new_slumber_studios_body_free_user">Abonneer je op Plus en geniet 1 jaar lang van een abonnement op Slumber Studios-content, podcasts ontworpen voor de zoetste dromen. &lt;a href=\"https://slumberstudios.com/\"&gt;Meer informatie&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Als onderdeel van je Plus-abonnement kan je 1 jaar lang genieten van een abonnement op Slumber Studios-content met code %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Meer informatie&lt;/a&gt;.</string>
     <string name="whats_new_slumber_studios_title">Droom groots</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">na je eerste jaar</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %s</string>
@@ -784,7 +787,6 @@ Language: nl
     <string name="settings_website_link">websitelink</string>
     <string name="settings_view">Bekijk</string>
     <string name="settings_version">Versie %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Podcast artwork-embed gebruiken</string>
     <string name="settings_use_android_light_dark_mode">Lichte/donkere Android-modus gebruiken</string>
     <string name="settings_up_next_tap_summary">Als dit is ingeschakeld, dan wordt een aflevering afgespeeld als je erop tikt in Hierna. Bij lang ingedrukt houden, worden opties voor de aflevering weergegeven.</string>
     <string name="settings_up_next_tap">Aflevering afspelen na tikken in Hierna</string>

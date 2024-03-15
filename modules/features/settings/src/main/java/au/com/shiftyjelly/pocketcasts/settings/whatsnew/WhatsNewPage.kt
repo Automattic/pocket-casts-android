@@ -38,17 +38,13 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -67,9 +63,14 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        is WhatsNewFeature.Bookmarks -> BookmarksHeader(onClose)
                         is WhatsNewFeature.SlumberStudiosPromo ->
                             SlumberStudiosHeader(
+                                onClose = onClose,
+                                fullModal = uiState.fullModel,
+                            )
+
+                        is WhatsNewFeature.DeselectChapters ->
+                            DeselectChaptersHeader(
                                 onClose = onClose,
                                 fullModal = uiState.fullModel,
                             )
@@ -84,7 +85,11 @@ fun WhatsNewPage(
     LaunchedEffect(Unit) {
         viewModel.navigationState
             .collect { navigationState ->
-                onConfirm(navigationState)
+                if (navigationState is WhatsNewViewModel.NavigationState.SlumberStudiosClose) {
+                    onClose()
+                } else {
+                    onConfirm(navigationState)
+                }
             }
     }
 }
@@ -157,19 +162,6 @@ private fun WhatsNewPageLoaded(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (state.feature is WhatsNewFeature.Bookmarks) {
-                    SubscriptionBadgeForTier(
-                        tier = Subscription.SubscriptionTier.fromUserTier(state.tier),
-                        displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(
-                            if (state.tier == UserTier.Free) 0.dp else 16.dp,
-                        ),
-                    )
-                }
-
                 if (state.fullModel) {
                     Spacer(modifier = Modifier.weight(0.1f))
                 }
@@ -219,7 +211,8 @@ private fun WhatsNewPageLoaded(
 private fun Message(
     state: UiState.Loaded,
 ) = when (state.feature) {
-    is WhatsNewFeature.Bookmarks -> TextP40(
+    is WhatsNewFeature.DeselectChapters,
+    -> TextP40(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
         color = MaterialTheme.theme.colors.primaryText02,
@@ -239,32 +232,12 @@ private fun Message(
 private fun getButtonTitle(
     state: UiState.Loaded,
 ): String = when (state.feature) {
-    is WhatsNewFeature.Bookmarks -> {
-        when {
-            state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
-            state.feature.hasOffer -> stringResource(LR.string.profile_start_free_trial)
-            else -> {
-                if (state.feature.subscriptionTier != null) {
-                    stringResource(
-                        LR.string.upgrade_to,
-                        when (requireNotNull(state.feature.subscriptionTier)) {
-                            Subscription.SubscriptionTier.PATRON -> stringResource(LR.string.pocket_casts_patron_short)
-                            Subscription.SubscriptionTier.PLUS -> stringResource(LR.string.pocket_casts_plus_short)
-                            Subscription.SubscriptionTier.UNKNOWN -> stringResource(LR.string.pocket_casts_plus_short)
-                        },
-                    )
-                } else {
-                    Timber.e("Subscription tier is null. This should not happen when user is not entitled to a feature.")
-                    ""
-                }
-            }
-        }
-    }
-
     is WhatsNewFeature.SlumberStudiosPromo -> when {
         state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
         else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
     }
+
+    is WhatsNewFeature.DeselectChapters -> stringResource(state.feature.confirmButtonTitle)
 }
 
 @Composable
@@ -293,23 +266,21 @@ private fun WhatsNewSlumberStudiosPreview(
 
 @Composable
 @Preview
-private fun WhatsNewBookmarksPreview(
+private fun WhatsNewDeselectChaptersPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
         WhatsNewPageLoaded(
             state = UiState.Loaded(
-                feature = WhatsNewFeature.Bookmarks(
-                    title = LR.string.whats_new_bookmarks_title,
-                    message = LR.string.whats_new_bookmarks_body,
-                    confirmButtonTitle = LR.string.whats_new_bookmarks_try_now_button,
-                    hasOffer = false,
+                feature = WhatsNewFeature.DeselectChapters(
+                    message = LR.string.whats_new_deselect_chapters_subscribe_to_plus_message,
+                    confirmButtonTitle = LR.string.upgrade_to_plus,
                     isUserEntitled = true,
-                    subscriptionTier = Subscription.SubscriptionTier.PLUS,
                 ),
                 tier = UserTier.Plus,
+                fullModel = true,
             ),
-            header = { BookmarksHeader(onClose = {}) },
+            header = { DeselectChaptersHeader(onClose = {}) },
             onConfirm = {},
             onClose = {},
         )

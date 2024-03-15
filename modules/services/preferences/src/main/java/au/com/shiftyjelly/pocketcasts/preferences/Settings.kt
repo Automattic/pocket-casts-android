@@ -61,7 +61,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9117
+        const val WHATS_NEW_VERSION_CODE = 9119
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -241,7 +241,7 @@ interface Settings {
 
         data object PlaybackSpeed : MediaNotificationControls(
             controlName = LR.string.playback_speed,
-            iconRes = IR.drawable.auto_1x,
+            iconRes = IR.drawable.auto_1,
             key = PLAYBACK_SPEED_KEY,
             serverId = "playback_speed",
         )
@@ -329,6 +329,7 @@ interface Settings {
     val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
+    val useRssArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
@@ -379,6 +380,7 @@ interface Settings {
 
     // Firebase remote config
     fun getPeriodicSaveTimeMs(): Long
+    fun getPlayerReleaseTimeOutMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String

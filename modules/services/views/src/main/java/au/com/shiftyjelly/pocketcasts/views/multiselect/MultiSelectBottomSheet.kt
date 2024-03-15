@@ -86,7 +86,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     }
 
     private fun onClick(item: MultiSelectAction) {
-        multiSelectHelper?.onMenuItemSelected(item.actionId, resources, parentFragmentManager)
+        multiSelectHelper?.onMenuItemSelected(item.actionId, resources, requireActivity())
         dismiss()
     }
 

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
@@ -70,10 +71,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
     ],
-    version = 86,
+    version = 90,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
+        AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
     ],
 )
 @TypeConverters(
@@ -94,6 +96,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     AutoArchiveInactiveTypeConverter::class,
     PodcastGroupingTypeConverter::class,
     ChapterIndicesConverter::class,
+    InstantConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -627,6 +630,45 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_86_87 = addMigration(86, 87) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN automatically_cached INTEGER NOT NULL DEFAULT 0
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_87_88 = addMigration(87, 88) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN episodes_sort_order_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_89_90 = addMigration(89, 90) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN deselected_chapters_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE user_episodes
+                    ADD COLUMN deselected_chapters_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        @DeleteColumn(
+            tableName = "podcast_episodes",
+            columnName = "automatically_cached",
+        )
+        class DeleteAutomaticallyCachedMigration : AutoMigrationSpec
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1003,6 +1045,10 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_83_84,
                 MIGRATION_84_85,
                 MIGRATION_85_86,
+                MIGRATION_86_87,
+                MIGRATION_87_88,
+                // 88 to 89 added via auto migration
+                MIGRATION_89_90,
             )
         }
 

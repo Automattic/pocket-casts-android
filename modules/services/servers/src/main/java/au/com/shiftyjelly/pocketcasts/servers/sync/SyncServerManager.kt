@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
@@ -27,7 +26,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
+import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.bookmarkRequest
+import com.pocketcasts.service.api.userPodcastListRequest
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -56,6 +57,11 @@ open class SyncServerManager @Inject constructor(
 
     companion object {
         const val SCOPE_MOBILE = "mobile"
+
+        private val userPodcastListRequest = userPodcastListRequest {
+            v = Settings.SYNC_API_VERSION.toString()
+            m = Settings.SYNC_API_MODEL
+        }
     }
 
     private val server: SyncServer = retrofit.create(SyncServer::class.java)
@@ -154,19 +160,8 @@ open class SyncServerManager @Inject constructor(
         server.getLastSyncAt(addBearer(token), buildBasicRequest())
             .map { response -> response.lastSyncAt ?: "" }
 
-    fun getHomeFolder(token: AccessToken): Single<PodcastListResponse> =
-        server.getPodcastList(addBearer(token), buildBasicRequest()).map { response ->
-            response.copy(podcasts = removeHomeFolderUuid(response.podcasts), folders = response.folders)
-        }
-
-    private fun removeHomeFolderUuid(podcasts: List<PodcastResponse>?): List<PodcastResponse>? =
-        podcasts?.map { podcast ->
-            if (podcast.folderUuid != null && podcast.folderUuid == Folder.homeFolderUuid) {
-                podcast.copy(folderUuid = null)
-            } else {
-                podcast
-            }
-        }
+    suspend fun getHomeFolder(token: AccessToken): UserPodcastListResponse =
+        server.getPodcastList(addBearer(token), userPodcastListRequest)
 
     fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): Single<PodcastEpisodesResponse> {
         val request = PodcastEpisodesRequest(podcastUuid)

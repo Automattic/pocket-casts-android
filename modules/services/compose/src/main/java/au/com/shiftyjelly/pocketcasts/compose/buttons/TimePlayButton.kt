@@ -11,8 +11,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -80,9 +78,7 @@ fun TimePlayButton(
     colors: TimePlayButtonColors = TimePlayButtonColors.Default,
     buttonStyle: TimePlayButtonStyle = TimePlayButtonStyle.Outlined,
 ) {
-    val timeText by remember {
-        mutableStateOf(TimeHelper.formattedSeconds(timeSecs.toDouble()))
-    }
+    val timeText = TimeHelper.formattedSeconds(timeSecs.toDouble())
     val description = stringResource(contentDescriptionId, timeText)
     val border = when (buttonStyle) {
         is TimePlayButtonStyle.Outlined -> BorderStroke(2.dp, colors.borderColor())

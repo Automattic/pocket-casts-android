@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
@@ -99,4 +100,10 @@ data class Chapters(
     fun isLastChapter(time: Int): Boolean {
         return getChapterIndex(time) == items.size - 1
     }
+
+    fun updateDeselectedState(currentEpisode: BaseEpisode?) = this.copy(
+        items = this.getList().map { chapter ->
+            chapter.copy(selected = currentEpisode?.deselectedChapters?.contains(chapter.index) == false)
+        },
+    )
 }

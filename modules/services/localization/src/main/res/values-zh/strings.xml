@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-01-30 09:54:03+0000
+Translation-Revision-Date: 2024-02-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
+    <string name="number_of_chapters_summary_plural">%1$d 个章节 • %2$d 已隐藏</string>
+    <string name="single_chapter">1 个章节</string>
+    <string name="number_of_chapters">%d 个章节</string>
+    <string name="skip_chapters">跳过章节</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">由 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 提供的一年独家内容</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">兑换您的代码</string>
+    <string name="whats_new_slumber_studios_title">怀揣远大梦想</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">第一年之后</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">定期付款费用为 %s</string>
+    <string name="half_price_first_year">首年享 5 折优惠</string>
+    <string name="plus_offer_duration">%s 优惠</string>
     <string name="report_subtitle">报告不适宜的内容</string>
     <string name="report">报告</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS 应用程序</string>
@@ -775,7 +787,6 @@ Language: zh_CN
     <string name="settings_website_link">网站链接</string>
     <string name="settings_view">查看</string>
     <string name="settings_version">版本 %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">使用嵌入式播客插图</string>
     <string name="settings_use_android_light_dark_mode">使用 Android 浅色/深色模式</string>
     <string name="settings_up_next_tap_summary">如果打开，点按“接下来播放”队列中的某个项目将播放该项目。 长按将显示剧集选项。</string>
     <string name="settings_up_next_tap">点按时播放“接下来播放”剧集</string>
