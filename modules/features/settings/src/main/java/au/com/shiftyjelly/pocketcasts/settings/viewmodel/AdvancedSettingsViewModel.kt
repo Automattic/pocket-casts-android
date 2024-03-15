@@ -42,6 +42,10 @@ class AdvancedSettingsViewModel
             isChecked = settings.audioOffloadEnabled(),
             onCheckedChange = {
                 onAudioOffloadCheckedChange(it)
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_ADVANCED_AUDIO_OFFLOAD_ENABLED,
+                    mapOf("enabled" to it),
+                )
             },
         ),
     )
