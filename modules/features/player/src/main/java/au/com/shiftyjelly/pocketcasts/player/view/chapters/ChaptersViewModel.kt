@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -65,6 +66,7 @@ class ChaptersViewModel
         val canSkipChapters: Boolean = false,
         val podcast: Podcast? = null,
         val isSkippingToNextChapter: Boolean = false,
+        val showHeader: Boolean = false,
     ) {
         val showSubscriptionIcon
             get() = !isTogglingChapters && !canSkipChapters
@@ -162,6 +164,8 @@ class ChaptersViewModel
             canSkipChapters = canSkipChapters,
             podcast = playbackState.podcast,
             isSkippingToNextChapter = _uiState.value.isSkippingToNextChapter,
+            showHeader = (playbackManager.getCurrentEpisode()?.let { it is PodcastEpisode } ?: false) &&
+                FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS),
         )
     }
 
