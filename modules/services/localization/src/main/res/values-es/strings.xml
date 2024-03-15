@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-27 09:54:03+0000
+Translation-Revision-Date: 2024-03-12 19:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="upgrade_to_patron">Actualiza a Patron</string>
+    <string name="upgrade_to_plus">Actualiza a Plus</string>
+    <string name="whats_new_got_it_button">De acuerdo</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Suscríbete a Patron y podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Suscríbete a Plus y podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Como parte de tu suscripción a Plus, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Como parte de tu suscripción a Patron, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="skip_chapters_patron_prompt">Omite capítulos y haz otros cambios con Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Omite capítulos y haz otros cambios con Pocket Casts Plus</string>
+    <string name="settings_use_embedded_podcast_artwork">Utilizar carátula de archivo insertada</string>
+    <string name="settings_episode_artwork_details">Muestra la carátula de las notas del programa del episodio (si tiene) en lugar de usar la carátula del programa. Si se incluyen tanto la carátula de RSS como la del archivo, se usará la carátula de RSS. </string>
+    <string name="select_one_chapter_message">Selecciona al menos un capítulo</string>
     <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
     <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d ocultos</string>
     <string name="single_chapter">1 capítulo</string>
@@ -13,6 +25,8 @@ Language: es
     <string name="skip_chapters">Omitir capítulos</string>
     <string name="onboarding_plus_feature_slumber_studios_title">Un año de contenido exclusivo de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Canjea tu código</string>
+    <string name="whats_new_slumber_studios_body_free_user">Suscríbete a Plus de forma anual y disfruta de un año de suscripción al contenido de Slumber Studios, podcasts diseñados para regalarte los más dulces sueños. &lt;a href=\"https://slumberstudios.com/\"&gt;Más información&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Como parte de tu suscripción anual a Plus, utiliza el código %1$s y disfrutarás de un año de suscripción al contenido de Slumber Studios. &lt;a href=\"https://slumberstudios.com/\"&gt;Más información&lt;/a&gt;.</string>
     <string name="whats_new_slumber_studios_title">Sueña a lo grande</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">tras tu primer año</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Pago recurrente en %s</string>
@@ -787,6 +801,7 @@ Language: es
     <string name="settings_website_link">enlace del sitio web</string>
     <string name="settings_view">Ver</string>
     <string name="settings_version">Versión %1$s (%2$s)</string>
+    <string name="settings_use_episode_podcast_artwork">Utilizar carátula de RSS insertada</string>
     <string name="settings_use_android_light_dark_mode">Usar el modo oscuro o claro de Android</string>
     <string name="settings_up_next_tap_summary">Si se activa esta opción, se reproducirá el elemento cuando lo toques en la cola de A continuación. Si lo mantienes pulsado, se mostrarán las opciones del episodio.</string>
     <string name="settings_up_next_tap">Reproducir episodio de A continuación al tocar</string>
