@@ -94,6 +94,8 @@ message SyncUserEpisode {
   google.protobuf.Int64Value played_up_to_modified = 10;
   google.protobuf.BoolValue starred = 11;
   google.protobuf.Int64Value starred_modified = 12;
+  string deselected_chapters = 13;
+  google.protobuf.Int64Value deselected_chapters_modified = 14;
 }
 
 message SyncUserDevice {

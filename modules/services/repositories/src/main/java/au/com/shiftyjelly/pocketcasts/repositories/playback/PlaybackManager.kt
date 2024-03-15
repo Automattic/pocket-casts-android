@@ -961,7 +961,6 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
             }
-
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val updatedItems = playbackState.chapters.getList().map {
                     if (it.index == chapter.index) {
@@ -975,6 +974,19 @@ open class PlaybackManager @Inject constructor(
                     playbackState.copy(
                         chapters = playbackState.chapters.copy(items = updatedItems),
                         lastChangeFrom = LastChangeFrom.OnChapterSelectionToggled.value,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun updatePlaybackStateDeselectedChapterIndices() {
+        launch {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
+                        lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
                     ),
                 )
             }
@@ -1515,15 +1527,7 @@ open class PlaybackManager @Inject constructor(
                 chapters.getList().last().endTime = playbackState.durationMs
             }
 
-            val chaptersWithDeselectState = chapters.copy(
-                items = chapters.getList().map { chapter ->
-                    if (getCurrentEpisode()?.deselectedChapters?.contains(chapter.index) == true) {
-                        chapter.copy(selected = false)
-                    } else {
-                        chapter
-                    }
-                },
-            )
+            val chaptersWithDeselectState = chapters.updateDeselectedState(getCurrentEpisode())
 
             playbackStateRelay.accept(
                 playbackState.copy(
@@ -2389,6 +2393,7 @@ open class PlaybackManager @Inject constructor(
         OnInit("Init"),
         OnBufferingStateChanged("onBufferingStateChanged"),
         OnChapterSelectionToggled("onChapterSelectionToggled"),
+        OnChapterIndicesUpdated("onChapterIndicesUpdated"),
         OnCompletion("onCompletion"),
         OnDurationAvailable("onDurationAvailable"),
         OnEffectsChanged("effectsChanged"),

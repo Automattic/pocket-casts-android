@@ -19,4 +19,5 @@ data class PodcastEpisode(
     @field:Json(name = "playedUpTo") val playedUpTo: Int?,
     @field:Json(name = "isDeleted") val isArchived: Boolean?,
     @field:Json(name = "starred") val starred: Boolean?,
+    @field:Json(name = "deselectedChapters") val deselectedChapters: String?,
 )
