@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-27 17:54:03+0000
+Translation-Revision-Date: 2024-03-12 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="upgrade_to_patron">Uppgradera till Patron</string>
+    <string name="upgrade_to_plus">Uppgradera till Plus</string>
+    <string name="whats_new_got_it_button">Uppfattat</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Prenumerera på Patron nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Prenumerera på Plus nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Som en del av din Plus-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Som en del av din Patron-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
+    <string name="skip_chapters_patron_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Plus</string>
+    <string name="settings_use_embedded_podcast_artwork">Använd inbäddat filomslag</string>
+    <string name="settings_episode_artwork_details">Visar omslag från avsnittets showanteckningar (om sådana finns) istället för att använda showens omslag. Om både fil- och RSS-omslag finns kommer RSS-omslaget att användas.</string>
+    <string name="select_one_chapter_message">Välj minst ett kapitel</string>
     <string name="number_of_chapters_summary_singular">1 kapitel • %d dolda</string>
     <string name="number_of_chapters_summary_plural">%1$d kapitel • %2$d dolda</string>
     <string name="single_chapter">1 kapitel</string>
@@ -13,6 +25,8 @@ Language: sv_SE
     <string name="skip_chapters">Hoppa över kapitel</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 års exklusivt innehåll från &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Lös in din kod</string>
+    <string name="whats_new_slumber_studios_body_free_user">Prenumerera på Plus Yearly och få en 1-årig prenumeration på innehåll från Slumber Studios, podcasts utformade för ljuva drömmar. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Som en del av din Plus Yearly-prenumeration får du en 1-årig prenumeration på innehåll från Slumber Studios med koden %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
     <string name="whats_new_slumber_studios_title">Dröm stort</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">efter ditt första år</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %s</string>
@@ -787,6 +801,7 @@ Language: sv_SE
     <string name="settings_website_link">webbplatslänk</string>
     <string name="settings_view">Visa</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
+    <string name="settings_use_episode_podcast_artwork">Använd inbäddat RSS-omslag</string>
     <string name="settings_use_android_light_dark_mode">Använd ljust/mörkt läge för Android</string>
     <string name="settings_up_next_tap_summary">Om detta är aktiverat spelas objekt i din Nästa-kö upp om du trycker på dem. En lång tryckning visar avsnittsalternativen.</string>
     <string name="settings_up_next_tap">Spela upp nästa avsnitt vid tryckning</string>

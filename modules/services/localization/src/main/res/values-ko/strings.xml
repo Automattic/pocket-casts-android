@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-27 09:54:03+0000
+Translation-Revision-Date: 2024-03-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="upgrade_to_patron">Patron으로 업그레이드</string>
+    <string name="upgrade_to_plus">Plus로 업그레이드</string>
+    <string name="whats_new_got_it_button">알겠습니다.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">지금 Patron을 구독하면 해당 챕터를 지원하는 모든 에피소드에서 챕터를 선택하고 건너뛸 수 있습니다.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">지금 Plus를 구독하면 해당 챕터를 지원하는 모든 에피소드에서 챕터를 선택하고 건너뛸 수 있습니다.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Plus 구독의 일부로 이제 해당 챕터를 지원하는 모든 에피소드에서 챕터를 선택하고 건너뛸 수 있습니다.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Patron 구독의 일부로 이제 해당 챕터를 지원하는 모든 에피소드에서 챕터를 선택하고 건너뛸 수 있습니다.</string>
+    <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 건너뛰기 등</string>
+    <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 건너뛰기 등</string>
+    <string name="settings_use_embedded_podcast_artwork">임베드한 파일 아트워크 사용</string>
+    <string name="settings_episode_artwork_details">프로그램의 아트워크를 사용하지 않고 에피소드의 프로그램 메모(있는 경우)의 아트워크를 보여줍니다. 파일과 RSS 아트워크가 둘 다 있으면 RSS 아트워크가 사용됩니다.</string>
+    <string name="select_one_chapter_message">챕터를 하나 이상 선택하세요.</string>
     <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>
     <string name="number_of_chapters_summary_plural">%1$d개 챕터 • %2$d개 숨김</string>
     <string name="single_chapter">1개 챕터</string>
@@ -13,6 +25,8 @@ Language: ko_KR
     <string name="skip_chapters">챕터 건너뛰기</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;의 1년 독점 콘텐츠</string>
     <string name="whats_new_slumber_studios_redeem_now_button">코드 사용</string>
+    <string name="whats_new_slumber_studios_body_free_user">Plus Yearly를 구독하고 가장 달콤한 꿈을 위해 디자인된 팟캐스트인 Slumber Studios 콘텐츠 1년 구독을 누리세요. &lt;a href=\"https://slumberstudios.com/\"&gt;자세히 알아보세요&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Yearly Plus 구독의 일부로 %1$s 코드를 사용하여 Slumber Studios 콘텐츠 1년 구독을 누리세요. &lt;a href=\"https://slumberstudios.com/\"&gt;자세히 알아보세요&lt;/a&gt;.</string>
     <string name="whats_new_slumber_studios_title">큰 꿈 꾸기</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">첫해 이후</string>
     <string name="onboarding_plus_recurring_after_intro_offer">반복 결제: %s</string>
@@ -787,6 +801,7 @@ Language: ko_KR
     <string name="settings_website_link">웹사이트 링크</string>
     <string name="settings_view">보기</string>
     <string name="settings_version">버전 %1$s(%2$s)</string>
+    <string name="settings_use_episode_podcast_artwork">임베드한 아트워크 RSS 사용</string>
     <string name="settings_use_android_light_dark_mode">Android 밝게/어둡게 모드 사용</string>
     <string name="settings_up_next_tap_summary">켜진 경우, 다음 차례 대기열의 아이템을 누르면 해당 아이템이 재생됩니다. 길게 누르면 에피소드 옵션이 표시됩니다.</string>
     <string name="settings_up_next_tap">탭에서 다음 차례 에피소드 재생</string>
