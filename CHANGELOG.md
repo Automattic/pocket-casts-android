@@ -1,6 +1,8 @@
 7.60
 -----
-
+*   New Features
+    *   Ability to deselect chapters entering Patron early access with full release for Plus users in next release
+        ([#1940](https://github.com/Automattic/pocket-casts-android/pull/1940))
 
 7.59
 -----

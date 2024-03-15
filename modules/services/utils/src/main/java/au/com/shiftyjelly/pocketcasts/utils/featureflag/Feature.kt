@@ -60,11 +60,11 @@ enum class Feature(
         hasDevToggle = true,
     ),
     DESELECT_CHAPTERS(
-        key = "deselect_chapters",
+        key = "deselect_chapters_enabled",
         title = "Deselect Chapters",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(null),
-        hasFirebaseRemoteFlag = false,
+        defaultValue = true,
+        tier = FeatureTier.Plus(ReleaseVersion(7, 60)),
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     CACHE_PLAYING_EPISODE(
