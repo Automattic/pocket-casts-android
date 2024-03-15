@@ -12,47 +12,44 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyl
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object ViewExtensions {
-
-    fun View.toCircle(circle: Boolean) {
-        if (!circle) {
-            return
-        }
-        clipToOutline = true
-        outlineProvider = object : ViewOutlineProvider() {
-            override fun getOutline(view: View, outline: Outline) {
-                outline.setOval(0, 0, view.width, view.height)
-            }
+fun View.toCircle(circle: Boolean) {
+    if (!circle) {
+        return
+    }
+    clipToOutline = true
+    outlineProvider = object : ViewOutlineProvider() {
+        override fun getOutline(view: View, outline: Outline) {
+            outline.setOval(0, 0, view.width, view.height)
         }
     }
+}
 
-    fun TextView.setLongStyleDate(date: Date?) {
-        text = date?.toLocalizedFormatLongStyle().orEmpty()
-    }
+fun TextView.setLongStyleDate(date: Date?) {
+    text = date?.toLocalizedFormatLongStyle().orEmpty()
+}
 
-    fun TextView.setEpisodeTimeLeft(episode: BaseEpisode) {
-        if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.MISSING) {
-            text = resources.getString(LR.string.podcast_episode_file_not_uploaded)
-        } else {
-            val timeLeft = TimeHelper.getTimeLeft(
-                currentTimeMs = episode.playedUpToMs,
-                durationMs = episode.durationMs.toLong(),
-                inProgress = episode.isInProgress,
-                context = context,
-            )
-            text = timeLeft.text
-            contentDescription = timeLeft.description
-        }
-    }
-
-    fun TextView.applyTimeLong(time: Int) {
+fun TextView.setEpisodeTimeLeft(episode: BaseEpisode) {
+    if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.MISSING) {
+        text = resources.getString(LR.string.podcast_episode_file_not_uploaded)
+    } else {
         val timeLeft = TimeHelper.getTimeLeft(
-            currentTimeMs = 0,
-            durationMs = time.toLong(),
-            inProgress = false,
+            currentTimeMs = episode.playedUpToMs,
+            durationMs = episode.durationMs.toLong(),
+            inProgress = episode.isInProgress,
             context = context,
         )
         text = timeLeft.text
         contentDescription = timeLeft.description
     }
+}
+
+fun TextView.applyTimeLong(time: Int) {
+    val timeLeft = TimeHelper.getTimeLeft(
+        currentTimeMs = 0,
+        durationMs = time.toLong(),
+        inProgress = false,
+        context = context,
+    )
+    text = timeLeft.text
+    contentDescription = timeLeft.description
 }
