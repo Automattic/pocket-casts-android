@@ -17,13 +17,11 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 
 private val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
-    override fun areItemsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean {
-        return oldItem == newItem
-    }
+    override fun areItemsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean =
+        oldItem.discoverCategory.id == newItem.discoverCategory.id
 
-    override fun areContentsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean {
-        return oldItem.hashCode() == newItem.hashCode()
-    }
+    override fun areContentsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean =
+        oldItem.discoverCategory == newItem.discoverCategory
 }
 
 @SuppressLint("NotifyDataSetChanged")
