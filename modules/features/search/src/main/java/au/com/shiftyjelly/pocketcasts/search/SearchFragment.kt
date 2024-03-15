@@ -39,6 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import androidx.core.view.updatePadding
 
 private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
@@ -109,6 +110,11 @@ class SearchFragment : BaseFragment() {
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setSource(source)
         binding.floating = floating
+        binding.floatingLayout.updatePadding(
+            top = if (floating) binding.floatingLayout.context.resources.getDimensionPixelSize(
+                R.dimen.search_box_floating_top
+            ) else 0
+        )
 
         this.binding = binding
 

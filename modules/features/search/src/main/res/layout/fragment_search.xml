@@ -24,7 +24,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
-                android:paddingTop="@{floating ? @dimen/search_box_floating_top : 0}"
                 android:background="?attr/secondary_ui_01">
 
                 <androidx.appcompat.widget.SearchView
