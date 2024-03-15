@@ -46,4 +46,17 @@ object BindingAdapters {
             textView.maxLines = if (textView.maxLines > collapsedLines) collapsedLines else Int.MAX_VALUE
         }
     }
+
+    fun TextView.readMore(collapsedLines: Int) {
+        maxLines = collapsedLines
+        ellipsize = TextUtils.TruncateAt.END
+        setOnClickListener {
+            val transition = ChangeBounds().apply {
+                duration = 200
+                interpolator = FastOutSlowInInterpolator()
+            }
+            TransitionManager.beginDelayedTransition(parent as ViewGroup, transition)
+            maxLines = if (maxLines > collapsedLines) collapsedLines else Int.MAX_VALUE
+        }
+    }
 }
