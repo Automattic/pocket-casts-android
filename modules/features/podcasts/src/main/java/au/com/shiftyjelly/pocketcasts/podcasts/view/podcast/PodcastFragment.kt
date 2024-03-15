@@ -297,22 +297,22 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         val dialog = OptionsDialog()
             .addCheckedOption(
                 titleId = LR.string.episode_sort_newest_to_oldest,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
                 click = sortEpisodesNewestToOldest,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_oldest_to_newest,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC,
                 click = sortEpisodesOldestToNewest,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_short_to_long,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC,
                 click = sortEpisodesLengthShortToLong,
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_long_to_short,
-                checked = binding?.podcast?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC,
+                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC,
                 click = sortEpisodesLengthLongToShort,
             )
         activity?.supportFragmentManager?.let {
@@ -559,7 +559,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         val context = binding.root.context
         val headerColor = context.getThemeColor(UR.attr.support_09)
-        binding.headerColor = headerColor
+        binding.headerBackgroundPlaceholder.setBackgroundColor(headerColor)
+        binding.toolbar.setBackgroundColor(headerColor)
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
@@ -653,8 +654,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         binding.btnRetry.setOnClickListener {
             loadData()
-            binding.error = null
-            binding.executePendingBindings()
         }
 
         binding.episodesRecyclerView.requestFocus()
@@ -770,12 +769,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         viewModel.podcast.observe(
             viewLifecycleOwner,
             Observer<Podcast> { podcast ->
-                val binding = binding ?: return@Observer
-
-                binding.podcast = podcast
-
                 val backgroundColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-                binding.headerColor = backgroundColor
+                binding?.toolbar?.setBackgroundColor(backgroundColor)
+                binding?.headerBackgroundPlaceholder?.setBackgroundColor(backgroundColor)
 
                 adapter?.setPodcast(podcast)
 
@@ -783,20 +779,22 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 statusBarColor = StatusBarColor.Custom(backgroundColor, true)
                 updateStatusBar()
-
-                binding.executePendingBindings()
             },
         )
 
         viewModel.tintColor.observe(viewLifecycleOwner) { tintColor ->
-            binding?.tintColor = tintColor
             adapter?.setTint(tintColor)
         }
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is PodcastViewModel.UiState.Loading -> Unit
+                is PodcastViewModel.UiState.Loading -> {
+                    binding?.loading?.visibility = View.VISIBLE
+                    binding?.errorContainer?.visibility = View.GONE
+                }
                 is PodcastViewModel.UiState.Loaded -> {
+                    binding?.loading?.visibility = View.GONE
+                    binding?.errorContainer?.visibility = View.GONE
                     addPaddingForEpisodeSearch(state.episodes)
                     when (state.showTab) {
                         PodcastTab.EPISODES -> {
@@ -830,7 +828,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 }
                 is PodcastViewModel.UiState.Error -> {
                     adapter?.setError()
-                    binding?.error = getString(LR.string.podcast_load_error)
+                    binding?.loading?.visibility = View.GONE
+                    binding?.errorContainer?.visibility = View.VISIBLE
+                    binding?.errorMessage?.text = getString(LR.string.podcast_load_error)
 
                     if (BuildConfig.DEBUG) {
                         UiUtil.displayAlertError(requireContext(), state.errorMessage, null)

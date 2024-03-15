@@ -73,7 +73,7 @@ class EpisodeViewHolder(
     override val rightLeftIcon2: ImageView
         get() = binding.rightLeftIcon2
     override val episode: BaseEpisode?
-        get() = binding.episode
+        get() = episodeInstance
     override val positionAdapter: Int
         get() = bindingAdapterPosition
     override val rightToLeftSwipeLayout: ViewGroup
@@ -92,11 +92,13 @@ class EpisodeViewHolder(
     val context: Context
         get() = binding.root.context
     private var disposable: Disposable? = null
+    private var episodeInstance: BaseEpisode? = null
+    private var isUpNext: Boolean? = null
     override var upNextAction = Settings.UpNextAction.PLAY_NEXT
     override var isMultiSelecting: Boolean = false
     override val leftIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() {
-            return if (binding.inUpNext == true) {
+            return if (isUpNext == true) {
                 listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_upnext_remove, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
             } else {
                 val addToUpNextIcon = when (upNextAction) {
@@ -150,7 +152,7 @@ class EpisodeViewHolder(
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
-        val sameEpisode = episode.uuid == binding.episode?.uuid
+        val sameEpisode = episode.uuid == episodeInstance?.uuid
 
         // don't set initial values if it's already been done, a side effect is when an episode is playing that it will quickly toggle between the play and pause icon
         if (!sameEpisode) {
@@ -158,7 +160,9 @@ class EpisodeViewHolder(
             binding.playButton.setButtonType(episode, buttonType, tintColor, fromListUuid)
             updateTimeLeft(textView = binding.lblStatus, episode = episode)
         }
-        binding.episode = episode
+        episodeInstance = episode
+        binding.star.isVisible = episode.isStarred
+        binding.video.isVisible = episode.isVideo
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         binding.playButton.listener = playButtonListener
@@ -214,8 +218,9 @@ class EpisodeViewHolder(
                 episode.playing = combinedData.playbackState.isPlaying && combinedData.playbackState.episodeUuid == episode.uuid
                 val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
                 binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
-                binding.inUpNext = combinedData.isInUpNext
-                binding.hasBookmarks = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid) && bookmarksAvailable
+                isUpNext = combinedData.isInUpNext
+                binding.imgUpNext.isVisible = isUpNext == true
+                binding.imgBookmark.isVisible = combinedData.bookmarks.map { it.episodeUuid }.contains(episode.uuid) && bookmarksAvailable
 
                 imgIcon.isVisible = false
                 progressCircle.isVisible = false
@@ -275,8 +280,6 @@ class EpisodeViewHolder(
                 val imageAlpha = if (episodeGreyedOut) 0.5f else 1f
                 imgArtwork.alpha = imageAlpha
                 binding.imgBookmark.alpha = imageAlpha
-
-                binding.executePendingBindings()
             }
             .subscribe()
             .addTo(disposables)

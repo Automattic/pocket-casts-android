@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.helper.BindingAdapters.readMore
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
@@ -257,9 +258,7 @@ class PodcastAdapter(
     }
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
-        holder.binding.podcast = podcast
-        holder.binding.expanded = headerExpanded
-        holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        bindHeaderBottom(holder)
         bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
@@ -283,8 +282,38 @@ class PodcastAdapter(
         }
 
         holder.binding.podcastHeader.contentDescription = podcast.title
+    }
 
-        holder.binding.executePendingBindings()
+    private fun bindHeaderBottom(holder: PodcastViewHolder) {
+        holder.binding.bottom.root.isVisible = headerExpanded
+        val tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        holder.binding.bottom.title.text = podcast.title
+        holder.binding.bottom.title.readMore(3)
+        with(holder.binding.bottom.category) {
+            text = podcast.getFirstCategory(context.resources)
+        }
+        with(holder.binding.bottom.nextText) {
+            text = podcast.displayableNextEpisodeDate(context)
+        }
+        holder.binding.bottom.description.text = podcast.podcastDescription
+        holder.binding.bottom.description.setLinkTextColor(tintColor)
+        holder.binding.bottom.description.readMore(3)
+        holder.binding.bottom.authorText.text = podcast.author
+        holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
+        holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()
+        holder.binding.bottom.linkImage.isVisible = podcast.getShortUrl().isNotBlank()
+        holder.binding.bottom.linkText.text = podcast.getShortUrl()
+        holder.binding.bottom.linkText.setTextColor(tintColor)
+        holder.binding.bottom.linkText.isVisible = podcast.getShortUrl().isNotBlank()
+        with(holder.binding.bottom.frequencyGroup) {
+            isVisible = podcast.displayableFrequency(context.resources) != null
+        }
+        with(holder.binding.bottom.scheduleText) {
+            text = podcast.displayableFrequency(context.resources)
+        }
+        with(holder.binding.bottom.nextGroup) {
+            isVisible = podcast.displayableNextEpisodeDate(context) != null
+        }
     }
 
     private fun bindHeaderTop(holder: PodcastViewHolder) {
@@ -670,7 +699,7 @@ class PodcastAdapter(
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
-    internal class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
+    internal inner class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
 
         var lastImagePodcastUuid: String? = null
 
@@ -802,7 +831,7 @@ class PodcastAdapter(
             set.playSequentially(fadeInButton, widthAndTickSet)
             set.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    if (binding.expanded) {
+                    if (headerExpanded) {
                         adapter.onHeaderClicked(binding)
                     }
                     adapter.onSubscribeClicked()

@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -651,6 +652,11 @@ class PodcastSyncProcess(
             }
             fields.put("user_podcast_uuid", episode.podcastUuid)
 
+            episode.deselectedChaptersModified?.let { deselectedChaptersModified ->
+                fields.put("deselected_chapters", ChapterIndices.toString(episode.deselectedChapters))
+                fields.put("deselected_chapters_modified", deselectedChaptersModified)
+            }
+
             val record = JSONObject().apply {
                 put("fields", fields)
                 put("type", "UserEpisode")
@@ -1033,6 +1039,11 @@ class PodcastSyncProcess(
                 }
             }
 
+            sync.deselectedChapters?.let {
+                episode.deselectedChapters = it
+                episode.deselectedChaptersModified = null
+            }
+
             episodeManager.update(episode)
 
             episode
@@ -1187,6 +1198,11 @@ class PodcastSyncProcess(
                     episode.archivedModified?.let { episodeArchivedModified ->
                         isDeleted = boolValue { value = episode.isArchived }
                         isDeletedModified = int64Value { value = episodeArchivedModified }
+                    }
+
+                    episode.deselectedChaptersModified?.let {
+                        deselectedChapters = ChapterIndices.toString(episode.deselectedChapters)
+                        deselectedChaptersModified = int64Value { value = it.time }
                     }
                 }
             }

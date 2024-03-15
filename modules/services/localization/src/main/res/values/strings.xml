@@ -1432,10 +1432,6 @@
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
-    <string name="whats_new_bookmarks_title">Bookmarks are here!</string>
-    <string name="whats_new_bookmarks_body" translatable="false">@string/bookmarks_create_instructions</string>
-    <string name="whats_new_bookmarks_enable_now_button">Enable it now</string>
-    <string name="whats_new_bookmarks_try_now_button">Try it now</string>
     <string name="whats_new_slumber_studios_title">Dream big</string>
     <!-- %1$s is Slumber Studios promo code -->
     <string name="whats_new_slumber_studios_body">As part of your Yearly Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>

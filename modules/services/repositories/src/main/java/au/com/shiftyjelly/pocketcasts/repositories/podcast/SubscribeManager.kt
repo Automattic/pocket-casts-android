@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -265,6 +266,7 @@ class SubscribeManager @Inject constructor(
             episode.isStarred = syncEpisode.starred ?: false
             episode.playedUpTo = syncEpisode.playedUpTo?.toDouble() ?: 0.toDouble()
             episode.isArchived = syncEpisode.isArchived ?: false
+            episode.deselectedChapters = ChapterIndices.fromString(syncEpisode.deselectedChapters)
             episode.setPlayingStatusInt(syncEpisode.playingStatus ?: 1)
             val duration = syncEpisode.duration ?: 0
             if (duration > 0) {

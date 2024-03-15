@@ -1,7 +1,10 @@
 7.60
 -----
+*   New Features
+    *   Ability to deselect chapters entering Patron early access with full release for Plus users in next release
+        ([#1940](https://github.com/Automattic/pocket-casts-android/pull/1940))
 *   Updates:
-    *   Navigate to a podcast when a podcast title in the player tapped.
+    *   Display episode's RSS artwork in more places in the app.
         ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
 
 7.59
