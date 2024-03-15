@@ -100,7 +100,6 @@ class NowPlayingViewModel @Inject constructor(
             showStreamingConfirmation()
         } else {
             playAttempt?.cancel()
-
             playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
@@ -123,7 +122,6 @@ class NowPlayingViewModel @Inject constructor(
         val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
         if (confirmedStreaming && !playbackManager.isPlaying()) {
             playAttempt?.cancel()
-
             playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }

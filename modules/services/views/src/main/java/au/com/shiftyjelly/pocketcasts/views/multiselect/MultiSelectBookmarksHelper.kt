@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
@@ -48,7 +49,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
     override fun onMenuItemSelected(
         itemId: Int,
         resources: Resources,
-        fragmentManager: FragmentManager,
+        activity: FragmentActivity,
     ): Boolean {
         return when (itemId) {
             UR.id.menu_edit -> {
@@ -57,7 +58,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
             }
 
             R.id.menu_delete -> {
-                delete(resources, fragmentManager)
+                delete(resources, activity.supportFragmentManager)
                 true
             }
 

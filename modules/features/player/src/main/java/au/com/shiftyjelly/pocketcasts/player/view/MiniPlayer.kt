@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -54,9 +54,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     private val inflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val binding = DataBindingUtil.inflate<ViewMiniPlayerBinding>(
+    private val binding = ViewMiniPlayerBinding.inflate(
         inflater,
-        R.layout.view_mini_player,
         this,
         true,
     )
@@ -104,7 +103,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     fun setPlaybackState(playbackState: PlaybackState) {
-        binding.playbackState = playbackState
         // set the progress bar values as we need the max to be set before progress or the initial state doesn't work
         with(binding.progressBar) {
             max = playbackState.durationMs
@@ -115,7 +113,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun updateTintColor(tintColor: Int, theme: Theme) {
-        binding.tintColor = ThemeColor.podcastIcon03(theme.activeTheme, tintColor)
+        val tintColorStateList: ColorStateList =
+            ColorStateList.valueOf(ThemeColor.podcastIcon03(theme.activeTheme, tintColor))
+
+        binding.skipForward.imageTintList = tintColorStateList
+        binding.miniPlayButton.backgroundTintList = tintColorStateList
+        binding.skipBack.imageTintList = tintColorStateList
+        binding.upNextButton.imageTintList = tintColorStateList
 
         val colorStateList = ThemeColor.podcastUi02(theme.activeTheme, tintColor)
         binding.miniPlayerTint.setBackgroundColor(colorStateList)
@@ -141,9 +145,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         if (upNextState is UpNextQueue.State.Loaded) {
             loadArtwork(upNextState.podcast, upNextState.episode, useRssArtwork)
 
-            binding.episode = upNextState.episode
-            binding.podcast = upNextState.podcast
-
             val podcast = upNextState.podcast
             if (podcast != null) {
                 updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
@@ -153,7 +154,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
 
         val upNextCount: Int = upNextState.queueSize()
-        binding.upNextCount = upNextCount
+        binding.countText.text = upNextCount.toString()
+        binding.countText.isVisible = upNextCount > 0
 
         val drawableId = when {
             upNextCount == 0 -> R.drawable.mini_player_upnext
@@ -222,6 +224,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: Boolean) {
         val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = binding.artwork
+        imageView.clipToOutline = true
         imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
 
         val artwork = getEpisodeArtwork(episode, useRssArtwork)

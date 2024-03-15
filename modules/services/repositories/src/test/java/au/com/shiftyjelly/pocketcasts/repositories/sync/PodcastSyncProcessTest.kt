@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -89,6 +90,7 @@ class PodcastSyncProcessTest {
 
     @Test
     fun podcastEpisodeToRecord_hasFields() {
+        val date = Date()
         val record = PodcastSyncProcess.toRecord(
             mockPodcastEpisode(
                 uuid = "uuid",
@@ -99,6 +101,8 @@ class PodcastSyncProcessTest {
                 playedUpTo = 12.0,
                 durationModified = 444,
                 duration = 13.0,
+                deselectedChaptersModified = date,
+                deselectedChapters = ChapterIndices(listOf(1, 2)),
             ),
         ).episode
 
@@ -113,6 +117,9 @@ class PodcastSyncProcessTest {
 
         assertEquals(444, record.durationModified.value)
         assertEquals(13, record.duration.value)
+
+        assertEquals(date.time, record.deselectedChaptersModified.value)
+        assertEquals("1,2", record.deselectedChapters)
     }
 
     @Test
@@ -350,6 +357,8 @@ class PodcastSyncProcessTest {
         isStarred: Boolean = false,
         archiveModified: Long? = null,
         isArchived: Boolean = false,
+        deselectedChaptersModified: Date? = null,
+        deselectedChapters: ChapterIndices = ChapterIndices(),
     ) = mock<PodcastEpisode> {
         on { this.uuid } doReturn uuid
         on { this.podcastUuid } doReturn podcastUuid
@@ -368,6 +377,9 @@ class PodcastSyncProcessTest {
 
         on { this.archivedModified } doReturn archiveModified
         on { this.isArchived } doReturn isArchived
+
+        on { this.deselectedChaptersModified } doReturn deselectedChaptersModified
+        on { this.deselectedChapters } doReturn deselectedChapters
     }
 
     private fun mockBookmark(

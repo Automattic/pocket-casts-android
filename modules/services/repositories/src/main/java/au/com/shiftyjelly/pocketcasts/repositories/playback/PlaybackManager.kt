@@ -59,13 +59,10 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -89,6 +86,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -478,11 +476,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
-
-        if (switchEpisode) {
-            cleanCachedEpisodes()
-        }
-
         if (switchEpisode || isPlayerSwitchRequired()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Player switch required. Different episode: $switchEpisode")
             pause(transientLoss = true)
@@ -968,7 +961,6 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
             }
-
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val updatedItems = playbackState.chapters.getList().map {
                     if (it.index == chapter.index) {
@@ -982,6 +974,19 @@ open class PlaybackManager @Inject constructor(
                     playbackState.copy(
                         chapters = playbackState.chapters.copy(items = updatedItems),
                         lastChangeFrom = LastChangeFrom.OnChapterSelectionToggled.value,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun updatePlaybackStateDeselectedChapterIndices() {
+        launch {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
+                        lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
                     ),
                 )
             }
@@ -1161,7 +1166,10 @@ open class PlaybackManager @Inject constructor(
                     event.message
                 }
                 Sentry.withScope { scope ->
-                    episode?.uuid?.let { scope.setTag("episodeUuid", it) }
+                    episode?.let {
+                        scope.setTag("episodeUuid", it.uuid)
+                        scope.setTag("playedUpTo", it.playedUpTo.roundToInt().toString())
+                    }
                     SentryHelper.recordException(
                         message = "Illegal playback state encountered",
                         throwable = event.error ?: IllegalStateException(event.message),
@@ -1291,8 +1299,6 @@ open class PlaybackManager @Inject constructor(
             // stop the downloads
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
             removeEpisodeFromQueue(episode, "finished", downloadManager)
-
-            cleanCachedEpisodes()
 
             // mark as played
             episodeManager.updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
@@ -1521,15 +1527,7 @@ open class PlaybackManager @Inject constructor(
                 chapters.getList().last().endTime = playbackState.durationMs
             }
 
-            val chaptersWithDeselectState = chapters.copy(
-                items = chapters.getList().map { chapter ->
-                    if (getCurrentEpisode()?.deselectedChapters?.contains(chapter.index) == true) {
-                        chapter.copy(selected = false)
-                    } else {
-                        chapter
-                    }
-                },
-            )
+            val chaptersWithDeselectState = chapters.updateDeselectedState(getCurrentEpisode())
 
             playbackStateRelay.accept(
                 playbackState.copy(
@@ -1897,8 +1895,6 @@ open class PlaybackManager @Inject constructor(
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
         }
-
-        addEpisodeToCache(episode)
     }
 
     private fun findPodcastByEpisode(episode: BaseEpisode): Podcast? {
@@ -2326,37 +2322,6 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(playbackState)
         }
     }
-    private suspend fun addEpisodeToCache(episode: BaseEpisode) {
-        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
-            isEpisodeEligibleToBeCached(episode) &&
-            canCacheEpisodeByDeviceSettings() &&
-            !Util.isAutomotive(application) && !Util.isWearOs(application)
-        ) {
-            episodeManager.updateAutomaticallyCachedStatus(episode, automaticallyCached = true)
-            downloadManager.addEpisodeToQueue(episode, "cache episode", false)
-        }
-    }
-
-    private fun isEpisodeEligibleToBeCached(episode: BaseEpisode): Boolean =
-        episode is PodcastEpisode && !episode.isDownloaded && !episode.isDownloading && !episode.isQueued
-
-    private fun canCacheEpisodeByDeviceSettings(): Boolean {
-        val internetConnectionCondition = !settings.autoDownloadUnmeteredOnly.value ||
-            (settings.autoDownloadUnmeteredOnly.value && !Network.isActiveNetworkMetered(application))
-
-        val chargingCondition = !settings.autoDownloadOnlyWhenCharging.value ||
-            (settings.autoDownloadOnlyWhenCharging.value && Power.isCharging(application))
-
-        return internetConnectionCondition && chargingCondition
-    }
-
-    private suspend fun cleanCachedEpisodes() {
-        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) &&
-            !Util.isAutomotive(application) && !Util.isWearOs(application)
-        ) {
-            episodeManager.cleanAutomaticallyCachedEpisodes(this)
-        }
-    }
 
     fun playTone() {
         try {
@@ -2428,6 +2393,7 @@ open class PlaybackManager @Inject constructor(
         OnInit("Init"),
         OnBufferingStateChanged("onBufferingStateChanged"),
         OnChapterSelectionToggled("onChapterSelectionToggled"),
+        OnChapterIndicesUpdated("onChapterIndicesUpdated"),
         OnCompletion("onCompletion"),
         OnDurationAvailable("onDurationAvailable"),
         OnEffectsChanged("effectsChanged"),

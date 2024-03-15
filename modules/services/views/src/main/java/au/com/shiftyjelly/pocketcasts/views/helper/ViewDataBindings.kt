@@ -1,11 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
-import android.content.res.ColorStateList
 import android.graphics.Outline
-import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.view.ViewOutlineProvider
-import android.widget.SeekBar
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
@@ -39,18 +36,16 @@ object ViewDataBindings {
         }
     }
 
-    @BindingAdapter(value = ["gradientStart", "gradientEnd", "gradientOrientation"], requireAll = true)
-    @JvmStatic
-    fun setBackgroundGradient(view: View, gradientStart: Int, gradientEnd: Int, gradientOrientation: GradientDrawable.Orientation) {
-        val colors = intArrayOf(gradientStart, gradientEnd)
-        val drawable = GradientDrawable(gradientOrientation, colors)
-        view.background = drawable
-    }
-
-    @BindingAdapter("android:progressTint")
-    @JvmStatic
-    fun setBackgroundGradient(seekBar: SeekBar, progressTint: Int) {
-        seekBar.progressTintList = ColorStateList.valueOf(progressTint)
+    fun View.toCircle(circle: Boolean) {
+        if (!circle) {
+            return
+        }
+        clipToOutline = true
+        outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setOval(0, 0, view.width, view.height)
+            }
+        }
     }
 
     @BindingAdapter("clipToOutline")
@@ -79,6 +74,10 @@ object ViewDataBindings {
         }
     }
 
+    fun TextView.setLongStyleDate(date: Date?) {
+        text = date?.toLocalizedFormatLongStyle().orEmpty()
+    }
+
     @BindingAdapter("timeLeft")
     @JvmStatic
     fun setTimeLeft(textView: TextView, episode: BaseEpisode) {
@@ -96,10 +95,19 @@ object ViewDataBindings {
         }
     }
 
-    @BindingAdapter("time")
-    @JvmStatic
-    fun setTime(textView: TextView, time: Int) {
-        textView.text = TimeHelper.formattedMs(time)
+    fun TextView.setEpisodeTimeLeft(episode: BaseEpisode) {
+        if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.MISSING) {
+            text = resources.getString(LR.string.podcast_episode_file_not_uploaded)
+        } else {
+            val timeLeft = TimeHelper.getTimeLeft(
+                currentTimeMs = episode.playedUpToMs,
+                durationMs = episode.durationMs.toLong(),
+                inProgress = episode.isInProgress,
+                context = context,
+            )
+            text = timeLeft.text
+            contentDescription = timeLeft.description
+        }
     }
 
     @BindingAdapter("timeLong")
@@ -115,9 +123,14 @@ object ViewDataBindings {
         textView.contentDescription = timeLeft.description
     }
 
-    @BindingAdapter(value = ["timePosition", "timeDuration"], requireAll = true)
-    @JvmStatic
-    fun setTimeLeft(textView: TextView, timePosition: Int, timeDuration: Int) {
-        textView.text = TimeHelper.getTimeLeftOnlyNumbers(timePosition, timeDuration)
+    fun TextView.applyTimeLong(time: Int) {
+        val timeLeft = TimeHelper.getTimeLeft(
+            currentTimeMs = 0,
+            durationMs = time.toLong(),
+            inProgress = false,
+            context = context,
+        )
+        text = timeLeft.text
+        contentDescription = timeLeft.description
     }
 }

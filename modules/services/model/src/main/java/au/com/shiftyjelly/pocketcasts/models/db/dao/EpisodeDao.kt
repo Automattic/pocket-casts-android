@@ -224,12 +224,6 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET automatically_cached = :automaticallyCached WHERE uuid = :uuid")
-    abstract suspend fun updateAutomaticallyCachedStatus(automaticallyCached: Boolean, uuid: String)
-
-    @Query("SELECT * FROM podcast_episodes WHERE automatically_cached = 1")
-    abstract suspend fun findAutomaticallyCachedEpisodes(): List<PodcastEpisode>?
-
     @Query("UPDATE podcast_episodes SET play_error_details = :playErrorDetails WHERE uuid = :uuid")
     abstract fun updatePlayErrorDetails(playErrorDetails: String?, uuid: String)
 
@@ -322,7 +316,7 @@ abstract class EpisodeDao {
     }
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
+    @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL OR deselected_chapters_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
     abstract fun findEpisodesToSync(): List<PodcastEpisode>
 
     @Query("SELECT podcast_episodes.* FROM podcasts, podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.podcast_id = :podcastUuid AND podcasts.subscribed = 1 AND podcast_episodes.archived = 0 AND (podcast_episodes.added_date < :inactiveTime AND (CASE WHEN podcast_episodes.last_playback_interaction_date IS NULL THEN 0 ELSE podcast_episodes.last_playback_interaction_date END) < :inactiveTime AND (CASE WHEN podcast_episodes.last_download_attempt_date IS NULL THEN 0 ELSE podcast_episodes.last_download_attempt_date END) < :inactiveDate AND (CASE WHEN podcast_episodes.last_archive_interaction_date IS NULL THEN 0 ELSE podcast_episodes.last_archive_interaction_date END) < :inactiveTime )")

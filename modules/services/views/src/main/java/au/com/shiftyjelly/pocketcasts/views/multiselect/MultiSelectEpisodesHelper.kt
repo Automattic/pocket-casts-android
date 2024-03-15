@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
@@ -70,7 +71,8 @@ class MultiSelectEpisodesHelper @Inject constructor(
     override fun isSelected(multiSelectable: BaseEpisode) =
         selectedList.count { it.uuid == multiSelectable.uuid } > 0
 
-    override fun onMenuItemSelected(itemId: Int, resources: Resources, fragmentManager: FragmentManager): Boolean {
+    override fun onMenuItemSelected(itemId: Int, resources: Resources, activity: FragmentActivity): Boolean {
+        val fragmentManager = activity.supportFragmentManager
         return when (itemId) {
             R.id.menu_archive -> {
                 archive(resources = resources, fragmentManager = fragmentManager)

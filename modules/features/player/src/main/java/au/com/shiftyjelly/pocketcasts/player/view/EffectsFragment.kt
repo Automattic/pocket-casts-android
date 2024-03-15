@@ -63,7 +63,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEffectsBinding.inflate(inflater, container, false)
-        binding?.lifecycleOwner = viewLifecycleOwner
 
         viewModel.effectsLive.value?.let { update(it) } // Make sure the window is the correct size before opening or else it won't expand properly
         viewModel.effectsLive.observe(viewLifecycleOwner) { podcastEffectsPair ->
@@ -92,12 +91,11 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         val binding = binding ?: return
 
-        binding.effects = effects
-        binding.podcast = podcast
+        binding.globalEffectsCard.isVisible = podcast.overrideGlobalEffects
 
         imageLoader.load(podcast).into(binding.podcastEffectsImage)
 
-        binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
+        binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
 
         binding.btnSpeedUp.setOnClickListener(this)
         binding.btnSpeedDown.setOnClickListener(this)
@@ -124,8 +122,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding.switchVolume.setOnCheckedChangeListener(this)
 
         binding.btnClear.setOnClickListener(this)
-
-        binding.executePendingBindings()
     }
 
     @Suppress("DEPRECATION")
@@ -162,10 +158,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         val speed = amount.roundedSpeed()
         effects.playbackSpeed = speed
         updatedSpeed = speed
-        binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
+        binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
-        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.playbackSpeedString}")
+        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
     }
 
     private fun updateTrimState() {
@@ -192,8 +188,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
-        val podcast = binding.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
             trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
@@ -215,8 +210,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onButtonChecked(group: MaterialButtonToggleGroup, checkedId: Int, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
-        val podcast = binding.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (group.id == binding.trimToggleGroup.id && isChecked) {
             val index = trimToggleGroupButtonIds.indexOf(checkedId)
@@ -231,8 +225,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onClick(view: View) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
-        val podcast = binding.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         when (view.id) {
             binding.btnSpeedUp.id -> changePlaybackSpeed(effects, podcast, effects.playbackSpeed + 0.1)

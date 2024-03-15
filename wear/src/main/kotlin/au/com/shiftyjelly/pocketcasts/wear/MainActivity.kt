@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalFoundationApi::class)
+@file:Suppress("DEPRECATION")
 
 package au.com.shiftyjelly.pocketcasts.wear
 
@@ -22,8 +23,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.wear.compose.material.SwipeToDismissBoxState
-import androidx.wear.compose.material.rememberSwipeToDismissBoxState
+import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import androidx.wear.tooling.preview.devices.WearDevices
@@ -122,6 +123,7 @@ fun WearApp(
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.route else RequirePlusScreen.route
 
+    @Suppress("DEPRECATION")
     WearNavScaffold(
         navController = navController,
         startDestination = startDestination,
@@ -396,7 +398,7 @@ fun WearApp(
 fun PodcastsScreenContent(
     navController: NavHostController,
     swipeToDismissState: SwipeToDismissBoxState,
-    scrollableScaffoldContext: ScrollableScaffoldContext,
+    @Suppress("DEPRECATION") scrollableScaffoldContext: ScrollableScaffoldContext,
 ) {
     NowPlayingPager(
         navController = navController,
@@ -418,11 +420,13 @@ fun PodcastsScreenContent(
 private fun NavGraphBuilder.loggingInScreens(
     onClose: () -> Unit,
 ) {
+    @Suppress("DEPRECATION")
     composable(LoggingInScreen.route) {
         Timber.i("navigating to logging in screen")
         LoggingInScreen(onClose = onClose)
     }
 
+    @Suppress("DEPRECATION")
     composable(LoggingInScreen.routeWithDelay) {
         LoggingInScreen(
             onClose = onClose,

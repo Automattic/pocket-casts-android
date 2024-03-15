@@ -243,6 +243,9 @@ data class DiscoverCategory(
     @field:Json(name = "source") override val source: String,
     override val curated: Boolean = false,
 ) : NetworkLoadableList {
+    companion object {
+        const val ALL_CATEGORIES_ID = -99
+    }
     override val title: String
         get() = name
     override val type: ListType

@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesRedesignBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowChangeRegionBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
@@ -41,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -57,6 +60,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import coil.imageLoader
@@ -104,6 +109,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
+        fun onAllCategoriesClicked(categories: List<DiscoverCategory>)
     }
 
     val loadPodcastList = { s: String ->
@@ -343,6 +349,11 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
+    class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+        init {
+            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
+        }
+    }
 
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
@@ -359,6 +370,7 @@ internal class DiscoverAdapter(
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
             R.layout.row_change_region -> ChangeRegionViewHolder(RowChangeRegionBinding.inflate(inflater, parent, false))
             R.layout.row_categories -> CategoriesViewHolder(RowCategoriesBinding.inflate(inflater, parent, false))
+            R.layout.row_categories_redesign -> CategoriesRedesignViewHolder(RowCategoriesRedesignBinding.inflate(inflater, parent, false))
             R.layout.row_single_podcast -> SinglePodcastViewHolder(RowSinglePodcastBinding.inflate(inflater, parent, false))
             R.layout.row_single_episode -> SingleEpisodeViewHolder(RowSingleEpisodeBinding.inflate(inflater, parent, false))
             R.layout.row_collection_list -> CollectionListViewHolder(RowCollectionListBinding.inflate(inflater, parent, false))
@@ -394,7 +406,7 @@ internal class DiscoverAdapter(
                         }
                     }
                     is ListType.Categories -> {
-                        return R.layout.row_categories
+                        return if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) R.layout.row_categories_redesign else R.layout.row_categories
                     }
                     else -> {}
                 }
@@ -459,7 +471,10 @@ internal class DiscoverAdapter(
                         },
                     )
 
-                    holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
+                    if (!FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
+                        holder.binding.layoutSearch.visibility = View.VISIBLE
+                        holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
+                    }
                 }
                 is SmallListViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
@@ -488,6 +503,27 @@ internal class DiscoverAdapter(
                             }
                         },
                     )
+                }
+                is CategoriesRedesignViewHolder -> {
+                    var discoverCategories = emptyList<DiscoverCategory>()
+                    val adapter = CategoriesListRowRedesignAdapter(
+                        onPodcastListClick = listener::onPodcastListClicked,
+                        onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
+                    )
+                    holder.recyclerView?.adapter = adapter
+                    holder.loadSingle(
+                        service.getCategoriesList(row.source),
+                        onSuccess = { categories ->
+                            val context = holder.itemView.context
+                            val allCategories = DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = "")
+                            discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+
+                            adapter.submitList(listOf(allCategories) + getMostPopularCategories(discoverCategories)) {
+                                onRestoreInstanceState(holder)
+                            }
+                        },
+                    )
+                    holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
                 is SinglePodcastViewHolder -> {
                     holder.loadFlowable(
@@ -678,6 +714,14 @@ internal class DiscoverAdapter(
                 savedState[holder.itemId] = holder.onSaveInstanceState()
             }
         }
+    }
+    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<DiscoverCategory> {
+        // True Crime, Comedy, Culture, History, Fiction, Technology
+        val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
+
+        return categories
+            .filter { it.id in mostPopularCategoriesId }
+            .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
     }
 
     private fun trackListImpression(listUuid: String) {
