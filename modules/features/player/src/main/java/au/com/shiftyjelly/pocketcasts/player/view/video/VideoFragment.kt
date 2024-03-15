@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.player.binding.BindingAdapters.setPlaybackState
+import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.setPlaybackState
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel
