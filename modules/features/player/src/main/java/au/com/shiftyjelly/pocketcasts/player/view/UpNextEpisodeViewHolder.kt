@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
+import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy

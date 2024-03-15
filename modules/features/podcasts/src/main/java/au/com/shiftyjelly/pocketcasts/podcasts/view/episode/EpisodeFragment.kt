@@ -57,8 +57,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setLongStyleDate
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber

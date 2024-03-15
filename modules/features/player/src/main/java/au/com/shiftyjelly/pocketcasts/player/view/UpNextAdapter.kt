@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
+import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
