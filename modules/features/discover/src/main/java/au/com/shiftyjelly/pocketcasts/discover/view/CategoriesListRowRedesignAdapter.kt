@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.content.ContextCompat.getString
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -59,8 +59,8 @@ class CategoriesListRowRedesignAdapter(
 
         private fun setUpAllCategoriesAndClear(context: Context, category: CategoryPill) {
             if (category.isSelected) {
-                binding.categoryName.visibility = View.GONE
-                binding.categoryIcon.visibility = View.VISIBLE
+                binding.categoryName.isVisible = false
+                binding.categoryIcon.isVisible = true
                 binding.categoryIcon.setImageResource(R.drawable.ic_arrow_close)
                 binding.categoryIcon.contentDescription =
                     getString(
@@ -70,8 +70,8 @@ class CategoriesListRowRedesignAdapter(
                 binding.categoryPill.background =
                     getDrawable(context, R.drawable.category_clear_all_pill_background)
             } else {
-                binding.categoryName.visibility = View.VISIBLE
-                binding.categoryIcon.visibility = View.VISIBLE
+                binding.categoryName.isVisible = true
+                binding.categoryIcon.isVisible = true
                 binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
                 binding.categoryPill.background =
                     getDrawable(context, R.drawable.category_pill_background)
@@ -92,8 +92,8 @@ class CategoriesListRowRedesignAdapter(
             }
             binding.categoryName.text = category.discoverCategory.name
             binding.categoryName.contentDescription = category.discoverCategory.name
-            binding.categoryName.visibility = View.VISIBLE
-            binding.categoryIcon.visibility = View.GONE
+            binding.categoryName.isVisible = true
+            binding.categoryIcon.isVisible = false
         }
     }
 
