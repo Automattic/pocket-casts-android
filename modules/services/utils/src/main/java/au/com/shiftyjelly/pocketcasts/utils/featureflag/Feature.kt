@@ -63,7 +63,7 @@ enum class Feature(
         key = "deselect_chapters",
         title = "Deselect Chapters",
         defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(null),
+        tier = FeatureTier.Plus(ReleaseVersion(7,60)),
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
