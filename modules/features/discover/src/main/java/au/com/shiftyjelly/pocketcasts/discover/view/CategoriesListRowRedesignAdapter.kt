@@ -8,18 +8,30 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.content.ContextCompat.getString
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 
+private val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
+    override fun areItemsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean {
+        return oldItem.hashCode() == newItem.hashCode()
+    }
+}
+
 @SuppressLint("NotifyDataSetChanged")
 class CategoriesListRowRedesignAdapter(
     private val onCategoryClick: (NetworkLoadableList) -> Unit,
     private val onAllCategoriesClick: (() -> Unit) -> Unit,
     private val categories: List<CategoryPill>,
-) : RecyclerView.Adapter<CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>() {
+) : ListAdapter<CategoryPill, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_REDESIGN_DIFF) {
     companion object {
         const val ALL_CATEGORIES_INDEX = 0
     }
@@ -36,6 +48,7 @@ class CategoriesListRowRedesignAdapter(
                 onItemClicked(bindingAdapterPosition)
             }
         }
+
         fun bind(category: CategoryPill, context: Context) {
             if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
                 setUpAllCategoriesAndClear(context, category)
@@ -43,30 +56,38 @@ class CategoriesListRowRedesignAdapter(
                 setUpCategories(context, category)
             }
         }
+
         private fun setUpAllCategoriesAndClear(context: Context, category: CategoryPill) {
             if (category.isSelected) {
                 binding.categoryName.visibility = View.GONE
                 binding.categoryIcon.visibility = View.VISIBLE
                 binding.categoryIcon.setImageResource(R.drawable.ic_arrow_close)
                 binding.categoryIcon.contentDescription =
-                    getString(context, au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all)
+                    getString(
+                        context,
+                        au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all,
+                    )
                 binding.categoryPill.background =
                     getDrawable(context, R.drawable.category_clear_all_pill_background)
             } else {
                 binding.categoryName.visibility = View.VISIBLE
                 binding.categoryIcon.visibility = View.VISIBLE
                 binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
-                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
+                binding.categoryPill.background =
+                    getDrawable(context, R.drawable.category_pill_background)
                 binding.categoryName.text = category.discoverCategory.name
                 binding.categoryName.contentDescription = category.discoverCategory.name
             }
         }
+
         private fun setUpCategories(context: Context, category: CategoryPill) {
             if (category.isSelected) {
-                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_selected_background)
+                binding.categoryPill.background =
+                    getDrawable(context, R.drawable.category_pill_selected_background)
                 binding.categoryName.setTextColor(Color.WHITE)
             } else {
-                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
+                binding.categoryPill.background =
+                    getDrawable(context, R.drawable.category_pill_background)
                 binding.categoryName.setTextAppearance(au.com.shiftyjelly.pocketcasts.ui.R.style.H40)
             }
             binding.categoryName.text = category.discoverCategory.name
@@ -103,9 +124,11 @@ class CategoriesListRowRedesignAdapter(
     override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
         holder.bind(currentCategories[position], holder.itemView.context)
     }
+
     override fun getItemCount(): Int {
         return currentCategories.size
     }
+
     private fun selectCategory(position: Int) {
         val selectedItem = currentCategories[position].copy()
         val allCategories = currentCategories[ALL_CATEGORIES_INDEX].copy()
@@ -119,6 +142,7 @@ class CategoriesListRowRedesignAdapter(
 
         notifyDataSetChanged()
     }
+
     private fun clearCategoryFilter() {
         currentCategories.clear()
         currentCategories.addAll(categories)
