@@ -4,8 +4,6 @@ import android.graphics.Outline
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
-import androidx.databinding.BindingConversion
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -14,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyl
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object ViewDataBindings {
+object ViewExtensions {
 
     fun View.toCircle(circle: Boolean) {
         if (!circle) {

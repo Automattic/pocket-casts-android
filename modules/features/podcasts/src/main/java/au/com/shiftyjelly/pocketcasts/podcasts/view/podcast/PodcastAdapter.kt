@@ -64,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewExtensions.toCircle
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.Observable

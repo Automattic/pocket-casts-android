@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewExtensions.toCircle
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import coil.load
 import coil.request.Disposable
