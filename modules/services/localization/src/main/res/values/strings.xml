@@ -1565,6 +1565,8 @@
     <string name="discover_button_play_episode">Play Episode</string>
     <string name="discover_button_play_trailer">Play Trailer</string>
     <string name="discover_sponsored">Sponsored</string>
+    <string name="discover_all_categories">All categories</string>
+    <string name="discover_select_categories">Select a category</string>
 
     <!-- Server errors -->
 

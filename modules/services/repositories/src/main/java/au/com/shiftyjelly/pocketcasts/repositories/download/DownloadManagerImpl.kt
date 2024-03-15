@@ -14,6 +14,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -187,8 +188,9 @@ class DownloadManagerImpl @Inject constructor(
                                     downloadingQueue.remove(info)
                                 }
 
+                                val error = EpisodeDownloadError.fromProperties(workInfo.outputData.keyValueMap)
                                 val errorMessage = workInfo.outputData.getString(DownloadEpisodeTask.OUTPUT_ERROR_MESSAGE)
-                                episodeDidDownload(DownloadResult.failedResult(workInfo.id, errorMessage, episodeUUID))
+                                episodeDidDownload(DownloadResult.failedResult(error, errorMessage))
                             }
                         }
                         WorkInfo.State.SUCCEEDED -> {
@@ -203,7 +205,7 @@ class DownloadManagerImpl @Inject constructor(
                                     false,
                                 )
                                 if (!wasCancelled) {
-                                    episodeDidDownload(DownloadResult.successResult(workInfo.id, episodeUUID))
+                                    episodeDidDownload(DownloadResult.successResult(episodeUUID))
                                 }
                             }
                         }
@@ -359,7 +361,14 @@ class DownloadManagerImpl @Inject constructor(
             }
         } catch (storageException: StorageException) {
             launch(downloadsCoroutineContext) {
-                episodeDidDownload(DownloadResult.failedResult(null, "Insufficient storage space", episode.uuid))
+                val error = EpisodeDownloadError(
+                    reason = EpisodeDownloadError.Reason.StorageIssue,
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    isProxy = Network.isVpnConnection(context),
+                    isCellular = Network.isCellularConnection(context),
+                )
+                episodeDidDownload(DownloadResult.failedResult(error, "Insufficient storage space"))
             }
         }
     }
@@ -417,12 +426,14 @@ class DownloadManagerImpl @Inject constructor(
 
                 RefreshPodcastsThread.updateNotifications(settings.getNotificationLastSeen(), settings, podcastManager, episodeManager, notificationHelper, context)
             } else {
-                episodeManager.setDownloadFailed(
-                    episode,
-                    result.errorMessage?.split(":")?.last()
-                        ?: "Download failed",
+                episodeManager.setDownloadFailed(episode, result.errorMessage?.split(":")?.last() ?: "Download failed")
+                val error = result.error ?: EpisodeDownloadError(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    isProxy = Network.isVpnConnection(context),
+                    isCellular = Network.isCellularConnection(context),
                 )
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, uuid = episode.uuid)
+                episodeAnalytics.trackEpisodeDownloadFailure(error)
             }
         } catch (t: Throwable) {
             Timber.e(t)

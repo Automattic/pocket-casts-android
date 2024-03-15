@@ -874,6 +874,10 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.PERIODIC_SAVE_TIME_MS)
     }
 
+    override fun getPlayerReleaseTimeOutMs(): Long {
+        return getRemoteConfigLong(FirebaseConfig.PLAYER_RELEASE_TIME_OUT_MS)
+    }
+
     override fun getPodcastSearchDebounceMs(): Long {
         return getRemoteConfigLong(FirebaseConfig.PODCAST_SEARCH_DEBOUNCE_MS)
     }

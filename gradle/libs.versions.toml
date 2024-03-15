@@ -25,7 +25,6 @@ compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.andro
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
 compose-kotlin-compiler = "1.5.9"
-coroutines = "1.6.4"
 espresso = "3.4.0"
 firebase = "30.5.0"
 glide = "4.13.2"
@@ -34,7 +33,7 @@ hilt = "2.50"
 hilt-compiler = "1.1.0"
 horologist = "0.5.21"
 kotlin = "1.9.22"
-kotlin-coroutines = "1.7.3"
+kotlin-coroutines = "1.8.1-Beta"
 ksp = "1.9.22-1.0.17"
 lifecycle = "2.6.0"
 lottie = "6.3.0"
@@ -140,6 +139,7 @@ lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.r
 lifecycle-reactivestreams = { module = "androidx.lifecycle:lifecycle-reactivestreams-ktx", version.ref = "lifecycle" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 

@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.applyTimeLong
+import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setLongStyleDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -65,14 +67,17 @@ class NotesFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) {
-            viewModel.loadEpisode(it.first, it.second)
+            val (episode, backgroundColor) = it
+            viewModel.loadEpisode(episode, backgroundColor)
 
-            binding?.root?.setBackgroundColor(it.second)
-            binding?.showNotes?.setBackgroundColor(it.second)
+            binding?.root?.setBackgroundColor(backgroundColor)
+            binding?.showNotes?.setBackgroundColor(backgroundColor)
+            binding?.title?.text = episode.title
+            binding?.date?.setLongStyleDate(episode.publishedDate)
+            binding?.time?.applyTimeLong(episode.durationMs)
         }
 
         binding = FragmentNotesBinding.inflate(inflater, container, false)
-        binding?.lifecycleOwner = viewLifecycleOwner
 
         binding?.progressBar?.apply {
             setIndicatorColor(ThemeColor.playerContrast03(theme.activeTheme))
@@ -91,8 +96,6 @@ class NotesFragment : BaseFragment() {
             val notes = if (state is ShowNotesState.Loaded) state.showNotes else ""
             loadShowNotes(notes)
         }
-
-        binding?.viewModel = viewModel
 
         return binding?.root
     }

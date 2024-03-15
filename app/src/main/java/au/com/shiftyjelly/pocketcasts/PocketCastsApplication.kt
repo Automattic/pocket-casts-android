@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
+import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
@@ -97,6 +98,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var widgetManager: WidgetManager
 
+    @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -131,6 +134,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
         AnalyticsTracker.refreshMetadata()
+        downloadStatisticsReporter.setup()
     }
 
     private fun setupSentry() {

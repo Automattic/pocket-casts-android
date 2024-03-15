@@ -350,6 +350,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DOWNLOAD_FINISHED("episode_download_finished"),
     EPISODE_DOWNLOAD_FAILED("episode_download_failed"),
     EPISODE_DOWNLOAD_CANCELLED("episode_download_cancelled"),
+    EPISODE_DOWNLOAD_STALE("episode_downloads_stale"),
     EPISODE_UPLOAD_QUEUED("episode_upload_queued"),
     EPISODE_UPLOAD_CANCELLED("episode_upload_cancelled"),
     EPISODE_UPLOAD_FINISHED("episode_upload_finished"),

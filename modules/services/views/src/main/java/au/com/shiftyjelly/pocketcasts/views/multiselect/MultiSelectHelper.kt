@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -59,7 +60,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     abstract fun onMenuItemSelected(
         itemId: Int,
         resources: Resources,
-        fragmentManager: FragmentManager,
+        activity: FragmentActivity,
     ): Boolean
     abstract fun deselect(multiSelectable: T)
 
