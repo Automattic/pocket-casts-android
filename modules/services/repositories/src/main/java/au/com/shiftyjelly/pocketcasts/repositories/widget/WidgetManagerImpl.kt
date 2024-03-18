@@ -92,6 +92,17 @@ class WidgetManagerImpl @Inject constructor(
         }
     }
 
+    override fun updateWidgetRssArtwork(playbackManager: PlaybackManager) {
+        val currentEpisode = playbackManager.getCurrentEpisode() ?: return
+        val target = RemoteViewsTarget(
+            context,
+            ComponentName(context, PodcastWidget::class.java),
+            RemoteViews(context.packageName, remoteViewsLayoutId),
+            R.id.widget_artwork,
+        )
+        imageRequestFactory.create(currentEpisode, settings.useRssArtwork.value).loadInto(target)
+    }
+
     override fun updateWidgetFromPlaybackState(playbackManager: PlaybackManager?) {
         val episode = playbackManager?.getCurrentEpisode() ?: return
         val podcast = findPodcastByEpisode(episode)
