@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -14,27 +13,20 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 
-private val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
+val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
     override fun areItemsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean =
         oldItem.discoverCategory.id == newItem.discoverCategory.id
 
     override fun areContentsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean =
-        oldItem.discoverCategory == newItem.discoverCategory
+        oldItem == newItem
 }
 
-@SuppressLint("NotifyDataSetChanged")
 class CategoriesListRowRedesignAdapter(
-    private val onCategoryClick: (NetworkLoadableList) -> Unit,
+    private val onCategoryClick: (CategoryPill) -> List<CategoryPill>,
     private val onAllCategoriesClick: (() -> Unit) -> Unit,
-    private val categories: List<CategoryPill>,
+    private val onClearCategoryClick: () -> Unit,
 ) : ListAdapter<CategoryPill, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_REDESIGN_DIFF) {
-    companion object {
-        const val ALL_CATEGORIES_INDEX = 0
-    }
-
-    private val currentCategories = categories.map { it.copy() }.toMutableList()
 
     class CategoriesRedesignViewHolder(
         val binding: CategoryPillBinding,
@@ -102,10 +94,10 @@ class CategoriesListRowRedesignAdapter(
         val inflater = LayoutInflater.from(parent.context)
         val binding = CategoryPillBinding.inflate(inflater, parent, false)
         return CategoriesRedesignViewHolder(binding) { position ->
-            val category = currentCategories[position]
+            val category = getItem(position)
             if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
                 if (category.isSelected) {
-                    clearCategoryFilter()
+                    onClearCategoryClick()
                 } else {
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
                     onAllCategoriesClick onCategorySelectionCancel@{
@@ -113,37 +105,15 @@ class CategoriesListRowRedesignAdapter(
                     }
                 }
             } else {
-                selectCategory(position)
-                onCategoryClick(category.discoverCategory)
+                updateCategories(onCategoryClick(category))
             }
         }
     }
 
     override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
-        holder.bind(currentCategories[position], holder.itemView.context)
+        holder.bind(getItem(position), holder.itemView.context)
     }
-
-    override fun getItemCount(): Int {
-        return currentCategories.size
-    }
-
-    private fun selectCategory(position: Int) {
-        val selectedItem = currentCategories[position].copy()
-        val allCategories = currentCategories[ALL_CATEGORIES_INDEX].copy()
-
-        selectedItem.isSelected = true
-        allCategories.isSelected = true
-
-        currentCategories.clear()
-        currentCategories.add(allCategories)
-        currentCategories.add(selectedItem)
-
-        notifyDataSetChanged()
-    }
-
-    private fun clearCategoryFilter() {
-        currentCategories.clear()
-        currentCategories.addAll(categories)
-        notifyDataSetChanged()
+    fun updateCategories(categoryPills: List<CategoryPill>) {
+        submitList(categoryPills)
     }
 }

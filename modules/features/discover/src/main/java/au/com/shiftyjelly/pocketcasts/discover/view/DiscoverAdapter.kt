@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Parcelable
@@ -98,6 +99,7 @@ internal class DiscoverAdapter(
     val theme: Theme,
     loadPodcastList: (String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
+    val loadCategories: (String) -> Flowable<List<CategoryPill>>,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -108,7 +110,9 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onAllCategoriesClicked(categories: List<DiscoverCategory>, onCategorySelectionCancel: () -> Unit)
+        fun onCategoryClick(selectedCategory: CategoryPill): List<CategoryPill>
+        fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit)
+        fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit)
     }
 
     val loadPodcastList = { s: String ->
@@ -348,9 +352,45 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
-    class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+    inner class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+        lateinit var source: String
+
+        private val adapter = CategoriesListRowRedesignAdapter(
+            onCategoryClick = { listener.onCategoryClick(it) },
+            onAllCategoriesClick = { onCategorySelectionCancel -> listener.onAllCategoriesClick(source, onCategorySelectionCancel) },
+            onClearCategoryClick = {
+                listener.onClearCategoryFilterClick(
+                    source,
+                    onCategoriesLoaded = {
+                        submitCategories(
+                            it,
+                            source,
+                            context = binding.root.context,
+                        )
+                    },
+                )
+            },
+        )
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
+            recyclerView?.adapter = adapter
+        }
+        fun submitCategories(categories: List<CategoryPill>, source: String, context: Context) {
+            this.source = source
+            val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
+
+            val categoriesFilter = mutableListOf(allCategories)
+            categoriesFilter.addAll(getMostPopularCategories(categories))
+
+            adapter.updateCategories(categoriesFilter)
+        }
+        private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
+            // True Crime, Comedy, Culture, History, Fiction, Technology
+            val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
+
+            return categories
+                .filter { it.discoverCategory.id in mostPopularCategoriesId }
+                .sortedBy { mostPopularCategoriesId.indexOf(it.discoverCategory.id) }
         }
     }
 
@@ -504,25 +544,14 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    holder.loadSingle(
-                        service.getCategoriesList(row.source),
-                        onSuccess = { categories ->
+                    holder.loadFlowable(
+                        loadCategories(row.source),
+                        onNext = { categories ->
                             val context = holder.itemView.context
-                            val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
-                            val discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
-                            val adapter = CategoriesListRowRedesignAdapter(
-                                onCategoryClick = {
-                                    listener.onPodcastListClicked(it)
-                                },
-                                onAllCategoriesClick = { onCategorySelectionCancel ->
-                                    listener.onAllCategoriesClicked(discoverCategories, onCategorySelectionCancel)
-                                },
-                                categories = (listOf(allCategories) + getMostPopularCategories(discoverCategories)).toMutableList(),
-                            )
-
-                            holder.binding.rowRecyclerView.adapter = adapter
+                            holder.submitCategories(categories, row.source, context)
                         },
                     )
+
                     holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
                 is SinglePodcastViewHolder -> {
@@ -715,27 +744,6 @@ internal class DiscoverAdapter(
             }
         }
     }
-    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<CategoryPill> {
-        // True Crime, Comedy, Culture, History, Fiction, Technology
-        val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
-
-        val sortedCategories = categories
-            .filter { it.id in mostPopularCategoriesId }
-            .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
-
-        return sortedCategories.map {
-            CategoryPill(
-                discoverCategory = DiscoverCategory(
-                    id = it.id,
-                    name = it.name,
-                    icon = it.icon,
-                    curated = it.curated,
-                    source = it.source,
-                ),
-            )
-        }
-    }
-
     private fun trackListImpression(listUuid: String) {
         FirebaseAnalyticsTracker.listImpression(listUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
