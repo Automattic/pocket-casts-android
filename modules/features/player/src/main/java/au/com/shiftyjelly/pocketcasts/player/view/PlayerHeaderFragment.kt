@@ -24,9 +24,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.playIfTrue
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.setSeekBarState
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.showIfPresent
+import au.com.shiftyjelly.pocketcasts.player.binding.playIfTrue
+import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -51,8 +51,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import coil.request.Disposable
 import coil.request.ErrorResult
 import com.airbnb.lottie.LottieAnimationView

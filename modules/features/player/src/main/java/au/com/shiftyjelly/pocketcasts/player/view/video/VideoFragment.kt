@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.setPlaybackState
+import au.com.shiftyjelly.pocketcasts.player.binding.setPlaybackState
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel
@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
+import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import com.airbnb.lottie.LottieAnimationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
