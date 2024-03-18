@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback.auto
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -30,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.autoDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.automotiveDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -64,10 +62,6 @@ data class AutoMediaId(
 }
 
 object AutoConverter {
-
-    private const val THUMBNAIL_IMAGE_SIZE = 200
-    private const val FULL_IMAGE_SIZE = 800
-
     fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, useRssArtwork: Boolean, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
         val localUri = getBitmapUriForPodcast(parentPodcast, episode, context, useRssArtwork)
 
@@ -171,16 +165,6 @@ object AutoConverter {
      */
     fun getArtworkUriForContentProvider(podcastArtUri: Uri?, context: Context): Uri? {
         return podcastArtUri?.asAlbumArtContentUri(context)
-    }
-
-    fun getBitmapForPodcast(podcast: Podcast?, useThumbnail: Boolean, context: Context): Bitmap? {
-        if (podcast == null) {
-            return null
-        }
-
-        val size = if (useThumbnail) THUMBNAIL_IMAGE_SIZE else FULL_IMAGE_SIZE
-        val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).smallPlaceholder()
-        return imageLoader.getBitmap(podcast, size)
     }
 
     fun getPodcastsBitmapUri(context: Context): Uri {
