@@ -101,8 +101,18 @@ data class Chapters(
         return getChapterIndex(time) == items.size - 1
     }
 
-    fun updateDeselectedState(currentEpisode: BaseEpisode?) = this.copy(
-        items = this.getList().map { chapter ->
+    fun updateChaptersTimes(episodeDurationMs: Int) = copy(
+        items = items.mapIndexed { index, chapter ->
+            when (index) {
+                0 -> chapter.copy(startTime = 0)
+                items.lastIndex -> chapter.copy(endTime = episodeDurationMs)
+                else -> chapter
+            }
+        },
+    )
+
+    fun updateDeselectedState(currentEpisode: BaseEpisode?) = copy(
+        items = items.map { chapter ->
             chapter.copy(selected = currentEpisode?.deselectedChapters?.contains(chapter.index) == false)
         },
     )

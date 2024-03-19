@@ -1522,16 +1522,12 @@ open class PlaybackManager @Inject constructor(
     fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
             val chapters = episodeMetadata.chapters
-            if (!chapters.isEmpty) {
-                chapters.getList().first().startTime = 0
-                chapters.getList().last().endTime = playbackState.durationMs
-            }
-
-            val chaptersWithDeselectState = chapters.updateDeselectedState(getCurrentEpisode())
+                .updateChaptersTimes(playbackState.durationMs)
+                .updateDeselectedState(getCurrentEpisode())
 
             playbackStateRelay.accept(
                 playbackState.copy(
-                    chapters = chaptersWithDeselectState,
+                    chapters = chapters,
                     embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
                     lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
                 ),

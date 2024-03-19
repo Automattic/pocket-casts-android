@@ -16,7 +16,6 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.Collections
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
@@ -75,11 +74,10 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                 }
             }
             // sort the chapters by start time
-            Collections.sort(newChapters, START_TIME_COMPARATOR)
-            newChapters.forEachIndexed { index, chapter ->
-                chapter.index = index + 1
+            val indexedChapters = newChapters.sortedWith(START_TIME_COMPARATOR).mapIndexed { index, chapter ->
+                chapter.copy(index = index + 1)
             }
-            chapters = Chapters(newChapters)
+            chapters = Chapters(indexedChapters)
         } catch (e: Exception) {
             Timber.e(e, "Unable to read chapters from ID3 tags.")
         }

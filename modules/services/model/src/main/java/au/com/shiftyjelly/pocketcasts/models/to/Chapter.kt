@@ -4,11 +4,11 @@ import okhttp3.HttpUrl
 
 data class Chapter(
     val title: String,
-    var startTime: Int,
-    var endTime: Int,
+    val startTime: Int,
+    val endTime: Int,
     val url: HttpUrl? = null,
     val imagePath: String? = null,
-    var index: Int = 0,
+    val index: Int = 0,
     val selected: Boolean = true,
 ) {
 
