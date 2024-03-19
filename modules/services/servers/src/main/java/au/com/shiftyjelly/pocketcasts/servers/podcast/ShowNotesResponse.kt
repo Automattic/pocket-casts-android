@@ -23,4 +23,15 @@ data class ShowNotesEpisode(
     @Json(name = "uuid") val uuid: String,
     @Json(name = "show_notes") val showNotes: String?,
     @Json(name = "image") val image: String?,
+    @Json(name = "chapters") val chapters: List<ShowNotesChapter>?,
+    @Json(name = "chapter_url") val chapterUrl: String?,
+)
+
+@JsonClass(generateAdapter = true)
+data class ShowNotesChapter(
+    @Json(name = "startTime") val startTime: Double,
+    @Json(name = "endTime") val endTime: Double?,
+    @Json(name = "title") val title: String?,
+    @Json(name = "img") val image: String?,
+    @Json(name = "url") val url: String?,
 )
