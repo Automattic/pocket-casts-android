@@ -61,6 +61,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -127,14 +128,13 @@ class PlayerViewModel @Inject constructor(
         val isUserEpisode: Boolean = false,
         val theme: Theme.ThemeType = Theme.ThemeType.DARK,
     ) {
-
         val isChaptersPresent: Boolean = !chapters.isEmpty
-        val chapter: Chapter? = chapters.getChapter(positionMs)
-        val chapterProgress: Float = chapter?.calculateProgress(positionMs) ?: 0f
-        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs) ?: ""
-        val chapterSummary: String = chapters.getChapterSummary(positionMs)
-        val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs)
-        val isLastChapter: Boolean = chapters.isLastChapter(positionMs)
+        val chapter: Chapter? = chapters.getChapter(positionMs.milliseconds)
+        val chapterProgress: Float = chapter?.calculateProgress(positionMs.milliseconds) ?: 0f
+        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs.milliseconds) ?: ""
+        val chapterSummary: String = chapters.getChapterSummary(positionMs.milliseconds)
+        val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs.milliseconds)
+        val isLastChapter: Boolean = chapters.isLastChapter(positionMs.milliseconds)
         val isChapterImagePresent = chapter?.isImagePresent ?: false
         val title = chapter?.title ?: episodeTitle
 
@@ -374,7 +374,7 @@ class PlayerViewModel @Inject constructor(
             )
         }
         val chapters = playbackState.chapters
-        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs)
+        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
 
         var episodeCount = 0
         var totalTime = 0.0

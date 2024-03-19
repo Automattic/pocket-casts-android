@@ -1,11 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import kotlin.time.Duration
 import okhttp3.HttpUrl
 
 data class Chapter(
     val title: String,
-    val startTime: Int,
-    val endTime: Int,
+    val startTime: Duration,
+    val endTime: Duration,
     val url: HttpUrl? = null,
     val imagePath: String? = null,
     val index: Int = 0,
@@ -15,30 +16,26 @@ data class Chapter(
     val isImagePresent: Boolean
         get() = !imagePath.isNullOrBlank()
 
-    val duration: Int
+    val duration: Duration
         get() = endTime - startTime
 
-    fun containsTime(time: Int): Boolean {
-        return time >= startTime && time < endTime || time >= startTime && endTime <= 0
+    operator fun contains(duration: Duration): Boolean {
+        return duration in startTime..<endTime || duration > startTime && endTime <= Duration.ZERO
     }
 
-    fun remainingTime(playbackPositionMs: Int): String {
-        val progress = calculateProgress(playbackPositionMs)
-        val length = endTime - startTime
-        val remaining = length * (1f - progress)
-        val minutesRemaining = remaining / 1000f / 60f
-        return if (minutesRemaining >= 1) {
-            "${minutesRemaining.toInt()}m"
+    fun remainingTime(playbackPosition: Duration): String {
+        val progress = calculateProgress(playbackPosition)
+        val remaining = duration * (1.0 - progress)
+        return if (remaining.inWholeMinutes >= 1) {
+            "${remaining.inWholeMinutes.toInt()}m"
         } else {
-            val secondsRemaining = remaining / 1000f
-            "${secondsRemaining.toInt()}s"
+            "${remaining.inWholeSeconds.toInt()}s"
         }
     }
 
-    fun calculateProgress(playbackPositionMs: Int): Float {
-        if (playbackPositionMs == 0 || playbackPositionMs < startTime || playbackPositionMs > endTime || duration <= 0) {
-            return 0f
-        }
-        return (playbackPositionMs - startTime).toFloat() / duration.toFloat()
+    fun calculateProgress(playbackPosition: Duration): Float = if (playbackPosition == Duration.ZERO || playbackPosition !in this) {
+        0f
+    } else {
+        (playbackPosition - startTime).inWholeMilliseconds.toFloat() / duration.inWholeMilliseconds.toFloat()
     }
 }

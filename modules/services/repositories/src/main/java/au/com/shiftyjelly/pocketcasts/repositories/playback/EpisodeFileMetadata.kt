@@ -16,6 +16,7 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import kotlin.time.Duration.Companion.milliseconds
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
@@ -111,8 +112,8 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
         return Chapter(
             title = title,
             url = url?.toHttpUrlOrNull(),
-            startTime = frame.startTimeMs,
-            endTime = frame.endTimeMs,
+            startTime = frame.startTimeMs.milliseconds,
+            endTime = frame.endTimeMs.milliseconds,
             imagePath = imagePath,
         )
     }

@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMin
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMinutes
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecs
+import kotlin.time.Duration
 
 object TimeHelper {
 
@@ -35,6 +36,17 @@ object TimeHelper {
             output = context.getString(R.string.time_short_seconds, secs) // "${secs}s"
         }
         return output.ifEmpty { emptyString }
+    }
+
+    /**
+     * Displays the duration with the long units such as minutes shortened to mins.
+     * For example: 6 hours
+     * 1 hours 12 mins
+     * 45 mins
+     * 45 secs
+     */
+    fun getTimeDurationMediumString(time: Duration, context: Context?, emptyString: String = "-"): String {
+        return getTimeDurationMediumString(time.inWholeMilliseconds.toInt(), context, emptyString)
     }
 
     /**
