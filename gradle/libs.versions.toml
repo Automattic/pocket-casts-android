@@ -29,8 +29,8 @@ espresso = "3.4.0"
 firebase = "30.5.0"
 glide = "4.13.2"
 google-services = "4.3.14"
-hilt = "2.50"
-hilt-compiler = "1.1.0"
+hilt = "2.51"
+hilt-compiler = "1.2.0"
 horologist = "0.5.21"
 kotlin = "1.9.22"
 kotlin-coroutines = "1.8.1-Beta"
@@ -95,8 +95,8 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
-hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.1.0"
-hilt-work = "androidx.hilt:hilt-work:1.1.0"
+hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
+hilt-work = "androidx.hilt:hilt-work:1.2.0"
 
 # Espresso
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
@@ -431,7 +431,6 @@ android-application = { id = "com.android.application", version.ref = "android-a
 android-library = { id = "com.android.library", version.ref = "android-application" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
