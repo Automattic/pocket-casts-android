@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -24,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -36,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -131,23 +130,13 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
-    override fun onCategoryClick(selectedCategory: CategoryPill): List<CategoryPill> {
-        context?.let {
-            val selectedItem = selectedCategory.copy(isSelected = true)
+    override fun onCategoryClick(selectedCategory: CategoryPill) {
+        val categoryWithRegionUpdated =
+            viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
-            val allCategories =
-                CategoryPill(
-                    DiscoverCategory(
-                        ALL_CATEGORIES_ID,
-                        it.getString(R.string.discover_all_categories),
-                        icon = "",
-                        source = "",
-                    ),
-                    isSelected = true,
-                )
-            return listOf(allCategories, selectedItem)
+        viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
+            LogBuffer.i("Tittle: ", it.title.toString())
         }
-        return emptyList()
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit) {
         viewModel.loadCategories(source) { categories ->

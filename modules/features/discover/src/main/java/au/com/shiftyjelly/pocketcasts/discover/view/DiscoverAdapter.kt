@@ -113,7 +113,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onCategoryClick(selectedCategory: CategoryPill): List<CategoryPill>
+        fun onCategoryClick(selectedCategory: CategoryPill)
         fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit)
         fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit)
     }
@@ -359,9 +359,13 @@ internal class DiscoverAdapter(
     }
     inner class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
         lateinit var source: String
+        private lateinit var allCategories: CategoryPill
 
         private val adapter = CategoriesListRowRedesignAdapter(
-            onCategoryClick = { listener.onCategoryClick(it) },
+            onCategoryClick = {
+                listener.onCategoryClick(it)
+                return@CategoriesListRowRedesignAdapter listOf(allCategories.copy(isSelected = true), it.copy(isSelected = true))
+            },
             onAllCategoriesClick = { onCategorySelectionCancel -> listener.onAllCategoriesClick(source, onCategorySelectionCancel) },
             onClearCategoryClick = {
                 listener.onClearCategoryFilterClick(
@@ -382,7 +386,7 @@ internal class DiscoverAdapter(
         }
         fun submitCategories(categories: List<CategoryPill>, source: String, context: Context) {
             this.source = source
-            val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
+            this.allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
 
             val categoriesFilter = mutableListOf(allCategories)
             categoriesFilter.addAll(getMostPopularCategories(categories))
