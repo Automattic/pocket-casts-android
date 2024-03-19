@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ModifiableFeatureProvider
 
-open class InMemoryFeatureProvider : ModifiableFeatureProvider {
+class InMemoryFeatureProvider : ModifiableFeatureProvider {
     private val features = mutableMapOf<Feature, Boolean>()
 
     override val priority = 0
