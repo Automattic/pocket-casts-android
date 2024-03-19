@@ -217,9 +217,8 @@ dependencies {
     ksp libs.moshi.kotlin.codegen
     ksp libs.glide.compiler
     ksp libs.showkase.processor
-    // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
-    kapt libs.hilt.compiler
-    kapt libs.dagger.hilt.compiler
+    ksp libs.hilt.compiler
+    ksp libs.dagger.hilt.compiler
 
     debugImplementation libs.compose.ui.test.manifest
     debugImplementation libs.compose.ui.tooling
