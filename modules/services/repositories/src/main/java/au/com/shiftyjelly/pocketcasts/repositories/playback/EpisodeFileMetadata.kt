@@ -16,7 +16,7 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.Collections
+import kotlin.time.Duration.Companion.milliseconds
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
@@ -75,11 +75,10 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                 }
             }
             // sort the chapters by start time
-            Collections.sort(newChapters, START_TIME_COMPARATOR)
-            newChapters.forEachIndexed { index, chapter ->
-                chapter.index = index + 1
+            val indexedChapters = newChapters.sortedWith(START_TIME_COMPARATOR).mapIndexed { index, chapter ->
+                chapter.copy(index = index + 1)
             }
-            chapters = Chapters(newChapters)
+            chapters = Chapters(indexedChapters)
         } catch (e: Exception) {
             Timber.e(e, "Unable to read chapters from ID3 tags.")
         }
@@ -93,7 +92,6 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
         var title = ""
         var url: String? = null
         var imagePath: String? = null
-        var mimeType: String? = null
         for (i in 0 until frame.subFrameCount) {
             val subFrame = frame.getSubFrame(i)
             if (subFrame is TextInformationFrame) {
@@ -108,17 +106,15 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                 val filePath = saveToDisk(subFrame.pictureData, file, context)
                 if (filePath != null) {
                     imagePath = filePath
-                    mimeType = subFrame.mimeType
                 }
             }
         }
         return Chapter(
             title = title,
             url = url?.toHttpUrlOrNull(),
-            startTime = frame.startTimeMs,
-            endTime = frame.endTimeMs,
+            startTime = frame.startTimeMs.milliseconds,
+            endTime = frame.endTimeMs.milliseconds,
             imagePath = imagePath,
-            mimeType = mimeType,
         )
     }
 

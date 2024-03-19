@@ -43,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -181,11 +183,10 @@ private fun getTextColor(
 fun ChapterRowPreview() {
     val chapter = Chapter(
         title = "Chapter Title",
-        startTime = 0,
-        endTime = 62,
+        startTime = Duration.ZERO,
+        endTime = 62.seconds,
         url = "https://pocketcasts.com".toHttpUrlOrNull(),
         imagePath = null,
-        mimeType = null,
         index = 1,
     )
     AppThemeWithBackground(Theme.ThemeType.DARK) {

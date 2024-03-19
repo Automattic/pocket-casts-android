@@ -87,6 +87,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -796,6 +798,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    private suspend fun seekToTimeMsInternal(duration: Duration) {
+        seekToTimeMsInternal(duration.inWholeMilliseconds.toInt())
+    }
+
     private suspend fun seekToTimeMsInternal(positionMs: Int) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "PlaybackService seekToTimeMsInternal %.3f ", positionMs.toDouble() / 1000.0)
         val episode = getCurrentEpisode()
@@ -893,7 +899,7 @@ open class PlaybackManager @Inject constructor(
         launch {
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode = episode)
-            playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs)?.let { chapter ->
+            playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
                 trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             } ?: skipToEndOfLastChapter()
@@ -904,7 +910,7 @@ open class PlaybackManager @Inject constructor(
         launch {
             val episode = getCurrentEpisode() ?: return@launch
             val currentTimeMs = getCurrentTimeMs(episode)
-            playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs)?.let { chapter ->
+            playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(currentTimeMs.milliseconds)?.let { chapter ->
                 seekToTimeMsInternal(chapter.startTime)
                 trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             }
@@ -1522,16 +1528,12 @@ open class PlaybackManager @Inject constructor(
     fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
             val chapters = episodeMetadata.chapters
-            if (!chapters.isEmpty) {
-                chapters.getList().first().startTime = 0
-                chapters.getList().last().endTime = playbackState.durationMs
-            }
-
-            val chaptersWithDeselectState = chapters.updateDeselectedState(getCurrentEpisode())
+                .updateChaptersTimes(playbackState.durationMs.milliseconds)
+                .updateDeselectedState(getCurrentEpisode())
 
             playbackStateRelay.accept(
                 playbackState.copy(
-                    chapters = chaptersWithDeselectState,
+                    chapters = chapters,
                     embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
                     lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
                 ),
