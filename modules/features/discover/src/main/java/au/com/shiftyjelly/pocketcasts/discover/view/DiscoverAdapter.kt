@@ -94,6 +94,7 @@ private const val INITIAL_PREFETCH_COUNT = 1
 private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
+internal data class MostPopularCategoriesRow(val listId: String?, val title: String?, val podcasts: List<DiscoverPodcast>)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -464,6 +465,10 @@ internal class DiscoverAdapter(
             }
             is ChangeRegionRow -> {
                 return R.layout.row_change_region
+            }
+
+            is MostPopularCategoriesRow -> {
+                return R.layout.row_most_popular_category_list
             }
         }
 

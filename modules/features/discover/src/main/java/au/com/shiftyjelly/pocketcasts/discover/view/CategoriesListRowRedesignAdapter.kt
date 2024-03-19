@@ -104,7 +104,7 @@ class CategoriesListRowRedesignAdapter(
                         binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
                     }
                 }
-            } else {
+            } else if (!category.isSelected) {
                 updateCategories(onCategoryClick(category))
             }
         }

@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -52,10 +51,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
     private var binding: FragmentDiscoverBinding? = null
-
-    override fun onResume() {
-        super.onResume()
-    }
 
     override fun onPause() {
         super.onPause()
@@ -135,7 +130,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
         viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
-            LogBuffer.i("Tittle: ", it.title.toString())
+            val mostPopularCategoriesRow =
+                MostPopularCategoriesRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
+            displayCategories(mostPopularCategoriesRow)
         }
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit) {
@@ -149,6 +146,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
     override fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit) {
         viewModel.loadCategories(source) { categories ->
+            clearCategoryFilter()
             onCategoriesLoaded(categories)
         }
     }
@@ -261,10 +259,28 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         return mutableContentList
     }
 
+    private fun displayCategories(mostPopularCategoriesRow: MostPopularCategoriesRow) {
+        adapter?.currentList?.let { currentList ->
+            val updatedList = currentList.toMutableList()
+
+            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularCategoriesRow)
+
+            adapter?.submitList(updatedList)
+        }
+    }
+    private fun clearCategoryFilter() {
+        adapter?.currentList?.let { currentList ->
+            val updatedList = currentList.toMutableList()
+            updatedList.removeAt(MOST_POPULAR_PODCASTS_ROW_INDEX)
+            adapter?.submitList(updatedList)
+        }
+    }
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
+        private const val MOST_POPULAR_PODCASTS_ROW_INDEX = 1
+        private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
         const val EPISODE_UUID_KEY = "episode_uuid"
