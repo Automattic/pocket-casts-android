@@ -209,7 +209,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         }
                         adapter?.onChangeRegion = onChangeRegion
 
-                        val sortedContent = sortContent(content)
+                        val sortedContent = sortContent(content, state.selectedRegion.code)
 
                         adapter?.submitList(sortedContent)
                     }
@@ -236,6 +236,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         activity?.onBackPressed()
 
         binding?.recyclerView?.scrollToPosition(0)
+
+        clearCategoryFilter()
     }
 
     @Suppress("DEPRECATION")
@@ -245,7 +247,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             FirebaseAnalyticsTracker.navigatedToDiscover()
         }
     }
-    private fun sortContent(content: List<Any>): MutableList<Any> {
+    private fun sortContent(content: List<Any>, region: String): MutableList<Any> {
         val mutableContentList = content.toMutableList()
 
         if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
@@ -253,7 +255,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
             if (categoriesIndex != -1) {
                 val categoriesItem = mutableContentList.removeAt(categoriesIndex)
-                mutableContentList.add(0, categoriesItem)
+                mutableContentList.add(0, (categoriesItem as DiscoverRow).copy(regionCode = region))
             }
         }
 

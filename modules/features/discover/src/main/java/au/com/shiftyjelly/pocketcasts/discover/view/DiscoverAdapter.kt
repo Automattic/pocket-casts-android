@@ -364,7 +364,8 @@ internal class DiscoverAdapter(
         }
     }
     inner class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
-        lateinit var source: String
+        private lateinit var source: String
+        private lateinit var region: String
         private lateinit var allCategories: CategoryPill
 
         private val adapter = CategoriesListRowRedesignAdapter(
@@ -379,9 +380,10 @@ internal class DiscoverAdapter(
                     source,
                     onCategoriesLoaded = {
                         submitCategories(
-                            it,
-                            source,
+                            categories = it,
+                            source = source,
                             context = binding.root.context,
+                            clearFilter = true,
                         )
                     },
                 )
@@ -391,14 +393,19 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
         }
-        fun submitCategories(categories: List<CategoryPill>, source: String, context: Context) {
+        fun submitCategories(categories: List<CategoryPill>, source: String, context: Context, clearFilter: Boolean = false, region: String? = null) {
             this.source = source
             this.allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
 
-            val categoriesFilter = mutableListOf(allCategories)
-            categoriesFilter.addAll(getMostPopularCategories(categories))
-
-            adapter.updateCategories(categoriesFilter)
+            // Reset category list when the current list is empty
+            // or user asked to clear the category filter
+            // or after changing region
+            if (adapter.currentList.isEmpty() || clearFilter || this.region != region) {
+                region?.let { this.region = it }
+                val categoriesFilter = mutableListOf(allCategories)
+                categoriesFilter.addAll(getMostPopularCategories(categories))
+                adapter.updateCategories(categoriesFilter)
+            }
         }
         private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
             // True Crime, Comedy, Culture, History, Fiction, Technology
@@ -410,7 +417,13 @@ internal class DiscoverAdapter(
         }
     }
 
-    inner class MostPopularCategoriesViewHolder(val binding: RowMostPopularCategoryListBinding) : NetworkLoadableViewHolder(binding.root)
+    inner class MostPopularCategoriesViewHolder(val binding: RowMostPopularCategoryListBinding) : NetworkLoadableViewHolder(binding.root) {
+        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        init {
+            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
+            recyclerView?.adapter = adapter
+        }
+    }
 
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
@@ -570,7 +583,7 @@ internal class DiscoverAdapter(
                         loadCategories(row.source),
                         onNext = { categories ->
                             val context = holder.itemView.context
-                            holder.submitCategories(categories, row.source, context)
+                            holder.submitCategories(categories, row.source, context, region = row.regionCode)
                         },
                     )
 
@@ -756,6 +769,7 @@ internal class DiscoverAdapter(
                 categoriesViewHolder.binding.lblTitle.text =
                     MostPopularPodcastsByCategoryRow.TITLE_TEMPLATE.tryToLocalise(resources = resources, args = listOf(localizedCategory))
             }
+            categoriesViewHolder.adapter.submitList(row.podcasts) { onRestoreInstanceState(categoriesViewHolder) }
         }
     }
 
