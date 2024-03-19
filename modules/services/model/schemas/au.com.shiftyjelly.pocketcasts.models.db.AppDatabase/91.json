@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 91,
-    "identityHash": "5aefed99ad187aa06f7603f6925d44b5",
+    "identityHash": "cdc56da1c8ba79c862fd72359b9cec02",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1628,7 +1628,7 @@
       },
       {
         "tableName": "episode_chapters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER NOT NULL, `title` TEXT, `image_url` TEXT, `url` TEXT, PRIMARY KEY(`episode_uuid`, `start_time`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER, `title` TEXT, `image_url` TEXT, `url` TEXT, PRIMARY KEY(`episode_uuid`, `start_time`))",
         "fields": [
           {
             "fieldPath": "episodeUuid",
@@ -1637,16 +1637,16 @@
             "notNull": true
           },
           {
-            "fieldPath": "startTime",
+            "fieldPath": "startTimeMs",
             "columnName": "start_time",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "endTime",
+            "fieldPath": "endTimeMs",
             "columnName": "end_time",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "title",
@@ -1691,7 +1691,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5aefed99ad187aa06f7603f6925d44b5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cdc56da1c8ba79c862fd72359b9cec02')"
     ]
   }
 }
