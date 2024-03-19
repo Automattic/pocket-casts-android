@@ -15,18 +15,11 @@ data class Chapter(
     val isImagePresent: Boolean
         get() = imagePath != null && imagePath.isNotBlank()
 
-    val isValid: Boolean
-        get() = startTime >= 0 && endTime > 0
-
     val duration: Int
         get() = endTime - startTime
 
     fun containsTime(time: Int): Boolean {
         return time >= startTime && time < endTime || time >= startTime && endTime <= 0
-    }
-
-    fun beforeTime(currentTimeMs: Int): Boolean {
-        return endTime <= currentTimeMs && endTime != -1
     }
 
     fun remainingTime(playbackPositionMs: Int): String {
