@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="16dp">
+    android:paddingTop="9dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,8 +17,8 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            tools:text="Great For Kids"
-            style="?attr/textH3"
+            tools:text="Most Popular in True Crime"
+            android:textAppearance="@style/H20"
             android:textColor="?attr/primary_text_01"/>
     </LinearLayout>
 

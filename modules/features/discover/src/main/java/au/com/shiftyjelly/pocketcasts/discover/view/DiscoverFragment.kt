@@ -125,14 +125,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
-    override fun onCategoryClick(selectedCategory: CategoryPill) {
+    override fun onCategoryClick(selectedCategory: CategoryPill, onPodcastsLoaded: () -> Unit) {
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
         viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
-            val mostPopularCategoriesRow =
-                MostPopularCategoriesRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
-            displayCategories(mostPopularCategoriesRow)
+            val mostPopularPodcastsByCategoryRow =
+                MostPopularPodcastsByCategoryRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
+            displayCategories(mostPopularPodcastsByCategoryRow)
+            onPodcastsLoaded()
         }
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit) {
@@ -259,11 +260,11 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         return mutableContentList
     }
 
-    private fun displayCategories(mostPopularCategoriesRow: MostPopularCategoriesRow) {
+    private fun displayCategories(mostPopularPodcastsByCategoryRow: MostPopularPodcastsByCategoryRow) {
         adapter?.currentList?.let { currentList ->
             val updatedList = currentList.toMutableList()
 
-            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularCategoriesRow)
+            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcastsByCategoryRow)
 
             adapter?.submitList(updatedList)
         }

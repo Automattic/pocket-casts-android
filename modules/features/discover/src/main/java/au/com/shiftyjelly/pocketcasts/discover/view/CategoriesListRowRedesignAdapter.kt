@@ -23,7 +23,7 @@ val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
 }
 
 class CategoriesListRowRedesignAdapter(
-    private val onCategoryClick: (CategoryPill) -> List<CategoryPill>,
+    private val onCategoryClick: (CategoryPill, (List<CategoryPill>) -> Unit) -> Unit,
     private val onAllCategoriesClick: (() -> Unit) -> Unit,
     private val onClearCategoryClick: () -> Unit,
 ) : ListAdapter<CategoryPill, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_REDESIGN_DIFF) {
@@ -105,7 +105,9 @@ class CategoriesListRowRedesignAdapter(
                     }
                 }
             } else if (!category.isSelected) {
-                updateCategories(onCategoryClick(category))
+                onCategoryClick(category) {
+                    updateCategories(it)
+                }
             }
         }
     }

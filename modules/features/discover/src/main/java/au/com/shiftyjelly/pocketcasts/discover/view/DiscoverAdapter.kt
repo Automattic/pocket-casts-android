@@ -94,7 +94,12 @@ private const val INITIAL_PREFETCH_COUNT = 1
 private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
-internal data class MostPopularCategoriesRow(val listId: String?, val title: String?, val podcasts: List<DiscoverPodcast>)
+internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>) {
+    companion object {
+        private const val TITLE_CATEGORY_KEY = "[category]"
+        const val TITLE_TEMPLATE = "most popular in $TITLE_CATEGORY_KEY"
+    }
+}
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -114,7 +119,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onCategoryClick(selectedCategory: CategoryPill)
+        fun onCategoryClick(selectedCategory: CategoryPill, onPodcastsLoaded: () -> Unit)
         fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit)
         fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit)
     }
@@ -363,9 +368,10 @@ internal class DiscoverAdapter(
         private lateinit var allCategories: CategoryPill
 
         private val adapter = CategoriesListRowRedesignAdapter(
-            onCategoryClick = {
-                listener.onCategoryClick(it)
-                return@CategoriesListRowRedesignAdapter listOf(allCategories.copy(isSelected = true), it.copy(isSelected = true))
+            onCategoryClick = { selectedCategory, onPodcastsLoaded ->
+                listener.onCategoryClick(selectedCategory, onPodcastsLoaded = {
+                    onPodcastsLoaded(listOf(allCategories.copy(isSelected = true), selectedCategory.copy(isSelected = true)))
+                })
             },
             onAllCategoriesClick = { onCategorySelectionCancel -> listener.onAllCategoriesClick(source, onCategorySelectionCancel) },
             onClearCategoryClick = {
@@ -467,7 +473,7 @@ internal class DiscoverAdapter(
                 return R.layout.row_change_region
             }
 
-            is MostPopularCategoriesRow -> {
+            is MostPopularPodcastsByCategoryRow -> {
                 return R.layout.row_most_popular_category_list
             }
         }
@@ -743,6 +749,13 @@ internal class DiscoverAdapter(
             }.allowHardware(false).build()
             context.imageLoader.enqueue(request)
             chip.setOnClickListener { onChangeRegion?.invoke() }
+        } else if (row is MostPopularPodcastsByCategoryRow) {
+            val categoriesViewHolder = holder as MostPopularCategoriesViewHolder
+            row.category?.let {
+                val localizedCategory = it.tryToLocalise(resources)
+                categoriesViewHolder.binding.lblTitle.text =
+                    MostPopularPodcastsByCategoryRow.TITLE_TEMPLATE.tryToLocalise(resources = resources, args = listOf(localizedCategory))
+            }
         }
     }
 
