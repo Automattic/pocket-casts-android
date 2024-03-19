@@ -8,7 +8,6 @@ data class Chapter(
     var endTime: Int,
     val url: HttpUrl? = null,
     val imagePath: String? = null,
-    val mimeType: String? = null,
     var index: Int = 0,
     val selected: Boolean = true,
 ) {

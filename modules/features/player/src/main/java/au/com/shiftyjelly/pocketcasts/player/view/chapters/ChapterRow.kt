@@ -185,7 +185,6 @@ fun ChapterRowPreview() {
         endTime = 62,
         url = "https://pocketcasts.com".toHttpUrlOrNull(),
         imagePath = null,
-        mimeType = null,
         index = 1,
     )
     AppThemeWithBackground(Theme.ThemeType.DARK) {

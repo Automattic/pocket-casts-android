@@ -93,7 +93,6 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
         var title = ""
         var url: String? = null
         var imagePath: String? = null
-        var mimeType: String? = null
         for (i in 0 until frame.subFrameCount) {
             val subFrame = frame.getSubFrame(i)
             if (subFrame is TextInformationFrame) {
@@ -108,7 +107,6 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                 val filePath = saveToDisk(subFrame.pictureData, file, context)
                 if (filePath != null) {
                     imagePath = filePath
-                    mimeType = subFrame.mimeType
                 }
             }
         }
@@ -118,7 +116,6 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             startTime = frame.startTimeMs,
             endTime = frame.endTimeMs,
             imagePath = imagePath,
-            mimeType = mimeType,
         )
     }
 
