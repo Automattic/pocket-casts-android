@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Parcelable
@@ -39,7 +40,8 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -54,7 +56,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
@@ -91,14 +93,15 @@ private const val INITIAL_PREFETCH_COUNT = 1
 private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
-
 internal class DiscoverAdapter(
+    val context: Context,
     val service: ListRepository,
     val staticServerManager: StaticServerManagerImpl,
     val listener: Listener,
     val theme: Theme,
     loadPodcastList: (String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
+    val loadCategories: (String) -> Flowable<List<CategoryPill>>,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -109,7 +112,9 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onAllCategoriesClicked(categories: List<DiscoverCategory>)
+        fun onCategoryClick(selectedCategory: CategoryPill): List<CategoryPill>
+        fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit)
+        fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit)
     }
 
     val loadPodcastList = { s: String ->
@@ -117,6 +122,8 @@ internal class DiscoverAdapter(
             .distinctUntilChanged()
     }
     var onChangeRegion: (() -> Unit)? = null
+
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
 
     init {
         setHasStableIds(true)
@@ -168,7 +175,7 @@ internal class DiscoverAdapter(
     }
 
     inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
         override val showAllButton: TextView
             get() = binding.btnShowAll
 
@@ -349,9 +356,45 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
-    class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+    inner class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+        lateinit var source: String
+
+        private val adapter = CategoriesListRowRedesignAdapter(
+            onCategoryClick = { listener.onCategoryClick(it) },
+            onAllCategoriesClick = { onCategorySelectionCancel -> listener.onAllCategoriesClick(source, onCategorySelectionCancel) },
+            onClearCategoryClick = {
+                listener.onClearCategoryFilterClick(
+                    source,
+                    onCategoriesLoaded = {
+                        submitCategories(
+                            it,
+                            source,
+                            context = binding.root.context,
+                        )
+                    },
+                )
+            },
+        )
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
+            recyclerView?.adapter = adapter
+        }
+        fun submitCategories(categories: List<CategoryPill>, source: String, context: Context) {
+            this.source = source
+            val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
+
+            val categoriesFilter = mutableListOf(allCategories)
+            categoriesFilter.addAll(getMostPopularCategories(categories))
+
+            adapter.updateCategories(categoriesFilter)
+        }
+        private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
+            // True Crime, Comedy, Culture, History, Fiction, Technology
+            val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
+
+            return categories
+                .filter { it.discoverCategory.id in mostPopularCategoriesId }
+                .sortedBy { mostPopularCategoriesId.indexOf(it.discoverCategory.id) }
         }
     }
 
@@ -420,7 +463,6 @@ internal class DiscoverAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val imageLoader = PodcastImageLoaderThemed(holder.itemView.context)
         val row = getItem(position)
         val resources = holder.itemView.resources
         if (row is DiscoverRow) {
@@ -505,24 +547,14 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    var discoverCategories = emptyList<DiscoverCategory>()
-                    val adapter = CategoriesListRowRedesignAdapter(
-                        onPodcastListClick = listener::onPodcastListClicked,
-                        onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
-                    )
-                    holder.recyclerView?.adapter = adapter
-                    holder.loadSingle(
-                        service.getCategoriesList(row.source),
-                        onSuccess = { categories ->
+                    holder.loadFlowable(
+                        loadCategories(row.source),
+                        onNext = { categories ->
                             val context = holder.itemView.context
-                            val allCategories = DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = "")
-                            discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
-
-                            adapter.submitList(listOf(allCategories) + getMostPopularCategories(discoverCategories)) {
-                                onRestoreInstanceState(holder)
-                            }
+                            holder.submitCategories(categories, row.source, context)
                         },
                     )
+
                     holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
                 is SinglePodcastViewHolder -> {
@@ -544,7 +576,7 @@ internal class DiscoverAdapter(
                                 row.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
                             }
 
-                            imageLoader.loadSmallImage(podcast.uuid).into(holder.binding.imgPodcast)
+                            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(holder.binding.imgPodcast)
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
                                     trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
@@ -586,7 +618,7 @@ internal class DiscoverAdapter(
                             binding.btnPlay.setText(if (episodeType == PodcastEpisode.EpisodeType.Trailer) LR.string.discover_button_play_trailer else LR.string.discover_button_play_episode)
                             binding.btnPlay.show()
 
-                            imageLoader.loadSmallImage(episode.podcast_uuid).into(binding.imgPodcast)
+                            imageRequestFactory.createForPodcast(episode.podcast_uuid).loadInto(holder.binding.imgPodcast)
                             val durationMs = (episode.duration ?: 0) * 1000
                             binding.duration.text = TimeHelper.getTimeDurationShortString(durationMs.toLong(), context)
                             val showDuration = durationMs > 0
@@ -715,15 +747,6 @@ internal class DiscoverAdapter(
             }
         }
     }
-    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<DiscoverCategory> {
-        // True Crime, Comedy, Culture, History, Fiction, Technology
-        val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
-
-        return categories
-            .filter { it.id in mostPopularCategoriesId }
-            .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
-    }
-
     private fun trackListImpression(listUuid: String) {
         FirebaseAnalyticsTracker.listImpression(listUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))

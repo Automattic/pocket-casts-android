@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -46,9 +48,12 @@ fun PodcastScreen(
     viewModel: PodcastViewModel = hiltViewModel(),
     columnState: ScalingLazyColumnState,
 ) {
+    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
+
     when (val state = viewModel.uiState) {
         is UiState.Loaded -> Content(
             state = state,
+            useRssArtwork = useRssArtwork,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
             columnState = columnState,
@@ -61,6 +66,7 @@ fun PodcastScreen(
 @Composable
 private fun Content(
     state: UiState.Loaded,
+    useRssArtwork: Boolean,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     columnState: ScalingLazyColumnState,
@@ -117,6 +123,7 @@ private fun Content(
             items(state.episodes) { episode ->
                 EpisodeChip(
                     episode = episode,
+                    useRssArtwork = useRssArtwork,
                     onClick = {
                         onEpisodeTap(episode)
                     },
