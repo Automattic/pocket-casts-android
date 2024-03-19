@@ -103,7 +103,8 @@ class WhatsNewFragment : BaseFragment() {
             is NavigationState.SlumberStudiosRedeemPromoCode -> redeemSlumberStudiosPromoCode()
             is NavigationState.SlumberStudiosClose -> Unit // It will not be sent to confirm action in real world scenario
             is NavigationState.DeselectChapterClose -> {
-                activity?.onBackPressedDispatcher?.onBackPressed()
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
             }
         }
     }
