@@ -2,43 +2,27 @@ package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(MockitoJUnitRunner::class)
-class ShowNotesManagerTest {
+class ShowNotesProcessTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    @Mock lateinit var serverShowNotesManager: ServerShowNotesManager
-
-    @Mock lateinit var episodeManager: EpisodeManager
-
-    private lateinit var showNotesManager: ShowNotesManager
-
-    @Before
-    fun setup() {
-        showNotesManager = ShowNotesManager(
-            serverShowNotesManager = serverShowNotesManager,
-            episodeManager = episodeManager,
-        )
-    }
+    private val episodeManager = mock<EpisodeManager>()
 
     @Test
-    fun updatesEpisodesWithImageUrls() = runTest {
+    fun `update episodes with image URLs`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager)
         val episodeWithImage1 = ShowNotesEpisode(
             uuid = "episode_uuid1",
             showNotes = "show_notes1",
@@ -65,7 +49,8 @@ class ShowNotesManagerTest {
                 ),
             ),
         )
-        showNotesManager.updateEpisodesWithImageUrls(showNotesResponse)
+
+        processor.process(showNotesResponse)
 
         val imageUrlUpdateForEpisode = { episode: ShowNotesEpisode ->
             ImageUrlUpdate(
