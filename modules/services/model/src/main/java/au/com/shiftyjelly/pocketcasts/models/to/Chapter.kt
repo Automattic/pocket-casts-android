@@ -13,7 +13,7 @@ data class Chapter(
 ) {
 
     val isImagePresent: Boolean
-        get() = imagePath != null && imagePath.isNotBlank()
+        get() = !imagePath.isNullOrBlank()
 
     val duration: Int
         get() = endTime - startTime
