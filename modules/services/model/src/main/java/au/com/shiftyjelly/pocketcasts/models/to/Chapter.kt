@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import okhttp3.HttpUrl
 
@@ -20,16 +21,16 @@ data class Chapter(
         get() = endTime - startTime
 
     operator fun contains(duration: Duration): Boolean {
-        return duration in startTime..<endTime || duration > startTime && endTime <= Duration.ZERO
+        return duration in startTime..endTime || duration > startTime && endTime <= Duration.ZERO
     }
 
     fun remainingTime(playbackPosition: Duration): String {
         val progress = calculateProgress(playbackPosition)
         val remaining = duration * (1.0 - progress)
-        return if (remaining.inWholeMinutes >= 1) {
-            "${remaining.inWholeMinutes.toInt()}m"
+        return if (remaining.inWholeMilliseconds >= 59500) {
+            "${(remaining.inWholeSeconds / 60.0).roundToInt()}m"
         } else {
-            "${remaining.inWholeSeconds.toInt()}s"
+            "${(remaining.inWholeMilliseconds / 1000.0).roundToInt()}s"
         }
     }
 
