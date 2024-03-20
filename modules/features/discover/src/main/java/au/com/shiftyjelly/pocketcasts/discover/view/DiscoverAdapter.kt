@@ -119,9 +119,9 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onCategoryClick(selectedCategory: CategoryPill, onPodcastsLoaded: () -> Unit)
-        fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit)
-        fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit)
+        fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit)
+        fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit)
+        fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit)
     }
 
     val loadPodcastList = { s: String ->
@@ -369,16 +369,27 @@ internal class DiscoverAdapter(
         private lateinit var allCategories: CategoryPill
 
         private val adapter = CategoriesListRowRedesignAdapter(
-            onCategoryClick = { selectedCategory, onPodcastsLoaded ->
-                listener.onCategoryClick(selectedCategory, onPodcastsLoaded = {
-                    onPodcastsLoaded(listOf(allCategories.copy(isSelected = true), selectedCategory.copy(isSelected = true)))
-                })
+            onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
+                listener.onCategoryClick(
+                    selectedCategory = selectedCategory,
+                    onCategorySelectionSuccess = {
+                        onCategorySelectionSuccess(listOf(allCategories.copy(isSelected = true), selectedCategory.copy(isSelected = true)))
+                    },
+                )
             },
-            onAllCategoriesClick = { onCategorySelectionCancel -> listener.onAllCategoriesClick(source, onCategorySelectionCancel) },
+            onAllCategoriesClick = { onCategorySelectionCancel, onCategorySelectionSuccess ->
+                listener.onAllCategoriesClick(
+                    source = source,
+                    onCategorySelectionSuccess = {
+                        onCategorySelectionSuccess(listOf(allCategories.copy(isSelected = true), it.copy(isSelected = true)))
+                    },
+                    onCategorySelectionCancel = onCategorySelectionCancel,
+                )
+            },
             onClearCategoryClick = {
                 listener.onClearCategoryFilterClick(
                     source,
-                    onCategoriesLoaded = {
+                    onCategoryClearSuccess = {
                         submitCategories(
                             categories = it,
                             source = source,

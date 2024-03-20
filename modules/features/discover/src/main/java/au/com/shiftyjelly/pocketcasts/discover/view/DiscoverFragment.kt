@@ -125,7 +125,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
-    override fun onCategoryClick(selectedCategory: CategoryPill, onPodcastsLoaded: () -> Unit) {
+    override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
@@ -133,21 +133,21 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             val mostPopularPodcastsByCategoryRow =
                 MostPopularPodcastsByCategoryRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
             updateDiscover(mostPopularPodcastsByCategoryRow)
-            onPodcastsLoaded()
+            onCategorySelectionSuccess()
         }
     }
-    override fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit) {
+    override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
         viewModel.loadCategories(source) { categories ->
             CategoriesBottomSheet(
                 categories = categories,
-                onCategoryClick = { onPodcastListClicked(it.discoverCategory) },
+                onCategoryClick = { this.onCategoryClick(it) { onCategorySelectionSuccess(it) } },
                 onCategorySelectionCancel = onCategorySelectionCancel,
             ).show(childFragmentManager, "categories_bottom_sheet")
         }
     }
-    override fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit) {
+    override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
         viewModel.loadCategories(source) { categories ->
-            onCategoriesLoaded(categories)
+            onCategoryClearSuccess(categories)
             clearCategoryFilter()
         }
     }
