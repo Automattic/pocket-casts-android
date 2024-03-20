@@ -73,11 +73,10 @@ android {
 }
 
 sentry {
-    includeProguardMapping = System.getenv()["CI"].toBoolean()
-            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
-    tracingInstrumentation {
-        features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
-    }
+    val shouldSendDebugFilesToSentry = (System.getenv()["CI"].toBoolean()
+            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean())
+    includeProguardMapping = shouldSendDebugFilesToSentry
+    includeSourceContext = shouldSendDebugFilesToSentry
 }
 
 dependencies {
