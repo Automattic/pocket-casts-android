@@ -21,17 +21,17 @@ data class ShowNotesPodcast(
 @JsonClass(generateAdapter = true)
 data class ShowNotesEpisode(
     @Json(name = "uuid") val uuid: String,
-    @Json(name = "show_notes") val showNotes: String?,
-    @Json(name = "image") val image: String?,
-    @Json(name = "chapters") val chapters: List<ShowNotesChapter>?,
-    @Json(name = "chapter_url") val chapterUrl: String?,
+    @Json(name = "show_notes") val showNotes: String? = null,
+    @Json(name = "image") val image: String? = null,
+    @Json(name = "chapters") val chapters: List<ShowNotesChapter>? = null,
+    @Json(name = "chapter_url") val chapterUrl: String? = null,
 )
 
 @JsonClass(generateAdapter = true)
 data class ShowNotesChapter(
     @Json(name = "startTime") val startTime: Double,
-    @Json(name = "endTime") val endTime: Double?,
-    @Json(name = "title") val title: String?,
-    @Json(name = "img") val image: String?,
-    @Json(name = "url") val url: String?,
+    @Json(name = "endTime") val endTime: Double? = null,
+    @Json(name = "title") val title: String? = null,
+    @Json(name = "img") val image: String? = null,
+    @Json(name = "url") val url: String? = null,
 )
