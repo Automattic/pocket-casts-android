@@ -13,6 +13,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Url
 
 @JsonClass(generateAdapter = true)
 data class SearchBody(@field:Json(name = "podcastuuid") val podcastuuid: String, @field:Json(name = "searchterm") val searchterm: String)
@@ -75,6 +76,9 @@ interface PodcastCacheServer {
     @GET("/mobile/show_notes/full/{podcastUuid}")
     @Headers("Cache-Control: only-if-cached, max-stale=7776000") // Use offline cache available for 90 days
     suspend fun getShowNotesCache(@Path("podcastUuid") podcastUuid: String): ShowNotesResponse
+
+    @GET
+    suspend fun getShowNotesChapters(@Url url: String): RawChaptersResponse
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     fun getPodcastAndEpisodeSingle(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>

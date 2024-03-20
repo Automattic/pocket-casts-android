@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.servers.di.PodcastCacheServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
 import javax.inject.Inject
@@ -10,13 +9,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import retrofit2.Response
-import retrofit2.Retrofit
 import timber.log.Timber
 
-class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetrofit private val retrofit: Retrofit) : PodcastCacheServerManager {
-
-    private val server = retrofit.create(PodcastCacheServer::class.java)
-
+class PodcastCacheServerManagerImpl @Inject constructor(
+    private val server: PodcastCacheServer,
+) : PodcastCacheServerManager {
     override fun getPodcastResponse(podcastUuid: String): Single<Response<PodcastResponse>> {
         return server.getPodcastAndEpisodesRaw(podcastUuid)
     }

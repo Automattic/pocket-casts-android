@@ -14,20 +14,20 @@ class ShowNotesManager @Inject constructor(
         serverShowNotesManager.loadShowNotesFlow(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            processShowNotes = showNotesProcessor::process,
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it) },
         )
 
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState =
         serverShowNotesManager.loadShowNotes(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            processShowNotes = showNotesProcessor::process,
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it) },
         )
 
-    suspend fun downloadToCacheShowNotes(podcastUuid: String) {
+    suspend fun downloadToCacheShowNotes(podcastUuid: String, episodeUuid: String) {
         serverShowNotesManager.downloadToCacheShowNotes(
             podcastUuid = podcastUuid,
-            processShowNotes = showNotesProcessor::process,
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it) },
         )
     }
 }
