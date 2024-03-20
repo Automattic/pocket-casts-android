@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -151,4 +153,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideRatingsManager(ratingsManagerImpl: RatingsManagerImpl): RatingsManager
+
+    @Binds
+    abstract fun bindChapterManager(chapterManagerImpl: ChapterManagerImpl): ChapterManager
 }
