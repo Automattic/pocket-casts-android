@@ -44,6 +44,19 @@ class ChapterDaoTest {
     }
 
     @Test
+    fun replaceTheSameChapter() = runBlocking {
+        val chapter = Chapter(
+            episodeUuid = "episode-id",
+            startTimeMs = 0L,
+        )
+
+        chapterDao.replaceAllChapters("episode-id", listOf(chapter.copy(title = "Title"), chapter))
+
+        val result = chapterDao.findAll()
+        assertEquals(listOf(chapter), result)
+    }
+
+    @Test
     fun insertMultipleChapters() = runBlocking {
         val chapters = List(10) { index ->
             Chapter(

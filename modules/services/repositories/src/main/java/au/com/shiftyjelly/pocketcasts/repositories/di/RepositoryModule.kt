@@ -155,5 +155,5 @@ abstract class RepositoryModule {
     abstract fun provideRatingsManager(ratingsManagerImpl: RatingsManagerImpl): RatingsManager
 
     @Binds
-    abstract fun bindChapterManager(chapterManagerImpl: ChapterManagerImpl): ChapterManager
+    abstract fun provideChapterManager(chapterManagerImpl: ChapterManagerImpl): ChapterManager
 }
