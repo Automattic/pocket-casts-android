@@ -105,17 +105,21 @@ class CategoriesListRowRedesignAdapter(
                     }
                 }
             } else if (!category.isSelected) {
+                markCategoryAsSelected(position)
                 onCategoryClick(category) {
                     updateCategories(it)
                 }
             }
         }
     }
-
     override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
         holder.bind(getItem(position), holder.itemView.context)
     }
     fun updateCategories(categoryPills: List<CategoryPill>) {
         submitList(categoryPills)
+    }
+    private fun markCategoryAsSelected(position: Int) {
+        getItem(position).isSelected = true
+        notifyItemChanged(position)
     }
 }
