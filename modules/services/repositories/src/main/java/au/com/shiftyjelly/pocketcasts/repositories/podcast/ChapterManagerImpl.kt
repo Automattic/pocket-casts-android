@@ -25,7 +25,7 @@ class ChapterManagerImpl @Inject constructor(
 
     private suspend fun List<DbChapter>.toChapters(episodeUuid: String): Chapters {
         val deselectedChapters = episodeDao.findByUuid(episodeUuid)?.deselectedChapters.orEmpty()
-        val chaptersList =  withIndex().windowed(size = 2, partialWindows = true) { window ->
+        val chaptersList = withIndex().windowed(size = 2, partialWindows = true) { window ->
             val index = window[0].index + 1
             val firstChapter = window[0].value
             val secondChapter = window.getOrNull(1)?.value
