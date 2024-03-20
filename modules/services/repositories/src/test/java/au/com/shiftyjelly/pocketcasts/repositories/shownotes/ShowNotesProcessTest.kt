@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.RawChaptersResponse
+import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
@@ -10,8 +14,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter as Chapter
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShowNotesProcessTest {
@@ -19,10 +29,12 @@ class ShowNotesProcessTest {
     val coroutineRule = MainCoroutineRule()
 
     private val episodeManager = mock<EpisodeManager>()
+    private val chapterManager = mock<ChapterManager>()
+    private val service = mock<PodcastCacheServer>()
 
     @Test
     fun `update episodes with image URLs`() = runTest(coroutineRule.testDispatcher) {
-        val processor = ShowNotesProcessor(this, episodeManager)
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
         val episodeWithImage1 = ShowNotesEpisode(
             uuid = "episode_uuid1",
             showNotes = "show_notes1",
@@ -50,7 +62,7 @@ class ShowNotesProcessTest {
             ),
         )
 
-        processor.process(showNotesResponse)
+        processor.process("episode_uuid1", showNotesResponse)
 
         val imageUrlUpdateForEpisode = { episode: ShowNotesEpisode ->
             ImageUrlUpdate(
@@ -64,5 +76,264 @@ class ShowNotesProcessTest {
         )
 
         verify(episodeManager).updateImageUrls(expectedUpdates)
+    }
+
+    @Test
+    fun `update episodes with chapters`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episodeWithChapters1 = ShowNotesEpisode(
+            uuid = "episode-id-1",
+            chapters = listOf(
+                ShowNotesChapter(
+                    startTime = 0.0,
+                    endTime = 20.25,
+                    title = "Title 1",
+                    image = "Image 1",
+                    url = "Url 1",
+                ),
+                ShowNotesChapter(
+                    startTime = 30.1,
+                    title = "Title 2",
+                    image = "Image 2",
+                    url = "Url 2",
+                ),
+            ),
+        )
+        val episodeWithChapters2 = ShowNotesEpisode(
+            uuid = "episode-id-2",
+            chapters = listOf(
+                ShowNotesChapter(
+                    startTime = 15.5,
+                ),
+            ),
+        )
+        val showNotes = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(
+                    episodeWithChapters1,
+                    episodeWithChapters2,
+                ),
+            ),
+        )
+
+        processor.process("episode-id-1", showNotes)
+
+        val expected1 = listOf(
+            Chapter(
+                episodeUuid = "episode-id-1",
+                startTimeMs = 0,
+                endTimeMs = 20250,
+                title = "Title 1",
+                imageUrl = "Image 1",
+                url = "Url 1",
+            ),
+            Chapter(
+                episodeUuid = "episode-id-1",
+                startTimeMs = 30100,
+                title = "Title 2",
+                imageUrl = "Image 2",
+                url = "Url 2",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id-1", expected1)
+
+        val expected2 = listOf(
+            Chapter(
+                episodeUuid = "episode-id-2",
+                startTimeMs = 15500,
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id-2", expected2)
+    }
+
+    @Test
+    fun `update episodes with no chapters`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episodeWithNoChapters = ShowNotesEpisode(
+            uuid = "episode-id",
+            chapters = emptyList(),
+        )
+        val showNotesResponse = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episodeWithNoChapters),
+            ),
+        )
+
+        processor.process("episode-id", showNotesResponse)
+
+        verify(chapterManager).updateChapters("episode-id", emptyList())
+    }
+
+    @Test
+    fun `update episodes without chapters`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episodeWithNoChapters = ShowNotesEpisode(
+            uuid = "episode-id",
+            chapters = null,
+        )
+        val showNotes = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episodeWithNoChapters),
+            ),
+        )
+
+        processor.process("episode-id", showNotes)
+
+        verify(chapterManager, never()).updateChapters("episode-id", emptyList())
+    }
+
+    @Test
+    fun `update episode with chapters from URL when chapters are null`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episode = ShowNotesEpisode(
+            uuid = "episode-id",
+            chaptersUrl = "url",
+            chapters = null,
+        )
+        val showNotes = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode),
+            ),
+        )
+
+        val urlChapters = listOf(
+            ShowNotesChapter(
+                startTime = 0.0,
+                endTime = 20.25,
+                title = "Title 1",
+                image = "Image 1",
+                url = "Url 1",
+            ),
+            ShowNotesChapter(
+                startTime = 30.1,
+                title = "Title 2",
+                image = "Image 2",
+                url = "Url 2",
+            ),
+        )
+        whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
+
+        processor.process("episode-id", showNotes)
+
+        val expected = listOf(
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 0,
+                endTimeMs = 20250,
+                title = "Title 1",
+                imageUrl = "Image 1",
+                url = "Url 1",
+            ),
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 30100,
+                title = "Title 2",
+                imageUrl = "Image 2",
+                url = "Url 2",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id", expected)
+    }
+
+    @Test
+    fun `update episode with chapters from URL when chapters are empty`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episode = ShowNotesEpisode(
+            uuid = "episode-id",
+            chaptersUrl = "url",
+            chapters = emptyList(),
+        )
+        val showNotes = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode),
+            ),
+        )
+
+        val urlChapters = listOf(
+            ShowNotesChapter(
+                startTime = 0.0,
+                endTime = 20.25,
+                title = "Title 1",
+                image = "Image 1",
+                url = "Url 1",
+            ),
+            ShowNotesChapter(
+                startTime = 30.1,
+                title = "Title 2",
+                image = "Image 2",
+                url = "Url 2",
+            ),
+        )
+        whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
+
+        processor.process("episode-id", showNotes)
+
+        val expected = listOf(
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 0,
+                endTimeMs = 20250,
+                title = "Title 1",
+                imageUrl = "Image 1",
+                url = "Url 1",
+            ),
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 30100,
+                title = "Title 2",
+                imageUrl = "Image 2",
+                url = "Url 2",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id", expected)
+    }
+
+    @Test
+    fun `do not fetch chapters from URL when chapters are present`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episode = ShowNotesEpisode(
+            uuid = "episode-id",
+            chapters = listOf(ShowNotesChapter(startTime = 0.0)),
+            chaptersUrl = "url",
+        )
+        val showNotesResponse = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode),
+            ),
+        )
+
+        processor.process("episode-id", showNotesResponse)
+
+        verifyNoInteractions(service)
+    }
+
+    @Test
+    fun `fetch chapters only for specified episode`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episode1 = ShowNotesEpisode(
+            uuid = "episode-id-1",
+            chaptersUrl = "url1",
+        )
+        val episode2 = ShowNotesEpisode(
+            uuid = "episode-id-2",
+            chaptersUrl = "url2",
+        )
+        val showNotesResponse = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode1, episode2),
+            ),
+        )
+
+        processor.process("episode-id-1", showNotesResponse)
+
+        verifyBlocking(service) { getShowNotesChapters("url1") }
+        verifyBlocking(service, never()) { getShowNotesChapters("url2") }
     }
 }
