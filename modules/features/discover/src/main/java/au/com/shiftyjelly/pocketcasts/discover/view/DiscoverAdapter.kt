@@ -777,8 +777,12 @@ internal class DiscoverAdapter(
             val categoriesViewHolder = holder as MostPopularPodcastsViewHolder
             row.category?.let {
                 val localizedCategory = it.tryToLocalise(resources)
-                categoriesViewHolder.binding.lblTitle.text =
-                    MostPopularPodcastsByCategoryRow.TITLE_TEMPLATE.tryToLocalise(resources = resources, args = listOf(localizedCategory))
+                val tittle = MostPopularPodcastsByCategoryRow.TITLE_TEMPLATE.tryToLocalise(
+                    resources = resources,
+                    args = listOf(localizedCategory),
+                )
+                categoriesViewHolder.binding.lblTitle.text = tittle
+                categoriesViewHolder.binding.lblTitle.contentDescription = tittle
             }
             categoriesViewHolder.adapter.fromListId = row.listId
             categoriesViewHolder.adapter.submitList(row.podcasts) { onRestoreInstanceState(categoriesViewHolder) }
