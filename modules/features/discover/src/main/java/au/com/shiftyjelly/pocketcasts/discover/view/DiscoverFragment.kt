@@ -132,7 +132,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
             val mostPopularPodcastsByCategoryRow =
                 MostPopularPodcastsByCategoryRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
-            displayCategories(mostPopularPodcastsByCategoryRow)
+            updateDiscover(mostPopularPodcastsByCategoryRow)
             onPodcastsLoaded()
         }
     }
@@ -147,8 +147,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
     override fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit) {
         viewModel.loadCategories(source) { categories ->
-            clearCategoryFilter()
             onCategoriesLoaded(categories)
+            clearCategoryFilter()
         }
     }
 
@@ -236,8 +236,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         activity?.onBackPressed()
 
         binding?.recyclerView?.scrollToPosition(0)
-
-        clearCategoryFilter()
     }
 
     @Suppress("DEPRECATION")
@@ -262,9 +260,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         return mutableContentList
     }
 
-    private fun displayCategories(mostPopularPodcastsByCategoryRow: MostPopularPodcastsByCategoryRow) {
-        adapter?.currentList?.let { currentList ->
-            val updatedList = currentList.toMutableList()
+    private fun updateDiscover(mostPopularPodcastsByCategoryRow: MostPopularPodcastsByCategoryRow) {
+        adapter?.currentList?.let { discoverList ->
+            val updatedList =
+                discoverList.filterNot { it is DiscoverRow && it.id == "featured" }.toMutableList() // Remove ads carousel
 
             updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcastsByCategoryRow)
 
@@ -272,10 +271,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
     }
     private fun clearCategoryFilter() {
-        adapter?.currentList?.let { currentList ->
-            val updatedList = currentList.toMutableList()
-            updatedList.removeAt(MOST_POPULAR_PODCASTS_ROW_INDEX)
-            adapter?.submitList(updatedList)
+        adapter?.currentList?.toMutableList()?.apply {
+            removeAll { it is MostPopularPodcastsByCategoryRow }
+            adapter?.submitList(this)
+            viewModel.loadData(resources)
         }
     }
     companion object {
