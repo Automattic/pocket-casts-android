@@ -429,7 +429,7 @@ internal class DiscoverAdapter(
     }
 
     inner class MostPopularPodcastsViewHolder(val binding: RowMostPopularPodcastsBinding) : NetworkLoadableViewHolder(binding.root) {
-        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = MostPopularPodcastsAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
@@ -780,6 +780,7 @@ internal class DiscoverAdapter(
                 categoriesViewHolder.binding.lblTitle.text =
                     MostPopularPodcastsByCategoryRow.TITLE_TEMPLATE.tryToLocalise(resources = resources, args = listOf(localizedCategory))
             }
+            categoriesViewHolder.adapter.fromListId = row.listId
             categoriesViewHolder.adapter.submitList(row.podcasts) { onRestoreInstanceState(categoriesViewHolder) }
         }
     }
