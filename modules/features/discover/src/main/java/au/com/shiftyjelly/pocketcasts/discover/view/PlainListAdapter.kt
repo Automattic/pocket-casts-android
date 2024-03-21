@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import java.util.UUID
 
-private val differ = object : DiffUtil.ItemCallback<Any>() {
+val plaintListDiffer = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
         return oldItem == newItem
     }
@@ -38,7 +38,7 @@ class PlainListAdapter(
     val onEpisodeClick: (DiscoverEpisode) -> Unit,
     val onEpisodePlayClick: (DiscoverEpisode) -> Unit,
     val onEpisodeStopClick: () -> Unit,
-) : ListAdapter<Any, RecyclerView.ViewHolder>(differ) {
+) : ListAdapter<Any, RecyclerView.ViewHolder>(plaintListDiffer) {
 
     var listTintColor: Int? = null
 

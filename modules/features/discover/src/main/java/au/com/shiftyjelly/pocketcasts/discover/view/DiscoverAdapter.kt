@@ -439,9 +439,18 @@ internal class DiscoverAdapter(
         }
     }
 
-    class RemainingPodcastsByCategoryViewHolder(val binding: RowRemainingPodcastsByCategoryBinding) : NetworkLoadableViewHolder(binding.root) {
+    inner class RemainingPodcastsByCategoryViewHolder(val binding: RowRemainingPodcastsByCategoryBinding) : NetworkLoadableViewHolder(binding.root) {
+        val adapter = RemainingPodcastsAdapter(
+            onPodcastClick = { podcast, listUuid ->
+                listener.onPodcastClicked(podcast, listUuid)
+            },
+            onPodcastSubscribe = { podcast, listUuid ->
+                listener.onPodcastSubscribe(podcast, listUuid)
+            },
+        )
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
+            recyclerView?.adapter = adapter
         }
     }
 
@@ -800,6 +809,9 @@ internal class DiscoverAdapter(
             }
             categoriesViewHolder.adapter.fromListId = row.listId
             categoriesViewHolder.adapter.submitList(row.podcasts) { onRestoreInstanceState(categoriesViewHolder) }
+        } else if (row is RemainingPodcastsByCategoryRow) {
+            val remainingPodcastHolder = holder as RemainingPodcastsByCategoryViewHolder
+            remainingPodcastHolder.adapter.submitList(row.podcasts)
         }
     }
 
