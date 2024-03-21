@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedTintColors
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -101,7 +102,7 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
         const val TITLE_TEMPLATE = "most popular in $TITLE_CATEGORY_KEY"
     }
 }
-internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val tintColor: Int, val podcasts: List<DiscoverPodcast>)
+internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val tintColor: DiscoverFeedTintColors?, val podcasts: List<DiscoverPodcast>)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,

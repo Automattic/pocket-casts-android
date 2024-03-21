@@ -130,9 +130,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
         viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
-            val mostPopularPodcastsByCategoryRow =
-                MostPopularPodcastsByCategoryRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
-            updateDiscover(mostPopularPodcastsByCategoryRow)
+            val podcasts = it.podcasts
+
+            val mostPopularPodcasts =
+                MostPopularPodcastsByCategoryRow(it.listId, it.title, podcasts.take(MOST_POPULAR_PODCASTS))
+
+            val remainingPodcasts =
+                RemainingPodcastsByCategoryRow(it.listId, it.title, it.tintColors, podcasts.drop(MOST_POPULAR_PODCASTS))
+
+            updateDiscover(mostPopularPodcasts, remainingPodcasts)
             onCategorySelectionSuccess()
         }
     }
@@ -260,12 +266,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         return mutableContentList
     }
 
-    private fun updateDiscover(mostPopularPodcastsByCategoryRow: MostPopularPodcastsByCategoryRow) {
+    private fun updateDiscover(
+        mostPopularPodcasts: MostPopularPodcastsByCategoryRow,
+        remainingPodcasts: RemainingPodcastsByCategoryRow,
+    ) {
         adapter?.currentList?.let { discoverList ->
-            val updatedList =
-                discoverList.filterNot { it is DiscoverRow && it.id == "featured" }.toMutableList() // Remove ads carousel
+            val updatedList = discoverList.filter { it is DiscoverRow && it.type is ListType.Categories }.toMutableList()
 
-            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcastsByCategoryRow)
+            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcasts)
+            updatedList.add(REMAINING_PODCASTS_ROW_INDEX, remainingPodcasts)
 
             adapter?.submitList(updatedList)
         }
@@ -282,6 +291,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
         private const val MOST_POPULAR_PODCASTS_ROW_INDEX = 1
+        private const val REMAINING_PODCASTS_ROW_INDEX = 2
         private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
