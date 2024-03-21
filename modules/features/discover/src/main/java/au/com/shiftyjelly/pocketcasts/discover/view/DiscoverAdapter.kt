@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowMostPopularPodcastsBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastLargeListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRemainingPodcastsByCategoryBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
@@ -100,6 +101,7 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
         const val TITLE_TEMPLATE = "most popular in $TITLE_CATEGORY_KEY"
     }
 }
+internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val tintColor: Int, val podcasts: List<DiscoverPodcast>)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -436,6 +438,12 @@ internal class DiscoverAdapter(
         }
     }
 
+    class RemainingPodcastsByCategoryViewHolder(val binding: RowRemainingPodcastsByCategoryBinding) : NetworkLoadableViewHolder(binding.root) {
+        init {
+            recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
+        }
+    }
+
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
     class SinglePodcastViewHolder(val binding: RowSinglePodcastBinding) : NetworkLoadableViewHolder(binding.root)
@@ -453,6 +461,7 @@ internal class DiscoverAdapter(
             R.layout.row_categories -> CategoriesViewHolder(RowCategoriesBinding.inflate(inflater, parent, false))
             R.layout.row_categories_redesign -> CategoriesRedesignViewHolder(RowCategoriesRedesignBinding.inflate(inflater, parent, false))
             R.layout.row_most_popular_podcasts -> MostPopularPodcastsViewHolder(RowMostPopularPodcastsBinding.inflate(inflater, parent, false))
+            R.layout.row_remaining_podcasts_by_category -> RemainingPodcastsByCategoryViewHolder(RowRemainingPodcastsByCategoryBinding.inflate(inflater, parent, false))
             R.layout.row_single_podcast -> SinglePodcastViewHolder(RowSinglePodcastBinding.inflate(inflater, parent, false))
             R.layout.row_single_episode -> SingleEpisodeViewHolder(RowSingleEpisodeBinding.inflate(inflater, parent, false))
             R.layout.row_collection_list -> CollectionListViewHolder(RowCollectionListBinding.inflate(inflater, parent, false))
@@ -499,6 +508,10 @@ internal class DiscoverAdapter(
 
             is MostPopularPodcastsByCategoryRow -> {
                 return R.layout.row_most_popular_podcasts
+            }
+
+            is RemainingPodcastsByCategoryRow -> {
+                return R.layout.row_remaining_podcasts_by_category
             }
         }
 
