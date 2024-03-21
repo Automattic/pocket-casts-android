@@ -5,7 +5,6 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.Px
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -17,6 +16,7 @@ import coil.request.SuccessResult
 import coil.target.Target
 import coil.transform.Transformation
 import java.io.File
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as PodcastEpisodeEntity
@@ -40,15 +40,10 @@ data class PocketCastsImageRequestFactory(
         onSuccess: () -> Unit = {},
     ) = create(RequestType.Podcast(podcastUuid), onSuccess)
 
-    fun createForFile(
-        filePath: String,
+    fun createForFileOrUrl(
+        filePathOrUrl: String,
         onSuccess: () -> Unit = {},
-    ) = create(RequestType.File(filePath), onSuccess)
-
-    fun createForUrl(
-        url: String,
-        onSuccess: () -> Unit = {},
-    ) = create(RequestType.Url(url), onSuccess)
+    ) = create(RequestType.FileOrUrl(filePathOrUrl), onSuccess)
 
     fun create(
         podcast: PodcastEntity,
@@ -92,8 +87,7 @@ data class PocketCastsImageRequestFactory(
         is RequestType.Podcast -> data(context)
         is RequestType.PodcastEpisode -> data(context)
         is RequestType.UserEpisode -> data()
-        is RequestType.File -> File(filePath)
-        is RequestType.Url -> url
+        is RequestType.FileOrUrl -> filePathOrUrl.toHttpUrlOrNull() ?: File(filePathOrUrl)
     }
 
     private fun RequestType.Podcast.data(context: Context) = podcastUuid?.let { podcastArtworkUrl(context, it) } ?: placeholderId
@@ -155,8 +149,7 @@ private sealed interface RequestType {
     data class Podcast(val podcastUuid: String?) : RequestType
     data class PodcastEpisode(val episode: PodcastEpisodeEntity, val useRssArtwork: Boolean) : RequestType
     data class UserEpisode(val episode: UserEpisodeEntity) : RequestType
-    data class File(val filePath: String) : RequestType
-    data class Url(val url: String) : RequestType
+    data class FileOrUrl(val filePathOrUrl: String) : RequestType
 }
 
 private class RetryWithPodcastListener(
