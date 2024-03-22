@@ -1281,12 +1281,6 @@ open class PlaybackManager @Inject constructor(
             .flatten()
     }
 
-    fun useSleep(episode: BaseEpisode?) {
-        launch {
-            sleep(episode)
-        }
-    }
-
     private suspend fun sleep(episode: BaseEpisode?) {
         sleepAfterEpisode = false
 
@@ -1519,7 +1513,8 @@ open class PlaybackManager @Inject constructor(
             if (nextEpisode == null) {
                 Timber.d("Playback: No episode in upnext, shutting down")
                 if (SETimer.timerShouldStop()){
-                    SETimer.stop(this, application,true)
+                    SETimer.stop(this, application)
+                    sleep(episode)
                 } else if (SETimer.timerIsActive()) {
                     SETimer.stop(this, application)
                 }
@@ -1745,7 +1740,8 @@ open class PlaybackManager @Inject constructor(
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
             if (shouldStopForSleep) {
-                SETimer.stop(this, application,true)
+                SETimer.stop(this, application)
+                sleep(episode)
             }
         }
     }

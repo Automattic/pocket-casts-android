@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel" />
-    </data>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,15 +18,13 @@
                 android:id="@+id/sleepSetup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{!safeUnbox(viewModel.isSleepRunning)}"
-                app:constraint_referenced_ids="sleepTitle,buttonMins5,labelMins5,buttonMins15,labelMins15,buttonMins30,labelMins30,buttonMins60,buttonCustomPreset1,labelCustomPreset1,buttonCustomPreset2,labelCustomPreset2,buttonCustomPreset3,labelCustomPreset3,buttonCustomPreset4,labelCustomPreset4,labelMins60,labelChaptersSoon,separator1,labelAfterNEpisodes,buttonAfterNEpisodes,decEpisodeButton,incEpisodeButton,separator2,labelEndOfEpisode,buttonEndOfEpisode,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton"
+                app:constraint_referenced_ids="sleepTitle,buttonMins5,buttonMins15,buttonMins30,buttonMins60,buttonCustomPreset1,buttonCustomPreset2,buttonCustomPreset3,buttonCustomPreset4,labelCustomPresetsSoon,labelChaptersSoon,separator1,labelAfterNEpisodes,buttonAfterNEpisodes,decEpisodeButton,incEpisodeButton,separator2,labelEndOfEpisode,buttonEndOfEpisode,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton"
                 tools:ignore="MissingConstraints" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/sleepRunning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning)}"
                 app:constraint_referenced_ids="sleepAnimation"
                 tools:ignore="MissingConstraints"
                 tools:visibility="invisible" />
@@ -42,7 +33,6 @@
                 android:id="@+id/sleepRunningTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; !safeUnbox(viewModel.isSleepAtEndOfEpisode) &amp;&amp; !safeUnbox(viewModel.isSleepForEpisodes)}"
                 app:constraint_referenced_ids="sleepTime,buttonAdd1Minute,buttonAdd5Minute,buttonEndOfEpisode2,buttonCancelTime"
                 tools:ignore="MissingConstraints"
                 tools:visibility="invisible" />
@@ -51,7 +41,6 @@
                 android:id="@+id/sleepRunningEndOfEpisode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; safeUnbox(viewModel.isSleepAtEndOfEpisode) &amp;&amp; !safeUnbox(viewModel.isSleepForEpisodes)}"
                 app:constraint_referenced_ids="sleepingEndOfEpisode,buttonCancelEndOfEpisode"
                 tools:ignore="MissingConstraints"
                 tools:visibility="invisible" />
@@ -60,7 +49,6 @@
                 android:id="@+id/sleepRunningByEpisode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; !safeUnbox(viewModel.isSleepAtEndOfEpisode) &amp;&amp; safeUnbox(viewModel.isSleepForEpisodes)}"
                 app:constraint_referenced_ids="episodesLeft,buttonAddEpisode,buttonAdd2Episodes,buttonAddNEpisodes,buttonEndOfCurrentEpisode,buttonCancelEpisodeTimer"
                 tools:ignore="MissingConstraints"
                 tools:visibility="invisible" />
@@ -86,241 +74,137 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/labelMins5"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonMins5"
                 style="@style/SleepTimer.MinutePreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_marginStart="48dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_marginStart="30dp"
+                android:layout_gravity="center"
                 android:text="@string/player_sleep_5_minutes"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/labelMins15"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMins15"
                 app:layout_constraintTop_toBottomOf="@+id/sleepTitle"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
-                android:id="@+id/buttonMins5"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription="@string/player_sleep_5_minutes"
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelMins5"
-                app:layout_constraintStart_toStartOf="@+id/labelMins5"
-                app:layout_constraintEnd_toEndOf="@+id/labelMins5"
-                app:layout_constraintBottom_toBottomOf="@+id/labelMins5"/>
-
-            <TextView
-                android:id="@+id/labelMins15"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonMins15"
                 style="@style/SleepTimer.MinutePreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_gravity="center"
                 android:text="@string/player_sleep_15_minutes"
                 android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toEndOf="@+id/labelMins5"
-                app:layout_constraintEnd_toStartOf="@+id/labelMins30"
+                app:layout_constraintStart_toEndOf="@+id/buttonMins5"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMins30"
                 app:layout_constraintTop_toBottomOf="@+id/sleepTitle"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
-                android:id="@+id/buttonMins15"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription="@string/player_sleep_15_minutes"
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelMins15"
-                app:layout_constraintStart_toStartOf="@+id/labelMins15"
-                app:layout_constraintEnd_toEndOf="@+id/labelMins15"
-                app:layout_constraintBottom_toBottomOf="@+id/labelMins15"/>
-
-            <TextView
-                android:id="@+id/labelMins30"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonMins30"
                 style="@style/SleepTimer.MinutePreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_gravity="center"
                 android:text="@string/player_sleep_30_minutes"
                 android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toEndOf="@+id/labelMins15"
-                app:layout_constraintEnd_toStartOf="@+id/labelMins60"
+                app:layout_constraintStart_toEndOf="@+id/buttonMins15"
+                app:layout_constraintEnd_toStartOf="@+id/buttonMins60"
                 app:layout_constraintTop_toBottomOf="@+id/sleepTitle"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
-                android:id="@+id/buttonMins30"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription="@string/player_sleep_30_minutes"
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelMins30"
-                app:layout_constraintStart_toStartOf="@+id/labelMins30"
-                app:layout_constraintEnd_toEndOf="@+id/labelMins30"
-                app:layout_constraintBottom_toBottomOf="@+id/labelMins30"/>
-
-            <TextView
-                android:id="@+id/labelMins60"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonMins60"
                 style="@style/SleepTimer.MinutePreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_marginEnd="32dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_gravity="center"
                 android:text="@string/player_sleep_60_minutes"
                 android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toEndOf="@+id/labelMins30"
+                app:layout_constraintStart_toEndOf="@+id/buttonMins30"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sleepTitle"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
-                android:id="@+id/buttonMins60"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription="@string/player_sleep_60_minutes"
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelMins60"
-                app:layout_constraintStart_toStartOf="@+id/labelMins60"
-                app:layout_constraintEnd_toEndOf="@+id/labelMins60"
-                app:layout_constraintBottom_toBottomOf="@+id/labelMins60"/>
-
-            <TextView
-                android:id="@+id/labelCustomPreset1"
-                style="@style/SleepTimer.CustomPreset"
-                android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_marginStart="48dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
-                android:text=""
-                android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/labelCustomPreset2"
-                app:layout_constraintTop_toBottomOf="@+id/labelMins5"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
-
-            <View
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonCustomPreset1"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription=""
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelCustomPreset1"
-                app:layout_constraintStart_toStartOf="@+id/labelCustomPreset1"
-                app:layout_constraintEnd_toEndOf="@+id/labelCustomPreset1"
-                app:layout_constraintBottom_toBottomOf="@+id/labelCustomPreset1"/>
-
-            <TextView
-                android:id="@+id/labelCustomPreset2"
                 style="@style/SleepTimer.CustomPreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_gravity="center"
                 android:text=""
+                android:alpha=".25"
                 android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toEndOf="@+id/labelCustomPreset1"
-                app:layout_constraintEnd_toStartOf="@+id/labelCustomPreset3"
-                app:layout_constraintTop_toBottomOf="@+id/labelMins15"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintStart_toStartOf="@+id/buttonMins5"
+                app:layout_constraintEnd_toEndOf="@+id/buttonMins5"
+                app:layout_constraintTop_toBottomOf="@+id/buttonMins5"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonCustomPreset2"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription=""
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelCustomPreset2"
-                app:layout_constraintStart_toStartOf="@+id/labelCustomPreset2"
-                app:layout_constraintEnd_toEndOf="@+id/labelCustomPreset2"
-                app:layout_constraintBottom_toBottomOf="@+id/labelCustomPreset2"/>
-
-            <TextView
-                android:id="@+id/labelCustomPreset3"
                 style="@style/SleepTimer.CustomPreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_gravity="center"
                 android:text=""
+                android:alpha=".25"
                 android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toEndOf="@+id/labelCustomPreset2"
-                app:layout_constraintEnd_toStartOf="@+id/labelCustomPreset4"
-                app:layout_constraintTop_toBottomOf="@+id/labelMins30"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintStart_toStartOf="@+id/buttonMins15"
+                app:layout_constraintEnd_toEndOf="@+id/buttonMins15"
+                app:layout_constraintTop_toBottomOf="@+id/buttonMins15"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonCustomPreset3"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription=""
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelCustomPreset3"
-                app:layout_constraintStart_toStartOf="@+id/labelCustomPreset3"
-                app:layout_constraintEnd_toEndOf="@+id/labelCustomPreset3"
-                app:layout_constraintBottom_toBottomOf="@+id/labelCustomPreset3"/>
-
-            <TextView
-                android:id="@+id/labelCustomPreset4"
                 style="@style/SleepTimer.CustomPreset"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_marginEnd="32dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:importantForAccessibility="no"
+                android:layout_gravity="center"
                 android:text=""
+                android:alpha=".25"
                 android:textColor="?attr/player_contrast_01"
-                app:layout_constraintStart_toEndOf="@+id/labelCustomPreset3"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/labelMins60"
-                app:layout_constraintHorizontal_chainStyle="packed"/>
+                app:layout_constraintStart_toStartOf="@+id/buttonMins30"
+                app:layout_constraintEnd_toEndOf="@+id/buttonMins30"
+                app:layout_constraintTop_toBottomOf="@+id/buttonMins30"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
 
-            <View
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonCustomPreset4"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                style="@style/SleepTimer.CustomPreset"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:text=""
+                android:alpha=".25"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="@+id/buttonMins60"
+                app:layout_constraintEnd_toEndOf="@+id/buttonMins60"
+                app:layout_constraintTop_toBottomOf="@+id/buttonMins60"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
+
+            <TextView
+                android:id="@+id/labelCustomPresetsSoon"
+                style="@style/DarkSubtitle1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:importantForAccessibility="no"
+                android:text="@string/player_sleep_custom_presets_coming"
                 android:gravity="center"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription=""
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="@+id/labelCustomPreset4"
-                app:layout_constraintStart_toStartOf="@+id/labelCustomPreset4"
-                app:layout_constraintEnd_toEndOf="@+id/labelCustomPreset4"
-                app:layout_constraintBottom_toBottomOf="@+id/labelCustomPreset4"/>
+                android:alpha=".5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/buttonCustomPreset1"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonCustomPreset1"/>
 
             <TextView
                 android:id="@+id/labelChaptersSoon"
@@ -334,7 +218,7 @@
                 android:alpha=".5"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonCustomPreset4" />
+                app:layout_constraintTop_toBottomOf="@+id/buttonCustomPreset2" />
 
             <View
                 android:id="@+id/separator1"
@@ -353,7 +237,6 @@
                 android:layout_marginStart="32dp"
                 android:gravity="center_vertical"
                 android:importantForAccessibility="no"
-                android:text="@{viewModel.episodesUntilSleepText}"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/separator1" />
@@ -364,7 +247,6 @@
                 android:layout_height="0dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
-                android:contentDescription="@{viewModel.episodesUntilSleepText}"
                 android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/labelAfterNEpisodes"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -447,7 +329,6 @@
                 android:layout_height="64dp"
                 android:layout_marginStart="32dp"
                 android:gravity="center_vertical"
-                android:text="@{viewModel.sleepCustomTimeText}"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/separator3" />
@@ -512,7 +393,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:text="@{viewModel.sleepTimeLeftText}"
                 android:textSize="60sp"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -604,7 +484,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:text="@{viewModel.episodesLeftUntilSleepText}"
                 android:textColor="?attr/player_contrast_01"
                 android:textSize="12sp"
                 android:gravity="center_horizontal"
@@ -662,7 +541,6 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
                 android:minWidth="172dp"
-                android:text="@{viewModel.customEpisodeIncrementText}"
                 android:textColor="?attr/player_contrast_01"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
