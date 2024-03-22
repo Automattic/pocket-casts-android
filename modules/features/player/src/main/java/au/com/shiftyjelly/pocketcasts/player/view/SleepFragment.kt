@@ -124,7 +124,7 @@ class SleepFragment : BaseDialogFragment() {
         }
 
         viewModel.customEpisodeIncrementText.observe(viewLifecycleOwner) {customEpisodeIncText ->
-            binding?.buttonAdd2Episodes?.text = customEpisodeIncText
+            binding?.buttonAddNEpisodes?.text = customEpisodeIncText
         }
 
         viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->

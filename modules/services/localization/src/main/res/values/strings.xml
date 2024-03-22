@@ -302,9 +302,9 @@
     <string name="player_sleep_episode_add">Add episode to timer</string>
     <string name="player_sleep_episode_subtract">Remove episode from timer</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
-    <string name="player_sleep_end_of_current_episode">End after this episode</string>
-    <string name="player_sleep_end_of_next_episode">End after next episode</string>
-    <string name="player_sleep_after_n_episodes">End after %d episodes</string>
+    <string name="player_sleep_end_of_current_episode">End of this episode</string>
+    <string name="player_sleep_end_of_next_episode">End of next episode</string>
+    <string name="player_sleep_after_n_episodes">End in %d episodes</string>
     <string name="player_sleep_1_episode_left">Sleeping after this episode</string>
     <string name="player_sleep_2_episodes_left">Sleeping after next episode</string>
     <string name="player_sleep_n_episodes_left">Sleeping after %d episodes</string>
