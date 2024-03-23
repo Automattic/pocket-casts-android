@@ -5,7 +5,7 @@ Adds into the Sleep Timer the feature of sleeping by episodes
 ## Testing Instructions
 1. Begin any podcast episode
 2. Open the miniplayer to expand it
-3. Select the Sleep Timer icon in the icon list
+3. Select the sleep timer icon in the icon list
 
 ## Screenshots or Screencast 
 ![sleep-timer-episodes-screenshot4](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/6f481c57-8992-41a7-8488-13ccc2f8b371)
