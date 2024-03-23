@@ -1,5 +1,6 @@
 ## Description
 Adds into the Sleep Timer the feature of sleeping by episodes
+Changed the layout of the minute presets
 
 
 ## Testing Instructions
