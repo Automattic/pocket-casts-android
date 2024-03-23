@@ -1,6 +1,6 @@
 ## Description
 Adds into the Sleep Timer the feature of sleeping by episodes
-Affects #940
+
 
 ## Testing Instructions
 1. Begin any podcast episode
