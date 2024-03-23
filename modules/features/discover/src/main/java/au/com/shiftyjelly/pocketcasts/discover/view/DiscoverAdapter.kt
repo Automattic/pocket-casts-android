@@ -49,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedTintColors
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -102,7 +101,7 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
         const val TITLE_TEMPLATE = "most popular in $TITLE_CATEGORY_KEY"
     }
 }
-internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val tintColor: DiscoverFeedTintColors?, val podcasts: List<DiscoverPodcast>)
+internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -406,6 +405,7 @@ internal class DiscoverAdapter(
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
+            recyclerView?.itemAnimator = null
         }
         fun submitCategories(categories: List<CategoryPill>, source: String, context: Context, clearFilter: Boolean = false, region: String? = null) {
             this.source = source
@@ -436,6 +436,7 @@ internal class DiscoverAdapter(
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
+            recyclerView?.itemAnimator = null
         }
     }
 
@@ -451,6 +452,7 @@ internal class DiscoverAdapter(
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
             recyclerView?.adapter = adapter
+            recyclerView?.itemAnimator = null
         }
     }
 
@@ -808,7 +810,8 @@ internal class DiscoverAdapter(
                 categoriesViewHolder.binding.lblTitle.contentDescription = tittle
             }
             categoriesViewHolder.adapter.fromListId = row.listId
-            categoriesViewHolder.adapter.submitList(row.podcasts) { onRestoreInstanceState(categoriesViewHolder) }
+            categoriesViewHolder.adapter.submitList(null)
+            categoriesViewHolder.adapter.submitList(row.podcasts)
         } else if (row is RemainingPodcastsByCategoryRow) {
             val remainingPodcastHolder = holder as RemainingPodcastsByCategoryViewHolder
             remainingPodcastHolder.adapter.submitList(row.podcasts)

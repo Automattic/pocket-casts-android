@@ -136,7 +136,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                 MostPopularPodcastsByCategoryRow(it.listId, it.title, podcasts.take(MOST_POPULAR_PODCASTS))
 
             val remainingPodcasts =
-                RemainingPodcastsByCategoryRow(it.listId, it.title, it.tintColors, podcasts.drop(MOST_POPULAR_PODCASTS))
+                RemainingPodcastsByCategoryRow(it.listId, it.title, podcasts.drop(MOST_POPULAR_PODCASTS))
 
             updateDiscover(mostPopularPodcasts, remainingPodcasts)
             onCategorySelectionSuccess()
@@ -154,7 +154,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
         viewModel.loadCategories(source) { categories ->
             onCategoryClearSuccess(categories)
-            clearCategoryFilter()
+            reloadDiscover()
         }
     }
 
@@ -279,12 +279,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             adapter?.submitList(updatedList)
         }
     }
-    private fun clearCategoryFilter() {
-        adapter?.currentList?.toMutableList()?.apply {
-            removeAll { it is MostPopularPodcastsByCategoryRow }
-            adapter?.submitList(this)
-            viewModel.loadData(resources)
-        }
+    private fun reloadDiscover() {
+        viewModel.onCleared()
+        viewModel.loadData(resources)
     }
     companion object {
         private const val ID_KEY = "id"

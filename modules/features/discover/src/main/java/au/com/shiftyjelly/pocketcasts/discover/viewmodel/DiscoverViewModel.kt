@@ -216,17 +216,21 @@ class DiscoverViewModel @Inject constructor(
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
         return podcastManager.getSubscribedPodcastUuids().toFlowable() // Get the current subscribed list
             .mergeWith(podcastManager.observePodcastSubscriptions()) // Get updated when it changes
-            .flatMap { subscribedList ->
-                val newPodcastList = list.podcasts.map { podcast -> // Update the podcast list with each podcasts subscription status
-                    podcast.updateIsSubscribed(subscribedList.contains(podcast.uuid))
+            .map { subscribedList ->
+                val updatedPodcasts = list.podcasts.map { podcast ->
+                    val isSubscribed = subscribedList.contains(podcast.uuid)
+                    if (podcast.isSubscribed != isSubscribed) { // Check if there's a change in isSubscribed state
+                        podcast.copy(isSubscribed = isSubscribed)
+                    } else {
+                        podcast // If there's no change, keep the podcast unchanged
+                    }
                 }
-
-                return@flatMap Flowable.just(list.copy(podcasts = newPodcastList))
+                list.copy(podcasts = updatedPodcasts)
             }
+            .distinctUntilChanged() // Emit only if there's a change in the list of podcasts
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
-
     private fun addPlaybackStateToList(list: PodcastList): Flowable<PodcastList> {
         return Flowable.just(list)
             .combineLatest(
@@ -257,7 +261,7 @@ class DiscoverViewModel @Inject constructor(
         return list.transformWithReplacements(replacements, resources)
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         super.onCleared()
         disposables.clear()
     }
