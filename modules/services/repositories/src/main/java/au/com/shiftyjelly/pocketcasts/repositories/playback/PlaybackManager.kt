@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -101,6 +100,7 @@ import kotlin.math.abs
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 
 @Singleton
 open class PlaybackManager @Inject constructor(
@@ -1512,7 +1512,7 @@ open class PlaybackManager @Inject constructor(
             val nextEpisode = autoLoadEpisode(autoPlay = play)
             if (nextEpisode == null) {
                 Timber.d("Playback: No episode in upnext, shutting down")
-                if (SETimer.timerShouldStop()){
+                if (SETimer.timerShouldStop()) {
                     SETimer.stop(this, application)
                     sleep(episode)
                 } else if (SETimer.timerIsActive()) {

@@ -368,7 +368,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             .forEach { episodeItemTouchHelper?.clearView(recyclerView, it) }
     }
 
-    private fun onEpisodesActionsInteraction(episodeUuid: String, podcastUuid: String?, shouldPlayOnTap: Boolean){
+    private fun onEpisodesActionsInteraction(episodeUuid: String, podcastUuid: String?, shouldPlayOnTap: Boolean) {
         if (shouldPlayOnTap) {
             playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
         } else {

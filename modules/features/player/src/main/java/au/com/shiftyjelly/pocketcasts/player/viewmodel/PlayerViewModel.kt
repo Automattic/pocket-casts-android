@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -72,6 +71,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -299,7 +299,7 @@ class PlayerViewModel @Inject constructor(
     val sleepCustomTimeText = MutableLiveData<String>().apply {
         postValue(calcCustomTimeText())
     }
-    val episodesUntilSleepText = MutableLiveData<String>().apply{
+    val episodesUntilSleepText = MutableLiveData<String>().apply {
         SETimer.setEpisodeOptionText(this)
         postValue(episodesUntilSleepMessage())
     }
@@ -319,23 +319,23 @@ class PlayerViewModel @Inject constructor(
         monitorPlaybackPosition()
     }
 
-    fun episodeSleepCount(): Int{
+    fun episodeSleepCount(): Int {
         return SETimer.episodesUntilSleep
     }
 
-    fun isMinEpisodeLimit(): Boolean{
+    fun isMinEpisodeLimit(): Boolean {
         return SETimer.episodesUntilSleep == 1
     }
 
-    fun isMaxEpisodeLimit(): Boolean{
+    fun isMaxEpisodeLimit(): Boolean {
         return SETimer.episodesUntilSleep == SETimer.MAX_EPISODES
     }
 
-    private fun episodesUntilSleepMessage(): String{
+    private fun episodesUntilSleepMessage(): String {
         return SETimer.untilSleepMessage(context)
     }
 
-    private fun episodesLeftUntilSleepMessage(): String{
+    private fun episodesLeftUntilSleepMessage(): String {
         return SETimer.leftUntilSleepMessage(context)
     }
 
@@ -610,7 +610,7 @@ class PlayerViewModel @Inject constructor(
     fun sleepTimerByEpisode() {
         playbackManager.updateSleepTimerStatus(running = true)
         SETimer.activateTimer()
-        SETimer.initCustomIncrement(customEpisodeIncrementText,context)
+        SETimer.initCustomIncrement(customEpisodeIncrementText, context)
         sleepTimer.cancelTimer()
     }
 
@@ -620,7 +620,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun cancelEpisodeTimer() {
-        SETimer.stop(playbackManager,context)
+        SETimer.stop(playbackManager, context)
     }
 
     fun sleepTimerAddExtraMins(mins: Int) {
@@ -637,7 +637,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun extendEpisodeTimer(eps: Int?) {
-        SETimer.extendTimer(eps,context)
+        SETimer.extendTimer(eps, context)
     }
 
     fun starToggle() {

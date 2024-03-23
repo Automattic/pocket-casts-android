@@ -7,10 +7,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 
 /**
  * A dialog that shows a clear Up Next confirmation dialog if there are more than two episodes in the queue.
@@ -52,7 +52,6 @@ class ClearUpNextDialog(
         } else {
             clear()
         }
-
     }
 
     companion object {

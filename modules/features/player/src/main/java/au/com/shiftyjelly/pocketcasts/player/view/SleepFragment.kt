@@ -73,8 +73,8 @@ class SleepFragment : BaseDialogFragment() {
             startTimerEndOfEpisode()
         }
         binding.buttonAfterNEpisodes.setOnClickListener { startTimerByEpisode() }
-        binding.incEpisodeButton.setOnClickListener{ addEpisodeForTimer() }
-        binding.decEpisodeButton.setOnClickListener{ subtractEpisodeForTimer() }
+        binding.incEpisodeButton.setOnClickListener { addEpisodeForTimer() }
+        binding.decEpisodeButton.setOnClickListener { subtractEpisodeForTimer() }
         if (viewModel.isMinEpisodeLimit()) {
             binding.decEpisodeButton.alpha = .5f
         } else if (viewModel.isMaxEpisodeLimit()) {
@@ -89,14 +89,14 @@ class SleepFragment : BaseDialogFragment() {
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
             startTimerEndOfEpisode()
         }
-        binding.buttonAddEpisode.setOnClickListener { addEpisodeToTimer( eps = 1) }
-        binding.buttonAdd2Episodes.setOnClickListener{ addEpisodeToTimer( eps = 2) }
-        binding.buttonAddNEpisodes.setOnClickListener{ addEpisodeToTimer( eps = null) }
-        binding.buttonEndOfCurrentEpisode.setOnClickListener{
+        binding.buttonAddEpisode.setOnClickListener { addEpisodeToTimer(eps = 1) }
+        binding.buttonAdd2Episodes.setOnClickListener { addEpisodeToTimer(eps = 2) }
+        binding.buttonAddNEpisodes.setOnClickListener { addEpisodeToTimer(eps = null) }
+        binding.buttonEndOfCurrentEpisode.setOnClickListener {
             cancelEpisodeTimer(false)
             startTimerEndOfEpisode()
         }
-        binding.buttonCancelEpisodeTimer.setOnClickListener{ cancelEpisodeTimer() }
+        binding.buttonCancelEpisodeTimer.setOnClickListener { cancelEpisodeTimer() }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
 
@@ -115,15 +115,15 @@ class SleepFragment : BaseDialogFragment() {
             binding?.labelCustom?.text = customTimeText
         }
 
-        viewModel.episodesUntilSleepText.observe(viewLifecycleOwner) {episodesText ->
+        viewModel.episodesUntilSleepText.observe(viewLifecycleOwner) { episodesText ->
             binding?.labelAfterNEpisodes?.text = episodesText
         }
 
-        viewModel.episodesLeftUntilSleepText.observe(viewLifecycleOwner) {episodesLeftText ->
+        viewModel.episodesLeftUntilSleepText.observe(viewLifecycleOwner) { episodesLeftText ->
             binding?.episodesLeft?.text = episodesLeftText
         }
 
-        viewModel.customEpisodeIncrementText.observe(viewLifecycleOwner) {customEpisodeIncText ->
+        viewModel.customEpisodeIncrementText.observe(viewLifecycleOwner) { customEpisodeIncText ->
             binding?.buttonAddNEpisodes?.text = customEpisodeIncText
         }
 
@@ -133,9 +133,9 @@ class SleepFragment : BaseDialogFragment() {
         }
 
         viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisode).combineLatest(viewModel.isSleepForEpisodes)
-            .observe(viewLifecycleOwner){ (sleepChecksPair,isSleepForEpsisodes) ->
+            .observe(viewLifecycleOwner) { (sleepChecksPair, isSleepForEpsisodes) ->
                 val (isSleepRunning, isSleepAtEndOfEpisode) = sleepChecksPair
-                binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode  && !isSleepForEpsisodes
+                binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode && !isSleepForEpsisodes
                 binding?.sleepRunningEndOfEpisode?.isVisible = isSleepRunning && isSleepAtEndOfEpisode && !isSleepForEpsisodes
                 binding?.sleepRunningByEpisode?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode && isSleepForEpsisodes
             }
@@ -234,8 +234,8 @@ class SleepFragment : BaseDialogFragment() {
 
     private fun startTimerByEpisode() {
         viewModel.sleepTimerByEpisode()
-        viewModel.episodeSleepCount().let{ eps ->
-            binding?.root?.announceForAccessibility("Sleep timer set for $eps episode"+ if (eps!=1) "s" else "")
+        viewModel.episodeSleepCount().let { eps ->
+            binding?.root?.announceForAccessibility("Sleep timer set for $eps episode" + if (eps != 1) "s" else "")
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(EPISODE_KEY to eps))
         }
         close()
@@ -262,8 +262,9 @@ class SleepFragment : BaseDialogFragment() {
     private fun addEpisodeToTimer(eps: Int?) {
         viewModel.extendEpisodeTimer(eps)
         eps.let {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED,
-                if ( it == null) mapOf(AMOUNT_KEY to viewModel.episodeSleepCount()) else mapOf(AMOUNT_KEY to it)
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED,
+                if (it == null) mapOf(AMOUNT_KEY to viewModel.episodeSleepCount()) else mapOf(AMOUNT_KEY to it)
             )
         }
     }
