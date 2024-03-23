@@ -11,9 +11,10 @@ import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -23,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class ShareListIncomingAdapter(
     private val clickListener: ClickListener,
-    private val context: Context
+    private val context: Context,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -38,7 +39,7 @@ class ShareListIncomingAdapter(
             notifyDataSetChanged()
         }
 
-    private val imageLoader = PodcastImageLoaderThemed(context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
     private var title: String? = null
     private var description: String? = null
     private var podcasts: List<Podcast>? = null
@@ -79,10 +80,7 @@ class ShareListIncomingAdapter(
 
         holder.button.contentDescription = getPodcastDescription(podcast, subscribed)
 
-        imageLoader
-            .smallPlaceholder()
-            .loadPodcastUuid(podcastUuid)
-            .into(holder.image)
+        imageRequestFactory.create(podcast).loadInto(holder.image)
     }
 
     private fun getPodcastDescription(podcast: Podcast, subscribed: Boolean): String {

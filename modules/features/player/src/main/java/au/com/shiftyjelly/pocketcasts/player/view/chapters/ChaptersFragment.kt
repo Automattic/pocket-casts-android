@@ -12,24 +12,35 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -49,9 +60,11 @@ class ChaptersFragment : BaseFragment() {
             AppTheme(Theme.ThemeType.DARK) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
-                val uiState by chaptersViewModel.uiState.subscribeAsState(chaptersViewModel.defaultUiState)
+                val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
                 val lazyListState = rememberLazyListState()
                 this@ChaptersFragment.lazyListState = lazyListState
+                val context = LocalContext.current
+                val currentView = LocalView.current
 
                 val scrollToChapter by chaptersViewModel.scrollToChapterState.collectAsState()
                 LaunchedEffect(scrollToChapter) {
@@ -65,13 +78,40 @@ class ChaptersFragment : BaseFragment() {
                     }
                 }
 
+                LaunchedEffect(Unit) {
+                    chaptersViewModel
+                        .navigationState
+                        .collectLatest { event ->
+                            when (event) {
+                                is NavigationState.StartUpsell -> startUpsell()
+                            }
+                        }
+                }
+
+                LaunchedEffect(Unit) {
+                    chaptersViewModel
+                        .snackbarMessage
+                        .collectLatest { message ->
+                            Snackbar.make(currentView, context.getString(message), Snackbar.LENGTH_SHORT)
+                                .setBackgroundTint(ThemeColor.playerContrast01(Theme.ThemeType.DARK))
+                                .setTextColor(ThemeColor.playerBackground01(Theme.ThemeType.DARK, theme.playerBackgroundColor(uiState.podcast)))
+                                .show()
+                        }
+                }
+
                 Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     ChaptersPage(
                         lazyListState = lazyListState,
-                        chapters = uiState.chapters,
+                        chapters = uiState.displayChapters,
+                        showHeader = uiState.showHeader,
+                        totalChaptersCount = uiState.totalChaptersCount,
+                        onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
                         onChapterClick = ::onChapterClick,
                         onUrlClick = ::onUrlClick,
-                        backgroundColor = uiState.backgroundColor
+                        onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
+                        isTogglingChapters = uiState.isTogglingChapters,
+                        showSubscriptionIcon = uiState.showSubscriptionIcon,
+                        backgroundColor = uiState.backgroundColor,
                     )
                 }
             }
@@ -99,5 +139,15 @@ class ChaptersFragment : BaseFragment() {
 
     private fun showPlayer() {
         (parentFragment as? PlayerContainerFragment)?.openPlayer()
+    }
+
+    private fun startUpsell() {
+        val source = OnboardingUpgradeSource.SKIP_CHAPTERS
+        val onboardingFlow = OnboardingFlow.Upsell(
+            source = source,
+            showPatronOnly = Feature.DESELECT_CHAPTERS.tier == FeatureTier.Patron ||
+                Feature.DESELECT_CHAPTERS.isCurrentlyExclusiveToPatron(),
+        )
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 }

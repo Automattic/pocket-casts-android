@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -18,7 +19,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -31,6 +31,7 @@ import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.helper.readMore
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
@@ -52,24 +54,27 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import java.util.Date
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -108,6 +113,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
 }
 
 class PodcastAdapter(
+    private val context: Context,
     val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
     val upNextQueue: UpNextQueue,
@@ -159,6 +165,8 @@ class PodcastAdapter(
     )
     data class BookmarkItemData(
         val bookmark: Bookmark,
+        val episode: BaseEpisode,
+        val useRssArtwork: Boolean,
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
@@ -196,6 +204,8 @@ class PodcastAdapter(
             notifyDataSetChanged()
         }
 
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
+
     init {
         setHasStableIds(true)
     }
@@ -219,6 +229,8 @@ class PodcastAdapter(
                 downloadProgressUpdates = downloadManager.progressUpdateRelay,
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
+                imageRequestFactory = imageRequestFactory.smallSize(),
+                settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
         }
@@ -246,11 +258,8 @@ class PodcastAdapter(
     }
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
-        holder.binding.podcast = podcast
-        holder.binding.expanded = headerExpanded
-        holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-        holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-        holder.binding.isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+        bindHeaderBottom(holder)
+        bindHeaderTop(holder)
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
@@ -258,25 +267,79 @@ class PodcastAdapter(
             }
         }
 
-        val context = holder.itemView.context
-        val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = holder.binding.top.artwork
         // stopping the artwork flickering when Glide reloads the image
         if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
             holder.lastImagePodcastUuid = podcast.uuid
-            imageLoader.loadLargeImage(podcast, imageView)
+            imageRequestFactory.create(podcast).loadInto(imageView)
         }
 
         imageView.setOnLongClickListener {
             onArtworkLongClicked {
-                imageLoader.loadLargeImage(podcast, imageView)
+                imageRequestFactory.create(podcast).loadInto(imageView)
             }
             true
         }
 
         holder.binding.podcastHeader.contentDescription = podcast.title
+    }
 
-        holder.binding.executePendingBindings()
+    private fun bindHeaderBottom(holder: PodcastViewHolder) {
+        holder.binding.bottom.root.isVisible = headerExpanded
+        val tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        holder.binding.bottom.title.text = podcast.title
+        holder.binding.bottom.title.readMore(3)
+        with(holder.binding.bottom.category) {
+            text = podcast.getFirstCategory(context.resources)
+        }
+        with(holder.binding.bottom.nextText) {
+            text = podcast.displayableNextEpisodeDate(context)
+        }
+        holder.binding.bottom.description.text = podcast.podcastDescription
+        holder.binding.bottom.description.setLinkTextColor(tintColor)
+        holder.binding.bottom.description.readMore(3)
+        holder.binding.bottom.authorText.text = podcast.author
+        holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
+        holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()
+        holder.binding.bottom.linkImage.isVisible = podcast.getShortUrl().isNotBlank()
+        holder.binding.bottom.linkText.text = podcast.getShortUrl()
+        holder.binding.bottom.linkText.setTextColor(tintColor)
+        holder.binding.bottom.linkText.isVisible = podcast.getShortUrl().isNotBlank()
+        with(holder.binding.bottom.frequencyGroup) {
+            isVisible = podcast.displayableFrequency(context.resources) != null
+        }
+        with(holder.binding.bottom.scheduleText) {
+            text = podcast.displayableFrequency(context.resources)
+        }
+        with(holder.binding.bottom.nextGroup) {
+            isVisible = podcast.displayableNextEpisodeDate(context) != null
+        }
+    }
+
+    private fun bindHeaderTop(holder: PodcastViewHolder) {
+        val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+        holder.binding.top.chevron.isEnabled = headerExpanded
+        holder.binding.top.settings.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
+        holder.binding.top.subscribedButton.isVisible = podcast.isSubscribed
+        holder.binding.top.subscribedButton.toCircle(true)
+        holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
+        holder.binding.top.folders.setImageResource(
+            if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
+        )
+        holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
+        with(holder.binding.top.notifications) {
+            val notificationsIconText =
+                context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
+            contentDescription = notificationsIconText
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                tooltipText = notificationsIconText
+            }
+            setImageResource(
+                if (podcast.isShowNotifications) R.drawable.ic_notifications_on else R.drawable.ic_notifications_off,
+            )
+            isVisible = podcast.isSubscribed
+        }
     }
 
     private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
@@ -393,7 +456,7 @@ class PodcastAdapter(
         podcast: Podcast,
         context: Context,
     ) {
-        val grouping = podcast.podcastGrouping
+        val grouping = podcast.grouping
         val groupingFunction = grouping.sortFunction
         val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
         if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
@@ -414,17 +477,15 @@ class PodcastAdapter(
         }
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
-            }
+            add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
             add(
                 EpisodeHeader(
                     showingArchived = showingArchived,
                     episodeCount = episodeCount,
                     archivedCount = archivedCount,
                     searchTerm = searchTerm,
-                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null
-                )
+                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null,
+                ),
             )
             addAll(episodesPlusLimit)
         }
@@ -436,16 +497,16 @@ class PodcastAdapter(
                         NoResultsMessage(
                             title = context.getString(LR.string.podcast_no_episodes_found),
                             bodyText = context.getString(LR.string.podcast_no_episodes),
-                            showButton = false
-                        )
+                            showButton = false,
+                        ),
                     )
                 } else {
                     content.add(
                         NoResultsMessage(
                             title = context.getString(LR.string.podcast_no_episodes_found),
                             bodyText = context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount),
-                            showButton = true
-                        )
+                            showButton = true,
+                        ),
                     )
                 }
             } else {
@@ -453,8 +514,8 @@ class PodcastAdapter(
                     NoResultsMessage(
                         title = context.getString(LR.string.podcast_no_episodes_found),
                         bodyText = context.getString(LR.string.podcast_no_episodes_matching),
-                        showButton = false
-                    )
+                        showButton = false,
+                    ),
                 )
             }
         }
@@ -464,57 +525,58 @@ class PodcastAdapter(
 
     fun setBookmarks(
         bookmarks: List<Bookmark>,
+        episodes: List<BaseEpisode>,
         searchTerm: String,
         context: Context,
     ) {
         val content = mutableListOf<Any>().apply {
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                add(Podcast())
-                add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
+            add(Podcast())
+            add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
 
-                if (!bookmarksAvailable) {
-                    add(BookmarkUpsell)
-                } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
-                    add(NoBookmarkMessage)
-                } else {
+            if (!bookmarksAvailable) {
+                add(BookmarkUpsell)
+            } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
+                add(NoBookmarkMessage)
+            } else {
+                add(
+                    BookmarkHeader(
+                        bookmarksCount = bookmarks.size,
+                        searchTerm = searchTerm,
+                        onSearchFocus = onSearchFocus,
+                        onSearchQueryChanged = onSearchQueryChanged,
+                        onOptionsClicked = onBookmarksOptionsClicked,
+                    ),
+                )
+                if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
                     add(
-                        BookmarkHeader(
-                            bookmarksCount = bookmarks.size,
-                            searchTerm = searchTerm,
-                            onSearchFocus = onSearchFocus,
-                            onSearchQueryChanged = onSearchQueryChanged,
-                            onOptionsClicked = onBookmarksOptionsClicked,
-                        )
+                        NoResultsMessage(
+                            title = context.getString(LR.string.podcast_no_bookmarks_found),
+                            bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
+                            showButton = false,
+                        ),
                     )
-                    if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
-                        add(
-                            NoResultsMessage(
-                                title = context.getString(LR.string.podcast_no_bookmarks_found),
-                                bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
-                                showButton = false
+                } else {
+                    addAll(
+                        bookmarks.map {
+                            BookmarkItemData(
+                                bookmark = it,
+                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: NoOpEpisode,
+                                onBookmarkPlayClicked = onBookmarkPlayClicked,
+                                onBookmarkRowLongPress = onBookmarkRowLongPress,
+                                onBookmarkRowClick = { bookmark, adapterPosition ->
+                                    multiSelectBookmarksHelper.toggle(bookmark)
+                                    notifyItemChanged(adapterPosition)
+                                },
+                                isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
+                                isSelected = { bookmark ->
+                                    multiSelectBookmarksHelper.isSelected(
+                                        bookmark,
+                                    )
+                                },
+                                useRssArtwork = settings.useRssArtwork.value,
                             )
-                        )
-                    } else {
-                        addAll(
-                            bookmarks.map {
-                                BookmarkItemData(
-                                    bookmark = it,
-                                    onBookmarkPlayClicked = onBookmarkPlayClicked,
-                                    onBookmarkRowLongPress = onBookmarkRowLongPress,
-                                    onBookmarkRowClick = { bookmark, adapterPosition ->
-                                        multiSelectBookmarksHelper.toggle(bookmark)
-                                        notifyItemChanged(adapterPosition)
-                                    },
-                                    isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                                    isSelected = { bookmark ->
-                                        multiSelectBookmarksHelper.isSelected(
-                                            bookmark
-                                        )
-                                    },
-                                )
-                            }
-                        )
-                    }
+                        },
+                    )
                 }
             }
         }
@@ -577,7 +639,7 @@ class PodcastAdapter(
             interpolator = FastOutSlowInInterpolator()
         }
 
-        val constraintLayout = binding.top.root as ConstraintLayout
+        val constraintLayout = binding.top.root
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout)
         constraintSet.constrainPercentWidth(R.id.artworkContainer, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
@@ -637,7 +699,7 @@ class PodcastAdapter(
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
-    internal class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
+    internal inner class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
 
         var lastImagePodcastUuid: String? = null
 
@@ -667,7 +729,7 @@ class PodcastAdapter(
                 adapter.onWebsiteLinkClicked(it.context)
             }
             binding.bottom.ratings.setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
             )
         }
 
@@ -769,7 +831,7 @@ class PodcastAdapter(
             set.playSequentially(fadeInButton, widthAndTickSet)
             set.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    if (binding.expanded) {
+                    if (headerExpanded) {
                         adapter.onHeaderClicked(binding)
                     }
                     adapter.onSubscribeClicked()
@@ -778,4 +840,6 @@ class PodcastAdapter(
             set.start()
         }
     }
+
+    private val NoOpEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
 }

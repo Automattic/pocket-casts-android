@@ -5,8 +5,8 @@ import androidx.annotation.IntDef;
 import androidx.annotation.OptIn;
 import androidx.media3.common.C;
 import androidx.media3.common.audio.AudioProcessor;
+import androidx.media3.common.audio.BaseAudioProcessor;
 import androidx.media3.common.util.UnstableApi;
-import androidx.media3.exoplayer.audio.BaseAudioProcessor;
 import androidx.media3.common.util.Assertions;
 import androidx.media3.common.util.Util;
 

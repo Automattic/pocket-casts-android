@@ -11,16 +11,17 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module
@@ -28,6 +29,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
+import java.net.HttpURLConnection
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
+import javax.inject.Singleton
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Dispatcher
@@ -39,12 +46,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.protobuf.ProtoConverterFactory
-import java.io.File
-import java.net.HttpURLConnection
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import javax.inject.Qualifier
-import javax.inject.Singleton
+import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -120,10 +122,11 @@ class ServersModule {
                 .build()
         }
 
-        fun provideMoshiBuilder(featureFlagWrapper: FeatureFlagWrapper = FeatureFlagWrapper()): Moshi.Builder {
+        fun provideMoshiBuilder(): Moshi.Builder {
             return Moshi.Builder()
+                .add(InstantAdapter())
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser(featureFlagWrapper))
+                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
                 .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
                 .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
                 .add(AccessToken::class.java, AccessToken.Adapter)
@@ -340,7 +343,7 @@ class ServersModule {
         val platform = if (Util.isAutomotive(context)) "automotive" else "android"
         return ListRepository(
             listWebService,
-            platform
+            platform,
         )
     }
 
@@ -349,6 +352,10 @@ class ServersModule {
     internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
         return AccountManager.get(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideCacheServer(@PodcastCacheServerRetrofit retrofit: Retrofit): PodcastCacheServer = retrofit.create()
 }
 
 @Qualifier

@@ -23,9 +23,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.rainbowBrush
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.coroutines.cancellation.CancellationException
 
 private const val AnimDurationInMs = 800
 private const val AnimAlphaDelayInMs = 500
@@ -59,7 +59,7 @@ fun GradientPillar(
                 if (!paused) {
                     animOffsetY.animateTo(
                         targetValue = 0f,
-                        animationSpec = animationSpec
+                        animationSpec = animationSpec,
                     )
                 }
             }
@@ -67,7 +67,7 @@ fun GradientPillar(
                 if (!paused) {
                     animAlpha.animateTo(
                         targetValue = 1f,
-                        animationSpec = animationAlphaSpec
+                        animationSpec = animationAlphaSpec,
                     )
                 }
             }
@@ -115,12 +115,12 @@ private fun createBrush(pillarStyle: PillarStyle, size: Size) = when (pillarStyl
         0.00f to Color(red = 0.31f, green = 0.31f, blue = 0.31f),
         1.00f to Color.Black,
         start = Offset(0.5f * size.width, 0f * size.height),
-        end = Offset(0.5f * size.width, size.height)
+        end = Offset(0.5f * size.width, size.height),
     )
 
     PillarStyle.Rainbow -> rainbowBrush(
         start = Offset(0.8f * size.width, 1.27f * size.height),
-        end = Offset(0.76f * size.width, -0.44f * size.height)
+        end = Offset(0.76f * size.width, -0.44f * size.height),
     )
 }
 
@@ -146,7 +146,7 @@ fun GradientPillarRainbowPreview() {
             content = {},
             paused = true,
             modifier = Modifier
-                .size(50.dp, 200.dp)
+                .size(50.dp, 200.dp),
         )
     }
 }
@@ -161,7 +161,7 @@ fun GradientPillarGreyPreview() {
             content = {},
             paused = true,
             modifier = Modifier
-                .size(50.dp, 200.dp)
+                .size(50.dp, 200.dp),
         )
     }
 }

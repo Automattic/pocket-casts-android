@@ -57,7 +57,7 @@ fun PodcastsScreen(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Text(
                     text = stringResource(LR.string.podcasts_no_subscriptions),
@@ -78,7 +78,7 @@ fun PodcastsScreen(
         is PodcastsViewModel.UiState.Loaded -> {
             ScalingLazyColumn(
                 modifier = modifier.fillMaxWidth(),
-                columnState = columnState
+                columnState = columnState,
             ) {
                 item {
                     ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)
@@ -101,7 +101,7 @@ fun PodcastsScreen(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 LoadingSpinner()
                 Spacer(Modifier.height(8.dp))
@@ -133,10 +133,10 @@ private fun FolderChip(
                 painter = painterResource(IR.drawable.ic_folder),
                 contentDescription = null,
                 tint = WearColors.getFolderColor(folder.color),
-                modifier = Modifier.padding(horizontal = 8.dp).size(24.dp)
+                modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
             )
         },
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -150,7 +150,7 @@ private fun PodcastChip(
         onClick = { onClick(podcast.uuid) },
         colors = ChipDefaults.gradientBackgroundChipColors(
             startBackgroundColor = Color(podcast.podcast.tintColorForDarkBg).darker(0.5f),
-            endBackgroundColor = MaterialTheme.colors.surface
+            endBackgroundColor = MaterialTheme.colors.surface,
         ),
         label = {
             ChipText(podcast.title)
@@ -159,10 +159,10 @@ private fun PodcastChip(
             PodcastImage(
                 uuid = podcast.uuid,
                 dropShadow = false,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
             )
         },
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -173,6 +173,6 @@ private fun ChipText(title: String) {
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.button,
-        color = MaterialTheme.colors.onPrimary
+        color = MaterialTheme.colors.onPrimary,
     )
 }

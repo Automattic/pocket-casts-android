@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
@@ -27,6 +26,7 @@ dependencies {
 
     api(libs.room.ktx)
     implementation(libs.bundles.room)
+    testImplementation(project(":modules:services:sharedtest"))
 
     ksp(libs.room.compiler)
 }

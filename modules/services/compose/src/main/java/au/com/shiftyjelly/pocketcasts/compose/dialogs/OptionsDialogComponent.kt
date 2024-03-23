@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun OptionsDialogComponent(title: String?, @ColorInt iconColor: Int?, options: List<OptionsDialogOption>, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.padding(bottom = 16.dp)
+        modifier = modifier.padding(bottom = 16.dp),
     ) {
         OptionsDialogHeader(title)
         options.forEachIndexed { index, option ->
@@ -58,7 +58,7 @@ private fun OptionsDialogHeader(title: String?, modifier: Modifier = Modifier) {
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.theme.colors.support01,
-        modifier = modifier.padding(start = 20.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+        modifier = modifier.padding(start = 20.dp, top = 16.dp, end = 16.dp, bottom = 8.dp),
     )
 }
 
@@ -71,7 +71,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
             .fillMaxWidth()
             .clickable(enabled = option.click != null) { option.click?.invoke() }
             .testTag("option_$index")
-            .background(MaterialTheme.theme.colors.primaryUi01)
+            .background(MaterialTheme.theme.colors.primaryUi01),
     ) {
         if (option.imageId != null) {
             Spacer(modifier = Modifier.width(20.dp))
@@ -81,7 +81,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
                 tint = if (iconColor == null) MaterialTheme.theme.colors.primaryIcon01 else Color(iconColor),
                 modifier = Modifier
                     .width(24.dp)
-                    .height(24.dp)
+                    .height(24.dp),
             )
         }
         Text(
@@ -90,7 +90,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
             fontWeight = FontWeight.SemiBold,
             letterSpacing = (-0.01).sp,
             color = if (option.titleColor == null) MaterialTheme.theme.colors.primaryText01 else Color(option.titleColor),
-            modifier = Modifier.padding(start = 20.dp, end = 10.dp)
+            modifier = Modifier.padding(start = 20.dp, end = 10.dp),
         )
         Spacer(modifier = Modifier.weight(1f))
         ToggleButtonGroup(option.toggleOptions)
@@ -103,7 +103,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = (-0.01).sp,
                 textAlign = TextAlign.End,
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier.padding(end = 10.dp),
             )
         }
         if (option.checked && option.onSwitch == null) {
@@ -111,7 +111,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
                 painter = painterResource(id = IR.drawable.ic_tick),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryIcon01,
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier.padding(end = 10.dp),
             )
         }
         Spacer(modifier = Modifier.width(10.dp))

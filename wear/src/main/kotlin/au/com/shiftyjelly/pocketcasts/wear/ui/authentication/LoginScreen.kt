@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.material.Chip
+import com.google.android.horologist.images.base.paintable.DrawableResPaintable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -16,7 +17,6 @@ fun LoginScreen(
     onLoginWithGoogleClick: () -> Unit,
     onLoginWithPhoneClick: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<LoginViewModel>()
 
     CallOnce {
@@ -30,7 +30,7 @@ fun LoginScreen(
             Chip(
                 labelId = LR.string.log_in_with_google,
                 colors = ChipDefaults.secondaryChipColors(),
-                icon = IR.drawable.google_g_white,
+                icon = DrawableResPaintable(IR.drawable.google_g_white),
                 onClick = {
                     viewModel.onGoogleLoginClicked()
                     onLoginWithGoogleClick()
@@ -42,7 +42,7 @@ fun LoginScreen(
             Chip(
                 labelId = LR.string.log_in_on_phone,
                 colors = ChipDefaults.secondaryChipColors(),
-                icon = IR.drawable.baseline_phone_android_24,
+                icon = DrawableResPaintable(IR.drawable.baseline_phone_android_24),
                 onClick = {
                     viewModel.onPhoneLoginClicked()
                     onLoginWithPhoneClick()

@@ -18,9 +18,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -35,14 +35,14 @@ import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -58,9 +58,13 @@ class NotificationsSettingsFragment :
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var notificationHelper: NotificationHelper
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var screen: PreferenceScreen? = null
@@ -113,10 +117,10 @@ class NotificationsSettingsFragment :
 
         hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
             val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
-            settings.hideNotificationOnPause.set(newBool)
+            settings.hideNotificationOnPause.set(newBool, needsSync = true)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
-                mapOf("enabled" to newBool)
+                mapOf("enabled" to newBool),
             )
             true
         }
@@ -125,11 +129,14 @@ class NotificationsSettingsFragment :
             val newSetting = (newValue as? String)?.let {
                 NotificationVibrateSetting.values().find { it.intValue.toString() == newValue }
             }
-            settings.notificationVibrate.set(newSetting ?: NotificationVibrateSetting.DEFAULT)
+            settings.notificationVibrate.set(
+                value = newSetting ?: NotificationVibrateSetting.DEFAULT,
+                needsSync = false,
+            )
             changeVibrateSummary()
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED,
-                mapOf("value" to (newSetting?.analyticsString ?: "unknown"))
+                mapOf("value" to (newSetting?.analyticsString ?: "unknown")),
             )
             true
         }
@@ -138,7 +145,7 @@ class NotificationsSettingsFragment :
                 ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
                 ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
 
-            settings.playOverNotification.set(playOverNotificationSetting)
+            settings.playOverNotification.set(playOverNotificationSetting, needsSync = true)
             changePlayOverNotificationSummary()
 
             analyticsTracker.track(
@@ -217,7 +224,7 @@ class NotificationsSettingsFragment :
             val ringtone = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
             val value = ringtone?.toString() ?: ""
             context?.let {
-                settings.notificationSound.set(NotificationSound(value, it))
+                settings.notificationSound.set(NotificationSound(value, it), needsSync = false)
                 ringtonePreference?.summary = getRingtoneValue(value)
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
             } ?: Timber.e("Context was null when trying to set notification sound")
@@ -229,9 +236,9 @@ class NotificationsSettingsFragment :
     private fun setupActions() {
         changeActionsSummary()
         notificationActions?.setOnPreferenceClickListener {
-            val initialActions = NewEpisodeNotificationAction.loadFromSettings(settings)
+            val initialActions = settings.newEpisodeNotificationActions.value
             val selectedActions = initialActions.toMutableList()
-            val initialSelection = selectedActions.map { it.index() }.toIntArray()
+            val initialSelection = selectedActions.map(NewEpisodeNotificationAction::ordinal).toIntArray()
             val onSelect: MultiChoiceListener = { dialog, _, items ->
                 selectedActions.clear()
                 selectedActions.addAll(NewEpisodeNotificationAction.fromLabels(items.map { it.toString() }, resources))
@@ -239,22 +246,29 @@ class NotificationsSettingsFragment :
             }
 
             activity?.let { activity ->
-                val dialog = MaterialDialog(activity).show {
-                    listItemsMultiChoice(items = NewEpisodeNotificationAction.labels(resources), waitForPositiveButton = false, allowEmptySelection = true, initialSelection = initialSelection, selection = onSelect)
-                    title(res = LR.string.settings_notification_actions_title)
-                    positiveButton(
-                        res = LR.string.ok,
-                        click = {
-                            val madeChange = initialActions != selectedActions
-                            if (madeChange) {
-                                trackActionsChange(selectedActions)
-                            }
-                            NewEpisodeNotificationAction.saveToSettings(selectedActions, settings)
-                            changeActionsSummary()
-                        }
+                val dialog = MaterialDialog(activity)
+                    .listItemsMultiChoice(
+                        items = NewEpisodeNotificationAction.labels(resources),
+                        waitForPositiveButton = false,
+                        allowEmptySelection = true,
+                        initialSelection = initialSelection,
+                        selection = onSelect,
                     )
-                    negativeButton(res = LR.string.cancel)
-                }
+                    .show {
+                        title(res = LR.string.settings_notification_actions_title)
+                        positiveButton(
+                            res = LR.string.ok,
+                            click = {
+                                val madeChange = initialActions != selectedActions
+                                if (madeChange) {
+                                    trackActionsChange(selectedActions)
+                                }
+                                settings.newEpisodeNotificationActions.set(selectedActions, needsSync = true)
+                                changeActionsSummary()
+                            },
+                        )
+                        negativeButton(res = LR.string.cancel)
+                    }
                 changeActionsDialog(selectedActions, dialog)
             }
 
@@ -266,17 +280,17 @@ class NotificationsSettingsFragment :
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_NOTIFICATIONS_ACTIONS_CHANGED,
             mapOf(
-                "action_archive" to selectedActions.contains(NewEpisodeNotificationAction.ARCHIVE),
-                "action_download" to selectedActions.contains(NewEpisodeNotificationAction.DOWNLOAD),
-                "action_play" to selectedActions.contains(NewEpisodeNotificationAction.PLAY),
-                "action_play_next" to selectedActions.contains(NewEpisodeNotificationAction.PLAY_NEXT),
-                "action_play_last" to selectedActions.contains(NewEpisodeNotificationAction.PLAY_LAST),
-            )
+                "action_archive" to selectedActions.contains(NewEpisodeNotificationAction.Archive),
+                "action_download" to selectedActions.contains(NewEpisodeNotificationAction.Download),
+                "action_play" to selectedActions.contains(NewEpisodeNotificationAction.Play),
+                "action_play_next" to selectedActions.contains(NewEpisodeNotificationAction.PlayNext),
+                "action_play_last" to selectedActions.contains(NewEpisodeNotificationAction.PlayLast),
+            ),
         )
     }
 
     private fun changeActionsSummary() {
-        val userActions = NewEpisodeNotificationAction.loadFromSettings(settings)
+        val userActions = settings.newEpisodeNotificationActions.value
         val actionStrings = userActions.joinToString { resources.getString(it.labelId) }
         notificationActions?.summary = if (userActions.isEmpty()) resources.getString(LR.string.none) else actionStrings
     }
@@ -291,12 +305,7 @@ class NotificationsSettingsFragment :
         if (actions.size < 3) {
             dialog.updateListItemsMultiChoice(items = NewEpisodeNotificationAction.labels(resources), disabledIndices = intArrayOf(), selection = onSelect)
         } else {
-            val disabled = arrayListOf<Int>()
-            NewEpisodeNotificationAction.values().forEach { action ->
-                if (!actions.contains(action)) {
-                    disabled.add(action.index())
-                }
-            }
+            val disabled = NewEpisodeNotificationAction.entries.filter { it !in actions }.map(NewEpisodeNotificationAction::ordinal)
             dialog.updateListItemsMultiChoice(items = NewEpisodeNotificationAction.labels(resources), disabledIndices = disabled.toIntArray(), selection = onSelect)
         }
     }
@@ -347,7 +356,7 @@ class NotificationsSettingsFragment :
                     notificationCount >= podcastCount -> resources.getString(LR.string.settings_podcasts_selected_all)
                     else -> resources.getString(
                         LR.string.settings_podcasts_selected_x,
-                        notificationCount
+                        notificationCount,
                     )
                 }
                 launch(Dispatchers.Main) {
@@ -361,6 +370,7 @@ class NotificationsSettingsFragment :
         super.onResume()
         setupEnabledNotifications()
         setupNotificationVibrate()
+        setupHidePlaybackNotifications()
         setupPlayOverNotifications()
     }
 
@@ -410,11 +420,11 @@ class NotificationsSettingsFragment :
 
                 enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
                     val checked = newValue as Boolean
-                    settings.notifyRefreshPodcast.set(checked)
+                    settings.notifyRefreshPodcast.set(checked, needsSync = true)
 
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
-                        mapOf("enabled" to checked)
+                        mapOf("enabled" to checked),
                     )
 
                     lifecycleScope.launch {
@@ -448,7 +458,7 @@ class NotificationsSettingsFragment :
             val options = arrayOf(
                 NotificationVibrateSetting.NewEpisodes,
                 NotificationVibrateSetting.OnlyWhenSilent,
-                NotificationVibrateSetting.Never
+                NotificationVibrateSetting.Never,
             )
             it.entries = options
                 .map { getString(it.summary) }

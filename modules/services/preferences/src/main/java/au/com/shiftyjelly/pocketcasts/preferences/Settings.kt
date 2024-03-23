@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -12,21 +14,21 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
-import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationActionSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -42,6 +44,7 @@ interface Settings {
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
         const val WP_COM_API_URL = "https://public-api.wordpress.com"
+        const val SLUMBER_STUDIOS_PROMO_URL = "https://slumberstudios.com/pocketcasts"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
@@ -58,7 +61,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9116
+        const val WHATS_NEW_VERSION_CODE = 9119
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -137,22 +140,57 @@ interface Settings {
         BOOKMARK(21483650),
     }
 
-    enum class UpNextAction {
-        PLAY_NEXT,
-        PLAY_LAST
+    enum class UpNextAction(val serverId: Int) {
+        PLAY_NEXT(serverId = 0),
+        PLAY_LAST(serverId = 1),
+        ;
+
+        companion object {
+            fun fromServerId(id: Int) = entries.find { it.serverId == id } ?: PLAY_NEXT
+        }
     }
 
-    enum class CloudSortOrder {
-        NEWEST_OLDEST,
-        OLDEST_NEWEST,
-        A_TO_Z,
-        Z_TO_A,
-        SHORT_LONG,
-        LONG_SHORT
+    enum class CloudSortOrder(
+        val analyticsValue: String,
+        val serverId: Int,
+    ) {
+        NEWEST_OLDEST(
+            analyticsValue = "newest_to_oldest",
+            serverId = 0,
+        ),
+        OLDEST_NEWEST(
+            analyticsValue = "oldest_to_newest",
+            serverId = 1,
+        ),
+        A_TO_Z(
+            analyticsValue = "title_a_to_z",
+            serverId = 2,
+        ),
+        Z_TO_A(
+            analyticsValue = "title_z_to_a",
+            serverId = 3,
+        ),
+        SHORT_LONG(
+            analyticsValue = "shortest_to_longest",
+            serverId = 4,
+        ),
+        LONG_SHORT(
+            analyticsValue = "longest_to_shortest",
+            serverId = 5,
+        ),
+        ;
+
+        companion object {
+            fun fromServerId(id: Int) = entries.find { it.serverId == id }
+        }
     }
 
-    sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
-
+    sealed class MediaNotificationControls(
+        @StringRes val controlName: Int,
+        @DrawableRes val iconRes: Int,
+        val key: String,
+        val serverId: String,
+    ) {
         companion object {
             val All
                 get() = listOf(PlaybackSpeed, Star, MarkAsPlayed, PlayNext, Archive)
@@ -169,23 +207,58 @@ interface Settings {
             fun itemForId(id: String): MediaNotificationControls? {
                 return items[id]
             }
+
+            fun fromServerId(id: String) = All.find { it.serverId == id }
         }
 
-        object Archive : MediaNotificationControls(LR.string.archive, IR.drawable.ic_archive, ARCHIVE_KEY)
+        init {
+            // We use comma as a delimiter when syncing list of these settings
+            require(!serverId.contains(',')) {
+                "Media notification control server ID cannot contain a comma"
+            }
+        }
 
-        object MarkAsPlayed : MediaNotificationControls(LR.string.mark_as_played, IR.drawable.ic_markasplayed, MARK_AS_PLAYED_KEY)
+        data object Archive : MediaNotificationControls(
+            controlName = LR.string.archive,
+            iconRes = IR.drawable.ic_archive,
+            key = ARCHIVE_KEY,
+            serverId = "archive",
+        )
 
-        object PlayNext : MediaNotificationControls(LR.string.play_next, com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next, PLAY_NEXT_KEY)
+        data object MarkAsPlayed : MediaNotificationControls(
+            controlName = LR.string.mark_as_played,
+            iconRes = IR.drawable.ic_markasplayed,
+            key = MARK_AS_PLAYED_KEY,
+            serverId = "mark_as_played",
+        )
 
-        object PlaybackSpeed : MediaNotificationControls(LR.string.playback_speed, IR.drawable.auto_1x, PLAYBACK_SPEED_KEY)
+        data object PlayNext : MediaNotificationControls(
+            controlName = LR.string.play_next,
+            iconRes = com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next,
+            key = PLAY_NEXT_KEY,
+            serverId = "play_next",
+        )
 
-        object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
+        data object PlaybackSpeed : MediaNotificationControls(
+            controlName = LR.string.playback_speed,
+            iconRes = IR.drawable.auto_1,
+            key = PLAYBACK_SPEED_KEY,
+            serverId = "playback_speed",
+        )
+
+        data object Star : MediaNotificationControls(
+            controlName = LR.string.star,
+            iconRes = IR.drawable.ic_star,
+            key = STAR_KEY,
+            serverId = "star",
+        )
     }
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val shelfItemsObservable: Observable<List<String>>
     val multiSelectItemsObservable: Observable<List<Int>>
+
+    val shelfItems: UserSetting<List<ShelfItem>>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -256,6 +329,7 @@ interface Settings {
     val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEmbeddedArtwork: UserSetting<Boolean>
+    val useRssArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
@@ -284,11 +358,11 @@ interface Settings {
     fun showPlayedEpisodes(): Boolean
 
     val showArtworkOnLockScreen: UserSetting<Boolean>
-    val newEpisodeNotificationActions: UserSetting<NewEpisodeNotificationActionSetting>
+    val newEpisodeNotificationActions: UserSetting<List<NewEpisodeNotificationAction>>
 
-    val autoArchiveIncludeStarred: UserSetting<Boolean>
-    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlayingSetting>
-    val autoArchiveInactive: UserSetting<AutoArchiveInactiveSetting>
+    val autoArchiveIncludesStarred: UserSetting<Boolean>
+    val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlaying>
+    val autoArchiveInactive: UserSetting<AutoArchiveInactive>
 
     fun selectedFilter(): String?
     fun setSelectedFilter(filterUUID: String?)
@@ -306,16 +380,18 @@ interface Settings {
 
     // Firebase remote config
     fun getPeriodicSaveTimeMs(): Long
+    fun getPlayerReleaseTimeOutMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
+    fun getReportViolationUrl(): String
+    fun getSlumberStudiosPromoCode(): String
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>
 
     val freeGiftAcknowledged: UserSetting<Boolean>
 
-    fun setCloudSortOrder(sortOrder: CloudSortOrder)
-    fun getCloudSortOrder(): CloudSortOrder
+    val cloudSortOrder: UserSetting<CloudSortOrder>
     val cloudAddToUpNext: UserSetting<Boolean>
     val deleteLocalFileAfterPlaying: UserSetting<Boolean>
     val deleteCloudFileAfterPlaying: UserSetting<Boolean>
@@ -338,7 +414,6 @@ interface Settings {
     fun getCustomStorageLimitGb(): Long
     fun getCancelledAcknowledged(): Boolean
     fun setCancelledAcknowledged(value: Boolean)
-    fun setShelfItems(items: List<String>)
     fun getSeenPlayerTour(): Boolean
     fun setSeenPlayerTour(value: Boolean)
     fun setSeenUpNextTour(value: Boolean)
@@ -402,7 +477,12 @@ interface Settings {
     fun setFullySignedOut(boolean: Boolean)
     fun getFullySignedOut(): Boolean
 
-    val lastLoadedFromPodcastOrFilterUuid: UserSetting<LastPlayedList>
+    val lastAutoPlaySource: UserSetting<AutoPlaySource>
+
+    // This property is used for determining which source should be used for auto play
+    // We don't want to always change the auto play source but we want to always track it
+    // in case we need to change it.
+    val trackingAutoPlaySource: UserSetting<AutoPlaySource>
 
     // It would be better to have this be a UserSetting<ThemeType>, but that
     // is not easy due to the way our modules are structured.
@@ -423,4 +503,16 @@ interface Settings {
     fun getReviewRequestedDates(): List<String>
 
     val useDarkUpNextTheme: UserSetting<Boolean>
+
+    val useDynamicColorsForWidget: UserSetting<Boolean>
+
+    // We need to have a trigger for requesting theme changes.
+    // It is needed because during the sync we apply updates
+    // to individual theme settings one by one.
+    //
+    // If we were to react to them this way and not as a whole
+    // it might lead to side effects such us resetting following
+    // system dark mode.
+    val themeReconfigurationEvents: Flow<Unit>
+    fun requestThemeReconfiguration()
 }

@@ -30,18 +30,17 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -53,8 +52,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -88,19 +87,27 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var bookmarkManager: BookmarkManager
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
-    private lateinit var imageLoader: PodcastImageLoader
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private var binding: FragmentProfileEpisodeListBinding? = null
 
     val mode: Mode
@@ -132,7 +139,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             settings = settings,
             onRowClick = onRowClick,
             playButtonListener = playButtonListener,
-            imageLoader = imageLoader,
+            imageRequestFactory = imageRequestFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -146,7 +153,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     Mode.History -> EpisodeItemTouchHelper.SwipeSource.LISTENING_HISTORY
                     Mode.Starred -> EpisodeItemTouchHelper.SwipeSource.STARRED
                 },
-            )
+            ),
         )
     }
 
@@ -167,9 +174,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageLoader = PodcastImageLoaderThemed(context).apply {
-            radiusPx = 4.dpToPx(context)
-        }.smallPlaceholder()
+        imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
 
         playButtonListener.source = getAnalyticsEventSource()
         multiSelectHelper.source = getAnalyticsEventSource()
@@ -187,10 +192,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         super.onResume()
         binding?.recyclerView?.adapter = adapter
         when (mode) {
-            Mode.Downloaded -> AutomaticUpNextSource.Companion.Predefined.downloads
-            Mode.History -> null
-            Mode.Starred -> AutomaticUpNextSource.Companion.Predefined.starred
-        }.let { AutomaticUpNextSource.mostRecentList = it }
+            Mode.Downloaded -> AutoPlaySource.Downloads
+            Mode.History -> AutoPlaySource.None
+            Mode.Starred -> AutoPlaySource.Starred
+        }.let { settings.trackingAutoPlaySource.set(it, needsSync = false) }
     }
 
     override fun onDestroyView() {
@@ -328,7 +333,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
+        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity())
     }
 
     private fun updateToolbar() {
@@ -343,7 +348,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            menu = if (mode.showMenu) R.menu.menu_profile_list else null
+            menu = if (mode.showMenu) R.menu.menu_profile_list else null,
         )
         toolbar.setOnMenuItemClickListener(this)
     }

@@ -41,13 +41,15 @@ android {
         coreLibraryDesugaringEnabled true
     }
 
+    final javaVersion = JavaVersion.toVersion(libs.versions.java.get())
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility javaVersion
+        targetCompatibility javaVersion
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = javaVersion.toString()
         // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
         freeCompilerArgs += [
             "-opt-in=kotlin.RequiresOptIn"
@@ -150,7 +152,6 @@ dependencies {
 //    debugImplementation libs.leakcanary
 //    debugProdImplementation libs.leakcanary
 
-    implementation libs.bundles.accompanist
     implementation libs.bundles.billing
     implementation libs.bundles.coroutines
     implementation libs.bundles.firebase
@@ -167,6 +168,8 @@ dependencies {
     implementation libs.bundles.sentry
     implementation libs.bundles.work
 
+    implementation platform(libs.compose.bom)
+    androidTestImplementation platform(libs.compose.bom)
     implementation platform(libs.firebase.bom)
     implementation platform(libs.sentry.bom)
 
@@ -210,9 +213,8 @@ dependencies {
     ksp libs.moshi.kotlin.codegen
     ksp libs.glide.compiler
     ksp libs.showkase.processor
-    // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
-    kapt libs.hilt.compiler
-    kapt libs.dagger.hilt.compiler
+    ksp libs.hilt.compiler
+    ksp libs.dagger.hilt.compiler
 
     debugImplementation libs.compose.ui.test.manifest
     debugImplementation libs.compose.ui.tooling
@@ -235,6 +237,7 @@ dependencies {
     androidTestImplementation libs.room.testing
     androidTestImplementation libs.uiautomator
     androidTestImplementation libs.work.test
+    androidTestImplementation libs.turbine
 
     testImplementation libs.arch.core
     testImplementation libs.coroutines.test
@@ -246,6 +249,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation libs.okHttp.mockwebserver
     testImplementation libs.turbine
+    testImplementation libs.lifecycle.runtime.testing
 
     coreLibraryDesugaring libs.desugar.jdk
 }

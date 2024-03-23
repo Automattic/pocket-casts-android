@@ -21,7 +21,7 @@ class ClearUpNextDialog(
     private val removeNowPlaying: Boolean,
     private val playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    context: Context
+    context: Context,
 ) : ConfirmationDialog() {
 
     init {

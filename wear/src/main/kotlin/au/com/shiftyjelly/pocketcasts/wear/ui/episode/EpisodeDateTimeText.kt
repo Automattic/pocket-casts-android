@@ -22,17 +22,17 @@ fun EpisodeDateTimeText(episode: BaseEpisode, modifier: Modifier = Modifier) {
         currentTimeMs = episode.playedUpToMs,
         durationMs = episode.durationMs.toLong(),
         inProgress = episode.isInProgress,
-        context = context
+        context = context,
     ).text
     val downloadSize = Util.formattedBytes(
         bytes = episode.sizeInBytes,
-        context = context
+        context = context,
     )
     LayoutContent(
         shortDate = shortDate,
         timeLeft = timeLeft,
         downloadSize = downloadSize,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -45,17 +45,17 @@ private fun LayoutContent(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Text(
             text = "$shortDate • $timeLeft",
             style = MaterialTheme.typography.body2,
-            color = MaterialTheme.colors.onPrimary
+            color = MaterialTheme.colors.onPrimary,
         )
         Text(
             text = downloadSize,
             style = MaterialTheme.typography.body2,
-            color = MaterialTheme.colors.onPrimary
+            color = MaterialTheme.colors.onPrimary,
         )
     }
 }

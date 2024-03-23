@@ -34,3 +34,10 @@ annotation class DownloadRequestBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class ApplicationScope
+
+/**
+ * Annotation for providing lifecycle owner that is associated with the app's process.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ProcessLifecycle

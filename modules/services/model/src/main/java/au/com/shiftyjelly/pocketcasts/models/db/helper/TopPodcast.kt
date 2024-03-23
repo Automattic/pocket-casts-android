@@ -17,6 +17,6 @@ data class TopPodcast(
         title = title,
         author = author,
         tintColorForLightBg = tintColorForLightBg,
-        tintColorForDarkBg = tintColorForDarkBg
+        tintColorForDarkBg = tintColorForDarkBg,
     )
 }

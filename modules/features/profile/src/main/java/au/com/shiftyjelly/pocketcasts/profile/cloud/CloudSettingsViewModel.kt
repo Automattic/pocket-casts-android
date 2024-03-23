@@ -33,50 +33,50 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     fun setAddToUpNext(enabled: Boolean) {
-        settings.cloudAddToUpNext.set(enabled)
+        settings.cloudAddToUpNext.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
     fun setDeleteLocalFileAfterPlaying(enabled: Boolean) {
-        settings.deleteLocalFileAfterPlaying.set(enabled)
+        settings.deleteLocalFileAfterPlaying.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
     fun setDeleteCloudFileAfterPlaying(enabled: Boolean) {
-        settings.deleteCloudFileAfterPlaying.set(enabled)
+        settings.deleteCloudFileAfterPlaying.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
     fun setCloudAutoUpload(enabled: Boolean) {
-        settings.cloudAutoUpload.set(enabled)
+        settings.cloudAutoUpload.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_UPLOAD_TO_CLOUD_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
     fun setCloudAutoDownload(enabled: Boolean) {
-        settings.cloudAutoDownload.set(enabled)
+        settings.cloudAutoDownload.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_AUTO_DOWNLOAD_FROM_CLOUD_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 
     fun setCloudOnlyWifi(enabled: Boolean) {
-        settings.cloudDownloadOnlyOnWifi.set(enabled)
+        settings.cloudDownloadOnlyOnWifi.set(enabled, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED,
-            mapOf("enabled" to enabled)
+            mapOf("enabled" to enabled),
         )
     }
 }

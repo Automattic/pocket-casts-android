@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,10 +29,10 @@ fun FilesScreen(
     columnState: ScalingLazyColumnState,
     navigateToEpisode: (episodeUuid: String) -> Unit,
 ) {
-
     val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
+    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
 
     when {
         // Show nothing while screen is loading
@@ -41,15 +42,15 @@ fun FilesScreen(
 
         else -> {
             ScalingLazyColumn(
-                columnState = columnState
+                columnState = columnState,
             ) {
-
                 item { ScreenHeaderChip(LR.string.profile_navigation_files) }
 
                 items(userEpisodes) { episode ->
                     EpisodeChip(
                         episode = episode,
-                        onClick = { navigateToEpisode(episode.uuid) }
+                        useRssArtwork = useRssArtwork,
+                        onClick = { navigateToEpisode(episode.uuid) },
                     )
                 }
             }
@@ -62,7 +63,7 @@ private fun EmptyState() {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Text(
             text = stringResource(LR.string.profile_cloud_no_files_uploaded),

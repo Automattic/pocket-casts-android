@@ -1,12 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_frame"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:background="@drawable/widget_background"
-    android:layoutDirection="ltr"
-    android:clickable="true"
-    android:focusable="true"
-    android:theme="@style/PCWidgetTheme">
+    tools:parentTag="android.widget.FrameLayout">
 
     <FrameLayout
         android:id="@+id/widget_empty_player"
@@ -153,4 +149,4 @@
         </LinearLayout>
     </FrameLayout>
 
-</FrameLayout>
+</merge>

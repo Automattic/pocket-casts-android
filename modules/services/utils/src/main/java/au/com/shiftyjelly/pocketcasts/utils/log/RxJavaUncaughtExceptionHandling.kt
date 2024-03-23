@@ -8,7 +8,6 @@ object RxJavaUncaughtExceptionHandling {
     fun setUp() {
         RxJavaPlugins.setErrorHandler { exception ->
             when (exception) {
-
                 is UndeliverableException -> {
                     // Merely log undeliverable exceptions
                     Timber.e(exception)

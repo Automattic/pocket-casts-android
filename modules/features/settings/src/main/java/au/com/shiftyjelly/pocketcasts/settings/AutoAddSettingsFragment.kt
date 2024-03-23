@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPod
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterAutoAddPodcastBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterHeaderBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterOptionRowBinding
@@ -23,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterPlainTextRowBi
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentAutoAddSettingsBinding
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoAddSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -67,18 +67,18 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
         val topAdapter = AutoAddTopAdapter()
         val headerRow = AutoAddTopSections.Header(getString(LR.string.settings_auto_up_next_podcasts))
 
-        val autoAddAdapter = AutoAddPodcastAdapter(PodcastImageLoaderThemed(view.context)) {
+        val autoAddAdapter = AutoAddPodcastAdapter(view.context) {
             OptionsDialog()
                 .setTitle(getString(LR.string.settings_auto_up_next_add_to))
                 .addCheckedOption(
                     titleString = getString(LR.string.settings_auto_up_next_top),
                     checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT,
-                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_NEXT) }
+                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_NEXT) },
                 )
                 .addCheckedOption(
                     titleString = getString(LR.string.settings_auto_up_next_bottom),
                     checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_LAST,
-                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_LAST) }
+                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_LAST) },
                 )
                 .show(childFragmentManager, "autoadd_options")
         }
@@ -90,11 +90,12 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
             val limitRow = AutoAddTopSections.Option(
                 IR.drawable.ic_upnext_playlast,
                 getString(
-                    LR.string.settings_auto_up_next_limit
+                    LR.string.settings_auto_up_next_limit,
                 ),
                 getString(
-                    LR.string.episodes_plural, settings.autoAddUpNextLimit.value
-                )
+                    LR.string.episodes_plural,
+                    settings.autoAddUpNextLimit.value,
+                ),
             ) {
                 val currentLimit = settings.autoAddUpNextLimit.value
                 OptionsDialog()
@@ -153,7 +154,7 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
         val fragment = PodcastSelectFragment.newInstance(
             tintColor = ThemeColor.primaryInteractive01(theme.activeTheme),
             showToolbar = true,
-            source = PodcastSelectFragmentSource.AUTO_ADD
+            source = PodcastSelectFragmentSource.AUTO_ADD,
         )
         fragment.listener = this
         (activity as? FragmentHostListener)?.addFragment(fragment)
@@ -267,7 +268,12 @@ class AutoAddTopAdapter : ListAdapter<AutoAddTopSections, RecyclerView.ViewHolde
     }
 }
 
-class AutoAddPodcastAdapter(val imageLoader: PodcastImageLoader, val onClick: (Podcast) -> Unit) : ListAdapter<Podcast, AutoAddPodcastAdapter.ViewHolder>(PodcastAutoAddDiff) {
+class AutoAddPodcastAdapter(
+    val context: Context,
+    val onClick: (Podcast) -> Unit,
+) : ListAdapter<Podcast, AutoAddPodcastAdapter.ViewHolder>(PodcastAutoAddDiff) {
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context)
+
     class ViewHolder(val binding: AdapterAutoAddPodcastBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -279,7 +285,7 @@ class AutoAddPodcastAdapter(val imageLoader: PodcastImageLoader, val onClick: (P
         val podcast = getItem(position)
 
         holder.binding.apply {
-            imageLoader.load(podcast).into(imageView)
+            imageRequestFactory.create(podcast).loadInto(imageView)
             lblTitle.text = podcast.title
             val resources = holder.itemView.resources
             lblSubtitle.text = when (podcast.autoAddToUpNext) {

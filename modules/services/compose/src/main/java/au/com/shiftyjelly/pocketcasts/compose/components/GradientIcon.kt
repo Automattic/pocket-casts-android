@@ -49,10 +49,10 @@ fun GradientIcon(
                     drawContent()
                     drawRect(
                         brush = Brush.horizontalGradient(atLeastTwoColors),
-                        blendMode = BlendMode.SrcAtop
+                        blendMode = BlendMode.SrcAtop,
                     )
                 }
-            }
+            },
     )
 }
 
@@ -78,6 +78,6 @@ fun GradientIconDarkPreview() {
 private fun GradientIconPreview() {
     GradientIcon(
         painter = painterResource(R.drawable.ic_podcasts),
-        colors = listOf(Color.Red, Color.Yellow)
+        colors = listOf(Color.Red, Color.Yellow),
     )
 }

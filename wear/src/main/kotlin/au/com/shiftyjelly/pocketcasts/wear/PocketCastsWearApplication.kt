@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
+import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
@@ -31,31 +32,44 @@ import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
 import io.sentry.protocol.User
+import java.io.File
+import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.util.concurrent.Executors
-import javax.inject.Inject
 
 @HiltAndroidApp
 class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
+
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var notificationHelper: NotificationHelper
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var syncManager: SyncManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
+
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
+
+    @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
     override fun onCreate() {
         super.onCreate()
@@ -95,7 +109,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
         runBlocking {
             FirebaseAnalyticsTracker.setup(
                 analytics = FirebaseAnalytics.getInstance(this@PocketCastsWearApplication),
-                settings = settings
+                settings = settings,
             )
 
             notificationHelper.setupNotificationChannels()
@@ -122,7 +136,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
                 podcastManager = podcastManager,
                 settings = settings,
                 syncManager = syncManager,
-                context = this@PocketCastsWearApplication
+                context = this@PocketCastsWearApplication,
             )
         }
 
@@ -134,6 +148,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
         AnalyticsTracker.refreshMetadata()
+        downloadStatisticsReporter.setup()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

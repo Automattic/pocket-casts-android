@@ -12,10 +12,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import javax.inject.Inject
 
 data class AutoAddSettingsState(val autoAddPodcasts: List<Podcast>, val limit: Int, val behaviour: AutoAddUpNextLimitBehaviour)
 
@@ -46,7 +46,7 @@ class AutoAddSettingsViewModel @Inject constructor(
                     .toFlowable(BackpressureStrategy.LATEST),
                 settings.autoAddUpNextLimitBehaviour.flow
                     .asObservable(viewModelScope.coroutineContext)
-                    .toFlowable(BackpressureStrategy.LATEST)
+                    .toFlowable(BackpressureStrategy.LATEST),
             )
             .map { AutoAddSettingsState(it.first, it.second, it.third) }
             .toLiveData()
@@ -57,7 +57,7 @@ class AutoAddSettingsViewModel @Inject constructor(
             podcastManager.updateAutoAddToUpNext(podcast, autoAddOption)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCAST_POSITION_OPTION_CHANGED,
-                mapOf("value" to autoAddOption.analyticsValue)
+                mapOf("value" to autoAddOption.analyticsValue),
             )
         }
     }
@@ -73,23 +73,23 @@ class AutoAddSettingsViewModel @Inject constructor(
     }
 
     fun autoAddUpNextLimitChanged(limit: Int) {
-        settings.autoAddUpNextLimit.set(limit)
+        settings.autoAddUpNextLimit.set(limit, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED,
-            mapOf("value" to limit)
+            mapOf("value" to limit),
         )
     }
 
     fun autoAddUpNextLimitBehaviorChanged(behavior: AutoAddUpNextLimitBehaviour) {
-        settings.autoAddUpNextLimitBehaviour.set(behavior)
+        settings.autoAddUpNextLimitBehaviour.set(behavior, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED,
             mapOf(
                 "value" to when (behavior) {
                     AutoAddUpNextLimitBehaviour.STOP_ADDING -> "stop_adding"
                     AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> "only_add_top"
-                }
-            )
+                },
+            ),
         )
     }
 }

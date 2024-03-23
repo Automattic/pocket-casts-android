@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback.auto
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -30,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.autoDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.automotiveDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -44,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class AutoMediaId(
     val episodeId: String,
-    val sourceId: String?
+    val sourceId: String?,
 ) {
     companion object {
         private const val DIVIDER = "#"
@@ -64,12 +62,8 @@ data class AutoMediaId(
 }
 
 object AutoConverter {
-
-    private const val THUMBNAIL_IMAGE_SIZE = 200
-    private const val FULL_IMAGE_SIZE = 800
-
-    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
-        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context)
+    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, useRssArtwork: Boolean, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
+        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context, useRssArtwork)
 
         val extrasForEpisode = extrasForEpisode(episode)
         if (groupTrailers) {
@@ -89,9 +83,9 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(episodeDesc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
     }
 
-    fun convertPodcastToMediaItem(podcast: Podcast, context: Context): MediaBrowserCompat.MediaItem? {
+    fun convertPodcastToMediaItem(podcast: Podcast, context: Context, useRssArtwork: Boolean): MediaBrowserCompat.MediaItem? {
         return try {
-            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context)
+            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context, showRssArtwork = useRssArtwork)
 
             val podcastDesc = MediaDescriptionCompat.Builder()
                 .setTitle(podcast.title)
@@ -131,8 +125,10 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context): Uri? {
-        val url = if (episode is UserEpisode) {
+    fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context, showRssArtwork: Boolean): Uri? {
+        val url = if (episode is PodcastEpisode && (!episode.imageUrl.isNullOrBlank()) && showRssArtwork) {
+            episode.imageUrl
+        } else if (episode is UserEpisode) {
             // the artwork for user uploaded episodes are stored on each episode
             episode.artworkUrl
         } else {
@@ -169,16 +165,6 @@ object AutoConverter {
      */
     fun getArtworkUriForContentProvider(podcastArtUri: Uri?, context: Context): Uri? {
         return podcastArtUri?.asAlbumArtContentUri(context)
-    }
-
-    fun getBitmapForPodcast(podcast: Podcast?, useThumbnail: Boolean, context: Context): Bitmap? {
-        if (podcast == null) {
-            return null
-        }
-
-        val size = if (useThumbnail) THUMBNAIL_IMAGE_SIZE else FULL_IMAGE_SIZE
-        val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).smallPlaceholder()
-        return imageLoader.getBitmap(podcast, size)
     }
 
     fun getPodcastsBitmapUri(context: Context): Uri {
@@ -223,7 +209,7 @@ object AutoConverter {
 
         return bundleOf(
             EXTRA_DOWNLOAD_STATUS to downloadStatus,
-            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus
+            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus,
         )
     }
 }

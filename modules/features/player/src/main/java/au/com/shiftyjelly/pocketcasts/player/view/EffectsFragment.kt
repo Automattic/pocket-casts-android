@@ -20,34 +20,36 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentEffectsBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.clipToRange
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.math.round
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeListener, MaterialButtonToggleGroup.OnButtonCheckedListener, View.OnClickListener {
 
     @Inject lateinit var stats: StatsManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var playbackManager: PlaybackManager
 
     override val statusBarColor: StatusBarColor? = null
 
     private val viewModel: PlayerViewModel by activityViewModels()
-    private lateinit var imageLoader: PodcastImageLoaderThemed
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private var binding: FragmentEffectsBinding? = null
     private val trimToggleGroupButtonIds = arrayOf(R.id.trimLow, R.id.trimMedium, R.id.trimHigh)
     private var updatedSpeed: Double? = null
@@ -55,14 +57,11 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageLoader = PodcastImageLoaderThemed(context).apply {
-            radiusPx = 4.dpToPx(context)
-        }
+        imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).themed()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEffectsBinding.inflate(inflater, container, false)
-        binding?.lifecycleOwner = viewLifecycleOwner
 
         viewModel.effectsLive.value?.let { update(it) } // Make sure the window is the correct size before opening or else it won't expand properly
         viewModel.effectsLive.observe(viewLifecycleOwner) { podcastEffectsPair ->
@@ -91,12 +90,11 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         val binding = binding ?: return
 
-        binding.effects = effects
-        binding.podcast = podcast
+        binding.globalEffectsCard.isVisible = podcast.overrideGlobalEffects
 
-        imageLoader.load(podcast).into(binding.podcastEffectsImage)
+        imageRequestFactory.create(podcast).loadInto(binding.podcastEffectsImage)
 
-        binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
+        binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
 
         binding.btnSpeedUp.setOnClickListener(this)
         binding.btnSpeedDown.setOnClickListener(this)
@@ -123,8 +121,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding.switchVolume.setOnCheckedChangeListener(this)
 
         binding.btnClear.setOnClickListener(this)
-
-        binding.executePendingBindings()
     }
 
     @Suppress("DEPRECATION")
@@ -142,12 +138,12 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             val trimButtonTextColor = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_checked), // Enabled
-                    intArrayOf()
+                    intArrayOf(),
                 ),
                 intArrayOf(
                     backgroundColor,
-                    playerContrast01
-                )
+                    playerContrast01,
+                ),
             )
             binding?.trimLow?.setTextColor(trimButtonTextColor)
             binding?.trimMedium?.setTextColor(trimButtonTextColor)
@@ -158,14 +154,13 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private fun changePlaybackSpeed(effects: PlaybackEffects, podcast: Podcast, amount: Double) {
         val binding = binding ?: return
 
-        // val speed = (amount.clipToRange(0.5, 3.0) * 10.0).toInt() / 10.0
-        val speed = round(amount.clipToRange(0.5, 3.0) * 10.0) / 10.0
+        val speed = amount.roundedSpeed()
         effects.playbackSpeed = speed
         updatedSpeed = speed
-        binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
+        binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
-        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.playbackSpeedString}")
+        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
     }
 
     private fun updateTrimState() {
@@ -192,8 +187,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
-        val podcast = binding.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
             trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
@@ -215,8 +209,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onButtonChecked(group: MaterialButtonToggleGroup, checkedId: Int, isChecked: Boolean) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
-        val podcast = binding.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         if (group.id == binding.trimToggleGroup.id && isChecked) {
             val index = trimToggleGroupButtonIds.indexOf(checkedId)
@@ -231,8 +224,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onClick(view: View) {
         val binding = binding ?: return
-        val effects = binding.effects ?: return
-        val podcast = binding.podcast ?: return
+        val (podcast, effects) = viewModel.effectsLive.value ?: return
 
         when (view.id) {
             binding.btnSpeedUp.id -> changePlaybackSpeed(effects, podcast, effects.playbackSpeed + 0.1)

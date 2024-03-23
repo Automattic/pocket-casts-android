@@ -35,7 +35,7 @@ fun ObtainConfirmationScreen(
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         TextH30(
             text = text,
@@ -43,14 +43,13 @@ fun ObtainConfirmationScreen(
             color = MaterialTheme.colors.onPrimary,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         )
 
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
-
             Button(
                 onClick = onCancel,
                 modifier = Modifier.size(52.dp),
@@ -60,12 +59,12 @@ fun ObtainConfirmationScreen(
                     modifier = Modifier
                         .background(color = MaterialTheme.colors.surface)
                         .clip(CircleShape)
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 ) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_close),
                         tint = Color.White,
-                        contentDescription = stringResource(LR.string.cancel)
+                        contentDescription = stringResource(LR.string.cancel),
                     )
                 }
             }
@@ -79,12 +78,12 @@ fun ObtainConfirmationScreen(
                     modifier = Modifier
                         .background(color = Color.Red)
                         .clip(CircleShape)
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 ) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_check_black_24dp),
                         tint = Color.Black,
-                        contentDescription = stringResource(LR.string.profile_confirm)
+                        contentDescription = stringResource(LR.string.profile_confirm),
                     )
                 }
             }

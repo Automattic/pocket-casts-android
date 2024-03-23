@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
@@ -12,12 +13,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import io.sentry.Sentry
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -48,17 +49,16 @@ class MultiSelectBookmarksHelper @Inject constructor(
     override fun onMenuItemSelected(
         itemId: Int,
         resources: Resources,
-        fragmentManager: FragmentManager,
+        activity: FragmentActivity,
     ): Boolean {
         return when (itemId) {
-
             UR.id.menu_edit -> {
                 edit()
                 true
             }
 
             R.id.menu_delete -> {
-                delete(resources, fragmentManager)
+                delete(resources, activity.supportFragmentManager)
                 true
             }
 
@@ -103,17 +103,17 @@ class MultiSelectBookmarksHelper @Inject constructor(
                     resources.getStringPlural(
                         count = count,
                         singular = LR.string.bookmarks_delete_singular,
-                        plural = LR.string.bookmarks_delete_plural
-                    )
-                )
+                        plural = LR.string.bookmarks_delete_plural,
+                    ),
+                ),
             )
             .setTitle(resources.getString(LR.string.are_you_sure))
             .setSummary(
                 resources.getStringPlural(
                     count = count,
                     singular = LR.string.bookmarks_delete_summary_singular,
-                    plural = LR.string.bookmarks_delete_summary_plural
-                )
+                    plural = LR.string.bookmarks_delete_summary_plural,
+                ),
             )
             .setIconId(R.drawable.ic_delete)
             .setIconTint(UR.attr.support_05)
@@ -123,7 +123,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
                         bookmarkManager.deleteToSync(it.uuid)
                         analyticsTracker.track(
                             AnalyticsEvent.BOOKMARK_DELETED,
-                            mapOf("source" to source.analyticsValue)
+                            mapOf("source" to source.analyticsValue),
                         )
                     }
 
@@ -131,7 +131,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
                         val snackText = resources.getStringPlural(
                             count,
                             LR.string.bookmarks_deleted_singular,
-                            LR.string.bookmarks_deleted_plural
+                            LR.string.bookmarks_deleted_plural,
                         )
                         showSnackBar(snackText)
                     }

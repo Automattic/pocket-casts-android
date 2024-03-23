@@ -24,15 +24,15 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
-import kotlin.math.min
 
 @HiltViewModel
 class FilterEpisodeListViewModel @Inject constructor(
@@ -118,7 +118,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Sort(sortOrder)),
-                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
                 playlistManager.update(playlist, userPlaylistUpdate)
             }
@@ -132,7 +132,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Starred),
-                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
                 playlistManager.update(playlist, userPlaylistUpdate)
             }

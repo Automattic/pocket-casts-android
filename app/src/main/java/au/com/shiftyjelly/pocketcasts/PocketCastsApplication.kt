@@ -26,7 +26,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
+import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
@@ -42,39 +44,65 @@ import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
 import io.sentry.protocol.User
+import java.io.File
+import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.util.concurrent.Executors
-import javax.inject.Inject
 
 @HiltAndroidApp
 class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
+
     @Inject lateinit var statsManager: StatsManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var fileStorage: FileStorage
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var notificationHelper: NotificationHelper
+
     @Inject lateinit var workerFactory: HiltWorkerFactory
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var appIcon: AppIcon
+
     @Inject lateinit var coilImageLoader: ImageLoader
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
+
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
+
     @Inject lateinit var syncManager: SyncManager
-    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
+
+    @Inject lateinit var widgetManager: WidgetManager
+
+    @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -82,7 +110,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                 StrictMode.ThreadPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
-                    .build()
+                    .build(),
             )
             StrictMode.setVmPolicy(
                 StrictMode.VmPolicy.Builder()
@@ -90,7 +118,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     .detectLeakedClosableObjects()
                     .penaltyLog()
                     // .penaltyDeath()
-                    .build()
+                    .build(),
             )
         }
 
@@ -107,6 +135,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
         AnalyticsTracker.refreshMetadata()
+        downloadStatisticsReporter.setup()
     }
 
     private fun setupSentry() {
@@ -117,6 +146,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         SentryAndroid.init(this) { options ->
             options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.MOBILE.value)
+            options.sampleRate = 0.3
         }
 
         // Link email to Sentry crash reports only if the user has opted in
@@ -147,7 +177,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
             FirebaseAnalyticsTracker.setup(
                 analytics = FirebaseAnalytics.getInstance(this@PocketCastsApplication),
-                settings = settings
+                settings = settings,
             )
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
@@ -201,7 +231,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
                 // create opml import folder
                 try {
-                    fileStorage.opmlFileFolder
+                    fileStorage.getOrCreateOpmlDir()
                 } catch (e: Exception) {
                     Timber.e(e, "Unable to create opml folder.")
                 }
@@ -210,7 +240,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     podcastManager = podcastManager,
                     settings = settings,
                     syncManager = syncManager,
-                    context = this@PocketCastsApplication
+                    context = this@PocketCastsApplication,
                 )
 
                 // check that we have .nomedia files in existing folders
@@ -228,6 +258,13 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
+
+        settings.useDynamicColorsForWidget.flow
+            .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
+            .launchIn(applicationScope)
+        settings.useRssArtwork.flow
+            .onEach { widgetManager.updateWidgetRssArtwork(playbackManager) }
+            .launchIn(applicationScope)
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
     }

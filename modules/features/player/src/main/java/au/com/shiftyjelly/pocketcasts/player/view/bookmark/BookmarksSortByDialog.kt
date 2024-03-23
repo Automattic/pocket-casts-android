@@ -26,7 +26,7 @@ class BookmarksSortByDialog(
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.key == sortOrder.key,
-                click = { changeSortOrder(order) }
+                click = { changeSortOrder(order) },
             )
         }
         dialog.show(fragmentManager, "bookmarks_sort_dialog")

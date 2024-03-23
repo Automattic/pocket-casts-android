@@ -29,7 +29,7 @@ class BookmarkArguments(
                 episodeUuid = intent.getStringExtra(ARGUMENT_EPISODE_UUID) ?: throw IllegalArgumentException("Episode UUID not set"),
                 timeSecs = intent.getIntExtra(ARGUMENT_TIME, 0),
                 backgroundColor = intent.getIntExtra(ARGUMENT_BACKGROUND_COLOR, 0),
-                tintColor = intent.getIntExtra(ARGUMENT_TINT_COLOR, 0)
+                tintColor = intent.getIntExtra(ARGUMENT_TINT_COLOR, 0),
             )
         }
 
@@ -39,7 +39,7 @@ class BookmarkArguments(
                 episodeUuid = arguments?.getString(ARGUMENT_EPISODE_UUID) ?: throw IllegalArgumentException("Episode UUID not set"),
                 timeSecs = arguments.getInt(ARGUMENT_TIME),
                 backgroundColor = arguments.getInt(ARGUMENT_BACKGROUND_COLOR),
-                tintColor = arguments.getInt(ARGUMENT_TINT_COLOR)
+                tintColor = arguments.getInt(ARGUMENT_TINT_COLOR),
             )
         }
     }
@@ -61,7 +61,7 @@ class BookmarkArguments(
                 ARGUMENT_EPISODE_UUID to episodeUuid,
                 ARGUMENT_TIME to timeSecs,
                 ARGUMENT_BACKGROUND_COLOR to backgroundColor,
-                ARGUMENT_TINT_COLOR to tintColor
+                ARGUMENT_TINT_COLOR to tintColor,
             )
         }
     }

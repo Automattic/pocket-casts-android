@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -46,9 +48,12 @@ fun PodcastScreen(
     viewModel: PodcastViewModel = hiltViewModel(),
     columnState: ScalingLazyColumnState,
 ) {
+    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
+
     when (val state = viewModel.uiState) {
         is UiState.Loaded -> Content(
             state = state,
+            useRssArtwork = useRssArtwork,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
             columnState = columnState,
@@ -61,6 +66,7 @@ fun PodcastScreen(
 @Composable
 private fun Content(
     state: UiState.Loaded,
+    useRssArtwork: Boolean,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     columnState: ScalingLazyColumnState,
@@ -70,7 +76,7 @@ private fun Content(
         PodcastColorBackground(
             podcast = podcast,
             theme = state.theme,
-            modifier = modifier
+            modifier = modifier,
         )
 
         ScalingLazyColumn(
@@ -81,7 +87,7 @@ private fun Content(
             item {
                 PodcastImage(
                     uuid = podcast.uuid,
-                    modifier = Modifier.size(PodcastScreen.podcastImageSize)
+                    modifier = Modifier.size(PodcastScreen.podcastImageSize),
                 )
                 Spacer(Modifier.height(4.dp))
             }
@@ -92,7 +98,7 @@ private fun Content(
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colors.onPrimary,
                         text = podcast.title,
-                        style = MaterialTheme.typography.button
+                        style = MaterialTheme.typography.button,
                     )
                     Text(
                         modifier = modifier
@@ -109,14 +115,15 @@ private fun Content(
                                         includeFontPadding = false,
                                     ),
                                 )
-                                )
-                        )
+                                ),
+                        ),
                     )
                 }
             }
             items(state.episodes) { episode ->
                 EpisodeChip(
                     episode = episode,
+                    useRssArtwork = useRssArtwork,
                     onClick = {
                         onEpisodeTap(episode)
                     },
@@ -144,9 +151,9 @@ private fun PodcastColorBackground(
                 Brush.verticalGradient(
                     listOf(
                         color.copy(alpha = 0.3f),
-                        Color.Transparent
-                    )
-                )
-            )
+                        Color.Transparent,
+                    ),
+                ),
+            ),
     )
 }

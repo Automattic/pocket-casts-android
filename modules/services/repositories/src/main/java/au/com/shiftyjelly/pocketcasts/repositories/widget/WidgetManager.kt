@@ -10,5 +10,7 @@ interface WidgetManager {
     fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?)
     fun updateWidgetFromProvider(context: Context, manager: AppWidgetManager, widgetIds: IntArray, playbackManager: PlaybackManager?)
     fun updateWidgetFromPlaybackState(playbackManager: PlaybackManager?)
+    fun updateWidgetFromSettings(playbackManager: PlaybackManager?)
+    fun updateWidgetRssArtwork(playbackManager: PlaybackManager)
     fun updateWidgetNotPlaying()
 }

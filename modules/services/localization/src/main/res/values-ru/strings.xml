@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 21:54:04+0000
+Translation-Revision-Date: 2024-03-13 12:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="upgrade_to_patron">Перейти на Patron</string>
+    <string name="upgrade_to_plus">Перейти на Plus</string>
+    <string name="whats_new_got_it_button">Понятно</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Подпишитесь на Patron, и вы сможете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Подпишитесь на Plus, и вы сможете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
+    <string name="whats_new_deselect_chapters_plus_message">В рамках подписки на Plus вы теперь можете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
+    <string name="whats_new_deselect_chapters_patron_message">В рамках подписки на Patron вы теперь можете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
+    <string name="skip_chapters_patron_prompt">Возможность пропускать главы и множество других функций с Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Возможность пропускать главы и множество других функций с Pocket Casts Plus</string>
+    <string name="settings_use_embedded_podcast_artwork">Использовать встроенные обложки файлов</string>
+    <string name="settings_episode_artwork_details">Показывает тему из заметок для показа эпизода (при наличии) вместо темы шоу. Если имеется одновременно и обложка файла, и тема RSS, будет применяться тема RSS.</string>
+    <string name="select_one_chapter_message">Выберите хотя бы одну главу</string>
+    <string name="number_of_chapters_summary_singular">1 глава • Скрыто: %d</string>
+    <string name="number_of_chapters_summary_plural">Глав: %1$d • Скрыто: %2$d</string>
+    <string name="single_chapter">1 глава</string>
+    <string name="number_of_chapters">Глав: %d</string>
+    <string name="skip_chapters">Пропустить главы</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">Эксклюзивный контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Использовать код</string>
+    <string name="whats_new_slumber_studios_body_free_user">Подпишитесь на Plus Yearly и получите в качестве бонуса годовую подписку на контент Slumber Studios — подкасты, которые подарят вам самые сладкие сны. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Примените код %1$s и получайте удовольствие, пользуясь годовой подпиской на контент Slumber Studios в качестве бонуса за подписку на Yearly Plus. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_title">Мечтайте о большем</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">по окончании первого года</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
+    <string name="half_price_first_year">Скидка 50 % на первый год</string>
+    <string name="plus_offer_duration">Предложение %s</string>
+    <string name="report_subtitle">Пожаловаться на нежелательный контент</string>
+    <string name="report">Пожаловаться</string>
+    <string name="onboarding_plus_feature_watch_playback">Приложения для Apple Watch и Wear OS</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Папки и закладки</string>
+    <string name="settings_use_dynamic_colors_widget_details">Если этот параметр включён, цвета виджета будут меняться в зависимости от цветов темы устройства.</string>
+    <string name="settings_use_dynamic_colors_widget">Использовать динамические цвета в виджете</string>
+    <string name="widget">Виджет</string>
+    <string name="bookmark_not_found">Закладка не найдена</string>
+    <string name="settings_use_dark_up_next_details">При включённом параметре Up Next будет всегда использовать тёмную тему, а при выключенном — соответствовать текущей теме</string>
+    <string name="settings_use_dark_up_next">Использовать тёмную тему Up Next</string>
     <string name="end_of_year_stories_completion_rate_share_text">Мои итоги 2023 года</string>
     <string name="end_of_year_stories_subscribe_to_plus">Оформите подписку Plus и узнайте, как изменились ваши слушательские привычки по сравнению с 2022 г., посмотрите другую любопытную статистику и ознакомьтесь с такими функциями тарифного плана Premium, как закладки и папки.</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
@@ -42,7 +78,6 @@ Language: ru
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>
     <string name="podcast_rate">Оцените %s</string>
     <string name="submit">Отправить</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Примите участие в бета-тестировании закладок!</string>
     <string name="whats_new_bookmarks_try_now_button">Попробовать</string>
     <string name="whats_new_bookmarks_title">Закладки уже готовы!</string>
     <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>
@@ -88,7 +123,7 @@ Language: ru
     <string name="bookmarks_select_option">Выбрать закладки</string>
     <string name="bookmarks_delete_summary_singular">Закладка будет удалена. Это действие нельзя отменить.</string>
     <string name="bookmarks_delete_summary_plural">Закладки (%d) будут удалены. Это действие нельзя отменить.</string>
-    <string name="bookmarks_deleted_singular">1 закладка удалена</string>
+    <string name="bookmarks_deleted_singular">Закладка удалена</string>
     <string name="bookmarks_deleted_plural">Закладок удалено: %1$d</string>
     <string name="bookmarks_delete_singular">Удалить закладку</string>
     <string name="bookmarks_delete_plural">Удалить закладки</string>
@@ -96,10 +131,6 @@ Language: ru
     <string name="deselect_all">Снять выделение</string>
     <string name="deselect_all_above">Отменить выбор всех выше</string>
     <string name="edit">Править</string>
-    <string name="whats_new_autoplay_maybe_later_button">Возможно, позже</string>
-    <string name="whats_new_autoplay_enable_button">Включить</string>
-    <string name="whats_new_autoplay_body">Если в очереди «Следующие» ничего нет, то после выпуска, который вы слушаете, автоматически запустится другой из этого подкаста или списка.</string>
-    <string name="whats_new_autoplay_title">А вот и автовоспроизведение!</string>
     <string name="filters_download_limit_3">3 выпуска</string>
     <string name="settings_title_headphone_controls">Элементы управления наушников</string>
     <string name="settings_headphone_controls_summary">Настройте действия для основных элементов управления наушников.</string>
@@ -123,7 +154,6 @@ Language: ru
     <string name="player_sleep_add_1_minute">+ 1 минута</string>
     <string name="player_sleep_1_minute">1 минута</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Дополнительные темы и значки приложения</string>
-    <string name="onboarding_plus_feature_watch_playback">Воспроизведение на Watch</string>
     <string name="onboarding_patron_feature_early_access_title">Ранний доступ к новым возможностям</string>
     <string name="settings_continuous_playback_summary">Если в очереди «Следующие» ничего нет, запустится другой выпуск из подкаста или списка, который вы слушаете.</string>
     <string name="renew_your_subscription">Продлить подписку</string>
@@ -239,7 +269,6 @@ Language: ru
     <string name="settings_media_actions_customise">Настройте действия с медиафайлами</string>
     <string name="settings_media_actions_prioritize_subtitle">Будут отображаться основные действия.</string>
     <string name="settings_media_actions_prioritize_title">Расставьте действия с медиафайлами в приоритетном порядке</string>
-    <string name="plus_take_your_podcasting_to_next_level">Получите доступ к эксклюзивным функциям и опциям настройки и выйдите на новый уровень прослушивания подкастов.</string>
     <string name="onboarding_recommendations_more">Другие %s</string>
     <string name="filter_id_or_title">ID или название фильтра</string>
     <string name="filter_title">Название фильтра</string>
@@ -332,11 +361,8 @@ Language: ru
     <string name="onboarding_plus_feature_cloud_storage_text">Загрузите файлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Облачное хранилище объемом 20 ГБ</string>
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
-    <string name="onboarding_plus_feature_folders_title">Папки</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Слушайте подкасты везде: в приложениях для Windows, macOS и веб-приложении.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Приложения для настольных систем</string>
-    <string name="onboarding_upgrade_unlock_all_features">Разблокировать все функции</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Получите доступ к эксклюзивным функциям и опциям настройки</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Приложения для ПК и веб-приложения</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Всё, что вам нравится в Pocket Casts, и ещё больше</string>
     <string name="onboarding_recommendations_import">Импорт</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Переходите на Pocket Casts. Выберите любимые подкасты или импортируйте их из другого плеера. Вы всегда сможете сделать это позже.</string>
@@ -775,7 +801,7 @@ Language: ru
     <string name="settings_website_link">ссылка на веб-сайт</string>
     <string name="settings_view">Просмотреть</string>
     <string name="settings_version">Версия%1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Использовать встроенную тему подкаста</string>
+    <string name="settings_use_episode_podcast_artwork">Использовать встроенную тему RSS</string>
     <string name="settings_use_android_light_dark_mode">Использовать светлый/тёмный режим Android</string>
     <string name="settings_up_next_tap_summary">Если функция включена, элемент очереди «Следующие» будет воспроизводиться при нажатии. При долгом нажатии появятся настройки выпуска.</string>
     <string name="settings_up_next_tap">Воспроизводить выпуск из очереди «Следующие» по нажатию</string>
@@ -960,13 +986,9 @@ Language: ru
     <string name="plus_lifetime_member">Пожизненное членство</string>
     <string name="plus_learn_more_button">Подробнее</string>
     <string name="plus_learn_more_about_plus">Подробнее о Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">С нашими приложениями для Windows, macOS и веб-клиентами вы сможете слушать свои подкасты где угодно.</string>
     <string name="plus_desktop_apps">Приложения для настольных систем</string>
-    <string name="plus_description_title">Расширенные возможности для продвинутых слушателей</string>
-    <string name="plus_description_body">Личное пространство в открытом мире. Загрузите свои личные аудиофайлы на наши облачные серверы, зайдите в свою учетную запись через веб-плеер и пользуйтесь приложением.</string>
     <string name="plus_create_marketing_features"> Все</string>
     <string name="plus_cloud_storage_limit">Облачное хранилище %d ГБ</string>
-    <string name="plus_cloud_storage_body">Ускорьте свои лекции. Быстро прослушивайте другое содержимое. Станьте диджеем собственного подкаста.</string>
     <string name="plus_cloud_storage">Облачное хранилище</string>
     <string name="profile_expiry_date_unknown">Неизвестно</string>
     <string name="profile_yearly">Ежегодно</string>
@@ -974,7 +996,6 @@ Language: ru
     <string name="profile_welcome_to_plus">Добро пожаловать в Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Добро пожаловать в Pocket Casts!</string>
     <string name="profile_web_player">Веб-плеер</string>
-    <string name="profile_upgrade_to_plus">Перейти на Plus</string>
     <string name="profile_updates_ends">Обновления завершаются: %s</string>
     <string name="profile_updates_ended">Обновления завершены: %s</string>
     <string name="profile_time_free">%s бесплатно</string>
@@ -1372,7 +1393,7 @@ Language: ru
     <string name="podcast_archive_played">Это стоит делать только в том случае, если вы больше не хотите их видеть.</string>
     <string name="podcast_archive_all_played">Архивировать все прослушанные</string>
     <string name="podcast_archive_all">Архивировать все</string>
-    <string name="podcasts_unarchive">Из&amp;nbsp;архива</string>
+    <string name="podcasts_unarchive">Из архива</string>
     <string name="podcasts_time_to_add_some_podcasts_summary">Вы можете добавить подкасты с помощью поиска выше, а если вы ищете немного вдохновения, попробуйте вкладку «Поиск».</string>
     <string name="podcasts_time_to_add_some_podcasts">Пора добавить подкасты!</string>
     <string name="podcasts_sort_order">Порядок сортировки</string>
@@ -1618,7 +1639,7 @@ Language: ru
     <string name="auto_archive">Автоматическое архивирование</string>
     <string name="archived">Архивирован</string>
     <string name="archive_episode">Архивировать выпуск</string>
-    <string name="unarchive">Из&amp;nbsp;архива</string>
+    <string name="unarchive">Из архива</string>
     <string name="archive">Архив</string>
     <string name="add_to_up_next">Добавить в «Следующие»</string>
 </resources>

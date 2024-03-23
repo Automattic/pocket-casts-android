@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun EpisodeChip(
     episode: BaseEpisode,
+    useRssArtwork: Boolean,
     useUpNextIcon: Boolean = true,
     onClick: () -> Unit,
     showImage: Boolean = true,
@@ -58,9 +59,8 @@ fun EpisodeChip(
             .clickable { onClick() }
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
-            .padding(vertical = 10.dp)
+            .padding(vertical = 10.dp),
     ) {
-
         val viewModel = hiltViewModel<EpisodeChipViewModel>()
 
         // Make sure the episode is always up-to-date
@@ -77,16 +77,16 @@ fun EpisodeChip(
         val showUpNextIcon = useUpNextIcon && isInUpNextQueue
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(IntrinsicSize.Max)
+            modifier = Modifier.height(IntrinsicSize.Max),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-
                 if (showImage) {
                     EpisodeImage(
                         episode = episode,
+                        useRssArtwork = useRssArtwork,
                         modifier = Modifier
                             .size(30.dp)
                             .clip(RoundedCornerShape(4.dp)),
@@ -94,7 +94,7 @@ fun EpisodeChip(
                     IconsRow(
                         showUpNextIcon,
                         episode,
-                        Modifier.padding(top = 4.dp)
+                        Modifier.padding(top = 4.dp),
                     )
                 }
             }
@@ -102,7 +102,7 @@ fun EpisodeChip(
             Spacer(Modifier.width(6.dp))
 
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
                     text = episode.title,
@@ -118,7 +118,7 @@ fun EpisodeChip(
                                     includeFontPadding = false,
                                 ),
                             )
-                            )
+                            ),
                     ),
                     maxLines = 2,
                 )
@@ -127,7 +127,7 @@ fun EpisodeChip(
                     currentTimeMs = episode.playedUpToMs,
                     durationMs = episode.durationMs.toLong(),
                     inProgress = episode.isInProgress,
-                    context = LocalContext.current
+                    context = LocalContext.current,
                 ).text
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -137,7 +137,7 @@ fun EpisodeChip(
                             showUpNextIcon,
                             episode,
                             modifier = Modifier
-                                .padding(end = if (showUpNextIcon || episode.isDownloaded) 4.dp else 0.dp)
+                                .padding(end = if (showUpNextIcon || episode.isDownloaded) 4.dp else 0.dp),
                         )
                     }
                     Text(
@@ -148,7 +148,7 @@ fun EpisodeChip(
                 }
                 episode.playErrorDetails?.let {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             painter = painterResource(IR.drawable.ic_alert_small),
@@ -162,7 +162,7 @@ fun EpisodeChip(
                             maxLines = 1,
                             color = MaterialTheme.colors.onSecondary,
                             style = MaterialTheme.typography.caption3,
-                            modifier = Modifier.padding(start = 5.dp)
+                            modifier = Modifier.padding(start = 5.dp),
                         )
                     }
                 }
@@ -179,7 +179,7 @@ private fun IconsRow(
 ) {
     Row(
         horizontalArrangement = spacedBy(4.dp),
-        modifier = modifier
+        modifier = modifier,
     ) {
         if (showUpNextIcon) {
             Icon(

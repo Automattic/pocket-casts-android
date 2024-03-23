@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class FilterListResponse(
-    @field:Json(name = "playlists") val filters: List<FilterResponse>?
+    @field:Json(name = "playlists") val filters: List<FilterResponse>?,
 )
 
 @JsonClass(generateAdapter = true)
@@ -32,7 +32,7 @@ data class FilterResponse(
     @field:Json(name = "episodeUuids") val episodeUuids: String?,
     @field:Json(name = "filterDuration") val filterDuration: Boolean?,
     @field:Json(name = "longerThan") val longerThan: Int?,
-    @field:Json(name = "shorterThan") val shorterThan: Int?
+    @field:Json(name = "shorterThan") val shorterThan: Int?,
 ) {
 
     fun toFilter(): Playlist? {

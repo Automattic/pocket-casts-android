@@ -8,16 +8,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class PodcastViewModel @Inject constructor(
@@ -25,6 +26,7 @@ class PodcastViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val theme: Theme,
+    settings: Settings,
 ) : ViewModel() {
 
     private val podcastUuid: String = savedStateHandle[PodcastScreen.argument] ?: ""
@@ -38,6 +40,8 @@ class PodcastViewModel @Inject constructor(
         ) : UiState()
     }
 
+    val useRssArtwork = settings.useRssArtwork.flow
+
     var uiState: UiState by mutableStateOf(UiState.Empty)
         private set
 
@@ -48,7 +52,7 @@ class PodcastViewModel @Inject constructor(
                 episodeManager.observeEpisodesByPodcastOrderedRx(it)
                     .asFlow()
                     .map { podcastEpisodes ->
-                        val sortFunction = podcast.podcastGrouping.sortFunction
+                        val sortFunction = podcast.grouping.sortFunction
                         if (sortFunction != null) {
                             podcastEpisodes.sortedByDescending(sortFunction)
                         } else {

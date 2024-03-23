@@ -27,7 +27,7 @@ class StorageSettingsFragment : BaseFragment() {
     private val viewModel: StorageSettingsViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { result ->
         if (result) viewModel.onPermissionGrantedStorage()
     }
@@ -35,7 +35,7 @@ class StorageSettingsFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
@@ -47,7 +47,7 @@ class StorageSettingsFragment : BaseFragment() {
                             @Suppress("DEPRECATION")
                             activity?.onBackPressed()
                         },
-                        onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) }
+                        onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) },
                     )
                 }
             }
@@ -82,6 +82,6 @@ class StorageSettingsFragment : BaseFragment() {
     private fun permissionGranted() =
         ContextCompat.checkSelfPermission(
             requireContext(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
         ) == PackageManager.PERMISSION_GRANTED
 }

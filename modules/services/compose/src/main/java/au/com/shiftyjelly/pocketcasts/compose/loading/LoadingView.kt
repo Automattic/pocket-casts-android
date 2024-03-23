@@ -18,7 +18,7 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 fun LoadingView() {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         CircularProgressIndicator(
             modifier = Modifier

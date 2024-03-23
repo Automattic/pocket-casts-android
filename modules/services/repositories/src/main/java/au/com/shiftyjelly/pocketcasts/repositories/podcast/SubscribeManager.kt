@@ -3,14 +3,14 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
@@ -18,6 +18,9 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.executeBlocking
+import coil.imageLoader
+import coil.request.CachePolicy
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
@@ -26,11 +29,11 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function3
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.rxCompletable
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.rx2.rxCompletable
+import timber.log.Timber
 
 @Singleton
 class SubscribeManager @Inject constructor(
@@ -39,7 +42,7 @@ class SubscribeManager @Inject constructor(
     private val staticServerManager: StaticServerManager,
     private val syncManager: SyncManager,
     @ApplicationContext val context: Context,
-    val settings: Settings
+    val settings: Settings,
 ) {
 
     private val subscribeRelay: PublishRelay<PodcastSubscribe> by lazy { setupSubscribeRelay() }
@@ -48,7 +51,7 @@ class SubscribeManager @Inject constructor(
     private val uuidsInQueue = HashSet<String>()
     private val podcastDao = appDatabase.podcastDao()
     private val episodeDao = appDatabase.episodeDao()
-    private val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = true)
 
     data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean)
 
@@ -64,7 +67,7 @@ class SubscribeManager @Inject constructor(
                     uuidsInQueue.remove(podcast.uuid)
                     Timber.i("Subscribed successfully to podcast ${podcast.uuid}")
                     subscriptionChangedRelay.accept(podcast.uuid)
-                }
+                },
             )
         return source
     }
@@ -101,7 +104,13 @@ class SubscribeManager @Inject constructor(
     }
 
     private fun cacheArtwork(podcast: Podcast): Completable {
-        return Completable.fromAction { imageLoader.cacheSubscribedArtwork(podcast) }.onErrorComplete()
+        return Completable.fromAction {
+            val request = imageRequestFactory.create(podcast)
+                .newBuilder()
+                .memoryCachePolicy(CachePolicy.DISABLED)
+                .build()
+            context.imageLoader.executeBlocking(request)
+        }.onErrorComplete()
     }
 
     fun isSubscribingToPodcast(podcastUuid: String): Boolean {
@@ -129,7 +138,7 @@ class SubscribeManager @Inject constructor(
         // set subscribed to true and update the sync status
         val updateObservable = podcastDao.updateSubscribedRx(subscribed = true, uuid = podcastUuid)
             .andThen(podcastDao.updateSyncStatusRx(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
-            .andThen(Completable.fromAction { podcastDao.updateGrouping(PodcastGrouping.All.indexOf(settings.podcastGroupingDefault.value), podcastUuid) })
+            .andThen(Completable.fromAction { podcastDao.updateGrouping(settings.podcastGroupingDefault.value, podcastUuid) })
             .andThen(rxCompletable { podcastDao.updateShowArchived(podcastUuid, settings.showArchivedDefault.value) })
         // return the final podcast
         val findObservable = podcastDao.findByUuidRx(podcastUuid)
@@ -143,7 +152,7 @@ class SubscribeManager @Inject constructor(
                 // mark sync status
                 podcast.syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED
                 podcast.isSubscribed = subscribed
-                podcast.grouping = PodcastGrouping.All.indexOf(settings.podcastGroupingDefault.value)
+                podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
             }
         // add the podcast
@@ -168,10 +177,12 @@ class SubscribeManager @Inject constructor(
         val allPodcastsObservable = podcastDao.findSubscribedRx().subscribeOn(Schedulers.io())
         // group the server podcast and all the existing podcasts to calculate the new podcast properties
         val cleanPodcastObservable = Single.zip(
-            serverPodcastObservable, colorObservable, allPodcastsObservable,
+            serverPodcastObservable,
+            colorObservable,
+            allPodcastsObservable,
             Function3<Podcast, Optional<ArtworkColors>, List<Podcast>, Podcast> { podcast, colors, allPodcasts ->
                 cleanPodcast(podcast, colors, allPodcasts)
-            }
+            },
         )
         // add sync information
         if (syncManager.isLoggedIn()) {
@@ -255,6 +266,7 @@ class SubscribeManager @Inject constructor(
             episode.isStarred = syncEpisode.starred ?: false
             episode.playedUpTo = syncEpisode.playedUpTo?.toDouble() ?: 0.toDouble()
             episode.isArchived = syncEpisode.isArchived ?: false
+            episode.deselectedChapters = ChapterIndices.fromString(syncEpisode.deselectedChapters)
             episode.setPlayingStatusInt(syncEpisode.playingStatus ?: 1)
             val duration = syncEpisode.duration ?: 0
             if (duration > 0) {

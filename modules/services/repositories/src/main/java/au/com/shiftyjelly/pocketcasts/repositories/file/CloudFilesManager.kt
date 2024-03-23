@@ -1,17 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.file
 
-import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import com.jakewharton.rxrelay2.BehaviorRelay
-import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.reactive.asFlow
 
 class CloudFilesManager @Inject constructor(
-    private val settings: Settings,
+    settings: Settings,
     private val userEpisodeManager: UserEpisodeManager,
 ) {
-    val sortOrderRelay = BehaviorRelay.create<Settings.CloudSortOrder>().apply { accept(settings.getCloudSortOrder()) }
-    val sortedCloudFiles = sortOrderRelay.toFlowable(BackpressureStrategy.LATEST).switchMap { userEpisodeManager.observeUserEpisodesSorted(it) }
-    val cloudFilesList = sortedCloudFiles.toLiveData()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val sortedCloudFiles = settings.cloudSortOrder.flow.flatMapLatest { userEpisodeManager.observeUserEpisodesSorted(it).asFlow() }
 }

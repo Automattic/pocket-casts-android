@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,11 +22,13 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPod
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PLAYBACK_DIFF
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -33,13 +36,16 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyl
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
+    @Inject lateinit var settings: Settings
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
@@ -48,6 +54,8 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
     val viewModel: CreateFilterViewModel by activityViewModels()
     private var chipLayoutStartY: Float = 0f
     private var scrollToChip: View? = null
+
+    private lateinit var episodeAdapter: SimpleEpisodeListAdapter
 
     companion object {
         fun newInstance(): CreateFilterChipFragment {
@@ -62,13 +70,39 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val episodeAdapter = SimpleEpisodeListAdapter()
-
+        episodeAdapter = SimpleEpisodeListAdapter(requireContext(), settings)
         binding.recyclerView.adapter = episodeAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.addItemDecoration(DividerItemDecoration(view.context, RecyclerView.VERTICAL))
 
+        observePlaylist()
+
+        // Setup sticky header for horizontal scroll view
+        binding.rootScrollView.doOnLayout { chipLayoutStartY = binding.chipScrollView.y }
+        binding.rootScrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            if (scrollY >= chipLayoutStartY) {
+                binding.chipScrollView.translationY = scrollY - chipLayoutStartY
+                binding.chipScrollView.elevation = 8.dpToPx(binding.root.context).toFloat()
+            } else {
+                binding.chipScrollView.translationY = 0f
+                binding.chipScrollView.elevation = 0f
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        scrollToChip = null
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun openOptionPageFrom(optionView: View, fragment: Fragment) {
+        (activity as FragmentHostListener).showModal(fragment)
+        scrollToChip = optionView
+        viewModel.onOptionPageOpen()
+    }
+
+    private fun observePlaylist() {
         viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
             val color = playlist.getColor(context)
 
@@ -187,37 +221,16 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
                 }
             }
         }
-
-        // Setup sticky header for horizontal scroll view
-        binding.rootScrollView.doOnLayout { chipLayoutStartY = binding.chipScrollView.y }
-        binding.rootScrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            if (scrollY >= chipLayoutStartY) {
-                binding.chipScrollView.translationY = scrollY - chipLayoutStartY
-                binding.chipScrollView.elevation = 8.dpToPx(binding.root.context).toFloat()
-            } else {
-                binding.chipScrollView.translationY = 0f
-                binding.chipScrollView.elevation = 0f
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        scrollToChip = null
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun openOptionPageFrom(optionView: View, fragment: Fragment) {
-        (activity as FragmentHostListener).showModal(fragment)
-        scrollToChip = optionView
-        viewModel.lockedToFirstPage.value = false
     }
 }
 
-private class SimpleEpisodeListAdapter : ListAdapter<BaseEpisode, SimpleEpisodeListAdapter.ViewHolder>(PLAYBACK_DIFF) {
-    class ViewHolder(val binding: RowCreateEpisodeBinding) : RecyclerView.ViewHolder(binding.root) {
-        val imageLoader = PodcastImageLoaderThemed(binding.root.context)
-    }
+private class SimpleEpisodeListAdapter(
+    private val context: Context,
+    private val settings: Settings,
+) : ListAdapter<BaseEpisode, SimpleEpisodeListAdapter.ViewHolder>(PLAYBACK_DIFF) {
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
+
+    class ViewHolder(val binding: RowCreateEpisodeBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = RowCreateEpisodeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -226,13 +239,13 @@ private class SimpleEpisodeListAdapter : ListAdapter<BaseEpisode, SimpleEpisodeL
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        val context = holder.binding.imageView.context
         holder.binding.lblTitle.text = item.title
         holder.binding.lblDate.text = item.publishedDate.toLocalizedFormatLongStyle()
         val timeLeft = TimeHelper.getTimeLeft(item.playedUpToMs, item.durationMs.toLong(), item.isInProgress, context)
         holder.binding.lblSubtitle.text = timeLeft.text
         holder.binding.lblSubtitle.contentDescription = timeLeft.description
-        holder.imageLoader.load(item).into(holder.binding.imageView)
+
+        imageRequestFactory.create(item, settings.useRssArtwork.value).loadInto(holder.binding.imageView)
     }
 }
 

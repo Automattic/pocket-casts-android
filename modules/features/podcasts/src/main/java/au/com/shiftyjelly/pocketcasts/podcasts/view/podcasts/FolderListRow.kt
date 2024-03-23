@@ -30,7 +30,7 @@ fun FolderListRow(
     modifier: Modifier = Modifier,
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
-    onClick: (() -> Unit)?
+    onClick: (() -> Unit)?,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -39,13 +39,13 @@ fun FolderListRow(
             .fillMaxWidth()
             .background(MaterialTheme.theme.colors.primaryUi01)
             .padding(horizontal = 16.dp)
-            .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
+            .then(if (onClick == null) Modifier else Modifier.clickable { onClick() }),
     ) {
         FolderImageSmall(color = color, podcastUuids = podcastUuids)
         Column(
             modifier = Modifier
                 .padding(start = 16.dp)
-                .weight(1f)
+                .weight(1f),
         ) {
             Text(
                 text = name,
@@ -53,7 +53,7 @@ fun FolderListRow(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(bottom = 2.dp)
+                modifier = Modifier.padding(bottom = 2.dp),
             )
             val podcastCount = if (podcastUuids.size == 1) {
                 stringResource(LR.string.podcasts_singular)
@@ -67,14 +67,14 @@ fun FolderListRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.padding(top = 2.dp)
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
         if (badgeType != BadgeType.OFF) {
             Text(
                 text = if (badgeType != BadgeType.LATEST_EPISODE) badgeCount.toString() else "●",
                 fontSize = 14.sp,
-                color = if (badgeType == BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02
+                color = if (badgeType == BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02,
             )
         }
     }

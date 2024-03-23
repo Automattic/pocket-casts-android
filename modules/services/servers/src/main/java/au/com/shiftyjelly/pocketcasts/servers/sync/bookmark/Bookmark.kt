@@ -12,6 +12,6 @@ fun BookmarkResponse.toBookmark(): Bookmark {
         episodeUuid = episodeUuid,
         timeSecs = time,
         createdAt = createdAt.toDate() ?: Date(),
-        title = title
+        title = title,
     )
 }

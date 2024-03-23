@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
@@ -30,13 +31,13 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import io.reactivex.BackpressureStrategy
 import io.sentry.Sentry
+import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -70,7 +71,8 @@ class MultiSelectEpisodesHelper @Inject constructor(
     override fun isSelected(multiSelectable: BaseEpisode) =
         selectedList.count { it.uuid == multiSelectable.uuid } > 0
 
-    override fun onMenuItemSelected(itemId: Int, resources: Resources, fragmentManager: FragmentManager): Boolean {
+    override fun onMenuItemSelected(itemId: Int, resources: Resources, activity: FragmentActivity): Boolean {
+        val fragmentManager = activity.supportFragmentManager
         return when (itemId) {
             R.id.menu_archive -> {
                 archive(resources = resources, fragmentManager = fragmentManager)
@@ -337,7 +339,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 episodeAnalytics.trackBulkEvent(
                     AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED,
                     source = source,
-                    count = if (episodes.isNotEmpty()) episodes.size else userEpisodes.size
+                    count = if (episodes.isNotEmpty()) episodes.size else userEpisodes.size,
                 )
             }
 
@@ -413,7 +415,6 @@ class MultiSelectEpisodesHelper @Inject constructor(
     }
 
     fun share(fragmentManager: FragmentManager) {
-
         val episode = selectedList.let { list ->
             if (list.size != 1) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Can only share one episode, but trying to share ${selectedList.size} episodes when multi selecting")

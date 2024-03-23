@@ -23,9 +23,9 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 class SearchHandler @Inject constructor(
     val serverManager: ServerManager,
@@ -34,7 +34,7 @@ class SearchHandler @Inject constructor(
     val settings: Settings,
     private val cacheServerManager: PodcastCacheServerManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    folderManager: FolderManager
+    folderManager: FolderManager,
 ) {
     private var source: SourceView = SourceView.UNKNOWN
     private val searchQuery = BehaviorRelay.create<Query>().apply {
@@ -179,7 +179,7 @@ class SearchHandler @Inject constructor(
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
                     loading = loading,
-                    error = serverSearchResults.error
+                    error = serverSearchResults.error,
                 )
             } else {
                 SearchState.NoResults(searchTerm = searchTerm.string)
@@ -194,7 +194,7 @@ class SearchHandler @Inject constructor(
                 podcasts = emptyList(),
                 episodes = emptyList(),
                 loading = false,
-                error = exception
+                error = exception,
             )
         }
         .observeOn(AndroidSchedulers.mainThread())

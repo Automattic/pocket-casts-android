@@ -31,8 +31,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -66,7 +64,7 @@ class EpisodeContainerFragment :
             overridePodcastLink = overridePodcastLink,
             podcastUuid = episode.podcastUuid,
             fromListUuid = fromListUuid,
-            forceDark = forceDark
+            forceDark = forceDark,
         )
 
         fun newInstance(
@@ -83,7 +81,7 @@ class EpisodeContainerFragment :
                 ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                 ARG_PODCAST_UUID to podcastUuid,
                 ARG_FROMLIST_UUID to fromListUuid,
-                ARG_FORCE_DARK to forceDark
+                ARG_FORCE_DARK to forceDark,
             )
         }
     }
@@ -92,7 +90,7 @@ class EpisodeContainerFragment :
         get() = StatusBarColor.Custom(
             context?.getThemeColor(UR.attr.primary_ui_01)
                 ?: Color.WHITE,
-            theme.isDarkTheme
+            theme.isDarkTheme,
         )
 
     var binding: FragmentEpisodeContainerBinding? = null
@@ -154,7 +152,7 @@ class EpisodeContainerFragment :
                     }
                     dismiss()
                 }
-            }
+            },
         )
         bottomSheetDialog?.behavior?.apply {
             isFitToContents = false
@@ -191,16 +189,14 @@ class EpisodeContainerFragment :
             overridePodcastLink = overridePodcastLink,
             podcastUuid = podcastUuid,
             fromListUuid = fromListUuid,
-            forceDarkTheme = forceDarkTheme
+            forceDarkTheme = forceDarkTheme,
         )
 
         viewPager.adapter = adapter
 
-        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-            TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
-                tab.setText(adapter.pageTitle(position))
-            }.attach()
-        }
+        TabLayoutMediator(tabLayout, viewPager, true) { tab, position ->
+            tab.setText(adapter.pageTitle(position))
+        }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
@@ -231,7 +227,7 @@ class EpisodeContainerFragment :
             lifecycleOwner = viewLifecycleOwner,
             multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
-            fragmentManager = parentFragmentManager,
+            activity = requireActivity(),
         )
     }
 
@@ -265,14 +261,12 @@ class EpisodeContainerFragment :
             get() = sections.indexOf(Section.Bookmarks)
 
         private sealed class Section(@StringRes val titleRes: Int) {
-            object Details : Section(LR.string.details)
-            object Bookmarks : Section(LR.string.bookmarks)
+            data object Details : Section(LR.string.details)
+            data object Bookmarks : Section(LR.string.bookmarks)
         }
 
         private var sections = mutableListOf<Section>(Section.Details).apply {
-            if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                add(Section.Bookmarks)
-            }
+            add(Section.Bookmarks)
         }.toList()
 
         override fun getItemId(position: Int): Long {
@@ -296,13 +290,13 @@ class EpisodeContainerFragment :
                     overridePodcastLink = overridePodcastLink,
                     podcastUuid = podcastUuid,
                     fromListUuid = fromListUuid,
-                    forceDark = forceDarkTheme
+                    forceDark = forceDarkTheme,
                 )
 
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
                     episodeUuid = requireNotNull(episodeUUID),
-                    forceDarkTheme = forceDarkTheme
+                    forceDarkTheme = forceDarkTheme,
                 )
             }
         }
@@ -318,9 +312,12 @@ class EpisodeContainerFragment :
     override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {
         binding?.apply {
             val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
-            episode = state.episode
-            toolbarTintColor = iconColor
-            tabLayout.tabTextColors = ColorStateList.valueOf(iconColor)
+            val iconTint = ColorStateList.valueOf(iconColor)
+            btnFav.setImageResource(if (state.episode.isStarred) R.drawable.ic_star_filled else R.drawable.ic_star)
+            btnFav.imageTintList = iconTint
+            btnClose.imageTintList = iconTint
+            btnShare.imageTintList = iconTint
+            tabLayout.tabTextColors = iconTint
             tabLayout.setSelectedTabIndicatorColor(iconColor)
             btnShare.setOnClickListener { state.onShareClicked() }
             btnFav.contentDescription = getString(if (state.episode.isStarred) LR.string.podcast_episode_starred else LR.string.podcast_episode_unstarred)

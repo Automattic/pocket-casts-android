@@ -15,7 +15,7 @@ internal class ActivityDelegate(
     fragmentManagerFactory: () -> FragmentManager,
     private val lifecycle: Lifecycle,
     val bottomNavigationView: BottomNavigationView,
-    private val bottomNavigator: BottomNavigator
+    private val bottomNavigator: BottomNavigator,
 ) : LifecycleObserver {
     fun clear() {
         bin.clear()

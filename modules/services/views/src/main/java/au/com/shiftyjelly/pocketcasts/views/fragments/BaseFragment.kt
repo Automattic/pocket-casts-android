@@ -20,10 +20,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -32,6 +32,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
     open var statusBarColor: StatusBarColor = StatusBarColor.Light
 
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
 
     override val coroutineContext: CoroutineContext
@@ -78,7 +79,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         chromeCastButton: ChromeCastButton = ChromeCastButton.None,
         navigationIcon: NavigationIcon = None,
         onNavigationClick: (() -> Unit)? = null,
-        toolbarColors: ToolbarColors? = ToolbarColors.Theme(theme = theme, context = toolbar.context)
+        toolbarColors: ToolbarColors? = ToolbarColors.Theme(theme = theme, context = toolbar.context),
     ) {
         toolbar.setup(
             title = title,
@@ -88,7 +89,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
             onNavigationClick = onNavigationClick,
             activity = activity,
             theme = theme,
-            toolbarColors = toolbarColors
+            toolbarColors = toolbarColors,
         )
         if (toolbarColors != null) {
             updateStatusBarColor(toolbarColors.backgroundColor)

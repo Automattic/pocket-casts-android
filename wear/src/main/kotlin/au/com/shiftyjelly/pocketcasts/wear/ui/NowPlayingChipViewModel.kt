@@ -2,12 +2,14 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,13 +17,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class NowPlayingChipViewModel @Inject constructor(
     episodeManager: EpisodeManager,
     playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
+    settings: Settings,
 ) : ViewModel() {
 
     data class State(
@@ -31,6 +33,8 @@ class NowPlayingChipViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
+
+    val useRssArtwork = settings.useRssArtwork.flow
 
     init {
         viewModelScope.launch {

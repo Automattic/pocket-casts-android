@@ -21,11 +21,10 @@ class BumpStatsTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val appDatabase: AppDatabase,
-    private val wpComServerManager: WpComServerManager
+    private val wpComServerManager: WpComServerManager,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-
         val bumpStatsDao = appDatabase.bumpStatsDao()
         val bumpStats = bumpStatsDao.get()
 
@@ -52,7 +51,6 @@ class BumpStatsTask @AssistedInject constructor(
         private const val TAG = "BumpStatsTask"
 
         fun scheduleToRun(context: Context) {
-
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()

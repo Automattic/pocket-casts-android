@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
@@ -34,9 +33,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -48,19 +50,22 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class MediaSessionManager(
@@ -68,10 +73,13 @@ class MediaSessionManager(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
+    val widgetManager: WidgetManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
     val bookmarkManager: BookmarkManager,
+    val bookmarkFeature: BookmarkFeatureControl,
+    applicationScope: CoroutineScope,
 ) : CoroutineScope {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
@@ -125,7 +133,7 @@ class MediaSessionManager(
                         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                     }
                 },
-            )
+            ),
         )
 
         if (!Util.isAutomotive(context)) { // We can't start activities on automotive
@@ -141,13 +149,13 @@ class MediaSessionManager(
         bookmarkHelper = BookmarkHelper(
             playbackManager,
             bookmarkManager,
-            settings
+            settings,
+            bookmarkFeature,
         )
 
         connect()
 
-        @OptIn(DelicateCoroutinesApi::class)
-        GlobalScope.launch {
+        applicationScope.launch {
             commandQueue.collect { (tag, command) ->
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Executing queued command: $tag")
                 command()
@@ -159,17 +167,19 @@ class MediaSessionManager(
         observePlaybackState()
         observeCustomMediaActionsVisibility()
         observeMediaNotificationControls()
-        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-            // ignore the playing episode progress updates, but update when the media player read the duration from the file.
+
+        val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
             .distinctUntilChanged { stateOne, stateTwo ->
                 UpNextQueue.State.isEqualWithEpisodeCompare(stateOne, stateTwo) { episodeOne, episodeTwo ->
                     episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
                 }
             }
-            .observeOn(Schedulers.io())
-            .doOnNext { updateUpNext(it) }
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
+        val useRssArtworkChanges = settings.useRssArtwork.flow
+
+        combine(upNextQueueChanges, useRssArtworkChanges) { queueState, useRssArtwork -> queueState to useRssArtwork }
+            .onEach { (queueState, useRssArtwork) -> updateUpNext(queueState, useRssArtwork) }
+            .catch { Timber.e(it) }
+            .launchIn(this)
     }
 
     private fun observeCustomMediaActionsVisibility() {
@@ -288,17 +298,17 @@ class MediaSessionManager(
         }
     }
 
-    private fun updateUpNext(upNext: UpNextQueue.State) {
+    private fun updateUpNext(upNext: UpNextQueue.State, useRssArtwork: Boolean) {
         try {
             mediaSession.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
-                updateMetadata(upNext.episode)
+                updateMetadata(upNext.episode, useRssArtwork)
 
                 val items = upNext.queue.map { episode ->
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
-                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)
+                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.useRssArtwork.value)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
@@ -311,7 +321,7 @@ class MediaSessionManager(
                 }
                 mediaSession.setQueue(items)
             } else {
-                updateMetadata(null)
+                updateMetadata(null, useRssArtwork)
                 mediaSession.setQueue(emptyList())
 
                 val playbackStateCompat = getPlaybackStateCompat(PlaybackState(state = PlaybackState.State.EMPTY), currentEpisode = null)
@@ -325,11 +335,11 @@ class MediaSessionManager(
     private fun observePlaybackState() {
         val ignoreStates = listOf(
             // ignore buffer position because it isn't displayed in the media session
-            "updateBufferPosition",
+            PlaybackManager.LastChangeFrom.OnUpdateBufferPosition.value,
             // ignore the playback progress updates as the media session can calculate this without being sent it every second
-            "updateCurrentPosition",
+            PlaybackManager.LastChangeFrom.OnUpdateCurrentPosition.value,
             // ignore the user seeking as the event onBufferingStateChanged will update the buffering state
-            "onUserSeeking"
+            PlaybackManager.LastChangeFrom.OnUserSeeking.value,
         )
 
         var previousEpisode: BaseEpisode? = null
@@ -366,11 +376,11 @@ class MediaSessionManager(
             .subscribeBy(
                 onError = { throwable ->
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
-                }
+                },
             ).addTo(disposables)
     }
 
-    private fun updateMetadata(episode: BaseEpisode?) {
+    private fun updateMetadata(episode: BaseEpisode?, useRssArtwork: Boolean) {
         if (episode == null) {
             Timber.i("MediaSession metadata. Nothing Playing.")
             mediaSession.setMetadata(NOTHING_PLAYING)
@@ -398,14 +408,9 @@ class MediaSessionManager(
         mediaSession.setMetadata(nowPlaying)
 
         if (settings.showArtworkOnLockScreen.value) {
-            if (Util.isAutomotive(context)) {
-                val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
-                nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
-                nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
-            } else {
-                val bitmap = AutoConverter.getBitmapForPodcast(podcast, false, context)
-                nowPlayingBuilder = nowPlayingBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-            }
+            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, useRssArtwork)?.toString()
+            nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
+            if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 
             val nowPlayingWithArtwork = nowPlayingBuilder.build()
             Timber.i("MediaSession metadata. With artwork.")
@@ -427,30 +432,34 @@ class MediaSessionManager(
                 MediaNotificationControls.PlayNext -> addCustomAction(stateBuilder, APP_ACTION_PLAY_NEXT, "Play next", com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
                 MediaNotificationControls.PlaybackSpeed -> {
                     if (playbackManager.isAudioEffectsAvailable()) {
-                        val currentSpeed = playbackState.playbackSpeed
-                        val drawableId = when {
-                            currentSpeed <= 1 -> IR.drawable.auto_1x
-                            currentSpeed == 1.1 -> IR.drawable.auto_1_1x
-                            currentSpeed == 1.2 -> IR.drawable.auto_1_2x
-                            currentSpeed == 1.3 -> IR.drawable.auto_1_3x
-                            currentSpeed == 1.4 -> IR.drawable.auto_1_4x
-                            currentSpeed == 1.5 -> IR.drawable.auto_1_5x
-                            currentSpeed == 1.6 -> IR.drawable.auto_1_6x
-                            currentSpeed == 1.7 -> IR.drawable.auto_1_7x
-                            currentSpeed == 1.8 -> IR.drawable.auto_1_8x
-                            currentSpeed == 1.9 -> IR.drawable.auto_1_9x
-                            currentSpeed == 2.0 -> IR.drawable.auto_2x
-                            currentSpeed == 2.1 -> IR.drawable.auto_2_1x
-                            currentSpeed == 2.2 -> IR.drawable.auto_2_2x
-                            currentSpeed == 2.3 -> IR.drawable.auto_2_3x
-                            currentSpeed == 2.4 -> IR.drawable.auto_2_4x
-                            currentSpeed == 2.5 -> IR.drawable.auto_2_5x
-                            currentSpeed == 2.6 -> IR.drawable.auto_2_6x
-                            currentSpeed == 2.7 -> IR.drawable.auto_2_7x
-                            currentSpeed == 2.8 -> IR.drawable.auto_2_8x
-                            currentSpeed == 2.9 -> IR.drawable.auto_2_9x
-                            currentSpeed == 3.0 -> IR.drawable.auto_3x
-                            else -> IR.drawable.auto_1x
+                        val drawableId = when (playbackState.playbackSpeed.roundedSpeed()) {
+                            in 0.0..<0.55 -> IR.drawable.auto_0_5
+                            in 0.55..<0.65 -> IR.drawable.auto_0_6
+                            in 0.65..<0.75 -> IR.drawable.auto_0_7
+                            in 0.75..<0.85 -> IR.drawable.auto_0_8
+                            in 0.85..<0.95 -> IR.drawable.auto_0_9
+                            in 0.95..<1.05 -> IR.drawable.auto_1
+                            in 1.05..<1.15 -> IR.drawable.auto_1_1
+                            in 1.15..<1.25 -> IR.drawable.auto_1_2
+                            in 1.25..<1.35 -> IR.drawable.auto_1_3
+                            in 1.35..<1.45 -> IR.drawable.auto_1_4
+                            in 1.45..<1.55 -> IR.drawable.auto_1_5
+                            in 1.55..<1.65 -> IR.drawable.auto_1_6
+                            in 1.65..<1.75 -> IR.drawable.auto_1_7
+                            in 1.75..<1.85 -> IR.drawable.auto_1_8
+                            in 1.85..<1.95 -> IR.drawable.auto_1_9
+                            in 1.95..<2.05 -> IR.drawable.auto_2
+                            in 2.05..<2.15 -> IR.drawable.auto_2_1
+                            in 2.15..<2.25 -> IR.drawable.auto_2_2
+                            in 2.25..<2.35 -> IR.drawable.auto_2_3
+                            in 2.35..<2.45 -> IR.drawable.auto_2_4
+                            in 2.45..<2.55 -> IR.drawable.auto_2_5
+                            in 2.55..<2.65 -> IR.drawable.auto_2_6
+                            in 2.65..<2.75 -> IR.drawable.auto_2_7
+                            in 2.75..<2.85 -> IR.drawable.auto_2_8
+                            in 2.85..<2.95 -> IR.drawable.auto_2_9
+                            in 2.95..<3.05 -> IR.drawable.auto_3
+                            else -> IR.drawable.auto_1
                         }
 
                         stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
@@ -548,7 +557,7 @@ class MediaSessionManager(
                                 playPauseTimer = null
                             }
                         },
-                        600
+                        600,
                     )
                 }
             } else {
@@ -574,7 +583,8 @@ class MediaSessionManager(
                 HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
                 HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
                 HeadphoneAction.NEXT_CHAPTER,
-                HeadphoneAction.PREVIOUS_CHAPTER -> Timber.e(ACTION_NOT_SUPPORTED)
+                HeadphoneAction.PREVIOUS_CHAPTER,
+                -> Timber.e(ACTION_NOT_SUPPORTED)
             }
         }
 
@@ -644,9 +654,6 @@ class MediaSessionManager(
                 episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
                     enqueueCommand("play from media id") {
                         playbackManager.playNowSuspend(episode = episode, sourceView = source)
-                    }
-                    LastPlayedList.fromString(autoMediaId.sourceId).let { lastPlayedList ->
-                        settings.lastLoadedFromPodcastOrFilterUuid.set(lastPlayedList)
                     }
                 }
             }
@@ -728,13 +735,17 @@ class MediaSessionManager(
 
     private fun changePlaybackSpeed() {
         launch {
-            val speed = playbackManager.getPlaybackSpeed()
-            val newSpeed = when {
-                speed < 1.2 -> 1.2
-                speed < 1.4 -> 1.4
-                speed < 1.6 -> 1.6
-                speed < 1.8 -> 1.8
-                speed < 2 -> 2.0
+            val newSpeed = when (playbackManager.getPlaybackSpeed()) {
+                in 0.0..<0.60 -> 0.6
+                in 0.60..<0.80 -> 0.8
+                in 0.80..<1.00 -> 1.0
+                in 1.00..<1.20 -> 1.2
+                in 1.20..<1.40 -> 1.4
+                in 1.40..<1.60 -> 1.6
+                in 1.60..<1.80 -> 1.8
+                in 1.80..<2.00 -> 2.0
+                in 2.00..<3.00 -> 3.0
+                in 3.00..<3.05 -> 0.6
                 else -> 1.0
             }
 
@@ -752,7 +763,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects)
+            settings.globalPlaybackEffects.set(effects, needsSync = true)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

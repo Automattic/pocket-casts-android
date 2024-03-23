@@ -5,6 +5,7 @@ enum class SubscriptionPlatform(val label: String) {
     IOS("ios"),
     ANDROID("android"),
     WEB("web"),
-    GIFT("gift");
+    GIFT("gift"),
+    ;
     override fun toString() = label
 }

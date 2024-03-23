@@ -36,7 +36,6 @@ enum class AnalyticsEvent(val key: String) {
     /* Plus Upsell */
     PLUS_PROMOTION_SHOWN("plus_promotion_shown"),
     PLUS_PROMOTION_DISMISSED("plus_promotion_dismissed"),
-    PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED("plus_promotion_upgrade_button_tapped"),
     PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED("plus_promotion_not_now_button_tapped"),
 
     /* Pull to refresh */
@@ -71,11 +70,6 @@ enum class AnalyticsEvent(val key: String) {
     SELECT_PAYMENT_FREQUENCY_SHOWN("select_payment_frequency_shown"),
     SELECT_PAYMENT_FREQUENCY_DISMISSED("select_payment_frequency_dismissed"),
     SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED("select_payment_frequency_next_button_tapped"),
-
-    /* Confirm Payment */
-    CONFIRM_PAYMENT_SHOWN("confirm_payment_shown"),
-    CONFIRM_PAYMENT_DISMISSED("confirm_payment_dismissed"),
-    CONFIRM_PAYMENT_CONFIRM_BUTTON_TAPPED("confirm_payment_confirm_button_tapped"),
 
     /* Purchase */
     PURCHASE_SUCCESSFUL("purchase_successful"),
@@ -221,6 +215,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_SCREEN_SORT_ORDER_CHANGED("podcasts_screen_sort_order_changed"),
     PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
     PODCASTS_SCREEN_TAB_TAPPED("podcasts_screen_tab_tapped"),
+    PODCAST_SCREEN_REPORT_TAPPED("podcast_screen_report_tapped"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -355,6 +350,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DOWNLOAD_FINISHED("episode_download_finished"),
     EPISODE_DOWNLOAD_FAILED("episode_download_failed"),
     EPISODE_DOWNLOAD_CANCELLED("episode_download_cancelled"),
+    EPISODE_DOWNLOAD_STALE("episode_downloads_stale"),
     EPISODE_UPLOAD_QUEUED("episode_upload_queued"),
     EPISODE_UPLOAD_CANCELLED("episode_upload_cancelled"),
     EPISODE_UPLOAD_FINISHED("episode_upload_finished"),
@@ -443,8 +439,10 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_APP_ICON_CHANGED("settings_appearance_app_icon_changed"),
     SETTINGS_APPEARANCE_REFRESH_ALL_ARTWORK_TAPPED("settings_appearance_refresh_all_artwork_tapped"),
     SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED("settings_appearance_use_embedded_artwork_toggled"),
+    SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED("settings_appearance_use_episode_artwork_toggled"),
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
     SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED("settings_appearance_use_dark_up_next_toggled"),
+    SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED("settings_appearance_use_dynamic_colors_widget_toggled"),
 
     /* Settings - Auto add */
     SETTINGS_AUTO_ADD_UP_NEXT_SHOWN("settings_auto_add_up_next_shown"),
@@ -531,11 +529,6 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_SOUND_CHANGED("settings_notifications_sound_changed"),
     SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED("settings_notifications_vibration_changed"),
 
-    /* Settings - Plus */
-    SETTINGS_PLUS_SHOWN("settings_plus_shown"),
-    SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
-    SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
-
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),
     SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE("settings_storage_clear_download_cache"),
@@ -594,4 +587,11 @@ enum class AnalyticsEvent(val key: String) {
 
     /* App Store Review */
     APP_STORE_REVIEW_REQUESTED("app_store_review_requested"),
+
+    /* Deselect Chapters */
+    DESELECT_CHAPTERS_TOGGLED_ON("deselect_chapters_toggled_on"),
+    DESELECT_CHAPTERS_TOGGLED_OFF("deselect_chapters_toggled_off"),
+    DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
+    DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
+    PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
 }

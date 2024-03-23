@@ -21,6 +21,7 @@ fun RowTextButton(
     fontSize: TextUnit? = null,
     tintIcon: Boolean = true,
     onClick: () -> Unit,
+    fullWidth: Boolean = true,
 ) {
     RowOutlinedButton(
         text = text,
@@ -31,7 +32,8 @@ fun RowTextButton(
         textIcon = textIcon,
         fontSize = fontSize,
         tintIcon = tintIcon,
-        onClick = onClick
+        onClick = onClick,
+        fullWidth = fullWidth,
     )
 }
 

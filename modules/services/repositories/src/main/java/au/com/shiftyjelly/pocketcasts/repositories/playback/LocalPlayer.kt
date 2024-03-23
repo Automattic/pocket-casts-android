@@ -15,6 +15,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
     companion object {
         // The volume we set the media player to seekToTimeMswhen we lose audio focus, but are allowed to reduce the volume instead of stopping playback.
         const val VOLUME_DUCK = 0.5f
+
         // The volume we set the media player when we have audio focus.
         const val VOLUME_NORMAL = 1.0f
     }
@@ -159,6 +160,10 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
 
     protected fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         onPlayerEvent(this, PlayerEvent.MetadataAvailable(episodeMetadata))
+    }
+
+    protected fun onEpisodeChanged(episodeUuid: String) {
+        onPlayerEvent(this, PlayerEvent.EpisodeChanged(episodeUuid))
     }
 
     override suspend fun seekToTimeMs(positionMs: Int) {

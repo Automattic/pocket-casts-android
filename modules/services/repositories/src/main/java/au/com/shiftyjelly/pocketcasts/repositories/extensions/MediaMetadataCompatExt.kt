@@ -23,7 +23,7 @@ import android.support.v4.media.MediaMetadataCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
-import androidx.media3.exoplayer.source.ConcatenatingMediaSource
+import androidx.media3.exoplayer.source.ConcatenatingMediaSource2
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 
 /**
@@ -240,7 +240,7 @@ fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
                 .Builder()
                 .setTag(fullDescription)
                 .setUri(mediaUri)
-                .build()
+                .build(),
         )
 
 /**
@@ -249,12 +249,13 @@ fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
  */
 @UnstableApi
 fun List<MediaMetadataCompat>.toMediaSource(
-    dataSourceFactory: DataSource.Factory
-): ConcatenatingMediaSource {
+    dataSourceFactory: DataSource.Factory,
+): ConcatenatingMediaSource2 {
+    val concatenatingMediaSource = ConcatenatingMediaSource2.Builder().apply {
+        forEach {
+            add(it.toMediaSource(dataSourceFactory))
+        }
+    }.build()
 
-    val concatenatingMediaSource = ConcatenatingMediaSource()
-    forEach {
-        concatenatingMediaSource.addMediaSource(it.toMediaSource(dataSourceFactory))
-    }
     return concatenatingMediaSource
 }

@@ -13,6 +13,8 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +24,13 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -64,6 +68,7 @@ sealed class BookmarkRowColors {
                 Color.Transparent
             }
         }
+
         @Composable
         override fun primaryTextColor() = MaterialTheme.theme.colors.playerContrast01
 
@@ -86,6 +91,7 @@ sealed class BookmarkRowColors {
                 MaterialTheme.theme.colors.primaryUi02
             }
         }
+
         @Composable
         override fun primaryTextColor() = MaterialTheme.theme.colors.primaryText01
 
@@ -97,6 +103,7 @@ sealed class BookmarkRowColors {
 @Composable
 fun BookmarkRow(
     bookmark: Bookmark,
+    episode: BaseEpisode,
     isMultiSelecting: () -> Boolean,
     isSelected: (Bookmark) -> Boolean,
     onPlayClick: (Bookmark) -> Unit,
@@ -105,13 +112,14 @@ fun BookmarkRow(
     timePlayButtonStyle: TimePlayButtonStyle,
     timePlayButtonColors: TimePlayButtonColors,
     showIcon: Boolean,
+    useRssArtwork: Boolean,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Divider(
             color = colors.dividerColor(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -121,9 +129,9 @@ fun BookmarkRow(
                 .background(
                     color = colors.backgroundColor(
                         isMultiSelecting = isMultiSelecting,
-                        isSelected = isSelected(bookmark)
-                    )
-                )
+                        isSelected = isSelected(bookmark),
+                    ),
+                ),
         ) {
             val createdAtText = bookmark.createdAt
                 .toLocalizedFormatPattern(bookmark.createdAtDatePattern())
@@ -133,15 +141,16 @@ fun BookmarkRow(
                     checked = isSelected(bookmark),
                     onCheckedChange = null,
                     modifier = Modifier
-                        .padding(start = 16.dp)
+                        .padding(start = 16.dp),
                 )
             }
 
             if (showIcon) {
                 Box(modifier = Modifier.padding(start = 16.dp)) {
-                    PodcastImage(
-                        uuid = bookmark.podcastUuid,
-                        modifier = modifier.size(56.dp)
+                    EpisodeImage(
+                        episode = episode,
+                        useRssArtwork = useRssArtwork,
+                        modifier = modifier.size(56.dp),
                     )
                 }
             }
@@ -149,7 +158,7 @@ fun BookmarkRow(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             ) {
                 if (bookmark.episodeTitle.isNotEmpty()) {
                     TextH70(
@@ -162,8 +171,8 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp
-                    )
+                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp,
+                    ),
                 )
 
                 TextH40(
@@ -181,8 +190,8 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp
-                    )
+                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp,
+                    ),
                 )
             }
 
@@ -230,7 +239,11 @@ private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
                 episodeTitle = "Episode Title",
                 timeSecs = 10,
                 title = "Bookmark Title",
-                createdAt = Date()
+                createdAt = Date(),
+            ),
+            episode = PodcastEpisode(
+                uuid = "",
+                publishedDate = Date(),
             ),
             isMultiSelecting = { false },
             isSelected = { false },
@@ -240,6 +253,7 @@ private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
             timePlayButtonStyle = TimePlayButtonStyle.Outlined,
             timePlayButtonColors = TimePlayButtonColors.Default,
             showIcon = false,
+            useRssArtwork = false,
         )
     }
 }
@@ -256,7 +270,11 @@ fun BookmarkRowPlayerPreview() {
                 episodeTitle = "Episode Title",
                 timeSecs = 10,
                 title = "Bookmark Title",
-                createdAt = Date()
+                createdAt = Date(),
+            ),
+            episode = PodcastEpisode(
+                uuid = "",
+                publishedDate = Date(),
             ),
             isMultiSelecting = { false },
             isSelected = { false },
@@ -266,6 +284,7 @@ fun BookmarkRowPlayerPreview() {
             timePlayButtonStyle = TimePlayButtonStyle.Solid,
             timePlayButtonColors = TimePlayButtonColors.Player(textColor = Color.Black),
             showIcon = false,
+            useRssArtwork = false,
         )
     }
 }

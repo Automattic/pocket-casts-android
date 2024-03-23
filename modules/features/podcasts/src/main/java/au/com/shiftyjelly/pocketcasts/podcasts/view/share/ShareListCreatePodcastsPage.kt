@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +23,7 @@ fun ShareListCreatePodcastsPage(
     onCloseClick: () -> Unit,
     onNextClick: (Int) -> Unit,
     viewModel: ShareListCreateViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
     Column {
@@ -34,14 +34,14 @@ fun ShareListCreatePodcastsPage(
             actions = {
                 IconButton(
                     onClick = { onNextClick(state.selectedPodcasts.size) },
-                    enabled = state.selectedPodcasts.isNotEmpty()
+                    enabled = state.selectedPodcasts.isNotEmpty(),
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = stringResource(LR.string.next)
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = stringResource(LR.string.next),
                     )
                 }
-            }
+            },
         )
         PodcastSelectGrid(
             podcasts = state.podcasts,
@@ -50,7 +50,7 @@ fun ShareListCreatePodcastsPage(
             onPodcastUnselected = { podcast -> viewModel.unselectPodcast(podcast) },
             onSelectAll = { viewModel.selectAll() },
             onSelectNone = { viewModel.selectNone() },
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }

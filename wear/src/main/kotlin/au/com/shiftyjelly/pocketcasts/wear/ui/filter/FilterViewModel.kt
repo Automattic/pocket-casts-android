@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -12,10 +13,10 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class FilterViewModel @Inject constructor(
@@ -23,6 +24,7 @@ class FilterViewModel @Inject constructor(
     private val playlistManager: PlaylistManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    settings: Settings,
 ) : ViewModel() {
 
     private val filterUuid: String = savedStateHandle[FilterScreen.argumentFilterUuid] ?: ""
@@ -54,4 +56,6 @@ class FilterViewModel @Inject constructor(
         .subscribeOn(Schedulers.io())
         .asFlow()
         .stateIn(viewModelScope, SharingStarted.Lazily, FiltersViewModel.UiState.Loading)
+
+    val useRssArtwork = settings.useRssArtwork.flow
 }

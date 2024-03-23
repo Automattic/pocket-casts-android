@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,8 +25,9 @@ import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import coil.compose.rememberAsyncImagePainter
@@ -41,11 +43,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun NowPlayingChip(
     onClick: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<NowPlayingChipViewModel>()
 
     val state by viewModel.state.collectAsState()
     val playbackState = state.playbackState
+    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
 
     val upNextQueue = state.upNextQueue
     val podcast = (upNextQueue as? UpNextQueue.State.Loaded)?.podcast
@@ -55,7 +57,8 @@ fun NowPlayingChip(
         podcast = podcast,
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
-        onClick = onClick
+        useRssArtwork = useRssArtwork,
+        onClick = onClick,
     )
 }
 
@@ -64,6 +67,7 @@ private fun Content(
     podcast: Podcast?,
     episode: BaseEpisode?,
     isPlaying: Boolean,
+    useRssArtwork: Boolean,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -83,25 +87,24 @@ private fun Content(
         },
         secondaryLabel = episode?.title,
         colors = ChipDefaults.imageBackgroundChipColors(
-            backgroundImagePainter = if (podcast != null) {
-                val imageRequest = remember(podcast.uuid) {
-                    PodcastImageLoaderThemed(context).loadCoil(podcastUuid = podcast.uuid).build()
+            backgroundImagePainter = if (episode != null) {
+                val imageRequest = remember(episode.uuid, useRssArtwork) {
+                    PocketCastsImageRequestFactory(context).themed().create(episode, useRssArtwork)
                 }
                 rememberAsyncImagePainter(
                     model = imageRequest,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             } else {
                 nothingPainter
             },
-            backgroundImageScrimBrush =
-            // only want a scrim if there is a podcast background
-            if (podcast != null) {
+            // only want a scrim if there is a episode background
+            backgroundImageScrimBrush = if (episode != null) {
                 Brush.linearGradient(
                     colors = listOf(
                         MaterialTheme.colors.surface,
-                        MaterialTheme.colors.surface.copy(alpha = 0f)
-                    )
+                        MaterialTheme.colors.surface.copy(alpha = 0f),
+                    ),
                 )
             } else {
                 SolidColor(MaterialTheme.colors.surface)
@@ -110,7 +113,9 @@ private fun Content(
             secondaryContentColor = MaterialTheme.colors.onSecondary,
         ),
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth() // This is needed for the backgroundImagePainter to work
+        modifier = Modifier
+            .height(ChipDefaults.Height)
+            .fillMaxWidth(), // This is needed for the backgroundImagePainter to work
     )
 }
 
@@ -122,7 +127,7 @@ private val nothingPainter = object : Painter() {
 @Composable
 private fun PlayingAnimation() {
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(IR.raw.nowplaying)
+        LottieCompositionSpec.RawRes(IR.raw.nowplaying),
     )
     LottieAnimation(
         composition = composition,
@@ -154,8 +159,9 @@ private fun Preview() {
             episode = PodcastEpisode(
                 title = "An Episode",
                 uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
-                publishedDate = Date()
+                publishedDate = Date(),
             ),
+            useRssArtwork = false,
             isPlaying = false,
             onClick = {},
         )

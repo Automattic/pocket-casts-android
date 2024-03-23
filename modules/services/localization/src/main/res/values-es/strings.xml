@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-13 18:54:04+0000
+Translation-Revision-Date: 2024-03-12 19:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="upgrade_to_patron">Actualiza a Patron</string>
+    <string name="upgrade_to_plus">Actualiza a Plus</string>
+    <string name="whats_new_got_it_button">De acuerdo</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Suscríbete a Patron y podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Suscríbete a Plus y podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Como parte de tu suscripción a Plus, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Como parte de tu suscripción a Patron, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
+    <string name="skip_chapters_patron_prompt">Omite capítulos y haz otros cambios con Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Omite capítulos y haz otros cambios con Pocket Casts Plus</string>
+    <string name="settings_use_embedded_podcast_artwork">Utilizar carátula de archivo insertada</string>
+    <string name="settings_episode_artwork_details">Muestra la carátula de las notas del programa del episodio (si tiene) en lugar de usar la carátula del programa. Si se incluyen tanto la carátula de RSS como la del archivo, se usará la carátula de RSS. </string>
+    <string name="select_one_chapter_message">Selecciona al menos un capítulo</string>
+    <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
+    <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d ocultos</string>
+    <string name="single_chapter">1 capítulo</string>
+    <string name="number_of_chapters">%d capítulos</string>
+    <string name="skip_chapters">Omitir capítulos</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">Un año de contenido exclusivo de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">Canjea tu código</string>
+    <string name="whats_new_slumber_studios_body_free_user">Suscríbete a Plus de forma anual y disfruta de un año de suscripción al contenido de Slumber Studios, podcasts diseñados para regalarte los más dulces sueños. &lt;a href=\"https://slumberstudios.com/\"&gt;Más información&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_body">Como parte de tu suscripción anual a Plus, utiliza el código %1$s y disfrutarás de un año de suscripción al contenido de Slumber Studios. &lt;a href=\"https://slumberstudios.com/\"&gt;Más información&lt;/a&gt;.</string>
+    <string name="whats_new_slumber_studios_title">Sueña a lo grande</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">tras tu primer año</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Pago recurrente en %s</string>
+    <string name="half_price_first_year">50 % de descuento en tu primer año</string>
+    <string name="plus_offer_duration">Oferta %s</string>
+    <string name="report_subtitle">Informar de contenido inapropiado</string>
+    <string name="report">Informe</string>
+    <string name="onboarding_plus_feature_watch_playback">Aplicaciones para Apple Watch y Wear OS</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Carpetas y marcadores</string>
+    <string name="settings_use_dynamic_colors_widget_details">Cuando está activado, los colores del widget cambiarán en función de los colores del tema del dispositivo.</string>
+    <string name="settings_use_dynamic_colors_widget">Utiliza colores dinámicos para el widget</string>
+    <string name="widget">Widget</string>
+    <string name="bookmark_not_found">No se ha encontrado el marcador.</string>
+    <string name="settings_use_dark_up_next_details">Si está activado, Up Next utilizará siempre el tema oscuro, o coincidirá con el tema actual si está desactivado</string>
+    <string name="settings_use_dark_up_next">Utilizar tema Up Next oscuro</string>
     <string name="end_of_year_stories_completion_rate_share_text">Mi tasa de finalización de 2023</string>
     <string name="end_of_year_stories_subscribe_to_plus">Suscríbete a Plus y descubre cómo se comparan tus escuchas con las de 2022, otras estadísticas divertidas y funciones Premium como marcadores y carpetas.</string>
     <string name="end_of_year_stories_theres_more">¡Y hay más!</string>
@@ -42,7 +78,6 @@ Language: es
     <string name="podcast_submit_rating_no_internet">No se ha encontrado ninguna conexión a Internet. Conéctate a Internet para enviar una valoración.</string>
     <string name="podcast_rate">Puntúa %s</string>
     <string name="submit">Enviar</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">Únete a nosotros en las pruebas beta de marcadores.</string>
     <string name="whats_new_bookmarks_try_now_button">Probar ahora</string>
     <string name="whats_new_bookmarks_title">Ya están aquí los marcadores.</string>
     <string name="bookmarks_upsell_instructions_early_access">Obtén acceso anticipado a esta función con Pocket Casts Patron y guarda las marcas de tiempo de tus episodios favoritos. Disponible próximamente para los suscriptores Plus.</string>
@@ -88,7 +123,7 @@ Language: es
     <string name="bookmarks_select_option">Elegir marcador</string>
     <string name="bookmarks_delete_summary_singular">Este marcador se eliminará. Esta acción no se puede deshacer.</string>
     <string name="bookmarks_delete_summary_plural">Se eliminarán %d marcadores. Esta acción no se puede deshacer.</string>
-    <string name="bookmarks_deleted_singular">Se ha eliminado 1 marcador</string>
+    <string name="bookmarks_deleted_singular">Se ha eliminado el marcador.</string>
     <string name="bookmarks_deleted_plural">Se han eliminado %1$d marcadores</string>
     <string name="bookmarks_delete_singular">Eliminar marcador</string>
     <string name="bookmarks_delete_plural">Eliminar marcadores</string>
@@ -96,10 +131,6 @@ Language: es
     <string name="deselect_all">Anular todas las selecciones</string>
     <string name="deselect_all_above">Anular la selección de todo lo anterior</string>
     <string name="edit">Editar</string>
-    <string name="whats_new_autoplay_maybe_later_button">Quizá más tarde</string>
-    <string name="whats_new_autoplay_enable_button">Activar esta opción ahora</string>
-    <string name="whats_new_autoplay_body">Si empiezas a escuchar un episodio sin que haya más en cola, la reproducción automática continuará reproduciendo episodios de ese pódcast o lista.</string>
-    <string name="whats_new_autoplay_title">¡Ya puedes disfrutar de la reproducción automática!</string>
     <string name="filters_download_limit_3">Tres episodios</string>
     <string name="settings_title_headphone_controls">Controles de los auriculares</string>
     <string name="settings_headphone_controls_summary">Personaliza las acciones que llevan a cabo los controles más habituales de los auriculares.</string>
@@ -123,7 +154,6 @@ Language: es
     <string name="player_sleep_add_1_minute">Más de un minuto</string>
     <string name="player_sleep_1_minute">Un minuto</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Temas e iconos de la aplicación adicionales</string>
-    <string name="onboarding_plus_feature_watch_playback">Reproducción en el reloj</string>
     <string name="onboarding_patron_feature_early_access_title">Acceso anticipado a las funciones</string>
     <string name="settings_continuous_playback_summary">Si no tienes ningún episodio en cola, reproduciremos los del pódcast o lista que estés escuchando en ese momento.</string>
     <string name="renew_your_subscription">Renovar la suscripción</string>
@@ -239,7 +269,6 @@ Language: es
     <string name="settings_media_actions_customise">Personalizar acciones de medios</string>
     <string name="settings_media_actions_prioritize_subtitle">Tus acciones principales estarán disponibles.</string>
     <string name="settings_media_actions_prioritize_title">Dar prioridad a las acciones de medios personalizadas</string>
-    <string name="plus_take_your_podcasting_to_next_level">Lleva tu experiencia con los pódcast al siguiente nivel con acceso exclusivo a funciones y opciones de personalización.</string>
     <string name="onboarding_recommendations_more">Más %s</string>
     <string name="filter_id_or_title">Título o ID del filtro</string>
     <string name="filter_title">Título del filtro</string>
@@ -332,11 +361,8 @@ Language: es
     <string name="onboarding_plus_feature_cloud_storage_text">Carga tus archivos en el almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Almacenamiento en la nube de 20 GB</string>
     <string name="onboarding_plus_feature_folders_text">Organiza tus pódcast en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
-    <string name="onboarding_plus_feature_folders_title">Carpetas</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Escucha pódcast en más lugares con nuestras aplicaciones para Windows, macOs y web.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Aplicaciones para ordenador</string>
-    <string name="onboarding_upgrade_unlock_all_features">Disfruta de todas las funciones</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Obtén acceso a funciones y opciones de personalización exclusivas</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicaciones web y para ordenador</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Haz tuya la aplicación Pocket Casts seleccionando tus pódcast favoritos o impórtalos desde otro reproductor de pódcast. Siempre puedes hacerlo más adelante.</string>
@@ -775,7 +801,7 @@ Language: es
     <string name="settings_website_link">enlace del sitio web</string>
     <string name="settings_view">Ver</string>
     <string name="settings_version">Versión %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Utilizar carátula del podcast integrada</string>
+    <string name="settings_use_episode_podcast_artwork">Utilizar carátula de RSS insertada</string>
     <string name="settings_use_android_light_dark_mode">Usar el modo oscuro o claro de Android</string>
     <string name="settings_up_next_tap_summary">Si se activa esta opción, se reproducirá el elemento cuando lo toques en la cola de A continuación. Si lo mantienes pulsado, se mostrarán las opciones del episodio.</string>
     <string name="settings_up_next_tap">Reproducir episodio de A continuación al tocar</string>
@@ -960,13 +986,9 @@ Language: es
     <string name="plus_lifetime_member">Miembro vitalicio</string>
     <string name="plus_learn_more_button">Aprender más</string>
     <string name="plus_learn_more_about_plus">Obtén más información sobre Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Con nuestras aplicaciones para Windows, macOS y web, podrás escuchar tus podcasts en más sitios.</string>
     <string name="plus_desktop_apps">Aplicaciones para ordenadores</string>
-    <string name="plus_description_title">Funciones mejoradas para oyentes avanzados</string>
-    <string name="plus_description_body">Personal y organizado, todo al mismo tiempo. Sube tus archivos de audio personales a nuestros servidores en la nube, accede a tu cuenta a través de nuestro reproductor web y conoce la aplicación.</string>
     <string name="plus_create_marketing_features"> Todo</string>
     <string name="plus_cloud_storage_limit">%d GB de almacenamiento en la nube</string>
-    <string name="plus_cloud_storage_body">Escucha tus clases más rápido. Consume otros contenidos. Sé tu propio DJ de los podcasts.</string>
     <string name="plus_cloud_storage">Almacenamiento en la nube</string>
     <string name="profile_expiry_date_unknown">Desconocido</string>
     <string name="profile_yearly">Anual</string>
@@ -974,7 +996,6 @@ Language: es
     <string name="profile_welcome_to_plus">¡Te damos la bienvenida a Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">¡Te damos la bienvenida a Pocket Casts!</string>
     <string name="profile_web_player">Reproductor web</string>
-    <string name="profile_upgrade_to_plus">Mejorar a Plus</string>
     <string name="profile_updates_ends">Las actualizaciones terminan: %s</string>
     <string name="profile_updates_ended">Las actualizaciones terminaron: %s</string>
     <string name="profile_time_free">%s gratis</string>

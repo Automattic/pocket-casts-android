@@ -47,7 +47,7 @@ class PrivacyFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.PRIVACY_SETTINGS_SHOWN)
@@ -74,7 +74,7 @@ class PrivacyFragment : BaseFragment() {
                         onBackClick = {
                             @Suppress("DEPRECATION")
                             activity?.onBackPressed()
-                        }
+                        },
                     )
                 }
             }
@@ -94,25 +94,25 @@ class PrivacyFragment : BaseFragment() {
         onLinkAccountClick: (Boolean) -> Unit,
         onPrivacyPolicyClick: () -> Unit,
         onBackClick: () -> Unit,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
     ) {
         Column(
             modifier = modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
-                .fillMaxHeight()
+                .fillMaxHeight(),
         ) {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_privacy),
-                onNavigationClick = onBackClick
+                onNavigationClick = onBackClick,
             )
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             ) {
                 TextP50(
                     text = stringResource(LR.string.settings_privacy_summary),
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
                 if (state is PrivacyViewModel.UiState.Loaded) {
                     SettingRow(
@@ -121,9 +121,9 @@ class PrivacyFragment : BaseFragment() {
                         toggle = SettingRowToggle.Switch(checked = state.analytics),
                         modifier = Modifier.toggleable(
                             value = state.analytics,
-                            role = Role.Switch
+                            role = Role.Switch,
                         ) { onAnalyticsClick(!state.analytics) },
-                        indent = false
+                        indent = false,
                     )
                     SettingRow(
                         primaryText = stringResource(LR.string.settings_privacy_crash),
@@ -131,9 +131,9 @@ class PrivacyFragment : BaseFragment() {
                         toggle = SettingRowToggle.Switch(checked = state.crashReports),
                         modifier = Modifier.toggleable(
                             value = state.crashReports,
-                            role = Role.Switch
+                            role = Role.Switch,
                         ) { onCrashReportsClick(!state.crashReports) },
-                        indent = false
+                        indent = false,
                     )
                     if (state.shouldShowLinkUserSetting()) {
                         SettingRow(
@@ -142,16 +142,16 @@ class PrivacyFragment : BaseFragment() {
                             toggle = SettingRowToggle.Switch(checked = state.linkAccount),
                             modifier = Modifier.toggleable(
                                 value = state.linkAccount,
-                                role = Role.Switch
+                                role = Role.Switch,
                             ) { onLinkAccountClick(!state.linkAccount) },
-                            indent = false
+                            indent = false,
                         )
                     }
                     LinkText(
                         text = stringResource(LR.string.profile_privacy_policy_read),
                         textAlign = TextAlign.Start,
                         onClick = onPrivacyPolicyClick,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     )
                 }
             }

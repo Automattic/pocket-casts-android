@@ -26,10 +26,14 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
+import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -39,16 +43,14 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     override var statusBarColor: StatusBarColor = StatusBarColor.Dark
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var staticServerManager: StaticServerManagerImpl
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
     private var binding: FragmentDiscoverBinding? = null
-
-    override fun onResume() {
-        super.onResume()
-    }
 
     override fun onPause() {
         super.onPause()
@@ -64,7 +66,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.subscribeToPodcast(podcast)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
-            mapOf(SOURCE_KEY to SourceView.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid)
+            mapOf(SOURCE_KEY to SourceView.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid),
         )
     }
 
@@ -98,7 +100,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             episodeUuid = episode.uuid,
             source = EpisodeViewSource.DISCOVER,
             podcastUuid = episode.podcast_uuid,
-            fromListUuid = listUuid
+            fromListUuid = listUuid,
         )
         fragment.show(parentFragmentManager, "episode_card")
     }
@@ -117,10 +119,37 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val searchFragment = SearchFragment.newInstance(
             floating = true,
             onlySearchRemote = true,
-            source = SourceView.DISCOVER
+            source = SourceView.DISCOVER,
         )
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         binding?.recyclerView?.smoothScrollToPosition(0)
+    }
+
+    override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
+        val categoryWithRegionUpdated =
+            viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
+
+        viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
+            val mostPopularPodcastsByCategoryRow =
+                MostPopularPodcastsByCategoryRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
+            updateDiscover(mostPopularPodcastsByCategoryRow)
+            onCategorySelectionSuccess()
+        }
+    }
+    override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
+        viewModel.loadCategories(source) { categories ->
+            CategoriesBottomSheet(
+                categories = categories,
+                onCategoryClick = { this.onCategoryClick(it) { onCategorySelectionSuccess(it) } },
+                onCategorySelectionCancel = onCategorySelectionCancel,
+            ).show(childFragmentManager, "categories_bottom_sheet")
+        }
+    }
+    override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
+        viewModel.loadCategories(source) { categories ->
+            onCategoryClearSuccess(categories)
+            clearCategoryFilter()
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -147,13 +176,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         if (adapter == null) {
             adapter = DiscoverAdapter(
+                context = requireContext(),
                 service = viewModel.repository,
                 staticServerManager = staticServerManager,
                 listener = this,
                 theme = theme,
                 loadPodcastList = viewModel::loadPodcastList,
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
-                analyticsTracker = analyticsTracker
+                loadCategories = viewModel::loadCategories,
+                analyticsTracker = analyticsTracker,
             )
         }
         recyclerView.adapter = adapter
@@ -177,7 +208,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                             fragment.listener = this
                         }
                         adapter?.onChangeRegion = onChangeRegion
-                        adapter?.submitList(content)
+
+                        val sortedContent = sortContent(content, state.selectedRegion.code)
+
+                        adapter?.submitList(sortedContent)
                     }
                     is DiscoverState.Error -> {
                         binding.errorLayout.isVisible = true
@@ -192,10 +226,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         binding.loading.isVisible = true
                     }
                 }
-            }
+            },
         )
     }
-
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
 
@@ -212,11 +245,44 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             FirebaseAnalyticsTracker.navigatedToDiscover()
         }
     }
+    private fun sortContent(content: List<Any>, region: String): MutableList<Any> {
+        val mutableContentList = content.toMutableList()
 
+        if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
+            val categoriesIndex = mutableContentList.indexOfFirst { it is DiscoverRow && it.type is ListType.Categories }
+
+            if (categoriesIndex != -1) {
+                val categoriesItem = mutableContentList.removeAt(categoriesIndex)
+                mutableContentList.add(0, (categoriesItem as DiscoverRow).copy(regionCode = region))
+            }
+        }
+
+        return mutableContentList
+    }
+
+    private fun updateDiscover(mostPopularPodcastsByCategoryRow: MostPopularPodcastsByCategoryRow) {
+        adapter?.currentList?.let { discoverList ->
+            val updatedList =
+                discoverList.filterNot { it is DiscoverRow && it.id == "featured" }.toMutableList() // Remove ads carousel
+
+            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcastsByCategoryRow)
+
+            adapter?.submitList(updatedList)
+        }
+    }
+    private fun clearCategoryFilter() {
+        adapter?.currentList?.toMutableList()?.apply {
+            removeAll { it is MostPopularPodcastsByCategoryRow }
+            adapter?.submitList(this)
+            viewModel.loadData(resources)
+        }
+    }
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
+        private const val MOST_POPULAR_PODCASTS_ROW_INDEX = 1
+        private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
         const val EPISODE_UUID_KEY = "episode_uuid"

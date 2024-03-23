@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,17 +57,15 @@ fun NowPlayingScreen(
     navigateToEpisode: (episodeUuid: String) -> Unit,
     navController: NavController,
 ) {
-
     // Listen for results from streaming confirmation screen
     navController.currentBackStackEntry?.savedStateHandle
         ?.getStateFlow<StreamingConfirmationScreen.Result?>(
             key = StreamingConfirmationScreen.resultKey,
-            initialValue = null
+            initialValue = null,
         )
         ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
 
             LaunchedEffect(streamingConfirmationResult) {
-
                 playerViewModel.onStreamingConfirmationResult(streamingConfirmationResult)
 
                 // Clear result once consumed
@@ -76,7 +73,7 @@ fun NowPlayingScreen(
                     .currentBackStackEntry
                     ?.savedStateHandle
                     ?.remove<StreamingConfirmationScreen.Result?>(
-                        key = StreamingConfirmationScreen.resultKey
+                        key = StreamingConfirmationScreen.resultKey,
                     )
             }
         }
@@ -85,7 +82,6 @@ fun NowPlayingScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) {
-
         val state = playerViewModel.state.collectAsState().value
 
         PlayerScreen(
@@ -94,7 +90,7 @@ fun NowPlayingScreen(
                     NowPlayingViewModel.State.Loading -> {
                         MessageMediaDisplay(
                             message = stringResource(R.string.nothing_playing),
-                            modifier = modifier
+                            modifier = modifier,
                         )
                     }
 
@@ -111,7 +107,7 @@ fun NowPlayingScreen(
                     is NowPlayingViewModel.State.Empty -> {
                         MessageMediaDisplay(
                             message = stringResource(LR.string.empty_play_state),
-                            modifier = modifier
+                            modifier = modifier,
                         )
                     }
                 }
@@ -124,7 +120,7 @@ fun NowPlayingScreen(
                                 playerViewModel.onPlayButtonClick(
                                     showStreamingConfirmation = {
                                         navController.navigate(StreamingConfirmationScreen.route)
-                                    }
+                                    },
                                 )
                             },
                             onPauseButtonClick = playerViewModel::onPauseButtonClick,
@@ -141,7 +137,6 @@ fun NowPlayingScreen(
                             pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
                             seekIconSize = 35.dp,
                             seekIconAlign = Alignment.CenterHorizontally,
-                            seekTapTargetSize = DpSize(50.dp, 60.dp),
                             progressColor = MaterialTheme.colors.onPrimary,
                             trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
                             backgroundColor = Color.Transparent,
@@ -191,8 +186,8 @@ fun NowPlayingScreen(
             modifier = Modifier
                 .onVolumeChangeByScroll(
                     focusRequester = rememberActiveFocusRequester(),
-                    onVolumeChangeByScroll = volumeViewModel::onVolumeChangeByScroll
-                )
+                    onVolumeChangeByScroll = volumeViewModel::onVolumeChangeByScroll,
+                ),
         )
     }
 }
@@ -205,7 +200,7 @@ private fun PodcastColorBackground(
     val context = LocalContext.current
     val tintColor = state.tintColor ?: context.getThemeColor(AR.attr.colorAccent)
     ColorBackground(
-        color = Color(ThemeColor.podcastIcon02(state.theme.activeTheme, tintColor))
+        color = Color(ThemeColor.podcastIcon02(state.theme.activeTheme, tintColor)),
     )
 }
 
@@ -218,17 +213,17 @@ fun NowPlayingSettingsButtons(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
             onClick = {
                 navController.navigate(EffectsScreen.route)
-            }
+            },
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_effects_off),
                 contentDescription = stringResource(LR.string.player_effects),
-                tint = Color.White
+                tint = Color.White,
             )
         }
         SetVolumeButtonStyled(

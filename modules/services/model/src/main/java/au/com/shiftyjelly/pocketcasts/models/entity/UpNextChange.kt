@@ -11,7 +11,7 @@ data class UpNextChange(
     @ColumnInfo(name = "type") var type: Int = 0,
     @ColumnInfo(name = "uuid") var uuid: String? = null,
     @ColumnInfo(name = "uuids") var uuids: String? = null,
-    @ColumnInfo(name = "modified") var modified: Long = 0
+    @ColumnInfo(name = "modified") var modified: Long = 0,
 ) : Serializable {
 
     companion object {

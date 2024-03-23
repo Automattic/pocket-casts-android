@@ -54,7 +54,7 @@ class ShareFragment : BaseDialogFragment() {
                     requireContext(),
                     ShareType.PODCAST,
                     SourceView.PLAYER,
-                    analyticsTracker
+                    analyticsTracker,
                 ).showShareDialogDirect()
             }
             close()
@@ -68,7 +68,7 @@ class ShareFragment : BaseDialogFragment() {
                     requireContext(),
                     ShareType.EPISODE,
                     SourceView.PLAYER,
-                    analyticsTracker
+                    analyticsTracker,
                 ).showShareDialogDirect()
             }
             close()
@@ -82,7 +82,7 @@ class ShareFragment : BaseDialogFragment() {
                     requireContext(),
                     ShareType.CURRENT_TIME,
                     SourceView.PLAYER,
-                    analyticsTracker
+                    analyticsTracker,
                 ).showShareDialogDirect()
             }
             close()
@@ -96,7 +96,7 @@ class ShareFragment : BaseDialogFragment() {
                     requireContext(),
                     ShareType.EPISODE_FILE,
                     SourceView.PLAYER,
-                    analyticsTracker
+                    analyticsTracker,
                 ).sendFile()
             }
             close()

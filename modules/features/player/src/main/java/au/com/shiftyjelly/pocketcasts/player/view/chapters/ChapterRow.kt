@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,26 +43,28 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ChapterRow(
     state: ChaptersViewModel.ChapterState,
+    isTogglingChapters: Boolean,
+    onSelectionChange: (Boolean, Chapter) -> Unit,
     onClick: () -> Unit,
     onUrlClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val chapter = state.chapter
-    val textColor =
-        if (state is ChaptersViewModel.ChapterState.Played) MaterialTheme.theme.colors.playerContrast04
-        else MaterialTheme.theme.colors.playerContrast01
+    val textColor = getTextColor(state, isTogglingChapters)
     Box(
         modifier = modifier
             // use intrinsic height so the progress bar fills the height of the row
             .height(IntrinsicSize.Max)
             .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp)),
     ) {
         if (state is ChaptersViewModel.ChapterState.Playing) {
             ChapterProgressBar(progress = state.progress)
@@ -70,11 +74,26 @@ fun ChapterRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onClick() }
-                .padding(horizontal = 12.dp)
+                .padding(end = 12.dp),
         ) {
+            AnimatedVisibility(visible = isTogglingChapters) {
+                Checkbox(
+                    checked = state.chapter.selected,
+                    onCheckedChange = { selected ->
+                        onSelectionChange(selected, chapter)
+                    },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.theme.colors.playerContrast01,
+                        uncheckedColor = MaterialTheme.theme.colors.playerContrast02,
+                    ),
+                )
+                Spacer(Modifier.width(8.dp))
+            }
             TextH50(
                 text = chapter.index.toString(),
-                color = textColor
+                color = textColor,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp),
             )
             Spacer(Modifier.width(8.dp))
             TextH50(
@@ -83,13 +102,13 @@ fun ChapterRow(
                 maxLines = 2,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 16.dp),
             )
             Spacer(Modifier.width(4.dp))
-            if (chapter.url != null) {
+            if (chapter.url != null && !isTogglingChapters) {
                 LinkButton(
                     textColor = textColor,
-                    onClick = onUrlClick
+                    onClick = onUrlClick,
                 )
                 Spacer(Modifier.width(8.dp))
             }
@@ -99,7 +118,7 @@ fun ChapterRow(
                 text = duration,
                 color = textColor,
                 textAlign = TextAlign.End,
-                modifier = Modifier.widthIn(min = 60.dp)
+                modifier = Modifier.widthIn(min = 60.dp),
             )
         }
     }
@@ -110,13 +129,13 @@ private fun ChapterProgressBar(progress: Float, modifier: Modifier = Modifier) {
     Box(
         modifier
             .fillMaxSize()
-            .background(MaterialTheme.theme.colors.playerContrast06)
+            .background(MaterialTheme.theme.colors.playerContrast06),
     ) {
         Box(
             Modifier
                 .fillMaxWidth(fraction = progress)
                 .fillMaxHeight()
-                .background(MaterialTheme.theme.colors.playerContrast05)
+                .background(MaterialTheme.theme.colors.playerContrast05),
         )
     }
 }
@@ -129,14 +148,32 @@ private fun LinkButton(textColor: Color, onClick: () -> Unit, modifier: Modifier
             .padding(4.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.theme.colors.playerContrast05)
-            .size(24.dp)
+            .size(24.dp),
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_link),
             tint = textColor,
             contentDescription = stringResource(LR.string.player_chapter_url),
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(16.dp),
         )
+    }
+}
+
+@Composable
+private fun getTextColor(
+    state: ChaptersViewModel.ChapterState,
+    isTogglingChapters: Boolean,
+) = if (isTogglingChapters) {
+    if (state.chapter.selected) {
+        MaterialTheme.theme.colors.playerContrast01
+    } else {
+        MaterialTheme.theme.colors.playerContrast02
+    }
+} else {
+    if (state is ChaptersViewModel.ChapterState.Played) {
+        MaterialTheme.theme.colors.playerContrast04
+    } else {
+        MaterialTheme.theme.colors.playerContrast01
     }
 }
 
@@ -146,29 +183,34 @@ private fun LinkButton(textColor: Color, onClick: () -> Unit, modifier: Modifier
 fun ChapterRowPreview() {
     val chapter = Chapter(
         title = "Chapter Title",
-        startTime = 0,
-        endTime = 62,
+        startTime = Duration.ZERO,
+        endTime = 62.seconds,
         url = "https://pocketcasts.com".toHttpUrlOrNull(),
         imagePath = null,
-        mimeType = null,
-        index = 1
+        index = 1,
     )
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         Column {
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Played(chapter = chapter),
+                isTogglingChapters = false,
+                onSelectionChange = { _, _ -> },
                 onClick = {},
-                onUrlClick = {}
+                onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.Playing(chapter = chapter, progress = 0.5f),
+                isTogglingChapters = false,
+                onSelectionChange = { _, _ -> },
                 onClick = {},
-                onUrlClick = {}
+                onUrlClick = {},
             )
             ChapterRow(
                 state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter),
+                isTogglingChapters = false,
+                onSelectionChange = { _, _ -> },
                 onClick = {},
-                onUrlClick = {}
+                onUrlClick = {},
             )
         }
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,9 +14,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import com.google.android.material.snackbar.Snackbar
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 abstract class MultiSelectHelper<T> : CoroutineScope {
@@ -59,7 +60,7 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
     abstract fun onMenuItemSelected(
         itemId: Int,
         resources: Resources,
-        fragmentManager: FragmentManager,
+        activity: FragmentActivity,
     ): Boolean
     abstract fun deselect(multiSelectable: T)
 
@@ -97,18 +98,18 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
                 .addTextOption(
                     titleId = selectAllAbove,
                     click = { toggleSelectAllAbove(multiSelectable) },
-                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_up else IR.drawable.ic_selectall_up
+                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_up else IR.drawable.ic_selectall_up,
 
                 )
                 .addTextOption(
                     titleId = selectAll,
                     click = { toggleSelectAll(multiSelectable) },
-                    imageId = if (selectedList.contains(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall else IR.drawable.ic_selectall
+                    imageId = if (selectedList.contains(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall else IR.drawable.ic_selectall,
                 )
                 .addTextOption(
                     titleId = selectAllBelow,
                     click = { toggleSelectAllBelow(multiSelectable) },
-                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_down else IR.drawable.ic_selectall_down
+                    imageId = if (isSelected(multiSelectable) && selectedList.size > 1) IR.drawable.ic_deselectall_down else IR.drawable.ic_selectall_down,
                 )
                 .show(fragmentManager, "multi_select_select_dialog")
         }

@@ -57,7 +57,7 @@ fun StoryTopListenedCategoriesView(
         StoryBlurredBackground(
             offset = Offset(
                 -LocalView.current.width * 0.4f,
-                -LocalView.current.height * 0.4f
+                -LocalView.current.height * 0.4f,
             ),
             rotate = 110f,
         )
@@ -66,7 +66,7 @@ fun StoryTopListenedCategoriesView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.height(40.dp))
 
@@ -99,7 +99,7 @@ private fun PrimaryText(
     }
     val text = stringResource(
         textResId,
-        story.listenedCategories[0].simplifiedCategoryName().tryToLocalise(context.resources)
+        story.listenedCategories[0].simplifiedCategoryName().tryToLocalise(context.resources),
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
@@ -112,12 +112,12 @@ private fun SecondaryText(
     val context = LocalContext.current
     val timeText = StatsHelper.secondsToFriendlyString(
         story.listenedCategories[0].totalPlayedTime,
-        context.resources
+        context.resources,
     )
     val text = stringResource(
         id = LR.string.end_of_year_story_top_categories_subtitle,
         story.listenedCategories[0].numberOfEpisodes,
-        timeText
+        timeText,
     )
     StorySecondaryText(text = text, color = story.subtitleColor, modifier = modifier)
 }
@@ -134,7 +134,7 @@ private fun CategoryList(
                 listenedCategory = it,
                 position = index,
                 subtitleColor = story.subtitleColor,
-                modifier = modifier
+                modifier = modifier,
             )
         }
     }
@@ -151,7 +151,7 @@ fun CategoryItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp),
     ) {
         TextH30(
             text = "${position + 1}",
@@ -161,27 +161,27 @@ fun CategoryItem(
             disableScale = disableScale(),
             modifier = modifier
                 .padding(end = 14.dp)
-                .widthIn(min = 16.dp)
+                .widthIn(min = 16.dp),
         )
         Row(
             modifier = modifier
                 .padding(vertical = 5.dp)
                 .weight(1f),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (position == 0) {
                 CategoryTexts(
                     listenedCategory = listenedCategory,
                     subtitleColor = Color.White,
                     modifier = Modifier
-                        .textGradient()
+                        .textGradient(),
                 )
             } else {
                 CategoryTexts(
                     listenedCategory = listenedCategory,
                     titleColor = CategoryColor,
                     subtitleColor = subtitleColor,
-                    modifier = Modifier
+                    modifier = Modifier,
                 )
             }
         }
@@ -198,7 +198,7 @@ private fun CategoryTexts(
     val context = LocalContext.current
     val timeText = StatsHelper.secondsToFriendlyString(
         listenedCategory.totalPlayedTime,
-        context.resources
+        context.resources,
     )
     Column {
         TextH10(

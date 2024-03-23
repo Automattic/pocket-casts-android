@@ -14,7 +14,7 @@ private val LogoHeight = 26.dp
 fun StoryAppLogo(modifier: Modifier = Modifier) {
     AppTheme(Theme.ThemeType.DARK) {
         HorizontalLogo(
-            modifier = modifier.height(LogoHeight)
+            modifier = modifier.height(LogoHeight),
         )
     }
 }

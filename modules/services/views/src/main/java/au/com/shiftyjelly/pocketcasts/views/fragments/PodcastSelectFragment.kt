@@ -18,10 +18,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowPodcastBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,9 +32,9 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -45,7 +45,7 @@ class PodcastSelectFragment : BaseFragment() {
         fun newInstance(
             @ColorInt tintColor: Int? = null,
             showToolbar: Boolean = false,
-            source: PodcastSelectFragmentSource
+            source: PodcastSelectFragmentSource,
         ): PodcastSelectFragment =
             PodcastSelectFragment().apply {
                 arguments = Bundle().apply {
@@ -55,7 +55,7 @@ class PodcastSelectFragment : BaseFragment() {
                             tintColor = tintColor,
                             showToolbar = showToolbar,
                             source = source,
-                        )
+                        ),
                     )
                 }
             }
@@ -77,6 +77,7 @@ class PodcastSelectFragment : BaseFragment() {
     private var userChanged = false
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val disposables = CompositeDisposable()
 
@@ -104,7 +105,7 @@ class PodcastSelectFragment : BaseFragment() {
 
         source = args.source
 
-        val imageLoader = PodcastImageLoaderThemed(view.context)
+        val imageRequestFactory = PocketCastsImageRequestFactory(requireContext()).themed()
         binding.toolbarLayout.isVisible = args.showToolbar
         if (binding.toolbarLayout.isVisible) {
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
@@ -126,7 +127,7 @@ class PodcastSelectFragment : BaseFragment() {
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = {
-                    val adapter = PodcastSelectAdapter(it, args.tintColor, imageLoader) {
+                    val adapter = PodcastSelectAdapter(it, args.tintColor, imageRequestFactory) {
                         val selectedList = it.map { it.uuid }
                         binding.lblPodcastsChosen.text =
                             resources.getStringPluralPodcastsSelected(selectedList.size)
@@ -152,7 +153,7 @@ class PodcastSelectFragment : BaseFragment() {
                     }
 
                     this.adapter = adapter
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -181,7 +182,6 @@ class PodcastSelectFragment : BaseFragment() {
                 }
             }
             when (source) {
-
                 PodcastSelectFragmentSource.AUTO_ADD -> {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED, props)
                 }
@@ -220,7 +220,8 @@ class PodcastSelectFragment : BaseFragment() {
 }
 
 private data class SelectablePodcast(val podcast: Podcast, var selected: Boolean)
-private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt val tintColor: Int?, val imageLoader: PodcastImageLoader, val onSelectionChanged: (selected: List<Podcast>) -> Unit) : RecyclerView.Adapter<PodcastSelectAdapter.PodcastViewHolder>() {
+private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt val tintColor: Int?, imageRequestFactory: PocketCastsImageRequestFactory, val onSelectionChanged: (selected: List<Podcast>) -> Unit) : RecyclerView.Adapter<PodcastSelectAdapter.PodcastViewHolder>() {
+    val imageRequestFactory = imageRequestFactory.smallSize()
 
     class PodcastViewHolder(val binding: SettingsRowPodcastBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -243,7 +244,7 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
         holder.binding.lblSubtitle.text = item.podcast.author
         holder.binding.checkbox.isChecked = item.selected
 
-        imageLoader.loadSmallImage(item.podcast).into(holder.binding.imageView)
+        imageRequestFactory.create(item.podcast).loadInto(holder.binding.imageView)
 
         holder.itemView.setOnClickListener {
             holder.binding.checkbox.isChecked = !holder.binding.checkbox.isChecked

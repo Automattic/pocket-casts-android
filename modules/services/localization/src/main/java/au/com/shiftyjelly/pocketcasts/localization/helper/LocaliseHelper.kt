@@ -7,7 +7,7 @@ object LocaliseHelper {
     val filterToId = mapOf(
         "In Progress" to R.string.filters_title_in_progress,
         "New Releases" to R.string.filters_title_new_releases,
-        "Starred" to R.string.filters_title_starred
+        "Starred" to R.string.filters_title_starred,
     )
 
     val stringToId = mapOf(
@@ -79,7 +79,8 @@ object LocaliseHelper {
         "yearly" to R.string.plus_yearly,
         "top" to R.string.discover_top,
         "popular" to R.string.discover_popular,
-        "popular in [regionname]" to R.string.discover_popular_in
+        "popular in [regionname]" to R.string.discover_popular_in,
+        "most popular in [category]" to R.string.discover_most_popular_in,
     )
 
     private val serverMessageIdToStringId = mapOf(
@@ -112,7 +113,7 @@ object LocaliseHelper {
         "user_email_success" to R.string.server_user_email_success,
         "user_email_verification_failed" to R.string.server_user_email_verification_failed,
         "user_change_email_success" to R.string.server_user_change_email_success,
-        "user_delete_account_with_sub_failed" to R.string.server_user_delete_account_with_sub_failed
+        "user_delete_account_with_sub_failed" to R.string.server_user_delete_account_with_sub_failed,
     )
 
     fun serverMessageIdToMessage(serverMessageId: String?, getResourceString: (Int) -> String?) =

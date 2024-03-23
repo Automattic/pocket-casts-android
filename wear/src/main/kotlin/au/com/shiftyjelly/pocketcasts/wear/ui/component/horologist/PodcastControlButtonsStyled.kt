@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ButtonColors
 import androidx.wear.compose.material.MaterialTheme
@@ -38,7 +37,6 @@ fun PodcastControlButtonsStyled(
     pauseIcon: ImageVector = Icons.Default.Pause,
     seekIconSize: Dp = 30.dp,
     seekIconAlign: Alignment.Horizontal = Alignment.Start,
-    seekTapTargetSize: DpSize = DpSize(48.dp, 60.dp),
     progressColor: Color = MaterialTheme.colors.primary,
     trackColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.10f),
     backgroundColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.10f),
@@ -54,9 +52,8 @@ fun PodcastControlButtonsStyled(
                 icon = seekBackIcon,
                 iconSize = seekIconSize,
                 iconAlign = seekIconAlign,
-                tapTargetSize = seekTapTargetSize,
                 colors = colors,
-                enabled = seekBackButtonEnabled
+                enabled = seekBackButtonEnabled,
             )
         },
         middleButton = {
@@ -81,10 +78,9 @@ fun PodcastControlButtonsStyled(
                 icon = seekForwardIcon,
                 iconSize = seekIconSize,
                 iconAlign = seekIconAlign,
-                tapTargetSize = seekTapTargetSize,
                 colors = colors,
-                enabled = seekForwardButtonEnabled
+                enabled = seekForwardButtonEnabled,
             )
-        }
+        },
     )
 }

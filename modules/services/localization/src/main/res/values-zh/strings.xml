@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-11-14 09:54:04+0000
+Translation-Revision-Date: 2024-03-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="upgrade_to_patron">升级至 Patron</string>
+    <string name="upgrade_to_plus">升级至 Plus</string>
+    <string name="whats_new_got_it_button">知道了</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">立即订阅 Patron，然后您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">立即订阅 Plus，然后您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
+    <string name="whats_new_deselect_chapters_plus_message">订阅 Plus 后，您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
+    <string name="whats_new_deselect_chapters_patron_message">订阅 Patron 后，您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
+    <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受跳过章节等更多功能</string>
+    <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受跳过章节等更多功能</string>
+    <string name="settings_use_embedded_podcast_artwork">使用嵌入式文件插图</string>
+    <string name="settings_episode_artwork_details">显示剧集节目注释（如果存在）中的插图，而非使用节目的插图。 如果文件插图和 RSS 插图都存在，则使用 RSS 插图。</string>
+    <string name="select_one_chapter_message">请至少选择一个章节</string>
+    <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
+    <string name="number_of_chapters_summary_plural">%1$d 个章节 • %2$d 已隐藏</string>
+    <string name="single_chapter">1 个章节</string>
+    <string name="number_of_chapters">%d 个章节</string>
+    <string name="skip_chapters">跳过章节</string>
+    <string name="onboarding_plus_feature_slumber_studios_title">由 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 提供的一年独家内容</string>
+    <string name="whats_new_slumber_studios_redeem_now_button">兑换您的代码</string>
+    <string name="whats_new_slumber_studios_body_free_user">订阅年度 Plus 并享受为期一年的 Slumber Studios 内容订阅，这是为实现最甜蜜的梦想而打造的播客。 &lt;a href=\"https://slumberstudios.com/\"&gt;了解更多&lt;/a&gt;。</string>
+    <string name="whats_new_slumber_studios_body">订阅年度 Plus 后，使用代码 %1$s 即可享受为期一年的 Slumber Studios 内容订阅。 &lt;a href=\"https://slumberstudios.com/\"&gt;了解更多&lt;/a&gt;。</string>
+    <string name="whats_new_slumber_studios_title">怀揣远大梦想</string>
+    <string name="onboarding_plus_recurring_after_intro_offer_sufix">第一年之后</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">定期付款费用为 %s</string>
+    <string name="half_price_first_year">首年享 5 折优惠</string>
+    <string name="plus_offer_duration">%s 优惠</string>
+    <string name="report_subtitle">报告不适宜的内容</string>
+    <string name="report">报告</string>
+    <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS 应用程序</string>
+    <string name="onboarding_plus_feature_folders_and_bookmarks_title">文件夹和书签</string>
+    <string name="settings_use_dynamic_colors_widget_details">启用后，小工具的颜色会跟随设备主题颜色而改变。</string>
+    <string name="settings_use_dynamic_colors_widget">为小工具使用动态颜色</string>
+    <string name="widget">小工具</string>
+    <string name="bookmark_not_found">未找到书签</string>
+    <string name="settings_use_dark_up_next_details">启用后，“下一个”将始终使用深色主题；禁用后，将与当前主题匹配</string>
+    <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
     <string name="end_of_year_stories_completion_rate_share_text">我在 2023 年的完成率</string>
     <string name="end_of_year_stories_subscribe_to_plus">订阅 Plus，了解您的收听情况与 2022 年的收听情况相比如何、其他有趣的统计信息，以及书签和文件夹等高级套餐功能。</string>
     <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
@@ -42,7 +78,6 @@ Language: zh_CN
     <string name="podcast_submit_rating_no_internet">未发现互联网连接。 请连接到互联网，以提交评级。</string>
     <string name="podcast_rate">评分 %s</string>
     <string name="submit">提交</string>
-    <string name="whats_new_boomarks_join_beta_testing_title">加入我们的书签 Beta 测试！</string>
     <string name="whats_new_bookmarks_try_now_button">立即试用</string>
     <string name="whats_new_bookmarks_title">书签在这里！</string>
     <string name="bookmarks_upsell_instructions_early_access">通过 Pocket Casts Patron 尽早使用此功能，并保存收藏剧集的时间戳。 即将面向 Plus 订阅用户推出。</string>
@@ -88,7 +123,7 @@ Language: zh_CN
     <string name="bookmarks_select_option">选择书签</string>
     <string name="bookmarks_delete_summary_singular">此书签将被删除。 此操作无法撤消。</string>
     <string name="bookmarks_delete_summary_plural">%d 个书签将被删除。 此操作无法撤消。</string>
-    <string name="bookmarks_deleted_singular">1 个书签已删除</string>
+    <string name="bookmarks_deleted_singular">书签已删除</string>
     <string name="bookmarks_deleted_plural">%1$d 个书签已删除</string>
     <string name="bookmarks_delete_singular">删除书签</string>
     <string name="bookmarks_delete_plural">删除书签</string>
@@ -96,10 +131,6 @@ Language: zh_CN
     <string name="deselect_all">全部不选</string>
     <string name="deselect_all_above">取消选择以上所有内容</string>
     <string name="edit">Edit</string>
-    <string name="whats_new_autoplay_maybe_later_button">稍后再说</string>
-    <string name="whats_new_autoplay_enable_button">立即启用</string>
-    <string name="whats_new_autoplay_body">如果您在“接下来播放”为空时播放节目，则自动播放会继续播放该播客或列表中的剧集。</string>
-    <string name="whats_new_autoplay_title">自动播放功能现已推出！</string>
     <string name="filters_download_limit_3"> 3 集</string>
     <string name="settings_title_headphone_controls">耳机控件</string>
     <string name="settings_headphone_controls_summary">自定义由常见耳机控件完成的操作。</string>
@@ -123,7 +154,6 @@ Language: zh_CN
     <string name="player_sleep_add_1_minute">+ 1 分钟</string>
     <string name="player_sleep_1_minute">1 分钟</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">其他主题和应用图标</string>
-    <string name="onboarding_plus_feature_watch_playback">观看播放</string>
     <string name="onboarding_patron_feature_early_access_title">抢先体验功能</string>
     <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
     <string name="renew_your_subscription">续订您的订阅</string>
@@ -239,7 +269,6 @@ Language: zh_CN
     <string name="settings_media_actions_customise">自定义媒体操作</string>
     <string name="settings_media_actions_prioritize_subtitle">您的顶部操作将可以使用。</string>
     <string name="settings_media_actions_prioritize_title">优先您的自定义媒体操作</string>
-    <string name="plus_take_your_podcasting_to_next_level">通过专享功能和自定义选项，将您的播客体验提升到新的水平。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">筛选 ID 或标题</string>
     <string name="filter_title">筛选标题</string>
@@ -332,11 +361,8 @@ Language: zh_CN
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB 云存储空间</string>
     <string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
-    <string name="onboarding_plus_feature_folders_title">文件夹</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">桌面应用程序</string>
-    <string name="onboarding_upgrade_unlock_all_features">解锁所有功能</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">访问专享功能和定制选项</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面和 Web 应用程序</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
     <string name="onboarding_recommendations_import">导入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">选择您喜欢的播客，或从其他播客播放器导入播客，定制您的 Pocket Casts。 您可以稍后完成此操作。</string>
@@ -775,7 +801,7 @@ Language: zh_CN
     <string name="settings_website_link">网站链接</string>
     <string name="settings_view">查看</string>
     <string name="settings_version">版本 %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">使用嵌入式播客插图</string>
+    <string name="settings_use_episode_podcast_artwork">使用嵌入式 RSS 插图</string>
     <string name="settings_use_android_light_dark_mode">使用 Android 浅色/深色模式</string>
     <string name="settings_up_next_tap_summary">如果打开，点按“接下来播放”队列中的某个项目将播放该项目。 长按将显示剧集选项。</string>
     <string name="settings_up_next_tap">点按时播放“接下来播放”剧集</string>
@@ -960,13 +986,9 @@ Language: zh_CN
     <string name="plus_lifetime_member">终身会员</string>
     <string name="plus_learn_more_button">了解更多</string>
     <string name="plus_learn_more_about_plus">了解有关 Pocket Casts Plus 的更多信息</string>
-    <string name="plus_desktop_apps_body">借助我们的 Windows、macOS 和 Web 应用程序，将播客传播到更多位置。</string>
     <string name="plus_desktop_apps">桌面应用程序</string>
-    <string name="plus_description_title">高级侦听器的增强功能</string>
-    <string name="plus_description_body">同时进行个性化设计并分发。 将您的个人音频文件上传到我们的云服务器，通过我们的 Web 播放器访问您的账户，并将应用程序设置为您的应用程序。</string>
     <string name="plus_create_marketing_features"> 所有内容</string>
     <string name="plus_cloud_storage_limit">%dGB 云存储</string>
-    <string name="plus_cloud_storage_body">加快您的讲座速度。 刻录其他内容。 成为您自己的播客 DJ。</string>
     <string name="plus_cloud_storage">云存储</string>
     <string name="profile_expiry_date_unknown">未知</string>
     <string name="profile_yearly">每年</string>
@@ -974,7 +996,6 @@ Language: zh_CN
     <string name="profile_welcome_to_plus">欢迎使用 Pocket Casts Plus！</string>
     <string name="profile_welcome_to_free">欢迎使用 Pocket Casts！</string>
     <string name="profile_web_player">Web 播放器</string>
-    <string name="profile_upgrade_to_plus">升级到 Plus</string>
     <string name="profile_updates_ends">更新结束：%s</string>
     <string name="profile_updates_ended">更新已结束：%s</string>
     <string name="profile_time_free">%s 免费</string>

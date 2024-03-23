@@ -12,5 +12,5 @@ data class OptionsDialogOption(
     val toggleOptions: List<ToggleButtonOption>? = null,
     val checked: Boolean = false,
     val click: (() -> Unit)?,
-    val onSwitch: ((switchedOn: Boolean) -> Unit)? = null
+    val onSwitch: ((switchedOn: Boolean) -> Unit)? = null,
 )

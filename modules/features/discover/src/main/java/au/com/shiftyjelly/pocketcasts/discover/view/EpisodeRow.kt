@@ -10,10 +10,11 @@ import android.widget.TextView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
@@ -23,10 +24,10 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class EpisodeRow @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val imageLoader = PodcastImageLoaderThemed(context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
     private val podcastTitleView: TextView
     private val episodeTitleView: TextView
     private val durationView: TextView
@@ -74,7 +75,7 @@ class EpisodeRow @JvmOverloads constructor(
 
                 val published = value.published
                 publishedView.text = if (published == null) "" else dateFormatter.format(published)
-                imageLoader.loadSmallImage(episode?.podcast_uuid).into(imageView)
+                imageRequestFactory.createForPodcast(value.podcast_uuid).loadInto(imageView)
                 playButton.setPlaying(isPlaying = value.isPlaying, animate = false)
             }
         }

@@ -4,8 +4,8 @@ import androidx.annotation.OptIn
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.AudioProcessorChain
+import androidx.media3.common.audio.SonicAudioProcessor
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.audio.SonicAudioProcessor
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import timber.log.Timber
 
@@ -16,20 +16,20 @@ class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) :
         this::onSkippedFrames,
         416000,
         291000,
-        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL
+        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
     )
     private val mediumProcessor =
         ShiftyTrimSilenceProcessor(
             this::onSkippedFrames,
             300000,
             225000,
-            ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL
+            ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
         )
     private val highProcessor = ShiftyTrimSilenceProcessor(
         this::onSkippedFrames,
         83000,
         0,
-        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL
+        ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
     )
     private val sonicAudioProcessor = SonicAudioProcessor()
 

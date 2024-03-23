@@ -8,14 +8,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.min
 
 class HistoryManager @Inject constructor(
     private val podcastManager: PodcastManager,
@@ -71,7 +71,9 @@ class HistoryManager @Inject constructor(
                         .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
                         .onErrorReturn { Podcast(uuid = podcastUuid) }
                         .toObservable()
-                }, true, ADD_PODCAST_CONCURRENCY
+                },
+                true,
+                ADD_PODCAST_CONCURRENCY,
             )
             .doOnNext {
                 synced += 1

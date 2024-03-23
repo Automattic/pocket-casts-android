@@ -43,13 +43,13 @@ fun StoryCompletionRateView(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(story.backgroundColor)
+            .background(story.backgroundColor),
     ) {
         val context = LocalView.current.context
         StoryBlurredBackground(
             offset = Offset(
                 maxWidth.value.toInt().dpToPx(context) * 0.4f,
-                -maxHeight.value.toInt().dpToPx(context) * 0.35f
+                -maxHeight.value.toInt().dpToPx(context) * 0.35f,
             ),
             style = blurredBackgroundStyle(userTier),
         )
@@ -59,7 +59,7 @@ fun StoryCompletionRateView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.height(40.dp))
 
@@ -83,7 +83,7 @@ fun StoryCompletionRateView(
                 titleColor = story.tintColor,
                 subTitleColor = story.subtitleColor,
                 modifier = modifier
-                    .weight(1f)
+                    .weight(1f),
             )
 
             Spacer(modifier = modifier.weight(0.2f))

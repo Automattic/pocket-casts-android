@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,16 +18,19 @@ import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonI
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 internal class LargeListRowAdapter(
+    private val context: Context,
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
     var fromListId: String? = null
 
@@ -42,6 +46,8 @@ internal class LargeListRowAdapter(
         const val NUMBER_OF_LOADING_ITEMS = 3
     }
 
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, placeholderType = PlaceholderType.Small).themed()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LargeListItemViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_large_list, parent, false)
         return LargeListItemViewHolder(itemView)
@@ -49,11 +55,9 @@ internal class LargeListRowAdapter(
 
     override fun onBindViewHolder(holder: LargeListItemViewHolder, position: Int) {
         val podcast = getItem(position)
-        val context = holder.imageView.context
-        val imageLoader = PodcastImageLoaderThemed(context).smallPlaceholder()
 
         if (podcast is DiscoverPodcast) {
-            imageLoader.loadPodcastUuid(podcast.uuid).into(holder.imageView)
+            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(holder.imageView)
 
             holder.lblTitle.text = podcast.title
             holder.lblSubtitle.text = podcast.author

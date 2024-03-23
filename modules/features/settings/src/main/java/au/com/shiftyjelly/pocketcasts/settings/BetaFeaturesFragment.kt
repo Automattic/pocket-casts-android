@@ -40,7 +40,7 @@ class BetaFeaturesFragment : BaseFragment() {
                         onBackPressed = {
                             @Suppress("DEPRECATION")
                             activity?.onBackPressed()
-                        }
+                        },
                     )
                 }
             }
@@ -57,7 +57,7 @@ class BetaFeaturesFragment : BaseFragment() {
             ThemedTopAppBar(
                 title = stringResource(R.string.settings_beta_features),
                 bottomShadow = true,
-                onNavigationClick = { onBackPressed() }
+                onNavigationClick = { onBackPressed() },
             )
 
             for (feature in state.featureFlags) {
@@ -66,7 +66,7 @@ class BetaFeaturesFragment : BaseFragment() {
                     toggle = SettingRowToggle.Switch(checked = feature.isEnabled),
                     modifier = Modifier.toggleable(
                         value = feature.isEnabled,
-                        role = Role.Switch
+                        role = Role.Switch,
                     ) {
                         viewModel.setFeatureEnabled(feature.featureFlag, it)
                     },

@@ -27,13 +27,14 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
         fun newInstance(itemIds: List<Int>): MultiSelectBottomSheet {
             val instance = MultiSelectBottomSheet()
             instance.arguments = bundleOf(
-                ARG_ACTION_IDS to itemIds.toIntArray()
+                ARG_ACTION_IDS to itemIds.toIntArray(),
             )
             return instance
         }
     }
 
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     var multiSelectHelper: MultiSelectEpisodesHelper? = null
@@ -77,7 +78,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
             val source = (multiSelectHelper?.source ?: SourceView.UNKNOWN)
             analyticsTracker.track(
                 AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED,
-                AnalyticsProp.sourceMap(source)
+                AnalyticsProp.sourceMap(source),
             )
             (activity as FragmentHostListener).showModal(MultiSelectFragment.newInstance(source))
             dismiss()
@@ -85,7 +86,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     }
 
     private fun onClick(item: MultiSelectAction) {
-        multiSelectHelper?.onMenuItemSelected(item.actionId, resources, parentFragmentManager)
+        multiSelectHelper?.onMenuItemSelected(item.actionId, resources, requireActivity())
         dismiss()
     }
 

@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -23,13 +24,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
@@ -42,7 +43,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class BookmarksViewModel
@@ -55,7 +55,7 @@ class BookmarksViewModel
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
-    private val feature: FeatureWrapper,
+    private val bookmarkFeature: BookmarkFeatureControl,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -122,8 +122,8 @@ class BookmarksViewModel
                     multiSelectHelper.selectAllInList(
                         bookmarks.subList(
                             startIndex,
-                            bookmarks.size
-                        )
+                            bookmarks.size,
+                        ),
                     )
                 }
             }
@@ -158,16 +158,19 @@ class BookmarksViewModel
                     isMultiSelectingFlow,
                     selectedListFlow,
                     settings.cachedSubscriptionStatus.flow,
-                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus ->
+                    settings.useRssArtwork.flow,
+                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useRssArtwork ->
                     val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                    _uiState.value = if (!feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)) {
+                    _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
                         UiState.Upsell(sourceView)
                     } else if (bookmarks.isEmpty()) {
                         UiState.Empty(sourceView)
                     } else {
                         UiState.Loaded(
                             bookmarks = bookmarks,
+                            episode = episode,
                             isMultiSelecting = isMultiSelecting,
+                            useRssArtwork = useRssArtwork,
                             isSelected = { selectedBookmark ->
                                 selectedList.map { bookmark -> bookmark.uuid }
                                     .contains(selectedBookmark.uuid)
@@ -177,8 +180,8 @@ class BookmarksViewModel
                         )
                     }
                 }.stateIn(viewModelScope)
-                    .takeWhile { !isFragmentActive } /* Stop collecting on player close
-                    when viewModelScope is still active but fragment is not. */
+                    // Stop collecting on player close when viewModelScope is still active but fragment is not.
+                    .takeWhile { !isFragmentActive }
             } ?: run { // This shouldn't happen in the ideal world
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
                 _uiState.value = UiState.Empty(sourceView)
@@ -214,13 +217,13 @@ class BookmarksViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeDefault) return
-        sourceView.mapToBookmarksSortTypeUserSetting().set(order)
+        sourceView.mapToBookmarksSortTypeUserSetting().set(order, needsSync = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
                 "sort_order" to order.key,
                 "source" to sourceView.analyticsValue,
-            )
+            ),
         )
     }
 
@@ -262,7 +265,7 @@ class BookmarksViewModel
                         episodeUuid = episodeUuid,
                         timeSecs = bookmark.timeSecs,
                         backgroundColor = backgroundColor,
-                        tintColor = tintColor
+                        tintColor = tintColor,
                     )
                     onSuccess(arguments)
                 }
@@ -288,7 +291,9 @@ class BookmarksViewModel
         object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
+            val episode: BaseEpisode,
             val isMultiSelecting: Boolean,
+            val useRssArtwork: Boolean,
             val isSelected: (Bookmark) -> Boolean,
             val onRowClick: (Bookmark) -> Unit,
             val sourceView: SourceView,

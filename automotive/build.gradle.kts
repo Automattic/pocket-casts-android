@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
@@ -22,7 +21,6 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        dataBinding = true
         compose = true
     }
 
@@ -90,6 +88,11 @@ dependencies {
     implementation(project(":modules:features:discover"))
     implementation(project(":modules:features:account"))
     implementation(project(":modules:features:shared"))
+}
+
+sentry {
+    includeProguardMapping = System.getenv()["CI"].toBoolean()
+            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
 }
 
 apply(plugin = "com.google.gms.google-services")

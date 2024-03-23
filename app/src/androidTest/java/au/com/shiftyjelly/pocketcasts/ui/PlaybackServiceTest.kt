@@ -20,6 +20,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
+import java.util.Date
+import java.util.UUID
+import java.util.concurrent.TimeoutException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,9 +39,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
-import java.util.Date
-import java.util.UUID
-import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class PlaybackServiceTest {
@@ -52,7 +52,7 @@ class PlaybackServiceTest {
         val application = ApplicationProvider.getApplicationContext<PocketCastsApplication>()
         val serviceIntent = Intent(
             application,
-            PlaybackService::class.java
+            PlaybackService::class.java,
         )
 
         // Bind the service and grab a reference to the binder.
@@ -73,14 +73,14 @@ class PlaybackServiceTest {
         val upNextCurrentEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 1")
         val upNextEpisodes = listOf(
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 2"),
-            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3")
+            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3"),
         )
         val filter = Playlist(uuid = UUID.randomUUID().toString(), title = "New Releases")
         val filters = listOf(filter)
         val filterEpisodes = listOf(
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4"),
             // use the same episode in the filter so we can test duplicates aren't used
-            upNextEpisodes.last()
+            upNextEpisodes.last(),
         )
         val latestEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 5")
 

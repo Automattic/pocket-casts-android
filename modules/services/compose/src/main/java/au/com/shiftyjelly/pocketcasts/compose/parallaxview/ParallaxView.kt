@@ -20,11 +20,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
-import java.util.LinkedList
 
 // https://rb.gy/pwz9r
 @Composable
@@ -105,7 +105,7 @@ private fun Content(
             BiasAlignment(
                 horizontalBias = (roll * 0.005).toFloat(),
                 verticalBias = 0f,
-            )
+            ),
         )
     }
 }

@@ -15,10 +15,10 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -27,7 +27,7 @@ class NotesViewModel
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val showNotesManager: ShowNotesManager,
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
 ) : ViewModel() {
 
     private val showNotesFormatter = ShowNotesFormatter(context).apply {

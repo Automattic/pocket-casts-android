@@ -79,7 +79,7 @@ class StatsFragment : BaseFragment() {
                         activity?.onBackPressed()
                     },
                     onRetryClick = { viewModel.loadStats() },
-                    launchReviewDialog = { viewModel.launchAppReviewDialog(it) }
+                    launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
                 )
             }
         }
@@ -129,11 +129,11 @@ private fun StatsPageError(onRetryClick: () -> Unit, modifier: Modifier = Modifi
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         TextH40(
             text = stringResource(LR.string.profile_status_error_internet),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))
         TextH40(
@@ -155,7 +155,7 @@ private fun StatsPageLoaded(
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 20.dp)
+            .padding(horizontal = 16.dp, vertical = 20.dp),
     ) {
         if (state.startedAt == null || state.startedAt.time <= 0) {
             TextP40(stringResource(LR.string.profile_stats_listened_for))
@@ -172,22 +172,22 @@ private fun StatsPageLoaded(
         StatsRow(
             icon = R.drawable.ic_skipping,
             label = LR.string.profile_stats_skipping,
-            value = state.skipping
+            value = state.skipping,
         )
         StatsRow(
             icon = R.drawable.ic_speed,
             label = LR.string.profile_stats_variable_speed,
-            value = state.variableSpeed
+            value = state.variableSpeed,
         )
         StatsRow(
             icon = R.drawable.ic_trim,
             label = LR.string.profile_stats_trim_silence,
-            value = state.trimSilence
+            value = state.trimSilence,
         )
         StatsRow(
             icon = R.drawable.ic_skip_both,
             label = LR.string.profile_stats_auto_skipping,
-            value = state.autoSkipping
+            value = state.autoSkipping,
         )
         Spacer(Modifier.height(12.dp))
         HorizontalDivider()
@@ -213,7 +213,7 @@ private fun TotalRow(time: Long) {
         TimeText(
             time = time,
             color = MaterialTheme.theme.colors.support01,
-            textAlign = TextAlign.End
+            textAlign = TextAlign.End,
         )
     }
 }
@@ -225,7 +225,7 @@ private fun LargeTimeText(time: Long, modifier: Modifier = Modifier) {
         color = MaterialTheme.theme.colors.support01,
         fontSize = 31.sp,
         fontWeight = FontWeight.Bold,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -236,7 +236,7 @@ private fun TimeText(
     fontSize: TextUnit = 16.sp,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     fontWeight: FontWeight? = null,
-    textAlign: TextAlign? = null
+    textAlign: TextAlign? = null,
 ) {
     val context = LocalContext.current
     val timeText = remember(time) {
@@ -248,7 +248,7 @@ private fun TimeText(
         color = color,
         fontWeight = fontWeight,
         textAlign = textAlign,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -258,23 +258,23 @@ private fun StatsRow(@DrawableRes icon: Int, @StringRes label: Int, value: Long)
         modifier = Modifier
             .padding(vertical = 12.dp)
             .semantics(mergeDescendants = true) {},
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
             tint = MaterialTheme.theme.colors.primaryIcon01,
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier.padding(end = 16.dp),
         )
         TextP40(
             text = stringResource(label),
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier.padding(end = 16.dp),
         )
         Spacer(Modifier.weight(1f))
         TimeText(
             time = value,
             color = MaterialTheme.theme.colors.primaryText02,
-            textAlign = TextAlign.End
+            textAlign = TextAlign.End,
         )
     }
 }
@@ -290,7 +290,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
         autoSkipping = 344,
         totalSaved = 3443,
         funnyText = "During which time you blinked 637 times. Heyooo!",
-        startedAt = Date()
+        startedAt = Date(),
     )
     AppThemeWithBackground(themeType) {
         StatsPage(

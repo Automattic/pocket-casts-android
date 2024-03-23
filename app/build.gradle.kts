@@ -4,7 +4,6 @@ import java.util.EnumSet
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
@@ -32,7 +31,6 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        dataBinding = true
         compose = true
     }
 
@@ -75,7 +73,8 @@ android {
 }
 
 sentry {
-    includeProguardMapping = file("$rootDir/sentry.properties").exists()
+    includeProguardMapping = System.getenv()["CI"].toBoolean()
+            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
     tracingInstrumentation {
         features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
     }

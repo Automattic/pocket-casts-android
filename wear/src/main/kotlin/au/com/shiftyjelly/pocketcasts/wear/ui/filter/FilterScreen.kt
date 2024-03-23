@@ -41,9 +41,12 @@ fun FilterScreen(
     columnState: ScalingLazyColumnState,
 ) {
     val uiState by viewModel.uiState.collectAsState(UiState.Loading)
+    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
+
     when (val state = uiState) {
         is UiState.Loaded -> Content(
             state = state,
+            useRssArtwork = useRssArtwork,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
             listState = columnState,
@@ -54,7 +57,7 @@ fun FilterScreen(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 state.filter?.let {
                     ScreenHeaderChip(it.title)
@@ -82,13 +85,14 @@ fun FilterScreen(
 @Composable
 private fun Content(
     state: UiState.Loaded,
+    useRssArtwork: Boolean,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     listState: ScalingLazyColumnState,
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        columnState = listState
+        columnState = listState,
     ) {
         item {
             ScreenHeaderChip(state.filter.title)
@@ -99,6 +103,7 @@ private fun Content(
                 onClick = {
                     onEpisodeTap(episode)
                 },
+                useRssArtwork = useRssArtwork,
                 showImage = true,
             )
         }

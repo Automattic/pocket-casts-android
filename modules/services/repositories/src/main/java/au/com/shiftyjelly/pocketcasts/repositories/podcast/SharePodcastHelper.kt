@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -13,17 +14,19 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
+import coil.executeBlocking
+import coil.imageLoader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.math.round
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class SharePodcastHelper(
@@ -35,6 +38,7 @@ data class SharePodcastHelper(
     private val source: SourceView,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
     fun showShareDialogDirect() {
         val host = Settings.SERVER_SHORT_URL
@@ -79,7 +83,7 @@ data class SharePodcastHelper(
             val file = File(path)
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = episode.fileType
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, this.context)
+            val uri = FileUtil.createUriWithReadPermissions(this.context, file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             this.context.startActivity(Intent.createChooser(intent, context.getString(LR.string.podcasts_share_via)))
         } catch (e: Exception) {
@@ -91,7 +95,8 @@ data class SharePodcastHelper(
         val scope = context.getActivity()?.lifecycleScope ?: return onComplete(null)
         scope.launch {
             val bitmap = withContext(Dispatchers.IO) {
-                PodcastImageLoader(context, false, emptyList()).getBitmapSuspend(podcast, 128)
+                val request = imageRequestFactory.create(podcast)
+                context.imageLoader.executeBlocking(request).drawable?.toBitmap()
             } ?: return@launch onComplete(null)
             // overwrites with every share
             val imageFile = File(context.cacheDir, "share_podcast_thumbnail.jpg")
@@ -123,6 +128,6 @@ data class SharePodcastHelper(
         PODCAST("podcast"),
         EPISODE("episode"),
         EPISODE_FILE("episode_file"),
-        CURRENT_TIME("current_time")
+        CURRENT_TIME("current_time"),
     }
 }

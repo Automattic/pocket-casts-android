@@ -54,6 +54,7 @@ class RegionSelectFragment : BaseFragment() {
     var listener: Listener? = null
 
     private var binding: FragmentRegionSelectBinding? = null
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

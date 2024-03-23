@@ -202,6 +202,56 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblShowArtwork" />
 
             <View
+                android:id="@+id/btnUseRssArtwork"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseRssArtwork"
+                app:layout_constraintBottom_toBottomOf="@+id/lblUseRssArtworkDetails"/>
+
+            <TextView
+                android:id="@+id/lblUseRssArtwork"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/settings_use_episode_podcast_artwork"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/swtUseRssArtwork"
+                app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblShowArtworkDetails" />
+
+            <Switch
+                android:id="@+id/swtUseRssArtwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="24dp"
+                android:contentDescription="@string/settings_use_episode_podcast_artwork"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseRssArtwork" />
+
+            <TextView
+                android:id="@+id/lblUseRssArtworkDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_episode_artwork_details"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toStartOf="@+id/swtUseRssArtwork"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/lblUseRssArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseRssArtwork" />
+
+            <View
                 android:id="@+id/btnUseEmbeddedArtwork"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -224,7 +274,7 @@
                 android:importantForAccessibility="no"
                 app:layout_constraintEnd_toStartOf="@+id/swtUseEmbeddedArtwork"
                 app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
-                app:layout_constraintTop_toBottomOf="@+id/lblShowArtworkDetails" />
+                app:layout_constraintTop_toBottomOf="@+id/lblUseRssArtworkDetails" />
 
             <Switch
                 android:id="@+id/swtUseEmbeddedArtwork"
@@ -341,6 +391,85 @@
                 app:layout_constraintBottom_toBottomOf="@+id/lblUseDarkUpNextDetails"/>
 
             <View
+                android:id="@+id/dividerViewWidget"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_marginTop="16dp"
+                android:background="?attr/primary_ui_05"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnUseDarkUpNext" />
+
+            <TextView
+                android:id="@+id/lblWidget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/widget"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerViewWidget" />
+
+            <TextView
+                android:id="@+id/lblUseDynamicColorsForWidget"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/settings_use_dynamic_colors_widget"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:paddingTop="16dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowArtwork"
+                app:layout_constraintStart_toStartOf="@+id/lblWidget"
+                app:layout_constraintTop_toBottomOf="@+id/lblWidget" />
+
+            <Switch
+                android:id="@+id/swtDynamicColorsForWidget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="24dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseDynamicColorsForWidget"
+                app:layout_constraintBottom_toBottomOf="@+id/lblUseDynamicColorsForWidget"/>
+
+            <TextView
+                android:id="@+id/lblDynamicColorsForWidgetDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_use_dynamic_colors_widget_details"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@+id/swtDynamicColorsForWidget"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/lblUseDynamicColorsForWidget"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseDynamicColorsForWidget" />
+
+            <View
+                android:id="@+id/btnUseDynamicColorsForWidget"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseDynamicColorsForWidget"
+                app:layout_constraintBottom_toBottomOf="@+id/lblDynamicColorsForWidgetDetails"/>
+
+            <View
                 android:id="@+id/dividerView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
@@ -349,7 +478,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnUseDarkUpNext" />
+                app:layout_constraintTop_toBottomOf="@+id/btnUseDynamicColorsForWidget" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/upgradeGroup"

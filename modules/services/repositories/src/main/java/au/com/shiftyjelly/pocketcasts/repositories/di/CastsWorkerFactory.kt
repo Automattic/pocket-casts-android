@@ -30,10 +30,9 @@ class CastsWorkerFactory @Inject constructor(
     val refreshServerManager: RefreshServerManager,
     val notificationHelper: NotificationHelper,
     val settings: Settings,
-    val userEpisodeManager: UserEpisodeManager
+    val userEpisodeManager: UserEpisodeManager,
 ) : WorkerFactory() {
     override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-
         val workerKlass = Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
         val constructor = workerKlass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)
         val instance = constructor.newInstance(appContext, workerParameters)

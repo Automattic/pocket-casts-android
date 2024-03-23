@@ -23,6 +23,7 @@ class BookmarkViewHolder(
             AppTheme(theme.activeTheme) {
                 BookmarkRow(
                     bookmark = data.bookmark,
+                    episode = data.episode,
                     isMultiSelecting = data.isMultiSelecting,
                     isSelected = data.isSelected,
                     onPlayClick = { data.onBookmarkPlayClicked(it) },
@@ -30,13 +31,14 @@ class BookmarkViewHolder(
                         .pointerInput(data.bookmark.adapterId) {
                             detectTapGestures(
                                 onLongPress = { data.onBookmarkRowLongPress(data.bookmark) },
-                                onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) }
+                                onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) },
                             )
                         },
                     colors = BookmarkRowColors.Default,
                     timePlayButtonStyle = TimePlayButtonStyle.Outlined,
                     timePlayButtonColors = TimePlayButtonColors.Default,
                     showIcon = true,
+                    useRssArtwork = data.useRssArtwork,
                 )
             }
         }

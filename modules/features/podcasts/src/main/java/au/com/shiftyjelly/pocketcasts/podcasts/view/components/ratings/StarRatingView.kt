@@ -57,9 +57,8 @@ fun StarRatingView(
 @Composable
 private fun Content(
     state: RatingState.Loaded,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-
     if (state.noRatings) return
 
     Row(
@@ -69,16 +68,15 @@ private fun Content(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-
         Stars(
             stars = state.stars,
-            color = MaterialTheme.theme.colors.filter03
+            color = MaterialTheme.theme.colors.filter03,
         )
 
         state.total?.let {
             TextP40(
                 text = it.abbreviated,
-                modifier = Modifier.padding(start = 6.dp)
+                modifier = Modifier.padding(start = 6.dp),
             )
         }
     }
@@ -94,7 +92,7 @@ private fun Stars(
             Icon(
                 imageVector = star.icon,
                 contentDescription = null,
-                tint = color
+                tint = color,
             )
         }
     }
@@ -111,10 +109,10 @@ private fun PodcastRatingsPreview(
                 PodcastRatings(
                     podcastUuid = UUID.randomUUID().toString(),
                     average = 3.5,
-                    total = 1200
-                )
+                    total = 1200,
+                ),
             ),
-            onClick = {}
+            onClick = {},
         )
     }
 }

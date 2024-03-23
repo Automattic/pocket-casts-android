@@ -25,7 +25,7 @@ PLAY_STORE_TRACK_PRODUCTION = 'production'
 GLOTPRESS_APP_STRINGS_PROJECT_URL = 'https://translate.wordpress.com/projects/pocket-casts/android/'
 VERSION_PROPERTIES_PATH = File.join(PROJECT_ROOT_FOLDER, 'version.properties')
 
-# Instanstiate versioning classes
+# Instantiate versioning classes
 VERSION_CALCULATOR = Fastlane::Wpmreleasetoolkit::Versioning::SemanticVersionCalculator.new
 VERSION_FORMATTER = Fastlane::Wpmreleasetoolkit::Versioning::RCNotationVersionFormatter.new
 BUILD_CODE_CALCULATOR = Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeCalculator.new
@@ -73,7 +73,7 @@ before_all do |_lane|
   # Check that the env files exist
   unless is_ci || File.file?(USER_ENV_FILE_PATH)
     example_path = File.join(PROJECT_ROOT_FOLDER, 'fastlane/env/user.env-example')
-    UI.user_error! "#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values."
+    UI.user_error!("#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values.")
   end
 end
 
@@ -86,35 +86,33 @@ platform :android do
     confirmation_message = <<-MESSAGE
 
       Code Freeze:
-      • New release branch from #{DEFAULT_BRANCH}: release/#{next_release_version}
-      • Current release version and build code: #{current_release_version} (#{current_build_code}).
-      • New release version and build code: #{first_beta_version} (#{next_build_code}).
-
-      Do you want to continue?
+      • New release branch from #{DEFAULT_BRANCH}: release/#{release_version_next}
+      • Current release version and build code: #{release_version_current} (#{build_code_current}).
+      • New release version and build code: #{beta_version_code_freeze} (#{build_code_next}).
 
     MESSAGE
 
-    # Ask user confirmation
-    UI.user_error!('Aborted by user request') unless options[:skip_confirm] || UI.confirm(confirmation_message)
+    UI.important(confirmation_message)
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     # Create the release branch
-    UI.message 'Creating release branch...'
-    Fastlane::Helper::GitHelper.create_branch("release/#{next_release_version}", from: DEFAULT_BRANCH)
+    UI.message('Creating release branch...')
+    Fastlane::Helper::GitHelper.create_branch("release/#{release_version_next}", from: DEFAULT_BRANCH)
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
-    UI.success "Done! New release branch is: #{git_branch}"
+    UI.success("Done! New release branch is: #{git_branch}")
 
     # Bump the version and build code
-    UI.message 'Bumping beta version and build code...'
+    UI.message('Bumping beta version and build code...')
     VERSION_FILE.write_version(
-      version_name: first_beta_version,
-      version_code: next_build_code
+      version_name: beta_version_code_freeze,
+      version_code: build_code_next
     )
-    UI.success "Done! New Beta Version: #{current_beta_version}. New Build Code: #{current_build_code}"
-
-    # Commit the version bump
     commit_version_bump
+    UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
 
-    new_version = current_release_version
+    new_version = release_version_current
 
     extract_release_notes_for_version(
       version: new_version,
@@ -134,11 +132,12 @@ platform :android do
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
-    new_version = current_release_version
+    new_version = release_version_current
 
     UI.important("Completing code freeze for: #{new_version}")
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
@@ -150,39 +149,40 @@ platform :android do
     # Check versions
     message = <<-MESSAGE
 
-      Current beta version: #{current_beta_version}
-      New beta version: #{next_beta_version}
+      Current beta version: #{beta_version_current}
+      New beta version: #{beta_version_next}
 
-      Current build code: #{current_build_code}
-      New build code: #{next_build_code}
+      Current build code: #{build_code_current}
+      New build code: #{build_code_next}
 
     MESSAGE
 
     # Check branch
-    unless !options[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: current_release_version)
-      UI.user_error!("Release branch for version #{current_release_version} doesn't exist.")
+    unless !options[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: release_version_current)
+      UI.user_error!("Release branch for version #{release_version_current} doesn't exist.")
     end
 
     # Check user override
     override_default_release_branch(options[:base_version]) unless options[:base_version].nil?
 
     UI.important(message)
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     # Bump the release version and build code
-    UI.message 'Bumping beta version and build code...'
+    UI.message('Bumping beta version and build code...')
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     VERSION_FILE.write_version(
-      version_name: next_beta_version,
-      version_code: next_build_code
+      version_name: beta_version_next,
+      version_code: build_code_next
     )
-    UI.success "Done! New Beta Version: #{current_beta_version}. New Build Code: #{current_build_code}"
-
     commit_version_bump
+    UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
+
     push_to_git_remote(tags: false)
 
-    trigger_release_build(branch_to_build: "release/#{current_release_version}")
+    trigger_release_build(branch_to_build: "release/#{release_version_current}")
   end
 
   # Sets the stage to start working on a hotfix
@@ -208,10 +208,9 @@ platform :android do
     # Check versions
     message = <<-MESSAGE
 
-      Current release version: #{current_release_version}
       New hotfix version: #{new_version}
 
-      Current build code: #{current_build_code}
+      Current build code: #{build_code_current}
       New build code: #{new_version_code}
 
       Branching from tag: #{previous_version}
@@ -219,38 +218,39 @@ platform :android do
     MESSAGE
 
     UI.important(message)
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     # Check tags
     UI.user_error!("The version `#{new_version}` tag already exists!") if git_tag_exists(tag: new_version)
     UI.user_error!("Version #{previous_version} is not tagged! A hotfix branch cannot be created.") unless git_tag_exists(tag: previous_version)
 
     # Create the hotfix branch
-    UI.message 'Creating hotfix branch...'
+    UI.message('Creating hotfix branch...')
     Fastlane::Helper::GitHelper.create_branch("release/#{new_version}", from: previous_version)
-    UI.success "Done! New hotfix branch is: #{git_branch}"
+    UI.success("Done! New hotfix branch is: #{git_branch}")
 
     # Bump the hotfix version and build code and write it to the `version.properties` file
-    UI.message 'Bumping hotfix version and build code...'
+    UI.message('Bumping hotfix version and build code...')
     VERSION_FILE.write_version(
       version_name: new_version,
       version_code: new_version_code
     )
-    UI.success "Done! New Release Version: #{current_release_version}. New Build Code: #{current_build_code}"
-
     commit_version_bump
+    UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
-  lane :finalize_hotfix_release do
+  lane :finalize_hotfix_release do |options|
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
-    UI.important("Triggering hotfix build for version: #{current_release_version}")
+    UI.important("Triggering hotfix build for version: #{release_version_current}")
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
-
-    trigger_release_build(branch_to_build: "release/#{current_release_version}")
+    trigger_release_build(branch_to_build: "release/#{release_version_current}")
   end
 
   # @param [String] branch_to_build (default: current git branch) The branch to build
@@ -274,16 +274,17 @@ platform :android do
   #
   desc 'Builds and uploads a new build to Google Play (without releasing it)'
   lane :build_and_upload_to_play_store do |options|
-    version = current_version_name
-    build_code = current_build_code
+    version = version_name_current
+    build_code = build_code_current
     is_beta = beta_version?(version)
     unless options[:skip_prechecks]
       # Match branch names that begin with `release/`
       ensure_git_branch(branch: '^release/') unless is_ci
 
-      UI.important("Building version #{current_version_name} (#{current_build_code}) for upload to Google Play Console")
-
-      UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+      UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
+      unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+        UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+      end
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
@@ -299,9 +300,10 @@ platform :android do
       aab_artifact_path = aab_artifact_path(app, version)
       UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
 
-      track = if app == APPS_AUTOMOTIVE
+      track = case app
+              when APPS_AUTOMOTIVE
                 is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
-              elsif app == APPS_WEAR
+              when APPS_WEAR
                 is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
               else
                 is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
@@ -327,24 +329,25 @@ platform :android do
   end
 
   lane :finalize_release do |options|
-    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if android_current_branch_is_hotfix(version_properties_path: VERSION_PROPERTIES_PATH)
+    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
-    UI.important("Finalizing release: #{current_release_version}")
-
-    UI.user_error!('Aborted by user request') if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+    UI.important("Finalizing release: #{release_version_current}")
+    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
+    end
 
     configure_apply(force: is_ci)
 
     # Bump the release version and build code
-    UI.message 'Bumping final release version and build code...'
+    UI.message('Bumping final release version and build code...')
     VERSION_FILE.write_version(
-      version_name: current_release_version,
-      version_code: next_build_code
+      version_name: release_version_current,
+      version_code: build_code_next
     )
     commit_version_bump
-    UI.success "Done! New Release Version: #{current_release_version}. New Build Code: #{current_build_code}"
+    UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
 
     # Download Localizations
     android_download_translations(
@@ -354,7 +357,7 @@ platform :android do
       lint_task: 'lintRelease'
     )
 
-    version = current_release_version
+    version = release_version_current
 
     # Wrap up
     removebranchprotection(repository: GH_REPOSITORY, branch: "release/#{version}")
@@ -468,12 +471,19 @@ platform :android do
     success = Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
     UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless success
 
-    UI.message "Checked out branch `#{git_branch}` as requested by user.\n"
+    UI.message("Checked out branch `#{git_branch}` as requested by user.\n")
   end
 
   #####################################################################################
   # Version Methods
   #####################################################################################
+
+  def release_is_hotfix?
+    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(version_name_current)
+    # Calculate and return whether the release version is a hotfix
+    VERSION_CALCULATOR.release_is_hotfix?(version: current_version)
+  end
 
   def commit_version_bump
     Fastlane::Helper::GitHelper.commit(
@@ -483,35 +493,35 @@ platform :android do
   end
 
   # Returns the current version name from `version.properties` without needing formatting or calculations
-  def current_version_name
+  def version_name_current
     VERSION_FILE.read_version_name
   end
 
   # Returns the release version of the app in the format `1.2` or `1.2.3` if it is a hotfix
   #
-  def current_release_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+  def release_version_current
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Return the formatted release version
     VERSION_FORMATTER.release_version(current_version)
   end
 
   #  Returns the next release version of the app in the format `1.2` or `1.2.3` if it is a hotfix
   #
-  def next_release_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+  def release_version_next
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate the next release version
-    next_release_version = VERSION_CALCULATOR.next_release_version(version: current_version)
+    release_version_next = VERSION_CALCULATOR.next_release_version(version: current_version)
     # Return the formatted release version
-    VERSION_FORMATTER.release_version(next_release_version)
+    VERSION_FORMATTER.release_version(release_version_next)
   end
 
   # Returns the beta version of the app in the format `1.2-rc-1`
   #
-  def current_beta_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+  def beta_version_current
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Return the formatted release version
     VERSION_FORMATTER.beta_version(current_version)
   end
@@ -519,45 +529,45 @@ platform :android do
   # Returns the beta version that is used by the code freeze
   # It first increments the minor number, which also resets the build number to 0
   # It then bumps the build number so the -rc-1 can be appended to the code freeze version
-  def first_beta_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+  def beta_version_code_freeze
+    # Read the current release version from the version.properties file and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate the next major version number
-    first_beta_version = VERSION_CALCULATOR.next_minor_version(version: current_version)
+    next_version = VERSION_CALCULATOR.next_release_version(version: current_version)
     # Calculate the next build number
-    first_beta_version = VERSION_CALCULATOR.next_build_number(version: first_beta_version)
+    beta_version_code_freeze = VERSION_CALCULATOR.next_build_number(version: next_version)
     # Return the formatted release version
-    VERSION_FORMATTER.beta_version(first_beta_version)
+    VERSION_FORMATTER.beta_version(beta_version_code_freeze)
   end
 
   # Returns the beta version of the app in the format `1.2-rc-1`
   #
-  def next_beta_version
-    # Read the current release version from the .xcconfig file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(VERSION_FILE.read_version_name)
+  def beta_version_next
+    # Read the current release version from `version.properties` and parse it into an AppVersion object
+    current_version = VERSION_FORMATTER.parse(version_name_current)
     # Calculate the next beta version
-    next_beta_version = VERSION_CALCULATOR.next_build_number(version: current_version)
+    beta_version_next = VERSION_CALCULATOR.next_build_number(version: current_version)
     # Return the formatted release version
-    VERSION_FORMATTER.beta_version(next_beta_version)
+    VERSION_FORMATTER.beta_version(beta_version_next)
   end
 
   # Returns the current build code of the app
   #
-  def current_build_code
-    # Read the current build code from the version.properties file into to a BuildCode object
-    current_build_code = VERSION_FILE.read_version_code
+  def build_code_current
+    # Read the current build code from `version.properties` into to a BuildCode object
+    build_code_current = VERSION_FILE.read_version_code
     # Return the formatted build code
-    BUILD_CODE_FORMATTER.build_code(build_code: current_build_code)
+    BUILD_CODE_FORMATTER.build_code(build_code: build_code_current)
   end
 
   # Returns the next build code of the app
   #
-  def next_build_code
-    # Read the current build code from the version.properties file into to a BuildCode object
-    current_build_code = VERSION_FILE.read_version_code
+  def build_code_next
+    # Read the current build code from `version.properties` into to a BuildCode object
+    build_code_current = VERSION_FILE.read_version_code
     # Calculate the next build code
-    next_build_code = BUILD_CODE_CALCULATOR.next_build_code(build_code: current_build_code)
+    build_code_next = BUILD_CODE_CALCULATOR.next_build_code(build_code: build_code_current)
     # Return the formatted build code
-    BUILD_CODE_FORMATTER.build_code(build_code: next_build_code)
+    BUILD_CODE_FORMATTER.build_code(build_code: build_code_next)
   end
 end

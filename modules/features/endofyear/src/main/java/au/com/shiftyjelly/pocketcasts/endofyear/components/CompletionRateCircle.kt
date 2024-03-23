@@ -90,7 +90,7 @@ private fun CompletionTextContent(
             fontSize = 14.sp,
             fontWeight = FontWeight.W600,
             textAlign = TextAlign.Center,
-            modifier = Modifier.offset(y = (-5).dp)
+            modifier = Modifier.offset(y = (-5).dp),
         )
     }
 }
@@ -105,7 +105,7 @@ private fun Modifier.drawCompletionCircle(
 
         val arcBrush = rainbowBrush(
             start = Offset(-0.65f * size.width, 0.5f * size.height),
-            end = Offset(1.49f * size.width, 0.5f * size.height)
+            end = Offset(1.49f * size.width, 0.5f * size.height),
         )
         val arcStroke = Stroke((size.height * 0.05f))
         val arcDiameterOffset = arcStroke.width / 2
@@ -117,7 +117,7 @@ private fun Modifier.drawCompletionCircle(
                 color = circleColor,
                 radius = circleRadius,
                 style = circleStroke,
-                blendMode = BlendMode.SrcOver
+                blendMode = BlendMode.SrcOver,
             )
             withTransform({ rotate(-90f) }) {
                 drawArc(
@@ -128,7 +128,7 @@ private fun Modifier.drawCompletionCircle(
                     topLeft = Offset(arcDiameterOffset, arcDiameterOffset),
                     size = Size(arcDimen, arcDimen),
                     style = arcStroke,
-                    blendMode = BlendMode.SrcOver
+                    blendMode = BlendMode.SrcOver,
                 )
             }
             drawContent()
@@ -172,7 +172,7 @@ fun CompletionRateCirclePreview(percent: Int) {
             subTitleColor = Color.Gray,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+                .height(300.dp),
         )
     }
 }

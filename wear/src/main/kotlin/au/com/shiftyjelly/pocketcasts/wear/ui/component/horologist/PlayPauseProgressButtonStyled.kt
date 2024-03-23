@@ -55,7 +55,7 @@ fun PlayPauseProgressButtonStyled(
                 modifier = Modifier.fillMaxSize(),
                 indicatorColor = progressColor,
                 trackColor = trackColor,
-                strokeWidth = progressStrokeWidth
+                strokeWidth = progressStrokeWidth,
             )
         } else if (trackPositionUiModel.showProgress) {
             CircularProgressIndicator(
@@ -63,7 +63,7 @@ fun PlayPauseProgressButtonStyled(
                 progress = progress,
                 indicatorColor = progressColor,
                 trackColor = trackColor,
-                strokeWidth = progressStrokeWidth
+                strokeWidth = progressStrokeWidth,
             )
         }
     }

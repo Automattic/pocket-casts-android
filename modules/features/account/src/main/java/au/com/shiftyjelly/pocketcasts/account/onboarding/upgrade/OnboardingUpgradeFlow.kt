@@ -22,16 +22,16 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
 
 private const val NULL_ACTIVITY_ERROR = "Activity is null when attempting subscription"
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingUpgradeFlow(
@@ -41,8 +41,8 @@ fun OnboardingUpgradeFlow(
     onBackPressed: () -> Unit,
     onNeedLogin: () -> Unit,
     onProceed: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
-
     val bottomSheetViewModel = hiltViewModel<OnboardingUpgradeBottomSheetViewModel>()
     val mainSheetViewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state = bottomSheetViewModel.state.collectAsState().value
@@ -54,29 +54,26 @@ fun OnboardingUpgradeFlow(
     val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.Upsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
 
-    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) {
+    if (userSignedInOrSignedUpInUpsellFlow) {
         activity?.let {
             LaunchedEffect(Unit) {
                 mainSheetViewModel.onClickSubscribe(
                     activity = activity,
                     flow = flow,
-                    onComplete = onProceed
+                    source = source,
+                    onComplete = onProceed,
                 )
             }
         }
     }
 
-    val startInExpandedState =
-        // Only start with expanded state if there are any subscriptions
+    val startSelectPaymentFrequencyInExpandedState =
+        // Only start with expanded state if there are any subscriptions and payment frequency selection is needed
         hasSubscriptions && (
-            // The hidden state is shown as the first screen in the Upsell flow, so when we return
-            // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            (!FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) ||
-                // User already indicated they want to upgrade, so go straight to purchase modal
-                flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
+            flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade
             )
-    val initialValue = if (startInExpandedState) {
+    val initialValue = if (startSelectPaymentFrequencyInExpandedState) {
         ModalBottomSheetValue.Expanded
     } else {
         ModalBottomSheetValue.Hidden
@@ -91,14 +88,14 @@ fun OnboardingUpgradeFlow(
             ModalBottomSheetValue.Hidden -> {
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
                 if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
-                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
+                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow, source)
                     if (flow is OnboardingFlow.PlusAccountUpgrade) {
                         mainSheetViewModel.onDismiss(flow, source)
                         onBackPressed()
                     }
                 }
             }
-            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
+            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow, source)
             else -> {}
         }
     }
@@ -122,14 +119,6 @@ fun OnboardingUpgradeFlow(
                 OnboardingUpgradeFeaturesPage(
                     flow = flow,
                     source = source,
-                    onUpgradePressed = {
-                        if (isLoggedIn) {
-                            coroutineScope.launch { sheetState.show() }
-                        } else {
-                            onNeedLogin()
-                        }
-                    },
-                    onNotNowPressed = onProceed,
                     onBackPressed = onBackPressed,
                     onClickSubscribe = {
                         if (activity != null) {
@@ -137,6 +126,7 @@ fun OnboardingUpgradeFlow(
                                 mainSheetViewModel.onClickSubscribe(
                                     activity = activity,
                                     flow = flow,
+                                    source = source,
                                     onComplete = onProceed,
                                 )
                             } else {
@@ -146,7 +136,9 @@ fun OnboardingUpgradeFlow(
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                         }
                     },
+                    onNotNowPressed = onProceed,
                     canUpgrade = hasSubscriptions,
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
         },
@@ -157,12 +149,13 @@ fun OnboardingUpgradeFlow(
                         bottomSheetViewModel.onClickSubscribe(
                             activity = activity,
                             flow = flow,
+                            source = source,
                             onComplete = onProceed,
                         )
                     } else {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                     }
-                }
+                },
             )
         },
     )

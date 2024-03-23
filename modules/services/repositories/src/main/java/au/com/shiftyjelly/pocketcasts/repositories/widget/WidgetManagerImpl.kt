@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import android.widget.RemoteViews
@@ -15,32 +16,44 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class WidgetManagerImpl @Inject constructor(
     private val settings: Settings,
     private val podcastManager: PodcastManager,
-    @ApplicationContext private val context: Context
-) : WidgetManager {
+    @ApplicationContext private val context: Context,
+) : WidgetManager, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext get() = Dispatchers.IO
+
+    private var remoteViewsLayoutId: Int = getRemoteViewsLayoutId()
+
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = true, placeholderType = PlaceholderType.Small).smallSize()
 
     override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?) {
         when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive,
-            AppPlatform.WearOs -> { /* do nothing */ }
+            AppPlatform.WearOs,
+            -> { /* do nothing */ }
             AppPlatform.Phone -> {
                 try {
                     val appWidgetManager = AppWidgetManager.getInstance(context)
 
-                    val views = RemoteViews(context.packageName, R.layout.widget)
+                    val views = RemoteViews(context.packageName, remoteViewsLayoutId)
                     val widgetName = ComponentName(context, PodcastWidget::class.java)
                     if (playingEpisode == null) {
                         showPlayingControls(false, views)
@@ -57,6 +70,37 @@ class WidgetManagerImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun updateWidgetFromSettings(playbackManager: PlaybackManager?) {
+        try {
+            /* We cannot apply a theme dynamically to an app widget.
+            As a workaround, multiple layouts are provided, and the correct theme/layout is picked
+            when remote views layout needs to be updated.
+            https://stackoverflow.com/a/4501902/193545 */
+            remoteViewsLayoutId = getRemoteViewsLayoutId()
+
+            val views = RemoteViews(context.packageName, remoteViewsLayoutId)
+            val widgetName = ComponentName(context, PodcastWidget::class.java)
+
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            appWidgetManager.updateAppWidget(widgetName, views)
+
+            updateWidgetFromPlaybackState(playbackManager)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    override fun updateWidgetRssArtwork(playbackManager: PlaybackManager) {
+        val currentEpisode = playbackManager.getCurrentEpisode() ?: return
+        val target = RemoteViewsTarget(
+            context,
+            ComponentName(context, PodcastWidget::class.java),
+            RemoteViews(context.packageName, remoteViewsLayoutId),
+            R.id.widget_artwork,
+        )
+        imageRequestFactory.create(currentEpisode, settings.useRssArtwork.value).loadInto(target)
     }
 
     override fun updateWidgetFromPlaybackState(playbackManager: PlaybackManager?) {
@@ -86,7 +130,7 @@ class WidgetManagerImpl @Inject constructor(
         for (i in widgetIds.indices) {
             val widgetId = widgetIds[i]
 
-            val views = RemoteViews(context.packageName, R.layout.widget)
+            val views = RemoteViews(context.packageName, remoteViewsLayoutId)
             updateOnClicks(views, context)
             updateSkipAmounts(views, settings)
             setupView(views, isPlaying, playbackManager, widgetName, context)
@@ -154,14 +198,9 @@ class WidgetManagerImpl @Inject constructor(
             context,
             widgetName,
             views,
-            R.id.widget_artwork
+            R.id.widget_artwork,
         )
-        val imageLoader = PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList())
-        if (playingEpisode is UserEpisode) {
-            imageLoader.smallPlaceholder().loadForTarget(playingEpisode, 128, target)
-        } else if (podcast != null) {
-            imageLoader.smallPlaceholder().loadForTarget(podcast, 128, target)
-        }
+        imageRequestFactory.create(playingEpisode, settings.useRssArtwork.value).loadInto(target)
     }
 
     private fun showPlayButton(playing: Boolean, views: RemoteViews) {
@@ -185,11 +224,27 @@ class WidgetManagerImpl @Inject constructor(
         return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE)
     }
 
-    private fun getSkipBackIntent(): PendingIntent? {
-        return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-    }
+    private fun getSkipBackIntent(): PendingIntent? = PendingIntent.getBroadcast(
+        context,
+        PodcastWidget.SKIP_BACKWARD_REQUEST_CODE,
+        Intent(context, PodcastWidget::class.java).apply {
+            action = PodcastWidget.SKIP_BACKWARD_ACTION
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+    )
 
-    private fun getSkipForwardIntent(): PendingIntent? {
-        return MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
+    private fun getSkipForwardIntent(): PendingIntent? = PendingIntent.getBroadcast(
+        context,
+        PodcastWidget.SKIP_FORWARD_REQUEST_CODE,
+        Intent(context, PodcastWidget::class.java).apply {
+            action = PodcastWidget.SKIP_FORWARD_ACTION
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+    )
+
+    private fun getRemoteViewsLayoutId() = if (settings.useDynamicColorsForWidget.value) {
+        R.layout.widget_dynamic_colors_theme
+    } else {
+        R.layout.widget_default_theme
     }
 }

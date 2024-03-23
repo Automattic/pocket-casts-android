@@ -18,8 +18,8 @@ import java.util.Date
     indices = [
         Index(name = "episode_last_download_attempt_date", value = arrayOf("last_download_attempt_date")),
         Index(name = "episode_podcast_id", value = arrayOf("podcast_id")),
-        Index(name = "episode_published_date", value = arrayOf("published_date"))
-    ]
+        Index(name = "episode_published_date", value = arrayOf("published_date")),
+    ],
 )
 data class PodcastEpisode(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") override var uuid: String,
@@ -59,6 +59,8 @@ data class PodcastEpisode(
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
     @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null,
     @ColumnInfo(name = "image_url") var imageUrl: String? = null,
+    @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: ChapterIndices = ChapterIndices(),
+    @ColumnInfo(name = "deselected_chapters_modified") override var deselectedChaptersModified: Date? = null,
 ) : BaseEpisode, Serializable {
 
     sealed class EpisodeType {
@@ -139,6 +141,7 @@ data class PodcastEpisode(
     // temporary variables
     @Ignore
     override var playing: Boolean = false
+
     @Ignore
     var hasBookmark: Boolean = false
 

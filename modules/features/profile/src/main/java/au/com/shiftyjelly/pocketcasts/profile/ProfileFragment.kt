@@ -47,10 +47,10 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -59,8 +59,11 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class ProfileFragment : BaseFragment() {
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
@@ -72,7 +75,7 @@ class ProfileFragment : BaseFragment() {
         SettingsAdapter.Item(LR.string.profile_navigation_files, R.drawable.ic_file, CloudFilesFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_starred, R.drawable.ic_starred, ProfileEpisodeListFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java),
-        SettingsAdapter.Item(LR.string.settings_title_help, IR.drawable.ic_help, HelpFragment::class.java)
+        SettingsAdapter.Item(LR.string.settings_title_help, IR.drawable.ic_help, HelpFragment::class.java),
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -209,7 +212,7 @@ class ProfileFragment : BaseFragment() {
         upgradeLayout.root.setOnClickListener {
             OnboardingLauncher.openOnboardingFlow(
                 activity = activity,
-                onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE)
+                onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE),
             )
         }
 
@@ -244,7 +247,7 @@ class ProfileFragment : BaseFragment() {
                                 settings.setEndOfYearShowModal(false)
                             }
                             (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
-                        }
+                        },
                     )
                 }
             }
@@ -280,9 +283,9 @@ class ProfileFragment : BaseFragment() {
                         lblRefreshStatus,
                         ColorStateList.valueOf(
                             context.getThemeColor(
-                                UR.attr.secondary_icon_01
-                            )
-                        )
+                                UR.attr.secondary_icon_01,
+                            ),
+                        ),
                     )
                     lblRefreshStatus.setOnClickListener {
                         AlertDialog.Builder(context)
@@ -322,27 +325,27 @@ class ProfileFragment : BaseFragment() {
             return TimeAndUnit(
                 value = days.toString(),
                 savedStringId = if (days == 1L) LR.string.profile_stats_day_saved else LR.string.profile_stats_days_saved,
-                listenedStringId = if (days == 1L) LR.string.profile_stats_day_listened else LR.string.profile_stats_days_listened
+                listenedStringId = if (days == 1L) LR.string.profile_stats_day_listened else LR.string.profile_stats_days_listened,
             )
         }
         if (hours > 0) {
             return TimeAndUnit(
                 value = hours.toString(),
                 savedStringId = if (hours == 1L) LR.string.profile_stats_hour_saved else LR.string.profile_stats_hours_saved,
-                listenedStringId = if (hours == 1L) LR.string.profile_stats_hour_listened else LR.string.profile_stats_hours_listened
+                listenedStringId = if (hours == 1L) LR.string.profile_stats_hour_listened else LR.string.profile_stats_hours_listened,
             )
         }
         if (mins > 0 && days < 1) {
             return TimeAndUnit(
                 value = mins.toString(),
                 savedStringId = if (mins == 1L) LR.string.profile_stats_minute_saved else LR.string.profile_stats_minutes_saved,
-                listenedStringId = if (mins == 1L) LR.string.profile_stats_minute_listened else LR.string.profile_stats_minutes_listened
+                listenedStringId = if (mins == 1L) LR.string.profile_stats_minute_listened else LR.string.profile_stats_minutes_listened,
             )
         }
         return TimeAndUnit(
             value = secs.toString(),
             savedStringId = if (secs == 1L) LR.string.profile_stats_second_saved else LR.string.profile_stats_seconds_saved,
-            listenedStringId = if (secs == 1L) LR.string.profile_stats_second_listened else LR.string.profile_stats_seconds_listened
+            listenedStringId = if (secs == 1L) LR.string.profile_stats_second_listened else LR.string.profile_stats_seconds_listened,
         )
     }
 

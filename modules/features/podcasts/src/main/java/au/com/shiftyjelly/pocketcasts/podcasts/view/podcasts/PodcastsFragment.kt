@@ -66,14 +66,16 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         fun newInstance(folderUuid: String): PodcastsFragment {
             return PodcastsFragment().apply {
                 arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid
+                    ARG_FOLDER_UUID to folderUuid,
                 )
             }
         }
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
@@ -96,8 +98,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
-
-        binding.lifecycleOwner = viewLifecycleOwner
 
         if (adapter == null) {
             adapter = FolderAdapter(this, settings, context, theme)
@@ -130,7 +130,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 toolbar = toolbar,
                 title = folder?.name ?: getString(LR.string.podcasts),
                 toolbarColors = toolbarColors,
-                navigationIcon = navigationIcon
+                navigationIcon = navigationIcon,
             )
 
             toolbar.menu.findItem(R.id.folders_locked)?.run {

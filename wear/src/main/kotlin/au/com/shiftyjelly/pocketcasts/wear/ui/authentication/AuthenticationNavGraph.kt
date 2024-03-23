@@ -21,7 +21,7 @@ fun NavGraphBuilder.authenticationNavGraph(
     googleSignInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
 ) {
     navigation(startDestination = AuthenticationNavRoutes.loginScreen, route = authenticationSubGraph) {
-
+        @Suppress("DEPRECATION")
         scrollable(AuthenticationNavRoutes.loginScreen) {
             LoginScreen(
                 columnState = it.columnState,
@@ -34,6 +34,7 @@ fun NavGraphBuilder.authenticationNavGraph(
             )
         }
 
+        @Suppress("DEPRECATION")
         scrollable(AuthenticationNavRoutes.loginWithPhone) {
             LoginWithPhoneScreen(
                 columnState = it.columnState,
@@ -41,6 +42,7 @@ fun NavGraphBuilder.authenticationNavGraph(
             )
         }
 
+        @Suppress("DEPRECATION")
         composable(AuthenticationNavRoutes.loginWithGoogle) {
             LoginWithGoogleScreen(
                 signInSuccessScreen = googleSignInSuccessScreen,

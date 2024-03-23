@@ -2,10 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 
 private val paidSubscriptionPlatforms = listOf(SubscriptionPlatform.ANDROID, SubscriptionPlatform.IOS, SubscriptionPlatform.WEB)
@@ -21,21 +18,16 @@ sealed class SignInState {
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Free
 
     val isSignedInAsPlus: Boolean
-        get() = if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
+        get() =
             this is SignedIn &&
                 this.subscriptionStatus is SubscriptionStatus.Paid &&
                 this.subscriptionStatus.tier == SubscriptionTier.PLUS
-        } else {
-            this is SignedIn &&
-                this.subscriptionStatus is SubscriptionStatus.Paid &&
-                this.subscriptionStatus.type == SubscriptionType.PLUS
-        }
 
     val isSignedInAsPatron: Boolean
-        get() = FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) &&
+        get() =
             this is SignedIn &&
-            this.subscriptionStatus is SubscriptionStatus.Paid &&
-            this.subscriptionStatus.tier == SubscriptionTier.PATRON
+                this.subscriptionStatus is SubscriptionStatus.Paid &&
+                this.subscriptionStatus.tier == SubscriptionTier.PATRON
 
     val isSignedInAsPlusOrPatron: Boolean
         get() = isSignedInAsPlus || isSignedInAsPatron

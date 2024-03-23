@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPromotionBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPromotion
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import java.util.UUID
 
@@ -36,7 +37,7 @@ class PlainListAdapter(
     val onPromotionClick: (DiscoverPromotion) -> Unit,
     val onEpisodeClick: (DiscoverEpisode) -> Unit,
     val onEpisodePlayClick: (DiscoverEpisode) -> Unit,
-    val onEpisodeStopClick: () -> Unit
+    val onEpisodeStopClick: () -> Unit,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(differ) {
 
     var listTintColor: Int? = null
@@ -92,13 +93,12 @@ class PlainListAdapter(
     }
 
     inner class PromotionViewHolder(private val binding: RowPromotionBinding) : RecyclerView.ViewHolder(binding.root) {
-
-        private val imageLoader = PodcastImageLoaderThemed(itemView.context)
+        private val imageRequestFactory = PocketCastsImageRequestFactory(itemView.context).smallSize().themed()
 
         fun bind(discoverPromotion: DiscoverPromotion) {
             binding.lblTitle.text = discoverPromotion.title
             binding.lblDescription.text = discoverPromotion.description
-            imageLoader.loadSmallImage(discoverPromotion.podcastUuid).into(binding.imageView)
+            imageRequestFactory.createForPodcast(discoverPromotion.podcastUuid).loadInto(binding.imageView)
 
             binding.btnSubscribe.updateSubscribeButtonIcon(subscribed = discoverPromotion.isSubscribed)
 

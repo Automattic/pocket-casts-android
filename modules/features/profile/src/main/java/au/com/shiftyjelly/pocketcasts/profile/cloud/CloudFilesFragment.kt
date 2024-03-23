@@ -26,20 +26,19 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBinding
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -51,25 +50,33 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+
     @Inject lateinit var castManager: CastManager
+
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     @Inject lateinit var bookmarkManager: BookmarkManager
 
-    private lateinit var imageLoader: PodcastImageLoader
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     lateinit var itemTouchHelper: EpisodeItemTouchHelper
 
     private val viewModel: CloudFilesViewModel by viewModels()
@@ -86,7 +93,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             settings = settings,
             onRowClick = onRowClick,
             playButtonListener = playButtonListener,
-            imageLoader = imageLoader,
+            imageRequestFactory = imageRequestFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -96,7 +103,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
-            )
+            ),
         )
     }
 
@@ -104,7 +111,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     // when the adapter's constructor includes references to the adapter
     private fun lazyNotifyItemChanged(
         @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
-        index: Int
+        index: Int,
     ) {
         val recyclerView = binding?.recyclerView
         recyclerView?.findViewHolderForAdapterPosition(index)?.let {
@@ -134,7 +141,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        AutomaticUpNextSource.mostRecentList = AutomaticUpNextSource.Companion.Predefined.files
+        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, needsSync = false)
     }
 
     override fun onPause() {
@@ -145,9 +152,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageLoader = PodcastImageLoaderThemed(context).apply {
-            radiusPx = 4.dpToPx(context)
-        }.smallPlaceholder()
+        imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
 
         playButtonListener.source = SourceView.FILES
         multiSelectHelper.source = SourceView.FILES
@@ -166,7 +171,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             activity = activity,
             theme = theme,
             chromeCastButton = Shown(chromeCastAnalytics),
-            menu = R.menu.menu_cloudfiles
+            menu = R.menu.menu_cloudfiles,
         )
         binding?.toolbar?.setOnMenuItemClickListener(this)
 
@@ -224,7 +229,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 binding.layoutUsage.isVisible = accountOptional.isPresent()
                 binding.layoutUsageLocked.isVisible = !binding.layoutUsage.isVisible
-            }
+            },
         )
 
         viewModel.refreshFiles(userInitiated = false)
@@ -262,7 +267,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
                     adapter.notifyDataSetChanged()
@@ -271,7 +276,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiSelectSelectNone() {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     multiSelectHelper.deselectAllInList(episodes)
                     adapter.notifyDataSetChanged()
@@ -280,7 +285,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -293,7 +298,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.cloudFilesList.value
+                val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -306,7 +311,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
-                val cloudFiles = viewModel.cloudFilesList.value
+                val cloudFiles = viewModel.uiState.value?.userEpisodes
                 if (cloudFiles != null) {
                     val startIndex = cloudFiles.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -318,7 +323,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
-                val cloudFiles = viewModel.cloudFilesList.value
+                val cloudFiles = viewModel.uiState.value?.userEpisodes
                 if (cloudFiles != null) {
                     val startIndex = cloudFiles.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -331,7 +336,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.source = SourceView.FILES
-        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
+        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity())
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -348,18 +353,20 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun showOptionsDialog() {
         val dialog = OptionsDialog()
             .addTextOption(
-                titleId = LR.string.sort_by, imageId = IR.drawable.ic_sort,
+                titleId = LR.string.sort_by,
+                imageId = IR.drawable.ic_sort,
                 click = {
                     analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
                     showSortOptions()
-                }
+                },
             )
             .addTextOption(
-                titleId = LR.string.profile_cloud_settings, imageId = IR.drawable.ic_profile_settings,
+                titleId = LR.string.profile_cloud_settings,
+                imageId = IR.drawable.ic_profile_settings,
                 click = {
                     analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to FILE_SETTINGS))
                     showCloudSettings()
-                }
+                },
             )
         dialog.show(parentFragmentManager, "cloud_options")
     }
@@ -376,34 +383,22 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 titleId = LR.string.episode_sort_newest_to_oldest,
                 click = {
                     viewModel.changeSort(Settings.CloudSortOrder.NEWEST_OLDEST)
-                    analyticsTracker.track(
-                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.NEWEST_TO_OLDEST.analyticsValue)
-                    )
                 },
-                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.NEWEST_OLDEST)
+                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.NEWEST_OLDEST),
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_oldest_to_newest,
                 click = {
                     viewModel.changeSort(Settings.CloudSortOrder.OLDEST_NEWEST)
-                    analyticsTracker.track(
-                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.OLDEST_TO_NEWEST.analyticsValue)
-                    )
                 },
-                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.OLDEST_NEWEST)
+                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.OLDEST_NEWEST),
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_sort_by_title,
                 click = {
                     viewModel.changeSort(Settings.CloudSortOrder.A_TO_Z)
-                    analyticsTracker.track(
-                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
-                        mapOf(SORT_BY to SortOrder.TITLE_A_TO_Z.analyticsValue)
-                    )
                 },
-                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z)
+                checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z),
             )
         dialog.show(parentFragmentManager, "sort_options")
     }
@@ -415,12 +410,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         } else {
             false
         }
-    }
-
-    enum class SortOrder(val analyticsValue: String) {
-        NEWEST_TO_OLDEST("newest_to_oldest"),
-        OLDEST_TO_NEWEST("oldest_to_newest"),
-        TITLE_A_TO_Z("title_a_to_z")
     }
 
     companion object {
