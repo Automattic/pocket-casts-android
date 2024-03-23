@@ -8,10 +8,11 @@ Affects #940
 3. Select the Sleep Timer icon in the icon list
 
 ## Screenshots or Screencast 
-![Screenshot_20240322_061005_Pocket Debug](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/da885589-6782-4bf8-98db-09f5732ddad4)
-![Screenshot_20240322_06100![Screenshot_20240322_061022_Pocket Debug](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/f3bc01a8-9771-4408-b063-9295b77b4848)
-![Screenshot_20240322_061008_Pocket Debug](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/b70cee1f-5bf6-498c-a2f8-ad733a4124e0)
-0_Pocket Debug](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/953d13cc-67a1-49d7-87e5-ce870f8e6017)
+![sleep-timer-episodes-screenshot4](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/6f481c57-8992-41a7-8488-13ccc2f8b371)
+![sleep-timer-episodes-screenshot3](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/63b825b5-9cc8-4664-b22d-c6f813b4309a)
+![sleep-timer-episodes-screenshot2](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/6cdfe347-2cc3-434b-bf73-135656717cbe)
+![sleep-timer-episodes-screenshot1](https://github.com/DaveHurley7/pocket-casts-android/assets/7275950/f5536395-1702-4129-bc7b-b3314ea938a4)
+
 
 
 ## Checklist
