@@ -1,13 +1,11 @@
 ## Description
-<!-- Please include a summary of what this PR is changing and why these changes are needed. -->
-
-Fixes # <!-- issue number, if applicable -->
+Adds into the Sleep Timer the feature of sleeping by episodes
+Fixes #940
 
 ## Testing Instructions
-<!-- Please include step by step instructions on how to test this PR. -->
-<!-- 1. Tap on the Filters tab -->
-<!-- 2. Tap on a filter -->
-<!-- 3. etc. -->
+1. Begin any podcast episode
+2. Open the miniplayer to expand it
+3. Select the Sleep Timer icon in the icon list
 
 ## Screenshots or Screencast 
 <!-- if applicable -->

@@ -1,3 +1,10 @@
+7.62
+----
+*   New Features:
+    *   Ability to use the sleep timer by episodes ()
+*   Updates:
+    *   Layout of minute preset timers changed from a vertical design to a horizontal design ()
+
 7.61
 -----
 *   New Features
