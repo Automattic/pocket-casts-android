@@ -1,9 +1,9 @@
 7.62
 ----
 *   New Features:
-    *   Ability to use the sleep timer by episodes ()
+    *   Ability to use the sleep timer by episodes ([#1970](https://github.com/Automattic/pocket-casts-android/pull/1970))
 *   Updates:
-    *   Layout of minute preset timers changed from a vertical design to a horizontal design ()
+    *   Layout of minute preset timers changed from a vertical design to a horizontal design ([#1970](https://github.com/Automattic/pocket-casts-android/pull/1970))
 
 7.61
 -----
