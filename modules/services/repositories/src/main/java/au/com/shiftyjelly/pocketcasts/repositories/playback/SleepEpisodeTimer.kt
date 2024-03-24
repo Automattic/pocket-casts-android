@@ -67,8 +67,8 @@ class SleepEpisodeTimer {
 
         fun untilSleepMessage(context: Context): String {
             return when (episodesUntilSleep) {
-                1 -> context.resources.getString(LR.string.player_sleep_end_of_episode)
-                2 -> context.resources.getString(LR.string.player_sleep_end_of_next_episode)
+                1 -> context.resources.getString(LR.string.player_sleep_end_after_current_episode)
+                2 -> context.resources.getString(LR.string.player_sleep_end_after_next_episode)
                 else -> context.resources.getString(LR.string.player_sleep_after_n_episodes, episodesUntilSleep)
             }
         }
