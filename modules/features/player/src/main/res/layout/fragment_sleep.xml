@@ -559,7 +559,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
                 android:minWidth="172dp"
-                android:text="@string/player_sleep_end_of_current_episode"
+                android:text="@string/player_sleep_end_after_current_episode"
                 android:textColor="?attr/player_contrast_01"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"

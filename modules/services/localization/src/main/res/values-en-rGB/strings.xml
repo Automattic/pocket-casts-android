@@ -1378,8 +1378,8 @@ Language: en_GB
     <string name="player_tab_playing">Playing</string>
     <string name="player_sleep_when_episode_ends">Sleeping when episode ends</string>
     <string name="player_sleep_timer">Sleep timer</string>
-    <string name="player_sleep_after_n_episodes">End in %d episodes</string>
-    <string name="player_sleep_end_of_next_episode">End of next episode</string>
+    <string name="player_sleep_after_n_episodes">End after %d episodes</string>
+    <string name="player_sleep_end_after_next_episode">End after next episode</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
     <string name="player_sleep_custom_plus">Custom plus</string>
