@@ -80,10 +80,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
         }
         if (list is DiscoverCategory) {
-            viewModel.currentRegionCode?.let {
-                FirebaseAnalyticsTracker.openedCategory(list.id, it)
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_SHOWN, mapOf(NAME_KEY to list.name, REGION_KEY to it, ID_KEY to list.id))
-            }
+            trackCategoryImpression(list)
         }
 
         if (list.expandedStyle is ExpandedStyle.GridList) {
@@ -126,6 +123,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
+        trackCategoryImpression(selectedCategory.discoverCategory)
+
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
@@ -279,7 +278,19 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             adapter?.submitList(updatedList)
         }
     }
-
+    private fun trackCategoryImpression(category: DiscoverCategory) {
+        viewModel.currentRegionCode?.let {
+            FirebaseAnalyticsTracker.openedCategory(category.id, it)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_CATEGORY_SHOWN,
+                mapOf(
+                    NAME_KEY to category.name,
+                    REGION_KEY to it,
+                    ID_KEY to category.id,
+                ),
+            )
+        }
+    }
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
