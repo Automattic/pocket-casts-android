@@ -36,14 +36,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -107,7 +107,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     @Inject lateinit var bookmarkManager: BookmarkManager
-    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
+    private lateinit var imageLoader: PodcastImageLoader
 
     private val adapter: EpisodeListAdapter by lazy {
         EpisodeListAdapter(
@@ -118,7 +118,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             settings = settings,
             onRowClick = this::onRowClick,
             playButtonListener = playButtonListener,
-            imageRequestFactory = imageRequestFactory,
+            imageLoader = imageLoader,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -148,7 +148,9 @@ class FilterEpisodeListFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageRequestFactory = PocketCastsImageRequestFactory(context).themed().smallSize()
+        imageLoader = PodcastImageLoaderThemed(context).apply {
+            radiusPx = 4.dpToPx(context)
+        }.smallPlaceholder()
 
         playButtonListener.source = SourceView.FILTERS
     }

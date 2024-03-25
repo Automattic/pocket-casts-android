@@ -26,8 +26,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
@@ -52,14 +52,13 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class EpisodeViewHolder(
+class EpisodeViewHolder constructor(
     val binding: AdapterEpisodeBinding,
     val viewMode: ViewMode,
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageRequestFactory: PocketCastsImageRequestFactory,
-    val settings: Settings,
+    val imageLoader: PodcastImageLoader? = null,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
@@ -289,8 +288,8 @@ class EpisodeViewHolder(
 
         val artworkVisible = viewMode is ViewMode.Artwork
         imgArtwork.isVisible = artworkVisible
-        if (!sameEpisode && artworkVisible) {
-            imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(imgArtwork)
+        if (!sameEpisode && artworkVisible && imageLoader != null) {
+            imageLoader.loadPodcastImageForEpisode(episode).into(imgArtwork)
         }
 
         val transition = AutoTransition()

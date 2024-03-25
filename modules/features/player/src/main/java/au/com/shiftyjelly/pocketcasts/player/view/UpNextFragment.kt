@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -189,9 +190,11 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        val imageLoader = PodcastImageLoaderThemed(context)
         multiSelectHelper.source = SourceView.UP_NEXT
         adapter = UpNextAdapter(
             context = context,
+            imageLoader = imageLoader,
             episodeManager = episodeManager,
             listener = this,
             multiSelectHelper = multiSelectHelper,

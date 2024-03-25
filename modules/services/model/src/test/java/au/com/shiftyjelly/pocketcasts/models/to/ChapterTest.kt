@@ -17,8 +17,8 @@ class ChapterTest {
         assertEquals(0f, chapter.calculateProgress(1.milliseconds), 0.001f)
         assertEquals(0f, chapter.calculateProgress(5000.milliseconds), 0.001f)
         assertEquals(0.5f, chapter.calculateProgress(7500.milliseconds), 0.001f)
-        assertEquals(1f, chapter.calculateProgress(9999.milliseconds), 0.001f)
-        assertEquals(0f, chapter.calculateProgress(10000.milliseconds), 0.001f)
+        assertEquals(1f, chapter.calculateProgress(10000.milliseconds), 0.001f)
+        assertEquals(0f, chapter.calculateProgress(11000.milliseconds), 0.001f)
     }
 
     @Test
@@ -34,6 +34,6 @@ class ChapterTest {
         assertEquals("59s", chapter.remainingTime(11000.milliseconds))
         assertEquals("2s", chapter.remainingTime(68000.milliseconds))
         assertEquals("1s", chapter.remainingTime(69000.milliseconds))
-        assertEquals("0s", chapter.remainingTime(69999.milliseconds))
+        assertEquals("0s", chapter.remainingTime(70000.milliseconds))
     }
 }

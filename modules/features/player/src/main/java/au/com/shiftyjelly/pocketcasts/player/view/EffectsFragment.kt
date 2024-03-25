@@ -20,12 +20,11 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentEffectsBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
@@ -49,7 +48,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     override val statusBarColor: StatusBarColor? = null
 
     private val viewModel: PlayerViewModel by activityViewModels()
-    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
+    private lateinit var imageLoader: PodcastImageLoaderThemed
     private var binding: FragmentEffectsBinding? = null
     private val trimToggleGroupButtonIds = arrayOf(R.id.trimLow, R.id.trimMedium, R.id.trimHigh)
     private var updatedSpeed: Double? = null
@@ -57,7 +56,9 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).themed()
+        imageLoader = PodcastImageLoaderThemed(context).apply {
+            radiusPx = 4.dpToPx(context)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -92,7 +93,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         binding.globalEffectsCard.isVisible = podcast.overrideGlobalEffects
 
-        imageRequestFactory.create(podcast).loadInto(binding.podcastEffectsImage)
+        imageLoader.load(podcast).into(binding.podcastEffectsImage)
 
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
 

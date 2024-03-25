@@ -273,16 +273,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         viewModel.searchQueryUpdated(searchQuery)
     }
 
-    private val sortEpisodesTitleAZ = {
-        adapter?.signalLargeDiff()
-        viewModel.updateEpisodesSortType(EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
-    }
-
-    private val sortEpisodesTitleZA = {
-        adapter?.signalLargeDiff()
-        viewModel.updateEpisodesSortType(EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC)
-    }
-
     private val sortEpisodesNewestToOldest = {
         adapter?.signalLargeDiff()
         viewModel.updateEpisodesSortType(EpisodesSortType.EPISODES_SORT_BY_DATE_DESC)
@@ -305,16 +295,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private val showEpisodeSortOptions = {
         val dialog = OptionsDialog()
-            .addCheckedOption(
-                titleId = LR.string.episode_sort_title_a_z,
-                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
-                click = sortEpisodesTitleAZ,
-            )
-            .addCheckedOption(
-                titleId = LR.string.episode_sort_title_z_a,
-                checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC,
-                click = sortEpisodesTitleZA,
-            )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_newest_to_oldest,
                 checked = viewModel.podcast.value?.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC,
@@ -422,13 +402,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun selectedSortOrderStringId(): Int {
         return when (viewModel.podcast.value?.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> LR.string.episode_sort_title_a_z
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> LR.string.episode_sort_title_z_a
             EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> LR.string.episode_sort_oldest_to_newest
             EpisodesSortType.EPISODES_SORT_BY_DATE_DESC -> LR.string.episode_sort_newest_to_oldest
             EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> LR.string.episode_sort_short_to_long
             EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> LR.string.episode_sort_long_to_short
-            null -> LR.string.empty
+            else -> LR.string.empty
         }
     }
 
@@ -615,7 +593,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         playButtonListener.source = SourceView.PODCAST_SCREEN
         if (adapter == null) {
             adapter = PodcastAdapter(
-                context = requireContext(),
                 downloadManager = downloadManager,
                 playbackManager = playbackManager,
                 upNextQueue = upNextQueue,
@@ -835,7 +812,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         PodcastTab.BOOKMARKS -> {
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
-                                episodes = state.episodes,
                                 searchTerm = state.searchBookmarkTerm,
                                 context = requireContext(),
                             )

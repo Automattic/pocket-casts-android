@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -158,8 +157,7 @@ class BookmarksViewModel
                     isMultiSelectingFlow,
                     selectedListFlow,
                     settings.cachedSubscriptionStatus.flow,
-                    settings.useRssArtwork.flow,
-                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useRssArtwork ->
+                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus ->
                     val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
                     _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
                         UiState.Upsell(sourceView)
@@ -168,9 +166,7 @@ class BookmarksViewModel
                     } else {
                         UiState.Loaded(
                             bookmarks = bookmarks,
-                            episode = episode,
                             isMultiSelecting = isMultiSelecting,
-                            useRssArtwork = useRssArtwork,
                             isSelected = { selectedBookmark ->
                                 selectedList.map { bookmark -> bookmark.uuid }
                                     .contains(selectedBookmark.uuid)
@@ -291,9 +287,7 @@ class BookmarksViewModel
         object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
-            val episode: BaseEpisode,
             val isMultiSelecting: Boolean,
-            val useRssArtwork: Boolean,
             val isSelected: (Bookmark) -> Boolean,
             val onRowClick: (Bookmark) -> Unit,
             val sourceView: SourceView,

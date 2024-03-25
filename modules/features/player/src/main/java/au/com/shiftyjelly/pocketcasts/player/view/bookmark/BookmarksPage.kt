@@ -29,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
@@ -174,7 +173,6 @@ private fun BookmarksView(
         items(state.bookmarks, key = { it }) { bookmark ->
             BookmarkRow(
                 bookmark = bookmark,
-                episode = state.episode,
                 isMultiSelecting = { state.isMultiSelecting },
                 isSelected = state.isSelected,
                 onPlayClick = onPlayClick,
@@ -192,7 +190,6 @@ private fun BookmarksView(
                     else -> TimePlayButtonColors.Default
                 },
                 showIcon = false,
-                useRssArtwork = state.useRssArtwork,
             )
         }
     }
@@ -217,12 +214,7 @@ private fun BookmarksPreview(
                         title = "Funny bit",
                     ),
                 ),
-                episode = PodcastEpisode(
-                    uuid = "",
-                    publishedDate = Date(),
-                ),
                 isMultiSelecting = false,
-                useRssArtwork = false,
                 isSelected = { false },
                 onRowClick = {},
                 sourceView = SourceView.PLAYER,

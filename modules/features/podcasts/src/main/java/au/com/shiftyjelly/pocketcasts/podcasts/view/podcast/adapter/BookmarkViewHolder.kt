@@ -23,7 +23,6 @@ class BookmarkViewHolder(
             AppTheme(theme.activeTheme) {
                 BookmarkRow(
                     bookmark = data.bookmark,
-                    episode = data.episode,
                     isMultiSelecting = data.isMultiSelecting,
                     isSelected = data.isSelected,
                     onPlayClick = { data.onBookmarkPlayClicked(it) },
@@ -38,7 +37,6 @@ class BookmarkViewHolder(
                     timePlayButtonStyle = TimePlayButtonStyle.Outlined,
                     timePlayButtonColors = TimePlayButtonColors.Default,
                     showIcon = true,
-                    useRssArtwork = data.useRssArtwork,
                 )
             }
         }
