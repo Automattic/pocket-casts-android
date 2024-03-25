@@ -1,8 +1,6 @@
 7.61
 -----
-*   Updates:
-    *   Display episode's RSS artwork in more places in the app.
-        ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
+
 
 7.60
 -----

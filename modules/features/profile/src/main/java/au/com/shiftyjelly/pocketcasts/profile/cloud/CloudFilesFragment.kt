@@ -32,13 +32,14 @@ import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBind
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -76,7 +77,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var bookmarkManager: BookmarkManager
 
-    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
+    private lateinit var imageLoader: PodcastImageLoader
     lateinit var itemTouchHelper: EpisodeItemTouchHelper
 
     private val viewModel: CloudFilesViewModel by viewModels()
@@ -93,7 +94,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             settings = settings,
             onRowClick = onRowClick,
             playButtonListener = playButtonListener,
-            imageRequestFactory = imageRequestFactory,
+            imageLoader = imageLoader,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -152,7 +153,9 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
+        imageLoader = PodcastImageLoaderThemed(context).apply {
+            radiusPx = 4.dpToPx(context)
+        }.smallPlaceholder()
 
         playButtonListener.source = SourceView.FILES
         multiSelectHelper.source = SourceView.FILES

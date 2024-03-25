@@ -33,14 +33,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -107,7 +108,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
-    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
+    private lateinit var imageLoader: PodcastImageLoader
     private var binding: FragmentProfileEpisodeListBinding? = null
 
     val mode: Mode
@@ -139,7 +140,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             settings = settings,
             onRowClick = onRowClick,
             playButtonListener = playButtonListener,
-            imageRequestFactory = imageRequestFactory,
+            imageLoader = imageLoader,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -174,7 +175,9 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
+        imageLoader = PodcastImageLoaderThemed(context).apply {
+            radiusPx = 4.dpToPx(context)
+        }.smallPlaceholder()
 
         playButtonListener.source = getAnalyticsEventSource()
         multiSelectHelper.source = getAnalyticsEventSource()

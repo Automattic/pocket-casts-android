@@ -17,22 +17,28 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.load
 import coil.request.Disposable
 import coil.request.ErrorResult
+import coil.request.ImageRequest
+import coil.size.Scale
+import coil.transform.RoundedCornersTransformation
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,8 +86,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             }
         }
     }
-
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 2).smallSize().themed()
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
@@ -218,19 +222,21 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: Boolean) {
+        val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = binding.artwork
         imageView.clipToOutline = true
+        imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
 
         val artwork = getEpisodeArtwork(episode, useRssArtwork)
         if (artwork == Artwork.None && podcast?.uuid != null) {
-            loadPodcastArtwork(podcast)
+            loadPodcastArtwork(imageLoader, podcast)
         } else {
-            loadEpisodeArtwork(artwork, imageView)?.let { disposable ->
+            loadEpisodeArtwork(artwork, imageView, imageLoader)?.let { disposable ->
                 launch {
                     // If episode artwork fails to load, then load podcast artwork
                     val result = disposable.job.await()
                     if (result is ErrorResult && podcast?.uuid != null) {
-                        loadPodcastArtwork(podcast)
+                        loadPodcastArtwork(imageLoader, podcast)
                     }
                 }
             }
@@ -239,11 +245,12 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     private var loadedPodcastUuid: String? = null
     private fun loadPodcastArtwork(
+        imageLoader: PodcastImageLoaderThemed,
         podcast: Podcast,
     ) {
         if (loadedPodcastUuid == podcast.uuid) return
         val imageView = binding.artwork
-        imageRequestFactory.create(podcast).loadInto(imageView)
+        imageLoader.smallPlaceholder().loadPodcastUuid(podcast.uuid).into(imageView)
         loadedPodcastUuid = podcast.uuid
         loadedEpisodeArtwork = null
     }
@@ -252,16 +259,31 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private fun loadEpisodeArtwork(
         artwork: Artwork,
         imageView: ImageView,
+        imageLoader: PodcastImageLoaderThemed,
     ): Disposable? {
         if (artwork is Artwork.None || loadedEpisodeArtwork == artwork) return null
         imageView.imageTintList = null
+
+        val imageBuilder: ImageRequest.Builder.() -> Unit = {
+            error(au.com.shiftyjelly.pocketcasts.images.R.drawable.defaultartwork_dark)
+            scale(Scale.FIT)
+            transformations(
+                RoundedCornersTransformation(imageLoader.radiusPx.toFloat()),
+                ThemedImageTintTransformation(imageView.context),
+            )
+        }
         loadedEpisodeArtwork = artwork
         loadedPodcastUuid = null
-
         return when (artwork) {
-            is Artwork.Path -> imageRequestFactory.createForFile(artwork.path).loadInto(imageView)
-            is Artwork.Url -> imageRequestFactory.createForUrl(artwork.url).loadInto(imageView)
-            else -> null
+            is Artwork.Path -> {
+                imageView.load(data = File(artwork.path), builder = imageBuilder)
+            }
+            is Artwork.Url -> {
+                imageView.load(data = artwork.url, builder = imageBuilder)
+            }
+            else -> {
+                null
+            }
         }
     }
 

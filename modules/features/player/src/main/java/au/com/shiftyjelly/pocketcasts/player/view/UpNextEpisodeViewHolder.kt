@@ -22,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextBinding
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getAttrTextStyleColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -46,10 +46,9 @@ class UpNextEpisodeViewHolder(
     val binding: AdapterUpNextBinding,
     val listener: UpNextListener?,
     val dateFormatter: RelativeDateFormatter,
-    val imageRequestFactory: PocketCastsImageRequestFactory,
+    val imageLoader: PodcastImageLoader,
     val episodeManager: EpisodeManager,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
-    private val settings: Settings,
 ) : RecyclerView.ViewHolder(binding.root),
     UpNextTouchCallback.ItemTouchHelperViewHolder,
     RowSwipeable {
@@ -118,7 +117,8 @@ class UpNextEpisodeViewHolder(
             false
         }
 
-        imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(binding.image)
+        imageLoader.radiusPx = 3.dpToPx(itemView.context)
+        imageLoader.load(episode).into(binding.image)
 
         val context = binding.itemContainer.context
         val transition = AutoTransition()

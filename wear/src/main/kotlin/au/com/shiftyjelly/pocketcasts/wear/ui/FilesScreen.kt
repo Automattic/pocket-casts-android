@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,7 +31,6 @@ fun FilesScreen(
     val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
-    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
 
     when {
         // Show nothing while screen is loading
@@ -49,7 +47,6 @@ fun FilesScreen(
                 items(userEpisodes) { episode ->
                     EpisodeChip(
                         episode = episode,
-                        useRssArtwork = useRssArtwork,
                         onClick = { navigateToEpisode(episode.uuid) },
                     )
                 }

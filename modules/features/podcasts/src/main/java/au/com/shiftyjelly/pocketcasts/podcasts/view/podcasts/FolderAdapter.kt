@@ -20,11 +20,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -46,7 +45,7 @@ class FolderAdapter(
 
     var badgeType = BadgeType.OFF
 
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context, placeholderType = PlaceholderType.None).themed()
+    private val imageLoader: PodcastImageLoaderThemed = PodcastImageLoaderThemed(context)
     private var podcastUuidToBadge: Map<String, Int> = emptyMap()
 
     init {
@@ -69,9 +68,10 @@ class FolderAdapter(
             FolderItem.Podcast.viewTypeId -> {
                 val isLayoutListView = settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
+                imageLoader.radiusPx = if (isLayoutListView) 4.dpToPx(context) else 0
                 val view = parent.inflate(layoutId, attachToThis = false)
                 val podcastGridLayout = settings.podcastGridLayout.value
-                PodcastViewHolder(view, imageRequestFactory.copy(cornerRadius = if (isLayoutListView) 4.dpToPx(context) else 0), podcastGridLayout, theme)
+                PodcastViewHolder(view, imageLoader, podcastGridLayout, theme)
             }
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.podcastGridLayout.value
@@ -151,7 +151,7 @@ class FolderAdapter(
 
     class PodcastViewHolder(
         val view: View,
-        private val imageRequestFactory: PocketCastsImageRequestFactory,
+        private val imageLoader: PodcastImageLoader,
         podcastGridLayout: PodcastGridLayoutType,
         val theme: Theme,
     ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
@@ -194,9 +194,7 @@ class FolderAdapter(
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
             button.contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
 
-            imageRequestFactory
-                .create(podcast, onSuccess = { if (!isListLayout) podcastTitle.hide() })
-                .loadInto(podcastThumbnail)
+            imageLoader.loadCoil(podcast.uuid, placeholder = false) { if (!isListLayout) podcastTitle.hide() }.into(podcastThumbnail)
         }
 
         @Suppress("NAME_SHADOWING")

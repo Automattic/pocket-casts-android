@@ -11,10 +11,9 @@ import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -39,7 +38,7 @@ class ShareListIncomingAdapter(
             notifyDataSetChanged()
         }
 
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
+    private val imageLoader = PodcastImageLoaderThemed(context)
     private var title: String? = null
     private var description: String? = null
     private var podcasts: List<Podcast>? = null
@@ -80,7 +79,10 @@ class ShareListIncomingAdapter(
 
         holder.button.contentDescription = getPodcastDescription(podcast, subscribed)
 
-        imageRequestFactory.create(podcast).loadInto(holder.image)
+        imageLoader
+            .smallPlaceholder()
+            .loadPodcastUuid(podcastUuid)
+            .into(holder.image)
     }
 
     private fun getPodcastDescription(podcast: Podcast, subscribed: Boolean): String {

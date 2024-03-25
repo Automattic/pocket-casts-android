@@ -27,16 +27,14 @@ fun DownloadsScreen(
 ) {
     val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
-    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
 
-    Content(columnState, state, useRssArtwork, onItemClick)
+    Content(columnState, state, onItemClick)
 }
 
 @Composable
 private fun Content(
     columnState: ScalingLazyColumnState,
     episodes: List<PodcastEpisode>?,
-    useRssArtwork: Boolean,
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
     ScalingLazyColumn(
@@ -56,7 +54,6 @@ private fun Content(
             items(episodes) { episode ->
                 EpisodeChip(
                     episode = episode,
-                    useRssArtwork = useRssArtwork,
                     onClick = { onItemClick(episode) },
                 )
             }
@@ -74,7 +71,6 @@ private fun DownloadsScreenPreview() {
     WearAppTheme {
         Content(
             columnState = ScalingLazyColumnState(),
-            useRssArtwork = false,
             onItemClick = {},
             episodes = listOf(
                 PodcastEpisode(

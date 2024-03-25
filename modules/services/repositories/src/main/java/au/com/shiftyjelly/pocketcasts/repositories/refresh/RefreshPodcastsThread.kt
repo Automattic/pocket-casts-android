@@ -12,7 +12,6 @@ import android.util.Pair
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -27,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -48,8 +47,6 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerI
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import coil.executeBlocking
-import coil.imageLoader
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -439,7 +436,7 @@ class RefreshPodcastsThread(
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
                     val episodePodcast = notificationsEpisodeAndPodcast[i]
-                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, notificationHelper, settings, context)
+                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, podcastManager, notificationHelper, settings, context)
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -453,6 +450,7 @@ class RefreshPodcastsThread(
             episodeIndex: Int,
             intentId: Int,
             isGroupNotification: Boolean,
+            podcastManager: PodcastManager,
             notificationHelper: NotificationHelper,
             settings: Settings,
             context: Context,
@@ -532,7 +530,7 @@ class RefreshPodcastsThread(
             }
             builder.extend(wearableExtender)
 
-            val bitmap = getEpisodeNotificationBitmap(episode, settings, context)
+            val bitmap = getPodcastNotificationBitmap(podcast.uuid, podcastManager, context)
             if (bitmap != null) {
                 builder.setLargeIcon(bitmap)
             }
@@ -650,8 +648,7 @@ class RefreshPodcastsThread(
             }
             val podcast = podcastManager.findPodcastByUuid(uuid) ?: return null
 
-            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = 400).create(podcast)
-            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+            return PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).getBitmap(podcast, 400)
         }
 
         private fun getPodcastNotificationBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {
@@ -663,16 +660,7 @@ class RefreshPodcastsThread(
             val resources = context.resources
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
-            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(podcast)
-            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
-        }
-
-        private fun getEpisodeNotificationBitmap(episode: PodcastEpisode, settings: Settings, context: Context): Bitmap? {
-            val resources = context.resources
-            val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
-
-            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.useRssArtwork.value)
-            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+            return PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).getBitmap(podcast, width)
         }
 
         private fun formatNotificationLine(podcastName: String?, episodeName: String?, context: Context): CharSequence {

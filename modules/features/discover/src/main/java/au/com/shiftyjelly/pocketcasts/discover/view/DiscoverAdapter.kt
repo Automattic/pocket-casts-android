@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Parcelable
@@ -41,8 +40,7 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -57,7 +55,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
@@ -101,7 +99,6 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
     }
 }
 internal class DiscoverAdapter(
-    val context: Context,
     val service: ListRepository,
     val staticServerManager: StaticServerManagerImpl,
     val listener: Listener,
@@ -129,8 +126,6 @@ internal class DiscoverAdapter(
             .distinctUntilChanged()
     }
     var onChangeRegion: (() -> Unit)? = null
-
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
 
     init {
         setHasStableIds(true)
@@ -182,7 +177,7 @@ internal class DiscoverAdapter(
     }
 
     inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = LargeListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
         override val showAllButton: TextView
             get() = binding.btnShowAll
 
@@ -506,6 +501,7 @@ internal class DiscoverAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val imageLoader = PodcastImageLoaderThemed(holder.itemView.context)
         val row = getItem(position)
         val resources = holder.itemView.resources
         if (row is DiscoverRow) {
@@ -619,7 +615,7 @@ internal class DiscoverAdapter(
                                 row.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
                             }
 
-                            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(holder.binding.imgPodcast)
+                            imageLoader.loadSmallImage(podcast.uuid).into(holder.binding.imgPodcast)
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
                                     trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
@@ -661,7 +657,7 @@ internal class DiscoverAdapter(
                             binding.btnPlay.setText(if (episodeType == PodcastEpisode.EpisodeType.Trailer) LR.string.discover_button_play_trailer else LR.string.discover_button_play_episode)
                             binding.btnPlay.show()
 
-                            imageRequestFactory.createForPodcast(episode.podcast_uuid).loadInto(holder.binding.imgPodcast)
+                            imageLoader.loadSmallImage(episode.podcast_uuid).into(binding.imgPodcast)
                             val durationMs = (episode.duration ?: 0) * 1000
                             binding.duration.text = TimeHelper.getTimeDurationShortString(durationMs.toLong(), context)
                             val showDuration = durationMs > 0

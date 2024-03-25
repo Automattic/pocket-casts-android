@@ -18,10 +18,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowPodcastBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -105,7 +105,7 @@ class PodcastSelectFragment : BaseFragment() {
 
         source = args.source
 
-        val imageRequestFactory = PocketCastsImageRequestFactory(requireContext()).themed()
+        val imageLoader = PodcastImageLoaderThemed(view.context)
         binding.toolbarLayout.isVisible = args.showToolbar
         if (binding.toolbarLayout.isVisible) {
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
@@ -127,7 +127,7 @@ class PodcastSelectFragment : BaseFragment() {
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = {
-                    val adapter = PodcastSelectAdapter(it, args.tintColor, imageRequestFactory) {
+                    val adapter = PodcastSelectAdapter(it, args.tintColor, imageLoader) {
                         val selectedList = it.map { it.uuid }
                         binding.lblPodcastsChosen.text =
                             resources.getStringPluralPodcastsSelected(selectedList.size)
@@ -220,8 +220,7 @@ class PodcastSelectFragment : BaseFragment() {
 }
 
 private data class SelectablePodcast(val podcast: Podcast, var selected: Boolean)
-private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt val tintColor: Int?, imageRequestFactory: PocketCastsImageRequestFactory, val onSelectionChanged: (selected: List<Podcast>) -> Unit) : RecyclerView.Adapter<PodcastSelectAdapter.PodcastViewHolder>() {
-    val imageRequestFactory = imageRequestFactory.smallSize()
+private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt val tintColor: Int?, val imageLoader: PodcastImageLoader, val onSelectionChanged: (selected: List<Podcast>) -> Unit) : RecyclerView.Adapter<PodcastSelectAdapter.PodcastViewHolder>() {
 
     class PodcastViewHolder(val binding: SettingsRowPodcastBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -244,7 +243,7 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
         holder.binding.lblSubtitle.text = item.podcast.author
         holder.binding.checkbox.isChecked = item.selected
 
-        imageRequestFactory.create(item.podcast).loadInto(holder.binding.imageView)
+        imageLoader.loadSmallImage(item.podcast).into(holder.binding.imageView)
 
         holder.itemView.setOnClickListener {
             holder.binding.checkbox.isChecked = !holder.binding.checkbox.isChecked
