@@ -1,8 +1,13 @@
 7.61
 -----
+*   New Features
+    *   Support embedded chapters from [Podcast Index](https://github.com/Podcastindex-org/podcast-namespace/blob/c40c127d9e1a3e9b800766d6f01e0dcd5b09ab2a/docs/1.0.md#chapters) and [Podlove](https://podlove.org/simple-chapters/).
+        ([#1965](https://github.com/Automattic/pocket-casts-android/pull/1940))
 *   Updates:
     *   Display episode's RSS artwork in more places in the app.
         ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
+    *   Add alphabetical sort order for podcast episodes.
+        ([#1968](https://github.com/Automattic/pocket-casts-android/pull/1968))
 
 7.60
 -----

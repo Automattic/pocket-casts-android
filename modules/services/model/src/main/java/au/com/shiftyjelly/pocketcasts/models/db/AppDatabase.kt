@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
@@ -53,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import java.util.Arrays
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -70,8 +72,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextEpisode::class,
         UserEpisode::class,
         PodcastRatings::class,
+        DbChapter::class,
     ],
-    version = 90,
+    version = 91,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -110,6 +113,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun podcastRatingsDao(): PodcastRatingsDao
     abstract fun bookmarkDao(): BookmarkDao
+    abstract fun chapterDao(): ChapterDao
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
@@ -648,6 +652,12 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        @DeleteColumn(
+            tableName = "podcast_episodes",
+            columnName = "automatically_cached",
+        )
+        class DeleteAutomaticallyCachedMigration : AutoMigrationSpec
+
         val MIGRATION_89_90 = addMigration(89, 90) { database ->
             database.execSQL(
                 """
@@ -663,11 +673,22 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
-        @DeleteColumn(
-            tableName = "podcast_episodes",
-            columnName = "automatically_cached",
-        )
-        class DeleteAutomaticallyCachedMigration : AutoMigrationSpec
+        val MIGRATION_90_91 = addMigration(90, 91) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE episode_chapters(
+                        episode_uuid TEXT NOT NULL, 
+                        start_time INTEGER NOT NULL,
+                        end_time INTEGER,
+                        title TEXT,
+                        image_url TEXT,
+                        url TEXT,
+                        PRIMARY KEY (episode_uuid, start_time)
+                    )
+                """.trimIndent(),
+            )
+            database.execSQL("CREATE INDEX chapter_episode_uuid_index ON episode_chapters(episode_uuid)")
+        }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
@@ -1049,6 +1070,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_87_88,
                 // 88 to 89 added via auto migration
                 MIGRATION_89_90,
+                MIGRATION_90_91,
             )
         }
 

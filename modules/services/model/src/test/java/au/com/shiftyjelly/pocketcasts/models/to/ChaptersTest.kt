@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.to
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +21,7 @@ class ChaptersTest {
         FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
         val chapters = initChapters()
 
-        val chapter = chapters.getNextSelectedChapter(150)
+        val chapter = chapters.getNextSelectedChapter(150.milliseconds)
 
         assert(chapter?.title == "5")
     }
@@ -30,7 +31,7 @@ class ChaptersTest {
         FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
         val chapters = initChapters()
 
-        val chapter = chapters.getPreviousSelectedChapter(350)
+        val chapter = chapters.getPreviousSelectedChapter(350.milliseconds)
 
         assert(chapter?.title == "1")
     }
@@ -40,7 +41,7 @@ class ChaptersTest {
         FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
         val chapters = initChapters()
 
-        val chapter = chapters.getNextSelectedChapter(150)
+        val chapter = chapters.getNextSelectedChapter(150.milliseconds)
 
         assert(chapter?.title == "3")
     }
@@ -50,7 +51,7 @@ class ChaptersTest {
         FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
         val chapters = initChapters()
 
-        val chapter = chapters.getPreviousSelectedChapter(350)
+        val chapter = chapters.getPreviousSelectedChapter(350.milliseconds)
 
         assert(chapter?.title == "3")
     }
@@ -58,11 +59,11 @@ class ChaptersTest {
     private fun initChapters(): Chapters {
         return Chapters(
             items = listOf(
-                Chapter("1", 0, 100, selected = true),
-                Chapter("2", 101, 200, selected = false),
-                Chapter("3", 201, 300, selected = false),
-                Chapter("4", 301, 400, selected = false),
-                Chapter("5", 401, 500, selected = true),
+                Chapter("1", 0.milliseconds, 100.milliseconds, selected = true),
+                Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
+                Chapter("3", 201.milliseconds, 300.milliseconds, selected = false),
+                Chapter("4", 301.milliseconds, 400.milliseconds, selected = false),
+                Chapter("5", 401.milliseconds, 500.milliseconds, selected = true),
             ),
         )
     }

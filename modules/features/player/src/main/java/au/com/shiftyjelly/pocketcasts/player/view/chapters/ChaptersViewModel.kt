@@ -27,6 +27,7 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -181,12 +182,12 @@ class ChaptersViewModel
             val chapterState = if (currentChapter != null) {
                 // a chapter that hasn't been played
                 ChapterState.NotPlayed(chapter)
-            } else if (chapter.containsTime(playbackPositionMs)) {
+            } else if (playbackPositionMs.milliseconds in chapter) {
                 if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
                     _uiState.value = _uiState.value.copy(isSkippingToNextChapter = false)
-                    val progress = chapter.calculateProgress(playbackPositionMs)
+                    val progress = chapter.calculateProgress(playbackPositionMs.milliseconds)
                     ChapterState.Playing(chapter = chapter, progress = progress)
                 } else {
                     if (!listOf(

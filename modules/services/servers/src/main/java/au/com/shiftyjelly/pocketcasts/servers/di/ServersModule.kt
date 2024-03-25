@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
@@ -45,6 +46,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -350,6 +352,10 @@ class ServersModule {
     internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
         return AccountManager.get(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideCacheServer(@PodcastCacheServerRetrofit retrofit: Retrofit): PodcastCacheServer = retrofit.create()
 }
 
 @Qualifier

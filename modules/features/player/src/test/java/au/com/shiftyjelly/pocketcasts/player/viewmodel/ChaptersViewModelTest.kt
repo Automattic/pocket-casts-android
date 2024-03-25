@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -88,16 +89,16 @@ class ChaptersViewModelTest {
 
     private val chaptersTwoSelectedOneUnselected = Chapters(
         listOf(
-            Chapter("1", 0, 100, selected = true),
-            Chapter("2", 101, 200, selected = false),
-            Chapter("3", 201, 300, selected = true),
+            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true),
+            Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
+            Chapter("3", 201.milliseconds, 300.milliseconds, selected = true),
         ),
     )
 
     private val chaptersOneSelectedOneUnselected = Chapters(
         listOf(
-            Chapter("1", 0, 100, selected = true),
-            Chapter("2", 101, 200, selected = false),
+            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true),
+            Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
         ),
     )
 

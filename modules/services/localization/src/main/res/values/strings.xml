@@ -579,6 +579,8 @@
     <string name="episode_row_waiting_for_power">Waiting for power</string>
     <string name="episode_row_waiting_for_wifi">Waiting for WiFi</string>
     <string name="episode_sort_long_to_short">Longest to shortest</string>
+    <string name="episode_sort_title_a_z">Title (A–Z)</string>
+    <string name="episode_sort_title_z_a">Title (Z–A)</string>
     <string name="episode_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
     <string name="episode_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
     <string name="episode_sort_short_to_long">Shortest to longest</string>
@@ -1562,6 +1564,7 @@
     <string name="discover_top">Top</string>
     <string name="discover_popular">Popular</string>
     <string name="discover_popular_in">Popular in %s</string>
+    <string name="discover_most_popular_in">Most Popular in %s</string>
     <string name="discover_button_play_episode">Play Episode</string>
     <string name="discover_button_play_trailer">Play Trailer</string>
     <string name="discover_sponsored">Sponsored</string>

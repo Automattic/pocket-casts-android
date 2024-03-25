@@ -62,16 +62,76 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND archived = :archived AND podcast_id = :podcastUuid")
     abstract fun findByEpisodePlayingAndArchiveStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus, archived: Boolean): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) ASC
+    """,
+    )
     abstract fun findByPodcastOrderTitleAsc(podcastUuid: String): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) ASC
+    """,
+    )
     abstract suspend fun findByPodcastOrderTitleAscSuspend(podcastUuid: String): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) DESC
+    """,
+    )
     abstract fun findByPodcastOrderTitleDesc(podcastUuid: String): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) DESC
+    """,
+    )
     abstract suspend fun findByPodcastOrderTitleDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
     @Transaction
@@ -122,11 +182,41 @@ abstract class EpisodeDao {
     abstract fun findNotificationEpisodes(date: Date, playingStatus: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): List<PodcastEpisode>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) ASC
+    """,
+    )
     abstract fun observeByPodcastOrderTitleAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) DESC
+    """,
+    )
     abstract fun observeByPodcastOrderTitleDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
     @Transaction

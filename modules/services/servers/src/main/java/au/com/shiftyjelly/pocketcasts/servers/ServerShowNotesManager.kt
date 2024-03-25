@@ -20,7 +20,7 @@ class ServerShowNotesManager @Inject constructor(
     fun loadShowNotesFlow(
         podcastUuid: String,
         episodeUuid: String,
-        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+        processShowNotes: (ShowNotesResponse) -> Unit,
     ): Flow<ShowNotesState> {
         return flow {
             emit(ShowNotesState.Loading)
@@ -33,12 +33,11 @@ class ServerShowNotesManager @Inject constructor(
                     loaded = true
                 }
                 // download or update cache
-                val showNotesDownloaded =
-                    downloadShowNotes(
-                        podcastUuid = podcastUuid,
-                        episodeUuid = episodeUuid,
-                        persistImageUrls = persistImageUrls,
-                    )
+                val showNotesDownloaded = downloadShowNotes(
+                    podcastUuid = podcastUuid,
+                    episodeUuid = episodeUuid,
+                    processShowNotes = processShowNotes,
+                )
                 if (showNotesDownloaded != null) {
                     if (showNotesDownloaded != showNotesCached || !loaded) {
                         emit(ShowNotesState.Loaded(showNotesDownloaded))
@@ -63,16 +62,15 @@ class ServerShowNotesManager @Inject constructor(
     suspend fun loadShowNotes(
         podcastUuid: String,
         episodeUuid: String,
-        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+        processShowNotes: (ShowNotesResponse) -> Unit,
     ): ShowNotesState {
         var downloadException: Exception? = null
         try {
-            val showNotesDownloaded =
-                downloadShowNotes(
-                    podcastUuid = podcastUuid,
-                    episodeUuid = episodeUuid,
-                    persistImageUrls = persistImageUrls,
-                )
+            val showNotesDownloaded = downloadShowNotes(
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                processShowNotes = processShowNotes,
+            )
             if (showNotesDownloaded != null) {
                 return ShowNotesState.Loaded(showNotesDownloaded)
             }
@@ -101,24 +99,24 @@ class ServerShowNotesManager @Inject constructor(
     private suspend fun downloadShowNotes(
         podcastUuid: String,
         episodeUuid: String,
-        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+        processShowNotes: (ShowNotesResponse) -> Unit,
     ): String? {
         if (podcastUuid.isBlank() || episodeUuid.isBlank()) {
             return null
         }
         val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
-        persistImageUrls(response)
+        processShowNotes(response)
         return response.findEpisode(episodeUuid)?.showNotes
     }
 
     suspend fun downloadToCacheShowNotes(
         podcastUuid: String,
-        persistImageUrls: suspend (ShowNotesResponse) -> Unit,
+        processShowNotes: (ShowNotesResponse) -> Unit,
     ) {
         if (podcastUuid.isBlank()) {
             return
         }
         val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
-        persistImageUrls(response)
+        processShowNotes(response)
     }
 }
