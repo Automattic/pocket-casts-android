@@ -5,11 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryBinding
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import coil.load
 
 class CategoriesBottomSheetAdapter(
-    private val onCategoryClick: (CategoryPill) -> Unit,
-) : ListAdapter<CategoryPill, CategoriesBottomSheetAdapter.CategoryViewHolder>(CATEGORY_REDESIGN_DIFF) {
+    private val onCategoryClick: (NetworkLoadableList) -> Unit,
+) : ListAdapter<DiscoverCategory, CategoriesBottomSheetAdapter.CategoryViewHolder>(CATEGORY_DIFF) {
     class CategoryViewHolder(
         val binding: ItemCategoryBinding,
         onItemClicked: (Int) -> Unit,
@@ -20,10 +22,10 @@ class CategoriesBottomSheetAdapter(
             }
         }
 
-        fun bind(category: CategoryPill) {
-            binding.lblTitle.text = category.discoverCategory.name
-            binding.lblTitle.contentDescription = category.discoverCategory.name
-            binding.imageView.load(category.discoverCategory.icon)
+        fun bind(category: DiscoverCategory) {
+            binding.lblTitle.text = category.name
+            binding.lblTitle.contentDescription = category.name
+            binding.imageView.load(category.icon)
         }
     }
 

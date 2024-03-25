@@ -91,6 +91,7 @@ private const val INITIAL_PREFETCH_COUNT = 1
 private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
+
 internal class DiscoverAdapter(
     val service: ListRepository,
     val staticServerManager: StaticServerManagerImpl,
@@ -98,7 +99,6 @@ internal class DiscoverAdapter(
     val theme: Theme,
     loadPodcastList: (String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
-    val loadCategories: (String) -> Flowable<List<CategoryPill>>,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -109,9 +109,7 @@ internal class DiscoverAdapter(
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
         fun onSearchClicked()
-        fun onCategoryClick(selectedCategory: CategoryPill): List<CategoryPill>
-        fun onAllCategoriesClick(source: String, onCategorySelectionCancel: () -> Unit)
-        fun onClearCategoryFilterClick(source: String, onCategoriesLoaded: (List<CategoryPill>) -> Unit)
+        fun onAllCategoriesClicked(categories: List<DiscoverCategory>)
     }
 
     val loadPodcastList = { s: String ->
@@ -351,45 +349,9 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
-    inner class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
-        lateinit var source: String
-
-        private val adapter = CategoriesListRowRedesignAdapter(
-            onCategoryClick = { listener.onCategoryClick(it) },
-            onAllCategoriesClick = { onCategorySelectionCancel -> listener.onAllCategoriesClick(source, onCategorySelectionCancel) },
-            onClearCategoryClick = {
-                listener.onClearCategoryFilterClick(
-                    source,
-                    onCategoriesLoaded = {
-                        submitCategories(
-                            it,
-                            source,
-                            context = binding.root.context,
-                        )
-                    },
-                )
-            },
-        )
+    class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
-            recyclerView?.adapter = adapter
-        }
-        fun submitCategories(categories: List<CategoryPill>, source: String, context: Context) {
-            this.source = source
-            val allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
-
-            val categoriesFilter = mutableListOf(allCategories)
-            categoriesFilter.addAll(getMostPopularCategories(categories))
-
-            adapter.updateCategories(categoriesFilter)
-        }
-        private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
-            // True Crime, Comedy, Culture, History, Fiction, Technology
-            val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
-
-            return categories
-                .filter { it.discoverCategory.id in mostPopularCategoriesId }
-                .sortedBy { mostPopularCategoriesId.indexOf(it.discoverCategory.id) }
         }
     }
 
@@ -543,14 +505,24 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CategoriesRedesignViewHolder -> {
-                    holder.loadFlowable(
-                        loadCategories(row.source),
-                        onNext = { categories ->
+                    var discoverCategories = emptyList<DiscoverCategory>()
+                    val adapter = CategoriesListRowRedesignAdapter(
+                        onPodcastListClick = listener::onPodcastListClicked,
+                        onAllCategoriesClick = { listener.onAllCategoriesClicked(discoverCategories) },
+                    )
+                    holder.recyclerView?.adapter = adapter
+                    holder.loadSingle(
+                        service.getCategoriesList(row.source),
+                        onSuccess = { categories ->
                             val context = holder.itemView.context
-                            holder.submitCategories(categories, row.source, context)
+                            val allCategories = DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = "")
+                            discoverCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+
+                            adapter.submitList(listOf(allCategories) + getMostPopularCategories(discoverCategories)) {
+                                onRestoreInstanceState(holder)
+                            }
                         },
                     )
-
                     holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
                 is SinglePodcastViewHolder -> {
@@ -743,6 +715,15 @@ internal class DiscoverAdapter(
             }
         }
     }
+    private fun getMostPopularCategories(categories: List<DiscoverCategory>): List<DiscoverCategory> {
+        // True Crime, Comedy, Culture, History, Fiction, Technology
+        val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
+
+        return categories
+            .filter { it.id in mostPopularCategoriesId }
+            .sortedBy { mostPopularCategoriesId.indexOf(it.id) }
+    }
+
     private fun trackListImpression(listUuid: String) {
         FirebaseAnalyticsTracker.listImpression(listUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
