@@ -8,6 +8,9 @@
         ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
     *   Add alphabetical sort order for podcast episodes.
         ([#1968](https://github.com/Automattic/pocket-casts-android/pull/1968))
+* Bug Fixes:
+    *   Subscription cancellation redirects now to a correct page.
+        ([#1973](https://github.com/Automattic/pocket-casts-android/pull/1973))
 
 7.60
 -----
