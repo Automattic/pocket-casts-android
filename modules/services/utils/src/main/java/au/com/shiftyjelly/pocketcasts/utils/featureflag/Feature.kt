@@ -81,7 +81,7 @@ enum class Feature(
         defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
+        hasDevToggle = true,
     ),
     ;
 
