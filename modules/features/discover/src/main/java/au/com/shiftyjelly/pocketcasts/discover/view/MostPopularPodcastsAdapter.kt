@@ -78,4 +78,8 @@ internal class MostPopularPodcastsAdapter(
             holder.bind(podcast)
         }
     }
+    fun replaceList(list: List<DiscoverPodcast>) {
+        submitList(null) // We need this to avoid displaying the previous category list when switching from a different category
+        submitList(list)
+    }
 }

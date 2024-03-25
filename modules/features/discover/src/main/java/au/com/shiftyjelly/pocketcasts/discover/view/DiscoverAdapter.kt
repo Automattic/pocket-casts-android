@@ -810,11 +810,10 @@ internal class DiscoverAdapter(
                 categoriesViewHolder.binding.lblTitle.contentDescription = tittle
             }
             categoriesViewHolder.adapter.fromListId = row.listId
-            categoriesViewHolder.adapter.submitList(null)
-            categoriesViewHolder.adapter.submitList(row.podcasts)
+            categoriesViewHolder.adapter.replaceList(row.podcasts)
         } else if (row is RemainingPodcastsByCategoryRow) {
             val remainingPodcastHolder = holder as RemainingPodcastsByCategoryViewHolder
-            remainingPodcastHolder.adapter.submitList(row.podcasts)
+            remainingPodcastHolder.adapter.replaceList(row.podcasts)
         }
     }
 

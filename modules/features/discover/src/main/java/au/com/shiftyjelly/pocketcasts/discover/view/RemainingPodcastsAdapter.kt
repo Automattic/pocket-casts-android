@@ -58,4 +58,9 @@ class RemainingPodcastsAdapter(
     override fun onBindViewHolder(holder: PodcastViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    fun replaceList(list: List<DiscoverPodcast>) {
+        submitList(null) // We need this to avoid displaying the previous category list when switching from a different category
+        submitList(list)
+    }
 }
