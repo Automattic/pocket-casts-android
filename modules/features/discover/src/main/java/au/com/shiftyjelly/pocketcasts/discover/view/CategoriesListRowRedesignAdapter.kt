@@ -23,8 +23,8 @@ val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
 }
 
 class CategoriesListRowRedesignAdapter(
-    private val onCategoryClick: (CategoryPill, (List<CategoryPill>) -> Unit) -> Unit,
-    private val onAllCategoriesClick: (() -> Unit, (List<CategoryPill>) -> Unit) -> Unit,
+    private val onCategoryClick: (CategoryPill) -> List<CategoryPill>,
+    private val onAllCategoriesClick: (() -> Unit) -> Unit,
     private val onClearCategoryClick: () -> Unit,
 ) : ListAdapter<CategoryPill, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_REDESIGN_DIFF) {
 
@@ -100,32 +100,20 @@ class CategoriesListRowRedesignAdapter(
                     onClearCategoryClick()
                 } else {
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
-                    onAllCategoriesClick(
-                        onCategorySelectionCancel@{
-                            binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
-                        },
-                        onCategorySelectionSuccess@{
-                            binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
-                            updateCategories(it)
-                        },
-                    )
+                    onAllCategoriesClick onCategorySelectionCancel@{
+                        binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
+                    }
                 }
-            } else if (!category.isSelected) {
-                markCategoryAsSelected(position)
-                onCategoryClick(category) {
-                    updateCategories(it)
-                }
+            } else {
+                updateCategories(onCategoryClick(category))
             }
         }
     }
+
     override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
         holder.bind(getItem(position), holder.itemView.context)
     }
     fun updateCategories(categoryPills: List<CategoryPill>) {
         submitList(categoryPills)
-    }
-    private fun markCategoryAsSelected(position: Int) {
-        getItem(position).isSelected = true
-        notifyItemChanged(position)
     }
 }

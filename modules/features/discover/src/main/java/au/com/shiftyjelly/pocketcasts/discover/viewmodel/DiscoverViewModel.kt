@@ -127,16 +127,6 @@ class DiscoverViewModel @Inject constructor(
                 addPlaybackStateToList(it)
             }
     }
-    fun loadPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
-        loadPodcastList(source).subscribeBy(
-            onNext = {
-                onPodcastsLoaded(it)
-            },
-            onError = {
-                Timber.e(it)
-            },
-        ).addTo(disposables)
-    }
 
     fun loadCarouselSponsoredPodcasts(
         sponsoredPodcastList: List<SponsoredPodcast>,
