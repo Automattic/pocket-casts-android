@@ -64,6 +64,7 @@ data class DiscoverRow(
     @field:Json(name = "sponsored") val sponsored: Boolean = false,
     @field:Json(name = "curated") override val curated: Boolean = false,
     @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
+    val regionCode: String? = null,
 ) : NetworkLoadableList {
 
     override fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): DiscoverRow {
