@@ -396,15 +396,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         lastLoadedUuid = null
 
         return when (embeddedArtwork) {
-            is PlayerViewModel.Artwork.Path -> imageRequestFactory.createForFileOrUrl(embeddedArtwork.path)
-            is PlayerViewModel.Artwork.Url -> imageRequestFactory.createForFileOrUrl(embeddedArtwork.url)
+            is PlayerViewModel.Artwork.Path -> imageRequestFactory.createForFile(embeddedArtwork.path)
+            is PlayerViewModel.Artwork.Url -> imageRequestFactory.createForUrl(embeddedArtwork.url)
             is PlayerViewModel.Artwork.None -> null
         }?.loadInto(imageView)
     }
 
     private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {
-        chapter?.imagePath?.let { pathOrUrl ->
-            imageRequestFactory.createForFileOrUrl(pathOrUrl).loadInto(imageView)
+        chapter?.imagePath?.let { filePath ->
+            imageRequestFactory.createForFile(filePath).loadInto(imageView)
         } ?: run {
             imageView.setImageDrawable(null)
         }

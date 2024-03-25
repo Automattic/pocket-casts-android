@@ -259,8 +259,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         loadedPodcastUuid = null
 
         return when (artwork) {
-            is Artwork.Path -> imageRequestFactory.createForFileOrUrl(artwork.path).loadInto(imageView)
-            is Artwork.Url -> imageRequestFactory.createForFileOrUrl(artwork.url).loadInto(imageView)
+            is Artwork.Path -> imageRequestFactory.createForFile(artwork.path).loadInto(imageView)
+            is Artwork.Url -> imageRequestFactory.createForUrl(artwork.url).loadInto(imageView)
             else -> null
         }
     }

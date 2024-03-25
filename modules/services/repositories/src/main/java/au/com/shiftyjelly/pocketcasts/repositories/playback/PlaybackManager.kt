@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -94,8 +93,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -130,7 +127,6 @@ open class PlaybackManager @Inject constructor(
     private val cloudFilesManager: CloudFilesManager,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
-    private val chapterManager: ChapterManager,
     bookmarkFeature: BookmarkFeatureControl,
     private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -1529,12 +1525,11 @@ open class PlaybackManager @Inject constructor(
         updateCurrentPositionInDatabase()
     }
 
-    private fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
+    fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
-            val newChapters = episodeMetadata.chapters
+            val chapters = episodeMetadata.chapters
                 .updateChaptersTimes(playbackState.durationMs.milliseconds)
                 .updateDeselectedState(getCurrentEpisode())
-            val chapters = maxOf(playbackState.chapters, newChapters) { a, b -> a.size.compareTo(b.size) }
 
             playbackStateRelay.accept(
                 playbackState.copy(
@@ -1543,27 +1538,6 @@ open class PlaybackManager @Inject constructor(
                     lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
                 ),
             )
-        }
-    }
-
-    @Volatile
-    private var observeChaptersJob: Job? = null
-
-    private fun onEpisodeChanged(episodeUuid: String) {
-        observeChaptersJob?.cancel()
-        observeChaptersJob = chapterManager.observerChaptersForEpisode(episodeUuid)
-            .onEach { onRemoteChaptersAvailable(it) }
-            .launchIn(this)
-    }
-
-    private fun onRemoteChaptersAvailable(remoteChapters: Chapters) {
-        playbackStateRelay.blockingFirst().let { playbackState ->
-            val newChapters = remoteChapters
-                .updateChaptersTimes(playbackState.durationMs.milliseconds)
-                .updateDeselectedState(getCurrentEpisode())
-            val chapters = maxOf(playbackState.chapters, newChapters) { a, b -> a.size.compareTo(b.size) }
-
-            playbackStateRelay.accept(playbackState.copy(chapters = chapters))
         }
     }
 
@@ -2134,7 +2108,6 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.MetadataAvailable -> onMetadataAvailable(event.metaData)
                 is PlayerEvent.PlayerError -> onPlayerError(event)
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
-                is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
             }
         }
     }
