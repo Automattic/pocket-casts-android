@@ -24,7 +24,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +59,7 @@ fun ChapterRow(
     modifier: Modifier = Modifier,
 ) {
     val chapter = state.chapter
+    var selectedState by remember(chapter.index) { mutableStateOf(state.chapter.selected) }
     val textColor = getTextColor(state, isTogglingChapters)
     Box(
         modifier = modifier
@@ -71,13 +75,22 @@ fun ChapterRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clickable { onClick() }
+                .clickable {
+                    if (isTogglingChapters) {
+                        val selected = !selectedState
+                        selectedState = selected
+                        onSelectionChange(selected, chapter)
+                    } else {
+                        onClick()
+                    }
+                }
                 .padding(end = 12.dp),
         ) {
             AnimatedVisibility(visible = isTogglingChapters) {
                 Checkbox(
-                    checked = state.chapter.selected,
+                    checked = selectedState,
                     onCheckedChange = { selected ->
+                        selectedState = selected
                         onSelectionChange(selected, chapter)
                     },
                     colors = CheckboxDefaults.colors(
