@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.content.Context
-import android.graphics.Color
+import android.graphics.Color.WHITE
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.content.ContextCompat.getString
 import androidx.core.view.isVisible
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
+import au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 
 val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
@@ -50,23 +53,12 @@ class CategoriesListRowRedesignAdapter(
         private fun setUpAllCategoriesAndClear(context: Context, category: CategoryPill) {
             if (category.isSelected) {
                 binding.categoryName.isVisible = false
-                binding.categoryIcon.isVisible = true
-                binding.categoryIcon.setImageResource(R.drawable.ic_arrow_close)
-                binding.categoryIcon.contentDescription =
-                    getString(
-                        context,
-                        au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all,
-                    )
-                binding.categoryPill.background =
-                    getDrawable(context, R.drawable.category_clear_all_pill_background)
+                binding.categoryIcon.setIcon(R.drawable.ic_arrow_close, getString(context, clear_all))
+                binding.categoryPill.background = getDrawable(context, R.drawable.category_clear_all_pill_background)
             } else {
-                binding.categoryName.isVisible = true
-                binding.categoryIcon.isVisible = true
-                binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
-                binding.categoryPill.background =
-                    getDrawable(context, R.drawable.category_pill_background)
-                binding.categoryName.text = category.discoverCategory.name
-                binding.categoryName.contentDescription = category.discoverCategory.name
+                binding.categoryName.setCategory(category.discoverCategory.name)
+                binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
+                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
             }
         }
 
@@ -74,15 +66,12 @@ class CategoriesListRowRedesignAdapter(
             if (category.isSelected) {
                 binding.categoryPill.background =
                     getDrawable(context, R.drawable.category_pill_selected_background)
-                binding.categoryName.setTextColor(Color.WHITE)
+                binding.categoryName.setTextColor(WHITE)
             } else {
-                binding.categoryPill.background =
-                    getDrawable(context, R.drawable.category_pill_background)
+                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
                 binding.categoryName.setTextAppearance(au.com.shiftyjelly.pocketcasts.ui.R.style.H40)
             }
-            binding.categoryName.text = category.discoverCategory.name
-            binding.categoryName.contentDescription = category.discoverCategory.name
-            binding.categoryName.isVisible = true
+            binding.categoryName.setCategory(category.discoverCategory.name)
             binding.categoryIcon.isVisible = false
         }
     }
@@ -102,10 +91,11 @@ class CategoriesListRowRedesignAdapter(
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
                     onAllCategoriesClick(
                         onCategorySelectionCancel@{
-                            binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
+                            binding.categoryName.setCategory(category.discoverCategory.name)
+                            binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
                         },
                         onCategorySelectionSuccess@{
-                            binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
+                            binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
                             updateCategories(it)
                         },
                     )
@@ -128,4 +118,15 @@ class CategoriesListRowRedesignAdapter(
         getItem(position).isSelected = true
         notifyItemChanged(position)
     }
+}
+private fun TextView.setCategory(category: String) {
+    isVisible = true
+    text = category
+    contentDescription = category
+}
+
+private fun ImageView.setIcon(resourceId: Int, contentDescription: CharSequence? = null) {
+    setImageResource(resourceId)
+    isVisible = true
+    contentDescription?.let { this.contentDescription = it }
 }
