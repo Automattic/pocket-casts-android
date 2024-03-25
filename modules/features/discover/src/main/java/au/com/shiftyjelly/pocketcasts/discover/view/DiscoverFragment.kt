@@ -154,7 +154,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
         viewModel.loadCategories(source) { categories ->
             onCategoryClearSuccess(categories)
-            reloadDiscover()
+            viewModel.loadData(resources) // Reload discover
         }
     }
 
@@ -279,10 +279,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             adapter?.submitList(updatedList)
         }
     }
-    private fun reloadDiscover() {
-        viewModel.onCleared()
-        viewModel.loadData(resources)
-    }
+
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"

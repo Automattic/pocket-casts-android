@@ -261,7 +261,7 @@ class DiscoverViewModel @Inject constructor(
         return list.transformWithReplacements(replacements, resources)
     }
 
-    public override fun onCleared() {
+    override fun onCleared() {
         super.onCleared()
         disposables.clear()
     }
