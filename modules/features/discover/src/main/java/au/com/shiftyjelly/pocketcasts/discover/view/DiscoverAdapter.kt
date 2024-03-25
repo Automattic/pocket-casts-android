@@ -540,7 +540,7 @@ internal class DiscoverAdapter(
                     holder.loadFlowable(
                         loadPodcastList(row.source),
                         onNext = {
-                            holder.adapter.fromListId = row.listUuid
+                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         },
                     )
@@ -593,7 +593,7 @@ internal class DiscoverAdapter(
                         onNext = {
                             val podcasts = it.podcasts.subList(0, Math.min(MAX_ROWS_SMALL_LIST, it.podcasts.count()))
                             holder.binding.pageIndicatorView.count = Math.ceil(podcasts.count().toDouble() / SmallListRowAdapter.SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
-                            holder.adapter.fromListId = row.listUuid
+                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         },
                     )
@@ -809,7 +809,7 @@ internal class DiscoverAdapter(
                 categoriesViewHolder.binding.lblTitle.text = tittle
                 categoriesViewHolder.binding.lblTitle.contentDescription = tittle
             }
-            categoriesViewHolder.adapter.fromListId = row.listId
+            row.listId?.let { categoriesViewHolder.adapter.setFromListId(it) }
             categoriesViewHolder.adapter.replaceList(row.podcasts)
         } else if (row is RemainingPodcastsByCategoryRow) {
             val remainingPodcastHolder = holder as RemainingPodcastsByCategoryViewHolder
