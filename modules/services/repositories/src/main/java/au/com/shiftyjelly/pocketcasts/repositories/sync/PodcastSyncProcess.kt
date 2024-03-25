@@ -654,7 +654,7 @@ class PodcastSyncProcess(
 
             episode.deselectedChaptersModified?.let { deselectedChaptersModified ->
                 fields.put("deselected_chapters", ChapterIndices.toString(episode.deselectedChapters))
-                fields.put("deselected_chapters_modified", deselectedChaptersModified)
+                fields.put("deselected_chapters_modified", deselectedChaptersModified.time)
             }
 
             val record = JSONObject().apply {
@@ -1041,7 +1041,7 @@ class PodcastSyncProcess(
 
             sync.deselectedChapters?.let {
                 episode.deselectedChapters = it
-                episode.deselectedChaptersModified = null
+                episode.deselectedChaptersModified = sync.deselectedChaptersModified?.let(::Date)
             }
 
             episodeManager.update(episode)

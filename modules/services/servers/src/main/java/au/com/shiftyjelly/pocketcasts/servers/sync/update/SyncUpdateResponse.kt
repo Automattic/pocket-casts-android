@@ -25,6 +25,7 @@ import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
+import com.pocketcasts.service.api.deselectedChaptersModifiedOrNull
 import com.pocketcasts.service.api.durationOrNull
 import com.pocketcasts.service.api.episodeGroupingOrNull
 import com.pocketcasts.service.api.episodeOrNull
@@ -203,7 +204,7 @@ data class SyncUpdateResponse(
                         EpisodePlayingStatus.fromInt(it)
                     } ?: EpisodePlayingStatus.NOT_PLAYED,
                     deselectedChapters = ChapterIndices.fromString(syncUserEpisode.deselectedChapters),
-                    deselectedChaptersModified = syncUserEpisode.deselectedChaptersModified.value,
+                    deselectedChaptersModified = syncUserEpisode.deselectedChaptersModifiedOrNull?.value,
                 )
         }
     }
