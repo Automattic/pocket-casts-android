@@ -52,6 +52,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     private var adapter: DiscoverAdapter? = null
     private var binding: FragmentDiscoverBinding? = null
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     override fun onPause() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
@@ -125,31 +129,13 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
-    override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
-        val categoryWithRegionUpdated =
-            viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
-
-        viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
-            val mostPopularPodcastsByCategoryRow =
-                MostPopularPodcastsByCategoryRow(it.listId, it.title, it.podcasts.take(MOST_POPULAR_PODCASTS))
-            updateDiscover(mostPopularPodcastsByCategoryRow)
-            onCategorySelectionSuccess()
-        }
-    }
-    override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
-        viewModel.loadCategories(source) { categories ->
-            CategoriesBottomSheet(
-                categories = categories,
-                onCategoryClick = { this.onCategoryClick(it) { onCategorySelectionSuccess(it) } },
-                onCategorySelectionCancel = onCategorySelectionCancel,
-            ).show(childFragmentManager, "categories_bottom_sheet")
-        }
-    }
-    override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
-        viewModel.loadCategories(source) { categories ->
-            onCategoryClearSuccess(categories)
-            clearCategoryFilter()
-        }
+    override fun onAllCategoriesClicked(categories: List<DiscoverCategory>) {
+        CategoriesBottomSheet(
+            categories,
+            onCategoryClick = {
+                onPodcastListClicked(it)
+            },
+        ).show(childFragmentManager, "categories_bottom_sheet")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -182,7 +168,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                 theme = theme,
                 loadPodcastList = viewModel::loadPodcastList,
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
-                loadCategories = viewModel::loadCategories,
                 analyticsTracker = analyticsTracker,
             )
         }
@@ -208,7 +193,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         }
                         adapter?.onChangeRegion = onChangeRegion
 
-                        val sortedContent = sortContent(content, state.selectedRegion.code)
+                        val sortedContent = sortContent(content)
 
                         adapter?.submitList(sortedContent)
                     }
@@ -244,7 +229,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             FirebaseAnalyticsTracker.navigatedToDiscover()
         }
     }
-    private fun sortContent(content: List<Any>, region: String): MutableList<Any> {
+    private fun sortContent(content: List<Any>): MutableList<Any> {
         val mutableContentList = content.toMutableList()
 
         if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
@@ -252,36 +237,17 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
             if (categoriesIndex != -1) {
                 val categoriesItem = mutableContentList.removeAt(categoriesIndex)
-                mutableContentList.add(0, (categoriesItem as DiscoverRow).copy(regionCode = region))
+                mutableContentList.add(0, categoriesItem)
             }
         }
 
         return mutableContentList
     }
 
-    private fun updateDiscover(mostPopularPodcastsByCategoryRow: MostPopularPodcastsByCategoryRow) {
-        adapter?.currentList?.let { discoverList ->
-            val updatedList =
-                discoverList.filterNot { it is DiscoverRow && it.id == "featured" }.toMutableList() // Remove ads carousel
-
-            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcastsByCategoryRow)
-
-            adapter?.submitList(updatedList)
-        }
-    }
-    private fun clearCategoryFilter() {
-        adapter?.currentList?.toMutableList()?.apply {
-            removeAll { it is MostPopularPodcastsByCategoryRow }
-            adapter?.submitList(this)
-            viewModel.loadData(resources)
-        }
-    }
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
-        private const val MOST_POPULAR_PODCASTS_ROW_INDEX = 1
-        private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
         const val EPISODE_UUID_KEY = "episode_uuid"
