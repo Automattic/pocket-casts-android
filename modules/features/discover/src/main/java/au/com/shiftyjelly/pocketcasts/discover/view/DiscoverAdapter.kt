@@ -540,7 +540,7 @@ internal class DiscoverAdapter(
                     holder.loadFlowable(
                         loadPodcastList(row.source),
                         onNext = {
-                            holder.adapter.fromListId = row.listUuid
+                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         },
                     )
