@@ -6,8 +6,6 @@
 *   Updates:
     *   Display episode's RSS artwork in more places in the app.
         ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
-    *   Add alphabetical sort order for podcast episodes.
-        ([#1968](https://github.com/Automattic/pocket-casts-android/pull/1968))
 
 7.60
 -----
