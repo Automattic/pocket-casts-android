@@ -22,9 +22,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
@@ -51,11 +50,11 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 class UserEpisodeViewHolder(
     val binding: AdapterUserEpisodeBinding,
-    val viewMode: ViewMode,
+    val settings: Settings,
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageLoader: PodcastImageLoader? = null,
+    val imageRequestFactory: PocketCastsImageRequestFactory,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val userBookmarksObservable: Observable<List<Bookmark>>,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
@@ -82,11 +81,6 @@ class UserEpisodeViewHolder(
     override val leftToRightSwipeLayout: ViewGroup
         get() = binding.leftToRightSwipeLayout
 
-    sealed class ViewMode {
-        object NoArtwork : ViewMode()
-        object Artwork : ViewMode()
-    }
-
     override lateinit var swipeButtonLayout: SwipeButtonLayout
 
     val dateFormatter = RelativeDateFormatter(context)
@@ -96,7 +90,6 @@ class UserEpisodeViewHolder(
     override var upNextAction = Settings.UpNextAction.PLAY_NEXT
     override var isMultiSelecting: Boolean = false
     var uploadConsumer = BehaviorRelay.create<Float>()
-    var lastImageLoaded: String? = null
 
     override val leftIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
         get() {
@@ -225,13 +218,7 @@ class UserEpisodeViewHolder(
 
         titleTextView.text = episode.title
 
-        val artworkVisible = viewMode is ViewMode.Artwork
-        artworkImageView.isVisible = artworkVisible
-        val artworkUrl = episode.getUrlForArtwork(thumbnail = true)
-        if (lastImageLoaded != artworkUrl && artworkVisible && imageLoader != null) {
-            imageLoader.load(episode, thumbnail = true).into(artworkImageView)
-            lastImageLoaded = artworkUrl
-        }
+        imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(artworkImageView)
 
         val checkbox = binding.checkbox
         if (checkbox.isVisible != multiSelectEnabled) {
