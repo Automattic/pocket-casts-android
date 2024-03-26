@@ -229,11 +229,11 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         binding.recyclerView.isVisible = false
                         binding.loading.isVisible = true
                     }
-                    is DiscoverState.FilteringPodcastsByCategory -> {
+                    is DiscoverState.FilteringPodcastsByCategory, DiscoverState.LoadingCategories -> {
                         binding.loading.isVisible = true
                         binding.errorLayout.isVisible = false
                     }
-                    is DiscoverState.PodcastsFilteredByCategory -> {
+                    is DiscoverState.PodcastsFilteredByCategory, DiscoverState.CategoriesLoaded -> {
                         binding.errorLayout.isVisible = false
                         binding.recyclerView.isVisible = true
                         binding.loading.isVisible = false

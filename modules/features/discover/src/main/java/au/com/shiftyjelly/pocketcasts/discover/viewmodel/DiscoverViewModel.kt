@@ -52,7 +52,7 @@ class DiscoverViewModel @Inject constructor(
     private val sourceView = SourceView.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
-    var replacements = emptyMap<String, String>()
+    private var replacements = emptyMap<String, String>()
     private var isFragmentChangingConfigurations: Boolean = false
 
     fun onShown() {
@@ -181,6 +181,8 @@ class DiscoverViewModel @Inject constructor(
         url: String,
         onSuccess: (List<CategoryPill>) -> Unit,
     ) {
+        state.postValue(DiscoverState.LoadingCategories)
+
         val categoriesList = repository.getCategoriesList(url)
 
         categoriesList.subscribeBy(
@@ -188,9 +190,11 @@ class DiscoverViewModel @Inject constructor(
                 val categoryPills = it.map { discoverCategory ->
                     convertCategoryToPill(discoverCategory)
                 }
+                state.postValue(DiscoverState.CategoriesLoaded)
                 onSuccess(categoryPills)
             },
             onError = {
+                state.postValue(DiscoverState.Error(it))
                 Timber.e(it)
             },
         ).addTo(disposables)
@@ -305,6 +309,8 @@ sealed class DiscoverState {
     data class DataLoaded(val data: List<DiscoverRow>, val selectedRegion: DiscoverRegion, val regionList: List<DiscoverRegion>) : DiscoverState()
     data object FilteringPodcastsByCategory : DiscoverState()
     data object PodcastsFilteredByCategory : DiscoverState()
+    data object LoadingCategories : DiscoverState()
+    data object CategoriesLoaded : DiscoverState()
     data class Error(val error: Throwable) : DiscoverState()
 }
 
