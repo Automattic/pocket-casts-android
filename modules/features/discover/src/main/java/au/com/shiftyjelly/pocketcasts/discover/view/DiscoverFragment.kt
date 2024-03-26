@@ -128,7 +128,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
-        viewModel.loadPodcasts(categoryWithRegionUpdated.source) {
+        viewModel.filterPodcasts(categoryWithRegionUpdated.source) {
             val podcasts = it.podcasts
 
             val mostPopularPodcasts =
@@ -203,7 +203,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                     is DiscoverState.DataLoaded -> {
                         binding.errorLayout.isVisible = false
                         binding.recyclerView.isVisible = true
-
                         binding.loading.isVisible = false
 
                         val content = state.data.plus(ChangeRegionRow(state.selectedRegion))
@@ -229,6 +228,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         binding.errorLayout.isVisible = false
                         binding.recyclerView.isVisible = false
                         binding.loading.isVisible = true
+                    }
+                    is DiscoverState.FilteringPodcastsByCategory -> {
+                        binding.loading.isVisible = true
+                        binding.errorLayout.isVisible = false
+                    }
+                    is DiscoverState.PodcastsFilteredByCategory -> {
+                        binding.errorLayout.isVisible = false
+                        binding.recyclerView.isVisible = true
+                        binding.loading.isVisible = false
                     }
                 }
             },
