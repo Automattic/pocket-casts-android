@@ -418,7 +418,7 @@ internal class DiscoverAdapter(
                 region?.let { this.region = it }
                 val categoriesFilter = mutableListOf(allCategories)
                 categoriesFilter.addAll(getMostPopularCategories(categories))
-                adapter.updateCategories(categoriesFilter)
+                adapter.loadCategories(categoriesFilter)
             }
         }
         private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {

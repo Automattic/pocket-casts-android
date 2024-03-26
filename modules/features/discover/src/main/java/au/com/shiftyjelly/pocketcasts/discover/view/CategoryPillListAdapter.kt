@@ -97,14 +97,15 @@ class CategoryPillListAdapter(
                         },
                         onCategorySelectionSuccess@{
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
-                            updateCategories(it)
+                            updateCategoryStatus(position, isSelected = false)
+                            loadCategories(it)
                         },
                     )
                 }
             } else if (!category.isSelected) {
-                markCategoryAsSelected(position)
+                updateCategoryStatus(position, isSelected = true)
                 onCategoryClick(category) {
-                    updateCategories(it)
+                    loadCategories(it)
                 }
             }
         }
@@ -112,11 +113,11 @@ class CategoryPillListAdapter(
     override fun onBindViewHolder(holder: CategoryPillViewHolder, position: Int) {
         holder.bind(getItem(position), holder.itemView.context)
     }
-    fun updateCategories(categoryPills: List<CategoryPill>) {
+    fun loadCategories(categoryPills: List<CategoryPill>) {
         submitList(categoryPills)
     }
-    private fun markCategoryAsSelected(position: Int) {
-        getItem(position).isSelected = true
+    private fun updateCategoryStatus(position: Int, isSelected: Boolean) {
+        getItem(position).isSelected = isSelected
         notifyItemChanged(position)
     }
 }
