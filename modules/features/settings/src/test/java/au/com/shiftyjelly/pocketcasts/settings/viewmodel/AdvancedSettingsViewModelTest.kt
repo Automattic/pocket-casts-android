@@ -38,6 +38,7 @@ class AdvancedSettingsViewModelTest {
     fun setUp() {
         whenever(settings.syncOnMeteredNetwork()).thenReturn(false)
         whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
+        whenever(settings.audioOffloadEnabled()).thenReturn(false)
         viewModel = AdvancedSettingsViewModel(
             settings,
             analyticsTracker,
@@ -47,6 +48,9 @@ class AdvancedSettingsViewModelTest {
 
     @Test
     fun `verify settings methods initialize the viewModel state correctly`() {
-        TestCase.assertEquals(viewModel.state.value.backgroundSyncOnMeteredState.isChecked, false)
+        with(viewModel.state.value) {
+            TestCase.assertEquals(backgroundSyncOnMeteredState.isChecked, false)
+            TestCase.assertEquals(audioOffloadEnabledState.isChecked, false)
+        }
     }
 }

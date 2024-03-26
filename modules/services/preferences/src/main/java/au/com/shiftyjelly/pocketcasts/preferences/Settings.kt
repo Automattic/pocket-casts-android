@@ -80,6 +80,7 @@ interface Settings {
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
         const val PREFERENCE_WARN_WHEN_NOT_ON_WIFI = "warnWhenNotOnWifi"
         const val PREFERENCE_SYNC_ON_METERED = "SyncWhenOnMetered"
+        const val PREFERENCE_AUDIO_OFFLOAD_ENABLED = "AudioOffloadEnabled"
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
@@ -270,6 +271,8 @@ interface Settings {
 
     fun syncOnMeteredNetwork(): Boolean
     fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
+    fun audioOffloadEnabled(): Boolean
+    fun setAudioOffloadEnabled(enable: Boolean)
     fun getWorkManagerNetworkTypeConstraint(): NetworkType
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     val backgroundRefreshPodcasts: UserSetting<Boolean>

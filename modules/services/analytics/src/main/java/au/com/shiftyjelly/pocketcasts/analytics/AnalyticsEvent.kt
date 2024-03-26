@@ -540,6 +540,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Advanced */
     SETTINGS_ADVANCED_SHOWN("settings_advanced_shown"),
     SETTINGS_ADVANCED_SYNC_ON_METERED("settings_advanced_sync_on_metered"),
+    SETTINGS_ADVANCED_AUDIO_OFFLOAD_ENABLED("settings_advanced_audio_offload_enabled"),
 
     /* Search */
     SEARCH_SHOWN("search_shown"),

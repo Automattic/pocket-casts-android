@@ -13,6 +13,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionParameters.AudioOffloadPreferences
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
@@ -213,6 +214,22 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .build()
+
+        if (settings.audioOffloadEnabled()) {
+            val audioOffloadPreferences = AudioOffloadPreferences.Builder()
+                .setAudioOffloadMode(AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_ENABLED)
+                .setIsGaplessSupportRequired(true)
+                .setIsSpeedChangeSupportRequired(true)
+                .build()
+
+            player.apply {
+                trackSelectionParameters = trackSelectionParameters
+                    .buildUpon()
+                    .setAudioOffloadPreferences(audioOffloadPreferences)
+                    .build()
+            }
+        }
+
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
 
         renderer.onAudioSessionId(player.audioSessionId)
