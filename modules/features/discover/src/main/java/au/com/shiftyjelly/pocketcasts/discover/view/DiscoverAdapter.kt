@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
-import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesRedesignBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoryPillsBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowChangeRegionBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
@@ -365,7 +365,7 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
-    inner class CategoriesRedesignViewHolder(val binding: RowCategoriesRedesignBinding) : NetworkLoadableViewHolder(binding.root) {
+    inner class CategoryPillsViewHolder(val binding: RowCategoryPillsBinding) : NetworkLoadableViewHolder(binding.root) {
         private lateinit var source: String
         private lateinit var region: String
         private lateinit var allCategories: CategoryPill
@@ -471,7 +471,7 @@ internal class DiscoverAdapter(
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
             R.layout.row_change_region -> ChangeRegionViewHolder(RowChangeRegionBinding.inflate(inflater, parent, false))
             R.layout.row_categories -> CategoriesViewHolder(RowCategoriesBinding.inflate(inflater, parent, false))
-            R.layout.row_categories_redesign -> CategoriesRedesignViewHolder(RowCategoriesRedesignBinding.inflate(inflater, parent, false))
+            R.layout.row_category_pills -> CategoryPillsViewHolder(RowCategoryPillsBinding.inflate(inflater, parent, false))
             R.layout.row_most_popular_podcasts -> MostPopularPodcastsViewHolder(RowMostPopularPodcastsBinding.inflate(inflater, parent, false))
             R.layout.row_remaining_podcasts_by_category -> RemainingPodcastsByCategoryViewHolder(RowRemainingPodcastsByCategoryBinding.inflate(inflater, parent, false))
             R.layout.row_single_podcast -> SinglePodcastViewHolder(RowSinglePodcastBinding.inflate(inflater, parent, false))
@@ -509,7 +509,7 @@ internal class DiscoverAdapter(
                         }
                     }
                     is ListType.Categories -> {
-                        return if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) R.layout.row_categories_redesign else R.layout.row_categories
+                        return if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) R.layout.row_category_pills else R.layout.row_categories
                     }
                     else -> {}
                 }
@@ -614,7 +614,7 @@ internal class DiscoverAdapter(
                         },
                     )
                 }
-                is CategoriesRedesignViewHolder -> {
+                is CategoryPillsViewHolder -> {
                     holder.loadFlowable(
                         loadCategories(row.source),
                         onNext = { categories ->
