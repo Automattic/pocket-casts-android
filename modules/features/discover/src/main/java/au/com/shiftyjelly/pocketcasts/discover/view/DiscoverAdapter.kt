@@ -370,7 +370,7 @@ internal class DiscoverAdapter(
         private lateinit var region: String
         private lateinit var allCategories: CategoryPill
 
-        private val adapter = CategoriesListRowRedesignAdapter(
+        private val adapter = CategoryPillListAdapter(
             onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
                 listener.onCategoryClick(
                     selectedCategory = selectedCategory,

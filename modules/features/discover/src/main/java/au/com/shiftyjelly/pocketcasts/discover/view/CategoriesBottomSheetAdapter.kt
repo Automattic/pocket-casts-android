@@ -9,7 +9,7 @@ import coil.load
 
 class CategoriesBottomSheetAdapter(
     private val onCategoryClick: (CategoryPill) -> Unit,
-) : ListAdapter<CategoryPill, CategoriesBottomSheetAdapter.CategoryViewHolder>(CATEGORY_REDESIGN_DIFF) {
+) : ListAdapter<CategoryPill, CategoriesBottomSheetAdapter.CategoryViewHolder>(CATEGORY_PILL_DIFF) {
     class CategoryViewHolder(
         val binding: ItemCategoryBinding,
         onItemClicked: (Int) -> Unit,
