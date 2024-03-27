@@ -64,12 +64,14 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                     // Get user's subscription status from cache
                     val cachedSubscriptionStatus = subscriptionManager.getCachedStatus()
 
+                    val filteredOffer = Subscription.filterOffers(subscriptions)
+
                     // If the user is a patron, only show the patron subscription
                     val cachedTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier
                     val filteredSubscriptions = if (cachedTier == SubscriptionTier.PATRON) {
-                        subscriptions.filter { it.tier == Subscription.SubscriptionTier.PATRON }
+                        filteredOffer.filter { it.tier == Subscription.SubscriptionTier.PATRON }
                     } else {
-                        subscriptions
+                        filteredOffer
                     }
                     val defaultSubscription = getDefaultSubscription(
                         filteredSubscriptions = filteredSubscriptions,

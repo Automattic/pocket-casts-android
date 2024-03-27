@@ -70,7 +70,10 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                             )
                         }
                     } ?: emptyList()
-                    _state.update { stateFromList(subscriptions) }
+                    _state.update {
+                        val filteredOffer = Subscription.filterOffers(subscriptions)
+                        stateFromList(filteredOffer)
+                    }
                 }
         }
     }

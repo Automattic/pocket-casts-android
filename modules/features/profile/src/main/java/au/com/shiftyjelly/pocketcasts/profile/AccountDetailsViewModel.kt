@@ -57,7 +57,8 @@ class AccountDetailsViewModel
                         ),
                     )
                 }
-            Optional.of(subscriptionManager.getDefaultSubscription(subscriptions))
+            val filteredOffer = Subscription.filterOffers(subscriptions)
+            Optional.of(subscriptionManager.getDefaultSubscription(filteredOffer))
         } else {
             Optional.empty()
         }
