@@ -537,6 +537,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
             SourceView.WIDGET_PLAYER_SMALL,
+            SourceView.WIDGET_PLAYER_MEDIUM,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
