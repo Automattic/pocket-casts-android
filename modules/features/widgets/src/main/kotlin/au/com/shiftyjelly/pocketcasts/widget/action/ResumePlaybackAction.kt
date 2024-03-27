@@ -20,8 +20,8 @@ internal class ResumePlaybackAction : ActionCallback {
     companion object {
         private val SourceKey = ActionParameters.Key<Int>("Source")
 
-        fun action() = actionRunCallback<ResumePlaybackAction>(
-            actionParametersOf(SourceKey to SourceView.WIDGET_PLAYER_SMALL.ordinal),
+        fun action(source: SourceView) = actionRunCallback<ResumePlaybackAction>(
+            actionParametersOf(SourceKey to source.ordinal),
         )
     }
 }

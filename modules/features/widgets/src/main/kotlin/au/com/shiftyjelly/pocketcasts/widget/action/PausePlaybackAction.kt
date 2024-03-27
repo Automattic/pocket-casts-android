@@ -20,8 +20,8 @@ internal class PausePlaybackAction : ActionCallback {
     companion object {
         private val SourceKey = ActionParameters.Key<Int>("Source")
 
-        fun action() = actionRunCallback<PausePlaybackAction>(
-            actionParametersOf(SourceKey to SourceView.WIDGET_PLAYER_SMALL.ordinal),
+        fun action(source: SourceView) = actionRunCallback<PausePlaybackAction>(
+            actionParametersOf(SourceKey to source.ordinal),
         )
     }
 }

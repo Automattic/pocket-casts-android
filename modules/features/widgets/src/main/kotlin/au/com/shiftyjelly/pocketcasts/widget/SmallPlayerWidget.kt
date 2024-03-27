@@ -1,11 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.widget
 
 import android.content.Context
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
 import au.com.shiftyjelly.pocketcasts.widget.ui.SmallPlayer
 
 class SmallPlayerWidget : GlanceAppWidget() {
@@ -16,7 +19,9 @@ class SmallPlayerWidget : GlanceAppWidget() {
         val updatedState = adapter.updateState(id) { it }
 
         provideContent {
-            SmallPlayer(adapter.currentState() ?: updatedState)
+            CompositionLocalProvider(LocalSource provides SourceView.WIDGET_PLAYER_SMALL) {
+                SmallPlayer(adapter.currentState() ?: updatedState)
+            }
         }
     }
 }
