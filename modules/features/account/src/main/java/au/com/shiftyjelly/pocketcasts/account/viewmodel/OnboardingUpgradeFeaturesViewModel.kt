@@ -65,7 +65,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                             )
                         }
                     }
-                    updateState(subscriptions)
+                    val filteredOffer = Subscription.filterOffers(subscriptions)
+                    updateState(filteredOffer)
                 }
         }
     }
