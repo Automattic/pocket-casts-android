@@ -44,7 +44,7 @@ class ViewModelConfigControlPlayback @Inject constructor(
         InputField(LR.string.time_to_skip_to_seconds, IR.drawable.filter_time, InputControlPlayback.PlaybackCommand.SkipToTime, { skipToSeconds }, { skipToSeconds = it }),
         InputField(LR.string.time_to_skip_seconds, IR.drawable.filter_time, listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { skipSeconds }, { skipSeconds = it }),
         object : InputField<Double>(LR.string.playback_speed_between_values, R.drawable.speedometer, InputControlPlayback.PlaybackCommand.SetPlaybackSpeed, { playbackSpeed }, { playbackSpeed = it }) {
-            override fun getPossibleValues() = MutableStateFlow((5..30).map { it / 10.0 })
+            override fun getPossibleValues() = MutableStateFlow((5..50).map { it / 10.0 })
         },
         object : InputField<TrimMode>(LR.string.trim_silence_mode, R.drawable.content_cut, InputControlPlayback.PlaybackCommand.SetTrimSilenceMode, { trimSilenceMode }, { trimSilenceMode = it }) {
             override fun getPossibleValues() = MutableStateFlow(TrimMode.values().toList())
