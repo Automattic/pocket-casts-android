@@ -15,8 +15,6 @@ Language: zh_CN
     <string name="whats_new_deselect_chapters_patron_message">订阅 Patron 后，您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
     <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受跳过章节等更多功能</string>
     <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受跳过章节等更多功能</string>
-    <string name="settings_use_embedded_podcast_artwork">使用嵌入式文件插图</string>
-    <string name="settings_episode_artwork_details">显示剧集节目注释（如果存在）中的插图，而非使用节目的插图。 如果文件插图和 RSS 插图都存在，则使用 RSS 插图。</string>
     <string name="select_one_chapter_message">请至少选择一个章节</string>
     <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 个章节 • %2$d 已隐藏</string>
@@ -801,7 +799,6 @@ Language: zh_CN
     <string name="settings_website_link">网站链接</string>
     <string name="settings_view">查看</string>
     <string name="settings_version">版本 %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">使用嵌入式 RSS 插图</string>
     <string name="settings_use_android_light_dark_mode">使用 Android 浅色/深色模式</string>
     <string name="settings_up_next_tap_summary">如果打开，点按“接下来播放”队列中的某个项目将播放该项目。 长按将显示剧集选项。</string>
     <string name="settings_up_next_tap">点按时播放“接下来播放”剧集</string>
@@ -913,7 +910,6 @@ Language: zh_CN
     <string name="settings_export_send_email">发送电子邮件</string>
     <string name="settings_export_save_file_summary">将 OPML 文件导出到您的存储设备。</string>
     <string name="settings_export_save_file">保存文件</string>
-    <string name="settings_embedded_artwork_details">在播放器中显示下载文件（如果存在）中的插图，而不是使用节目的插图。</string>
     <string name="settings_developer">开发人员</string>
     <string name="settings_close_upgrade_offer">关闭升级优惠</string>
     <string name="settings_choose_podcasts">选择播客</string>

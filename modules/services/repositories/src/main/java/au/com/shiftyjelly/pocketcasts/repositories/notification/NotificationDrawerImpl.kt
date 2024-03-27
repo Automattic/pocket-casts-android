@@ -92,7 +92,7 @@ class NotificationDrawerImpl @Inject constructor(
     }
 
     private fun loadUserEpisodeArtwork(episode: UserEpisode): Bitmap? {
-        val request = imageRequestFactory.create(episode, settings.useRssArtwork.value)
+        val request = imageRequestFactory.create(episode, settings.useEpisodeArtwork.value)
         return context.imageLoader.executeBlocking(request).drawable?.toBitmap() ?: loadPlaceholderBitmap()
     }
 

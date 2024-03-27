@@ -15,8 +15,6 @@ Language: ja_JP
     <string name="whats_new_deselect_chapters_patron_message">Patron サブスクリプションの一環として、チャプターに対応するどのエピソードでも、選択したチャプターをスキップできるようになりました。</string>
     <string name="skip_chapters_patron_prompt">Pocket Casts Patron でチャプターのスキップやその他の機能を利用</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus でチャプターのスキップやその他の機能を利用</string>
-    <string name="settings_use_embedded_podcast_artwork">埋め込みファイルアートワークを使用</string>
-    <string name="settings_episode_artwork_details">番組のアートワークを使用する代わりに、エピソードのショーノートからのアートワークを表示します (存在する場合)。 ファイルと RSS アートワークの両方が存在する場合、RSS アートワークが使用されます。</string>
     <string name="select_one_chapter_message">チャプターを少なくとも1つ選択してください</string>
     <string name="number_of_chapters_summary_singular">1個のチャプター • %d個が非表示</string>
     <string name="number_of_chapters_summary_plural">%1$d個のチャプター • %2$d個が非表示</string>
@@ -801,7 +799,6 @@ Language: ja_JP
     <string name="settings_website_link">サイトのリンク</string>
     <string name="settings_view">表示</string>
     <string name="settings_version">バージョン%1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">埋め込み RSS アートワークを使用</string>
     <string name="settings_use_android_light_dark_mode">Android のライト / ダークモードを使用</string>
     <string name="settings_up_next_tap_summary">オンにすると、次のエピソード待機リストでアイテムをタップすることでアイテムが再生されます。 長押しするとエピソードオプションが表示されます。</string>
     <string name="settings_up_next_tap">タップして次のエピソードを再生</string>
@@ -913,7 +910,6 @@ Language: ja_JP
     <string name="settings_export_send_email">メールを送信</string>
     <string name="settings_export_save_file_summary">OPML ファイルをストレージにエクスポートします。</string>
     <string name="settings_export_save_file">ファイルを保存</string>
-    <string name="settings_embedded_artwork_details">番組のアートワークを使用する代わりに、プレーヤーのダウンロードファイルからのアートワークを表示します (存在する場合)。</string>
     <string name="settings_developer">開発者</string>
     <string name="settings_close_upgrade_offer">アップグレードのオファーを閉じる</string>
     <string name="settings_choose_podcasts">ポッドキャストを選択</string>

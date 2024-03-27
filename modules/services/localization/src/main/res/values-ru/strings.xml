@@ -15,8 +15,6 @@ Language: ru
     <string name="whats_new_deselect_chapters_patron_message">В рамках подписки на Patron вы теперь можете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
     <string name="skip_chapters_patron_prompt">Возможность пропускать главы и множество других функций с Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Возможность пропускать главы и множество других функций с Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Использовать встроенные обложки файлов</string>
-    <string name="settings_episode_artwork_details">Показывает тему из заметок для показа эпизода (при наличии) вместо темы шоу. Если имеется одновременно и обложка файла, и тема RSS, будет применяться тема RSS.</string>
     <string name="select_one_chapter_message">Выберите хотя бы одну главу</string>
     <string name="number_of_chapters_summary_singular">1 глава • Скрыто: %d</string>
     <string name="number_of_chapters_summary_plural">Глав: %1$d • Скрыто: %2$d</string>
@@ -801,7 +799,6 @@ Language: ru
     <string name="settings_website_link">ссылка на веб-сайт</string>
     <string name="settings_view">Просмотреть</string>
     <string name="settings_version">Версия%1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Использовать встроенную тему RSS</string>
     <string name="settings_use_android_light_dark_mode">Использовать светлый/тёмный режим Android</string>
     <string name="settings_up_next_tap_summary">Если функция включена, элемент очереди «Следующие» будет воспроизводиться при нажатии. При долгом нажатии появятся настройки выпуска.</string>
     <string name="settings_up_next_tap">Воспроизводить выпуск из очереди «Следующие» по нажатию</string>
@@ -913,7 +910,6 @@ Language: ru
     <string name="settings_export_send_email">Послать сообщение по эл.почте</string>
     <string name="settings_export_save_file_summary">Экспортировать файл OPML в ваше хранилище.</string>
     <string name="settings_export_save_file">Сохранить файл</string>
-    <string name="settings_embedded_artwork_details">Показывает в плеере тему из загруженного файла (при наличии) вместо темы шоу.</string>
     <string name="settings_developer">Разработчик</string>
     <string name="settings_close_upgrade_offer">закрыть предложение платной услуги</string>
     <string name="settings_choose_podcasts">Выбрать подкасты</string>

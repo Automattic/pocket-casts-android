@@ -15,8 +15,6 @@ Language: nl
     <string name="whats_new_deselect_chapters_patron_message">Met het Patron-abonnement kan je waar mogelijk hoofdstukken van afleveringen selecteren en overslaan.</string>
     <string name="skip_chapters_patron_prompt">Sla hoofdstukken over en geniet van extra functies met Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Sla hoofdstukken over en geniet van extra functies met Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Artwork-embed gebruiken</string>
-    <string name="settings_episode_artwork_details">Geeft de artwork van het gedownloade bestand weer (als het bestaat) in de speler, in plaats van de artwork van de serie te gebruiken. If both file and RSS artwork are present, RSS artwork will be used.</string>
     <string name="select_one_chapter_message">Please select at least one chapter</string>
     <string name="number_of_chapters_summary_singular">1 hoofdstuk • %d verborgen</string>
     <string name="number_of_chapters_summary_plural">%1$d hoofdstukken • %2$d verborgen</string>
@@ -801,7 +799,6 @@ Language: nl
     <string name="settings_website_link">websitelink</string>
     <string name="settings_view">Bekijk</string>
     <string name="settings_version">Versie %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Artwork-embed gebruiken</string>
     <string name="settings_use_android_light_dark_mode">Lichte/donkere Android-modus gebruiken</string>
     <string name="settings_up_next_tap_summary">Als dit is ingeschakeld, dan wordt een aflevering afgespeeld als je erop tikt in Hierna. Bij lang ingedrukt houden, worden opties voor de aflevering weergegeven.</string>
     <string name="settings_up_next_tap">Aflevering afspelen na tikken in Hierna</string>
@@ -913,7 +910,6 @@ Language: nl
     <string name="settings_export_send_email">Verstuur e-mail</string>
     <string name="settings_export_save_file_summary">Exporteer het OPML-bestanden naar je opslag.</string>
     <string name="settings_export_save_file">Bestand opslaan</string>
-    <string name="settings_embedded_artwork_details">Geeft de artwork van het gedownloade bestand weer (als het bestaat) in de speler, in plaats van de artwork van de serie te gebruiken.</string>
     <string name="settings_developer">Ontwikkelaar</string>
     <string name="settings_close_upgrade_offer">upgrade-aanbod sluiten</string>
     <string name="settings_choose_podcasts">Podcasts kiezen</string>

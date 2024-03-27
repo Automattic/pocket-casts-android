@@ -262,7 +262,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         settings.useDynamicColorsForWidget.flow
             .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
             .launchIn(applicationScope)
-        settings.useRssArtwork.flow
+        settings.useEpisodeArtwork.flow
             .onEach { widgetManager.updateWidgetRssArtwork(playbackManager) }
             .launchIn(applicationScope)
 

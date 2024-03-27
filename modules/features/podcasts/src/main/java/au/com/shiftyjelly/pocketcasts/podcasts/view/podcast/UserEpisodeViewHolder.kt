@@ -218,7 +218,7 @@ class UserEpisodeViewHolder(
 
         titleTextView.text = episode.title
 
-        imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(artworkImageView)
+        imageRequestFactory.create(episode, settings.useEpisodeArtwork.value).loadInto(artworkImageView)
 
         val checkbox = binding.checkbox
         if (checkbox.isVisible != multiSelectEnabled) {

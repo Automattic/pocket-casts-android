@@ -342,7 +342,7 @@ class EpisodeFragment : BaseFragment() {
                                 .show()
                             true
                         }
-                        imageRequestFactory.create(state.episode, settings.useRssArtwork.value).loadInto(binding.podcastArtwork)
+                        imageRequestFactory.create(state.episode, settings.useEpisodeArtwork.value).loadInto(binding.podcastArtwork)
 
                         binding.btnPlay.setOnPlayClicked {
                             val context = binding.root.context

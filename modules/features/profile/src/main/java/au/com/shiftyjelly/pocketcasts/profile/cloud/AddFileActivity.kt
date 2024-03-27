@@ -692,7 +692,7 @@ class AddFileActivity :
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 val episodeMetadata = EpisodeFileMetadata()
-                episodeMetadata.read(tracks, true, this@AddFileActivity)
+                episodeMetadata.read(tracks, useEpisodeArtwork = false, this@AddFileActivity)
                 episodeMetadata.embeddedArtworkPath?.let {
                     val artworkUri = Uri.parse(it)
                     loadImageFromUri(artworkUri, isFile = true)

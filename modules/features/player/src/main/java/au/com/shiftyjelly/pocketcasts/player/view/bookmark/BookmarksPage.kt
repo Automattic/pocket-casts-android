@@ -192,7 +192,7 @@ private fun BookmarksView(
                     else -> TimePlayButtonColors.Default
                 },
                 showIcon = false,
-                useRssArtwork = state.useRssArtwork,
+                useEpisodeArtwork = state.useEpisodeArtwork,
             )
         }
     }
@@ -222,7 +222,7 @@ private fun BookmarksPreview(
                     publishedDate = Date(),
                 ),
                 isMultiSelecting = false,
-                useRssArtwork = false,
+                useEpisodeArtwork = false,
                 isSelected = { false },
                 onRowClick = {},
                 sourceView = SourceView.PLAYER,

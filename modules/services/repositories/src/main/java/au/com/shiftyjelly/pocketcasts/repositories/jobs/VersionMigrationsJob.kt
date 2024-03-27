@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -158,6 +159,10 @@ class VersionMigrationsJob : JobService() {
         if (previousVersionCode < 6362) {
             upgradeTrimSilenceMode()
         }
+
+        if (previousVersionCode < 9204) {
+            consolidateEmbeddedArtworkSettings(applicationContext)
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {
@@ -233,6 +238,14 @@ class VersionMigrationsJob : JobService() {
             }
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not migrate trimsilence mode on podcasts")
+        }
+    }
+
+    private fun consolidateEmbeddedArtworkSettings(context: Context) {
+        if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
+            val useFileArtwork = settings.getBooleanForKey("useEmbeddedArtwork", false)
+            settings.useEpisodeArtwork.set(useEpisodeArtwork || useFileArtwork, needsSync = true)
         }
     }
 }
