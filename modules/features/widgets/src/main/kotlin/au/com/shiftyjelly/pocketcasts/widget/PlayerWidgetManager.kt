@@ -52,9 +52,11 @@ class PlayerWidgetManager @Inject constructor(
     private suspend fun glaceIds() = buildList {
         val manager = GlanceAppWidgetManager(context)
         addAll(manager.getGlanceIds(SmallPlayerWidget::class.java))
+        addAll(manager.getGlanceIds(MediumPlayerWidget::class.java))
     }
 
     private suspend fun refreshAllWidgets() {
         SmallPlayerWidget().updateAll(context)
+        MediumPlayerWidget().updateAll(context)
     }
 }
