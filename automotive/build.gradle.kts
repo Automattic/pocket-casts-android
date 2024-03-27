@@ -91,8 +91,10 @@ dependencies {
 }
 
 sentry {
-    includeProguardMapping = System.getenv()["CI"].toBoolean()
-            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+    val shouldSendDebugFilesToSentry = (System.getenv()["CI"].toBoolean()
+            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean())
+    includeProguardMapping = shouldSendDebugFilesToSentry
+    includeSourceContext = shouldSendDebugFilesToSentry
 }
 
 apply(plugin = "com.google.gms.google-services")
