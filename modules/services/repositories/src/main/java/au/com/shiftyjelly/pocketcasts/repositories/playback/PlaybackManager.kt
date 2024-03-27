@@ -137,7 +137,7 @@ open class PlaybackManager @Inject constructor(
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
-        private const val UPDATE_EVERY = 10
+        private const val UPDATE_EVERY = 5
         private const val UPDATE_TIMER_POLL_TIME: Long = 1000
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
@@ -543,6 +543,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.WHATS_NEW,
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
+            SourceView.WIDGET_PLAYER_SMALL,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,

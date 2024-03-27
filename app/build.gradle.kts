@@ -94,6 +94,7 @@ dependencies {
     implementation(project(":modules:features:settings"))
     implementation(project(":modules:features:shared"))
     implementation(project(":modules:features:taskerplugin"))
+    implementation(project(":modules:features:widgets"))
     // services
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))

@@ -36,6 +36,7 @@ enum class SourceView(val analyticsValue: String) {
     STATS("stats"),
     WHATS_NEW("whats_new"),
     METERED_NETWORK_CHANGE("metered_network_change"),
+    WIDGET_PLAYER_SMALL("widget_player_small"),
     ;
 
     fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
