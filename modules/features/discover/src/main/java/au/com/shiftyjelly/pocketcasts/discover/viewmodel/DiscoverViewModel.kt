@@ -52,7 +52,7 @@ class DiscoverViewModel @Inject constructor(
     private val sourceView = SourceView.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
-    var replacements = emptyMap<String, String>()
+    private var replacements = emptyMap<String, String>()
     private var isFragmentChangingConfigurations: Boolean = false
 
     fun onShown() {
@@ -127,12 +127,16 @@ class DiscoverViewModel @Inject constructor(
                 addPlaybackStateToList(it)
             }
     }
-    fun loadPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+    fun filterPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+        state.postValue(DiscoverState.FilteringPodcastsByCategory)
+
         loadPodcastList(source).subscribeBy(
             onNext = {
+                state.postValue(DiscoverState.PodcastsFilteredByCategory)
                 onPodcastsLoaded(it)
             },
             onError = {
+                state.postValue(DiscoverState.Error(it))
                 Timber.e(it)
             },
         ).addTo(disposables)
@@ -216,17 +220,21 @@ class DiscoverViewModel @Inject constructor(
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
         return podcastManager.getSubscribedPodcastUuids().toFlowable() // Get the current subscribed list
             .mergeWith(podcastManager.observePodcastSubscriptions()) // Get updated when it changes
-            .flatMap { subscribedList ->
-                val newPodcastList = list.podcasts.map { podcast -> // Update the podcast list with each podcasts subscription status
-                    podcast.updateIsSubscribed(subscribedList.contains(podcast.uuid))
+            .map { subscribedList ->
+                val updatedPodcasts = list.podcasts.map { podcast ->
+                    val isSubscribed = subscribedList.contains(podcast.uuid)
+                    if (podcast.isSubscribed != isSubscribed) { // Check if there's a change in isSubscribed state
+                        podcast.copy(isSubscribed = isSubscribed)
+                    } else {
+                        podcast // If there's no change, keep the podcast unchanged
+                    }
                 }
-
-                return@flatMap Flowable.just(list.copy(podcasts = newPodcastList))
+                list.copy(podcasts = updatedPodcasts)
             }
+            .distinctUntilChanged() // Emit only if there's a change in the list of podcasts
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
-
     private fun addPlaybackStateToList(list: PodcastList): Flowable<PodcastList> {
         return Flowable.just(list)
             .combineLatest(
@@ -293,8 +301,10 @@ class DiscoverViewModel @Inject constructor(
 }
 
 sealed class DiscoverState {
-    object Loading : DiscoverState()
+    data object Loading : DiscoverState()
     data class DataLoaded(val data: List<DiscoverRow>, val selectedRegion: DiscoverRegion, val regionList: List<DiscoverRegion>) : DiscoverState()
+    data object FilteringPodcastsByCategory : DiscoverState()
+    data object PodcastsFilteredByCategory : DiscoverState()
     data class Error(val error: Throwable) : DiscoverState()
 }
 

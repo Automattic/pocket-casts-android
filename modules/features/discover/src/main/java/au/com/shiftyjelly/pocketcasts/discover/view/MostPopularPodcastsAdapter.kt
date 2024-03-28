@@ -24,7 +24,7 @@ internal class MostPopularPodcastsAdapter(
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, MostPopularPodcastsViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
 
-    var fromListId: String? = null
+    private var fromListId: String? = null
 
     class MostPopularPodcastsViewHolder(
         val binding: ItemMostPopularPodcastsBinding,
@@ -60,22 +60,31 @@ internal class MostPopularPodcastsAdapter(
         val binding = ItemMostPopularPodcastsBinding.inflate(inflater, parent, false)
         return MostPopularPodcastsViewHolder(binding) { position ->
             val podcast = getItem(position) as DiscoverPodcast
-            fromListId?.let {
-                FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
-                analyticsTracker.track(
-                    AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
-                    mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid),
-                )
-            }
+            trackImpression(podcast)
             onPodcastClicked(podcast, fromListId)
         }
     }
-
     override fun onBindViewHolder(holder: MostPopularPodcastsViewHolder, position: Int) {
         val podcast = getItem(position)
 
         if (podcast is DiscoverPodcast) {
             holder.bind(podcast)
+        }
+    }
+    fun replaceList(list: List<DiscoverPodcast>) {
+        submitList(null) // We need this to avoid displaying the previous category list when switching from a different category
+        submitList(list)
+    }
+    fun setFromListId(value: String) {
+        this.fromListId = value
+    }
+    private fun trackImpression(podcast: DiscoverPodcast) {
+        fromListId?.let {
+            FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+                mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid),
+            )
         }
     }
 }
