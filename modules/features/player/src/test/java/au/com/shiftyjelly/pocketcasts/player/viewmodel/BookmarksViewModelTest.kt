@@ -98,6 +98,10 @@ class BookmarksViewModelTest {
             .thenReturn(MutableLiveData<Boolean>().apply { value = false })
         whenever(multiSelectHelper.selectedListLive)
             .thenReturn(MutableLiveData<List<Bookmark>>().apply { value = emptyList() })
+        val useRssArtwork = mock<UserSetting<Boolean>> {
+            on { flow } doReturn MutableStateFlow(false)
+        }
+        whenever(settings.useRssArtwork).thenReturn(useRssArtwork)
 
         bookmarksViewModel = BookmarksViewModel(
             analyticsTracker = analyticsTracker,

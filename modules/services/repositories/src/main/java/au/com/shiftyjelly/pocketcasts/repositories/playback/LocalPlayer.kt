@@ -162,6 +162,10 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
         onPlayerEvent(this, PlayerEvent.MetadataAvailable(episodeMetadata))
     }
 
+    protected fun onEpisodeChanged(episodeUuid: String) {
+        onPlayerEvent(this, PlayerEvent.EpisodeChanged(episodeUuid))
+    }
+
     override suspend fun seekToTimeMs(positionMs: Int) {
         withContext(Dispatchers.Main) {
             if (positionMs < 0) {

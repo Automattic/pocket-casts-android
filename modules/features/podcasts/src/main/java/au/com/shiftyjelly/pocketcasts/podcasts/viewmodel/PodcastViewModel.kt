@@ -569,7 +569,7 @@ class PodcastViewModel
     }
 
     sealed class UiState {
-        data class Loaded(
+        data class Loaded constructor(
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,

@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -47,7 +47,7 @@ class EpisodeListAdapter(
     val settings: Settings,
     val onRowClick: (BaseEpisode) -> Unit,
     val playButtonListener: PlayButton.OnClickListener,
-    val imageLoader: PodcastImageLoader,
+    val imageRequestFactory: PocketCastsImageRequestFactory,
     val multiSelectHelper: MultiSelectEpisodesHelper,
     val fragmentManager: FragmentManager,
     val fromListUuid: String? = null,
@@ -77,16 +77,17 @@ class EpisodeListAdapter(
                 downloadProgressUpdates = downloadManager.progressUpdateRelay,
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
-                imageLoader = imageLoader,
+                imageRequestFactory = imageRequestFactory,
+                settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
             )
             R.layout.adapter_user_episode -> UserEpisodeViewHolder(
                 binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),
-                viewMode = UserEpisodeViewHolder.ViewMode.Artwork,
+                settings = settings,
                 downloadProgressUpdates = downloadManager.progressUpdateRelay,
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
-                imageLoader = imageLoader,
+                imageRequestFactory = imageRequestFactory,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
                 userBookmarksObservable = bookmarkManager.findUserEpisodesBookmarksFlow().asObservable(),
             )
