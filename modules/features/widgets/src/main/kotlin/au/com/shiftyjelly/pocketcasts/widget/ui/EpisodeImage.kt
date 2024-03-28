@@ -22,18 +22,18 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 internal fun EpisodeImage(
     episode: PlayerWidgetEpisode?,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     val context = LocalContext.current
-    var provider by remember(episode?.uuid, useRssArtwork) {
+    var provider by remember(episode?.uuid, useEpisodeArtwork) {
         mutableStateOf(ImageProvider(IR.drawable.defaultartwork_small_rounded))
     }
 
     if (episode != null) {
-        LaunchedEffect(episode.artworkUrl, useRssArtwork) {
+        LaunchedEffect(episode.artworkUrl, useEpisodeArtwork) {
             val requestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 16).smallSize()
-            val request = requestFactory.create(episode.toBaseEpisode(), useRssArtwork)
+            val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
             var drawable: Drawable? = null
             while (drawable == null) {
                 drawable = context.imageLoader.execute(request).drawable

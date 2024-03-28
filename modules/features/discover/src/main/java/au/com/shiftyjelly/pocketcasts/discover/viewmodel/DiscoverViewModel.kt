@@ -52,7 +52,7 @@ class DiscoverViewModel @Inject constructor(
     private val sourceView = SourceView.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
-    var replacements = emptyMap<String, String>()
+    private var replacements = emptyMap<String, String>()
     private var isFragmentChangingConfigurations: Boolean = false
 
     fun onShown() {
@@ -127,12 +127,16 @@ class DiscoverViewModel @Inject constructor(
                 addPlaybackStateToList(it)
             }
     }
-    fun loadPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+    fun filterPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+        state.postValue(DiscoverState.FilteringPodcastsByCategory)
+
         loadPodcastList(source).subscribeBy(
             onNext = {
+                state.postValue(DiscoverState.PodcastsFilteredByCategory)
                 onPodcastsLoaded(it)
             },
             onError = {
+                state.postValue(DiscoverState.Error(it))
                 Timber.e(it)
             },
         ).addTo(disposables)
@@ -297,8 +301,10 @@ class DiscoverViewModel @Inject constructor(
 }
 
 sealed class DiscoverState {
-    object Loading : DiscoverState()
+    data object Loading : DiscoverState()
     data class DataLoaded(val data: List<DiscoverRow>, val selectedRegion: DiscoverRegion, val regionList: List<DiscoverRegion>) : DiscoverState()
+    data object FilteringPodcastsByCategory : DiscoverState()
+    data object PodcastsFilteredByCategory : DiscoverState()
     data class Error(val error: Throwable) : DiscoverState()
 }
 

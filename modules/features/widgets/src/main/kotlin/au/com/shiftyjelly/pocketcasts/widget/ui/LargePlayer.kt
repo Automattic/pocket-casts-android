@@ -30,7 +30,7 @@ internal fun LargePlayer(state: PlayerWidgetState) {
                 )
                 LargePlayerQueue(
                     queue = upNextEpisodes,
-                    useRssArtwork = state.useRssArtwork,
+                    useEpisodeArtwork = state.useEpisodeArtwork,
                 )
             }
         }

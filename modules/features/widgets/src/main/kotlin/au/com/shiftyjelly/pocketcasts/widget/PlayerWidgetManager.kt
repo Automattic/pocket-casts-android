@@ -30,9 +30,9 @@ class PlayerWidgetManager @Inject constructor(
         }
     }
 
-    fun updateUseRssArtwork(useRssArtwork: Boolean) {
+    fun updateUseEpisodeArtwork(useEpisodeArtwork: Boolean) {
         updateWidgetStates { state ->
-            state.copy(useRssArtwork = useRssArtwork)
+            state.copy(useEpisodeArtwork = useEpisodeArtwork)
         }
     }
 

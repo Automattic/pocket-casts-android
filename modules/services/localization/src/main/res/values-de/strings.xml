@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 09:54:03+0000
+Translation-Revision-Date: 2024-03-26 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="discover_most_popular_in">Am Beliebtesten in %s</string>
+    <string name="discover_select_categories">Kategorie auswählen</string>
+    <string name="discover_all_categories">Alle Kategorien</string>
     <string name="upgrade_to_patron">Upgrade auf Patron durchführen </string>
     <string name="upgrade_to_plus">Upgrade auf Plus durchführen</string>
     <string name="whats_new_got_it_button">Verstanden</string>
@@ -15,8 +18,6 @@ Language: de
     <string name="whats_new_deselect_chapters_patron_message">Als Teil deines Patron-Abonnements kannst du nun in jeder Folge Kapitel auswählen und überspringen kannst (falls unterstützt).</string>
     <string name="skip_chapters_patron_prompt">Überspringe Kapitel und mehr mit Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Überspringe Kapitel und mehr mit Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Eingebettetes Datei-Cover verwenden</string>
-    <string name="settings_episode_artwork_details">Dadurch wird anstelle des Show-Covers das Cover der Shownotizen der Episode (falls vorhanden) angezeigt. Wenn sowohl Datei- als auch RSS-Cover vorhanden sind, wir das RSS-Cover verwendet.</string>
     <string name="select_one_chapter_message">Bitte wähle mindestens ein Kapitel aus</string>
     <string name="number_of_chapters_summary_singular">1 Kapitel • %d versteckt</string>
     <string name="number_of_chapters_summary_plural">%1$d Kapitel • %2$d versteckt</string>
@@ -73,13 +74,10 @@ Language: de
     <string name="eoy_story_top_podcasts_title">Und auch diese Shows haben dir gefallen!</string>
     <string name="end_of_year_story_top_podcast_title">%1$s war deine am häufigsten angehörte Show im Jahr 2023</string>
     <string name="end_of_year_share_story">Diese Story teilen</string>
-    <string name="whats_new_bookmarks_enable_now_button">Jetzt aktivieren</string>
     <string name="podcast_log_in_to_rate">Bitte melde dich an, um eine Bewertung abzugeben</string>
     <string name="podcast_submit_rating_no_internet">Keine Internetverbindung gefunden. Bitte stelle eine Internetverbindung her, um eine Bewertung abzugeben.</string>
     <string name="podcast_rate">%s bewerten</string>
     <string name="submit">Übermitteln</string>
-    <string name="whats_new_bookmarks_try_now_button">Jetzt testen</string>
-    <string name="whats_new_bookmarks_title">Die Lesezeichen sind da!</string>
     <string name="bookmarks_upsell_instructions_early_access">Profitiere mit Pocket Casts Patron von frühzeitigem Zugriff auf diese Funktion und speichere Zeitstempel für deine Lieblingsfolgen. Bald für Plus-Abonnenten verfügbar.</string>
     <string name="bookmarks_upsell_instructions">Speichere Zeitstempel für deine Lieblingsfolgen und schalte viele weitere Funktionen mit Pocket Casts Plus frei.</string>
     <string name="error_loading_show_notes">Notizen zur Show konnten für diese Folge nicht gefunden werden.</string>
@@ -801,7 +799,6 @@ Language: de
     <string name="settings_website_link">Website-Link</string>
     <string name="settings_view">Ansehen</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Eingebettetes RSS-Cover verwenden</string>
     <string name="settings_use_android_light_dark_mode">Android Light Mode/Dark Mode verwenden</string>
     <string name="settings_up_next_tap_summary">Wenn diese Funktion aktiviert ist, wird eine Folge in deiner Warteschlange abgespielt, wenn du sie antippst. Durch Gedrückthalten werden Optionen für die Folge angezeigt.</string>
     <string name="settings_up_next_tap">Folgen in der Warteschlange beim Antippen abspielen</string>
@@ -913,7 +910,6 @@ Language: de
     <string name="settings_export_send_email">E-Mail senden</string>
     <string name="settings_export_save_file_summary">Exportiere die OPML-Datei in deinen Speicher.</string>
     <string name="settings_export_save_file">Datei speichern</string>
-    <string name="settings_embedded_artwork_details">Dadurch wird im Player anstelle des Podcast-Covers das Cover aus der heruntergeladenen Datei (falls vorhanden) angezeigt.</string>
     <string name="settings_developer">Entwickler</string>
     <string name="settings_close_upgrade_offer">Upgrade-Angebot beenden</string>
     <string name="settings_choose_podcasts">Podcasts auswählen</string>

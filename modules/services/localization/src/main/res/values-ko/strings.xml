@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 09:54:03+0000
+Translation-Revision-Date: 2024-03-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="discover_most_popular_in">%s에서 가장 인기있는</string>
+    <string name="discover_select_categories">카테고리 선택</string>
+    <string name="discover_all_categories">모든 카테고리</string>
     <string name="upgrade_to_patron">Patron으로 업그레이드</string>
     <string name="upgrade_to_plus">Plus로 업그레이드</string>
     <string name="whats_new_got_it_button">알겠습니다.</string>
@@ -15,8 +18,6 @@ Language: ko_KR
     <string name="whats_new_deselect_chapters_patron_message">Patron 구독의 일부로 이제 해당 챕터를 지원하는 모든 에피소드에서 챕터를 선택하고 건너뛸 수 있습니다.</string>
     <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 건너뛰기 등</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 건너뛰기 등</string>
-    <string name="settings_use_embedded_podcast_artwork">임베드한 파일 아트워크 사용</string>
-    <string name="settings_episode_artwork_details">프로그램의 아트워크를 사용하지 않고 에피소드의 프로그램 메모(있는 경우)의 아트워크를 보여줍니다. 파일과 RSS 아트워크가 둘 다 있으면 RSS 아트워크가 사용됩니다.</string>
     <string name="select_one_chapter_message">챕터를 하나 이상 선택하세요.</string>
     <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>
     <string name="number_of_chapters_summary_plural">%1$d개 챕터 • %2$d개 숨김</string>
@@ -73,13 +74,10 @@ Language: ko_KR
     <string name="eoy_story_top_podcasts_title">이런 프로그램도 많이 청취하셨습니다!</string>
     <string name="end_of_year_story_top_podcast_title">2023년 가장 많이 청취한 프로그램은 %1$s였습니다.</string>
     <string name="end_of_year_share_story">이 스토리 공유</string>
-    <string name="whats_new_bookmarks_enable_now_button">지금 활성화</string>
     <string name="podcast_log_in_to_rate">평가를 남기려면 로그인 필요</string>
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
     <string name="podcast_rate">%s 평가</string>
     <string name="submit">제출</string>
-    <string name="whats_new_bookmarks_try_now_button">지금 시도</string>
-    <string name="whats_new_bookmarks_title">북마크는 여기 있습니다!</string>
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>
     <string name="bookmarks_upsell_instructions">Pocket Casts Plus로 좋아하는 에피소드의 타임스탬프를 저장하고 다양한 기능을 이용해보세요.</string>
     <string name="error_loading_show_notes">이 에피소드의 프로그램 메모를 찾을 수 없습니다.</string>
@@ -801,7 +799,6 @@ Language: ko_KR
     <string name="settings_website_link">웹사이트 링크</string>
     <string name="settings_view">보기</string>
     <string name="settings_version">버전 %1$s(%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">임베드한 아트워크 RSS 사용</string>
     <string name="settings_use_android_light_dark_mode">Android 밝게/어둡게 모드 사용</string>
     <string name="settings_up_next_tap_summary">켜진 경우, 다음 차례 대기열의 아이템을 누르면 해당 아이템이 재생됩니다. 길게 누르면 에피소드 옵션이 표시됩니다.</string>
     <string name="settings_up_next_tap">탭에서 다음 차례 에피소드 재생</string>
@@ -913,7 +910,6 @@ Language: ko_KR
     <string name="settings_export_send_email">이메일 보내기</string>
     <string name="settings_export_save_file_summary">저장 공간으로 OPML 파일을 내보냅니다.</string>
     <string name="settings_export_save_file">파일 저장</string>
-    <string name="settings_embedded_artwork_details">프로그램의 아트워크를 사용하지 않고 다운로드한 파일(있는 경우)의 아트워크를 플레이어에서 보여줍니다.</string>
     <string name="settings_developer">개발자</string>
     <string name="settings_close_upgrade_offer">업그레이드 제안 닫기</string>
     <string name="settings_choose_podcasts">팟캐스트 선택</string>

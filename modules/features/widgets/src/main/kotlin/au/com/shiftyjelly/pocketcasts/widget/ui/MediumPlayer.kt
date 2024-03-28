@@ -43,7 +43,7 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
         ) {
             EpisodeImage(
                 episode = state.currentEpisode,
-                useRssArtwork = state.useRssArtwork,
+                useEpisodeArtwork = state.useEpisodeArtwork,
                 modifier = GlanceModifier
                     .size(66.dp)
                     .clickable(action),

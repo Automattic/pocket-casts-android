@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 11:54:03+0000
+Translation-Revision-Date: 2024-03-25 20:56:48+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="episode_sort_title_z_a">Rubrik (Ö-A)</string>
+    <string name="episode_sort_title_a_z">Rubrik (A–Ö)</string>
+    <string name="discover_most_popular_in">Mest populärt i %s</string>
+    <string name="discover_select_categories">Välj en kategori</string>
+    <string name="discover_all_categories">Alla kategorier</string>
     <string name="upgrade_to_patron">Uppgradera till Patron</string>
     <string name="upgrade_to_plus">Uppgradera till Plus</string>
     <string name="whats_new_got_it_button">Uppfattat</string>
@@ -15,8 +20,6 @@ Language: sv_SE
     <string name="whats_new_deselect_chapters_patron_message">Som en del av din Patron-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
     <string name="skip_chapters_patron_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Använd inbäddat filomslag</string>
-    <string name="settings_episode_artwork_details">Visar omslag från avsnittets showanteckningar (om sådana finns) istället för att använda showens omslag. Om både fil- och RSS-omslag finns kommer RSS-omslaget att användas.</string>
     <string name="select_one_chapter_message">Välj minst ett kapitel</string>
     <string name="number_of_chapters_summary_singular">1 kapitel • %d dolda</string>
     <string name="number_of_chapters_summary_plural">%1$d kapitel • %2$d dolda</string>
@@ -73,13 +76,10 @@ Language: sv_SE
     <string name="eoy_story_top_podcasts_title">Du lyssnade även mycket på dessa podcasts.</string>
     <string name="end_of_year_story_top_podcast_title">%1$s var den podcast du lyssnade mest på under 2023</string>
     <string name="end_of_year_share_story">Dela den här berättelsen</string>
-    <string name="whats_new_bookmarks_enable_now_button">Aktivera det nu</string>
     <string name="podcast_log_in_to_rate">Du måste logga in för att ge ett betyg</string>
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
     <string name="podcast_rate">Omdöme %s</string>
     <string name="submit">Skicka</string>
-    <string name="whats_new_bookmarks_try_now_button">Testa nu</string>
-    <string name="whats_new_bookmarks_title">Bokmärkena är här!</string>
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
     <string name="bookmarks_upsell_instructions">Spara tidsstämplar för dina favoritavsnitt och lås upp många fler funktioner med Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Det gick inte att hitta programnotiser för detta avsnitt.</string>
@@ -801,7 +801,6 @@ Language: sv_SE
     <string name="settings_website_link">webbplatslänk</string>
     <string name="settings_view">Visa</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Använd inbäddat RSS-omslag</string>
     <string name="settings_use_android_light_dark_mode">Använd ljust/mörkt läge för Android</string>
     <string name="settings_up_next_tap_summary">Om detta är aktiverat spelas objekt i din Nästa-kö upp om du trycker på dem. En lång tryckning visar avsnittsalternativen.</string>
     <string name="settings_up_next_tap">Spela upp nästa avsnitt vid tryckning</string>
@@ -913,7 +912,6 @@ Language: sv_SE
     <string name="settings_export_send_email">Skicka e-post</string>
     <string name="settings_export_save_file_summary">Exportera OPML-filen till ditt lagringsutrymme.</string>
     <string name="settings_export_save_file">Spara fil</string>
-    <string name="settings_embedded_artwork_details">Visar omslag från den nedladdade filen (om ett sådant finns) i spelaren istället för att använda showens omslag.</string>
     <string name="settings_developer">Utvecklare</string>
     <string name="settings_close_upgrade_offer">stäng uppgraderingserbjudande</string>
     <string name="settings_choose_podcasts">Välj podcasts</string>

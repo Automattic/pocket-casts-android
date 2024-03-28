@@ -152,5 +152,9 @@ class ShareServerManagerImplTest {
         websiteUrl = "/${BuildConfig.SERVER_LIST_HOST}/fddf52be-6058-48c4-a821-09edc8ad023d"
         id = ListServerManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
         assertEquals("fddf52be-6058-48c4-a821-09edc8ad023d", id)
+
+        websiteUrl = "/share-and-explore"
+        id = ListServerManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
+        assertEquals("share-and-explore", id)
     }
 }

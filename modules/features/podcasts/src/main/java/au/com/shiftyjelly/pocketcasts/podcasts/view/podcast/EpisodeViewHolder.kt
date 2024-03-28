@@ -290,7 +290,7 @@ class EpisodeViewHolder(
         val artworkVisible = viewMode is ViewMode.Artwork
         imgArtwork.isVisible = artworkVisible
         if (!sameEpisode && artworkVisible) {
-            imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(imgArtwork)
+            imageRequestFactory.create(episode, settings.useEpisodeArtwork.value).loadInto(imgArtwork)
         }
 
         val transition = AutoTransition()

@@ -46,7 +46,7 @@ internal fun LargePlayerHeader(
     ) {
         EpisodeImage(
             episode = episode,
-            useRssArtwork = state.useRssArtwork,
+            useEpisodeArtwork = state.useEpisodeArtwork,
             modifier = GlanceModifier
                 .size(132.dp)
                 .clickable(action),

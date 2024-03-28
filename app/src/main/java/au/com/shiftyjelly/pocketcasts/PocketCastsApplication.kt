@@ -275,8 +275,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun keepPlayerWidgetsUpdated() {
-        settings.useRssArtwork.flow
-            .onEach(playerWidgetManager::updateUseRssArtwork)
+        settings.useEpisodeArtwork.flow
+            .onEach(playerWidgetManager::updateUseEpisodeArtwork)
             .launchIn(applicationScope)
         settings.useDynamicColorsForWidget.flow
             .onEach(playerWidgetManager::updateUseDynamicColors)

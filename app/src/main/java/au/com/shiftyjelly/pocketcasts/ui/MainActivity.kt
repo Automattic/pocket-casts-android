@@ -754,18 +754,18 @@ class MainActivity :
         }
 
         val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
-        val useRssArtworkChanges = settings.useRssArtwork.flow
+        val useEpisodeArtworkChanges = settings.useEpisodeArtwork.flow
 
-        val combinedFlow = combine(upNextQueueChanges, useRssArtworkChanges) { upNextQueue, useRssArtwork ->
-            upNextQueue to useRssArtwork
+        val combinedFlow = combine(upNextQueueChanges, useEpisodeArtworkChanges) { upNextQueue, useEpisodeArtwork ->
+            upNextQueue to useEpisodeArtwork
         }
-            .onEach { (upNextQueue, useRssArtwork) ->
+            .onEach { (upNextQueue, useEpisodeArtwork) ->
                 updatePlaybackStateDeselectedChapterIndices(upNextQueue)
                 binding.playerBottomSheet.setUpNext(
                     upNext = upNextQueue,
                     theme = theme,
                     shouldAnimateOnAttach = !showMiniPlayerImmediately,
-                    useRssArtwork = useRssArtwork,
+                    useEpisodeArtwork = useEpisodeArtwork,
                 )
             }
             .catch { Timber.e(it) }

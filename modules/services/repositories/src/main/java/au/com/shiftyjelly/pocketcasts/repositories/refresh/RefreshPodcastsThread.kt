@@ -671,7 +671,7 @@ class RefreshPodcastsThread(
             val resources = context.resources
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
-            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.useRssArtwork.value)
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.useEpisodeArtwork.value)
             return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
         }
 

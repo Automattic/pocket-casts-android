@@ -14,10 +14,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
+import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPillListAdapter.CategoryPillViewHolder
 import au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 
-val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
+val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
     override fun areItemsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean =
         oldItem.discoverCategory.id == newItem.discoverCategory.id
 
@@ -25,13 +26,13 @@ val CATEGORY_REDESIGN_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
         oldItem == newItem
 }
 
-class CategoriesListRowRedesignAdapter(
+class CategoryPillListAdapter(
     private val onCategoryClick: (CategoryPill, (List<CategoryPill>) -> Unit) -> Unit,
     private val onAllCategoriesClick: (() -> Unit, (List<CategoryPill>) -> Unit) -> Unit,
     private val onClearCategoryClick: () -> Unit,
-) : ListAdapter<CategoryPill, CategoriesListRowRedesignAdapter.CategoriesRedesignViewHolder>(CATEGORY_REDESIGN_DIFF) {
+) : ListAdapter<CategoryPill, CategoryPillViewHolder>(CATEGORY_PILL_DIFF) {
 
-    class CategoriesRedesignViewHolder(
+    class CategoryPillViewHolder(
         val binding: CategoryPillBinding,
         private val onItemClicked: (Int) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -79,10 +80,10 @@ class CategoriesListRowRedesignAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CategoriesRedesignViewHolder {
+    ): CategoryPillViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = CategoryPillBinding.inflate(inflater, parent, false)
-        return CategoriesRedesignViewHolder(binding) { position ->
+        return CategoryPillViewHolder(binding) { position ->
             val category = getItem(position)
             if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
                 if (category.isSelected) {
@@ -96,26 +97,27 @@ class CategoriesListRowRedesignAdapter(
                         },
                         onCategorySelectionSuccess@{
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
-                            updateCategories(it)
+                            updateCategoryStatus(position, isSelected = false)
+                            loadCategories(it)
                         },
                     )
                 }
             } else if (!category.isSelected) {
-                markCategoryAsSelected(position)
+                updateCategoryStatus(position, isSelected = true)
                 onCategoryClick(category) {
-                    updateCategories(it)
+                    loadCategories(it)
                 }
             }
         }
     }
-    override fun onBindViewHolder(holder: CategoriesRedesignViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CategoryPillViewHolder, position: Int) {
         holder.bind(getItem(position), holder.itemView.context)
     }
-    fun updateCategories(categoryPills: List<CategoryPill>) {
+    fun loadCategories(categoryPills: List<CategoryPill>) {
         submitList(categoryPills)
     }
-    private fun markCategoryAsSelected(position: Int) {
-        getItem(position).isSelected = true
+    private fun updateCategoryStatus(position: Int, isSelected: Boolean) {
+        getItem(position).isSelected = isSelected
         notifyItemChanged(position)
     }
 }

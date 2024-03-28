@@ -39,7 +39,7 @@ internal fun SmallPlayer(state: PlayerWidgetState) {
         ) {
             EpisodeImage(
                 episode = state.currentEpisode,
-                useRssArtwork = state.useRssArtwork,
+                useEpisodeArtwork = state.useEpisodeArtwork,
             )
             if (state.currentEpisode != null) {
                 PlaybackButton(

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 15:54:03+0000
+Translation-Revision-Date: 2024-03-26 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="discover_most_popular_in">Più popolare in %s</string>
+    <string name="discover_select_categories">Seleziona una categoria</string>
+    <string name="discover_all_categories">Tutte le categorie</string>
     <string name="upgrade_to_patron">Esegui l\'aggiornamento a Patron</string>
     <string name="upgrade_to_plus">Esegui l\'aggiornamento a Plus</string>
     <string name="whats_new_got_it_button">Fatto</string>
@@ -15,8 +18,6 @@ Language: it
     <string name="whats_new_deselect_chapters_patron_message">Grazie al tuo abbonamento a Patron, ora puoi selezionare e saltare i capitoli in qualsiasi episodio che li supporta.</string>
     <string name="skip_chapters_patron_prompt">Salta capitoli e altro ancora con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Salta capitoli e altro ancora con Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Usa grafica del file incorporata</string>
-    <string name="settings_episode_artwork_details">Mostra la grafica delle note dell\'episodio (se esiste) invece di usare la grafica dello show. Se sono presenti sia la grafica del file che quella dell\'RSS, verrà utilizzata la grafica dell\'RSS.</string>
     <string name="select_one_chapter_message">Seleziona almeno un capitolo</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
@@ -73,13 +74,10 @@ Language: it
     <string name="eoy_story_top_podcasts_title">Anche tu eri grande in questi programmi.</string>
     <string name="end_of_year_story_top_podcast_title">%1$s è stato il podcast che hai ascoltato di più nel 2023</string>
     <string name="end_of_year_share_story">Condividi questa storia</string>
-    <string name="whats_new_bookmarks_enable_now_button">Attiva ora</string>
     <string name="podcast_log_in_to_rate">Devi accedere per lasciare una valutazione</string>
     <string name="podcast_submit_rating_no_internet">Nessuna connessione a Internet trovata. Connettiti a Internet per inviare una valutazione.</string>
     <string name="podcast_rate">Valuta %s</string>
     <string name="submit">Invia</string>
-    <string name="whats_new_bookmarks_try_now_button">Prova ora</string>
-    <string name="whats_new_bookmarks_title">I segnalibri sono disponibili.</string>
     <string name="bookmarks_upsell_instructions_early_access">Ottieni l\'accesso anticipato a questa funzionalità con Pocket Casts Patron e salva le date e le ore dei tuoi episodi preferiti. Presto disponibile per gli abbonati a Plus.</string>
     <string name="bookmarks_upsell_instructions">Salva le date e le ore dei tuoi episodi preferiti e sblocca molte altre funzionalità con Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Impossibile trovare le note di show per questo episodio.</string>
@@ -801,7 +799,6 @@ Language: it
     <string name="settings_website_link">link al sito web</string>
     <string name="settings_view">Visualizza</string>
     <string name="settings_version">Versione %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Usa grafica dell\'RSS incorporata</string>
     <string name="settings_use_android_light_dark_mode">Usa la modalità chiaro/scuro di Android</string>
     <string name="settings_up_next_tap_summary">Se attivo, potrai riprodurre il prossimo elemento in coda con un semplice tocco. Se tieni premuto, potrai visualizzare le opzioni dell\'episodio.</string>
     <string name="settings_up_next_tap">Tocca per riprodurre il prossimo episodio</string>
@@ -913,7 +910,6 @@ Language: it
     <string name="settings_export_send_email">Invia e-mail</string>
     <string name="settings_export_save_file_summary">Esporta il file OPML nel tuo spazio di archiviazione.</string>
     <string name="settings_export_save_file">Salva il file</string>
-    <string name="settings_embedded_artwork_details">Mostra l\'illustrazione legata al file scaricato (se esiste) nel lettore invece dell\'illustrazione del podcast.</string>
     <string name="settings_developer">Sviluppatore</string>
     <string name="settings_close_upgrade_offer">chiudi l\'offerta di aggiornamento</string>
     <string name="settings_choose_podcasts">Scegli i podcast</string>

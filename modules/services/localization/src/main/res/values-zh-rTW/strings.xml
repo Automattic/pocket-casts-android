@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 13:54:05+0000
+Translation-Revision-Date: 2024-03-26 13:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="discover_most_popular_in">在「%s」最受歡迎</string>
+    <string name="discover_select_categories">請選取類別</string>
+    <string name="discover_all_categories">所有類別</string>
     <string name="upgrade_to_patron">升級至 Patron</string>
     <string name="upgrade_to_plus">升級至 Plus</string>
     <string name="whats_new_got_it_button">知道了</string>
@@ -15,8 +18,6 @@ Language: zh_TW
     <string name="whats_new_deselect_chapters_patron_message">你已訂閱 Patron，現在可以在支援章節功能的節目中選取並跳過章節。</string>
     <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能跳過章節並享有更多功能</string>
     <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能跳過章節並享有更多功能</string>
-    <string name="settings_use_embedded_podcast_artwork">使用嵌入檔案圖片</string>
-    <string name="settings_episode_artwork_details">使用單集節目說明的圖片 (若有)，而非該節目的圖片。 若該檔案和 RSS 圖片皆存在，則將使用 RSS 圖片。</string>
     <string name="select_one_chapter_message">請選取至少一章</string>
     <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 個章節 • %2$d 個章節已隱藏</string>
@@ -73,13 +74,10 @@ Language: zh_TW
     <string name="eoy_story_top_podcasts_title">你也是這些節目的忠實粉絲！</string>
     <string name="end_of_year_story_top_podcast_title">%1$s 是你在 2023 年最常收聽的節目</string>
     <string name="end_of_year_share_story">分享這個故事</string>
-    <string name="whats_new_bookmarks_enable_now_button">立即啟用</string>
     <string name="podcast_log_in_to_rate">評分前請先登入</string>
     <string name="podcast_submit_rating_no_internet">找不到網際網路連線。 若要提交評分，請先連線至網際網路。</string>
     <string name="podcast_rate">為 %s 評分</string>
     <string name="submit">提交</string>
-    <string name="whats_new_bookmarks_try_now_button">立即試試</string>
-    <string name="whats_new_bookmarks_title">書籤登場！</string>
     <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>
     <string name="bookmarks_upsell_instructions">利用 Pocket Casts Plus 儲存你所愛單集的時間戳記，並解鎖其他許多功能。</string>
     <string name="error_loading_show_notes">找不到此單集的節目說明。</string>
@@ -801,7 +799,6 @@ Language: zh_TW
     <string name="settings_website_link">網站連結</string>
     <string name="settings_view">檢視</string>
     <string name="settings_version">版本 %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">使用嵌入的 RSS 圖片</string>
     <string name="settings_use_android_light_dark_mode">使用 Android 淺色/深色模式</string>
     <string name="settings_up_next_tap_summary">若啟用，點選「接下來播放」佇列中的項目將開始播放。 長按將顯示單集選項。</string>
     <string name="settings_up_next_tap">點選「接下來播放」即可播放單集</string>
@@ -913,7 +910,6 @@ Language: zh_TW
     <string name="settings_export_send_email">傳送電子郵件</string>
     <string name="settings_export_save_file_summary">將 OPML 檔案匯出到你的儲存空間。</string>
     <string name="settings_export_save_file">儲存檔案</string>
-    <string name="settings_embedded_artwork_details">在播放器中顯示下載檔案的封面 (如有)，而不使用節目的封面。</string>
     <string name="settings_developer">開發人員</string>
     <string name="settings_close_upgrade_offer">關閉升級方案</string>
     <string name="settings_choose_podcasts">選擇 Podcast</string>

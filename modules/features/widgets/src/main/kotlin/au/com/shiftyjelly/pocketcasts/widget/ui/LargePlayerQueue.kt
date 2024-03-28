@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 @Composable
 internal fun LargePlayerQueue(
     queue: List<PlayerWidgetEpisode>,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     LazyColumn(
@@ -42,7 +42,7 @@ internal fun LargePlayerQueue(
             ) {
                 EpisodeImage(
                     episode = episode,
-                    useRssArtwork = useRssArtwork,
+                    useEpisodeArtwork = useEpisodeArtwork,
                     modifier = GlanceModifier
                         .size(66.dp)
                         .clickable(OpenEpisodeDetailsAction.action(episode.uuid)),

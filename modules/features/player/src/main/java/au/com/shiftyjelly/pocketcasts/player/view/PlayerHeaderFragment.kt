@@ -21,6 +21,7 @@ import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -53,8 +54,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
-import coil.request.Disposable
-import coil.request.ErrorResult
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -213,18 +212,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
             binding.episodeTitle.setTextColor(playerContrast1)
 
-            if (headerViewModel.embeddedArtwork == PlayerViewModel.Artwork.None && headerViewModel.podcastUuid != null) {
-                loadArtwork(headerViewModel.podcastUuid, binding.artwork)
-            } else {
-                loadEpisodeArtwork(headerViewModel.embeddedArtwork, binding.artwork)?.let { disposable ->
-                    launch {
-                        // If episode artwork fails to load, then load podcast artwork
-                        val result = disposable.job.await()
-                        if (result is ErrorResult && headerViewModel.podcastUuid != null) {
-                            loadArtwork(headerViewModel.podcastUuid, binding.artwork)
-                        }
-                    }
-                }
+            headerViewModel.episode?.let { episode ->
+                loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
             }
 
             binding.podcastTitle?.let { podcastTitle ->
@@ -376,30 +365,21 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         return ThemeColor.playerHighlight01(viewModel.theme, viewModel.iconTintColor)
     }
 
-    private var lastLoadedUuid: String? = null
-    private fun loadArtwork(podcastUuid: String, imageView: ImageView) {
-        if (lastLoadedUuid == podcastUuid) return
+    private var lastLoadedBaseEpisode: BaseEpisode? = null
+    private var lastUseEpisodeArtwork: Boolean? = null
 
-        imageRequestFactory.createForPodcast(podcastUuid).loadInto(imageView)
-        lastLoadedUuid = podcastUuid
-        lastLoadedEmbedded = null
-    }
-
-    private var lastLoadedEmbedded: PlayerViewModel.Artwork? = null
-    private fun loadEpisodeArtwork(
-        embeddedArtwork: PlayerViewModel.Artwork,
+    private fun loadArtwork(
+        baseEpisode: BaseEpisode,
+        useEpisodeArtwork: Boolean,
         imageView: ImageView,
-    ): Disposable? {
-        if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return null
-        imageView.imageTintList = null
-        lastLoadedEmbedded = embeddedArtwork
-        lastLoadedUuid = null
+    ) {
+        if (lastLoadedBaseEpisode == baseEpisode && lastUseEpisodeArtwork == useEpisodeArtwork) {
+            return
+        }
 
-        return when (embeddedArtwork) {
-            is PlayerViewModel.Artwork.Path -> imageRequestFactory.createForFileOrUrl(embeddedArtwork.path)
-            is PlayerViewModel.Artwork.Url -> imageRequestFactory.createForFileOrUrl(embeddedArtwork.url)
-            is PlayerViewModel.Artwork.None -> null
-        }?.loadInto(imageView)
+        lastLoadedBaseEpisode = baseEpisode
+        lastUseEpisodeArtwork = useEpisodeArtwork
+        imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
 
     private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {

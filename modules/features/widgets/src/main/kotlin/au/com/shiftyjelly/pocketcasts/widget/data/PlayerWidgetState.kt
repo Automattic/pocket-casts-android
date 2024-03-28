@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.firstOrNull
 internal data class PlayerWidgetState(
     val queue: List<PlayerWidgetEpisode> = emptyList(),
     val isPlaying: Boolean = false,
-    val useRssArtwork: Boolean = true,
+    val useEpisodeArtwork: Boolean = true,
     val useDynamicColors: Boolean = false,
 ) {
     val currentEpisode get() = queue.firstOrNull()
@@ -24,7 +24,7 @@ internal data class PlayerWidgetState(
             return PlayerWidgetState(
                 queue = queue,
                 isPlaying = playbackManager.isPlaying(),
-                useRssArtwork = settings.useRssArtwork.value,
+                useEpisodeArtwork = settings.useEpisodeArtwork.value,
                 useDynamicColors = settings.useDynamicColorsForWidget.value,
             )
         }

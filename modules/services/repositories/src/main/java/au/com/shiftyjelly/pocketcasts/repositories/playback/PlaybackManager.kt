@@ -1537,7 +1537,6 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(
                 playbackState.copy(
                     chapters = chapters,
-                    embeddedArtworkPath = episodeMetadata.embeddedArtworkPath,
                     lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
                 ),
             )
@@ -1771,7 +1770,6 @@ open class PlaybackManager @Inject constructor(
                     episodeUuid = episode.uuid,
                     podcast = podcast,
                     chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-                    embeddedArtworkPath = if (sameEpisode) previousPlaybackState?.embeddedArtworkPath else null,
                     lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisodeDataWarning.value,
                 )
                 withContext(Dispatchers.Main) {
@@ -1885,7 +1883,6 @@ open class PlaybackManager @Inject constructor(
             episodeUuid = episode.uuid,
             podcast = podcast,
             chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-            embeddedArtworkPath = if (sameEpisode) previousPlaybackState?.embeddedArtworkPath else null,
             playbackSpeed = playbackEffects.playbackSpeed,
             trimMode = playbackEffects.trimMode,
             isVolumeBoosted = playbackEffects.isVolumeBoosted,
@@ -2340,7 +2337,6 @@ open class PlaybackManager @Inject constructor(
                 positionMs = episode.playedUpToMs,
                 episodeUuid = episode.uuid,
                 podcast = podcast,
-                embeddedArtworkPath = if (sameEpisode) previousPlaybackState?.embeddedArtworkPath else null,
                 chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
                 lastChangeFrom = LastChangeFrom.OnUpdatePausedPlaybackState.value,
             )
