@@ -12,23 +12,22 @@ import androidx.glance.background
 import androidx.glance.semantics.contentDescription
 import androidx.glance.semantics.semantics
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.widget.action.controlPlaybackAction
+import au.com.shiftyjelly.pocketcasts.widget.action.SkipBackAction
 import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
-internal fun PlaybackButton(
-    isPlaying: Boolean,
+internal fun SkipBackButton(
     modifier: GlanceModifier = GlanceModifier,
 ) {
-    val contentDescription = LocalContext.current.getString(if (isPlaying) R.string.play_episode else R.string.pause_episode)
+    val contentDescription = LocalContext.current.getString(R.string.skip_back)
 
     Image(
-        provider = ImageProvider(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
+        provider = ImageProvider(IR.drawable.ic_widget_skip_back),
         contentDescription = null,
         modifier = modifier
             .background(ImageProvider(IR.drawable.ic_circle))
-            .clickable(controlPlaybackAction(isPlaying, LocalSource.current))
+            .clickable(SkipBackAction.action(LocalSource.current))
             .semantics { this.contentDescription = contentDescription },
         colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
     )

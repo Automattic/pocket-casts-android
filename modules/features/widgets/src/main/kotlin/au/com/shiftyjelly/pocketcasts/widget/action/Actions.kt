@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.widget.action
 
 import androidx.glance.action.Action
-import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 
-internal fun controlPlaybackAction(state: PlayerWidgetState): Action = when {
-    state.currentEpisode == null -> OpenPocketCastsAction.action()
-    state.isPlaying -> PausePlaybackAction.action()
-    else -> ResumePlaybackAction.action()
+internal fun controlPlaybackAction(
+    isPlaying: Boolean,
+    source: SourceView,
+): Action = if (isPlaying) {
+    PausePlaybackAction.action(source)
+} else {
+    ResumePlaybackAction.action(source)
 }
