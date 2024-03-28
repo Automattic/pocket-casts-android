@@ -19,7 +19,6 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
@@ -38,58 +37,46 @@ internal fun LargePlayerHeader(
     }
 
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         modifier = modifier
             .fillMaxWidth()
             .height(132.dp)
-            .background(GlanceTheme.colors.primaryContainer)
-            .clickable(action),
+            .background(GlanceTheme.colors.primaryContainer),
 
     ) {
         EpisodeImage(
             episode = episode,
             useRssArtwork = state.useRssArtwork,
-            modifier = GlanceModifier.size(132.dp),
+            modifier = GlanceModifier
+                .size(132.dp)
+                .clickable(action),
         )
 
         if (episode != null) {
-            Spacer(modifier = GlanceModifier.width(12.dp))
+            Spacer(
+                modifier = GlanceModifier.width(12.dp),
+            )
             Column(
                 verticalAlignment = Alignment.Vertical.Top,
-                modifier = GlanceModifier.height(132.dp),
+                modifier = GlanceModifier.defaultWeight().height(132.dp),
             ) {
                 Text(
                     text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
                     maxLines = 1,
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onPrimaryContainer,
-                        fontSize = 16.sp,
-                    ),
+                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 16.sp),
                 )
                 Text(
                     text = episode.title,
                     maxLines = 1,
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onPrimaryContainer,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
+                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 22.sp, fontWeight = FontWeight.Bold),
                 )
                 Spacer(
                     modifier = GlanceModifier.height(4.dp),
                 )
                 Text(
-                    text = TimeHelper.getTimeLeft(
-                        episode.playedUpToMs,
-                        episode.durationMs,
-                        inProgress = true,
-                        LocalContext.current,
-                    ).text,
+                    text = episode.getTimeLeft(LocalContext.current),
                     maxLines = 1,
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onPrimaryContainer,
-                        fontSize = 16.sp,
-                    ),
+                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 16.sp),
                 )
 
                 PlaybackControls(
@@ -97,6 +84,11 @@ internal fun LargePlayerHeader(
                     modifier = GlanceModifier.defaultWeight(),
                 )
             }
+        } else {
+            Spacer(
+                modifier = GlanceModifier.defaultWeight(),
+            )
         }
+        PocketCastsLogo()
     }
 }

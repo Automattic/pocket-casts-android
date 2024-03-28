@@ -25,8 +25,13 @@ internal fun LargePlayer(state: PlayerWidgetState) {
         ) {
             LargePlayerHeader(state = state)
             if (upNextEpisodes.isNotEmpty()) {
-                Spacer(modifier = GlanceModifier.height(12.dp))
-                LargePlayerQueue(queue = upNextEpisodes, useRssArtwork = state.useRssArtwork)
+                Spacer(
+                    modifier = GlanceModifier.height(12.dp),
+                )
+                LargePlayerQueue(
+                    queue = upNextEpisodes,
+                    useRssArtwork = state.useRssArtwork,
+                )
             }
         }
     }

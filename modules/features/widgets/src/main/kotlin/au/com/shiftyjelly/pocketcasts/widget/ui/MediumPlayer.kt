@@ -39,17 +39,20 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
                 .fillMaxWidth()
                 .height(90.dp)
                 .background(GlanceTheme.colors.primaryContainer)
-                .padding(12.dp)
-                .clickable(action),
+                .padding(12.dp),
         ) {
             EpisodeImage(
                 episode = state.currentEpisode,
                 useRssArtwork = state.useRssArtwork,
-                modifier = GlanceModifier.size(66.dp),
+                modifier = GlanceModifier
+                    .size(66.dp)
+                    .clickable(action),
             )
 
             if (episode != null) {
-                Spacer(modifier = GlanceModifier.width(12.dp))
+                Spacer(
+                    modifier = GlanceModifier.width(12.dp),
+                )
                 Column(
                     verticalAlignment = Alignment.Vertical.Top,
                     modifier = GlanceModifier.height(66.dp),

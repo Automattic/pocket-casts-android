@@ -20,7 +20,6 @@ import androidx.glance.layout.size
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 
@@ -39,13 +38,14 @@ internal fun LargePlayerQueue(
                 modifier = GlanceModifier
                     .fillMaxWidth()
                     .height(78.dp)
-                    .padding(bottom = 12.dp)
-                    .clickable(OpenEpisodeDetailsAction.action(episode.uuid)),
+                    .padding(bottom = 12.dp),
             ) {
                 EpisodeImage(
                     episode = episode,
                     useRssArtwork = useRssArtwork,
-                    modifier = GlanceModifier.size(66.dp),
+                    modifier = GlanceModifier
+                        .size(66.dp)
+                        .clickable(OpenEpisodeDetailsAction.action(episode.uuid)),
                 )
                 Column(
                     verticalAlignment = Alignment.CenterVertically,
@@ -64,12 +64,7 @@ internal fun LargePlayerQueue(
                         modifier = GlanceModifier.height(4.dp),
                     )
                     Text(
-                        text = TimeHelper.getTimeLeft(
-                            episode.playedUpToMs,
-                            episode.durationMs,
-                            inProgress = true,
-                            LocalContext.current,
-                        ).text,
+                        text = episode.getTimeLeft(LocalContext.current),
                         maxLines = 1,
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimaryContainer,
@@ -78,8 +73,7 @@ internal fun LargePlayerQueue(
                     )
                 }
                 PlayButton(
-                    episode,
-                    modifier = GlanceModifier.size(42.dp).padding(6.dp),
+                    episode = episode,
                 )
             }
         }

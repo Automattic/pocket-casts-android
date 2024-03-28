@@ -8,29 +8,22 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.layout.Box
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.semantics.contentDescription
-import androidx.glance.semantics.semantics
-import au.com.shiftyjelly.pocketcasts.widget.action.SkipForwardAction
-import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun SkipForwardButton(
-    size: Dp = 42.dp,
+internal fun PocketCastsLogo(
+    size: Dp = 32.dp,
+    modifier: GlanceModifier = GlanceModifier,
 ) {
-    val contentDescription = LocalContext.current.getString(LR.string.skip_forward)
-
     Box(
-        modifier = GlanceModifier
+        modifier = modifier
             .size(size)
-            .clickable(SkipForwardAction.action(LocalSource.current))
-            .semantics { this.contentDescription = contentDescription },
+            .clickable(OpenPocketCastsAction.action()),
     ) {
         Image(
             provider = ImageProvider(IR.drawable.ic_circle),
@@ -39,10 +32,10 @@ internal fun SkipForwardButton(
             modifier = GlanceModifier.size(size),
         )
         Image(
-            provider = ImageProvider(IR.drawable.ic_widget_skip_forward),
+            provider = ImageProvider(IR.drawable.ic_logo_foreground),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 6),
+            modifier = GlanceModifier.size(size).padding(size / 8),
         )
     }
 }

@@ -7,8 +7,6 @@ import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
-import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.semantics.contentDescription
 import androidx.glance.semantics.semantics
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
@@ -46,7 +44,7 @@ internal fun SmallPlayer(state: PlayerWidgetState) {
             if (state.currentEpisode != null) {
                 PlaybackButton(
                     state.isPlaying,
-                    modifier = GlanceModifier.size(32.dp).padding(4.dp),
+                    size = 32.dp,
                 )
             }
         }

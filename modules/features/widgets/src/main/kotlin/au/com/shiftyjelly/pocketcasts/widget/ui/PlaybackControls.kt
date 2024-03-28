@@ -7,8 +7,6 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.layout.width
 
 @Composable
@@ -20,21 +18,16 @@ internal fun PlaybackControls(
         verticalAlignment = Alignment.Vertical.Bottom,
         modifier = modifier.fillMaxWidth(),
     ) {
-        SkipBackButton(
-            modifier = GlanceModifier.size(42.dp).padding(8.dp),
-        )
+        SkipBackButton()
         Spacer(
             modifier = GlanceModifier.width(8.dp),
         )
         PlaybackButton(
-            isPlaying,
-            modifier = GlanceModifier.size(42.dp).padding(6.dp),
+            isPlaying = isPlaying,
         )
         Spacer(
             modifier = GlanceModifier.width(8.dp),
         )
-        SkipForwardButton(
-            modifier = GlanceModifier.size(42.dp).padding(8.dp),
-        )
+        SkipForwardButton()
     }
 }
