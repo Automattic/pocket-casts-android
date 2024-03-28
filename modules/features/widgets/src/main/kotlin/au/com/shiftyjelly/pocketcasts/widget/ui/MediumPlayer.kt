@@ -19,12 +19,20 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
 
 @Composable
 internal fun MediumPlayer(state: PlayerWidgetState) {
     WidgetTheme(state.useDynamicColors) {
+        val episode = state.currentEpisode
+        val action = if (episode == null) {
+            OpenPocketCastsAction.action()
+        } else {
+            OpenEpisodeDetailsAction.action(episode.uuid)
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = GlanceModifier
@@ -32,14 +40,14 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
                 .height(96.dp)
                 .background(GlanceTheme.colors.primaryContainer)
                 .padding(12.dp)
-                .clickable(OpenPocketCastsAction.action()),
+                .clickable(action),
         ) {
             EpisodeImage(
                 episode = state.currentEpisode,
                 useRssArtwork = state.useRssArtwork,
                 modifier = GlanceModifier.size(72.dp),
             )
-            val episode = state.currentEpisode
+
             if (episode != null) {
                 Spacer(modifier = GlanceModifier.width(12.dp))
                 Column(
