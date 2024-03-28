@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.layout.Alignment
@@ -20,6 +21,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 
 @Composable
@@ -31,13 +33,14 @@ internal fun LargePlayerQueue(
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
     ) {
-        items(queue, itemId = PlayerWidgetEpisode::longId) { episode ->
+        items(queue, PlayerWidgetEpisode::longId) { episode ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = GlanceModifier
                     .fillMaxWidth()
                     .height(78.dp)
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 12.dp)
+                    .clickable(OpenEpisodeDetailsAction.action(episode.uuid)),
             ) {
                 EpisodeImage(
                     episode = episode,
