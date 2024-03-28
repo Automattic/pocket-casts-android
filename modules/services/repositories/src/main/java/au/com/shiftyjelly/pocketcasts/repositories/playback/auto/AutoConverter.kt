@@ -62,8 +62,8 @@ data class AutoMediaId(
 }
 
 object AutoConverter {
-    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, useRssArtwork: Boolean, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
-        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context, useRssArtwork)
+    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, useEpisodeArtwork: Boolean, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
+        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context, useEpisodeArtwork)
 
         val extrasForEpisode = extrasForEpisode(episode)
         if (groupTrailers) {
@@ -83,9 +83,9 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(episodeDesc, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
     }
 
-    fun convertPodcastToMediaItem(podcast: Podcast, context: Context, useRssArtwork: Boolean): MediaBrowserCompat.MediaItem? {
+    fun convertPodcastToMediaItem(podcast: Podcast, context: Context, useEpisodeArtwork: Boolean): MediaBrowserCompat.MediaItem? {
         return try {
-            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context, showRssArtwork = useRssArtwork)
+            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context, showRssArtwork = useEpisodeArtwork)
 
             val podcastDesc = MediaDescriptionCompat.Builder()
                 .setTitle(podcast.title)

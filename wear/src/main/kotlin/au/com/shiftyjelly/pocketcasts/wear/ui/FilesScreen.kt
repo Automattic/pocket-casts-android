@@ -32,7 +32,7 @@ fun FilesScreen(
     val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
-    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
+    val useEpisodeArtwork by viewModel.useEpisodeArtwork.collectAsState()
 
     when {
         // Show nothing while screen is loading
@@ -49,7 +49,7 @@ fun FilesScreen(
                 items(userEpisodes) { episode ->
                     EpisodeChip(
                         episode = episode,
-                        useRssArtwork = useRssArtwork,
+                        useEpisodeArtwork = useEpisodeArtwork,
                         onClick = { navigateToEpisode(episode.uuid) },
                     )
                 }

@@ -18,8 +18,6 @@ Language: it
     <string name="whats_new_deselect_chapters_patron_message">Grazie al tuo abbonamento a Patron, ora puoi selezionare e saltare i capitoli in qualsiasi episodio che li supporta.</string>
     <string name="skip_chapters_patron_prompt">Salta capitoli e altro ancora con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Salta capitoli e altro ancora con Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Usa grafica del file incorporata</string>
-    <string name="settings_episode_artwork_details">Mostra la grafica delle note dell\'episodio (se esiste) invece di usare la grafica dello show. Se sono presenti sia la grafica del file che quella dell\'RSS, verrà utilizzata la grafica dell\'RSS.</string>
     <string name="select_one_chapter_message">Seleziona almeno un capitolo</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
@@ -801,7 +799,6 @@ Language: it
     <string name="settings_website_link">link al sito web</string>
     <string name="settings_view">Visualizza</string>
     <string name="settings_version">Versione %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Usa grafica dell\'RSS incorporata</string>
     <string name="settings_use_android_light_dark_mode">Usa la modalità chiaro/scuro di Android</string>
     <string name="settings_up_next_tap_summary">Se attivo, potrai riprodurre il prossimo elemento in coda con un semplice tocco. Se tieni premuto, potrai visualizzare le opzioni dell\'episodio.</string>
     <string name="settings_up_next_tap">Tocca per riprodurre il prossimo episodio</string>
@@ -913,7 +910,6 @@ Language: it
     <string name="settings_export_send_email">Invia e-mail</string>
     <string name="settings_export_save_file_summary">Esporta il file OPML nel tuo spazio di archiviazione.</string>
     <string name="settings_export_save_file">Salva il file</string>
-    <string name="settings_embedded_artwork_details">Mostra l\'illustrazione legata al file scaricato (se esiste) nel lettore invece dell\'illustrazione del podcast.</string>
     <string name="settings_developer">Sviluppatore</string>
     <string name="settings_close_upgrade_offer">chiudi l\'offerta di aggiornamento</string>
     <string name="settings_choose_podcasts">Scegli i podcast</string>

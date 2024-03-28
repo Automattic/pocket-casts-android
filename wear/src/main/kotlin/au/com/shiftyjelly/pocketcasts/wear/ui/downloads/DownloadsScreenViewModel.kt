@@ -20,5 +20,5 @@ class DownloadsScreenViewModel @Inject constructor(
         .asFlow()
         .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    val useRssArtwork = settings.useRssArtwork.flow
+    val useEpisodeArtwork = settings.useEpisodeArtwork.flow
 }

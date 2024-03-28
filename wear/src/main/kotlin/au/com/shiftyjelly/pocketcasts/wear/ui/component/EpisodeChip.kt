@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun EpisodeChip(
     episode: BaseEpisode,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
     useUpNextIcon: Boolean = true,
     onClick: () -> Unit,
     showImage: Boolean = true,
@@ -86,7 +86,7 @@ fun EpisodeChip(
                 if (showImage) {
                     EpisodeImage(
                         episode = episode,
-                        useRssArtwork = useRssArtwork,
+                        useEpisodeArtwork = useEpisodeArtwork,
                         modifier = Modifier
                             .size(30.dp)
                             .clip(RoundedCornerShape(4.dp)),

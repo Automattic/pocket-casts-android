@@ -112,7 +112,7 @@ fun BookmarkRow(
     timePlayButtonStyle: TimePlayButtonStyle,
     timePlayButtonColors: TimePlayButtonColors,
     showIcon: Boolean,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
 ) {
     Column(
         modifier = modifier,
@@ -149,7 +149,7 @@ fun BookmarkRow(
                 Box(modifier = Modifier.padding(start = 16.dp)) {
                     EpisodeImage(
                         episode = episode,
-                        useRssArtwork = useRssArtwork,
+                        useEpisodeArtwork = useEpisodeArtwork,
                         modifier = modifier.size(56.dp),
                     )
                 }
@@ -253,7 +253,7 @@ private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
             timePlayButtonStyle = TimePlayButtonStyle.Outlined,
             timePlayButtonColors = TimePlayButtonColors.Default,
             showIcon = false,
-            useRssArtwork = false,
+            useEpisodeArtwork = false,
         )
     }
 }
@@ -284,7 +284,7 @@ fun BookmarkRowPlayerPreview() {
             timePlayButtonStyle = TimePlayButtonStyle.Solid,
             timePlayButtonColors = TimePlayButtonColors.Player(textColor = Color.Black),
             showIcon = false,
-            useRssArtwork = false,
+            useEpisodeArtwork = false,
         )
     }
 }

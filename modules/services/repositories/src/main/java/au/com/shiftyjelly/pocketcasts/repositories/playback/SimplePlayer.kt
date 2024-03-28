@@ -225,7 +225,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             override fun onTracksChanged(tracks: Tracks) {
                 episodeUuid?.let { onEpisodeChanged(it) }
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
-                episodeMetadata.read(tracks, settings, context)
+                episodeMetadata.read(tracks, settings.useEpisodeArtwork.value, context)
                 onMetadataAvailable(episodeMetadata)
             }
 

@@ -803,7 +803,6 @@ Language: ar
     <string name="settings_export_send_email">إرسال بريد إلكتروني</string>
     <string name="settings_export_save_file_summary">قم بتصدير ملف OPML إلى مساحة تخزينك.</string>
     <string name="settings_export_save_file">حفظ الملف</string>
-    <string name="settings_embedded_artwork_details">يعرض العمل الفني من الملف الذي تم تنزيله (إذا كان موجودًا) في المُشغِّل بدلاً من استخدام العمل الفني للعرض.</string>
     <string name="settings_developer">مطوّر</string>
     <string name="settings_close_upgrade_offer">إغلاق عرض الترقية</string>
     <string name="settings_choose_podcasts">اختيار البث الصوتي</string>

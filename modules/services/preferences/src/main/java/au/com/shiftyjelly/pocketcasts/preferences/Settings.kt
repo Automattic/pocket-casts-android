@@ -328,8 +328,7 @@ interface Settings {
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
 
-    val useEmbeddedArtwork: UserSetting<Boolean>
-    val useRssArtwork: UserSetting<Boolean>
+    val useEpisodeArtwork: UserSetting<Boolean>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 

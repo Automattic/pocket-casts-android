@@ -185,7 +185,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
-                useEmbeddedArtwork = settings.useEmbeddedArtwork.getSyncSetting(::NamedChangedSettingBool),
+                useEpisodeArtwork = settings.useEpisodeArtwork.getSyncSetting(::NamedChangedSettingBool),
                 notificationSettingActions = settings.newEpisodeNotificationActions.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingString(
                         value = setting.joinToString(separator = ",", transform = NewEpisodeNotificationAction::serverId),
@@ -254,7 +254,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                 deleteCloudFilesAfterPlayback = settings.deleteCloudFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
                 deleteLocalFilesAfterPlayback = settings.deleteLocalFileAfterPlaying.getSyncSetting(::NamedChangedSettingBool),
                 isPodcastBackgroundRefreshEnabled = settings.backgroundRefreshPodcasts.getSyncSetting(::NamedChangedSettingBool),
-                useRssArtwork = settings.useRssArtwork.getSyncSetting(::NamedChangedSettingBool),
             ),
         )
 
@@ -437,7 +436,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                     "useEmbeddedArtworkGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.useEmbeddedArtwork,
+                        setting = settings.useEpisodeArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     "privacyCrashReports" -> updateSettingIfPossible(
@@ -577,11 +576,6 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     "backgroundRefresh" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.backgroundRefreshPodcasts,
-                        newSettingValue = (changedSettingResponse.value as? Boolean),
-                    )
-                    "useRssArtwork" -> updateSettingIfPossible(
-                        changedSettingResponse = changedSettingResponse,
-                        setting = settings.useRssArtwork,
                         newSettingValue = (changedSettingResponse.value as? Boolean),
                     )
                     else -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot handle named setting response with unknown key: $key")
