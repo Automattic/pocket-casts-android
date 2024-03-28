@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 09:54:03+0000
+Translation-Revision-Date: 2024-03-26 09:54:02+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="discover_most_popular_in">最受欢迎的 %s</string>
+    <string name="discover_select_categories">选择一个分类</string>
+    <string name="discover_all_categories">所有分类</string>
     <string name="upgrade_to_patron">升级至 Patron</string>
     <string name="upgrade_to_plus">升级至 Plus</string>
     <string name="whats_new_got_it_button">知道了</string>
@@ -73,13 +76,10 @@ Language: zh_CN
     <string name="eoy_story_top_podcasts_title">您也非常喜欢这些节目！</string>
     <string name="end_of_year_story_top_podcast_title">%1$s 是您在 2023 年收听率最高的节目</string>
     <string name="end_of_year_share_story">分享此故事</string>
-    <string name="whats_new_bookmarks_enable_now_button">立即启用</string>
     <string name="podcast_log_in_to_rate">您必须登录后才可以给予评级</string>
     <string name="podcast_submit_rating_no_internet">未发现互联网连接。 请连接到互联网，以提交评级。</string>
     <string name="podcast_rate">评分 %s</string>
     <string name="submit">提交</string>
-    <string name="whats_new_bookmarks_try_now_button">立即试用</string>
-    <string name="whats_new_bookmarks_title">书签在这里！</string>
     <string name="bookmarks_upsell_instructions_early_access">通过 Pocket Casts Patron 尽早使用此功能，并保存收藏剧集的时间戳。 即将面向 Plus 订阅用户推出。</string>
     <string name="bookmarks_upsell_instructions">通过 Pocket Casts Plus 保存收藏剧集的时间戳，并解锁更多功能。</string>
     <string name="error_loading_show_notes">无法找到本剧集的节目注释。</string>

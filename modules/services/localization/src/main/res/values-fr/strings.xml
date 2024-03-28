@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 11:54:03+0000
+Translation-Revision-Date: 2024-03-26 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="discover_most_popular_in">Les plus populaires dans %s</string>
+    <string name="discover_select_categories">Sélectionner une catégorie</string>
+    <string name="discover_all_categories">Toutes les catégories</string>
     <string name="upgrade_to_patron">Mettre à niveau vers Patron</string>
     <string name="upgrade_to_plus">Mettre à niveau vers Plus</string>
     <string name="whats_new_got_it_button">J’ai compris</string>
@@ -73,13 +76,10 @@ Language: fr
     <string name="eoy_story_top_podcasts_title">Vous avez aussi adoré ces émissions !</string>
     <string name="end_of_year_story_top_podcast_title">%1$s est l’émission que vous avez le plus écoutée en 2023</string>
     <string name="end_of_year_share_story">Partager cette story</string>
-    <string name="whats_new_bookmarks_enable_now_button">Activez-la maintenant</string>
     <string name="podcast_log_in_to_rate">Vous devez vous connecter pour laisser une note</string>
     <string name="podcast_submit_rating_no_internet">Aucune connexion Internet détectée. Veuillez vous connecter à Internet pour envoyer une note.</string>
     <string name="podcast_rate">Évaluer %s</string>
     <string name="submit">Envoyer</string>
-    <string name="whats_new_bookmarks_try_now_button">Essayer maintenant</string>
-    <string name="whats_new_bookmarks_title">Les favoris sont là !</string>
     <string name="bookmarks_upsell_instructions_early_access">Bénéficiez d’un accès anticipé à cette fonctionnalité avec Pocket Casts Patron et enregistrez les horodatages de vos épisodes favoris. Bientôt disponible pour les abonnés Plus.</string>
     <string name="bookmarks_upsell_instructions">Enregistrez les horodatages de vos épisodes favoris et déverrouillez bien d’autres fonctionnalités avec Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Impossible de trouver des notes pour cet épisode.</string>
