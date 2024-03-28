@@ -1,11 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.widget.data
 
+import android.content.Context
+import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import java.util.Date
+import java.util.UUID
 
 internal sealed interface PlayerWidgetEpisode {
     val uuid: String
@@ -15,6 +18,11 @@ internal sealed interface PlayerWidgetEpisode {
     val playedUpTo: Double
     val durationMs: Int get() = (duration * 1000.0).toInt()
     val playedUpToMs: Int get() = (playedUpTo * 1000.0).toInt()
+
+    // We use conjugation with Long.MAX_VALUE because Glance IDs must be positive values
+    val longId get() = UUID.fromString(uuid).mostSignificantBits and Long.MAX_VALUE
+
+    fun getTimeLeft(context: Context) = TimeHelper.getTimeLeft(playedUpToMs, durationMs, inProgress = true, context).text
 
     fun toBaseEpisode(): BaseEpisode
 

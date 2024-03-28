@@ -15,21 +15,23 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.semantics.contentDescription
 import androidx.glance.semantics.semantics
-import au.com.shiftyjelly.pocketcasts.widget.action.SkipForwardAction
+import au.com.shiftyjelly.pocketcasts.widget.action.PlayEpisodeAction
 import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
+import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun SkipForwardButton(
+internal fun PlayButton(
+    episode: PlayerWidgetEpisode,
     size: Dp = 42.dp,
 ) {
-    val contentDescription = LocalContext.current.getString(LR.string.skip_forward)
+    val contentDescription = LocalContext.current.getString(LR.string.play_episode)
 
     Box(
         modifier = GlanceModifier
             .size(size)
-            .clickable(SkipForwardAction.action(LocalSource.current))
+            .clickable(PlayEpisodeAction.action(episode.uuid, LocalSource.current))
             .semantics { this.contentDescription = contentDescription },
     ) {
         Image(
@@ -39,10 +41,10 @@ internal fun SkipForwardButton(
             modifier = GlanceModifier.size(size),
         )
         Image(
-            provider = ImageProvider(IR.drawable.ic_widget_skip_forward),
+            provider = ImageProvider(IR.drawable.ic_widget_play),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 6),
+            modifier = GlanceModifier.size(size).padding(size / 8),
         )
     }
 }

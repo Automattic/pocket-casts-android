@@ -288,7 +288,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             .launchIn(applicationScope)
         val queueFlow = flow {
             while (true) {
-                emit(upNextDao.findUpNextEpisodes(limit = 4))
+                emit(upNextDao.findUpNextEpisodes(limit = 10))
                 // Emit every second to update playback durations
                 delay(1.seconds)
             }

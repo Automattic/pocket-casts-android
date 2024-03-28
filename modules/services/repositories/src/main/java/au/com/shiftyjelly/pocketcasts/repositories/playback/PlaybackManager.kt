@@ -442,6 +442,16 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun playNowSuspend(
+        episodeUuid: String,
+        forceStream: Boolean = false,
+        showedStreamWarning: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
+        playNowSuspend(episode, forceStream, showedStreamWarning, sourceView)
+    }
+
+    suspend fun playNowSuspend(
         episode: BaseEpisode,
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
@@ -538,6 +548,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.METERED_NETWORK_CHANGE,
             SourceView.WIDGET_PLAYER_SMALL,
             SourceView.WIDGET_PLAYER_MEDIUM,
+            SourceView.WIDGET_PLAYER_LARGE,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
