@@ -159,6 +159,7 @@
     <string name="widget">Widget</string>
     <string name="small_player_widget_label">Small Player</string>
     <string name="medium_player_widget_label">Medium Player</string>
+    <string name="large_player_widget_label">Large Player</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

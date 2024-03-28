@@ -538,6 +538,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.METERED_NETWORK_CHANGE,
             SourceView.WIDGET_PLAYER_SMALL,
             SourceView.WIDGET_PLAYER_MEDIUM,
+            SourceView.WIDGET_PLAYER_LARGE,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,

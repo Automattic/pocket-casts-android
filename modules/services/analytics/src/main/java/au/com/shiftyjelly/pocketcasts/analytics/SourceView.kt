@@ -38,6 +38,7 @@ enum class SourceView(val analyticsValue: String) {
     METERED_NETWORK_CHANGE("metered_network_change"),
     WIDGET_PLAYER_SMALL("widget_player_small"),
     WIDGET_PLAYER_MEDIUM("widget_player_medium"),
+    WIDGET_PLAYER_LARGE("widget_player_large"),
     ;
 
     fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
