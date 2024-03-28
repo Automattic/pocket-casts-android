@@ -13,13 +13,14 @@ internal data class PlayerWidgetState(
     val useDynamicColors: Boolean = false,
 ) {
     val currentEpisode get() = queue.firstOrNull()
+    val upNextEpisodes get() = queue.drop(1)
 
     companion object {
         suspend fun getInitialState(context: Context): PlayerWidgetState {
             val upNextDao = context.widgetEntryPoint().upNextDao()
             val settings = context.widgetEntryPoint().settings()
             val playbackManager = context.widgetEntryPoint().playbackManager()
-            val queue = upNextDao.findUpNextEpisodes(limit = 4).map(PlayerWidgetEpisode::fromBaseEpisode)
+            val queue = upNextDao.findUpNextEpisodes(limit = 10).map(PlayerWidgetEpisode::fromBaseEpisode)
             return PlayerWidgetState(
                 queue = queue,
                 isPlaying = playbackManager.isPlaying(),
