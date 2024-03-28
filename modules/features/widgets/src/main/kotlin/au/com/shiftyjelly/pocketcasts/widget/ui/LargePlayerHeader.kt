@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
+import androidx.glance.action.clickable
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
@@ -19,6 +20,8 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -27,22 +30,29 @@ internal fun LargePlayerHeader(
     state: PlayerWidgetState,
     modifier: GlanceModifier = GlanceModifier,
 ) {
-    val currentEpisode = state.currentEpisode
+    val episode = state.currentEpisode
+    val action = if (episode == null) {
+        OpenPocketCastsAction.action()
+    } else {
+        OpenEpisodeDetailsAction.action(episode.uuid)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .height(132.dp)
-            .background(GlanceTheme.colors.primaryContainer),
+            .background(GlanceTheme.colors.primaryContainer)
+            .clickable(action),
 
     ) {
         EpisodeImage(
-            episode = state.currentEpisode,
+            episode = episode,
             useRssArtwork = state.useRssArtwork,
             modifier = GlanceModifier.size(132.dp),
         )
 
-        if (currentEpisode != null) {
+        if (episode != null) {
             Spacer(modifier = GlanceModifier.width(12.dp))
             Column(
                 verticalAlignment = Alignment.Vertical.Top,
@@ -57,7 +67,7 @@ internal fun LargePlayerHeader(
                     ),
                 )
                 Text(
-                    text = currentEpisode.title,
+                    text = episode.title,
                     maxLines = 1,
                     style = TextStyle(
                         color = GlanceTheme.colors.onPrimaryContainer,
@@ -70,8 +80,8 @@ internal fun LargePlayerHeader(
                 )
                 Text(
                     text = TimeHelper.getTimeLeft(
-                        currentEpisode.playedUpToMs,
-                        currentEpisode.durationMs,
+                        episode.playedUpToMs,
+                        episode.durationMs,
                         inProgress = true,
                         LocalContext.current,
                     ).text,
