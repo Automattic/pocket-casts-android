@@ -37,7 +37,7 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .height(96.dp)
+                .height(90.dp)
                 .background(GlanceTheme.colors.primaryContainer)
                 .padding(12.dp)
                 .clickable(action),
@@ -45,21 +45,21 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
             EpisodeImage(
                 episode = state.currentEpisode,
                 useRssArtwork = state.useRssArtwork,
-                modifier = GlanceModifier.size(72.dp),
+                modifier = GlanceModifier.size(66.dp),
             )
 
             if (episode != null) {
                 Spacer(modifier = GlanceModifier.width(12.dp))
                 Column(
                     verticalAlignment = Alignment.Vertical.Top,
-                    modifier = GlanceModifier.height(72.dp),
+                    modifier = GlanceModifier.height(66.dp),
                 ) {
                     Text(
                         text = episode.title,
                         maxLines = 1,
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimaryContainer,
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                         ),
                     )
@@ -70,20 +70,20 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
                             .fillMaxWidth(),
                     ) {
                         SkipBackButton(
-                            modifier = GlanceModifier.size(42.dp).padding(8.dp),
+                            modifier = GlanceModifier.size(36.dp).padding(8.dp),
                         )
                         Spacer(
                             modifier = GlanceModifier.width(8.dp),
                         )
                         PlaybackButton(
                             state.isPlaying,
-                            modifier = GlanceModifier.size(42.dp).padding(6.dp),
+                            modifier = GlanceModifier.size(36.dp).padding(6.dp),
                         )
                         Spacer(
                             modifier = GlanceModifier.width(8.dp),
                         )
                         SkipForwardButton(
-                            modifier = GlanceModifier.size(42.dp).padding(8.dp),
+                            modifier = GlanceModifier.size(36.dp).padding(8.dp),
                         )
                     }
                 }
