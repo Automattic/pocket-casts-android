@@ -69,6 +69,7 @@ import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -268,9 +269,16 @@ class PlayerViewModel @Inject constructor(
 
     val isSleepRunning = MutableLiveData<Boolean>().apply { postValue(false) }
     val isSleepAtEndOfEpisode = MutableLiveData<Boolean>().apply { postValue(false) }
+    val isSleepForEpisodes = MutableLiveData<Boolean>().apply { postValue(false) }
     val sleepTimeLeftText = MutableLiveData<String>()
+    val episodesLeftUntilSleepText = MutableLiveData<String>().apply { SETimer.setEpisodeCountdownText(this) }
+    val customEpisodeIncrementText = MutableLiveData<String>()
     val sleepCustomTimeText = MutableLiveData<String>().apply {
         postValue(calcCustomTimeText())
+    }
+    val episodesUntilSleepText = MutableLiveData<String>().apply {
+        SETimer.setEpisodeOptionText(this)
+        postValue(episodesUntilSleepMessage())
     }
     var sleepCustomTimeMins: Int = 5
         set(value) {
@@ -286,6 +294,26 @@ class PlayerViewModel @Inject constructor(
     init {
         updateSleepTimer()
         monitorPlaybackPosition()
+    }
+
+    fun episodeSleepCount(): Int {
+        return SETimer.episodesUntilSleep
+    }
+
+    fun isMinEpisodeLimit(): Boolean {
+        return SETimer.episodesUntilSleep == 1
+    }
+
+    fun isMaxEpisodeLimit(): Boolean {
+        return SETimer.episodesUntilSleep == SETimer.MAX_EPISODES
+    }
+
+    private fun episodesUntilSleepMessage(): String {
+        return SETimer.untilSleepMessage(context)
+    }
+
+    private fun episodesLeftUntilSleepMessage(): String {
+        return SETimer.leftUntilSleepMessage(context)
     }
 
     private fun monitorPlaybackPosition() {
@@ -377,6 +405,7 @@ class PlayerViewModel @Inject constructor(
     fun playEpisode(uuid: String, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
+            SETimer.reduceCountIfActive()
             playbackManager.playNow(episode = episode, sourceView = sourceView)
         }
     }
@@ -400,6 +429,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextEpisodeClick() {
+        SETimer.reduceCountIfActive()
         playbackManager.playNextInQueue(sourceView = source)
     }
 
@@ -508,9 +538,15 @@ class PlayerViewModel @Inject constructor(
         val timeLeft = sleepTimer.timeLeftInSecs()
         if ((sleepTimer.isRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.sleepAfterEpisode) {
             isSleepAtEndOfEpisode.postValue(playbackManager.sleepAfterEpisode)
+            isSleepForEpisodes.postValue(false)
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
+        } else if (SETimer.timerIsActive()) {
+            isSleepAtEndOfEpisode.postValue(false)
+            isSleepForEpisodes.postValue(true)
+            episodesLeftUntilSleepText.postValue(episodesLeftUntilSleepMessage())
         } else {
             isSleepAtEndOfEpisode.postValue(false)
+            isSleepForEpisodes.postValue(false)
             playbackManager.updateSleepTimerStatus(false)
         }
     }
@@ -530,14 +566,37 @@ class PlayerViewModel @Inject constructor(
         sleepTimer.cancelTimer()
     }
 
+    fun sleepTimerByEpisode() {
+        playbackManager.updateSleepTimerStatus(running = true)
+        SETimer.activateTimer()
+        SETimer.initCustomIncrement(customEpisodeIncrementText, context)
+        sleepTimer.cancelTimer()
+    }
+
     fun cancelSleepTimer() {
         playbackManager.updateSleepTimerStatus(running = false)
         sleepTimer.cancelTimer()
     }
 
+    fun cancelEpisodeTimer() {
+        SETimer.stop(playbackManager, context)
+    }
+
     fun sleepTimerAddExtraMins(mins: Int) {
         sleepTimer.addExtraTime(mins)
         updateSleepTimer()
+    }
+
+    fun incEpisodesForTimer() {
+        SETimer.incEpisodeTimer(context)
+    }
+
+    fun decEpisodesForTimer() {
+        SETimer.decEpisodeTimer(context)
+    }
+
+    fun extendEpisodeTimer(eps: Int?) {
+        SETimer.extendTimer(eps, context)
     }
 
     fun starToggle() {

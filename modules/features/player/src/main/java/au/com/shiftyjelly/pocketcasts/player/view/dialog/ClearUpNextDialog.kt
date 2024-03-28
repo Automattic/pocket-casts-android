@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 
 /**
  * A dialog that shows a clear Up Next confirmation dialog if there are more than two episodes in the queue.
@@ -43,6 +44,9 @@ class ClearUpNextDialog(
 
     fun showOrClear(fragmentManager: FragmentManager) {
         val episodeCount = playbackManager.upNextQueue.queueEpisodes.size
+        if (SETimer.timerIsActive()) {
+            SETimer.stop(playbackManager, requireContext())
+        }
         return if (episodeCount >= 3) {
             show(fragmentManager, "mini_player_clear_dialog")
         } else {

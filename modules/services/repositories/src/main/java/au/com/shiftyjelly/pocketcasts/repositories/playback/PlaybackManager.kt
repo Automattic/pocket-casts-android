@@ -108,6 +108,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepEpisodeTimer as SETimer
 
 @Singleton
 open class PlaybackManager @Inject constructor(
@@ -211,7 +212,6 @@ open class PlaybackManager @Inject constructor(
         bookmarkFeature = bookmarkFeature,
     )
     var sleepAfterEpisode: Boolean = false
-
     var player: Player? = null
 
     val mediaSession: MediaSessionCompat
@@ -1354,7 +1354,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         val autoPlay = !shouldSleepAfterEpisode && wasPlaying
-
+        SETimer.reduceCountIfActive()
         var nextEpisode = getCurrentEpisode()
         if (nextEpisode == null) {
             nextEpisode = autoLoadEpisode(autoPlay)
@@ -1693,11 +1693,16 @@ open class PlaybackManager @Inject constructor(
 
             else -> null
         }
-
         if (episode == null) {
             val nextEpisode = autoLoadEpisode(autoPlay = play)
             if (nextEpisode == null) {
                 Timber.d("Playback: No episode in upnext, shutting down")
+                if (SETimer.timerShouldStop()) {
+                    SETimer.stop(this, application)
+                    sleep(episode)
+                } else if (SETimer.timerIsActive()) {
+                    SETimer.stop(this, application)
+                }
                 shutdown()
             }
             return
@@ -1910,8 +1915,8 @@ open class PlaybackManager @Inject constructor(
         episodeManager.updatePlaybackInteractionDate(episode)
 
         widgetManager.updateWidget(podcast, play, episode)
-
-        if (play) {
+        val shouldStopForSleep = SETimer.timerShouldStop()
+        if (play && !shouldStopForSleep) {
             if (sameEpisode && currentPositionMs != null) {
                 player?.seekToTimeMs(currentPositionMs)
             }
@@ -1919,6 +1924,10 @@ open class PlaybackManager @Inject constructor(
         } else {
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
+            if (shouldStopForSleep) {
+                SETimer.stop(this, application)
+                sleep(episode)
+            }
         }
     }
 

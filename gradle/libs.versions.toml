@@ -14,51 +14,60 @@
 #    https://github.com/google/horologist/blob/main/gradle/libs.versions.toml
 #    wear-compose = Wear Compose Version
 #    horologist = Horologist Version
+#
+# 4. Check the Compose and Accompanist versions are compatible.
+#    https://github.com/google/accompanist
+#    compose = Compose Version
+#    accompanist = Accompanist Version
 
 [versions]
 aboutlibraries = "10.5.0"
+accompanist = "0.30.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
-android-application = "8.2.2"
+android-application = "8.1.4"
 billing = "6.0.1"
-coil = "2.5.0"
-compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
+coil = "2.2.1"
+compose = "1.4.2"
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
-compose-kotlin-compiler = "1.5.9"
+compose-kotlin-compiler = "1.5.2"
+coroutines = "1.6.4"
 espresso = "3.4.0"
 firebase = "30.5.0"
 glide = "4.13.2"
 google-services = "4.3.14"
-hilt = "2.51"
-hilt-compiler = "1.2.0"
-horologist = "0.5.21"
-kotlin = "1.9.22"
-kotlin-coroutines = "1.8.1-Beta"
-ksp = "1.9.22-1.0.17"
+hilt = "2.49"
+hilt-compiler = "1.1.0"
+horologist = "0.4.17"
+kotlin = "1.9.0"
+kotlin-coroutines = "1.6.4"
+ksp = "1.9.0-1.0.13"
 lifecycle = "2.6.0"
-lottie = "6.3.0"
-media3 = "1.2.1"
+lottie = "5.2.0"
+media3 = "1.0.0"
 mockito = "4.0.0"
 mockito-android = "4.6.1"
 moshi = "1.13.0"
 navigation = "2.5.1"
 okhttp = "4.9.3"
 protobuf = "3.23.4"
-protobuf-plugin = "0.9.4"
 retrofit = "2.9.0"
 room = "2.5.1"
 sentry = "6.28.0"
 sentry-plugin = "3.10.0"
 showkase = "1.0.2"
 test = "1.5.0"
-wear-compose = "1.3.0"
+wear-compose = "1.2.1"
 work = "2.8.1"
-java = "17"
 
 [libraries]
 # About Libraries
 aboutLibraries-compose = "com.mikepenz:aboutlibraries-compose:10.5.0"
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
+
+# Accompanist
+accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 # Billing
 billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
@@ -69,19 +78,18 @@ coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 # Compose
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
-compose-animation = { module = "androidx.compose.animation:animation" }
-compose-icons = { module = "androidx.compose.material:material-icons-extended" }
-compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
-compose-material = { module = "androidx.compose.material:material" }
-compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
-compose-ui = { module = "androidx.compose.ui:ui" }
-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-ui-util = { module = "androidx.compose.ui:ui-util" }
-compose-activity = "androidx.activity:activity-compose:1.8.2"
+compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
+compose-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
+compose-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2", version.ref = "compose" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
+compose-activity = "androidx.activity:activity-compose:1.5.1"
 compose-constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
 # Coroutines
@@ -95,8 +103,8 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
-hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
-hilt-work = "androidx.hilt:hilt-work:1.2.0"
+hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.0.0"
+hilt-work = "androidx.hilt:hilt-work:1.0.0"
 
 # Espresso
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
@@ -139,7 +147,6 @@ lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.r
 lifecycle-reactivestreams = { module = "androidx.lifecycle:lifecycle-reactivestreams-ktx", version.ref = "lifecycle" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
@@ -181,7 +188,6 @@ okHttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.
 # For Android users, it's recommended to use protobuf Java Lite runtime because of its smaller code size.
 # Java Lite runtime also works better with Proguard because it doesn't rely on Java reflection and is optimized
 # to allow as much code stripping as possible.
-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
 
@@ -241,7 +247,7 @@ browser = "androidx.browser:browser:1.4.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 car = "androidx.car.app:app:1.2.0"
 cardview = "androidx.cardview:cardview:1.0.0"
-cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
+cast = "com.google.android.gms:play-services-cast-framework:21.2.0"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 core-ktx = "androidx.core:core-ktx:1.10.1"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
@@ -277,6 +283,11 @@ wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 aboutlibraries = [
     "aboutlibraries-core",
     "aboutLibraries-compose"
+]
+
+accompanist = [
+    "accompanist-flowlayout",
+    "accompanist-systemuicontroller"
 ]
 
 billing = [
@@ -431,11 +442,10 @@ android-application = { id = "com.android.application", version.ref = "android-a
 android-library = { id = "com.android.library", version.ref = "android-application" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:2.0.3"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.23.3"
-protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
+spotless = "com.diffplug.spotless:6.2.2"
