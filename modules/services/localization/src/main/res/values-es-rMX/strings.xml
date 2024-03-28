@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 19:54:03+0000
+Translation-Revision-Date: 2024-03-26 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="discover_most_popular_in">Los más populares en %s</string>
+    <string name="discover_select_categories">Elegir categoría</string>
+    <string name="discover_all_categories">Todas las categorías</string>
     <string name="upgrade_to_patron">Actualiza a Patron</string>
     <string name="upgrade_to_plus">Actualiza a Plus</string>
     <string name="whats_new_got_it_button">De acuerdo</string>
@@ -73,13 +76,10 @@ Language: es
     <string name="eoy_story_top_podcasts_title">Y también escuchaste mucho estos programas.</string>
     <string name="end_of_year_story_top_podcast_title">%1$s fue tu programa más escuchado en 2023</string>
     <string name="end_of_year_share_story">Compartir esta historia</string>
-    <string name="whats_new_bookmarks_enable_now_button">Activar esta opción ahora</string>
     <string name="podcast_log_in_to_rate">Debes acceder para dejar una valoración</string>
     <string name="podcast_submit_rating_no_internet">No se ha encontrado ninguna conexión a Internet. Conéctate a Internet para enviar una valoración.</string>
     <string name="podcast_rate">Puntúa %s</string>
     <string name="submit">Enviar</string>
-    <string name="whats_new_bookmarks_try_now_button">Probar ahora</string>
-    <string name="whats_new_bookmarks_title">Ya están aquí los marcadores.</string>
     <string name="bookmarks_upsell_instructions_early_access">Obtén acceso anticipado a esta función con Pocket Casts Patron y guarda las marcas de tiempo de tus episodios favoritos. Disponible próximamente para los suscriptores Plus.</string>
     <string name="bookmarks_upsell_instructions">Guarda las marcas de tiempo de tus episodios favoritos y desbloquea muchas más funciones con Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">No se han encontrado las notas de este episodio.</string>

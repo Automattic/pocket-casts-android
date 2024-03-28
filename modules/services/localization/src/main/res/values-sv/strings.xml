@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 11:54:03+0000
+Translation-Revision-Date: 2024-03-25 20:56:48+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="episode_sort_title_z_a">Rubrik (Ö-A)</string>
+    <string name="episode_sort_title_a_z">Rubrik (A–Ö)</string>
+    <string name="discover_most_popular_in">Mest populärt i %s</string>
+    <string name="discover_select_categories">Välj en kategori</string>
+    <string name="discover_all_categories">Alla kategorier</string>
     <string name="upgrade_to_patron">Uppgradera till Patron</string>
     <string name="upgrade_to_plus">Uppgradera till Plus</string>
     <string name="whats_new_got_it_button">Uppfattat</string>
@@ -73,13 +78,10 @@ Language: sv_SE
     <string name="eoy_story_top_podcasts_title">Du lyssnade även mycket på dessa podcasts.</string>
     <string name="end_of_year_story_top_podcast_title">%1$s var den podcast du lyssnade mest på under 2023</string>
     <string name="end_of_year_share_story">Dela den här berättelsen</string>
-    <string name="whats_new_bookmarks_enable_now_button">Aktivera det nu</string>
     <string name="podcast_log_in_to_rate">Du måste logga in för att ge ett betyg</string>
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
     <string name="podcast_rate">Omdöme %s</string>
     <string name="submit">Skicka</string>
-    <string name="whats_new_bookmarks_try_now_button">Testa nu</string>
-    <string name="whats_new_bookmarks_title">Bokmärkena är här!</string>
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
     <string name="bookmarks_upsell_instructions">Spara tidsstämplar för dina favoritavsnitt och lås upp många fler funktioner med Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Det gick inte att hitta programnotiser för detta avsnitt.</string>

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-13 12:54:03+0000
+Translation-Revision-Date: 2024-03-26 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="discover_most_popular_in">Самые популярные в %s</string>
+    <string name="discover_select_categories">Выбрать рубрику</string>
+    <string name="discover_all_categories">Все рубрики</string>
     <string name="upgrade_to_patron">Перейти на Patron</string>
     <string name="upgrade_to_plus">Перейти на Plus</string>
     <string name="whats_new_got_it_button">Понятно</string>
@@ -73,13 +76,10 @@ Language: ru
     <string name="eoy_story_top_podcasts_title">А ещё вы были на высоте в этих шоу!</string>
     <string name="end_of_year_story_top_podcast_title">Шоу %1$s набрало больше всего прослушиваний в 2023 г.</string>
     <string name="end_of_year_share_story">Поделитесь этим</string>
-    <string name="whats_new_bookmarks_enable_now_button">Включить</string>
     <string name="podcast_log_in_to_rate">Чтобы поставить оценку, необходимо войти в систему</string>
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>
     <string name="podcast_rate">Оцените %s</string>
     <string name="submit">Отправить</string>
-    <string name="whats_new_bookmarks_try_now_button">Попробовать</string>
-    <string name="whats_new_bookmarks_title">Закладки уже готовы!</string>
     <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>
     <string name="bookmarks_upsell_instructions">Сохраняйте отметки времени понравившихся вам эпизодов и разблокируйте многие другие функции с Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Не удалось найти заметки для показа к этому эпизоду.</string>

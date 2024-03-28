@@ -17,6 +17,9 @@
 *   New Features
     *   Ability to deselect chapters entering Patron early access with full release for Plus users in next release
         ([#1940](https://github.com/Automattic/pocket-casts-android/pull/1940))
+* Bug Fixes:
+    *   Fix an issue where shared lists from the newsletter might not open.
+        ([#1988](https://github.com/Automattic/pocket-casts-android/pull/1988))
 
 7.59
 -----

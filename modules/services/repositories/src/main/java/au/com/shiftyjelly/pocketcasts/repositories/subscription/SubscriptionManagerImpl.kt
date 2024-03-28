@@ -431,7 +431,8 @@ class SubscriptionManagerImpl @Inject constructor(
                 }
             } ?: emptyList()
 
-            val updatedSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
+            val filteredOffer = Subscription.filterOffers(subscriptions)
+            val updatedSubscriptions = filteredOffer.filter { it.tier == subscriptionTier }
             val defaultSubscription = getDefaultSubscription(
                 subscriptions = updatedSubscriptions,
                 tier = subscriptionTier,

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 15:54:03+0000
+Translation-Revision-Date: 2024-03-26 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="discover_most_popular_in">Populairst in %s</string>
+    <string name="discover_select_categories">Een categorie selecteren</string>
+    <string name="discover_all_categories">Alle categorieën</string>
     <string name="upgrade_to_patron">Upgrade naar Patron</string>
     <string name="upgrade_to_plus">Upgraden naar Plus</string>
     <string name="whats_new_got_it_button">Duidelijk</string>
@@ -73,13 +76,10 @@ Language: nl
     <string name="eoy_story_top_podcasts_title">En deze shows vond je ook geweldig!</string>
     <string name="end_of_year_story_top_podcast_title">%1$s was jouw meest beluisterde show in 2023</string>
     <string name="end_of_year_share_story">Deel dit verhaal</string>
-    <string name="whats_new_bookmarks_enable_now_button">Nu inschakelen</string>
     <string name="podcast_log_in_to_rate">Je moet inloggen om een beoordeling achter te laten</string>
     <string name="podcast_submit_rating_no_internet">Geen internetverbinding gevonden. Maak verbinding met het internet om een beoordeling in te dienen.</string>
     <string name="podcast_rate">Tarief %s</string>
     <string name="submit">Verzenden</string>
-    <string name="whats_new_bookmarks_try_now_button">Probeer het nu</string>
-    <string name="whats_new_bookmarks_title">De bladwijzers zijn er!</string>
     <string name="bookmarks_upsell_instructions_early_access">Krijg vroegtijdige toegang tot deze functie met Pocket Casts Patron en sla tijdstempels op van je favoriete afleveringen. Binnenkort beschikbaar voor Plus-abonnees.</string>
     <string name="bookmarks_upsell_instructions">Sla tijdstempels op van je favoriete afleveringen en ontgrendel nog veel meer functies met Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Kan geen shownotes vinden voor deze aflevering.</string>

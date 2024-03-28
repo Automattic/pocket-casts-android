@@ -20,7 +20,6 @@ class ListServerManagerImpl @Inject constructor(
     private val downloadServer: ListDownloadServer = downloadRetrofit.create(ListDownloadServer::class.java)
 
     companion object {
-
         private val DATE_FORMAT = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
 
         fun buildSecurityHash(date: String, serverSecret: String): String? {
@@ -28,9 +27,14 @@ class ListServerManagerImpl @Inject constructor(
             return stringToHash.sha1()
         }
 
-        fun extractShareListIdFromWebUrl(id: String?): String? {
+        fun extractShareListIdFromWebUrl(webUrl: String): String {
             val host = Settings.SERVER_LIST_HOST
-            return id?.replace("https://$host/", "")?.replace("http://$host/", "")?.replace("/$host/", "")?.replace(".html", "")
+            return webUrl
+                .trimStart { it == '/' }
+                .replace("https://$host/", "")
+                .replace("http://$host/", "")
+                .replace("$host/", "")
+                .replace(".html", "")
         }
     }
 
@@ -52,7 +56,7 @@ class ListServerManagerImpl @Inject constructor(
         return downloadServer.getPodcastList(listId)
     }
 
-    override fun extractShareListIdFromWebUrl(webUrl: String?): String? {
+    override fun extractShareListIdFromWebUrl(webUrl: String): String {
         return Companion.extractShareListIdFromWebUrl(webUrl)
     }
 }
