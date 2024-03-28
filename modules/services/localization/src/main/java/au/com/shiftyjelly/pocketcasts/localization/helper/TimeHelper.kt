@@ -109,6 +109,10 @@ object TimeHelper {
         return if (output.isEmpty()) emptyString else output
     }
 
+    fun getTimeLeft(currentTimeMs: Int, durationMs: Int, inProgress: Boolean, context: Context): TimeLeft {
+        return getTimeLeft(currentTimeMs, durationMs.toLong(), inProgress, context)
+    }
+
     fun getTimeLeft(currentTimeMs: Int, durationMs: Long, inProgress: Boolean, context: Context): TimeLeft {
         if (durationMs == 0L) {
             return TimeLeft(text = "-", description = "")
