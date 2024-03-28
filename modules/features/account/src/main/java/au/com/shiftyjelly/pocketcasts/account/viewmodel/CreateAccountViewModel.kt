@@ -109,8 +109,9 @@ class CreateAccountViewModel
                                     isOfferEligible = subscriptionManager.isOfferEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
                                 )
                             }
-                        subscriptionManager.getDefaultSubscription(subscriptions)?.let { updateSubscription(it) }
-                        createAccountState.postValue(CreateAccountState.ProductsLoaded(subscriptions))
+                        val filteredOffer = Subscription.filterOffers(subscriptions)
+                        subscriptionManager.getDefaultSubscription(filteredOffer)?.let { updateSubscription(it) }
+                        createAccountState.postValue(CreateAccountState.ProductsLoaded(filteredOffer))
                     } else {
                         errorUpdate(CreateAccountError.CANNOT_LOAD_SUBS, true)
                     }
