@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPill
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedTintColors
@@ -125,6 +127,16 @@ class DiscoverViewModel @Inject constructor(
                 addPlaybackStateToList(it)
             }
     }
+    fun loadPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+        loadPodcastList(source).subscribeBy(
+            onNext = {
+                onPodcastsLoaded(it)
+            },
+            onError = {
+                Timber.e(it)
+            },
+        ).addTo(disposables)
+    }
 
     fun loadCarouselSponsoredPodcasts(
         sponsoredPodcastList: List<SponsoredPodcast>,
@@ -161,6 +173,45 @@ class DiscoverViewModel @Inject constructor(
             Flowable.just(emptyList())
         }
     }
+    fun loadCategories(
+        url: String,
+        onSuccess: (List<CategoryPill>) -> Unit,
+    ) {
+        val categoriesList = repository.getCategoriesList(url)
+
+        categoriesList.subscribeBy(
+            onSuccess = {
+                val categoryPills = it.map { discoverCategory ->
+                    convertCategoryToPill(discoverCategory)
+                }
+                onSuccess(categoryPills)
+            },
+            onError = {
+                Timber.e(it)
+            },
+        ).addTo(disposables)
+    }
+    fun loadCategories(
+        url: String,
+    ): Flowable<List<CategoryPill>> {
+        val categoriesList: Flowable<List<DiscoverCategory>> = repository.getCategoriesList(url)
+            .toFlowable()
+
+        return categoriesList.map { discoverCategories ->
+            discoverCategories.map { discoverCategory ->
+                convertCategoryToPill(discoverCategory)
+            }
+        }
+    }
+    private fun convertCategoryToPill(category: DiscoverCategory): CategoryPill = CategoryPill(
+        discoverCategory = DiscoverCategory(
+            id = category.id,
+            name = category.name,
+            icon = category.icon,
+            curated = category.curated,
+            source = category.source,
+        ),
+    )
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
         return podcastManager.getSubscribedPodcastUuids().toFlowable() // Get the current subscribed list
