@@ -63,29 +63,10 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
                             fontWeight = FontWeight.Bold,
                         ),
                     )
-                    Row(
-                        verticalAlignment = Alignment.Vertical.Bottom,
-                        modifier = GlanceModifier
-                            .defaultWeight()
-                            .fillMaxWidth(),
-                    ) {
-                        SkipBackButton(
-                            modifier = GlanceModifier.size(36.dp).padding(8.dp),
-                        )
-                        Spacer(
-                            modifier = GlanceModifier.width(8.dp),
-                        )
-                        PlaybackButton(
-                            state.isPlaying,
-                            modifier = GlanceModifier.size(36.dp).padding(6.dp),
-                        )
-                        Spacer(
-                            modifier = GlanceModifier.width(8.dp),
-                        )
-                        SkipForwardButton(
-                            modifier = GlanceModifier.size(36.dp).padding(8.dp),
-                        )
-                    }
+                    PlaybackControls(
+                        isPlaying = state.isPlaying,
+                        modifier = GlanceModifier.defaultWeight(),
+                    )
                 }
             }
         }
