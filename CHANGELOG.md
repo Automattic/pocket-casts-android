@@ -9,7 +9,7 @@
     *   Consolidate episode's embedded file artwork and RSS artwork into a single setting.
         ([#1987](https://github.com/Automattic/pocket-casts-android/pull/1987))
     *   Add alphabetical sort order for podcast episodes.
-        ([#1968](https://github.com/Automattic/pocket-casts-android/pull/1968))
+        ([#1969](https://github.com/Automattic/pocket-casts-android/pull/1969))
 * Bug Fixes:
     *   Subscription cancellation redirects now to a correct page.
         ([#1973](https://github.com/Automattic/pocket-casts-android/pull/1973))
