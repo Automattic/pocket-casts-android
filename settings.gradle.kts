@@ -13,6 +13,11 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("com.gradle.enterprise").version("3.16.2")
+}
+apply(from = File("gradle_build_cache.gradle.kts"))
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
