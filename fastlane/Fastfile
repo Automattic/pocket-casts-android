@@ -124,8 +124,8 @@ platform :android do
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
     push_to_git_remote(tags: false)
-    setbranchprotection(repository: GH_REPOSITORY, branch: "release/#{new_version}")
-    setfrozentag(repository: GH_REPOSITORY, milestone: new_version)
+    set_branch_protection(repository: GH_REPOSITORY, branch: "release/#{new_version}")
+    set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: new_version)
   end
 
   lane :complete_code_freeze do |options|
@@ -360,8 +360,8 @@ platform :android do
     version = release_version_current
 
     # Wrap up
-    removebranchprotection(repository: GH_REPOSITORY, branch: "release/#{version}")
-    setfrozentag(repository: GH_REPOSITORY, milestone: version, freeze: false)
+    remove_branch_protection(repository: GH_REPOSITORY, branch: "release/#{version}")
+    set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: version, freeze: false)
     create_new_milestone(repository: GH_REPOSITORY, need_appstore_submission: true)
     close_milestone(repository: GH_REPOSITORY, milestone: version)
 
