@@ -345,8 +345,8 @@
 
     <!-- Chapters -->
 
-    <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to skip (to not be played) -->
-    <string name="skip_chapters">Skip chapters</string>
+    <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to preselect (to be played) -->
+    <string name="skip_chapters">Preselect chapters</string>
     <!-- Indicates the number of chapters in a podcast episode. %d is the number of chapters. -->
     <string name="number_of_chapters">%d chapters</string>
     <!-- Singular indication of number of chapters -->
@@ -355,8 +355,8 @@
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
     <string name="select_one_chapter_message">Please select at least one chapter</string>
-    <string name="skip_chapters_plus_prompt">Skip chapters and more with Pocket Casts Plus</string>
-    <string name="skip_chapters_patron_prompt">Skip chapters and more with Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
+    <string name="skip_chapters_patron_prompt">Preselect chapters and more with Pocket Casts Patron</string>
 
     <!-- Podcasts -->
 
@@ -1437,14 +1437,14 @@
     <string name="whats_new_slumber_studios_body">As part of your Yearly Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
     <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus Yearly and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
     <string name="whats_new_slumber_studios_redeem_now_button">Redeem your code</string>
-    <!-- Skip Chapters what's new message for Patron users. Don't translate "Patron" -->
-    <string name="whats_new_deselect_chapters_patron_message">As part of your Patron subscription, you can now select and skip chapters in any episode that supports them.</string>
-    <!-- Skip Chapters what's new message for Plus users. Don't translate "Plus" -->
-    <string name="whats_new_deselect_chapters_plus_message">As part of your Plus subscription, you can now select and skip chapters in any episode that supports them.</string>
-    <!-- Skip Chapters what's new message to subscribe to Plus. Don't translate "Plus" -->
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Subscribe to Plus now so you can select and skip chapters in any episode that supports them.</string>
-    <!-- Skip Chapters what's new message to subscribe to Patron. Don't translate "Patron" -->
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Subscribe to Patron now so you can select and skip chapters in any episode that supports them.</string>
+    <!-- Preselect Chapters what's new message for Patron users. Don't translate "Patron" -->
+    <string name="whats_new_deselect_chapters_patron_message">As part of your Patron subscription, you can now preselect and skip chapters automatically in any episode that supports them.</string>
+    <!-- Preselect Chapters what's new message for Plus users. Don't translate "Plus" -->
+    <string name="whats_new_deselect_chapters_plus_message">As part of your Plus subscription, you can now preselect and skip chapters automatically in any episode that supports them.</string>
+    <!-- Preselect Chapters what's new message to subscribe to Plus. Don't translate "Plus" -->
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Subscribe to Plus now so you can preselect and skip chapters automatically in any episode that supports them.</string>
+    <!-- Preselect Chapters what's new message to subscribe to Patron. Don't translate "Patron" -->
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Subscribe to Patron now so you can preselect and skip chapters automatically in any episode that supports them.</string>
     <!-- Used in a button meaning that the user understood the message. -->
     <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
