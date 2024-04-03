@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -32,6 +33,14 @@ enum class PlusUpgradeFeatureItem(
     Folders(
         image = IR.drawable.ic_folders,
         title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
+    ),
+    SkipChapters(
+        image = IR.drawable.ic_tick_circle_filled,
+        title = LR.string.skip_chapters,
+        isYearlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+            SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
+        isMonthlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+            SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
     ),
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
