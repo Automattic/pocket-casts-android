@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/podcast"
+    android:background="?attr/selectableItemBackground"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:padding="8dp"
+    android:focusable="true">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="179dp"
+        android:layout_height="179dp"
+        android:layout_marginBottom="6dp"
+        android:clipToPadding="false"
+        android:elevation="3dp"
+        app:cardCornerRadius="8dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/defaultArtworkSmall" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/lblTitle"
+        android:textAppearance="@style/H40"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/primary_text_01"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/lblSubtitle"
+        android:textAppearance="@style/H50"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/primary_text_02"
+        android:ellipsize="end"
+        android:maxLines="1" />
+</LinearLayout>

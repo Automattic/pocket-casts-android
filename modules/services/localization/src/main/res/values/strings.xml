@@ -1562,6 +1562,7 @@
     <string name="discover_top">Top</string>
     <string name="discover_popular">Popular</string>
     <string name="discover_popular_in">Popular in %s</string>
+    <string name="discover_most_popular_in">Most Popular in %s</string>
     <string name="discover_button_play_episode">Play Episode</string>
     <string name="discover_button_play_trailer">Play Trailer</string>
     <string name="discover_sponsored">Sponsored</string>
