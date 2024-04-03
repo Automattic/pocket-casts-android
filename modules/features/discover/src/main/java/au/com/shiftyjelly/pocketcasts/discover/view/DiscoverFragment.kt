@@ -176,6 +176,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         if (adapter == null) {
             adapter = DiscoverAdapter(
+                context = requireContext(),
                 service = viewModel.repository,
                 staticServerManager = staticServerManager,
                 listener = this,

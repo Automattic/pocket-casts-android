@@ -10,9 +10,12 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import coil.imageLoader
+import coil.request.CachePolicy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -43,10 +46,14 @@ class RefreshArtworkWorker @AssistedInject constructor(
             coilManager.clearAll()
             val podcasts = podcastManager.findSubscribedNoOrder()
             colorManager.updateColors(podcasts)
-            val imageLoader = PodcastImageLoaderThemed(applicationContext)
+            val imageRequestFactory = PocketCastsImageRequestFactory(applicationContext).themed()
             for (podcast in podcasts) {
                 try {
-                    imageLoader.cacheSubscribedArtworkSuspend(podcast)
+                    val request = imageRequestFactory.create(podcast)
+                        .newBuilder()
+                        .memoryCachePolicy(CachePolicy.DISABLED)
+                        .build()
+                    applicationContext.imageLoader.execute(request)
                 } catch (e: Exception) {
                     Timber.e(e)
                 }

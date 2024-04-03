@@ -19,7 +19,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter as Chapter
 
@@ -294,11 +293,20 @@ class ShowNotesProcessTest {
     }
 
     @Test
-    fun `do not fetch chapters from URL when chapters are present`() = runTest(coroutineRule.testDispatcher) {
+    fun `use direct chapters when there is less URL chapters`() = runTest(coroutineRule.testDispatcher) {
         val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
         val episode = ShowNotesEpisode(
             uuid = "episode-id",
-            chapters = listOf(ShowNotesChapter(startTime = 0.0)),
+            chapters = listOf(
+                ShowNotesChapter(
+                    startTime = 0.0,
+                    title = "Title 1",
+                ),
+                ShowNotesChapter(
+                    startTime = 1.0,
+                    title = "Title 2",
+                ),
+            ),
             chaptersUrl = "url",
         )
         val showNotesResponse = ShowNotesResponse(
@@ -308,9 +316,78 @@ class ShowNotesProcessTest {
             ),
         )
 
+        val urlChapters = listOf(
+            ShowNotesChapter(
+                startTime = 2.0,
+                title = "Title 3",
+            ),
+        )
+        whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
+
         processor.process("episode-id", showNotesResponse)
 
-        verifyNoInteractions(service)
+        val expected = listOf(
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 0,
+                title = "Title 1",
+            ),
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 1000,
+                title = "Title 2",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id", expected)
+    }
+
+    @Test
+    fun `use URL chapters when there is less direct chapters`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, service)
+        val episode = ShowNotesEpisode(
+            uuid = "episode-id",
+            chapters = listOf(
+                ShowNotesChapter(
+                    startTime = 0.0,
+                    title = "Title 1",
+                ),
+            ),
+            chaptersUrl = "url",
+        )
+        val showNotesResponse = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode),
+            ),
+        )
+
+        val urlChapters = listOf(
+            ShowNotesChapter(
+                startTime = 1.0,
+                title = "Title 2",
+            ),
+            ShowNotesChapter(
+                startTime = 2.0,
+                title = "Title 3",
+            ),
+        )
+        whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
+
+        processor.process("episode-id", showNotesResponse)
+
+        val expected = listOf(
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 1000,
+                title = "Title 2",
+            ),
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 2000,
+                title = "Title 3",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id", expected)
     }
 
     @Test

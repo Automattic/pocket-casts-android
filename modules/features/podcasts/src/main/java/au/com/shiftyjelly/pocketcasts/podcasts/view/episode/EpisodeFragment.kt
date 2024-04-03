@@ -34,14 +34,15 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -112,7 +113,7 @@ class EpisodeFragment : BaseFragment() {
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
-    private lateinit var imageLoader: PodcastImageLoader
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
 
     private var webView: WebView? = null
     private var formattedNotes: String? = null
@@ -175,7 +176,7 @@ class EpisodeFragment : BaseFragment() {
         super.onAttach(context)
         listener = context as FragmentHostListener
         episodeLoadedListener = (parentFragment as? EpisodeLoadedListener)
-        imageLoader = PodcastImageLoaderThemed(context)
+        imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -341,13 +342,7 @@ class EpisodeFragment : BaseFragment() {
                                 .show()
                             true
                         }
-                        binding.podcastArtwork.let { imageView ->
-                            imageLoader.largePlaceholder().loadEpisodeArtworkInto(
-                                imageView = imageView,
-                                episode = state.episode,
-                                coroutineScope = this,
-                            )
-                        }
+                        imageRequestFactory.create(state.episode, settings.useRssArtwork.value).loadInto(binding.podcastArtwork)
 
                         binding.btnPlay.setOnPlayClicked {
                             val context = binding.root.context

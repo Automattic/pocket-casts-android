@@ -9,9 +9,10 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 
@@ -21,7 +22,7 @@ class PodcastDescriptiveRow @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val imageLoader = PodcastImageLoaderThemed(context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
     private val lblTitle: TextView
     private val lblSubtitle: TextView
     private val lblDescription: TextView
@@ -53,7 +54,7 @@ class PodcastDescriptiveRow @JvmOverloads constructor(
                 lblTitle.text = value.title
                 lblSubtitle.text = value.author
                 lblDescription.text = value.description
-                imageLoader.loadSmallImage(value.uuid).into(imageView)
+                imageRequestFactory.createForPodcast(value.uuid).loadInto(imageView)
                 isVisible = true
                 btnSubscribe.updateSubscribeButtonIcon(subscribed = value.isSubscribed)
             } else {

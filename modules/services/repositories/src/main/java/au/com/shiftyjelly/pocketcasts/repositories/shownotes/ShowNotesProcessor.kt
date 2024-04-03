@@ -22,7 +22,7 @@ class ShowNotesProcessor @Inject constructor(
 ) {
     fun process(episodeUuidForChapterUrl: String, showNotes: ShowNotesResponse) {
         updateImageUrls(showNotes)
-        updateChapters(showNotes)
+        updateChapters(episodeUuidForChapterUrl, showNotes)
         updateChapterFromLink(episodeUuidForChapterUrl, showNotes)
     }
 
@@ -33,12 +33,14 @@ class ShowNotesProcessor @Inject constructor(
         imageUrlUpdates?.let { episodeManager.updateImageUrls(it) }
     }
 
-    private fun updateChapters(showNotes: ShowNotesResponse) = scope.launch {
-        val chapters = showNotes.podcast?.episodes?.mapNotNull { episodeShowNotes ->
-            val episodeUuid = episodeShowNotes.uuid
-            val chapters = episodeShowNotes.chapters?.map { chapterShowNotes -> chapterShowNotes.toChapter(episodeUuid) }
-            chapters?.let { episodeUuid to it }
-        }
+    private fun updateChapters(episodeUuid: String, showNotes: ShowNotesResponse) = scope.launch {
+        val chapters = showNotes.podcast?.episodes
+            ?.filter { it.uuid != episodeUuid } // We handle requesting episode with URL link
+            ?.mapNotNull { episodeShowNotes ->
+                val mappingEpisodeId = episodeShowNotes.uuid
+                val chapters = episodeShowNotes.chapters?.map { chapterShowNotes -> chapterShowNotes.toChapter(mappingEpisodeId) }
+                chapters?.let { episodeShowNotes.uuid to it }
+            }
         chapters?.forEach { (episodeUuid, chapters) ->
             chapterManager.updateChapters(episodeUuid, chapters)
         }
@@ -46,16 +48,23 @@ class ShowNotesProcessor @Inject constructor(
 
     private fun updateChapterFromLink(episodeUuid: String, showNotes: ShowNotesResponse) = scope.launch {
         val episode = showNotes.findEpisode(episodeUuid) ?: return@launch
-        val chaptersUrl = episode.chaptersUrl?.takeIf { episode.chapters.isNullOrEmpty() } ?: return@launch
 
-        val chapters = try {
-            service.getShowNotesChapters(chaptersUrl).chapters?.map { it.toChapter(episodeUuid) }
+        val podcastIndexChapters = try {
+            episode.chaptersUrl?.let { url ->
+                service.getShowNotesChapters(url).chapters?.map { it.toChapter(episodeUuid) }
+            }
         } catch (e: Throwable) {
-            Timber.e(e, "Failed to fetch chapters for episode $episodeUuid from $chaptersUrl")
+            Timber.e(e, "Failed to fetch chapters for episode $episodeUuid from ${episode.chaptersUrl}")
             null
-        } ?: return@launch
+        }
+        val podLoveChapters = episode.chapters?.map { chapterShowNotes -> chapterShowNotes.toChapter(episodeUuid) }
 
-        chapterManager.updateChapters(episodeUuid, chapters)
+        val newChapters = if (podcastIndexChapters != null && podLoveChapters != null) {
+            maxOf(podcastIndexChapters, podLoveChapters) { a, b -> a.size.compareTo(b.size) }
+        } else {
+            podcastIndexChapters ?: podLoveChapters
+        }
+        newChapters?.let { chapterManager.updateChapters(episodeUuid, it) }
     }
 
     private fun ShowNotesChapter.toChapter(episodeUuid: String) = Chapter(
