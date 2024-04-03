@@ -82,14 +82,6 @@ enum class PatronUpgradeFeatureItem(
         image = IR.drawable.ic_new_features,
         title = LR.string.onboarding_patron_feature_early_access_title,
     ),
-    SkipChapters(
-        image = IR.drawable.ic_tick_circle_filled,
-        title = LR.string.skip_chapters,
-        isYearlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-            SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON,
-        isMonthlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-            SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON,
-    ),
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
         title = LR.string.onboarding_patron_feature_cloud_storage_title,
