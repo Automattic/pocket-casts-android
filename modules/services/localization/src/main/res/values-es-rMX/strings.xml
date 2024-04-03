@@ -18,8 +18,6 @@ Language: es
     <string name="whats_new_deselect_chapters_patron_message">Como parte de tu suscripción a Patron, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
     <string name="skip_chapters_patron_prompt">Omite capítulos y haz otros cambios con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Omite capítulos y haz otros cambios con Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Utilizar carátula de archivo insertada</string>
-    <string name="settings_episode_artwork_details">Muestra la carátula de las notas del programa del episodio (si tiene) en lugar de usar la carátula del programa. Si se incluyen tanto la carátula de RSS como la del archivo, se usará la carátula de RSS. </string>
     <string name="select_one_chapter_message">Selecciona al menos un capítulo</string>
     <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
     <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d ocultos</string>
@@ -801,7 +799,6 @@ Language: es
     <string name="settings_website_link">enlace del sitio web</string>
     <string name="settings_view">Ver</string>
     <string name="settings_version">Versión %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Utilizar carátula de RSS insertada</string>
     <string name="settings_use_android_light_dark_mode">Usar el modo oscuro o claro de Android</string>
     <string name="settings_up_next_tap_summary">Si se activa esta opción, se reproducirá el elemento cuando lo toques en la cola de A continuación. Si lo mantienes pulsado, se mostrarán las opciones del episodio.</string>
     <string name="settings_up_next_tap">Reproducir episodio de A continuación al tocar</string>
@@ -913,7 +910,6 @@ Language: es
     <string name="settings_export_send_email">Enviar correo electrónico</string>
     <string name="settings_export_save_file_summary">Exportar el archivo OPML a tu almacenamiento.</string>
     <string name="settings_export_save_file">Guardar archivo</string>
-    <string name="settings_embedded_artwork_details">En el reproductor, muestra las carátulas desde el archivo descargado (si existe), en lugar de utilizar las del programa.</string>
     <string name="settings_developer">Desarrollador</string>
     <string name="settings_close_upgrade_offer">cerrar oferta de mejora</string>
     <string name="settings_choose_podcasts">Elegir podcasts</string>

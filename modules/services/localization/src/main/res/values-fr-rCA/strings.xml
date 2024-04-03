@@ -18,8 +18,6 @@ Language: fr
     <string name="whats_new_deselect_chapters_patron_message">Dans le cadre de votre abonnement Patron, vous pouvez maintenant sélectionner et passer des chapitres dans n’importe quel épisode qui en comporte.</string>
     <string name="skip_chapters_patron_prompt">Passer des chapitres et plus encore avec Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Passer des chapitres et plus encore avec Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Utiliser les illustrations de fichiers intégrées</string>
-    <string name="settings_episode_artwork_details">Affiche l’illustration issue des notes de l’émission à laquelle appartient l’épisode (le cas échéant) au lieu d’utiliser l’illustration de l’émission. Si un fichier et une illustration RSS sont disponibles, l\'illustration RSS sera utilisée.</string>
     <string name="select_one_chapter_message">Veuillez sélectionner au moins un chapitre</string>
     <string name="number_of_chapters_summary_singular">1 chapitre • %d masqué</string>
     <string name="number_of_chapters_summary_plural">%1$d chapitres • %2$d masqués</string>
@@ -801,7 +799,6 @@ Language: fr
     <string name="settings_website_link">lien de site Web</string>
     <string name="settings_view">Voir</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Utiliser les illustrations RSS intégrées</string>
     <string name="settings_use_android_light_dark_mode">Utiliser le mode clair/sombre d’Android</string>
     <string name="settings_up_next_tap_summary">S’il est activé, un appui sur un élément dans votre file d’attente déclenche sa lecture. Une pression prolongée affiche les options de l’épisode.</string>
     <string name="settings_up_next_tap">Lire le prochain épisode par une pression</string>
@@ -913,7 +910,6 @@ Language: fr
     <string name="settings_export_send_email">Envoyer un e-mail</string>
     <string name="settings_export_save_file_summary">Exportez le fichier OPML vers votre stockage.</string>
     <string name="settings_export_save_file">Enregistrer le fichier</string>
-    <string name="settings_embedded_artwork_details">Affiche l’illustration du fichier téléchargé (si elle existe) dans le lecteur au lieu d’utiliser l’illustration de l’émission.</string>
     <string name="settings_developer">Développeur</string>
     <string name="settings_close_upgrade_offer">fermer l’offre de mise à niveau</string>
     <string name="settings_choose_podcasts">Sélectionner des podcasts</string>

@@ -308,7 +308,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                         dialog?.dismiss()
                     }
                 }
-                pocketCastsImageRequestFactory?.create(episode, useRssArtwork = false)?.loadInto(binding.imgFile)
+                pocketCastsImageRequestFactory?.create(episode, useEpisodeArtwork = false)?.loadInto(binding.imgFile)
             },
         )
 

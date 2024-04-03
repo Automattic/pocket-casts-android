@@ -12,13 +12,13 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 @Composable
 fun EpisodeImage(
     episode: BaseEpisode,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
-    val imageRequest = remember(episode.uuid, useRssArtwork) {
-        PocketCastsImageRequestFactory(context).themed().create(episode, useRssArtwork)
+    val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
+        PocketCastsImageRequestFactory(context).themed().create(episode, useEpisodeArtwork)
     }
 
     CoilImage(

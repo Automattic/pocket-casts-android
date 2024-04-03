@@ -57,5 +57,5 @@ class FilterViewModel @Inject constructor(
         .asFlow()
         .stateIn(viewModelScope, SharingStarted.Lazily, FiltersViewModel.UiState.Loading)
 
-    val useRssArtwork = settings.useRssArtwork.flow
+    val useEpisodeArtwork = settings.useEpisodeArtwork.flow
 }

@@ -802,7 +802,6 @@ Language: nb_NO
     <string name="settings_export_send_email">Send e-post</string>
     <string name="settings_export_save_file_summary">Eksport OPML-filen til lagringen din.</string>
     <string name="settings_export_save_file">Lagre fil</string>
-    <string name="settings_embedded_artwork_details">Viser grafikk fra den nedlastede filen (hvis den finnes) i avspilleren i stedet for å bruke grafikk fra programmet.</string>
     <string name="settings_developer">Utvikler</string>
     <string name="settings_close_upgrade_offer">lukk oppgraderingstilbud</string>
     <string name="settings_choose_podcasts">Velg podcaster</string>

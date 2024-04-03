@@ -818,7 +818,6 @@ Language: en_GB
     <string name="settings_export_send_email">Send email</string>
     <string name="settings_export_save_file_summary">Export the OPML file to your storage.</string>
     <string name="settings_export_save_file">Save file</string>
-    <string name="settings_embedded_artwork_details">Shows artwork from the downloaded file (if it exists) in the player instead of using the show\'s artwork.</string>
     <string name="settings_developer">Developer</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>

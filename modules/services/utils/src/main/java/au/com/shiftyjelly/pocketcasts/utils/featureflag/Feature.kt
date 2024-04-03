@@ -77,11 +77,11 @@ enum class Feature(
     ),
     CATEGORIES_REDESIGN(
         key = "CATEGORIES_REDESIGN",
-        title = "Categories Redesign and Ads in Categories",
-        defaultValue = false,
+        title = "Podcasts by category shown in discover view",
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
     ),
     ;
 

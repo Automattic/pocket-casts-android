@@ -538,15 +538,9 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val useEmbeddedArtwork = UserSetting.BoolPref(
-        sharedPrefKey = "useEmbeddedArtwork",
+    override val useEpisodeArtwork = UserSetting.BoolPref(
+        sharedPrefKey = "useEpisodeArtwork",
         defaultValue = false,
-        sharedPrefs = sharedPreferences,
-    )
-
-    override val useRssArtwork = UserSetting.BoolPref(
-        sharedPrefKey = "useRssArtwork",
-        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 

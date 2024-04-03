@@ -166,7 +166,7 @@ class PodcastAdapter(
     data class BookmarkItemData(
         val bookmark: Bookmark,
         val episode: BaseEpisode,
-        val useRssArtwork: Boolean,
+        val useEpisodeArtwork: Boolean,
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
@@ -573,7 +573,7 @@ class PodcastAdapter(
                                         bookmark,
                                     )
                                 },
-                                useRssArtwork = settings.useRssArtwork.value,
+                                useEpisodeArtwork = settings.useEpisodeArtwork.value,
                             )
                         },
                     )

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R.layout
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
@@ -34,7 +35,12 @@ class CategoriesBottomSheet(
             dismiss()
         }
         recyclerView.adapter = adapter
-        adapter.submitList(categories)
+
+        val sortedCategories = categories.map {
+            it.copy(discoverCategory = it.discoverCategory.copy(name = it.discoverCategory.name.tryToLocalise(resources)))
+        }.sortedBy { it.discoverCategory.name }
+
+        adapter.submitList(sortedCategories)
 
         val behavior = BottomSheetBehavior.from(view.parent as View)
         val windowHeight = resources.displayMetrics.heightPixels

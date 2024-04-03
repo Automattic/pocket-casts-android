@@ -27,19 +27,19 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 internal class LargeListRowAdapter(
-    private val context: Context,
+    context: Context,
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
-    var fromListId: String? = null
+    private var fromListId: String? = null
 
     class LargeListItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val placeholderDrawable = itemView.context.getThemeDrawable(UR.attr.defaultArtworkSmall)
-        val imageView = itemView.findViewById<ImageView>(R.id.imageView)
-        val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
-        val lblSubtitle = itemView.findViewById<TextView>(R.id.lblSubtitle)
-        val btnSubscribe = itemView.findViewById<ImageButton>(R.id.btnSubscribe)
+        val imageView: ImageView = itemView.findViewById(R.id.imageView)
+        val lblTitle: TextView = itemView.findViewById(R.id.lblTitle)
+        val lblSubtitle: TextView = itemView.findViewById(R.id.lblSubtitle)
+        val btnSubscribe: ImageButton = itemView.findViewById(R.id.btnSubscribe)
     }
 
     companion object {
@@ -89,9 +89,11 @@ internal class LargeListRowAdapter(
             holder.btnSubscribe.isVisible = false
         }
     }
-
     fun showLoadingList() {
         val loadingList = listOf(MutableList(NUMBER_OF_LOADING_ITEMS) { LoadingItem() })
         submitList(loadingList)
+    }
+    fun setFromListId(value: String) {
+        this.fromListId = value
     }
 }
