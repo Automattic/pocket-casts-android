@@ -154,7 +154,11 @@ class ProfileFragment : BaseFragment() {
                         (activity as? FragmentHostListener)?.addFragment(fragment)
                     }
                     BookmarksContainerFragment::class.java -> {
-                        // TODO: Navigate to profile bookmarks
+                        analyticsTracker.track(AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN)
+                        val fragment = BookmarksContainerFragment.newInstance(
+                            sourceView = SourceView.PROFILE,
+                        )
+                        (activity as? FragmentHostListener)?.addFragment(fragment)
                     }
                     HelpFragment::class.java -> {
                         (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())

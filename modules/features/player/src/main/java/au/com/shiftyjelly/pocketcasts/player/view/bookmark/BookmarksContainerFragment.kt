@@ -30,7 +30,7 @@ class BookmarksContainerFragment :
         private const val ARG_EPISODE_UUID = "episodeUUID"
         private const val ARG_SOURCE_VIEW = "sourceView"
         fun newInstance(
-            episodeUuid: String,
+            episodeUuid: String? = null,
             sourceView: SourceView,
         ) = BookmarksContainerFragment().apply {
             arguments = bundleOf(
@@ -110,7 +110,15 @@ class BookmarksContainerFragment :
             .addToBackStack(null)
             .commit()
 
-        binding.btnClose.setOnClickListener { dismiss() }
+        dialog?.let {
+            binding.btnClose.setOnClickListener { dismiss() }
+        } ?: run {
+            binding.btnClose.setImageResource(R.drawable.ic_arrow_back)
+            binding.btnClose.setOnClickListener {
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
+            }
+        }
     }
 
     private fun FragmentBookmarksContainerBinding.setupMultiSelectHelper() {
