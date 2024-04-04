@@ -17,6 +17,8 @@
 * Bug Fixes:
     *   Subscription cancellation redirects now to a correct page.
         ([#1973](https://github.com/Automattic/pocket-casts-android/pull/1973))
+    *   Fix not displaying chapter titles in the player.
+        ([#2008](https://github.com/Automattic/pocket-casts-android/pull/2008))
 
 7.60
 -----
