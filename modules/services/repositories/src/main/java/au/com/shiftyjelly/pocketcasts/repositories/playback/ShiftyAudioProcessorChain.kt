@@ -4,8 +4,8 @@ import androidx.annotation.OptIn
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.AudioProcessorChain
-import androidx.media3.common.audio.SonicAudioProcessor
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.audio.SonicAudioProcessor
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import timber.log.Timber
 
