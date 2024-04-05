@@ -179,6 +179,11 @@ public final class ShiftyTrimSilenceProcessor extends BaseAudioProcessor {
         if (!hasOutputNoise) {
             skippedFrames += paddingSize / bytesPerFrame;
         }
+        hasOutputNoise = false;
+        maybeSilenceBuffer = Util.EMPTY_BYTE_ARRAY;
+        maybeSilenceBufferSize = 0;
+        paddingBuffer = Util.EMPTY_BYTE_ARRAY;
+        paddingSize = 0;
     }
 
     @Override
@@ -205,9 +210,11 @@ public final class ShiftyTrimSilenceProcessor extends BaseAudioProcessor {
     @Override
     protected void onReset() {
         enabled = false;
-        paddingSize = 0;
+        hasOutputNoise = false;
         maybeSilenceBuffer = Util.EMPTY_BYTE_ARRAY;
+        maybeSilenceBufferSize = 0;
         paddingBuffer = Util.EMPTY_BYTE_ARRAY;
+        paddingSize = 0;
     }
 
     // Internal methods.
