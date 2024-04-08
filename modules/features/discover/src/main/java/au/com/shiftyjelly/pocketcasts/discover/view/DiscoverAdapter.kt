@@ -490,28 +490,25 @@ internal class DiscoverAdapter(
 
         when (row) {
             is DiscoverRow -> {
-                when (row.type) {
-                    is ListType.PodcastList -> {
-                        return when (row.displayStyle) {
-                            is DisplayStyle.Carousel -> R.layout.row_carousel_list
-                            is DisplayStyle.LargeList -> R.layout.row_podcast_large_list
-                            is DisplayStyle.SmallList -> R.layout.row_podcast_small_list
-                            is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
-                            is DisplayStyle.CollectionList -> R.layout.row_collection_list
-                            else -> R.layout.row_error
-                        }
+                if (row.type is ListType.PodcastList) {
+                    return when (row.displayStyle) {
+                        is DisplayStyle.Carousel -> R.layout.row_carousel_list
+                        is DisplayStyle.LargeList -> R.layout.row_podcast_large_list
+                        is DisplayStyle.SmallList -> R.layout.row_podcast_small_list
+                        is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
+                        is DisplayStyle.CollectionList -> R.layout.row_collection_list
+                        else -> R.layout.row_error
                     }
-                    is ListType.EpisodeList -> {
-                        return when (row.displayStyle) {
-                            is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
-                            is DisplayStyle.CollectionList -> R.layout.row_collection_list
-                            else -> R.layout.row_error
-                        }
+                } else if (row.type is ListType.EpisodeList) {
+                    return when (row.displayStyle) {
+                        is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
+                        is DisplayStyle.CollectionList -> R.layout.row_collection_list
+                        else -> R.layout.row_error
                     }
-                    is ListType.Categories -> {
-                        return if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) R.layout.row_category_pills else R.layout.row_categories
-                    }
-                    else -> {}
+                } else if (row.type is ListType.Categories && row.displayStyle is DisplayStyle.Pills) {
+                    return R.layout.row_category_pills
+                } else if (row.type is ListType.Categories && row.displayStyle is DisplayStyle.Category) {
+                    return R.layout.row_categories
                 }
             }
             is ChangeRegionRow -> {
