@@ -369,6 +369,7 @@ internal class DiscoverAdapter(
         private lateinit var source: String
         private lateinit var region: String
         private lateinit var allCategories: CategoryPill
+        private lateinit var mostPopularCategoriesId: List<Int>
 
         private val adapter = CategoryPillListAdapter(
             onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
@@ -421,9 +422,11 @@ internal class DiscoverAdapter(
                 adapter.loadCategories(categoriesFilter)
             }
         }
+        fun setMostPopularCategoriesId(ids: List<Int>) {
+            this.mostPopularCategoriesId = ids
+        }
         private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
-            // True Crime, Comedy, Culture, History, Fiction, Technology
-            val mostPopularCategoriesId = setOf(19, 3, 13, 18, 17, 15)
+            if (::mostPopularCategoriesId.isInitialized.not()) return categories
 
             return categories
                 .filter { it.discoverCategory.id in mostPopularCategoriesId }
@@ -616,6 +619,7 @@ internal class DiscoverAdapter(
                         loadCategories(row.source),
                         onNext = { categories ->
                             val context = holder.itemView.context
+                            row.mostPopularCategoriesId?.let { holder.setMostPopularCategoriesId(it) }
                             holder.submitCategories(categories, row.source, context, region = row.regionCode)
                         },
                     )
