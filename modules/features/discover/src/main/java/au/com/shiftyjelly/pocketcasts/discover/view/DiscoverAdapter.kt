@@ -369,7 +369,7 @@ internal class DiscoverAdapter(
         private lateinit var source: String
         private lateinit var region: String
         private lateinit var allCategories: CategoryPill
-        private lateinit var mostPopularCategoriesId: List<Int>
+        private var mostPopularCategoriesId: List<Int> = emptyList()
 
         private val adapter = CategoryPillListAdapter(
             onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
@@ -426,7 +426,7 @@ internal class DiscoverAdapter(
             this.mostPopularCategoriesId = ids
         }
         private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
-            if (::mostPopularCategoriesId.isInitialized.not()) return categories
+            if (mostPopularCategoriesId.isEmpty()) return categories
 
             return categories
                 .filter { it.discoverCategory.id in mostPopularCategoriesId }
