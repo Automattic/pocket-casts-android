@@ -4,7 +4,7 @@
         android:width="1dp"
         android:color="@color/coolgrey_50" />
 
-    <solid android:color="@color/select_categories_tittle_color" />
+    <solid android:color="?attr/primary_icon_01" />
 
     <padding
         android:left="20dp"
