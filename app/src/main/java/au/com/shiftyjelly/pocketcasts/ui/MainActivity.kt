@@ -891,6 +891,7 @@ class MainActivity :
     private fun updatePlaybackStateDeselectedChapterIndices(upNextQueue: UpNextQueue.State) {
         (upNextQueue as? UpNextQueue.State.Loaded)?.let {
             val lastPlaybackState = viewModel.lastPlaybackState
+            if (lastPlaybackState?.chapters?.getList()?.isEmpty() == true) return
             val currentEpisodeDeselectedChapterIndicesChanged = playbackManager.getCurrentEpisode()?.let { currentEpisode ->
                 currentEpisode.uuid == it.episode.uuid &&
                     lastPlaybackState != null &&
