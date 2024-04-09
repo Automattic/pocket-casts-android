@@ -90,7 +90,12 @@ data class Podcast(
     @ColumnInfo(name = "trim_silence_level") var trimMode: TrimMode = TrimMode.OFF,
     @ColumnInfo(name = "trim_silence_level_modified") var trimModeModified: Date? = null,
     @ColumnInfo(name = "refresh_available") var refreshAvailable: Boolean = false,
-    @ColumnInfo(name = "folder_uuid") var folderUuid: String? = null,
+    @Deprecated(
+        message = "This property doesn't account for home folder. Use 'folderUuid' instead.",
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith(expression = "folderUuid"),
+    )
+    @ColumnInfo(name = "folder_uuid") internal var rawFolderUuid: String? = null,
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
@@ -159,6 +164,13 @@ data class Podcast(
             effects.trimMode = trimMode
             effects.isVolumeBoosted = isVolumeBoosted
             return effects
+        }
+
+    @Suppress("DEPRECATION_ERROR")
+    var folderUuid: String?
+        get() = rawFolderUuid?.takeIf { it != Folder.homeFolderUuid }
+        set(value) {
+            rawFolderUuid = value?.takeIf { it != Folder.homeFolderUuid }
         }
 
     enum class Licensing {
