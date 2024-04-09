@@ -593,4 +593,8 @@ enum class AnalyticsEvent(val key: String) {
     DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
     DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
     PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
+
+    /* Widgets */
+    WIDGET_INSTALLED("widget_installed"),
+    WIDGET_UNINSTALLED("widget_uninstalled"),
 }
