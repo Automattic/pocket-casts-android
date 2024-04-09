@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -37,6 +38,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
         .map {
             Sentry.addBreadcrumb("MultiSelectBookmarksHelper toolbarActions updated, ${it.size} bookmarks from $source")
             listOf(
+                MultiSelectBookmarkAction.ShareBookmark(
+                    isVisible = source != SourceView.FILES &&
+                        it.count() == 1,
+                ),
                 MultiSelectBookmarkAction.EditBookmark(isVisible = it.count() == 1),
                 MultiSelectBookmarkAction.DeleteBookmark,
                 MultiSelectAction.SelectAll,
