@@ -894,8 +894,8 @@ class MainActivity :
             val currentEpisodeDeselectedChapterIndicesChanged = playbackManager.getCurrentEpisode()?.let { currentEpisode ->
                 currentEpisode.uuid == it.episode.uuid &&
                     lastPlaybackState != null &&
-                    it.episode.deselectedChapters !=
-                    lastPlaybackState.chapters.getList().filterNot { it.selected }.map { it.index }
+                    it.episode.deselectedChapters.sorted() !=
+                    lastPlaybackState.chapters.getList().filterNot { it.selected }.map { it.index }.sorted()
             } ?: false
             if (currentEpisodeDeselectedChapterIndicesChanged) {
                 playbackManager.updatePlaybackStateDeselectedChapterIndices()
