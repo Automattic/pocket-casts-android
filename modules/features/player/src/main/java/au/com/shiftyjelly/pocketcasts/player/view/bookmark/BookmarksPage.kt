@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import java.util.Date
 import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -51,6 +52,7 @@ fun BookmarksPage(
     bookmarksViewModel: BookmarksViewModel,
     multiSelectHelper: MultiSelectBookmarksHelper,
     onRowLongPressed: (Bookmark) -> Unit,
+    onShareBookmarkClick: () -> Unit,
     onEditBookmarkClick: () -> Unit,
     onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
@@ -89,9 +91,12 @@ fun BookmarksPage(
     }
 
     LaunchedEffect(context) {
-        multiSelectHelper.showEditBookmarkPage
-            .collect { show ->
-                if (show) onEditBookmarkClick()
+        multiSelectHelper.navigationState
+            .collect { navigationState ->
+                when (navigationState) {
+                    NavigationState.ShareBookmark -> onShareBookmarkClick()
+                    NavigationState.EditBookmark -> onEditBookmarkClick()
+                }
             }
     }
 }

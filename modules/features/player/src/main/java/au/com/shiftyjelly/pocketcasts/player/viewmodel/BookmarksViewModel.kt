@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
@@ -23,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -212,6 +216,30 @@ class BookmarksViewModel
     fun onOptionsMenuClicked() {
         viewModelScope.launch {
             _showOptionsDialog.emit(sourceView.mapToBookmarksSortTypeUserSetting().flow.value.labelId)
+        }
+    }
+
+    fun onShareClicked(context: Context) {
+        (_uiState.value as? UiState.Loaded)?.let {
+            val bookmark =
+                it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
+            bookmark?.let {
+                viewModelScope.launch(ioDispatcher) {
+                    val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                    val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+                    if (podcast != null && episode is PodcastEpisode) {
+                        SharePodcastHelper(
+                            podcast,
+                            episode,
+                            bookmark.timeSecs.toDouble(),
+                            context,
+                            ShareType.BOOKMARK_TIME,
+                            sourceView,
+                            analyticsTracker,
+                        ).showShareDialogDirect()
+                    }
+                }
+            }
         }
     }
 

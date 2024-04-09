@@ -26,10 +26,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : MultiSelectHelper<Bookmark>() {
-    override val maxToolbarIcons = 2
+    override val maxToolbarIcons = 3
 
-    private val _showEditBookmarkPage = MutableSharedFlow<Boolean>()
-    val showEditBookmarkPage = _showEditBookmarkPage.asSharedFlow()
+    private val _navigationState = MutableSharedFlow<NavigationState>()
+    val navigationState = _navigationState.asSharedFlow()
 
     override var source by bookmarkManager::sourceView
 
@@ -52,6 +52,11 @@ class MultiSelectBookmarksHelper @Inject constructor(
         activity: FragmentActivity,
     ): Boolean {
         return when (itemId) {
+            R.id.menu_share -> {
+                share()
+                true
+            }
+
             UR.id.menu_edit -> {
                 edit()
                 true
@@ -84,8 +89,12 @@ class MultiSelectBookmarksHelper @Inject constructor(
         }
     }
 
+    private fun share() {
+        launch { _navigationState.emit(NavigationState.ShareBookmark) }
+    }
+
     private fun edit() {
-        launch { _showEditBookmarkPage.emit(true) }
+        launch { _navigationState.emit(NavigationState.EditBookmark) }
     }
 
     fun delete(resources: Resources, fragmentManager: FragmentManager) {
@@ -139,5 +148,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
                 closeMultiSelect()
             }
             .show(fragmentManager, "delete_bookmarks_warning")
+    }
+
+    sealed class NavigationState {
+        data object EditBookmark : NavigationState()
+        data object ShareBookmark : NavigationState()
     }
 }

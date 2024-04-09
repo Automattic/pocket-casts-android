@@ -77,6 +77,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -689,12 +690,19 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.multiSelectBookmarksHelper.showEditBookmarkPage
-                    .collect { show ->
-                        if (show) onEditBookmarkClick()
+                viewModel.multiSelectBookmarksHelper.navigationState
+                    .collect { navigationState ->
+                        when (navigationState) {
+                            NavigationState.ShareBookmark -> onShareBookmarkClick()
+                            NavigationState.EditBookmark -> onEditBookmarkClick()
+                        }
                     }
             }
         }
+    }
+
+    private fun onShareBookmarkClick() {
+        viewModel.onShareBookmarkClick(requireContext())
     }
 
     private fun onEditBookmarkClick() {
