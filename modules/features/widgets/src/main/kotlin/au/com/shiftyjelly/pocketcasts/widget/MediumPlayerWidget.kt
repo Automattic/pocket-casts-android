@@ -8,13 +8,14 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
+import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.ui.MediumPlayer
 
 class MediumPlayerWidget : GlanceAppWidget() {
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val adapter = PlayerWidgetStateAdapter(context)
+        val adapter = MediumPlayerWidgetState.Adapter(context)
         val updatedState = adapter.updateState(id) { it }
 
         provideContent {

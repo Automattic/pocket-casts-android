@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.widget
 
 import android.content.Context
+import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
+import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
-import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
+import au.com.shiftyjelly.pocketcasts.widget.data.SmallPlayerWidgetState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -16,49 +19,56 @@ class PlayerWidgetManager @Inject constructor(
     @ApplicationContext private val context: Context,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
-    private val adapter = PlayerWidgetStateAdapter(context)
+    private val smallAdapter = SmallPlayerWidgetState.Adapter(context)
+    private val mediumAdapter = MediumPlayerWidgetState.Adapter(context)
+    private val largeAdapter = LargePlayerWidgetState.Adapter(context)
+    private val widgetManager = GlanceAppWidgetManager(context)
 
     fun updateQueue(queue: List<BaseEpisode>) {
-        updateWidgetStates { state ->
-            state.copy(queue = queue.map(PlayerWidgetEpisode::fromBaseEpisode))
-        }
+        val episodes = queue.map(PlayerWidgetEpisode::fromBaseEpisode)
+        updateSmallWidgets { state -> state.copy(episode = episodes.firstOrNull()) }
+        updateMediumWidgets { state -> state.copy(episode = episodes.firstOrNull()) }
+        updateLargeWidgets { state -> state.copy(queue = episodes) }
     }
 
     fun updateIsPlaying(isPlaying: Boolean) {
-        updateWidgetStates { state ->
-            state.copy(isPlaying = isPlaying)
-        }
+        updateSmallWidgets { state -> state.copy(isPlaying = isPlaying) }
+        updateMediumWidgets { state -> state.copy(isPlaying = isPlaying) }
+        updateLargeWidgets { state -> state.copy(isPlaying = isPlaying) }
     }
 
     fun updateUseEpisodeArtwork(useEpisodeArtwork: Boolean) {
-        updateWidgetStates { state ->
-            state.copy(useEpisodeArtwork = useEpisodeArtwork)
-        }
+        updateSmallWidgets { state -> state.copy(useEpisodeArtwork = useEpisodeArtwork) }
+        updateMediumWidgets { state -> state.copy(useEpisodeArtwork = useEpisodeArtwork) }
+        updateLargeWidgets { state -> state.copy(useEpisodeArtwork = useEpisodeArtwork) }
     }
 
     fun updateUseDynamicColors(useDynamicColors: Boolean) {
-        updateWidgetStates { state ->
-            state.copy(useDynamicColors = useDynamicColors)
-        }
+        updateSmallWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
+        updateMediumWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
+        updateLargeWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
     }
 
-    private fun updateWidgetStates(update: (PlayerWidgetState) -> PlayerWidgetState) {
+    private fun updateSmallWidgets(update: (SmallPlayerWidgetState) -> SmallPlayerWidgetState) {
         scope.launch {
-            glaceIds().forEach { glanceId -> adapter.updateState(glanceId, update) }
-            refreshAllWidgets()
+            glanceIds<SmallPlayerWidget>().forEach { glanceId -> smallAdapter.updateState(glanceId, update) }
+            SmallPlayerWidget().updateAll(context)
         }
     }
 
-    private suspend fun glaceIds() = buildList {
-        val manager = GlanceAppWidgetManager(context)
-        addAll(manager.getGlanceIds(SmallPlayerWidget::class.java))
-        addAll(manager.getGlanceIds(MediumPlayerWidget::class.java))
-        addAll(manager.getGlanceIds(LargePlayerWidget::class.java))
+    private fun updateMediumWidgets(update: (MediumPlayerWidgetState) -> MediumPlayerWidgetState) {
+        scope.launch {
+            glanceIds<MediumPlayerWidget>().forEach { glanceId -> mediumAdapter.updateState(glanceId, update) }
+            MediumPlayerWidget().updateAll(context)
+        }
     }
 
-    private suspend fun refreshAllWidgets() {
-        SmallPlayerWidget().updateAll(context)
-        MediumPlayerWidget().updateAll(context)
-        LargePlayerWidget().updateAll(context)
+    private fun updateLargeWidgets(update: (LargePlayerWidgetState) -> LargePlayerWidgetState) {
+        scope.launch {
+            glanceIds<LargePlayerWidget>().forEach { glanceId -> largeAdapter.updateState(glanceId, update) }
+            LargePlayerWidget().updateAll(context)
+        }
     }
+
+    private suspend inline fun <reified T : GlanceAppWidget> glanceIds() = widgetManager.getGlanceIds(T::class.java)
 }

@@ -21,16 +21,15 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
-import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
+import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 
 @Composable
-internal fun MediumPlayer(state: PlayerWidgetState) {
+internal fun MediumPlayer(state: MediumPlayerWidgetState) {
     WidgetTheme(state.useDynamicColors) {
-        val episode = state.currentEpisode
-        val action = if (episode == null) {
+        val action = if (state.episode == null) {
             OpenPocketCastsAction.action()
         } else {
-            OpenEpisodeDetailsAction.action(episode.uuid)
+            OpenEpisodeDetailsAction.action(state.episode.uuid)
         }
 
         Row(
@@ -42,14 +41,14 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
                 .padding(12.dp),
         ) {
             EpisodeImage(
-                episode = state.currentEpisode,
+                episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 modifier = GlanceModifier
                     .size(66.dp)
                     .clickable(action),
             )
 
-            if (episode != null) {
+            if (state.episode != null) {
                 Spacer(
                     modifier = GlanceModifier.width(12.dp),
                 )
@@ -58,7 +57,7 @@ internal fun MediumPlayer(state: PlayerWidgetState) {
                     modifier = GlanceModifier.height(66.dp),
                 ) {
                     Text(
-                        text = episode.title,
+                        text = state.episode.title,
                         maxLines = 1,
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimaryContainer,

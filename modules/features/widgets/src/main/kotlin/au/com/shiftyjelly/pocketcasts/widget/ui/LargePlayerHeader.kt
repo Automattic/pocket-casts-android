@@ -21,12 +21,12 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
-import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
+import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun LargePlayerHeader(
-    state: PlayerWidgetState,
+    state: LargePlayerWidgetState,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     val episode = state.currentEpisode
