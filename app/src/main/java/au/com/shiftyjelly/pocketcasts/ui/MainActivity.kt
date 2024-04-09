@@ -891,11 +891,12 @@ class MainActivity :
     private fun updatePlaybackStateDeselectedChapterIndices(upNextQueue: UpNextQueue.State) {
         (upNextQueue as? UpNextQueue.State.Loaded)?.let {
             val lastPlaybackState = viewModel.lastPlaybackState
+            if (lastPlaybackState?.chapters?.getList()?.isEmpty() == true) return
             val currentEpisodeDeselectedChapterIndicesChanged = playbackManager.getCurrentEpisode()?.let { currentEpisode ->
                 currentEpisode.uuid == it.episode.uuid &&
                     lastPlaybackState != null &&
-                    it.episode.deselectedChapters !=
-                    lastPlaybackState.chapters.getList().filterNot { it.selected }.map { it.index }
+                    it.episode.deselectedChapters.sorted() !=
+                    lastPlaybackState.chapters.getList().filterNot { it.selected }.map { it.index }.sorted()
             } ?: false
             if (currentEpisodeDeselectedChapterIndicesChanged) {
                 playbackManager.updatePlaybackStateDeselectedChapterIndices()

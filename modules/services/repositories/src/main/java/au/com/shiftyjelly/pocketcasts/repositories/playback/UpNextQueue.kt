@@ -137,7 +137,7 @@ interface UpNextQueue {
     fun updateCurrentEpisodeStateIfNeeded(episodeFromDb: BaseEpisode, state: State) {
         currentEpisode?.let { currentEpisode ->
             if (episodeFromDb.uuid == currentEpisode.uuid &&
-                episodeFromDb.deselectedChapters != currentEpisode.deselectedChapters
+                episodeFromDb.deselectedChapters.sorted() != currentEpisode.deselectedChapters.sorted()
             ) {
                 updateCurrentEpisodeState(state)
             }
