@@ -16,6 +16,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_PLAY_TAPPED("bookmark_play_tapped"),
     BOOKMARKS_SORT_BY_CHANGED("bookmarks_sort_by_changed"),
     BOOKMARK_DELETED("bookmark_deleted"),
+    PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
