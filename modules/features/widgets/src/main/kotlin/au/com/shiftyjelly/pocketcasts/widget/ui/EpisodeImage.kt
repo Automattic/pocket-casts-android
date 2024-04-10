@@ -31,7 +31,7 @@ internal fun EpisodeImage(
     }
 
     if (episode != null) {
-        LaunchedEffect(episode.artworkUrl, useEpisodeArtwork) {
+        LaunchedEffect(episode.uuid, useEpisodeArtwork) {
             val requestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 16).smallSize()
             val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
             var drawable: Drawable? = null
