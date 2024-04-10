@@ -211,7 +211,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         }
                         adapter?.onChangeRegion = onChangeRegion
 
-                        val updatedContent = addRegionToCategoryRow(content, state.selectedRegion.code)
+                        val updatedContent = updateDiscoverRowsAndRemoveCategoryAds(content, state.selectedRegion.code)
 
                         adapter?.submitList(updatedContent)
                     }
@@ -256,7 +256,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             FirebaseAnalyticsTracker.navigatedToDiscover()
         }
     }
-    private fun addRegionToCategoryRow(content: List<Any>, region: String): MutableList<Any> {
+    private fun updateDiscoverRowsAndRemoveCategoryAds(content: List<Any>, region: String): MutableList<Any> {
         val mutableContentList = content.toMutableList()
 
         val categoriesIndex = mutableContentList.indexOfFirst { it is DiscoverRow && it.type is ListType.Categories }
@@ -265,6 +265,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             val categoriesItem = mutableContentList[categoriesIndex] as DiscoverRow
             mutableContentList[categoriesIndex] = categoriesItem.copy(regionCode = region)
         }
+
+        mutableContentList.removeAll { it is DiscoverRow && it.categoryId != null } // Remove ads exclusive to category view
 
         return mutableContentList
     }
