@@ -178,7 +178,7 @@ class BookmarksFragment : BaseFragment() {
                             settings = settings,
                             changeSortOrder = bookmarksViewModel::changeSortOrder,
                             sourceView = sourceView,
-                            forceDarkTheme = true,
+                            forceDarkTheme = sourceView == SourceView.PLAYER,
                         ).show(
                             context = requireContext(),
                             fragmentManager = it,
