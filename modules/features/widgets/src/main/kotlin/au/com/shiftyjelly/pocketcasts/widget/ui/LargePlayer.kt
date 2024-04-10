@@ -7,7 +7,7 @@ import androidx.glance.GlanceTheme
 import androidx.glance.background
 import androidx.glance.layout.Column
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
@@ -19,9 +19,10 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
     WidgetTheme(state.useDynamicColors) {
         Column(
             modifier = GlanceModifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(350.dp)
                 .background(GlanceTheme.colors.primaryContainer)
-                .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 0.dp),
+                .padding(16.dp),
         ) {
             LargePlayerHeader(state = state)
             if (upNextEpisodes.isNotEmpty()) {

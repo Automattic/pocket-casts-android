@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlayButton(
     episode: PlayerWidgetEpisode,
-    size: Dp = 42.dp,
+    size: Dp = 38.dp,
 ) {
     val contentDescription = LocalContext.current.getString(LR.string.play_episode)
 

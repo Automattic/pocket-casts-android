@@ -40,7 +40,7 @@ internal fun LargePlayerHeader(
         verticalAlignment = Alignment.Top,
         modifier = modifier
             .fillMaxWidth()
-            .height(132.dp)
+            .height(116.dp)
             .background(GlanceTheme.colors.primaryContainer),
 
     ) {
@@ -48,7 +48,7 @@ internal fun LargePlayerHeader(
             episode = episode,
             useEpisodeArtwork = state.useEpisodeArtwork,
             modifier = GlanceModifier
-                .size(132.dp)
+                .size(116.dp)
                 .clickable(action),
         )
 
@@ -58,17 +58,20 @@ internal fun LargePlayerHeader(
             )
             Column(
                 verticalAlignment = Alignment.Vertical.Top,
-                modifier = GlanceModifier.defaultWeight().height(132.dp),
+                modifier = GlanceModifier.defaultWeight().height(116.dp),
             ) {
+                Spacer(
+                    modifier = GlanceModifier.height(4.dp),
+                )
                 Text(
                     text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
                     maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 16.sp),
+                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 12.sp),
                 )
                 Text(
                     text = episode.title,
                     maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 22.sp, fontWeight = FontWeight.Bold),
+                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 14.sp, fontWeight = FontWeight.Bold),
                 )
                 Spacer(
                     modifier = GlanceModifier.height(4.dp),
@@ -76,12 +79,14 @@ internal fun LargePlayerHeader(
                 Text(
                     text = episode.getTimeLeft(LocalContext.current),
                     maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 16.sp),
+                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 12.sp),
                 )
-
                 PlaybackControls(
                     isPlaying = state.isPlaying,
                     modifier = GlanceModifier.defaultWeight(),
+                )
+                Spacer(
+                    modifier = GlanceModifier.height(4.dp),
                 )
             }
         } else {
@@ -89,6 +94,9 @@ internal fun LargePlayerHeader(
                 modifier = GlanceModifier.defaultWeight(),
             )
         }
+        Spacer(
+            modifier = GlanceModifier.width(16.dp),
+        )
         PocketCastsLogo()
     }
 }

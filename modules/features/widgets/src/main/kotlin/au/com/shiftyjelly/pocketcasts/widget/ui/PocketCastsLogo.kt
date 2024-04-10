@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 internal fun PocketCastsLogo(
-    size: Dp = 32.dp,
+    size: Dp = 28.dp,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     Box(
