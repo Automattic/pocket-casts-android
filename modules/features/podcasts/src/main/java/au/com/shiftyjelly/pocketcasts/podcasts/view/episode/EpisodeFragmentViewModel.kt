@@ -130,8 +130,8 @@ class EpisodeFragmentViewModel @Inject constructor(
             .doOnNext {
                 if (it is EpisodeFragmentState.Loaded) {
                     timestamp?.let { timestamp ->
-                        if (it.episode.playedUpTo.toInt() != timestamp.toInt(DurationUnit.SECONDS)
-                            && episode is PodcastEpisode
+                        if (it.episode.playedUpTo.toInt() != timestamp.toInt(DurationUnit.SECONDS) &&
+                            episode is PodcastEpisode
                         ) {
                             it.episode.playedUpTo = timestamp.toDouble(DurationUnit.SECONDS)
                             seekToTimeMs(timestamp.toInt(DurationUnit.MILLISECONDS))
