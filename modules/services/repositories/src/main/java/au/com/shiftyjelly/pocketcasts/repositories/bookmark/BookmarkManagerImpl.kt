@@ -152,6 +152,7 @@ class BookmarkManagerImpl @Inject constructor(
             ).flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun findBookmarksFlow(
         sortType: BookmarksSortTypeForProfile,
     ): Flow<List<Bookmark>> = when (sortType) {
@@ -166,7 +167,8 @@ class BookmarkManagerImpl @Inject constructor(
             )
 
         BookmarksSortTypeForProfile.PODCAST_AND_EPISODE ->
-            bookmarkDao.findBookmarksFlow() // To be updated
+            bookmarkDao.findAllBookmarksByOrderPodcastAndEpisodeFlow()
+                .flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
     }
 
     override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =

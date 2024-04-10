@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ProfileBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -106,6 +107,23 @@ abstract class BookmarkDao {
         isAsc: Boolean,
         deleted: Boolean = false,
     ): Flow<List<Bookmark>>
+
+    // Sorts the array by podcast name, episodes release date, and the bookmarks timestamp
+    @Query(
+        """SELECT bookmarks.*, podcasts.title as podcastTitle, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
+            FROM bookmarks
+            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid
+            LEFT JOIN podcasts ON bookmarks.podcast_uuid = podcasts.uuid
+            WHERE deleted = :deleted
+            ORDER BY
+            CASE WHEN podcasts.title is NULL then 1 else 0 end, UPPER(podcasts.title) ASC, 
+            podcast_episodes.published_date DESC, 
+            bookmarks.time ASC
+        """,
+    )
+    abstract fun findAllBookmarksByOrderPodcastAndEpisodeFlow(
+        deleted: Boolean = false,
+    ): Flow<List<ProfileBookmark>>
 
     @Query(
         """SELECT bookmarks.*
