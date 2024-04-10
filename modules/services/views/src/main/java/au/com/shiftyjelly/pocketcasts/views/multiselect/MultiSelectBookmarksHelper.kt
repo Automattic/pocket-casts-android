@@ -111,7 +111,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
         val count = bookmarks.size
         ConfirmationDialog()
-            .setForceDarkTheme(true)
+            .setForceDarkTheme(source == SourceView.PLAYER)
             .setButtonType(
                 ConfirmationDialog.ButtonType.Danger(
                     resources.getStringPlural(

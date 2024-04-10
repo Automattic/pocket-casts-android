@@ -78,7 +78,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         episodeUuid: String,
         podcastUuid: String?,
         forceDark: Boolean,
-        timestampInSecs: Duration?,
+        timestamp: Duration?,
     ) {
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
@@ -129,15 +129,15 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
             .doOnNext {
                 if (it is EpisodeFragmentState.Loaded) {
-                    episode = it.episode
-                    val timestampSecs = timestampInSecs?.toInt(DurationUnit.SECONDS)
-                    if (timestampSecs != null &&
-                        it.episode.playedUpTo.toInt() != timestampSecs &&
-                        episode is PodcastEpisode
-                    ) {
-                        episode?.playedUpTo = timestampSecs.toDouble()
-                        seekToTimeMs(timestampSecs * 1000)
+                    timestamp?.let { timestamp ->
+                        if (it.episode.playedUpTo.toInt() != timestamp.toInt(DurationUnit.SECONDS)
+                            && episode is PodcastEpisode
+                        ) {
+                            it.episode.playedUpTo = timestamp.toDouble(DurationUnit.SECONDS)
+                            seekToTimeMs(timestamp.toInt(DurationUnit.MILLISECONDS))
+                        }
                     }
+                    episode = it.episode
                 }
             }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
