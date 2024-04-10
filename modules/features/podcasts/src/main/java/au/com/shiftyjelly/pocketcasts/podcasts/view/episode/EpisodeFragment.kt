@@ -62,6 +62,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -85,12 +87,12 @@ class EpisodeFragment : BaseFragment() {
             podcastUuid: String? = null,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
-            timestampInSecs: Int? = null,
+            timestampInSecs: Duration? = null,
         ): EpisodeFragment {
             return EpisodeFragment().apply {
                 arguments = bundleOf(
                     EpisodeContainerFragment.ARG_EPISODE_UUID to episodeUuid,
-                    EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS to timestampInSecs,
+                    EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS to timestampInSecs?.inWholeSeconds,
                     EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE to source.value,
                     EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                     EpisodeContainerFragment.ARG_PODCAST_UUID to podcastUuid,
@@ -124,8 +126,8 @@ class EpisodeFragment : BaseFragment() {
     private val episodeUUID: String?
         get() = arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_UUID)
 
-    private val timestampInSecs: Int?
-        get() = arguments?.getInt(EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS)
+    private val timestampInSecs: Duration?
+        get() = arguments?.getLong(EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS)?.seconds
 
     private val episodeViewSource: EpisodeViewSource
         get() = EpisodeViewSource.fromString(arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE))

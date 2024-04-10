@@ -138,6 +138,8 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1384,7 +1386,7 @@ class MainActivity :
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
-        timestampInSecs: Int?,
+        timestampInSecs: Duration?,
     ) {
         episodeUuid ?: return
 
@@ -1487,7 +1489,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
-                            timestampInSecs = timestampInSecs,
+                            timestampInSecs = timestampInSecs?.seconds,
                         )
                     } else {
                         openPodcastPage(podcastUuid)

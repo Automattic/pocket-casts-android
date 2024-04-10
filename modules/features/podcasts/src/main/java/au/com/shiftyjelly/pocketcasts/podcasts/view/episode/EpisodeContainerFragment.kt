@@ -36,6 +36,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -75,11 +77,11 @@ class EpisodeContainerFragment :
             podcastUuid: String? = null,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
-            timestampInSecs: Int? = null,
+            timestampInSecs: Duration? = null,
         ) = EpisodeContainerFragment().apply {
             arguments = bundleOf(
                 ARG_EPISODE_UUID to episodeUuid,
-                ARG_TIMESTAMP_IN_SECS to timestampInSecs,
+                ARG_TIMESTAMP_IN_SECS to timestampInSecs?.inWholeSeconds,
                 ARG_EPISODE_VIEW_SOURCE to source.value,
                 ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                 ARG_PODCAST_UUID to podcastUuid,
@@ -101,8 +103,8 @@ class EpisodeContainerFragment :
     private val episodeUUID: String?
         get() = arguments?.getString(ARG_EPISODE_UUID)
 
-    private val timestampInSecs: Int?
-        get() = arguments?.getInt(ARG_TIMESTAMP_IN_SECS)
+    private val timestampInSecs: Duration?
+        get() = arguments?.getLong(ARG_TIMESTAMP_IN_SECS)?.seconds
 
     private val episodeViewSource: EpisodeViewSource
         get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
@@ -258,7 +260,7 @@ class EpisodeContainerFragment :
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle,
         private val episodeUUID: String?,
-        private val timestampInSecs: Int?,
+        private val timestampInSecs: Duration?,
         private val episodeViewSource: EpisodeViewSource,
         private val overridePodcastLink: Boolean,
         private val podcastUuid: String?,

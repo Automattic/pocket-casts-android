@@ -38,6 +38,8 @@ import io.reactivex.schedulers.Schedulers
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,7 +78,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         episodeUuid: String,
         podcastUuid: String?,
         forceDark: Boolean,
-        timestampInSecs: Int?,
+        timestampInSecs: Duration?,
     ) {
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
@@ -128,12 +130,13 @@ class EpisodeFragmentViewModel @Inject constructor(
             .doOnNext {
                 if (it is EpisodeFragmentState.Loaded) {
                     episode = it.episode
-                    if (timestampInSecs != null &&
-                        it.episode.playedUpTo != timestampInSecs.toDouble() &&
+                    val timestampSecs = timestampInSecs?.toInt(DurationUnit.SECONDS)
+                    if (timestampSecs != null &&
+                        it.episode.playedUpTo.toInt() != timestampSecs &&
                         episode is PodcastEpisode
                     ) {
-                        episode?.playedUpTo = timestampInSecs.toDouble()
-                        seekToTimeMs(timestampInSecs * 1000)
+                        episode?.playedUpTo = timestampSecs.toDouble()
+                        seekToTimeMs(timestampSecs * 1000)
                     }
                 }
             }
