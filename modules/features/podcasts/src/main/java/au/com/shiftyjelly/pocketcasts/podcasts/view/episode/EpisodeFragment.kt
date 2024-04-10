@@ -85,10 +85,12 @@ class EpisodeFragment : BaseFragment() {
             podcastUuid: String? = null,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
+            timestampInSecs: Int? = null,
         ): EpisodeFragment {
             return EpisodeFragment().apply {
                 arguments = bundleOf(
                     EpisodeContainerFragment.ARG_EPISODE_UUID to episodeUuid,
+                    EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS to timestampInSecs,
                     EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE to source.value,
                     EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                     EpisodeContainerFragment.ARG_PODCAST_UUID to podcastUuid,
@@ -121,6 +123,9 @@ class EpisodeFragment : BaseFragment() {
 
     private val episodeUUID: String?
         get() = arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_UUID)
+
+    private val timestampInSecs: Int?
+        get() = arguments?.getInt(EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS)
 
     private val episodeViewSource: EpisodeViewSource
         get() = EpisodeViewSource.fromString(arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE))
@@ -207,7 +212,12 @@ class EpisodeFragment : BaseFragment() {
 
         binding?.loadingGroup?.isInvisible = true
 
-        viewModel.setup(episodeUUID!!, podcastUuid, forceDarkTheme)
+        viewModel.setup(
+            episodeUuid = episodeUUID!!,
+            podcastUuid = podcastUuid,
+            forceDark = forceDarkTheme,
+            timestampInSecs = timestampInSecs,
+        )
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->

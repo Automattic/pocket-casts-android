@@ -46,6 +46,7 @@ class EpisodeContainerFragment :
     EpisodeFragment.EpisodeLoadedListener {
     companion object {
         const val ARG_EPISODE_UUID = "episodeUUID"
+        const val ARG_TIMESTAMP_IN_SECS = "timestamp_in_secs"
         const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
         const val ARG_OVERRIDE_PODCAST_LINK = "override_podcast_link"
         const val ARG_PODCAST_UUID = "podcastUUID"
@@ -74,9 +75,11 @@ class EpisodeContainerFragment :
             podcastUuid: String? = null,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
+            timestampInSecs: Int? = null,
         ) = EpisodeContainerFragment().apply {
             arguments = bundleOf(
                 ARG_EPISODE_UUID to episodeUuid,
+                ARG_TIMESTAMP_IN_SECS to timestampInSecs,
                 ARG_EPISODE_VIEW_SOURCE to source.value,
                 ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                 ARG_PODCAST_UUID to podcastUuid,
@@ -97,6 +100,9 @@ class EpisodeContainerFragment :
 
     private val episodeUUID: String?
         get() = arguments?.getString(ARG_EPISODE_UUID)
+
+    private val timestampInSecs: Int?
+        get() = arguments?.getInt(ARG_TIMESTAMP_IN_SECS)
 
     private val episodeViewSource: EpisodeViewSource
         get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
@@ -185,6 +191,7 @@ class EpisodeContainerFragment :
             fragmentManager = childFragmentManager,
             lifecycle = viewLifecycleOwner.lifecycle,
             episodeUUID = episodeUUID,
+            timestampInSecs = timestampInSecs,
             episodeViewSource = episodeViewSource,
             overridePodcastLink = overridePodcastLink,
             podcastUuid = podcastUuid,
@@ -251,6 +258,7 @@ class EpisodeContainerFragment :
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle,
         private val episodeUUID: String?,
+        private val timestampInSecs: Int?,
         private val episodeViewSource: EpisodeViewSource,
         private val overridePodcastLink: Boolean,
         private val podcastUuid: String?,
@@ -286,6 +294,7 @@ class EpisodeContainerFragment :
             return when (sections[position]) {
                 Section.Details -> EpisodeFragment.newInstance(
                     episodeUuid = requireNotNull(episodeUUID),
+                    timestampInSecs = timestampInSecs,
                     source = episodeViewSource,
                     overridePodcastLink = overridePodcastLink,
                     podcastUuid = podcastUuid,

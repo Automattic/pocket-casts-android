@@ -1384,6 +1384,7 @@ class MainActivity :
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
+        timestampInSecs: Int?,
     ) {
         episodeUuid ?: return
 
@@ -1398,6 +1399,7 @@ class MainActivity :
                     source = source,
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark,
+                    timestampInSecs = timestampInSecs,
                 )
             } else if (episode is PodcastEpisode) {
                 EpisodeContainerFragment.newInstance(
@@ -1405,6 +1407,7 @@ class MainActivity :
                     source = source,
                     podcastUuid = podcastUuid,
                     forceDark = forceDark,
+                    timestampInSecs = timestampInSecs,
                 )
             } else {
                 CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true)
@@ -1457,6 +1460,11 @@ class MainActivity :
         if (intent.data?.pathSegments?.size == 1) {
             sharePath = "$SOCIAL_SHARE_PATH$sharePath"
         }
+        val includesTimeStamp = intent.data?.queryParameterNames?.contains("t") ?: false
+        var timestampInSecs: Int? = null
+        if (includesTimeStamp) {
+            timestampInSecs = intent.data?.getQueryParameter("t")?.toIntOrNull()
+        }
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
             sharePath,
@@ -1478,12 +1486,15 @@ class MainActivity :
 
                     val episode = result.episode
                     if (episode != null) {
-                        openEpisodeDialog(
-                            episodeUuid = episode.uuid,
-                            source = EpisodeViewSource.SHARE,
-                            podcastUuid = podcastUuid,
-                            forceDark = false,
-                        )
+                        launch(Dispatchers.Default) {
+                            openEpisodeDialog(
+                                episodeUuid = episode.uuid,
+                                source = EpisodeViewSource.SHARE,
+                                podcastUuid = podcastUuid,
+                                forceDark = false,
+                                timestampInSecs = timestampInSecs,
+                            )
+                        }
                     } else {
                         openPodcastPage(podcastUuid)
                     }

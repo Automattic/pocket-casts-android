@@ -72,7 +72,12 @@ class EpisodeFragmentViewModel @Inject constructor(
     var episode: PodcastEpisode? = null
     var isFragmentChangingConfigurations: Boolean = false
 
-    fun setup(episodeUuid: String, podcastUuid: String?, forceDark: Boolean) {
+    fun setup(
+        episodeUuid: String,
+        podcastUuid: String?,
+        forceDark: Boolean,
+        timestampInSecs: Int?,
+    ) {
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
             .filter { it.episodeUuid == episodeUuid }
@@ -120,7 +125,18 @@ class EpisodeFragmentViewModel @Inject constructor(
                     zipper,
                 )
             }
-            .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
+            .doOnNext {
+                if (it is EpisodeFragmentState.Loaded) {
+                    episode = it.episode
+                    if (timestampInSecs != null &&
+                        it.episode.playedUpTo != timestampInSecs.toDouble() &&
+                        episode is PodcastEpisode
+                    ) {
+                        episode?.playedUpTo = timestampInSecs.toDouble()
+                        seekToTimeMs(timestampInSecs * 1000)
+                    }
+                }
+            }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())

@@ -127,6 +127,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
+        timestampInSecs: Int?,
     ) {
     }
 

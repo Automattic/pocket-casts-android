@@ -25,7 +25,13 @@ interface FragmentHostListener {
     fun getPlayerBottomSheetState(): Int
     fun addPlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback)
     fun removePlayerBottomSheetCallback(callback: BottomSheetBehavior.BottomSheetCallback)
-    fun openEpisodeDialog(episodeUuid: String?, source: EpisodeViewSource, podcastUuid: String?, forceDark: Boolean)
+    fun openEpisodeDialog(
+        episodeUuid: String?,
+        source: EpisodeViewSource,
+        podcastUuid: String?,
+        forceDark: Boolean,
+        timestampInSecs: Int? = null,
+    )
     fun lockPlayerBottomSheet(locked: Boolean)
     fun updateSystemColors()
     fun overrideNextRefreshTimer()
