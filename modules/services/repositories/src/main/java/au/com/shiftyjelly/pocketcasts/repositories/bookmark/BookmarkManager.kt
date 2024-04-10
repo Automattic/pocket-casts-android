@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import kotlinx.coroutines.flow.Flow
 
 interface BookmarkManager {
@@ -26,7 +27,9 @@ interface BookmarkManager {
     fun findBookmarksToSync(): List<Bookmark>
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
-    fun findBookmarksFlow(): Flow<List<Bookmark>>
+    fun findBookmarksFlow(
+        sortType: BookmarksSortTypeForProfile,
+    ): Flow<List<Bookmark>>
 
     var sourceView: SourceView
 

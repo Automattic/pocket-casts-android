@@ -95,6 +95,19 @@ abstract class BookmarkDao {
     abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 
     @Query(
+        """SELECT *
+            FROM bookmarks
+            WHERE deleted = :deleted
+            ORDER BY 
+            CASE WHEN :isAsc = 1 THEN created_at END ASC, 
+            CASE WHEN :isAsc = 0 THEN created_at END DESC""",
+    )
+    abstract fun findAllBookmarksOrderByCreatedAtFlow(
+        isAsc: Boolean,
+        deleted: Boolean = false,
+    ): Flow<List<Bookmark>>
+
+    @Query(
         """SELECT bookmarks.*
             FROM bookmarks
             LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
