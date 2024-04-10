@@ -43,6 +43,7 @@
         android:id="@+id/rowRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:paddingStart="16dp" />
 
 </LinearLayout>
