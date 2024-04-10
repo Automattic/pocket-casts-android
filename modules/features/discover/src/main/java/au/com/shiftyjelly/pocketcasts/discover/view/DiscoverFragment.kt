@@ -32,8 +32,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -213,9 +211,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                         }
                         adapter?.onChangeRegion = onChangeRegion
 
-                        val sortedContent = sortContent(content, state.selectedRegion.code)
+                        val updatedContent = addRegionToCategoryRow(content, state.selectedRegion.code)
 
-                        adapter?.submitList(sortedContent)
+                        adapter?.submitList(updatedContent)
                     }
                     is DiscoverState.Error -> {
                         binding.errorLayout.isVisible = true
@@ -258,16 +256,14 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             FirebaseAnalyticsTracker.navigatedToDiscover()
         }
     }
-    private fun sortContent(content: List<Any>, region: String): MutableList<Any> {
+    private fun addRegionToCategoryRow(content: List<Any>, region: String): MutableList<Any> {
         val mutableContentList = content.toMutableList()
 
-        if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
-            val categoriesIndex = mutableContentList.indexOfFirst { it is DiscoverRow && it.type is ListType.Categories }
+        val categoriesIndex = mutableContentList.indexOfFirst { it is DiscoverRow && it.type is ListType.Categories }
 
-            if (categoriesIndex != -1) {
-                val categoriesItem = mutableContentList.removeAt(categoriesIndex)
-                mutableContentList.add(0, (categoriesItem as DiscoverRow).copy(regionCode = region))
-            }
+        if (categoriesIndex != -1) {
+            val categoriesItem = mutableContentList[categoriesIndex] as DiscoverRow
+            mutableContentList[categoriesIndex] = categoriesItem.copy(regionCode = region)
         }
 
         return mutableContentList
