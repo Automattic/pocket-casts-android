@@ -10,10 +10,10 @@ import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetState
+import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
 
 @Composable
-internal fun LargePlayer(state: PlayerWidgetState) {
+internal fun LargePlayer(state: LargePlayerWidgetState) {
     val upNextEpisodes = state.upNextEpisodes
 
     WidgetTheme(state.useDynamicColors) {
