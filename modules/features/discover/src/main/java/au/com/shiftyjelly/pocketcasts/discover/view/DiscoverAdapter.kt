@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
@@ -35,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBindi
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
 import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.CATEGORY_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -838,10 +840,10 @@ internal class DiscoverAdapter(
 
                     imageRequestFactory.createForPodcast(podcast.uuid).loadInto(adHolder.binding.imgPodcast)
                     adHolder.itemView.setOnClickListener {
-                        row.discoverRow.listUuid?.let { listUuid ->
-                            trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
-                            listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
+                        row.discoverRow.categoryId?.let { categoryId ->
+                            analyticsTracker.track(DISCOVER_AD_CATEGORY_TAPPED, mapOf(CATEGORY_ID_KEY to categoryId))
                         }
+                        listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
                     }
 
                     val lblSponsored = adHolder.binding.lblSponsored
