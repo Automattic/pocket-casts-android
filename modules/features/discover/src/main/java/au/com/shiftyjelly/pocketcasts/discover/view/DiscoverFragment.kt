@@ -135,7 +135,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             val remainingPodcasts =
                 RemainingPodcastsByCategoryRow(it.listId, it.title, podcasts.drop(MOST_POPULAR_PODCASTS))
 
-            updateDiscover(mostPopularPodcasts, remainingPodcasts)
+            updateDiscoverWithCategorySelected(selectedCategory.discoverCategory.id, mostPopularPodcasts, remainingPodcasts)
+
             onCategorySelectionSuccess()
         }
     }
@@ -271,15 +272,22 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         return mutableContentList
     }
 
-    private fun updateDiscover(
+    private fun updateDiscoverWithCategorySelected(
+        categoryId: Int,
         mostPopularPodcasts: MostPopularPodcastsByCategoryRow,
         remainingPodcasts: RemainingPodcastsByCategoryRow,
     ) {
         adapter?.currentList?.let { discoverList ->
             val updatedList = discoverList.filter { it is DiscoverRow && it.type is ListType.Categories }.toMutableList()
 
-            updatedList.add(MOST_POPULAR_PODCASTS_ROW_INDEX, mostPopularPodcasts)
-            updatedList.add(REMAINING_PODCASTS_ROW_INDEX, remainingPodcasts)
+            // First, we insert the most popular podcasts.
+            updatedList.add(mostPopularPodcasts)
+
+            // If there is ad, we add it.
+            viewModel.getAdForCategoryView(categoryId)?.let { updatedList.add(CategoryAdRow(it)) }
+
+            // Lastly, we add the remaining podcast list.
+            updatedList.add(remainingPodcasts)
 
             adapter?.submitList(updatedList)
         }
@@ -301,8 +309,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
-        private const val MOST_POPULAR_PODCASTS_ROW_INDEX = 1
-        private const val REMAINING_PODCASTS_ROW_INDEX = 2
         private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"

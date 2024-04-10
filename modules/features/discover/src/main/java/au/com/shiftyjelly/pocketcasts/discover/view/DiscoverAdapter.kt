@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoryAdBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoryPillsBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowChangeRegionBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListBinding
@@ -102,6 +103,7 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
     }
 }
 internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>)
+internal data class CategoryAdRow(val discoverRow: DiscoverRow)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -461,6 +463,7 @@ internal class DiscoverAdapter(
 
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
+    class CategoryAdViewHolder(val binding: RowCategoryAdBinding) : NetworkLoadableViewHolder(binding.root)
     class SinglePodcastViewHolder(val binding: RowSinglePodcastBinding) : NetworkLoadableViewHolder(binding.root)
     class SingleEpisodeViewHolder(val binding: RowSingleEpisodeBinding) : NetworkLoadableViewHolder(binding.root)
     class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root)
@@ -477,6 +480,7 @@ internal class DiscoverAdapter(
             R.layout.row_category_pills -> CategoryPillsViewHolder(RowCategoryPillsBinding.inflate(inflater, parent, false))
             R.layout.row_most_popular_podcasts -> MostPopularPodcastsViewHolder(RowMostPopularPodcastsBinding.inflate(inflater, parent, false))
             R.layout.row_remaining_podcasts_by_category -> RemainingPodcastsByCategoryViewHolder(RowRemainingPodcastsByCategoryBinding.inflate(inflater, parent, false))
+            R.layout.row_category_ad -> CategoryAdViewHolder(RowCategoryAdBinding.inflate(inflater, parent, false))
             R.layout.row_single_podcast -> SinglePodcastViewHolder(RowSinglePodcastBinding.inflate(inflater, parent, false))
             R.layout.row_single_episode -> SingleEpisodeViewHolder(RowSingleEpisodeBinding.inflate(inflater, parent, false))
             R.layout.row_collection_list -> CollectionListViewHolder(RowCollectionListBinding.inflate(inflater, parent, false))
@@ -524,6 +528,10 @@ internal class DiscoverAdapter(
 
             is RemainingPodcastsByCategoryRow -> {
                 return R.layout.row_remaining_podcasts_by_category
+            }
+
+            is CategoryAdRow -> {
+                return R.layout.row_category_ad
             }
         }
 
@@ -815,6 +823,41 @@ internal class DiscoverAdapter(
         } else if (row is RemainingPodcastsByCategoryRow) {
             val remainingPodcastHolder = holder as RemainingPodcastsByCategoryViewHolder
             remainingPodcastHolder.adapter.replaceList(row.podcasts)
+        } else if (row is CategoryAdRow) {
+            val adHolder = holder as CategoryAdViewHolder
+
+            (holder as NetworkLoadableViewHolder).loadFlowable(
+                loadPodcastList(row.discoverRow.source),
+                onNext = {
+                    val podcast = it.podcasts.firstOrNull() ?: return@loadFlowable
+                    val context = adHolder.itemView.context
+                    val podcastTitle = podcast.title
+
+                    adHolder.binding.lblTitle.text = podcastTitle
+                    adHolder.binding.lblBody.text = it.description
+
+                    imageRequestFactory.createForPodcast(podcast.uuid).loadInto(adHolder.binding.imgPodcast)
+                    adHolder.itemView.setOnClickListener {
+                        row.discoverRow.listUuid?.let { listUuid ->
+                            trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
+                            listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
+                        }
+                    }
+
+                    val lblSponsored = adHolder.binding.lblSponsored
+                    if (row.discoverRow.sponsored) {
+                        lblSponsored.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
+                        lblSponsored.text = context.getString(LR.string.discover_row_sponsored)
+                    } else {
+                        lblSponsored.setTextColor(context.getThemeColor(UR.attr.support_02))
+                        lblSponsored.text = context.getString(LR.string.discover_row_fresh_pick)
+                    }
+
+                    val textSize = if ((podcastTitle ?: "").length < 15) 18f else 15f
+                    adHolder.binding.lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                    onRestoreInstanceState(adHolder)
+                },
+            )
         }
     }
 
