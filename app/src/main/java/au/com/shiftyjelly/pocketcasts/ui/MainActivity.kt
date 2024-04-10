@@ -1460,11 +1460,7 @@ class MainActivity :
         if (intent.data?.pathSegments?.size == 1) {
             sharePath = "$SOCIAL_SHARE_PATH$sharePath"
         }
-        val includesTimeStamp = intent.data?.queryParameterNames?.contains("t") ?: false
-        var timestampInSecs: Int? = null
-        if (includesTimeStamp) {
-            timestampInSecs = intent.data?.getQueryParameter("t")?.toIntOrNull()
-        }
+        val timestampInSecs = intent.data?.getQueryParameter("t")?.toIntOrNull()
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
             sharePath,
