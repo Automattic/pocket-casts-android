@@ -26,6 +26,19 @@ abstract class ChapterDao {
         insertAll(chapters.filter { it.episodeUuid == episodeUuid })
     }
 
+    @Transaction
+    open suspend fun replaceAllChaptersIfMoreIsPassed(episodeUuid: String, chapters: List<Chapter>) {
+        val storedChapters = findEpisodeChapters(episodeUuid)
+        if (storedChapters.size >= chapters.size) {
+            return
+        }
+        deleteForEpisode(episodeUuid)
+        insertAll(chapters.filter { it.episodeUuid == episodeUuid })
+    }
+
+    @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
+    protected abstract suspend fun findEpisodeChapters(episodeUuid: String): List<Chapter>
+
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract fun _observerChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
 
