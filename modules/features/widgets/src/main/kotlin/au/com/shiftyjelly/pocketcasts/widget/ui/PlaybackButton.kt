@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlaybackButton(
     isPlaying: Boolean,
-    size: Dp = 42.dp,
+    size: Dp = 36.dp,
 ) {
     val contentDescription = LocalContext.current.getString(if (isPlaying) LR.string.play_episode else LR.string.pause_episode)
 

@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun SkipBackButton(
-    size: Dp = 42.dp,
+    size: Dp = 36.dp,
 ) {
     val contentDescription = LocalContext.current.getString(LR.string.skip_back)
 
