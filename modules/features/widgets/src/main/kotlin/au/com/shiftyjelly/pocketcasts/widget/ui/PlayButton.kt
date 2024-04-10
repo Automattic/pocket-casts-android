@@ -44,7 +44,7 @@ internal fun PlayButton(
             provider = ImageProvider(IR.drawable.ic_widget_play),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 8),
+            modifier = GlanceModifier.size(size).padding(size / 5),
         )
     }
 }

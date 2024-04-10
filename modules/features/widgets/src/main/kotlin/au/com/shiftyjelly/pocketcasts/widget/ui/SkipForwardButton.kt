@@ -42,7 +42,7 @@ internal fun SkipForwardButton(
             provider = ImageProvider(IR.drawable.ic_widget_skip_forward),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 6),
+            modifier = GlanceModifier.size(size).padding(size / 5),
         )
     }
 }
