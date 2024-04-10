@@ -101,37 +101,35 @@ class BookmarksFragment : BaseFragment() {
                         .collectAsState(initial = null)
 
                     val episodeUuid = episodeUuid(listData)
-                    if (episodeUuid != null) {
-                        BookmarksPage(
-                            episodeUuid = episodeUuid,
-                            backgroundColor = requireNotNull(backgroundColor(listData)),
-                            textColor = requireNotNull(textColor(listData)),
-                            sourceView = sourceView,
-                            bookmarksViewModel = bookmarksViewModel,
-                            multiSelectHelper = bookmarksViewModel.multiSelectHelper,
-                            onRowLongPressed = { bookmark ->
-                                bookmarksViewModel.multiSelectHelper.defaultLongPress(
-                                    multiSelectable = bookmark,
-                                    fragmentManager = childFragmentManager,
-                                    forceDarkTheme = sourceView == SourceView.PLAYER,
-                                )
-                            },
-                            onShareBookmarkClick = ::onShareBookmarkClick,
-                            onEditBookmarkClick = ::onEditBookmarkClick,
-                            onUpgradeClicked = ::onUpgradeClicked,
-                            showOptionsDialog = { showOptionsDialog(it) },
-                            openFragment = { fragment ->
-                                (parentFragment as? BottomSheetDialogFragment)?.dismiss() // Closes bookmarks bottom sheet dialog if opened from user files
-                                val fragmentHostListener = (activity as? FragmentHostListener)
-                                fragmentHostListener?.apply {
-                                    closePlayer() // Closes player if open
-                                    openTab(R.id.navigation_profile)
-                                    addFragment(SettingsFragment())
-                                    addFragment(fragment)
-                                }
-                            },
-                        )
-                    }
+                    BookmarksPage(
+                        episodeUuid = episodeUuid,
+                        backgroundColor = backgroundColor(listData),
+                        textColor = textColor(listData),
+                        sourceView = sourceView,
+                        bookmarksViewModel = bookmarksViewModel,
+                        multiSelectHelper = bookmarksViewModel.multiSelectHelper,
+                        onRowLongPressed = { bookmark ->
+                            bookmarksViewModel.multiSelectHelper.defaultLongPress(
+                                multiSelectable = bookmark,
+                                fragmentManager = childFragmentManager,
+                                forceDarkTheme = sourceView == SourceView.PLAYER,
+                            )
+                        },
+                        onShareBookmarkClick = ::onShareBookmarkClick,
+                        onEditBookmarkClick = ::onEditBookmarkClick,
+                        onUpgradeClicked = ::onUpgradeClicked,
+                        showOptionsDialog = { showOptionsDialog(it) },
+                        openFragment = { fragment ->
+                            (parentFragment as? BottomSheetDialogFragment)?.dismiss() // Closes bookmarks bottom sheet dialog if opened from user files
+                            val fragmentHostListener = (activity as? FragmentHostListener)
+                            fragmentHostListener?.apply {
+                                closePlayer() // Closes player if open
+                                openTab(R.id.navigation_profile)
+                                addFragment(SettingsFragment())
+                                addFragment(fragment)
+                            }
+                        },
+                    )
                 }
             }
         }
@@ -148,6 +146,7 @@ class BookmarksFragment : BaseFragment() {
     private fun backgroundColor(listData: State<PlayerViewModel.ListData?>) =
         when (sourceView) {
             SourceView.PLAYER -> listData.value?.let { Color(it.podcastHeader.backgroundColor) }
+                ?: MaterialTheme.theme.colors.primaryUi01
             else -> MaterialTheme.theme.colors.primaryUi01
         }
 
@@ -155,6 +154,7 @@ class BookmarksFragment : BaseFragment() {
     private fun textColor(listData: State<PlayerViewModel.ListData?>) =
         when (sourceView) {
             SourceView.PLAYER -> listData.value?.let { Color(it.podcastHeader.backgroundColor) }
+                ?: MaterialTheme.theme.colors.primaryUi01
             else -> MaterialTheme.theme.colors.primaryText02
         }
 
