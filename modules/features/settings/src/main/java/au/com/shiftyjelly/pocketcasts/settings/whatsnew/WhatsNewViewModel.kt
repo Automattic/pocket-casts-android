@@ -160,15 +160,17 @@ class WhatsNewViewModel @Inject constructor(
         ) : UiState()
     }
 
-    sealed class WhatsNewFeature(
-        @StringRes open val title: Int,
-        @StringRes open val message: Int,
-        @StringRes open val confirmButtonTitle: Int,
-        @StringRes val closeButtonTitle: Int? = null,
-    ) {
-        abstract val hasOffer: Boolean
-        abstract val isUserEntitled: Boolean
-        abstract val subscriptionTier: SubscriptionTier? // To show subscription when user is not entitled to the feature
+    sealed interface WhatsNewFeature {
+        @get:StringRes val title: Int
+
+        @get:StringRes val message: Int
+
+        @get:StringRes val confirmButtonTitle: Int
+
+        @get:StringRes val closeButtonTitle: Int? get() = null
+        val hasOffer: Boolean
+        val isUserEntitled: Boolean
+        val subscriptionTier: SubscriptionTier? // To show subscription when user is not entitled to the feature
 
         data class SlumberStudiosPromo(
             val promoCode: String = "",
@@ -176,11 +178,10 @@ class WhatsNewViewModel @Inject constructor(
             override val hasOffer: Boolean = false,
             override val isUserEntitled: Boolean = true,
             override val subscriptionTier: SubscriptionTier? = null,
-        ) : WhatsNewFeature(
-            title = LR.string.whats_new_slumber_studios_title,
-            message = message,
-            confirmButtonTitle = LR.string.whats_new_slumber_studios_redeem_now_button,
-        )
+        ) : WhatsNewFeature {
+            override val title = LR.string.whats_new_slumber_studios_title
+            override val confirmButtonTitle = LR.string.whats_new_slumber_studios_redeem_now_button
+        }
 
         data class DeselectChapters(
             @StringRes override val message: Int,
@@ -188,11 +189,9 @@ class WhatsNewViewModel @Inject constructor(
             override val hasOffer: Boolean = false,
             override val isUserEntitled: Boolean = true,
             override val subscriptionTier: SubscriptionTier? = null,
-        ) : WhatsNewFeature(
-            title = LR.string.skip_chapters,
-            message = message,
-            confirmButtonTitle = confirmButtonTitle,
-        )
+        ) : WhatsNewFeature {
+            override val title = LR.string.skip_chapters
+        }
     }
 
     sealed class NavigationState(
