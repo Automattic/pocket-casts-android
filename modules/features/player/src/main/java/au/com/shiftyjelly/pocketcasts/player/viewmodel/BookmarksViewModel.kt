@@ -146,43 +146,49 @@ class BookmarksViewModel
         this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
-            val bookmarksFlow = getBookmarksFlow(episodeUuid, sourceView)
-            val episode = episodeUuid?.let { episodeManager.findEpisodeByUuid(episodeUuid) }
-            val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
-            val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
-            combine(
-                bookmarksFlow,
-                isMultiSelectingFlow,
-                selectedListFlow,
-                settings.cachedSubscriptionStatus.flow,
-                settings.useEpisodeArtwork.flow,
-            ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork ->
-                val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
-                    UiState.Upsell(sourceView)
-                } else if (bookmarks.isEmpty()) {
-                    UiState.Empty(sourceView)
-                } else {
-                    val episodes = episode?.let { listOf(it) }
-                        ?: episodeManager.findEpisodesByUuids(bookmarks.map { it.episodeUuid })
-                    UiState.Loaded(
-                        bookmarks = bookmarks,
-                        episodes = episodes,
-                        isMultiSelecting = isMultiSelecting,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        isSelected = { selectedBookmark ->
-                            selectedList.map { bookmark -> bookmark.uuid }
-                                .contains(selectedBookmark.uuid)
-                        },
-                        onRowClick = ::onRowClick,
-                        sourceView = sourceView,
-                        showIcon = sourceView == SourceView.PROFILE,
-                    )
-                }
-            }.stateIn(viewModelScope)
-                // Stop collecting on player close when viewModelScope is still active but fragment is not.
-                .takeWhile { !isFragmentActive }
+            setupUiStateFlow(episodeUuid)
         }
+    }
+
+    private suspend fun setupUiStateFlow(
+        episodeUuid: String?,
+    ) {
+        val bookmarksFlow = getBookmarksFlow(episodeUuid, sourceView)
+        val episode = episodeUuid?.let { episodeManager.findEpisodeByUuid(episodeUuid) }
+        val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
+        val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
+        combine(
+            bookmarksFlow,
+            isMultiSelectingFlow,
+            selectedListFlow,
+            settings.cachedSubscriptionStatus.flow,
+            settings.useEpisodeArtwork.flow,
+        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork ->
+            val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+            _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
+                UiState.Upsell(sourceView)
+            } else if (bookmarks.isEmpty()) {
+                UiState.Empty(sourceView)
+            } else {
+                val episodes = episode?.let { listOf(it) }
+                    ?: episodeManager.findEpisodesByUuids(bookmarks.map { it.episodeUuid })
+                UiState.Loaded(
+                    bookmarks = bookmarks,
+                    episodes = episodes,
+                    isMultiSelecting = isMultiSelecting,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    isSelected = { selectedBookmark ->
+                        selectedList.map { bookmark -> bookmark.uuid }
+                            .contains(selectedBookmark.uuid)
+                    },
+                    onRowClick = ::onRowClick,
+                    sourceView = sourceView,
+                    showIcon = sourceView == SourceView.PROFILE,
+                )
+            }
+        }.stateIn(viewModelScope)
+            // Stop collecting on player close when viewModelScope is still active but fragment is not.
+            .takeWhile { !isFragmentActive }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
