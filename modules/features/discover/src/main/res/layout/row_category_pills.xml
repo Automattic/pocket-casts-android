@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="?attr/primary_ui_01"
+        android:background="@drawable/search_with_category_pills_background"
         android:foreground="?attr/selectableItemBackground"
         android:layout_margin="16dp"
         android:clickable="true"
