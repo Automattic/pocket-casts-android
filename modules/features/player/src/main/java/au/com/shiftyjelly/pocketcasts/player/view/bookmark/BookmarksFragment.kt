@@ -120,7 +120,8 @@ class BookmarksFragment : BaseFragment() {
                         onUpgradeClicked = ::onUpgradeClicked,
                         showOptionsDialog = { showOptionsDialog(it) },
                         openFragment = { fragment ->
-                            (parentFragment as? BottomSheetDialogFragment)?.dismiss() // Closes bookmarks bottom sheet dialog if opened from user files
+                            val bottomSheet = (parentFragment as? BottomSheetDialogFragment)
+                            if (sourceView != SourceView.PROFILE) bottomSheet?.dismiss() // Do not close bookmarks container dialog if opened from profile
                             val fragmentHostListener = (activity as? FragmentHostListener)
                             fragmentHostListener?.apply {
                                 closePlayer() // Closes player if open
