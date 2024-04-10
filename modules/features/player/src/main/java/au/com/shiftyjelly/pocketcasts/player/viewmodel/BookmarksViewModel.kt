@@ -224,7 +224,7 @@ class BookmarksViewModel
             val bookmark =
                 it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
             bookmark?.let {
-                viewModelScope.launch(ioDispatcher) {
+                viewModelScope.launch {
                     val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
                     val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
                     if (podcast != null && episode is PodcastEpisode) {

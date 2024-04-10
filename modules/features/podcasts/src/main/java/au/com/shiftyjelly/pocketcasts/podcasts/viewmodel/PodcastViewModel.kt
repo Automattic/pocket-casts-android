@@ -421,7 +421,7 @@ class PodcastViewModel
 
     fun onShareBookmarkClick(context: Context) {
         multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
-            viewModelScope.launch(ioDispatcher) {
+            viewModelScope.launch {
                 val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
                 val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
                 if (podcast != null && episode is PodcastEpisode) {
