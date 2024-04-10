@@ -1486,15 +1486,13 @@ class MainActivity :
 
                     val episode = result.episode
                     if (episode != null) {
-                        launch(Dispatchers.Default) {
-                            openEpisodeDialog(
-                                episodeUuid = episode.uuid,
-                                source = EpisodeViewSource.SHARE,
-                                podcastUuid = podcastUuid,
-                                forceDark = false,
-                                timestampInSecs = timestampInSecs,
-                            )
-                        }
+                        openEpisodeDialog(
+                            episodeUuid = episode.uuid,
+                            source = EpisodeViewSource.SHARE,
+                            podcastUuid = podcastUuid,
+                            forceDark = false,
+                            timestampInSecs = timestampInSecs,
+                        )
                     } else {
                         openPodcastPage(podcastUuid)
                     }
