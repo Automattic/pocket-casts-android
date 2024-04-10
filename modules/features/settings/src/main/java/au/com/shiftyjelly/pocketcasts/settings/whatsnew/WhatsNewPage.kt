@@ -74,6 +74,11 @@ fun WhatsNewPage(
                                 onClose = onClose,
                                 fullModal = uiState.fullModel,
                             )
+                        is WhatsNewFeature.NewWidgets ->
+                            NewWidgetsHeader(
+                                onClose = onClose,
+                                fullModal = uiState.fullModel,
+                            )
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -211,8 +216,7 @@ private fun WhatsNewPageLoaded(
 private fun Message(
     state: UiState.Loaded,
 ) = when (state.feature) {
-    is WhatsNewFeature.DeselectChapters,
-    -> TextP40(
+    is WhatsNewFeature.DeselectChapters -> TextP40(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
         color = MaterialTheme.theme.colors.primaryText02,
@@ -226,6 +230,13 @@ private fun Message(
         modifier = Modifier.padding(horizontal = 16.dp),
         selectable = true,
     )
+
+    is WhatsNewFeature.NewWidgets -> TextP40(
+        text = stringResource(state.feature.message),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.theme.colors.primaryText02,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
 }
 
 @Composable
@@ -238,6 +249,8 @@ private fun getButtonTitle(
     }
 
     is WhatsNewFeature.DeselectChapters -> stringResource(state.feature.confirmButtonTitle)
+
+    is WhatsNewFeature.NewWidgets -> stringResource(state.feature.confirmButtonTitle)
 }
 
 @Composable
@@ -281,6 +294,25 @@ private fun WhatsNewDeselectChaptersPreview(
                 fullModel = true,
             ),
             header = { DeselectChaptersHeader(onClose = {}) },
+            onConfirm = {},
+            onClose = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun WhatsNewNewWidgetsPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        WhatsNewPageLoaded(
+            state = UiState.Loaded(
+                feature = WhatsNewFeature.NewWidgets,
+                tier = UserTier.Plus,
+                fullModel = true,
+            ),
+            header = { NewWidgetsHeader(onClose = {}) },
             onConfirm = {},
             onClose = {},
         )

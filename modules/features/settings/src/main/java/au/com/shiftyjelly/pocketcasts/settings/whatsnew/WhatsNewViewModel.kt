@@ -32,6 +32,11 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
+        _state.value = UiState.Loaded(
+            feature = WhatsNewFeature.NewWidgets,
+            fullModel = true,
+            tier = UserTier.Free,
+        )
         viewModelScope.launch {
             settings.cachedSubscriptionStatus.flow.stateIn(viewModelScope).collect { subscriptionStatus ->
                 if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
@@ -141,6 +146,8 @@ class WhatsNewViewModel @Inject constructor(
                 } else {
                     NavigationState.StartUpsellFlow(OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS)
                 }
+
+                is WhatsNewFeature.NewWidgets -> NavigationState.NewWidgetsClose
             }
             _navigationState.emit(target)
         }
@@ -192,6 +199,15 @@ class WhatsNewViewModel @Inject constructor(
         ) : WhatsNewFeature {
             override val title = LR.string.skip_chapters
         }
+
+        data object NewWidgets : WhatsNewFeature {
+            override val title = LR.string.whats_new_new_widgets_title
+            override val message = LR.string.whats_new_new_widgets_message
+            override val confirmButtonTitle = LR.string.whats_new_got_it_button
+            override val hasOffer = false
+            override val isUserEntitled = true
+            override val subscriptionTier = null
+        }
     }
 
     sealed class NavigationState(
@@ -207,5 +223,6 @@ class WhatsNewViewModel @Inject constructor(
         data object SlumberStudiosRedeemPromoCode : NavigationState(shouldCloseOnConfirm = false)
         data object SlumberStudiosClose : NavigationState()
         data object DeselectChapterClose : NavigationState()
+        data object NewWidgetsClose : NavigationState()
     }
 }

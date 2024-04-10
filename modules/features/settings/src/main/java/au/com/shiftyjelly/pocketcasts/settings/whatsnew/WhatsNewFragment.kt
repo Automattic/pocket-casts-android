@@ -106,6 +106,10 @@ class WhatsNewFragment : BaseFragment() {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
+            is NavigationState.NewWidgetsClose -> {
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
+            }
         }
     }
 
