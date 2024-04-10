@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
@@ -1311,6 +1312,12 @@ class SettingsImpl @Inject constructor(
     override val podcastBookmarksSortType = BookmarksSortTypeForPodcast.UserSettingPref(
         sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
         defaultValue = BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val profileBookmarksSortType = BookmarksSortTypeForProfile.UserSettingPref(
+        sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PROFILE,
+        defaultValue = BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST,
         sharedPrefs = sharedPreferences,
     )
 
