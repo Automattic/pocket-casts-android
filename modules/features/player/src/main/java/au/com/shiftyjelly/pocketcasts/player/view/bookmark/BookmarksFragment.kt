@@ -116,6 +116,7 @@ class BookmarksFragment : BaseFragment() {
                                     forceDarkTheme = sourceView == SourceView.PLAYER,
                                 )
                             },
+                            onShareBookmarkClick = ::onShareBookmarkClick,
                             onEditBookmarkClick = ::onEditBookmarkClick,
                             onUpgradeClicked = ::onUpgradeClicked,
                             showOptionsDialog = { showOptionsDialog(it) },
@@ -185,6 +186,10 @@ class BookmarksFragment : BaseFragment() {
                     },
                 ).show(it, "bookmarks_options_dialog")
         }
+    }
+
+    private fun onShareBookmarkClick() {
+        bookmarksViewModel.onShareClicked(requireContext())
     }
 
     private fun onEditBookmarkClick() {

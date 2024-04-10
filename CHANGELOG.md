@@ -1,6 +1,8 @@
 7.62
 -----
-
+*   New Features
+    *   Allow sharing of bookmarks from bookmarks list
+        ([#2022](https://github.com/Automattic/pocket-casts-android/pull/2022))
 
 7.61
 -----
