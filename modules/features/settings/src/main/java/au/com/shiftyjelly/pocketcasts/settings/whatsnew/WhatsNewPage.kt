@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
 import android.content.res.Configuration
-import android.view.Gravity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,14 +38,12 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun WhatsNewPage(
@@ -63,17 +60,6 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        is WhatsNewFeature.SlumberStudiosPromo ->
-                            SlumberStudiosHeader(
-                                onClose = onClose,
-                                fullModal = uiState.fullModel,
-                            )
-
-                        is WhatsNewFeature.DeselectChapters ->
-                            DeselectChaptersHeader(
-                                onClose = onClose,
-                                fullModal = uiState.fullModel,
-                            )
                         is WhatsNewFeature.NewWidgets ->
                             NewWidgetsHeader(
                                 onClose = onClose,
@@ -88,14 +74,9 @@ fun WhatsNewPage(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.navigationState
-            .collect { navigationState ->
-                if (navigationState is WhatsNewViewModel.NavigationState.SlumberStudiosClose) {
-                    onClose()
-                } else {
-                    onConfirm(navigationState)
-                }
-            }
+        viewModel.navigationState.collect { navigationState ->
+            onConfirm(navigationState)
+        }
     }
 }
 
@@ -216,21 +197,6 @@ private fun WhatsNewPageLoaded(
 private fun Message(
     state: UiState.Loaded,
 ) = when (state.feature) {
-    is WhatsNewFeature.DeselectChapters -> TextP40(
-        text = stringResource(state.feature.message),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.theme.colors.primaryText02,
-        modifier = Modifier.padding(horizontal = 16.dp),
-    )
-
-    is WhatsNewFeature.SlumberStudiosPromo -> HtmlText(
-        html = stringResource(state.feature.message, state.feature.promoCode),
-        textStyleResId = UR.style.P40,
-        gravity = Gravity.CENTER_HORIZONTAL,
-        modifier = Modifier.padding(horizontal = 16.dp),
-        selectable = true,
-    )
-
     is WhatsNewFeature.NewWidgets -> TextP40(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
@@ -243,61 +209,7 @@ private fun Message(
 private fun getButtonTitle(
     state: UiState.Loaded,
 ): String = when (state.feature) {
-    is WhatsNewFeature.SlumberStudiosPromo -> when {
-        state.feature.isUserEntitled -> stringResource(state.feature.confirmButtonTitle)
-        else -> stringResource(LR.string.subscribe_to, stringResource(LR.string.pocket_casts_plus_short))
-    }
-
-    is WhatsNewFeature.DeselectChapters -> stringResource(state.feature.confirmButtonTitle)
-
     is WhatsNewFeature.NewWidgets -> stringResource(state.feature.confirmButtonTitle)
-}
-
-@Composable
-@Preview
-private fun WhatsNewSlumberStudiosPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    AppThemeWithBackground(themeType) {
-        WhatsNewPageLoaded(
-            state = UiState.Loaded(
-                feature = WhatsNewFeature.SlumberStudiosPromo(
-                    promoCode = "PROMO",
-                    message = LR.string.whats_new_slumber_studios_body,
-                    hasOffer = false,
-                    isUserEntitled = true,
-                ),
-                fullModel = true,
-                tier = UserTier.Plus,
-            ),
-            header = { SlumberStudiosHeader(onClose = {}) },
-            onConfirm = {},
-            onClose = {},
-        )
-    }
-}
-
-@Composable
-@Preview
-private fun WhatsNewDeselectChaptersPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    AppThemeWithBackground(themeType) {
-        WhatsNewPageLoaded(
-            state = UiState.Loaded(
-                feature = WhatsNewFeature.DeselectChapters(
-                    message = LR.string.whats_new_deselect_chapters_subscribe_to_plus_message,
-                    confirmButtonTitle = LR.string.upgrade_to_plus,
-                    isUserEntitled = true,
-                ),
-                tier = UserTier.Plus,
-                fullModel = true,
-            ),
-            header = { DeselectChaptersHeader(onClose = {}) },
-            onConfirm = {},
-            onClose = {},
-        )
-    }
 }
 
 @Composable

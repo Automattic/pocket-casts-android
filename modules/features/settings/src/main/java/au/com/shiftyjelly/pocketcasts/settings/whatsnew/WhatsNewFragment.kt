@@ -13,20 +13,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.NavigationState
-import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -97,32 +93,12 @@ class WhatsNewFragment : BaseFragment() {
 
     private fun performConfirmAction(navigationState: NavigationState) {
         when (navigationState) {
-            is NavigationState.HeadphoneControlsSettings -> openFragment(HeadphoneControlsSettingsFragment())
-            is NavigationState.FullScreenPlayerScreen -> openPlayer()
             is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
-            is NavigationState.SlumberStudiosRedeemPromoCode -> redeemSlumberStudiosPromoCode()
-            is NavigationState.SlumberStudiosClose -> Unit // It will not be sent to confirm action in real world scenario
-            is NavigationState.DeselectChapterClose -> {
-                @Suppress("DEPRECATION")
-                activity?.onBackPressed()
-            }
             is NavigationState.NewWidgetsClose -> {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
         }
-    }
-
-    private fun openFragment(fragment: Fragment) {
-        val fragmentHostListener = activity as? FragmentHostListener
-            ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
-        fragmentHostListener.addFragment(fragment)
-    }
-
-    private fun openPlayer() {
-        val fragmentHostListener = activity as? FragmentHostListener
-            ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
-        fragmentHostListener.openPlayer(SourceView.WHATS_NEW.analyticsValue)
     }
 
     private fun startUpsellFlow(source: OnboardingUpgradeSource) {
@@ -135,10 +111,6 @@ class WhatsNewFragment : BaseFragment() {
             },
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-    }
-
-    private fun redeemSlumberStudiosPromoCode() {
-        openUrl(Settings.SLUMBER_STUDIOS_PROMO_URL)
     }
 
     companion object {
