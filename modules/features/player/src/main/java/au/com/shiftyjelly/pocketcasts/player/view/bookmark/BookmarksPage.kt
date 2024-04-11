@@ -225,10 +225,10 @@ private fun BookmarksPreview(
                 ),
                 bookmarkIdAndEpisodeMap = mapOf(
                     UUID.randomUUID().toString() to
-                    PodcastEpisode(
-                        uuid = "",
-                        publishedDate = Date(),
-                    ),
+                        PodcastEpisode(
+                            uuid = "",
+                            publishedDate = Date(),
+                        ),
                 ),
                 isMultiSelecting = false,
                 useEpisodeArtwork = false,
