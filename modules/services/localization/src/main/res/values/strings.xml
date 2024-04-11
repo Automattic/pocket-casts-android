@@ -161,6 +161,8 @@
     <string name="medium_player_widget_label">Medium Player</string>
     <string name="large_player_widget_label">Large Player</string>
     <string name="widget_no_episode_playing">No episode playing</string>
+    <string name="widget_nothing_in_up_next">Nothing in Up Next</string>
+    <string name="widget_check_out_discover">Check out Discover for more</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

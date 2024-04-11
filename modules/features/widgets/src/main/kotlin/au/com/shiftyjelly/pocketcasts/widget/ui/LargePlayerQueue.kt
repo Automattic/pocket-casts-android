@@ -60,7 +60,7 @@ internal fun LargePlayerQueue(
                         maxLines = 2,
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimaryContainer,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                         ),
                     )
@@ -72,7 +72,7 @@ internal fun LargePlayerQueue(
                         maxLines = 1,
                         style = TextStyle(
                             color = secondaryTextColor,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                         ),
                     )
                 }

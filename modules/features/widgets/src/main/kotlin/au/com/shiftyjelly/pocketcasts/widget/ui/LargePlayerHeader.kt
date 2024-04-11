@@ -42,53 +42,48 @@ internal fun LargePlayerHeader(
             size = 116.dp,
         )
 
-        if (episode != null) {
-            val secondaryTextColor = if (state.useDynamicColors) {
-                GlanceTheme.colors.onPrimaryContainer
-            } else {
-                GlanceTheme.colors.onSecondaryContainer
-            }
-            Spacer(
-                modifier = GlanceModifier.width(12.dp),
-            )
-            Column(
-                verticalAlignment = Alignment.Vertical.Top,
-                modifier = GlanceModifier.defaultWeight().height(116.dp),
-            ) {
-                Spacer(
-                    modifier = GlanceModifier.height(4.dp),
-                )
-                Text(
-                    text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
-                    maxLines = 1,
-                    style = TextStyle(color = secondaryTextColor, fontSize = 12.sp),
-                )
-                Text(
-                    text = episode.title,
-                    maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                )
-                Spacer(
-                    modifier = GlanceModifier.height(4.dp),
-                )
-                Text(
-                    text = episode.getTimeLeft(LocalContext.current),
-                    maxLines = 1,
-                    style = TextStyle(color = secondaryTextColor, fontSize = 12.sp),
-                )
-                PlaybackControls(
-                    isPlaying = state.isPlaying,
-                    modifier = GlanceModifier.defaultWeight(),
-                )
-                Spacer(
-                    modifier = GlanceModifier.height(4.dp),
-                )
-            }
+        val secondaryTextColor = if (state.useDynamicColors) {
+            GlanceTheme.colors.onPrimaryContainer
         } else {
+            GlanceTheme.colors.onSecondaryContainer
+        }
+        Spacer(
+            modifier = GlanceModifier.width(12.dp),
+        )
+        Column(
+            verticalAlignment = Alignment.Vertical.Top,
+            modifier = GlanceModifier.defaultWeight().height(116.dp),
+        ) {
             Spacer(
+                modifier = GlanceModifier.height(4.dp),
+            )
+            Text(
+                text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
+                maxLines = 1,
+                style = TextStyle(color = secondaryTextColor, fontSize = 14.sp),
+            )
+            Text(
+                text = episode?.title ?: LocalContext.current.getString(LR.string.widget_no_episode_playing),
+                maxLines = 1,
+                style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 18.sp, fontWeight = FontWeight.Bold),
+            )
+            Spacer(
+                modifier = GlanceModifier.height(4.dp),
+            )
+            Text(
+                text = episode?.getTimeLeft(LocalContext.current) ?: " ",
+                maxLines = 1,
+                style = TextStyle(color = secondaryTextColor, fontSize = 14.sp),
+            )
+            PlaybackControls(
+                isPlaying = state.isPlaying,
                 modifier = GlanceModifier.defaultWeight(),
             )
+            Spacer(
+                modifier = GlanceModifier.height(4.dp),
+            )
         }
+
         Spacer(
             modifier = GlanceModifier.width(16.dp),
         )
