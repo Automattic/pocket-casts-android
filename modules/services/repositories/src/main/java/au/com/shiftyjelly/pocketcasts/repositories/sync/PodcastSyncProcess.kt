@@ -917,44 +917,60 @@ class PodcastSyncProcess(
         podcast.addedDate = podcastSync.dateAdded
         podcast.folderUuid = podcastSync.folderUuid
         podcastSync.sortPosition?.let { podcast.sortPosition = it }
-        podcastSync.episodesSortOrder?.let { podcast.episodesSortType = EpisodesSortType.fromServerId(it) ?: EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC }
-        podcastSync.episodesSortOrderModified?.let { podcast.episodesSortTypeModified = it }
-        podcastSync.startFromSecs?.let { podcast.startFromSecs = it }
-        podcastSync.startFromModified?.let { podcast.startFromModified = it }
-        podcastSync.skipLastSecs?.let { podcast.skipLastSecs = it }
-        podcastSync.skipLastModified?.let { podcast.skipLastModified = it }
-        podcastSync.addToUpNextLocalSetting?.let { podcast.autoAddToUpNext = it }
-        podcastSync.addToUpNextModifiedLocalSetting?.let { podcast.autoAddToUpNextModified = it }
-        podcastSync.useCustomPlaybackEffects?.let { podcast.overrideGlobalEffects = it }
-        podcastSync.useCustomPlaybackEffectsModified?.let { podcast.overrideGlobalEffectsModified = it }
-        podcastSync.playbackSpeed?.let { podcast.playbackSpeed = it }
-        podcastSync.playbackSpeedModified?.let { podcast.playbackSpeedModified = it }
-        podcastSync.trimSilence?.let {
-            podcast.trimMode = when (it) {
-                0 -> TrimMode.OFF
-                1 -> TrimMode.LOW
-                2 -> TrimMode.MEDIUM
-                3 -> TrimMode.HIGH
-                else -> TrimMode.OFF
-            }
+        withSyncValue(podcast.episodesSortTypeModified, podcastSync.episodesSortOrderModified, podcastSync.episodesSortOrder) {
+            podcast.episodesSortType = EpisodesSortType.fromServerId(it) ?: EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC
         }
-        podcastSync.trimSilenceModified?.let { podcast.trimModeModified = it }
-        podcastSync.useVolumeBoost?.let { podcast.isVolumeBoosted = it }
-        podcastSync.useVolumeBoostModified?.let { podcast.volumeBoostedModified = it }
-        podcastSync.showNotifications?.let { podcast.isShowNotifications = it }
-        podcastSync.showNotificationsModified?.let { podcast.showNotificationsModified = it }
-        podcastSync.autoArchive?.let { podcast.overrideGlobalArchive = it }
-        podcastSync.autoArchiveModified?.let { podcast.overrideGlobalArchiveModified = it }
-        podcastSync.autoArchivePlayed?.let { podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context) }
-        podcastSync.autoArchivePlayedModified?.let { podcast.autoArchiveAfterPlayingModified = it }
-        podcastSync.autoArchiveInactive?.let { podcast.autoArchiveInactive = AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default }
-        podcastSync.autoArchiveInactiveModified?.let { podcast.autoArchiveInactiveModified = it }
-        podcastSync.autoArchiveEpisodeLimit?.let { podcast.autoArchiveEpisodeLimit = it }
-        podcastSync.autoArchiveEpisodeLimitModified?.let { podcast.autoArchiveEpisodeLimitModified = it }
-        podcastSync.episodeGrouping?.let { podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None }
-        podcastSync.episodeGroupingModified?.let { podcast.groupingModified = it }
-        podcastSync.showArchived?.let { podcast.showArchived = it }
-        podcastSync.showArchivedModified?.let { podcast.showNotificationsModified = it }
+        withSyncValue(podcast.startFromModified, podcastSync.startFromModified, podcastSync.startFromSecs) {
+            podcast.startFromSecs = it
+        }
+        withSyncValue(podcast.skipLastModified, podcastSync.skipLastModified, podcastSync.skipLastSecs) {
+            podcast.skipLastSecs = it
+        }
+        withSyncValue(podcast.autoAddToUpNextModified, podcastSync.addToUpNextLocalSettingModified, podcastSync.addToUpNextLocalSetting) {
+            podcast.autoAddToUpNext = it
+        }
+        withSyncValue(podcast.overrideGlobalEffectsModified, podcastSync.useCustomPlaybackEffectsModified, podcastSync.useCustomPlaybackEffects) {
+            podcast.overrideGlobalEffects = it
+        }
+        withSyncValue(podcast.playbackSpeedModified, podcastSync.playbackSpeedModified, podcastSync.playbackSpeed) {
+            podcast.playbackSpeed = it
+        }
+        withSyncValue(podcast.trimModeModified, podcastSync.trimSilenceModified, podcastSync.trimSilence) {
+            podcast.trimMode = TrimMode.fromServerId(it)
+        }
+        withSyncValue(podcast.volumeBoostedModified, podcastSync.useVolumeBoostModified, podcastSync.useVolumeBoost) {
+            podcast.isVolumeBoosted = it
+        }
+        withSyncValue(podcast.showNotificationsModified, podcastSync.showNotificationsModified, podcastSync.showNotifications) {
+            podcast.isShowNotifications = it
+        }
+        withSyncValue(podcast.overrideGlobalArchiveModified, podcastSync.autoArchiveModified, podcastSync.autoArchive) {
+            podcast.overrideGlobalArchive = it
+        }
+        withSyncValue(podcast.autoArchiveAfterPlayingModified, podcastSync.autoArchivePlayedModified, podcastSync.autoArchivePlayed) {
+            podcast.autoArchiveAfterPlaying = AutoArchiveAfterPlaying.fromServerId(it) ?: AutoArchiveAfterPlaying.defaultValue(context)
+        }
+        withSyncValue(podcast.autoArchiveInactiveModified, podcastSync.autoArchiveInactiveModified, podcastSync.autoArchiveInactive) {
+            podcast.autoArchiveInactive = AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default
+        }
+        withSyncValue(podcast.autoArchiveEpisodeLimitModified, podcastSync.autoArchiveEpisodeLimitModified, podcastSync.autoArchiveEpisodeLimit) {
+            podcast.autoArchiveEpisodeLimit = it
+        }
+        withSyncValue(podcast.groupingModified, podcastSync.episodeGroupingModified, podcastSync.episodeGrouping) {
+            podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None
+        }
+        withSyncValue(podcast.showArchivedModified, podcastSync.showArchivedModified, podcastSync.showArchived) {
+            podcast.showArchived = it
+        }
+    }
+
+    private fun <T> withSyncValue(localDate: Date?, remoteDate: Date?, remoteValue: T?, update: (T) -> Unit) {
+        val newValue = when {
+            remoteValue == null || remoteDate == null -> null
+            remoteDate > (localDate ?: Date(0)) -> remoteValue
+            else -> null
+        }
+        newValue?.let(update)
     }
 
     fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
@@ -1116,14 +1132,7 @@ class PodcastSyncProcess(
                             modifiedAt = podcast.playbackSpeedModified.toProtobufTimestampOrEpoch()
                         }
                         trimSilence = int32Setting {
-                            value = int32Value {
-                                value = when (podcast.trimMode) {
-                                    TrimMode.OFF -> 0
-                                    TrimMode.LOW -> 1
-                                    TrimMode.MEDIUM -> 2
-                                    TrimMode.HIGH -> 3
-                                }
-                            }
+                            value = int32Value { value = podcast.trimMode.serverId }
                             modifiedAt = podcast.trimModeModified.toProtobufTimestampOrEpoch()
                         }
                         volumeBoost = boolSetting {
@@ -1136,7 +1145,7 @@ class PodcastSyncProcess(
                         }
                         autoArchive = boolSetting {
                             value = boolValue { value = podcast.overrideGlobalArchive }
-                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.overrideGlobalArchiveModified.toProtobufTimestampOrEpoch()
                         }
                         autoArchivePlayed = int32Setting {
                             value = int32Value { value = podcast.autoArchiveAfterPlaying.serverId }
@@ -1282,12 +1291,17 @@ private fun Date.toProtobufTimestamp(): Timestamp {
 }
 
 private fun Date?.toProtobufTimestampOrEpoch(): Timestamp {
-    val instant = this?.toInstant() ?: Instant.EPOCH
+    val instant = this?.toInstant() ?: fallbackTimestamp
     return timestamp {
         seconds = instant.epochSecond
         nanos = instant.nano
     }
 }
+
+// We use EPOCH +1 millisecond as a default timestamp for updates because initial values of when app is installed are null.
+// This means that if a user syncs settings that were set before we started tracking timestamps
+// they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
+private val fallbackTimestamp: Instant = Instant.EPOCH.plusMillis(1)
 
 private val Podcast.addToUpNextSyncSetting get() = autoAddToUpNext != Podcast.AutoAddUpNext.OFF
 private val Podcast.addToUpNextPositionSyncSetting get() = when (autoAddToUpNext) {
@@ -1303,7 +1317,7 @@ private val SyncUpdateResponse.PodcastSync.addToUpNextLocalSetting get() = when 
     }
     else -> null
 }
-private val SyncUpdateResponse.PodcastSync.addToUpNextModifiedLocalSetting get() = addToUpNextModified?.let { addModified ->
+private val SyncUpdateResponse.PodcastSync.addToUpNextLocalSettingModified get() = addToUpNextModified?.let { addModified ->
     addToUpNextPositionModified?.let { positionModified ->
         maxOf(addModified, positionModified)
     }
