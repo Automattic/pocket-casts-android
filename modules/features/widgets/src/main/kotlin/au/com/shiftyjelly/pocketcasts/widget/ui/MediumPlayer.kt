@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.action.clickable
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
@@ -19,19 +18,11 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 
 @Composable
 internal fun MediumPlayer(state: MediumPlayerWidgetState) {
     WidgetTheme(state.useDynamicColors) {
-        val action = if (state.episode == null) {
-            OpenPocketCastsAction.action()
-        } else {
-            OpenEpisodeDetailsAction.action(state.episode.uuid)
-        }
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = GlanceModifier
@@ -43,9 +34,7 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
             EpisodeImage(
                 episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
-                modifier = GlanceModifier
-                    .size(58.dp)
-                    .clickable(action),
+                size = 58.dp,
             )
 
             if (state.episode != null) {

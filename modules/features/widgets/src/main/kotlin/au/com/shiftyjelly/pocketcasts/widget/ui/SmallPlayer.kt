@@ -40,6 +40,10 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
             EpisodeImage(
                 episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
+                size = null,
+                backgroundColor = if (!state.useDynamicColors) { { it.secondary } } else null,
+                iconColor = if (!state.useDynamicColors) { { it.onSecondary } } else null,
+                onClick = { controlPlayback },
             )
             if (state.episode != null) {
                 PlaybackButton(
