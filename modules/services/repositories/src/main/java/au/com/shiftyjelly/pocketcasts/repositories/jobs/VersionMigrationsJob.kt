@@ -160,7 +160,7 @@ class VersionMigrationsJob : JobService() {
             upgradeTrimSilenceMode()
         }
 
-        if (previousVersionCode < 9207) {
+        if (previousVersionCode < 9209) {
             consolidateEmbeddedArtworkSettings(applicationContext)
         }
     }
