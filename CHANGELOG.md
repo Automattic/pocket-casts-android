@@ -5,6 +5,9 @@
         ([#2022](https://github.com/Automattic/pocket-casts-android/pull/2022))
     *   Add profile bookmark screen where all user bookmarks can be managed
         ([#2037](https://github.com/Automattic/pocket-casts-android/pull/2037))
+*   Updates:
+    *   Updated widget and added two new variants - small and large.
+        ([#2043](https://github.com/Automattic/pocket-casts-android/pull/2043))
 
 7.61
 -----
