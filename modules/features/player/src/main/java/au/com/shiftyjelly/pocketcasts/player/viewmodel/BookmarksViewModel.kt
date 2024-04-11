@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
@@ -30,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -45,7 +47,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -65,6 +66,7 @@ class BookmarksViewModel
     private val theme: Theme,
     private val bookmarkFeature: BookmarkFeatureControl,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val bookmarkSearchHandler: BookmarkSearchHandler,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -160,26 +162,34 @@ class BookmarksViewModel
         val episode = episodeUuid?.let { episodeManager.findEpisodeByUuid(episodeUuid) }
         val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
         val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
-        combine(
+        val bookmarkSearchResults = bookmarkSearchHandler.getBookmarkSearchResultsFlow()
+        combine6(
             bookmarksFlow,
             isMultiSelectingFlow,
             selectedListFlow,
             settings.cachedSubscriptionStatus.flow,
             settings.useEpisodeArtwork.flow,
-        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork ->
+            bookmarkSearchResults,
+        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork, searchResults ->
             val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
             _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
                 UiState.Upsell(sourceView)
             } else if (bookmarks.isEmpty()) {
                 UiState.Empty(sourceView)
             } else {
+                val searchText = (_uiState.value as? UiState.Loaded)?.searchText ?: ""
+                val filteredBookmarks = if (searchText.isNotEmpty()) {
+                    bookmarks.filter { bookmark -> searchResults.searchUuids?.contains(bookmark.uuid) == true }
+                } else {
+                    bookmarks
+                }
                 val episodes = episode?.let { listOf(it) }
-                    ?: episodeManager.findEpisodesByUuids(bookmarks.map { it.episodeUuid }.distinct())
-                val bookmarkIdAndEpisodeMap = bookmarks.associate { bookmark ->
+                    ?: episodeManager.findEpisodesByUuids(filteredBookmarks.map { it.episodeUuid }.distinct())
+                val bookmarkIdAndEpisodeMap = filteredBookmarks.associate { bookmark ->
                     bookmark.uuid to episodes.firstOrNull { it.uuid == bookmark.episodeUuid }
                 }
                 UiState.Loaded(
-                    bookmarks = bookmarks,
+                    bookmarks = filteredBookmarks,
                     bookmarkIdAndEpisodeMap = bookmarkIdAndEpisodeMap,
                     isMultiSelecting = isMultiSelecting,
                     useEpisodeArtwork = useEpisodeArtwork,
@@ -190,6 +200,8 @@ class BookmarksViewModel
                     onRowClick = ::onRowClick,
                     sourceView = sourceView,
                     showIcon = sourceView == SourceView.PROFILE,
+                    searchEnabled = sourceView == SourceView.PROFILE,
+                    searchText = searchResults.searchTerm,
                 )
             }
         }.stateIn(viewModelScope)
@@ -274,6 +286,13 @@ class BookmarksViewModel
         }
     }
 
+    fun onSearchTextChanged(searchText: String) {
+        (uiState.value as? UiState.Loaded)?.let {
+            _uiState.value = it.copy(searchText = searchText)
+            bookmarkSearchHandler.searchQueryUpdated(searchText)
+        }
+    }
+
     fun changeSortOrder(order: BookmarksSortType) {
         sourceView.mapToBookmarksSortTypeUserSetting().set(order, updateModifiedAt = true)
         analyticsTracker.track(
@@ -350,7 +369,7 @@ class BookmarksViewModel
                 }
         }
 
-        object Loading : UiState()
+        data object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
             val bookmarkIdAndEpisodeMap: Map<String, BaseEpisode?>,
@@ -360,6 +379,8 @@ class BookmarksViewModel
             val onRowClick: (Bookmark) -> Unit,
             val sourceView: SourceView,
             val showIcon: Boolean = false,
+            val searchText: String = "",
+            val searchEnabled: Boolean = false,
         ) : UiState() {
             val headerRowColors: HeaderRowColors
                 get() = when (sourceView) {

@@ -174,6 +174,9 @@ class BookmarkManagerImpl @Inject constructor(
     override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
         bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
 
+    override suspend fun searchByBookmarkOrEpisodeTitle(title: String) =
+        bookmarkDao.searchByBookmarkOrEpisodeTitle("%$title%").map { it.uuid }
+
     /**
      * Mark the bookmark as deleted so it can be synced to other devices.
      */
