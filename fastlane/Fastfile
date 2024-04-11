@@ -415,7 +415,7 @@ platform :android do
       project_id: firebase_secret(name: 'project_id'),
       key_file: GOOGLE_FIREBASE_SECRETS_PATH,
       model: 'Pixel2.arm',
-      version: 23,
+      version: 30,
       test_apk_path: File.join(apk_dir, 'androidTest', 'debug', 'app-debug-androidTest.apk'),
       apk_path: File.join(apk_dir, 'debug', 'app-debug.apk'),
       results_output_dir: File.join(PROJECT_ROOT_FOLDER, 'build', 'instrumented-tests')
