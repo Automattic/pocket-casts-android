@@ -20,7 +20,7 @@ class BookmarkSearchHandler @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun getBookmarkSearchResultsFlow() = searchQueryFlow.flatMapLatest { searchTerm ->
-        if (searchTerm.trim().isNotEmpty()) {
+        if (searchTerm.isNotEmpty()) {
             flow {
                 emit(bookmarkManager.searchByBookmarkOrEpisodeTitle(searchTerm))
             }
