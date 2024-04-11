@@ -38,30 +38,30 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
                 .fillMaxWidth()
                 .height(90.dp)
                 .background(GlanceTheme.colors.primaryContainer)
-                .padding(12.dp),
+                .padding(16.dp),
         ) {
             EpisodeImage(
                 episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 modifier = GlanceModifier
-                    .size(66.dp)
+                    .size(58.dp)
                     .clickable(action),
             )
 
             if (state.episode != null) {
                 Spacer(
-                    modifier = GlanceModifier.width(12.dp),
+                    modifier = GlanceModifier.width(16.dp),
                 )
                 Column(
                     verticalAlignment = Alignment.Vertical.Top,
-                    modifier = GlanceModifier.height(66.dp),
+                    modifier = GlanceModifier.height(58.dp),
                 ) {
                     Text(
                         text = state.episode.title,
                         maxLines = 1,
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimaryContainer,
-                            fontSize = 16.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                         ),
                     )

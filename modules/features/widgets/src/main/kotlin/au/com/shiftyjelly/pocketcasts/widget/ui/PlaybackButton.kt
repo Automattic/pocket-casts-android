@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlaybackButton(
     isPlaying: Boolean,
-    size: Dp = 42.dp,
+    size: Dp = 36.dp,
 ) {
     val contentDescription = LocalContext.current.getString(if (isPlaying) LR.string.play_episode else LR.string.pause_episode)
 
@@ -43,7 +43,7 @@ internal fun PlaybackButton(
             provider = ImageProvider(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 8),
+            modifier = GlanceModifier.size(size).padding(size / if (isPlaying) 8 else 5),
         )
     }
 }

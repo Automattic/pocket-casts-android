@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun SkipForwardButton(
-    size: Dp = 42.dp,
+    size: Dp = 36.dp,
 ) {
     val contentDescription = LocalContext.current.getString(LR.string.skip_forward)
 
@@ -42,7 +42,7 @@ internal fun SkipForwardButton(
             provider = ImageProvider(IR.drawable.ic_widget_skip_forward),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 6),
+            modifier = GlanceModifier.size(size).padding(size / 5),
         )
     }
 }
