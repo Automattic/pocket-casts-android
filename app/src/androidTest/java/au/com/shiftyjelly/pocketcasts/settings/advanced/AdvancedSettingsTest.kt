@@ -76,7 +76,7 @@ class AdvancedSettingsTest {
 
     @Test
     fun shelfItemsSettingsAlwaysSavesAllEntries() {
-        settings.shelfItems.set(listOf(ShelfItem.Archive), needsSync = false)
+        settings.shelfItems.set(listOf(ShelfItem.Archive), updateModifiedAt = false)
 
         val items = settings.shelfItems.value
 
@@ -85,7 +85,7 @@ class AdvancedSettingsTest {
 
     @Test
     fun shelfItemsDoNotSaveDuplicates() {
-        settings.shelfItems.set(listOf(ShelfItem.Cast, ShelfItem.Cast), needsSync = false)
+        settings.shelfItems.set(listOf(ShelfItem.Cast, ShelfItem.Cast), updateModifiedAt = false)
 
         val items = settings.shelfItems.value
 
@@ -96,7 +96,7 @@ class AdvancedSettingsTest {
     fun shelfItemsAreSavedInOrder() {
         val items = listOf(ShelfItem.Archive, ShelfItem.Bookmark, ShelfItem.Star, ShelfItem.Played, ShelfItem.Sleep)
 
-        settings.shelfItems.set(items, needsSync = false)
+        settings.shelfItems.set(items, updateModifiedAt = false)
 
         assertEquals(settings.shelfItems.value.take(5), items)
     }

@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
@@ -463,10 +464,10 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        deleteCloudFileAfterPlaying.set(false, needsSync = false)
-        cloudAutoUpload.set(false, needsSync = false)
-        cloudAutoDownload.set(false, needsSync = false)
-        cloudDownloadOnlyOnWifi.set(false, needsSync = false)
+        deleteCloudFileAfterPlaying.set(false, updateModifiedAt = false)
+        cloudAutoUpload.set(false, updateModifiedAt = false)
+        cloudAutoDownload.set(false, updateModifiedAt = false)
+        cloudDownloadOnlyOnWifi.set(false, updateModifiedAt = false)
         setCancelledAcknowledged(false)
     }
 
@@ -555,9 +556,9 @@ class SettingsImpl @Inject constructor(
         }
 
         override fun persist(value: PlaybackEffects, commit: Boolean) {
-            globalPlaybackSpeed.set(value.playbackSpeed, needsSync = false)
-            globalAudioEffectRemoveSilence.set(value.trimMode, needsSync = false)
-            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted, needsSync = false)
+            globalPlaybackSpeed.set(value.playbackSpeed, updateModifiedAt = false)
+            globalAudioEffectRemoveSilence.set(value.trimMode, updateModifiedAt = false)
+            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted, updateModifiedAt = false)
         }
     }
 
@@ -1311,6 +1312,12 @@ class SettingsImpl @Inject constructor(
     override val podcastBookmarksSortType = BookmarksSortTypeForPodcast.UserSettingPref(
         sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST,
         defaultValue = BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val profileBookmarksSortType = BookmarksSortTypeForProfile.UserSettingPref(
+        sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PROFILE,
+        defaultValue = BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST,
         sharedPrefs = sharedPreferences,
     )
 

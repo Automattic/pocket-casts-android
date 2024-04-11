@@ -244,7 +244,7 @@ class PodcastsViewModel
 
         val folder = folder
         if (folder == null) {
-            settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, needsSync = true)
+            settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, updateModifiedAt = true)
         } else {
             folderManager.updateSortType(folderUuid = folder.uuid, podcastsSortType = PodcastsSortType.DRAG_DROP)
         }

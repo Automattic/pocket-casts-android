@@ -191,11 +191,11 @@ class VersionMigrationsJob : JobService() {
     private fun performV7Migration() {
         // We want v6 users to keep defaulting to download, new users should get the new stream default
         val currentStreamingPreference = if (settings.contains(Settings.PREFERENCE_GLOBAL_STREAMING_MODE)) settings.streamingMode.value else false
-        settings.streamingMode.set(currentStreamingPreference, needsSync = false)
+        settings.streamingMode.set(currentStreamingPreference, updateModifiedAt = false)
     }
 
     private fun addUpNextAutoDownload() {
-        settings.autoDownloadUpNext.set(!settings.streamingMode.value, needsSync = false)
+        settings.autoDownloadUpNext.set(!settings.streamingMode.value, updateModifiedAt = false)
     }
 
     private fun deletePodcastImages() {
@@ -245,7 +245,7 @@ class VersionMigrationsJob : JobService() {
         if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
             val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
             val useFileArtwork = settings.getBooleanForKey("useEmbeddedArtwork", false)
-            settings.useEpisodeArtwork.set(useEpisodeArtwork || useFileArtwork, needsSync = true)
+            settings.useEpisodeArtwork.set(useEpisodeArtwork || useFileArtwork, updateModifiedAt = true)
         }
     }
 }

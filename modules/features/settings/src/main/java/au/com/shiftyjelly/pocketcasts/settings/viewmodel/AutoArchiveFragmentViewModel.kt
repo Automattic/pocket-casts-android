@@ -26,7 +26,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
     }
 
     fun onStarredChanged(newValue: Boolean) {
-        settings.autoArchiveIncludesStarred.set(newValue, needsSync = true)
+        settings.autoArchiveIncludesStarred.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
             mapOf("enabled" to newValue),
@@ -35,7 +35,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
 
     fun onPlayedEpisodesAfterChanged(newStringValue: String) {
         val newValue = AutoArchiveAfterPlaying.fromString(newStringValue, context)
-        settings.autoArchiveAfterPlaying.set(newValue, needsSync = true)
+        settings.autoArchiveAfterPlaying.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
             mapOf("value" to newValue.analyticsValue),
@@ -44,7 +44,7 @@ class AutoArchiveFragmentViewModel @Inject constructor(
 
     fun onInactiveChanged(newStringValue: String) {
         val newValue = AutoArchiveInactive.fromString(newStringValue, context)
-        settings.autoArchiveInactive.set(newValue, needsSync = true)
+        settings.autoArchiveInactive.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
             mapOf("value" to newValue.analyticsValue),

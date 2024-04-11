@@ -108,7 +108,7 @@ class AccountDetailsViewModel
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked),
         )
-        settings.marketingOptIn.set(isChecked, needsSync = true)
+        settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
     }
 
     override fun onCleared() {

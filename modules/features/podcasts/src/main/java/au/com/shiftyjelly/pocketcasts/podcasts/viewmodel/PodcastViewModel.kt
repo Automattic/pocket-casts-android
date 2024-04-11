@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -393,7 +395,7 @@ class PodcastViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
-        settings.podcastBookmarksSortType.set(order, needsSync = true)
+        settings.podcastBookmarksSortType.set(order, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
@@ -414,6 +416,26 @@ class PodcastViewModel
                 }
             }
             playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+        }
+    }
+
+    fun onShareBookmarkClick(context: Context) {
+        multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
+            viewModelScope.launch {
+                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+                if (podcast != null && episode is PodcastEpisode) {
+                    SharePodcastHelper(
+                        podcast,
+                        episode,
+                        bookmark.timeSecs.toDouble(),
+                        context,
+                        ShareType.BOOKMARK_TIME,
+                        SourceView.PODCAST_SCREEN,
+                        analyticsTracker,
+                    ).showShareDialogDirect()
+                }
+            }
         }
     }
 

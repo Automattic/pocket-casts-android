@@ -35,7 +35,7 @@ object AnalyticsTracker {
 
     fun setSendUsageStats(send: Boolean) {
         if (send != getSendUsageStats()) {
-            settings.collectAnalytics.set(send, needsSync = true)
+            settings.collectAnalytics.set(send, updateModifiedAt = true)
             if (!send) {
                 trackers.forEach { it.clearAllData() }
             }

@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -151,12 +152,30 @@ class BookmarkManagerImpl @Inject constructor(
             ).flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
     }
 
-    override fun findBookmarksFlow(): Flow<List<Bookmark>> {
-        return bookmarkDao.findBookmarksFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun findBookmarksFlow(
+        sortType: BookmarksSortTypeForProfile,
+    ): Flow<List<Bookmark>> = when (sortType) {
+        BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST ->
+            bookmarkDao.findAllBookmarksOrderByCreatedAtFlow(
+                isAsc = false,
+            )
+
+        BookmarksSortTypeForProfile.DATE_ADDED_OLDEST_TO_NEWEST ->
+            bookmarkDao.findAllBookmarksOrderByCreatedAtFlow(
+                isAsc = true,
+            )
+
+        BookmarksSortTypeForProfile.PODCAST_AND_EPISODE ->
+            bookmarkDao.findAllBookmarksByOrderPodcastAndEpisodeFlow()
+                .flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
     }
 
     override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
         bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
+
+    override suspend fun searchByBookmarkOrEpisodeTitle(title: String) =
+        bookmarkDao.searchByBookmarkOrEpisodeTitle("%$title%").map { it.uuid }
 
     /**
      * Mark the bookmark as deleted so it can be synced to other devices.

@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -116,7 +117,7 @@ class EpisodeListAdapter(
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
             disposables = disposables,
-            bookmarksObservable = bookmarkManager.findBookmarksFlow().asObservable(),
+            bookmarksObservable = bookmarkManager.findBookmarksFlow(BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST).asObservable(),
             bookmarksAvailable = bookmarksAvailable,
         )
         holder.episodeRow.setOnClickListener {

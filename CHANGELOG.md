@@ -1,6 +1,10 @@
 7.62
 -----
-
+*   New Features
+    *   Allow sharing of bookmarks from bookmarks list
+        ([#2022](https://github.com/Automattic/pocket-casts-android/pull/2022))
+    *   Add profile bookmark screen where all user bookmarks can be managed
+        ([#2037](https://github.com/Automattic/pocket-casts-android/pull/2037))
 
 7.61
 -----

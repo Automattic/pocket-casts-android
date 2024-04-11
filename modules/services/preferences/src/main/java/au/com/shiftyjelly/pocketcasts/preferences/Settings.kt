@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
@@ -92,6 +93,7 @@ interface Settings {
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_EPISODE = "bookmarksSortTypeForEpisode"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST = "bookmarksSortTypeForPodcast"
+        const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PROFILE = "bookmarksSortTypeForProfile"
 
         val SUPPORTED_LANGUAGE_CODES = arrayOf("us", "se", "jp", "gb", "fr", "es", "de", "ca", "au", "it", "ru", "br", "no", "be", "cn", "dk", "sw", "ch", "ie", "pl", "kr", "nl")
 
@@ -496,6 +498,7 @@ interface Settings {
     val episodeBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val playerBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val podcastBookmarksSortType: UserSetting<BookmarksSortTypeForPodcast>
+    val profileBookmarksSortType: UserSetting<BookmarksSortTypeForProfile>
 
     fun addReviewRequestedDate()
     fun getReviewRequestedDates(): List<String>
