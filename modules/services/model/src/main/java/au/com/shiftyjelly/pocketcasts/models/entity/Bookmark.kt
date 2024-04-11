@@ -29,6 +29,7 @@ data class Bookmark(
     @ColumnInfo(name = "deleted_modified") var deletedModified: Long? = null,
     @ColumnInfo(name = "sync_status") var syncStatus: SyncStatus = SyncStatus.NOT_SYNCED,
     @Ignore val episodeTitle: String = "",
+    @Ignore val podcastTitle: String = "",
 ) : Serializable {
     constructor() : this(uuid = "")
 

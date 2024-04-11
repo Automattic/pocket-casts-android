@@ -45,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun BookmarksPage(
-    episodeUuid: String,
+    episodeUuid: String?,
     backgroundColor: Color,
     textColor: Color,
     sourceView: SourceView,
@@ -116,7 +116,7 @@ private fun Content(
     Box(
         modifier = Modifier
             .background(color = backgroundColor)
-            .padding(bottom = 28.dp),
+            .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
     ) {
         when (state) {
             is UiState.Loading -> LoadingView()
@@ -177,9 +177,10 @@ private fun BookmarksView(
             )
         }
         items(state.bookmarks, key = { it }) { bookmark ->
+            val episode = state.bookmarkIdAndEpisodeMap[bookmark.uuid]
             BookmarkRow(
-                bookmark = bookmark,
-                episode = state.episode,
+                bookmark = bookmark.copy(episodeTitle = episode?.title ?: ""),
+                episode = episode,
                 isMultiSelecting = { state.isMultiSelecting },
                 isSelected = state.isSelected,
                 onPlayClick = onPlayClick,
@@ -196,7 +197,7 @@ private fun BookmarksView(
                     SourceView.PLAYER -> TimePlayButtonColors.Player(textColor = textColor)
                     else -> TimePlayButtonColors.Default
                 },
-                showIcon = false,
+                showIcon = state.showIcon,
                 useEpisodeArtwork = state.useEpisodeArtwork,
             )
         }
@@ -222,9 +223,12 @@ private fun BookmarksPreview(
                         title = "Funny bit",
                     ),
                 ),
-                episode = PodcastEpisode(
-                    uuid = "",
-                    publishedDate = Date(),
+                bookmarkIdAndEpisodeMap = mapOf(
+                    UUID.randomUUID().toString() to
+                        PodcastEpisode(
+                            uuid = "",
+                            publishedDate = Date(),
+                        ),
                 ),
                 isMultiSelecting = false,
                 useEpisodeArtwork = false,
