@@ -991,19 +991,6 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun updatePlaybackStateDeselectedChapterIndices() {
-        launch {
-            playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(
-                    playbackState.copy(
-                        chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
-                        lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
-                    ),
-                )
-            }
-        }
-    }
-
     fun clearUpNextAsync() {
         launch {
             upNextQueue.clearUpNext()
@@ -1532,17 +1519,13 @@ open class PlaybackManager @Inject constructor(
 
     private fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
-            val newChapters = episodeMetadata.chapters
-                .updateChaptersTimes(playbackState.durationMs.milliseconds)
-                .updateDeselectedState(getCurrentEpisode())
-            val chapters = maxOf(playbackState.chapters, newChapters) { a, b -> a.size.compareTo(b.size) }
-
-            playbackStateRelay.accept(
-                playbackState.copy(
-                    chapters = chapters,
-                    lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
-                ),
-            )
+            launch {
+                chapterManager.updateChapters(
+                    playbackState.episodeUuid,
+                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid),
+                    forceUpdate = false,
+                )
+            }
         }
     }
 
@@ -1552,17 +1535,12 @@ open class PlaybackManager @Inject constructor(
     private fun onEpisodeChanged(episodeUuid: String) {
         observeChaptersJob?.cancel()
         observeChaptersJob = chapterManager.observerChaptersForEpisode(episodeUuid)
-            .onEach { onRemoteChaptersAvailable(it) }
+            .onEach { onChaptersAvailable(it) }
             .launchIn(this)
     }
 
-    private fun onRemoteChaptersAvailable(remoteChapters: Chapters) {
+    private fun onChaptersAvailable(chapters: Chapters) {
         playbackStateRelay.blockingFirst().let { playbackState ->
-            val newChapters = remoteChapters
-                .updateChaptersTimes(playbackState.durationMs.milliseconds)
-                .updateDeselectedState(getCurrentEpisode())
-            val chapters = maxOf(playbackState.chapters, newChapters) { a, b -> a.size.compareTo(b.size) }
-
             playbackStateRelay.accept(playbackState.copy(chapters = chapters))
         }
     }
