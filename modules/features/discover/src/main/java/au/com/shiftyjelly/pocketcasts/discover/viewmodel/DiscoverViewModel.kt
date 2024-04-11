@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -66,7 +68,12 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadData(resources: Resources) {
-        val feed = repository.getDiscoverFeed()
+        val feed =
+            if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
+                repository.getDiscoverFeedWithCategoriesAtTheTop()
+            } else {
+                repository.getDiscoverFeed()
+            }
 
         feed.toFlowable()
             .subscribeBy(

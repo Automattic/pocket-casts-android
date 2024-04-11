@@ -27,6 +27,7 @@ enum class SourceView(val analyticsValue: String) {
     AUTO_PAUSE("auto_pause"),
     PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
     PODCAST_SETTINGS("podcast_settings"),
+    PROFILE("profile"),
     ONBOARDING_RECOMMENDATIONS("onboarding_recommendations"),
     ONBOARDING_RECOMMENDATIONS_SEARCH("onboarding_recommendations_search"),
     UNKNOWN("unknown"),
