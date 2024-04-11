@@ -190,6 +190,7 @@ class BookmarksViewModel
                     onRowClick = ::onRowClick,
                     sourceView = sourceView,
                     showIcon = sourceView == SourceView.PROFILE,
+                    searchEnabled = sourceView == SourceView.PROFILE,
                 )
             }
         }.stateIn(viewModelScope)
@@ -271,6 +272,12 @@ class BookmarksViewModel
                     }
                 }
             }
+        }
+    }
+
+    fun onSearchTextChanged(searchText: String) {
+        (uiState.value as? UiState.Loaded)?.let {
+            _uiState.value = it.copy(searchText = searchText)
         }
     }
 
@@ -360,6 +367,8 @@ class BookmarksViewModel
             val onRowClick: (Bookmark) -> Unit,
             val sourceView: SourceView,
             val showIcon: Boolean = false,
+            val searchText: String = "",
+            val searchEnabled: Boolean = false,
         ) : UiState() {
             val headerRowColors: HeaderRowColors
                 get() = when (sourceView) {
