@@ -113,7 +113,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
-        settings.discoverCountryCode.set(region.code, needsSync = false)
+        settings.discoverCountryCode.set(region.code, updateModifiedAt = false)
         currentRegionCode = region.code
         loadData(resources)
     }

@@ -552,7 +552,7 @@ open class PlaybackManager @Inject constructor(
             -> {
                 val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.uuid) }
                 if (source != null) {
-                    settings.trackingAutoPlaySource.set(source, needsSync = false)
+                    settings.trackingAutoPlaySource.set(source, updateModifiedAt = false)
                 }
                 source
             }

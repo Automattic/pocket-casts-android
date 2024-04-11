@@ -117,7 +117,7 @@ class NotificationsSettingsFragment :
 
         hidePlaybackNotificationsPreference?.setOnPreferenceChangeListener { _, newValue ->
             val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
-            settings.hideNotificationOnPause.set(newBool, needsSync = true)
+            settings.hideNotificationOnPause.set(newBool, updateModifiedAt = true)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
                 mapOf("enabled" to newBool),
@@ -131,7 +131,7 @@ class NotificationsSettingsFragment :
             }
             settings.notificationVibrate.set(
                 value = newSetting ?: NotificationVibrateSetting.DEFAULT,
-                needsSync = false,
+                updateModifiedAt = false,
             )
             changeVibrateSummary()
             analyticsTracker.track(
@@ -145,7 +145,7 @@ class NotificationsSettingsFragment :
                 ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
                 ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
 
-            settings.playOverNotification.set(playOverNotificationSetting, needsSync = true)
+            settings.playOverNotification.set(playOverNotificationSetting, updateModifiedAt = true)
             changePlayOverNotificationSummary()
 
             analyticsTracker.track(
@@ -224,7 +224,7 @@ class NotificationsSettingsFragment :
             val ringtone = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
             val value = ringtone?.toString() ?: ""
             context?.let {
-                settings.notificationSound.set(NotificationSound(value, it), needsSync = false)
+                settings.notificationSound.set(NotificationSound(value, it), updateModifiedAt = false)
                 ringtonePreference?.summary = getRingtoneValue(value)
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
             } ?: Timber.e("Context was null when trying to set notification sound")
@@ -263,7 +263,7 @@ class NotificationsSettingsFragment :
                                 if (madeChange) {
                                     trackActionsChange(selectedActions)
                                 }
-                                settings.newEpisodeNotificationActions.set(selectedActions, needsSync = true)
+                                settings.newEpisodeNotificationActions.set(selectedActions, updateModifiedAt = true)
                                 changeActionsSummary()
                             },
                         )
@@ -420,7 +420,7 @@ class NotificationsSettingsFragment :
 
                 enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
                     val checked = newValue as Boolean
-                    settings.notifyRefreshPodcast.set(checked, needsSync = true)
+                    settings.notifyRefreshPodcast.set(checked, updateModifiedAt = true)
 
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,

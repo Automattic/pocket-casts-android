@@ -275,7 +275,7 @@ class BookmarksViewModel
     }
 
     fun changeSortOrder(order: BookmarksSortType) {
-        sourceView.mapToBookmarksSortTypeUserSetting().set(order, needsSync = true)
+        sourceView.mapToBookmarksSortTypeUserSetting().set(order, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(

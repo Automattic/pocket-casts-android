@@ -113,7 +113,7 @@ class UserManagerImpl @Inject constructor(
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
                 }
 
-                settings.marketingOptIn.set(false, needsSync = false)
+                settings.marketingOptIn.set(false, updateModifiedAt = false)
                 settings.setEndOfYearShowModal(true)
 
                 analyticsTracker.track(
