@@ -120,6 +120,78 @@ class ChapterDaoTest {
     }
 
     @Test
+    fun replaceAllChaptersIfExistingCountIsSmaller() = runBlocking {
+        val chapters1 = List(5) { index ->
+            Chapter(
+                title = "$index-0",
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+            )
+        }
+        chapterDao.replaceAllChapters("episode-id", chapters1)
+
+        val chapters2 = List(6) { index ->
+            Chapter(
+                title = "$index-1",
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+            )
+        }
+        chapterDao.replaceAllChaptersIfMoreIsPassed("episode-id", chapters2)
+
+        val result = chapterDao.findAll()
+        assertEquals(chapters2, result)
+    }
+
+    @Test
+    fun doNotReplaceAllChaptersIfExistingCountIsEqual() = runBlocking {
+        val chapters1 = List(5) { index ->
+            Chapter(
+                title = "$index-0",
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+            )
+        }
+        chapterDao.replaceAllChapters("episode-id", chapters1)
+
+        val chapters2 = List(5) { index ->
+            Chapter(
+                title = "$index-1",
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+            )
+        }
+        chapterDao.replaceAllChaptersIfMoreIsPassed("episode-id", chapters2)
+
+        val result = chapterDao.findAll()
+        assertEquals(chapters1, result)
+    }
+
+    @Test
+    fun doNotReplaceAllChaptersIfExistingCountIsLarger() = runBlocking {
+        val chapters1 = List(6) { index ->
+            Chapter(
+                title = "$index-0",
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+            )
+        }
+        chapterDao.replaceAllChapters("episode-id", chapters1)
+
+        val chapters2 = List(5) { index ->
+            Chapter(
+                title = "$index-1",
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+            )
+        }
+        chapterDao.replaceAllChaptersIfMoreIsPassed("episode-id", chapters2)
+
+        val result = chapterDao.findAll()
+        assertEquals(chapters1, result)
+    }
+
+    @Test
     fun doNotDeleteChaptersForOtherEpisodes() = runBlocking {
         val id1 = "episode-id-1"
         val id2 = "episode-id-2"

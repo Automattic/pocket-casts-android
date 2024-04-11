@@ -18,8 +18,10 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowC
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -38,12 +40,14 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
@@ -138,57 +142,84 @@ class BookmarksViewModel
         multiSelectHelper.listener = multiSelectListener
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun loadBookmarks(
-        episodeUuid: String,
+        episodeUuid: String?,
         sourceView: SourceView,
     ) {
         this.sourceView = sourceView
         viewModelScope.coroutineContext.cancelChildren()
         viewModelScope.launch(ioDispatcher) {
-            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
-                val bookmarksFlow =
-                    bookmarksSortTypeFlow.flatMapLatest { sortType ->
-                        bookmarkManager.findEpisodeBookmarksFlow(
-                            episode = episode,
-                            sortType = sortType,
-                        )
-                    }
-                val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
-                val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
-                combine(
-                    bookmarksFlow,
-                    isMultiSelectingFlow,
-                    selectedListFlow,
-                    settings.cachedSubscriptionStatus.flow,
-                    settings.useEpisodeArtwork.flow,
-                ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork ->
-                    val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                    _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
-                        UiState.Upsell(sourceView)
-                    } else if (bookmarks.isEmpty()) {
-                        UiState.Empty(sourceView)
-                    } else {
-                        UiState.Loaded(
-                            bookmarks = bookmarks,
-                            episode = episode,
-                            isMultiSelecting = isMultiSelecting,
-                            useEpisodeArtwork = useEpisodeArtwork,
-                            isSelected = { selectedBookmark ->
-                                selectedList.map { bookmark -> bookmark.uuid }
-                                    .contains(selectedBookmark.uuid)
-                            },
-                            onRowClick = ::onRowClick,
-                            sourceView = sourceView,
-                        )
-                    }
-                }.stateIn(viewModelScope)
-                    // Stop collecting on player close when viewModelScope is still active but fragment is not.
-                    .takeWhile { !isFragmentActive }
-            } ?: run { // This shouldn't happen in the ideal world
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
-                _uiState.value = UiState.Empty(sourceView)
+            setupUiStateFlow(episodeUuid)
+        }
+    }
+
+    private suspend fun setupUiStateFlow(
+        episodeUuid: String?,
+    ) {
+        val bookmarksFlow = getBookmarksFlow(episodeUuid, sourceView)
+        val episode = episodeUuid?.let { episodeManager.findEpisodeByUuid(episodeUuid) }
+        val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
+        val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
+        combine(
+            bookmarksFlow,
+            isMultiSelectingFlow,
+            selectedListFlow,
+            settings.cachedSubscriptionStatus.flow,
+            settings.useEpisodeArtwork.flow,
+        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork ->
+            val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+            _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
+                UiState.Upsell(sourceView)
+            } else if (bookmarks.isEmpty()) {
+                UiState.Empty(sourceView)
+            } else {
+                val episodes = episode?.let { listOf(it) }
+                    ?: episodeManager.findEpisodesByUuids(bookmarks.map { it.episodeUuid }.distinct())
+                val bookmarkIdAndEpisodeMap = bookmarks.associate { bookmark ->
+                    bookmark.uuid to episodes.firstOrNull { it.uuid == bookmark.episodeUuid }
+                }
+                UiState.Loaded(
+                    bookmarks = bookmarks,
+                    bookmarkIdAndEpisodeMap = bookmarkIdAndEpisodeMap,
+                    isMultiSelecting = isMultiSelecting,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    isSelected = { selectedBookmark ->
+                        selectedList.map { bookmark -> bookmark.uuid }
+                            .contains(selectedBookmark.uuid)
+                    },
+                    onRowClick = ::onRowClick,
+                    sourceView = sourceView,
+                    showIcon = sourceView == SourceView.PROFILE,
+                )
+            }
+        }.stateIn(viewModelScope)
+            // Stop collecting on player close when viewModelScope is still active but fragment is not.
+            .takeWhile { !isFragmentActive }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun getBookmarksFlow(
+        episodeUuid: String?,
+        sourceView: SourceView,
+    ): Flow<List<Bookmark>> {
+        val bookmarksSortTypeFlow = sourceView.mapToBookmarksSortTypeUserSetting().flow
+        return bookmarksSortTypeFlow.flatMapLatest { sortType ->
+            if (episodeUuid == null) {
+                if (sortType is BookmarksSortTypeForProfile) {
+                    bookmarkManager.findBookmarksFlow(sortType)
+                } else {
+                    flowOf(emptyList())
+                }
+            } else {
+                episodeManager.findEpisodeByUuid(episodeUuid)?.let {
+                    bookmarkManager.findEpisodeBookmarksFlow(
+                        episode = it,
+                        sortType = sortType as BookmarksSortTypeDefault,
+                    )
+                } ?: run { // This shouldn't happen in the ideal world
+                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
+                    flowOf(emptyList())
+                }
             }
         }
     }
@@ -244,7 +275,6 @@ class BookmarksViewModel
     }
 
     fun changeSortOrder(order: BookmarksSortType) {
-        if (order !is BookmarksSortTypeDefault) return
         sourceView.mapToBookmarksSortTypeUserSetting().set(order, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
@@ -301,11 +331,15 @@ class BookmarksViewModel
         }
     }
 
-    private fun SourceView.mapToBookmarksSortTypeUserSetting() =
-        when (this) {
+    private fun SourceView.mapToBookmarksSortTypeUserSetting(): UserSetting<BookmarksSortType> {
+        val sortType = when (this) {
             SourceView.PLAYER -> settings.playerBookmarksSortType
+            SourceView.PROFILE -> settings.profileBookmarksSortType
             else -> settings.episodeBookmarksSortType
         }
+        @Suppress("UNCHECKED_CAST")
+        return sortType as UserSetting<BookmarksSortType>
+    }
 
     sealed class UiState {
         data class Empty(val sourceView: SourceView) : UiState() {
@@ -319,12 +353,13 @@ class BookmarksViewModel
         object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
-            val episode: BaseEpisode,
+            val bookmarkIdAndEpisodeMap: Map<String, BaseEpisode?>,
             val isMultiSelecting: Boolean,
             val useEpisodeArtwork: Boolean,
             val isSelected: (Bookmark) -> Boolean,
             val onRowClick: (Bookmark) -> Unit,
             val sourceView: SourceView,
+            val showIcon: Boolean = false,
         ) : UiState() {
             val headerRowColors: HeaderRowColors
                 get() = when (sourceView) {

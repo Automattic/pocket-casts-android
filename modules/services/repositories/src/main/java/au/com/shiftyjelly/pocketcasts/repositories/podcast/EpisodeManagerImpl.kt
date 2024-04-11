@@ -87,8 +87,17 @@ class EpisodeManagerImpl @Inject constructor(
         return userEpisodeManager.findEpisodeByUuid(uuid)
     }
 
+    override suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode> {
+        val episodes = findByUuids(uuids)
+        val userEpisodes = userEpisodeManager.findEpisodesByUuids(uuids)
+        return episodes + userEpisodes
+    }
+
     override suspend fun findByUuid(uuid: String): PodcastEpisode? =
         episodeDao.findByUuid(uuid)
+
+    private suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode> =
+        episodeDao.findByUuids(episodeUuids)
 
     @Deprecated("Use findByUuid suspended method instead")
     override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =

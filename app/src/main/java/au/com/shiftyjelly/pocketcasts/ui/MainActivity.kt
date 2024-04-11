@@ -762,7 +762,6 @@ class MainActivity :
             upNextQueue to useEpisodeArtwork
         }
             .onEach { (upNextQueue, useEpisodeArtwork) ->
-                updatePlaybackStateDeselectedChapterIndices(upNextQueue)
                 binding.playerBottomSheet.setUpNext(
                     upNext = upNextQueue,
                     theme = theme,
@@ -888,21 +887,6 @@ class MainActivity :
                 }
             }
         })
-    }
-
-    private fun updatePlaybackStateDeselectedChapterIndices(upNextQueue: UpNextQueue.State) {
-        (upNextQueue as? UpNextQueue.State.Loaded)?.let {
-            val lastPlaybackState = viewModel.lastPlaybackState
-            val currentEpisodeDeselectedChapterIndicesChanged = playbackManager.getCurrentEpisode()?.let { currentEpisode ->
-                currentEpisode.uuid == it.episode.uuid &&
-                    lastPlaybackState != null &&
-                    it.episode.deselectedChapters !=
-                    lastPlaybackState.chapters.getList().filterNot { it.selected }.map { it.index }
-            } ?: false
-            if (currentEpisodeDeselectedChapterIndicesChanged) {
-                playbackManager.updatePlaybackStateDeselectedChapterIndices()
-            }
-        }
     }
 
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
