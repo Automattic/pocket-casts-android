@@ -53,6 +53,11 @@ internal fun LargePlayerHeader(
         )
 
         if (episode != null) {
+            val secondaryTextColor = if (state.useDynamicColors) {
+                GlanceTheme.colors.onPrimaryContainer
+            } else {
+                GlanceTheme.colors.onSecondaryContainer
+            }
             Spacer(
                 modifier = GlanceModifier.width(12.dp),
             )
@@ -66,7 +71,7 @@ internal fun LargePlayerHeader(
                 Text(
                     text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
                     maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 12.sp),
+                    style = TextStyle(color = secondaryTextColor, fontSize = 12.sp),
                 )
                 Text(
                     text = episode.title,
@@ -79,7 +84,7 @@ internal fun LargePlayerHeader(
                 Text(
                     text = episode.getTimeLeft(LocalContext.current),
                     maxLines = 1,
-                    style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 12.sp),
+                    style = TextStyle(color = secondaryTextColor, fontSize = 12.sp),
                 )
                 PlaybackControls(
                     isPlaying = state.isPlaying,

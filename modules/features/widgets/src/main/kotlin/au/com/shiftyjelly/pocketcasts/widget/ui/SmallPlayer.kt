@@ -45,6 +45,8 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
                 PlaybackButton(
                     state.isPlaying,
                     size = 32.dp,
+                    backgroundColor = if (!state.useDynamicColors) { { it.surface } } else null,
+                    iconColor = if (!state.useDynamicColors) { { it.onSurface } } else null,
                 )
             }
         }

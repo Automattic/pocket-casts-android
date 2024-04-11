@@ -28,9 +28,15 @@ import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 internal fun LargePlayerQueue(
     queue: List<PlayerWidgetEpisode>,
     useEpisodeArtwork: Boolean,
+    useDynamicColors: Boolean,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     val lastIndex = queue.lastIndex
+    val secondaryTextColor = if (useDynamicColors) {
+        GlanceTheme.colors.onPrimaryContainer
+    } else {
+        GlanceTheme.colors.onSecondaryContainer
+    }
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -69,7 +75,7 @@ internal fun LargePlayerQueue(
                         text = episode.getTimeLeft(LocalContext.current),
                         maxLines = 1,
                         style = TextStyle(
-                            color = GlanceTheme.colors.onPrimaryContainer,
+                            color = secondaryTextColor,
                             fontSize = 12.sp,
                         ),
                     )

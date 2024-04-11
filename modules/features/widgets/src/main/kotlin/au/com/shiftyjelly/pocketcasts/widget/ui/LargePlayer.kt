@@ -32,6 +32,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                 LargePlayerQueue(
                     queue = upNextEpisodes,
                     useEpisodeArtwork = state.useEpisodeArtwork,
+                    useDynamicColors = state.useDynamicColors,
                 )
             }
         }
