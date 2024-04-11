@@ -55,6 +55,7 @@ class DiscoverViewModel @Inject constructor(
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
     private var replacements = emptyMap<String, String>()
+    private var adsForCategoryView = emptyList<DiscoverRow>()
     private var isFragmentChangingConfigurations: Boolean = false
 
     fun onShown() {
@@ -97,6 +98,9 @@ class DiscoverViewModel @Inject constructor(
 
                     // Update the list with the correct region substituted in where needed
                     val updatedList = it.layout.transformWithRegion(region, replacements, resources)
+
+                    // Save ads to display in category view
+                    adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
 
                     state.postValue(DiscoverState.DataLoaded(updatedList, region, it.regions.values.toList()))
                 },
@@ -304,6 +308,9 @@ class DiscoverViewModel @Inject constructor(
 
     fun stopPlayback() {
         playbackManager.stopAsync(sourceView = sourceView)
+    }
+    fun getAdForCategoryView(categoryInt: Int): DiscoverRow? {
+        return adsForCategoryView.firstOrNull { it.categoryId == categoryInt }
     }
 }
 
