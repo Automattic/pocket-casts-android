@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.time.Clock
 import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,30 +52,22 @@ abstract class UserSetting<T>(
 
     open fun set(
         value: T,
-        needsSync: Boolean,
+        updateModifiedAt: Boolean,
         commit: Boolean = false,
         clock: Clock = Clock.systemUTC(),
     ) {
         persist(value, commit)
         _flow.value = get()
-        val modifiedAt = if (needsSync) Instant.now(clock).toString() else null
+        val modifiedAt = if (updateModifiedAt) Instant.now(clock) else null
         updateModifiedAtServerString(modifiedAt)
     }
 
-    // A null parameter reflects a setting that does not need to be synced
-    private fun updateModifiedAtServerString(modifiedAt: String?) {
+    private fun updateModifiedAtServerString(modifiedAt: Instant?) {
         if (modifiedAt != null) {
-            val parsable = runCatching { Instant.parse(modifiedAt) }.isSuccess
-            if (!parsable) {
-                // Only persist the string if it is parsable
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot set invalid modified at server string: $modifiedAt")
-                return
+            sharedPrefs.edit().run {
+                putString(modifiedAtKey, modifiedAt.toString())
+                apply()
             }
-        }
-
-        sharedPrefs.edit().run {
-            putString(modifiedAtKey, modifiedAt)
-            apply()
         }
     }
 
@@ -292,6 +283,6 @@ abstract class UserSetting<T>(
     ) {
         override fun get(): T = initialValue
         override fun persist(value: T, commit: Boolean) = Unit
-        override fun set(value: T, needsSync: Boolean, commit: Boolean, clock: Clock) = Unit
+        override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) = Unit
     }
 }

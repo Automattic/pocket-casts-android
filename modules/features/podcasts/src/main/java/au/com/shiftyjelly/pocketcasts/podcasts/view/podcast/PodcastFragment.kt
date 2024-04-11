@@ -546,7 +546,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(podcastUuid), needsSync = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(podcastUuid), updateModifiedAt = false)
     }
 
     override fun onPause() {

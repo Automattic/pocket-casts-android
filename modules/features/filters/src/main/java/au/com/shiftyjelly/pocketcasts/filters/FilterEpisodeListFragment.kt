@@ -187,7 +187,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         recyclerView.adapter = adapter
         listSavedState?.let { recyclerView.layoutManager?.onRestoreInstanceState(it) }
         setShowFilterOptions(showingFilterOptionsBeforeModal)
-        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), needsSync = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), updateModifiedAt = false)
     }
 
     override fun onDestroyView() {

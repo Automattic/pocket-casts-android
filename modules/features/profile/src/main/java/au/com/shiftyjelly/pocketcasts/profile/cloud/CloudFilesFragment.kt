@@ -141,7 +141,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, needsSync = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, updateModifiedAt = false)
     }
 
     override fun onPause() {

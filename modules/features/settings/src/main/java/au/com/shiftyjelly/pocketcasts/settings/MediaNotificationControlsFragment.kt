@@ -139,7 +139,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                     ShowCustomMediaActionsSettingsRow(
                         shouldShowCustomMediaActions = settings.customMediaActionsVisibility.flow.collectAsState().value,
                         onShowCustomMediaActionsToggled = { showCustomActions ->
-                            settings.customMediaActionsVisibility.set(showCustomActions, needsSync = true)
+                            settings.customMediaActionsVisibility.set(showCustomActions, updateModifiedAt = true)
                             updateMediaActionsVisibility(showCustomActions)
                         },
                     )
@@ -282,7 +282,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         // Reset mediaActionMove now that we've tracked it
         mediaActionMove = null
 
-        settings.mediaControlItems.set(items.filterIsInstance<Settings.MediaNotificationControls>(), needsSync = true)
+        settings.mediaControlItems.set(items.filterIsInstance<Settings.MediaNotificationControls>(), updateModifiedAt = true)
     }
 }
 
