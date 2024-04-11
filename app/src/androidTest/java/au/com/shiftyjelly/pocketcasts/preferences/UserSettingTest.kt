@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.MutableClock
 import java.time.Instant
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -42,7 +43,7 @@ class UserSettingTest {
         userSetting.set("new_value", clock = clock, updateModifiedAt = false)
 
         assertEquals("new_value", userSetting.value)
-        assertEquals(Instant.EPOCH, userSetting.modifiedAt)
+        assertNull(userSetting.modifiedAt)
     }
 
     @Test
@@ -75,6 +76,27 @@ class UserSettingTest {
 
             cancel()
         }
+    }
+
+    @Test
+    fun useEpochPlusOneAsDefaultSyncTimestamp() {
+        lateinit var timestamp: Instant
+        userSetting.getSyncSetting { _, modifiedAt ->
+            timestamp = modifiedAt
+        }
+        assertEquals(Instant.EPOCH.plusMillis(1), timestamp)
+    }
+
+    @Test
+    fun useStoredSyncTimestamp() {
+        clock += 1.seconds
+        userSetting.set("new_value", clock = clock, updateModifiedAt = true)
+
+        lateinit var timestamp: Instant
+        userSetting.getSyncSetting { _, modifiedAt ->
+            timestamp = modifiedAt
+        }
+        assertEquals(clock.instant(), timestamp)
     }
 
     private class ReversingToSetting(

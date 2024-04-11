@@ -16,16 +16,16 @@ abstract class UserSetting<T>(
 
     private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
 
-    val modifiedAt get(): Instant = runCatching {
+    val modifiedAt get(): Instant? = runCatching {
         Instant.parse(getModifiedAtServerString())
-    }.getOrDefault(Instant.EPOCH)
+    }.getOrNull()
 
     /**
      * Returns the value to sync. If sync is not needed or the modification timestamp is unknown
-     * it provides [Instant.EPOCH] as the modification timestamp.
+     * it provides [Instant.EPOCH] plus one millisecond as the modification timestamp.
      */
     fun <U> getSyncSetting(f: (T, Instant) -> U): U {
-        return f(value, modifiedAt)
+        return f(value, modifiedAt ?: fallbackTimestamp)
     }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
@@ -284,5 +284,12 @@ abstract class UserSetting<T>(
         override fun get(): T = initialValue
         override fun persist(value: T, commit: Boolean) = Unit
         override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) = Unit
+    }
+
+    private companion object {
+        // We use EPOCH +1 millisecond as a default timestamp for updates because initial values of when app is installed are null.
+        // This means that if a user syncs settings that were set before we started tracking timestamps
+        // they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
+        val fallbackTimestamp: Instant = Instant.EPOCH.plusMillis(1)
     }
 }
