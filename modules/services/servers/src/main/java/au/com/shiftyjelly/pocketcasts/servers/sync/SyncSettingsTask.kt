@@ -613,7 +613,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             }
 
             val localModifiedAt = setting.modifiedAt
-            if (localModifiedAt > serverModifiedAt) {
+            if ((localModifiedAt ?: Instant.EPOCH) >= serverModifiedAt) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
                 return null
             }
