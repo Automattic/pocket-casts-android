@@ -16,7 +16,6 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -63,6 +62,7 @@ internal fun LargePlayerQueue(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                         ),
+                        modifier = GlanceModifier.padding(end = 16.dp),
                     )
                     Spacer(
                         modifier = GlanceModifier.height(2.dp),
@@ -74,11 +74,9 @@ internal fun LargePlayerQueue(
                             color = secondaryTextColor,
                             fontSize = 13.sp,
                         ),
+                        modifier = GlanceModifier.padding(end = 16.dp),
                     )
                 }
-                Spacer(
-                    modifier = GlanceModifier.width(16.dp),
-                )
                 PlayButton(episode = episode)
             }
         }
