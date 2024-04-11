@@ -1822,6 +1822,7 @@
     <string name="bookmark_notification_action_delete_title" translatable="false">@string/delete</string>
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
+    <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
 
     <!--    Tasker Plugin-->
 
@@ -1872,6 +1873,7 @@
     <string name="dont_clear">Don\'t Clear</string>
     <string name="clear_up_next">Clear Up Next</string>
     <string name="clear_all">Clear All</string>
+    <string name="clear_search">Clear Search</string>
     <string name="add_mode">Add Mode</string>
     <string name="start_playing">Start Playing</string>
     <string name="last">Last</string>
