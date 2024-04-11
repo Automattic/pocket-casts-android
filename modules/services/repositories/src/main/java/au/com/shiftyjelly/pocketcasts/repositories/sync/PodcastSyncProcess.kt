@@ -380,7 +380,6 @@ class PodcastSyncProcess(
             }
         }
 
-        podcast.folderUuid = podcast.folderUuid.takeIf { it != Folder.homeFolderUuid }
         podcastManager.updatePodcast(podcast)
     }
 

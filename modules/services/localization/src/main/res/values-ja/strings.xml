@@ -12,10 +12,6 @@ Language: ja_JP
     <string name="upgrade_to_patron">Patron にアップグレード</string>
     <string name="upgrade_to_plus">Plus にアップグレード</string>
     <string name="whats_new_got_it_button">OK</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">今すぐ Patron に登録すると、チャプターに対応するどのエピソードでも、選択したチャプターをスキップできます。</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">今すぐ Plus に登録すると、チャプターに対応するどのエピソードでも、選択したチャプターをスキップできます。</string>
-    <string name="whats_new_deselect_chapters_plus_message">Plus サブスクリプションの一環として、チャプターに対応するどのエピソードでも、選択したチャプターをスキップできるようになりました。</string>
-    <string name="whats_new_deselect_chapters_patron_message">Patron サブスクリプションの一環として、チャプターに対応するどのエピソードでも、選択したチャプターをスキップできるようになりました。</string>
     <string name="skip_chapters_patron_prompt">Pocket Casts Patron でチャプターのスキップやその他の機能を利用</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus でチャプターのスキップやその他の機能を利用</string>
     <string name="select_one_chapter_message">チャプターを少なくとも1つ選択してください</string>
@@ -25,10 +21,6 @@ Language: ja_JP
     <string name="number_of_chapters">%d個のチャプター</string>
     <string name="skip_chapters">チャプターをスキップ</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; の限定コンテンツを1年間聴取可能</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">コードを引き換える</string>
-    <string name="whats_new_slumber_studios_body_free_user">Plus の年間購読を開始すると、夢の実現に役立つポッドキャスト、Slumber Studios のコンテンツを1年間購読できます。 &lt;a href=\"https://slumberstudios.com/\"&gt;さらに詳しく&lt;/a&gt;。</string>
-    <string name="whats_new_slumber_studios_body">Plus の年間購読の一環として、Slumber Studios のコンテンツを1年間購読できます。コード %1$s をお使いください。 &lt;a href=\"https://slumberstudios.com/\"&gt;さらに詳しく&lt;/a&gt;。</string>
-    <string name="whats_new_slumber_studios_title">次年度以降の</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">夢は大きく</string>
     <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
     <string name="half_price_first_year">初年度は50% オフ</string>

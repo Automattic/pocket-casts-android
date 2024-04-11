@@ -23,11 +23,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
@@ -45,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -69,14 +73,18 @@ class ProfileFragment : BaseFragment() {
     private val viewModel: ProfileViewModel by viewModels()
 
     private var binding: FragmentProfileBinding? = null
-    private val sections = listOf(
+    private val sections = arrayListOf(
         SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_downloads, R.drawable.ic_profile_download, ProfileEpisodeListFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_files, R.drawable.ic_file, CloudFilesFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_starred, R.drawable.ic_starred, ProfileEpisodeListFragment::class.java),
         SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java),
         SettingsAdapter.Item(LR.string.settings_title_help, IR.drawable.ic_help, HelpFragment::class.java),
-    )
+    ).apply {
+        if (FeatureFlag.isEnabled(Feature.ACCOUNT_BOOKMARKS)) {
+            add(4, SettingsAdapter.Item(LR.string.bookmarks, IR.drawable.ic_bookmark, BookmarksContainerFragment::class.java))
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -143,6 +151,13 @@ class ProfileFragment : BaseFragment() {
                             }
                             else -> throw IllegalStateException("Unknown row")
                         }
+                        (activity as? FragmentHostListener)?.addFragment(fragment)
+                    }
+                    BookmarksContainerFragment::class.java -> {
+                        analyticsTracker.track(AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN)
+                        val fragment = BookmarksContainerFragment.newInstance(
+                            sourceView = SourceView.PROFILE,
+                        )
                         (activity as? FragmentHostListener)?.addFragment(fragment)
                     }
                     HelpFragment::class.java -> {

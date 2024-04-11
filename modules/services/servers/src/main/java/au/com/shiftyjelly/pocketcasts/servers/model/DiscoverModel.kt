@@ -64,6 +64,7 @@ data class DiscoverRow(
     @field:Json(name = "sponsored") val sponsored: Boolean = false,
     @field:Json(name = "curated") override val curated: Boolean = false,
     @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
+    @field:Json(name = "popular") val mostPopularCategoriesId: List<Int>?,
     val regionCode: String? = null,
 ) : NetworkLoadableList {
 
@@ -98,6 +99,7 @@ data class DiscoverRow(
             sponsored = sponsored,
             curated = curated,
             sponsoredPodcasts = sponsoredPodcasts,
+            mostPopularCategoriesId = mostPopularCategoriesId,
         )
     }
 }
