@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksInSearchView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
@@ -176,7 +177,6 @@ private fun BookmarksView(
                     text = state.searchText,
                     placeholder = stringResource(LR.string.search),
                     onTextChanged = onSearchTextChanged,
-                    onSearch = {},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -184,21 +184,28 @@ private fun BookmarksView(
                 )
             }
         }
-        item {
-            val title = stringResource(
-                id = if (state.bookmarks.size > 1) {
-                    LR.string.bookmarks_plural
-                } else {
-                    LR.string.bookmarks_singular
-                },
-                state.bookmarks.size,
-            )
+        if (state.searchEnabled &&
+            state.searchText.isNotEmpty() &&
+            state.bookmarks.isEmpty()
+        ) {
+            item { NoBookmarksInSearchView(onActionClick = { onSearchTextChanged("") }) }
+        } else {
+            item {
+                val title = stringResource(
+                    id = if (state.bookmarks.size > 1) {
+                        LR.string.bookmarks_plural
+                    } else {
+                        LR.string.bookmarks_singular
+                    },
+                    state.bookmarks.size,
+                )
 
-            HeaderRow(
-                title = title,
-                onOptionsMenuClicked = onOptionsMenuClicked,
-                style = state.headerRowColors,
-            )
+                HeaderRow(
+                    title = title,
+                    onOptionsMenuClicked = onOptionsMenuClicked,
+                    style = state.headerRowColors,
+                )
+            }
         }
         items(state.bookmarks, key = { it }) { bookmark ->
             val episode = state.bookmarkIdAndEpisodeMap[bookmark.uuid]
