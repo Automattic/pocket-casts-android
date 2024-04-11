@@ -79,7 +79,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        updatePlayButton(isPlaying = playing, animate = false)
+        if (changed) {
+            updatePlayButton(isPlaying = playing, animate = false)
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
