@@ -3,5 +3,6 @@
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="40dp"
     android:minHeight="40dp"
+    android:previewImage="@drawable/widget_player_small_preview"
     android:targetCellWidth="1"
     android:targetCellHeight="1" />
