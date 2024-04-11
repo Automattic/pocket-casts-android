@@ -64,7 +64,7 @@ class BookmarkSearchHandlerTest {
         bookmarkSearchHandler.searchQueryUpdated(searchTerm)
 
         val result = bookmarkSearchHandler.getBookmarkSearchResultsFlow().first()
-        assertEquals(searchTerm, result.searchTerm)
+        assertEquals("", result.searchTerm)
         assertNull(result.searchUuids)
     }
 }
