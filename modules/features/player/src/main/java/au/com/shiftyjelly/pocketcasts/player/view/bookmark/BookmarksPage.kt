@@ -177,7 +177,7 @@ private fun BookmarksView(
             )
         }
         items(state.bookmarks, key = { it }) { bookmark ->
-            val episode = state.episodes.firstOrNull { bookmark.episodeUuid == it.uuid }
+            val episode = state.bookmarkIdAndEpisodeMap[bookmark.uuid]
             BookmarkRow(
                 bookmark = bookmark.copy(episodeTitle = episode?.title ?: ""),
                 episode = episode,
@@ -223,7 +223,8 @@ private fun BookmarksPreview(
                         title = "Funny bit",
                     ),
                 ),
-                episodes = listOf(
+                bookmarkIdAndEpisodeMap = mapOf(
+                    UUID.randomUUID().toString() to
                     PodcastEpisode(
                         uuid = "",
                         publishedDate = Date(),

@@ -174,10 +174,13 @@ class BookmarksViewModel
                 UiState.Empty(sourceView)
             } else {
                 val episodes = episode?.let { listOf(it) }
-                    ?: episodeManager.findEpisodesByUuids(bookmarks.map { it.episodeUuid })
+                    ?: episodeManager.findEpisodesByUuids(bookmarks.map { it.episodeUuid }.distinct())
+                val bookmarkIdAndEpisodeMap = bookmarks.associate { bookmark ->
+                    bookmark.uuid to episodes.firstOrNull { it.uuid == bookmark.episodeUuid }
+                }
                 UiState.Loaded(
                     bookmarks = bookmarks,
-                    episodes = episodes,
+                    bookmarkIdAndEpisodeMap = bookmarkIdAndEpisodeMap,
                     isMultiSelecting = isMultiSelecting,
                     useEpisodeArtwork = useEpisodeArtwork,
                     isSelected = { selectedBookmark ->
@@ -350,7 +353,7 @@ class BookmarksViewModel
         object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),
-            val episodes: List<BaseEpisode>,
+            val bookmarkIdAndEpisodeMap: Map<String, BaseEpisode?>,
             val isMultiSelecting: Boolean,
             val useEpisodeArtwork: Boolean,
             val isSelected: (Bookmark) -> Boolean,
