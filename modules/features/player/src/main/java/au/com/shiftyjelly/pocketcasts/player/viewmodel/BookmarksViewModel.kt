@@ -178,7 +178,7 @@ class BookmarksViewModel
                 UiState.Empty(sourceView)
             } else {
                 val searchText = (_uiState.value as? UiState.Loaded)?.searchText ?: ""
-                val filteredBookmarks = if (searchText.isNotEmpty()) {
+                val filteredBookmarks = if (searchResults.searchTerm.isNotEmpty()) {
                     bookmarks.filter { bookmark -> searchResults.searchUuids?.contains(bookmark.uuid) == true }
                 } else {
                     bookmarks
@@ -201,7 +201,7 @@ class BookmarksViewModel
                     sourceView = sourceView,
                     showIcon = sourceView == SourceView.PROFILE,
                     searchEnabled = sourceView == SourceView.PROFILE,
-                    searchText = searchResults.searchTerm,
+                    searchText = searchText,
                 )
             }
         }.stateIn(viewModelScope)
@@ -289,7 +289,7 @@ class BookmarksViewModel
     fun onSearchTextChanged(searchText: String) {
         (uiState.value as? UiState.Loaded)?.let {
             _uiState.value = it.copy(searchText = searchText)
-            bookmarkSearchHandler.searchQueryUpdated(searchText)
+            bookmarkSearchHandler.searchQueryUpdated(searchText.trim())
         }
     }
 
