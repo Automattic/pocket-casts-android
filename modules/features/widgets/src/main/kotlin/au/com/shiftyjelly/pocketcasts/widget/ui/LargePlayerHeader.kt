@@ -60,12 +60,12 @@ internal fun LargePlayerHeader(
             Text(
                 text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
                 maxLines = 1,
-                style = TextStyle(color = secondaryTextColor, fontSize = 14.sp),
+                style = TextStyle(color = secondaryTextColor, fontSize = 13.sp),
             )
             Text(
                 text = episode?.title ?: LocalContext.current.getString(LR.string.widget_no_episode_playing),
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 15.sp, fontWeight = FontWeight.Bold),
             )
             Spacer(
                 modifier = GlanceModifier.height(4.dp),
@@ -73,7 +73,7 @@ internal fun LargePlayerHeader(
             Text(
                 text = episode?.getTimeLeft(LocalContext.current) ?: " ",
                 maxLines = 1,
-                style = TextStyle(color = secondaryTextColor, fontSize = 14.sp),
+                style = TextStyle(color = secondaryTextColor, fontSize = 13.sp),
             )
             PlaybackControls(
                 isPlaying = state.isPlaying,
