@@ -42,36 +42,46 @@
             app:layout_constraintWidth_max="192dp"
             tools:src="@tools:sample/avatars" />
 
+        <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
+            android:id="@+id/videoView"
+            android:layout_width="wrap_content"
+            android:layout_height="192dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/artworkStartBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="true"
+            app:barrierAllowsGoneWidgets="false"
             app:barrierDirection="start"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
+            app:constraint_referenced_ids="artwork,chapterArtwork,videoView" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/artworkTopBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:barrierAllowsGoneWidgets="false"
             app:barrierDirection="top"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
+            app:constraint_referenced_ids="artwork,chapterArtwork,videoView" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/artworkEndBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="true"
+            app:barrierAllowsGoneWidgets="false"
             app:barrierDirection="end"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
+            app:constraint_referenced_ids="artwork,chapterArtwork,videoView" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/artworkBottomBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="true"
+            app:barrierAllowsGoneWidgets="false"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
+            app:constraint_referenced_ids="artwork,chapterArtwork,videoView" />
 
         <FrameLayout
             android:id="@+id/chapterUrl"
@@ -97,15 +107,6 @@
                 android:src="@drawable/ic_link" />
 
         </FrameLayout>
-
-        <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
-            android:id="@+id/videoView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/artworkBottomBarrier"
-            app:layout_constraintEnd_toEndOf="@id/artworkEndBarrier"
-            app:layout_constraintStart_toStartOf="@id/artworkStartBarrier"
-            app:layout_constraintTop_toTopOf="@id/artworkTopBarrier" />
 
         <TextView
             android:id="@+id/episodeTitle"
