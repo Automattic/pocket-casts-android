@@ -39,7 +39,7 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
             )
 
             Spacer(
-                modifier = GlanceModifier.width(16.dp),
+                modifier = GlanceModifier.width(15.dp),
             )
             Column(
                 verticalAlignment = Alignment.Vertical.Top,

@@ -59,7 +59,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                     Text(
                         text = LocalContext.current.getString(LR.string.widget_nothing_in_up_next),
                         maxLines = 1,
-                        style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                        style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 15.sp, fontWeight = FontWeight.Bold),
                     )
                     Spacer(
                         modifier = GlanceModifier.height(4.dp),
@@ -67,7 +67,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                     Text(
                         text = LocalContext.current.getString(LR.string.widget_check_out_discover),
                         maxLines = 1,
-                        style = TextStyle(color = secondaryTextColor, fontSize = 14.sp),
+                        style = TextStyle(color = secondaryTextColor, fontSize = 13.sp),
                     )
                 }
             }
