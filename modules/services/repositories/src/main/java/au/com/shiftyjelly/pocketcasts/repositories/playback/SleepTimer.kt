@@ -29,7 +29,8 @@ class SleepTimer @Inject constructor(
         private var lastTimeHasFinishedInMillis: Long = 0
         private var lastEpisodeUuidAutomaticEnded: String? = null
         private const val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5
-        private const val TIME_IN_SECOND_KEY = "time"
+        private const val TIME_KEY = "time"
+        private const val END_OF_EPISODE_VALUE = "end_of_episode"
     }
 
     fun sleepAfter(mins: Int, onSuccess: () -> Unit) {
@@ -61,11 +62,9 @@ class SleepTimer @Inject constructor(
 
         if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
             onRestartSleepOnEpisodeEnd()
+            analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
         } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != 0 && !isSleepTimerRunning) {
-            analyticsTracker.track(
-                PLAYER_SLEEP_TIMER_RESTARTED,
-                mapOf(TIME_IN_SECOND_KEY to lastSleepAfterTimeInMinutes * 60), // Convert to seconds
-            )
+            analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to lastSleepAfterTimeInMinutes * 60)) // Convert to seconds
             sleepAfter(lastSleepAfterTimeInMinutes, onRestartSleepAfterTime)
         }
     }
