@@ -32,8 +32,9 @@ private val DefaultColors = ColorProviders(
         primaryContainer = Color(0xFFF43E37),
         onPrimaryContainer = Color(0xFFF8FAF6),
         inversePrimary = UndefinedColor,
-        secondary = UndefinedColor,
-        onSecondary = UndefinedColor,
+        // Used as a trick to have different small player placeholder colors.
+        secondary = Color(0xFFF43E37),
+        onSecondary = Color(0xFFF8FAF6),
         secondaryContainer = UndefinedColor,
         // Used as a trick to have alpha on secondary texts with non dynamic themes.
         onSecondaryContainer = Color(0xCCF8FAF6),
@@ -43,7 +44,7 @@ private val DefaultColors = ColorProviders(
         onTertiaryContainer = UndefinedColor,
         background = UndefinedColor,
         onBackground = UndefinedColor,
-        // Used as a trick to have different button color for small widget with non dynamic themes in dark mode.
+        // Used as a trick to have different small player button colors for small widget with non dynamic themes in dark mode.
         surface = Color(0xFFF8FAF6),
         onSurface = Color(0xFFF43E37),
         surfaceVariant = UndefinedColor,
@@ -65,8 +66,9 @@ private val DefaultColors = ColorProviders(
         primaryContainer = Color(0xFF292B2E),
         onPrimaryContainer = Color(0xFFFFFFFF),
         inversePrimary = UndefinedColor,
-        secondary = UndefinedColor,
-        onSecondary = UndefinedColor,
+        // Used as a trick to have different small player placeholder colors.
+        secondary = Color(0xFFD9201C),
+        onSecondary = Color(0xFFFFFFFF),
         secondaryContainer = UndefinedColor,
         // Used as a trick to have alpha on secondary texts with non dynamic themes.
         onSecondaryContainer = Color(0xCCFFFFFF),
@@ -76,7 +78,7 @@ private val DefaultColors = ColorProviders(
         onTertiaryContainer = UndefinedColor,
         background = UndefinedColor,
         onBackground = UndefinedColor,
-        // Used as a trick to have different button color for small widget with non dynamic themes.
+        // Used as a trick to have different small player button colors for small widget with non dynamic themes.
         surface = Color(0xFFF8FAF6),
         onSurface = Color(0xFFD9201C),
         surfaceVariant = UndefinedColor,

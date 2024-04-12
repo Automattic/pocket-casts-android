@@ -10,7 +10,6 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.clickable
 import androidx.glance.layout.Box
-import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -18,10 +17,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 internal fun PocketCastsLogo(
     size: Dp = 28.dp,
-    modifier: GlanceModifier = GlanceModifier,
 ) {
     Box(
-        modifier = modifier
+        modifier = GlanceModifier
             .size(size)
             .clickable(OpenPocketCastsAction.action()),
     ) {
@@ -35,7 +33,7 @@ internal fun PocketCastsLogo(
             provider = ImageProvider(IR.drawable.ic_logo_foreground),
             contentDescription = null,
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.size(size).padding(size / 8),
+            modifier = GlanceModifier.size(size),
         )
     }
 }

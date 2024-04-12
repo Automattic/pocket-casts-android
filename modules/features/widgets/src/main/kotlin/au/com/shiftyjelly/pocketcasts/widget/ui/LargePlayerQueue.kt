@@ -6,7 +6,6 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
-import androidx.glance.action.clickable
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.layout.Alignment
@@ -17,11 +16,9 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 
 @Composable
@@ -51,9 +48,7 @@ internal fun LargePlayerQueue(
                 EpisodeImage(
                     episode = episode,
                     useEpisodeArtwork = useEpisodeArtwork,
-                    modifier = GlanceModifier
-                        .size(58.dp)
-                        .clickable(OpenEpisodeDetailsAction.action(episode.uuid)),
+                    size = 58.dp,
                 )
                 Column(
                     verticalAlignment = Alignment.CenterVertically,
@@ -64,9 +59,10 @@ internal fun LargePlayerQueue(
                         maxLines = 2,
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimaryContainer,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                         ),
+                        modifier = GlanceModifier.padding(end = 16.dp),
                     )
                     Spacer(
                         modifier = GlanceModifier.height(2.dp),
@@ -76,13 +72,11 @@ internal fun LargePlayerQueue(
                         maxLines = 1,
                         style = TextStyle(
                             color = secondaryTextColor,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                         ),
+                        modifier = GlanceModifier.padding(end = 16.dp),
                     )
                 }
-                Spacer(
-                    modifier = GlanceModifier.width(16.dp),
-                )
                 PlayButton(episode = episode)
             }
         }
