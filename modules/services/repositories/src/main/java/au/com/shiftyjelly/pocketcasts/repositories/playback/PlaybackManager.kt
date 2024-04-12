@@ -129,6 +129,7 @@ open class PlaybackManager @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
     private val chapterManager: ChapterManager,
+    private val sleepTimer: SleepTimer,
     bookmarkFeature: BookmarkFeatureControl,
     private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -2046,6 +2047,10 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
+
+        sleepTimer.restartSleepTimerIfApplies {
+            updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+        }
 
         trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, sourceView)
     }

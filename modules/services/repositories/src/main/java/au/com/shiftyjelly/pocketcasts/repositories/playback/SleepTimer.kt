@@ -20,6 +20,9 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
 
     companion object {
         private var sleepTimeMs: Long? = null
+        private var lastSleepAfterTime: Int = 0
+        private var lastTimeHasFinished: Long = 0
+        private const val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5
     }
 
     fun sleepAfter(mins: Int, onSuccess: () -> Unit) {
@@ -28,6 +31,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             add(Calendar.MINUTE, mins)
         }
         if (createAlarm(time.timeInMillis)) {
+            lastSleepAfterTime = mins
             onSuccess()
         }
     }
@@ -42,6 +46,16 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             add(Calendar.MINUTE, mins)
         }
         createAlarm(time.timeInMillis)
+    }
+    fun restartSleepTimerIfApplies(onSuccess: () -> Unit) {
+        val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinished
+        val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
+
+        if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != 0) {
+            sleepAfter(lastSleepAfterTime, onSuccess)
+        } else {
+            cancelAutomaticSleepTimerRestart()
+        }
     }
 
     private fun createAlarm(timeMs: Long): Boolean {
@@ -61,6 +75,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             return try {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
                 sleepTimeMs = timeMs
+                lastTimeHasFinished = timeMs
                 true
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
@@ -71,7 +86,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
 
     fun cancelTimer() {
         getAlarmManager().cancel(getSleepIntent())
-        sleepTimeMs = null
+        cleanUpSleepTimer()
     }
 
     val isRunning: Boolean
@@ -82,7 +97,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
 
         val timeLeft = sleepTimeMs - System.currentTimeMillis()
         if (timeLeft < 0) {
-            SleepTimer.sleepTimeMs = null
+            cleanUpSleepTimer()
             return null
         }
         return (timeLeft / DateUtils.SECOND_IN_MILLIS).toInt()
@@ -95,5 +110,14 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
 
     private fun getAlarmManager(): AlarmManager {
         return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    }
+
+    private fun cleanUpSleepTimer() {
+        sleepTimeMs = null
+        cancelAutomaticSleepTimerRestart()
+    }
+    private fun cancelAutomaticSleepTimerRestart() {
+        lastSleepAfterTime = 0
+        lastTimeHasFinished = 0
     }
 }
