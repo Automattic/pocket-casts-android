@@ -27,6 +27,7 @@ class SleepTimer @Inject constructor(
         private var sleepTimeMs: Long? = null
         private var lastSleepAfterTimeInMinutes: Int = 0
         private var lastTimeHasFinishedInMillis: Long = 0
+        private var lastEpisodeUuidAutomaticEnded: String? = null
         private const val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5
         private const val TIME_IN_SECOND_KEY = "time"
     }
@@ -38,6 +39,7 @@ class SleepTimer @Inject constructor(
         }
         if (createAlarm(time.timeInMillis)) {
             lastSleepAfterTimeInMinutes = mins
+            cancelAutomaticSleepOnEpisodeEndRestart()
             onSuccess()
         }
     }
@@ -53,19 +55,24 @@ class SleepTimer @Inject constructor(
         }
         createAlarm(time.timeInMillis)
     }
-    fun restartSleepTimerIfApplies(onSuccess: () -> Unit) {
+    suspend fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: suspend () -> Unit) {
         val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinishedInMillis
         val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
 
-        if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != 0) {
+        if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
+            onRestartSleepOnEpisodeEnd()
+        } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != 0 && !isSleepTimerRunning) {
             analyticsTracker.track(
                 PLAYER_SLEEP_TIMER_RESTARTED,
                 mapOf(TIME_IN_SECOND_KEY to lastSleepAfterTimeInMinutes * 60), // Convert to seconds
             )
-            sleepAfter(lastSleepAfterTimeInMinutes, onSuccess)
-        } else {
-            cancelAutomaticSleepTimerRestart()
+            sleepAfter(lastSleepAfterTimeInMinutes, onRestartSleepAfterTime)
         }
+    }
+    fun sleepTimerWasTriggeredForEndOfEpisode(uuid: String?) {
+        lastEpisodeUuidAutomaticEnded = uuid
+        lastTimeHasFinishedInMillis = System.currentTimeMillis()
+        cancelAutomaticSleepAfterTimeRestart()
     }
 
     private fun createAlarm(timeMs: Long): Boolean {
@@ -124,10 +131,13 @@ class SleepTimer @Inject constructor(
 
     private fun cleanUpSleepTimer() {
         sleepTimeMs = null
-        cancelAutomaticSleepTimerRestart()
+        cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnEpisodeEndRestart()
     }
-    private fun cancelAutomaticSleepTimerRestart() {
+    private fun cancelAutomaticSleepAfterTimeRestart() {
         lastSleepAfterTimeInMinutes = 0
-        lastTimeHasFinishedInMillis = 0
+    }
+    private fun cancelAutomaticSleepOnEpisodeEndRestart() {
+        lastEpisodeUuidAutomaticEnded = null
     }
 }

@@ -1428,6 +1428,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun sleep(episode: BaseEpisode?) {
+        sleepTimer.sleepTimerWasTriggeredForEndOfEpisode(episode?.uuid)
         sleepAfterEpisode = false
 
         withContext(Dispatchers.Main) {
@@ -2048,9 +2049,16 @@ open class PlaybackManager @Inject constructor(
 
         player?.play(currentTimeMs)
 
-        sleepTimer.restartSleepTimerIfApplies {
-            updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
-        }
+        sleepTimer.restartSleepTimerIfApplies(
+            currentEpisodeUuid = episode.uuid,
+            isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
+            onRestartSleepAfterTime = {
+                updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+            },
+            onRestartSleepOnEpisodeEnd = {
+                updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+            },
+        )
 
         trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, sourceView)
     }
