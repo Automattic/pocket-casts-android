@@ -8,6 +8,8 @@ import android.os.Build
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.text.format.DateUtils
 import android.widget.Toast
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
@@ -16,13 +18,17 @@ import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
-class SleepTimer @Inject constructor(@ApplicationContext private val context: Context) {
+class SleepTimer @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    @ApplicationContext private val context: Context,
+) {
 
     companion object {
         private var sleepTimeMs: Long? = null
-        private var lastSleepAfterTime: Int = 0
-        private var lastTimeHasFinished: Long = 0
+        private var lastSleepAfterTimeInMinutes: Int = 0
+        private var lastTimeHasFinishedInMillis: Long = 0
         private const val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5
+        private const val TIME_IN_SECOND_KEY = "time"
     }
 
     fun sleepAfter(mins: Int, onSuccess: () -> Unit) {
@@ -31,7 +37,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             add(Calendar.MINUTE, mins)
         }
         if (createAlarm(time.timeInMillis)) {
-            lastSleepAfterTime = mins
+            lastSleepAfterTimeInMinutes = mins
             onSuccess()
         }
     }
@@ -48,11 +54,15 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
         createAlarm(time.timeInMillis)
     }
     fun restartSleepTimerIfApplies(onSuccess: () -> Unit) {
-        val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinished
+        val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinishedInMillis
         val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
 
-        if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != 0) {
-            sleepAfter(lastSleepAfterTime, onSuccess)
+        if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != 0) {
+            analyticsTracker.track(
+                PLAYER_SLEEP_TIMER_RESTARTED,
+                mapOf(TIME_IN_SECOND_KEY to lastSleepAfterTimeInMinutes * 60), // Convert to seconds
+            )
+            sleepAfter(lastSleepAfterTimeInMinutes, onSuccess)
         } else {
             cancelAutomaticSleepTimerRestart()
         }
@@ -75,7 +85,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             return try {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
                 sleepTimeMs = timeMs
-                lastTimeHasFinished = timeMs
+                lastTimeHasFinishedInMillis = timeMs
                 true
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
@@ -117,7 +127,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
         cancelAutomaticSleepTimerRestart()
     }
     private fun cancelAutomaticSleepTimerRestart() {
-        lastSleepAfterTime = 0
-        lastTimeHasFinished = 0
+        lastSleepAfterTimeInMinutes = 0
+        lastTimeHasFinishedInMillis = 0
     }
 }

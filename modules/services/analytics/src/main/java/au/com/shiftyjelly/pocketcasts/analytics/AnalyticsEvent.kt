@@ -323,6 +323,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
     PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
+    PLAYER_SLEEP_TIMER_RESTARTED("player_sleep_timer_restarted"),
 
     /* Player - Playback effects */
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
