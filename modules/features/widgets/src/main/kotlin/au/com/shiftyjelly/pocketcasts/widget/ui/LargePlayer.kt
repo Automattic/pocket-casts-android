@@ -7,6 +7,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
@@ -31,6 +32,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .height(350.dp)
+                .cornerRadius(6.dp)
                 .background(GlanceTheme.colors.primaryContainer)
                 .padding(16.dp),
         ) {
