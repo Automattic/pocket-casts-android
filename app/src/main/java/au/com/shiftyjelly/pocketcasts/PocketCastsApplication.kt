@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -26,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
 import com.google.firebase.FirebaseApp
@@ -47,12 +48,19 @@ import io.sentry.protocol.User
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -97,12 +105,14 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var syncManager: SyncManager
 
-    @Inject lateinit var widgetManager: WidgetManager
-
     @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
+
+    @Inject lateinit var playerWidgetManager: PlayerWidgetManager
+
+    @Inject lateinit var upNextDao: UpNextDao
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -259,14 +269,34 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
 
-        settings.useDynamicColorsForWidget.flow
-            .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
-            .launchIn(applicationScope)
-        settings.useEpisodeArtwork.flow
-            .onEach { widgetManager.updateWidgetRssArtwork(playbackManager) }
-            .launchIn(applicationScope)
+        keepPlayerWidgetsUpdated()
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
+    }
+
+    private fun keepPlayerWidgetsUpdated() {
+        settings.useEpisodeArtwork.flow
+            .onEach(playerWidgetManager::updateUseEpisodeArtwork)
+            .launchIn(applicationScope)
+        settings.useDynamicColorsForWidget.flow
+            .onEach(playerWidgetManager::updateUseDynamicColors)
+            .launchIn(applicationScope)
+        playbackManager.playbackStateRelay.asFlow()
+            .map { state -> state.isPlaying }
+            .distinctUntilChanged()
+            .onEach(playerWidgetManager::updateIsPlaying)
+            .launchIn(applicationScope)
+        val queueFlow = flow {
+            while (true) {
+                emit(upNextDao.findUpNextEpisodes(limit = 10))
+                // Emit every second to update playback durations
+                delay(1.seconds)
+            }
+        }
+        queueFlow
+            .distinctUntilChangedBy { queue -> queue.map { it.uuid to it.playedUpToMs } }
+            .onEach(playerWidgetManager::updateQueue)
+            .launchIn(applicationScope)
     }
 
     @Suppress("DEPRECATION")

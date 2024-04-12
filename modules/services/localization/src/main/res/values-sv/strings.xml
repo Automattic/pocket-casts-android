@@ -14,10 +14,6 @@ Language: sv_SE
     <string name="upgrade_to_patron">Uppgradera till Patron</string>
     <string name="upgrade_to_plus">Uppgradera till Plus</string>
     <string name="whats_new_got_it_button">Uppfattat</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Prenumerera på Patron nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Prenumerera på Plus nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_plus_message">Som en del av din Plus-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_patron_message">Som en del av din Patron-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
     <string name="skip_chapters_patron_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Välj minst ett kapitel</string>
@@ -27,10 +23,6 @@ Language: sv_SE
     <string name="number_of_chapters">%d kapitel</string>
     <string name="skip_chapters">Hoppa över kapitel</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 års exklusivt innehåll från &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Lös in din kod</string>
-    <string name="whats_new_slumber_studios_body_free_user">Prenumerera på Plus Yearly och få en 1-årig prenumeration på innehåll från Slumber Studios, podcasts utformade för ljuva drömmar. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Som en del av din Plus Yearly-prenumeration får du en 1-årig prenumeration på innehåll från Slumber Studios med koden %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_title">Dröm stort</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">efter ditt första år</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %s</string>
     <string name="half_price_first_year">50 % rabatt på ditt första år</string>
