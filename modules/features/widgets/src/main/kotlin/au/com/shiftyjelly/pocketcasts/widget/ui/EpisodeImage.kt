@@ -19,6 +19,8 @@ import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.cornerRadius
+import androidx.glance.background
 import androidx.glance.color.ColorProviders
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -57,13 +59,10 @@ internal fun EpisodeImage(
         contentAlignment = Alignment.Center,
         modifier = GlanceModifier
             .clickable(onClick(episode))
+            .background(backgroundColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.primary)
+            .cornerRadius(6.dp)
             .then(if (size != null) GlanceModifier.size(size) else GlanceModifier),
     ) {
-        Image(
-            provider = ImageProvider(IR.drawable.ic_rounded_square),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(backgroundColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.primary),
-        )
         Image(
             provider = ImageProvider(IR.drawable.ic_logo_background),
             contentDescription = null,
@@ -83,7 +82,7 @@ internal fun EpisodeImage(
     if (episode != null) {
         val context = LocalContext.current
         LaunchedEffect(episode.uuid, useEpisodeArtwork) {
-            val requestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 8).smallSize()
+            val requestFactory = PocketCastsImageRequestFactory(context).smallSize()
             val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
             var drawable: Drawable? = null
             while (drawable == null) {
