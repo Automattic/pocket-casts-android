@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 09:54:02+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="clear_search">清除搜索</string>
+    <string name="podcast_and_episode">播客与剧集</string>
+    <string name="skip_chapters">预选章节</string>
+    <string name="settings_use_episode_artwork_details">有些节目会为特定剧集定制插图。 启用此选项后，Pocket Casts 将显示剧集的插图，而非节目的插图。</string>
+    <string name="settings_use_episode_artwork">使用剧集插图</string>
+    <string name="episode_sort_title_z_a">标题 (Z-A)</string>
+    <string name="episode_sort_title_a_z">标题 (A-Z)</string>
     <string name="discover_most_popular_in">最受欢迎的 %s</string>
     <string name="discover_select_categories">选择一个分类</string>
     <string name="discover_all_categories">所有分类</string>
     <string name="upgrade_to_patron">升级至 Patron</string>
     <string name="upgrade_to_plus">升级至 Plus</string>
     <string name="whats_new_got_it_button">知道了</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">立即订阅 Patron，然后您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">立即订阅 Plus，然后您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
-    <string name="whats_new_deselect_chapters_plus_message">订阅 Plus 后，您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
-    <string name="whats_new_deselect_chapters_patron_message">订阅 Patron 后，您就能在任何支持相应功能的剧集中选择和跳过章节。</string>
-    <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受跳过章节等更多功能</string>
-    <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受跳过章节等更多功能</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">立即订阅 Patron，然后您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">立即订阅 Plus，然后您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
+    <string name="whats_new_deselect_chapters_plus_message">订阅 Plus 后，您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
+    <string name="whats_new_deselect_chapters_patron_message">订阅 Patron 后，您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
+    <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受预选章节等更多功能</string>
+    <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受预选章节等更多功能</string>
     <string name="select_one_chapter_message">请至少选择一个章节</string>
     <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 个章节 • %2$d 已隐藏</string>
     <string name="single_chapter">1 个章节</string>
     <string name="number_of_chapters">%d 个章节</string>
-    <string name="skip_chapters">跳过章节</string>
     <string name="onboarding_plus_feature_slumber_studios_title">由 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 提供的一年独家内容</string>
     <string name="whats_new_slumber_studios_redeem_now_button">兑换您的代码</string>
     <string name="whats_new_slumber_studios_body_free_user">订阅年度 Plus 并享受为期一年的 Slumber Studios 内容订阅，这是为实现最甜蜜的梦想而打造的播客。 &lt;a href=\"https://slumberstudios.com/\"&gt;了解更多&lt;/a&gt;。</string>

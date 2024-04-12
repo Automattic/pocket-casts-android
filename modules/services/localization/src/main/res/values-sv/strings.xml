@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-25 20:56:48+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="clear_search">Rensa sökning</string>
+    <string name="podcast_and_episode">Podcast och avsnitt</string>
+    <string name="skip_chapters">Förvalda kapitel</string>
+    <string name="settings_use_episode_artwork_details">Vissa shower har anpassade omslag för specifika avsnitt. Aktivera det här alternativet så visar Pocket Casts dem istället för showens omslag.</string>
+    <string name="settings_use_episode_artwork">Använd avsnittsomslag</string>
     <string name="episode_sort_title_z_a">Rubrik (Ö-A)</string>
     <string name="episode_sort_title_a_z">Rubrik (A–Ö)</string>
     <string name="discover_most_popular_in">Mest populärt i %s</string>
@@ -14,18 +19,17 @@ Language: sv_SE
     <string name="upgrade_to_patron">Uppgradera till Patron</string>
     <string name="upgrade_to_plus">Uppgradera till Plus</string>
     <string name="whats_new_got_it_button">Uppfattat</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Prenumerera på Patron nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Prenumerera på Plus nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_plus_message">Som en del av din Plus-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_patron_message">Som en del av din Patron-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="skip_chapters_patron_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Plus</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Prenumerera på Patron nu så att du kan välja och hoppa över kapitel automatiskt i avsnitt som stöder detta.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Prenumerera på Plus nu så att du kan välja och hoppa över kapitel automatiskt i avsnitt som stöder detta.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Som en del av din Plus-prenumeration kan du nu välja och hoppa över kapitel automatiskt i avsnitt som stöder detta.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Som en del av din Patron-prenumeration kan du nu välja och hoppa över kapitel automatiskt i avsnitt som stöder detta.</string>
+    <string name="skip_chapters_patron_prompt">Välj kapitel och mer i förväg med Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Välj kapitel och mer i förväg med Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Välj minst ett kapitel</string>
     <string name="number_of_chapters_summary_singular">1 kapitel • %d dolda</string>
     <string name="number_of_chapters_summary_plural">%1$d kapitel • %2$d dolda</string>
     <string name="single_chapter">1 kapitel</string>
     <string name="number_of_chapters">%d kapitel</string>
-    <string name="skip_chapters">Hoppa över kapitel</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 års exklusivt innehåll från &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Lös in din kod</string>
     <string name="whats_new_slumber_studios_body_free_user">Prenumerera på Plus Yearly och få en 1-årig prenumeration på innehåll från Slumber Studios, podcasts utformade för ljuva drömmar. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>

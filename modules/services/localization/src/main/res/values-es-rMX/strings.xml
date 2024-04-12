@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 17:54:03+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="clear_search">Borrar la búsqueda</string>
+    <string name="podcast_and_episode">Podcast y episodio</string>
+    <string name="skip_chapters">Preselección de capítulos</string>
+    <string name="settings_use_episode_artwork_details">Algunos programas disponen de carátulas personalizadas para determinados episodios. Activa esta opción y Pocket Casts las mostrará en lugar de la carátula del programa.</string>
+    <string name="settings_use_episode_artwork">Usar carátula del episodio</string>
+    <string name="episode_sort_title_z_a">Título (Z-A)</string>
+    <string name="episode_sort_title_a_z">Título (A-Z)</string>
     <string name="discover_most_popular_in">Los más populares en %s</string>
     <string name="discover_select_categories">Elegir categoría</string>
     <string name="discover_all_categories">Todas las categorías</string>
     <string name="upgrade_to_patron">Actualiza a Patron</string>
     <string name="upgrade_to_plus">Actualiza a Plus</string>
     <string name="whats_new_got_it_button">De acuerdo</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Suscríbete a Patron y podrás elegir y omitir capítulos en los episodios compatibles.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Suscríbete a Plus y podrás elegir y omitir capítulos en los episodios compatibles.</string>
-    <string name="whats_new_deselect_chapters_plus_message">Como parte de tu suscripción a Plus, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
-    <string name="whats_new_deselect_chapters_patron_message">Como parte de tu suscripción a Patron, ahora podrás elegir y omitir capítulos en los episodios compatibles.</string>
-    <string name="skip_chapters_patron_prompt">Omite capítulos y haz otros cambios con Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Omite capítulos y haz otros cambios con Pocket Casts Plus</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Suscríbete a Patron y podrás preseleccionar y omitir capítulos automáticamente en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Suscríbete a Plus y podrás preseleccionar y omitir capítulos automáticamente en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Como parte de tu suscripción a Plus, ahora podrás preseleccionar y omitir capítulos automáticamente en los episodios compatibles.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Como parte de tu suscripción a Patron, ahora podrás preseleccionar y omitir capítulos automáticamente en los episodios compatibles.</string>
+    <string name="skip_chapters_patron_prompt">Preselecciona capítulos y haz otros ajustes con Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Preselecciona capítulos y haz otros ajustes con Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Selecciona al menos un capítulo</string>
     <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
     <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d ocultos</string>
     <string name="single_chapter">1 capítulo</string>
     <string name="number_of_chapters">%d capítulos</string>
-    <string name="skip_chapters">Omitir capítulos</string>
     <string name="onboarding_plus_feature_slumber_studios_title">Un año de contenido exclusivo de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Canjea tu código</string>
     <string name="whats_new_slumber_studios_body_free_user">Suscríbete a Plus de forma anual y disfruta de un año de suscripción al contenido de Slumber Studios, podcasts diseñados para regalarte los más dulces sueños. &lt;a href=\"https://slumberstudios.com/\"&gt;Más información&lt;/a&gt;.</string>

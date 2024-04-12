@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 17:54:03+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="clear_search">Supprimer la recherche</string>
+    <string name="podcast_and_episode">Podcast et épisode</string>
+    <string name="skip_chapters">Présélectionner des chapitres</string>
+    <string name="settings_use_episode_artwork_details">Certaines émissions ont des illustrations personnalisées pour certains épisodes. Activez cette option et Pocket Casts les affichera à la place de l’illustration de l’émission.</string>
+    <string name="settings_use_episode_artwork">Utiliser l’illustration de l’épisode</string>
+    <string name="episode_sort_title_z_a">Titre (Z-A)</string>
+    <string name="episode_sort_title_a_z">Titre (A-Z)</string>
     <string name="discover_most_popular_in">Les plus populaires dans %s</string>
     <string name="discover_select_categories">Sélectionner une catégorie</string>
     <string name="discover_all_categories">Toutes les catégories</string>
     <string name="upgrade_to_patron">Mettre à niveau vers Patron</string>
     <string name="upgrade_to_plus">Mettre à niveau vers Plus</string>
     <string name="whats_new_got_it_button">J’ai compris</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Abonnez-vous à Patron dès maintenant pour pouvoir sélectionner et passer des chapitres dans n’importe quel épisode qui en comporte.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Abonnez-vous à Plus dès maintenant pour pouvoir sélectionner et passer des chapitres dans n’importe quel épisode qui en comporte.</string>
-    <string name="whats_new_deselect_chapters_plus_message">Dans le cadre de votre abonnement Plus, vous pouvez maintenant sélectionner et passer des chapitres dans n’importe quel épisode qui en comporte.</string>
-    <string name="whats_new_deselect_chapters_patron_message">Dans le cadre de votre abonnement Patron, vous pouvez maintenant sélectionner et passer des chapitres dans n’importe quel épisode qui en comporte.</string>
-    <string name="skip_chapters_patron_prompt">Passer des chapitres et plus encore avec Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Passer des chapitres et plus encore avec Pocket Casts Plus</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Abonnez-vous à Patron dès maintenant pour pouvoir présélectionner et passer automatiquement des chapitres dans n’importe quel épisode qui en comporte.</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Abonnez-vous à Plus dès maintenant pour pouvoir présélectionner et passer automatiquement des chapitres dans n’importe quel épisode qui en comporte.</string>
+    <string name="whats_new_deselect_chapters_plus_message">Dans le cadre de votre abonnement Plus, vous pouvez maintenant présélectionner et passer automatiquement des chapitres dans n’importe quel épisode qui en comporte.</string>
+    <string name="whats_new_deselect_chapters_patron_message">Dans le cadre de votre abonnement Patron, vous pouvez maintenant présélectionner et passer automatiquement des chapitres dans n’importe quel épisode qui en comporte.</string>
+    <string name="skip_chapters_patron_prompt">Présélectionner des chapitres et plus encore avec Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Présélectionner des chapitres et plus encore avec Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Veuillez sélectionner au moins un chapitre</string>
     <string name="number_of_chapters_summary_singular">1 chapitre • %d masqué</string>
     <string name="number_of_chapters_summary_plural">%1$d chapitres • %2$d masqués</string>
     <string name="single_chapter">1 chapitre</string>
     <string name="number_of_chapters">%d chapitres</string>
-    <string name="skip_chapters">Sauter les chapitres</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 an de contenu exclusif de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Échanger votre code</string>
     <string name="whats_new_slumber_studios_body_free_user">Abonnez-vous à Plus Yearly et profitez d’un abonnement d’un an au contenu de Slumber Studios, des podcasts conçus pour vous emmener dans les bras de Morphée. &lt;a href=\"https://slumberstudios.com/\"&gt;Lire la suite&lt;/a&gt;.</string>

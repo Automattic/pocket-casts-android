@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 11:54:03+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="clear_search">Suche löschen</string>
+    <string name="podcast_and_episode">Podcast &amp; Folge</string>
+    <string name="skip_chapters">Kapitel vorauswählen</string>
+    <string name="settings_use_episode_artwork_details">Für manche Shows stehen für bestimmte Folgen individuelle Cover zur Verfügung. Aktiviere diese Option, damit Pocket Casts diese anstelle des Show-Covers anzeigt.</string>
+    <string name="settings_use_episode_artwork">Cover der Folge verwenden</string>
+    <string name="episode_sort_title_z_a">Titel (Z–A)</string>
+    <string name="episode_sort_title_a_z">Titel (A–Z)</string>
     <string name="discover_most_popular_in">Am Beliebtesten in %s</string>
     <string name="discover_select_categories">Kategorie auswählen</string>
     <string name="discover_all_categories">Alle Kategorien</string>
     <string name="upgrade_to_patron">Upgrade auf Patron durchführen </string>
     <string name="upgrade_to_plus">Upgrade auf Plus durchführen</string>
     <string name="whats_new_got_it_button">Verstanden</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Abonniere Patron jetzt, damit du in jeder Folge Kapitel auswählen und überspringen kannst (falls unterstützt).</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Abonniere Plus jetzt, damit du in jeder Folge Kapitel auswählen und überspringen kannst (falls unterstützt).</string>
-    <string name="whats_new_deselect_chapters_plus_message">Als Teil deines Plus-Abonnements kannst du nun in jeder Folge Kapitel auswählen und überspringen kannst (falls unterstützt).</string>
-    <string name="whats_new_deselect_chapters_patron_message">Als Teil deines Patron-Abonnements kannst du nun in jeder Folge Kapitel auswählen und überspringen kannst (falls unterstützt).</string>
-    <string name="skip_chapters_patron_prompt">Überspringe Kapitel und mehr mit Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Überspringe Kapitel und mehr mit Pocket Casts Plus</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Abonniere Patron jetzt, damit du in jeder Folge Kapitel vorauswählen und automatisch überspringen kannst (falls unterstützt).</string>
+    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Abonniere Plus jetzt, damit du in jeder Folge Kapitel vorauswählen und automatisch überspringen kannst (falls unterstützt).</string>
+    <string name="whats_new_deselect_chapters_plus_message">Als Teil deines Plus-Abonnements kannst du nun in jeder Folge Kapitel vorauswählen und automatisch überspringen (falls unterstützt).</string>
+    <string name="whats_new_deselect_chapters_patron_message">Als Teil deines Patron-Abonnements kannst du nun in jeder Folge Kapitel vorauswählen und automatisch überspringen (falls unterstützt).</string>
+    <string name="skip_chapters_patron_prompt">Kapitel vorauswählen und mehr mit Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Kapitel vorauswählen und mehr mit Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Bitte wähle mindestens ein Kapitel aus</string>
     <string name="number_of_chapters_summary_singular">1 Kapitel • %d versteckt</string>
     <string name="number_of_chapters_summary_plural">%1$d Kapitel • %2$d versteckt</string>
     <string name="single_chapter">1 Kapitel</string>
     <string name="number_of_chapters">%d Kapitel</string>
-    <string name="skip_chapters">Kapitel überspringen</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 Jahr exklusive Inhalte von &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="whats_new_slumber_studios_redeem_now_button">Code einlösen</string>
     <string name="whats_new_slumber_studios_body_free_user">Abonniere das Plus-Jahresabonnement und erhalte ein 1-Jahres-Abonnement für Slumber Studios-Inhalte, die Podcasts für süße Träume. &lt;a href=\"https://slumberstudios.com/\"&gt;Weitere Informationen&lt;/a&gt;.</string>
