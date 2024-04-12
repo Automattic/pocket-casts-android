@@ -13,6 +13,7 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
+import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
@@ -65,7 +66,12 @@ internal fun LargePlayerHeader(
             Text(
                 text = episode?.title ?: LocalContext.current.getString(LR.string.widget_no_episode_playing),
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(
+                    color = GlanceTheme.colors.onPrimaryContainer,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                modifier = GlanceModifier.padding(end = 16.dp),
             )
             Spacer(
                 modifier = GlanceModifier.height(4.dp),
@@ -83,10 +89,6 @@ internal fun LargePlayerHeader(
                 modifier = GlanceModifier.height(4.dp),
             )
         }
-
-        Spacer(
-            modifier = GlanceModifier.width(16.dp),
-        )
         PocketCastsLogo()
     }
 }
