@@ -5,6 +5,8 @@
         ([#2022](https://github.com/Automattic/pocket-casts-android/pull/2022))
     *   Add profile bookmark screen where all user bookmarks can be managed
         ([#2037](https://github.com/Automattic/pocket-casts-android/pull/2037))
+    *   Sleep Timer restarts automatically if you play again within 5 minutes
+        ([#2048](https://github.com/Automattic/pocket-casts-android/pull/2048))
 *   Updates:
     *   Updated widget and added two new variants - small and large.
         ([#2043](https://github.com/Automattic/pocket-casts-android/pull/2043))
