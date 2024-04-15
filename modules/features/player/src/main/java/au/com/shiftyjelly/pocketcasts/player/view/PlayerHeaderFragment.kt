@@ -216,20 +216,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
             }
 
-            binding.podcastTitle?.let { podcastTitle ->
-                podcastTitle.setOnClickListener {
-                    val podcastUuid = headerViewModel.podcastUuid ?: return@setOnClickListener
-                    analyticsTracker.track(
-                        AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
-                        mapOf(
-                            AnalyticsProp.Key.EPISODE_UUID to headerViewModel.episodeUuid,
-                            AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
-                        ),
-                    )
-                    (activity as? FragmentHostListener)?.let { listener ->
-                        listener.closePlayer()
-                        listener.openPodcastPage(podcastUuid)
-                    }
+            binding.podcastTitle.setOnClickListener {
+                val podcastUuid = headerViewModel.podcastUuid ?: return@setOnClickListener
+                analyticsTracker.track(
+                    AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+                    mapOf(
+                        AnalyticsProp.Key.EPISODE_UUID to headerViewModel.episodeUuid,
+                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+                    ),
+                )
+                (activity as? FragmentHostListener)?.let { listener ->
+                    listener.closePlayer()
+                    listener.openPodcastPage(podcastUuid)
                 }
             }
 
@@ -297,8 +295,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
             binding.videoView.isVisible = headerViewModel.isVideoVisible()
             binding.episodeTitle.text = headerViewModel.title
-            binding.podcastTitle?.text = headerViewModel.podcastTitle
-            binding.podcastTitle?.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
+            binding.podcastTitle.text = headerViewModel.podcastTitle
+            binding.podcastTitle.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
             binding.chapterSummary.text = headerViewModel.chapterSummary
             binding.chapterSummary.isVisible = headerViewModel.isChaptersPresent
             binding.previousChapter.alpha = if (headerViewModel.isFirstChapter) 0.5f else 1f

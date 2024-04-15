@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ProfileBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -95,6 +96,48 @@ abstract class BookmarkDao {
     abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 
     @Query(
+        """SELECT *
+            FROM bookmarks
+            WHERE deleted = :deleted
+            ORDER BY 
+            CASE WHEN :isAsc = 1 THEN created_at END ASC, 
+            CASE WHEN :isAsc = 0 THEN created_at END DESC""",
+    )
+    abstract fun findAllBookmarksOrderByCreatedAtFlow(
+        isAsc: Boolean,
+        deleted: Boolean = false,
+    ): Flow<List<Bookmark>>
+
+    // Sorts the array by podcast name, episodes release date, and the bookmarks timestamp
+    @Query(
+        """SELECT 
+              bookmarks.*, 
+              podcasts.title as podcastTitle, 
+              podcast_episodes.title as episodeTitle, 
+              podcast_episodes.published_date as publishedDate 
+            FROM 
+              bookmarks 
+              LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+              LEFT JOIN podcasts ON bookmarks.podcast_uuid = podcasts.uuid 
+            WHERE 
+              deleted = :deleted 
+            ORDER BY 
+              CASE WHEN podcasts.title is NULL then 1 else 0 end, 
+              (CASE
+                  WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
+                  WHEN UPPER(podcasts.title) LIKE 'A %' THEN SUBSTR(UPPER(podcasts.title), 3)
+                  WHEN UPPER(podcasts.title) LIKE 'AN %' THEN SUBSTR(UPPER(podcasts.title), 4)
+                  ELSE UPPER(podcasts.title)
+              END) ASC, 
+              podcast_episodes.published_date DESC, 
+              bookmarks.time ASC
+        """,
+    )
+    abstract fun findAllBookmarksByOrderPodcastAndEpisodeFlow(
+        deleted: Boolean = false,
+    ): Flow<List<ProfileBookmark>>
+
+    @Query(
         """SELECT bookmarks.*
             FROM bookmarks
             LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
@@ -104,6 +147,25 @@ abstract class BookmarkDao {
     )
     abstract suspend fun searchInPodcastByTitle(
         podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
+
+    @Query(
+        """
+        SELECT 
+          bookmarks.* 
+        FROM 
+          bookmarks 
+          LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+        WHERE 
+          (
+            UPPER(bookmarks.title) LIKE UPPER(:title) 
+            OR UPPER(podcast_episodes.title) LIKE UPPER(:title)
+          ) 
+          AND deleted = :deleted""",
+    )
+    abstract suspend fun searchByBookmarkOrEpisodeTitle(
         title: String,
         deleted: Boolean = false,
     ): List<Bookmark>

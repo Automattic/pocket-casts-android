@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -53,6 +55,7 @@ class DiscoverViewModel @Inject constructor(
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
     private var replacements = emptyMap<String, String>()
+    private var adsForCategoryView = emptyList<DiscoverRow>()
     private var isFragmentChangingConfigurations: Boolean = false
 
     fun onShown() {
@@ -66,7 +69,12 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadData(resources: Resources) {
-        val feed = repository.getDiscoverFeed()
+        val feed =
+            if (FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
+                repository.getDiscoverFeedWithCategoriesAtTheTop()
+            } else {
+                repository.getDiscoverFeed()
+            }
 
         feed.toFlowable()
             .subscribeBy(
@@ -91,6 +99,9 @@ class DiscoverViewModel @Inject constructor(
                     // Update the list with the correct region substituted in where needed
                     val updatedList = it.layout.transformWithRegion(region, replacements, resources)
 
+                    // Save ads to display in category view
+                    adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
+
                     state.postValue(DiscoverState.DataLoaded(updatedList, region, it.regions.values.toList()))
                 },
                 onError = { throwable ->
@@ -102,7 +113,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
-        settings.discoverCountryCode.set(region.code, needsSync = false)
+        settings.discoverCountryCode.set(region.code, updateModifiedAt = false)
         currentRegionCode = region.code
         loadData(resources)
     }
@@ -297,6 +308,9 @@ class DiscoverViewModel @Inject constructor(
 
     fun stopPlayback() {
         playbackManager.stopAsync(sourceView = sourceView)
+    }
+    fun getAdForCategoryView(categoryInt: Int): DiscoverRow? {
+        return adsForCategoryView.firstOrNull { it.categoryId == categoryInt }
     }
 }
 

@@ -16,6 +16,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_PLAY_TAPPED("bookmark_play_tapped"),
     BOOKMARKS_SORT_BY_CHANGED("bookmarks_sort_by_changed"),
     BOOKMARK_DELETED("bookmark_deleted"),
+    PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
@@ -278,6 +279,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_SHOWN("discover_shown"),
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
+    DISCOVER_AD_CATEGORY_TAPPED("discover_ad_category_tapped"),
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
@@ -593,4 +595,8 @@ enum class AnalyticsEvent(val key: String) {
     DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
     DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
     PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
+
+    /* Widgets */
+    WIDGET_INSTALLED("widget_installed"),
+    WIDGET_UNINSTALLED("widget_uninstalled"),
 }

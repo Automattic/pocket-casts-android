@@ -74,7 +74,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         PodcastRatings::class,
         DbChapter::class,
     ],
-    version = 91,
+    version = 92,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -690,6 +690,16 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX chapter_episode_uuid_index ON episode_chapters(episode_uuid)")
         }
 
+        val MIGRATION_91_92 = addMigration(91, 92) { database ->
+            database.execSQL(
+                """
+                    UPDATE podcasts
+                    SET folder_uuid = NULL 
+                    WHERE folder_uuid IS '973df93c-e4dc-41fb-879e-0c7b532ebb70'
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1071,6 +1081,7 @@ abstract class AppDatabase : RoomDatabase() {
                 // 88 to 89 added via auto migration
                 MIGRATION_89_90,
                 MIGRATION_90_91,
+                MIGRATION_91_92,
             )
         }
 

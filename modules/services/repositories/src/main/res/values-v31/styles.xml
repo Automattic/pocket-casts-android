@@ -1,4 +1,0 @@
-<resources>
-    <!-- Do not override any color attribute. -->
-    <style name="PCWidgetDynamicColorsTheme" parent="Theme.Material3.DynamicColors.DayNight" />
-</resources>

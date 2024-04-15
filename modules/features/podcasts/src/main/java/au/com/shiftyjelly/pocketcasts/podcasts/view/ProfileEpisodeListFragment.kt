@@ -195,7 +195,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.Downloaded -> AutoPlaySource.Downloads
             Mode.History -> AutoPlaySource.None
             Mode.Starred -> AutoPlaySource.Starred
-        }.let { settings.trackingAutoPlaySource.set(it, needsSync = false) }
+        }.let { settings.trackingAutoPlaySource.set(it, updateModifiedAt = false) }
     }
 
     override fun onDestroyView() {

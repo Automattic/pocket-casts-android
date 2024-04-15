@@ -129,5 +129,6 @@ data class SharePodcastHelper(
         EPISODE("episode"),
         EPISODE_FILE("episode_file"),
         CURRENT_TIME("current_time"),
+        BOOKMARK_TIME("bookmark_time"),
     }
 }

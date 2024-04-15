@@ -559,7 +559,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                settings.globalPlaybackEffects.set(effects, needsSync = true)
+                settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
             }
             playbackManager.updatePlayerEffects(effects)
         }

@@ -1,6 +1,16 @@
 7.62
 -----
-
+*   New Features
+    *   Allow sharing of bookmarks from bookmarks list
+        ([#2022](https://github.com/Automattic/pocket-casts-android/pull/2022))
+    *   Add profile bookmark screen where all user bookmarks can be managed
+        ([#2037](https://github.com/Automattic/pocket-casts-android/pull/2037))
+*   Updates:
+    *   Updated widget and added two new variants - small and large.
+        ([#2043](https://github.com/Automattic/pocket-casts-android/pull/2043))
+*   Bug Fixes
+    *   Improved player view in landscape mode. Added chapter artwork, podcast title, and improved video experience.
+        ([#2044](https://github.com/Automattic/pocket-casts-android/pull/1944))
 
 7.61
 -----

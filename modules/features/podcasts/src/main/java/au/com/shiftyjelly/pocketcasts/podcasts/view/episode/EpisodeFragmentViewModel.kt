@@ -38,6 +38,8 @@ import io.reactivex.schedulers.Schedulers
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,7 +74,12 @@ class EpisodeFragmentViewModel @Inject constructor(
     var episode: PodcastEpisode? = null
     var isFragmentChangingConfigurations: Boolean = false
 
-    fun setup(episodeUuid: String, podcastUuid: String?, forceDark: Boolean) {
+    fun setup(
+        episodeUuid: String,
+        podcastUuid: String?,
+        forceDark: Boolean,
+        timestamp: Duration?,
+    ) {
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
             .filter { it.episodeUuid == episodeUuid }
@@ -120,7 +127,19 @@ class EpisodeFragmentViewModel @Inject constructor(
                     zipper,
                 )
             }
-            .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
+            .doOnNext {
+                if (it is EpisodeFragmentState.Loaded) {
+                    timestamp?.let { timestamp ->
+                        if (it.episode.playedUpTo.toInt() != timestamp.toInt(DurationUnit.SECONDS) &&
+                            episode is PodcastEpisode
+                        ) {
+                            it.episode.playedUpTo = timestamp.toDouble(DurationUnit.SECONDS)
+                            seekToTimeMs(timestamp.toInt(DurationUnit.MILLISECONDS))
+                        }
+                    }
+                    episode = it.episode
+                }
+            }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())

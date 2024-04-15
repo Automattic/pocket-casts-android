@@ -75,6 +75,9 @@ abstract class UserEpisodeDao {
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
 
+    @Query("SELECT * FROM user_episodes WHERE uuid IN (:episodeUuids)")
+    abstract suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
+
     @Query("UPDATE user_episodes SET played_up_to = :playedUpTo, played_up_to_modified = :modified WHERE uuid = :uuid AND (played_up_to IS NULL OR played_up_to < :playedUpToMin OR played_up_to > :playedUpToMax)")
     abstract fun updatePlayedUpToIfChanged(playedUpTo: Double, playedUpToMin: Double, playedUpToMax: Double, modified: Long, uuid: String)
 

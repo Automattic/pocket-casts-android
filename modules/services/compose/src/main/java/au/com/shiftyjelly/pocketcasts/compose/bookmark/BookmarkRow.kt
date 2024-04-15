@@ -103,7 +103,7 @@ sealed class BookmarkRowColors {
 @Composable
 fun BookmarkRow(
     bookmark: Bookmark,
-    episode: BaseEpisode,
+    episode: BaseEpisode?,
     isMultiSelecting: () -> Boolean,
     isSelected: (Bookmark) -> Boolean,
     onPlayClick: (Bookmark) -> Unit,
@@ -146,12 +146,14 @@ fun BookmarkRow(
             }
 
             if (showIcon) {
-                Box(modifier = Modifier.padding(start = 16.dp)) {
-                    EpisodeImage(
-                        episode = episode,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        modifier = modifier.size(56.dp),
-                    )
+                episode?.let {
+                    Box(modifier = Modifier.padding(start = 16.dp)) {
+                        EpisodeImage(
+                            episode = it,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            modifier = modifier.size(56.dp),
+                        )
+                    }
                 }
             }
 
@@ -283,7 +285,7 @@ fun BookmarkRowPlayerPreview() {
             colors = BookmarkRowColors.Player,
             timePlayButtonStyle = TimePlayButtonStyle.Solid,
             timePlayButtonColors = TimePlayButtonColors.Player(textColor = Color.Black),
-            showIcon = false,
+            showIcon = true,
             useEpisodeArtwork = false,
         )
     }

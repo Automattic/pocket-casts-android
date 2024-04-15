@@ -36,6 +36,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -46,6 +48,7 @@ class EpisodeContainerFragment :
     EpisodeFragment.EpisodeLoadedListener {
     companion object {
         const val ARG_EPISODE_UUID = "episodeUUID"
+        const val ARG_TIMESTAMP_IN_SECS = "timestamp_in_secs"
         const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
         const val ARG_OVERRIDE_PODCAST_LINK = "override_podcast_link"
         const val ARG_PODCAST_UUID = "podcastUUID"
@@ -74,9 +77,11 @@ class EpisodeContainerFragment :
             podcastUuid: String? = null,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
+            timestamp: Duration? = null,
         ) = EpisodeContainerFragment().apply {
             arguments = bundleOf(
                 ARG_EPISODE_UUID to episodeUuid,
+                ARG_TIMESTAMP_IN_SECS to timestamp?.inWholeSeconds,
                 ARG_EPISODE_VIEW_SOURCE to source.value,
                 ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                 ARG_PODCAST_UUID to podcastUuid,
@@ -97,6 +102,9 @@ class EpisodeContainerFragment :
 
     private val episodeUUID: String?
         get() = arguments?.getString(ARG_EPISODE_UUID)
+
+    private val timestamp: Duration?
+        get() = arguments?.getLong(ARG_TIMESTAMP_IN_SECS)?.seconds
 
     private val episodeViewSource: EpisodeViewSource
         get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
@@ -185,6 +193,7 @@ class EpisodeContainerFragment :
             fragmentManager = childFragmentManager,
             lifecycle = viewLifecycleOwner.lifecycle,
             episodeUUID = episodeUUID,
+            timestamp = timestamp,
             episodeViewSource = episodeViewSource,
             overridePodcastLink = overridePodcastLink,
             podcastUuid = podcastUuid,
@@ -251,6 +260,7 @@ class EpisodeContainerFragment :
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle,
         private val episodeUUID: String?,
+        private val timestamp: Duration?,
         private val episodeViewSource: EpisodeViewSource,
         private val overridePodcastLink: Boolean,
         private val podcastUuid: String?,
@@ -286,6 +296,7 @@ class EpisodeContainerFragment :
             return when (sections[position]) {
                 Section.Details -> EpisodeFragment.newInstance(
                     episodeUuid = requireNotNull(episodeUUID),
+                    timestamp = timestamp,
                     source = episodeViewSource,
                     overridePodcastLink = overridePodcastLink,
                     podcastUuid = podcastUuid,
