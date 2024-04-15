@@ -12,10 +12,6 @@ Language: nl
     <string name="upgrade_to_patron">Upgrade naar Patron</string>
     <string name="upgrade_to_plus">Upgraden naar Plus</string>
     <string name="whats_new_got_it_button">Duidelijk</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Neem een Patron-abonnement om waar mogelijk hoofdstukken van afleveringen te selecteren en over te slaan.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Neem een Plus-abonnement om waar mogelijk hoofdstukken van afleveringen te selecteren en over te slaan.</string>
-    <string name="whats_new_deselect_chapters_plus_message">Met het Plus-abonnement kan je waar mogelijk hoofdstukken van afleveringen selecteren en overslaan.</string>
-    <string name="whats_new_deselect_chapters_patron_message">Met het Patron-abonnement kan je waar mogelijk hoofdstukken van afleveringen selecteren en overslaan.</string>
     <string name="skip_chapters_patron_prompt">Sla hoofdstukken over en geniet van extra functies met Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Sla hoofdstukken over en geniet van extra functies met Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Please select at least one chapter</string>
@@ -25,10 +21,6 @@ Language: nl
     <string name="number_of_chapters">%d hoofdstukken</string>
     <string name="skip_chapters">Hoofdstukken overslaan</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 jaar lang exclusieve content van &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Verzilver je code</string>
-    <string name="whats_new_slumber_studios_body_free_user">Abonneer je op Plus en geniet 1 jaar lang van een abonnement op Slumber Studios-content, podcasts ontworpen voor de zoetste dromen. &lt;a href=\"https://slumberstudios.com/\"&gt;Meer informatie&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Als onderdeel van je Plus-abonnement kan je 1 jaar lang genieten van een abonnement op Slumber Studios-content met code %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Meer informatie&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_title">Droom groots</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">na je eerste jaar</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %s</string>
     <string name="half_price_first_year">50% korting op je eerste jaar</string>

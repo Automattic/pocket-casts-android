@@ -168,7 +168,7 @@ class UpNextQueueImpl @Inject constructor(
         if (queueEpisodes.isEmpty()) {
             // when the upNextQueue is empty, save the source for auto playing the next episode
             automaticUpNextSource?.let {
-                settings.lastAutoPlaySource.set(value = it, needsSync = true)
+                settings.lastAutoPlaySource.set(value = it, updateModifiedAt = true)
             }
             saveChanges(UpNextAction.ClearAll)
         }
@@ -312,8 +312,8 @@ class UpNextQueueImpl @Inject constructor(
         // clear last loaded uuid if anything gets added to the up next queue
         val hasQueuedItems = currentEpisode != null
         if (hasQueuedItems) {
-            settings.trackingAutoPlaySource.set(AutoPlaySource.None, needsSync = false)
-            settings.lastAutoPlaySource.set(AutoPlaySource.None, needsSync = true)
+            settings.trackingAutoPlaySource.set(AutoPlaySource.None, updateModifiedAt = false)
+            settings.lastAutoPlaySource.set(AutoPlaySource.None, updateModifiedAt = true)
         }
     }
 

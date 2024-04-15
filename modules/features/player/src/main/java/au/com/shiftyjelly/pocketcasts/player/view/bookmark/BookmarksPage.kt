@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,7 +15,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -27,11 +31,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksInSearchView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
@@ -76,6 +82,7 @@ fun BookmarksPage(
             ).show()
             bookmarksViewModel.play(bookmark)
         },
+        onSearchTextChanged = { bookmarksViewModel.onSearchTextChanged(it) },
         onUpgradeClicked = onUpgradeClicked,
         openFragment = openFragment,
     )
@@ -110,6 +117,7 @@ private fun Content(
     onRowLongPressed: (Bookmark) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClicked: () -> Unit,
+    onSearchTextChanged: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     openFragment: (Fragment) -> Unit,
 ) {
@@ -126,6 +134,7 @@ private fun Content(
                 onRowLongPressed = onRowLongPressed,
                 onOptionsMenuClicked = onBookmarksOptionsMenuClicked,
                 onPlayClick = onPlayClick,
+                onSearchTextChanged = onSearchTextChanged,
             )
 
             is UiState.Empty -> NoBookmarksView(
@@ -155,29 +164,51 @@ private fun BookmarksView(
     onRowLongPressed: (Bookmark) -> Unit,
     onOptionsMenuClicked: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
+    onSearchTextChanged: (String) -> Unit,
 ) {
+    val focusRequester = remember { FocusRequester() }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
     ) {
-        item {
-            val title = stringResource(
-                id = if (state.bookmarks.size > 1) {
-                    LR.string.bookmarks_plural
-                } else {
-                    LR.string.bookmarks_singular
-                },
-                state.bookmarks.size,
-            )
+        if (state.searchEnabled) {
+            item {
+                SearchBar(
+                    text = state.searchText,
+                    placeholder = stringResource(LR.string.search),
+                    onTextChanged = onSearchTextChanged,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .focusRequester(focusRequester),
+                )
+            }
+        }
+        if (state.searchEnabled &&
+            state.searchText.isNotEmpty() &&
+            state.bookmarks.isEmpty()
+        ) {
+            item { NoBookmarksInSearchView(onActionClick = { onSearchTextChanged("") }) }
+        } else {
+            item {
+                val title = stringResource(
+                    id = if (state.bookmarks.size > 1) {
+                        LR.string.bookmarks_plural
+                    } else {
+                        LR.string.bookmarks_singular
+                    },
+                    state.bookmarks.size,
+                )
 
-            HeaderRow(
-                title = title,
-                onOptionsMenuClicked = onOptionsMenuClicked,
-                style = state.headerRowColors,
-            )
+                HeaderRow(
+                    title = title,
+                    onOptionsMenuClicked = onOptionsMenuClicked,
+                    style = state.headerRowColors,
+                )
+            }
         }
         items(state.bookmarks, key = { it }) { bookmark ->
-            val episode = state.episodes.firstOrNull { bookmark.episodeUuid == it.uuid }
+            val episode = state.bookmarkIdAndEpisodeMap[bookmark.uuid]
             BookmarkRow(
                 bookmark = bookmark.copy(episodeTitle = episode?.title ?: ""),
                 episode = episode,
@@ -223,11 +254,12 @@ private fun BookmarksPreview(
                         title = "Funny bit",
                     ),
                 ),
-                episodes = listOf(
-                    PodcastEpisode(
-                        uuid = "",
-                        publishedDate = Date(),
-                    ),
+                bookmarkIdAndEpisodeMap = mapOf(
+                    UUID.randomUUID().toString() to
+                        PodcastEpisode(
+                            uuid = "",
+                            publishedDate = Date(),
+                        ),
                 ),
                 isMultiSelecting = false,
                 useEpisodeArtwork = false,
@@ -241,6 +273,7 @@ private fun BookmarksPreview(
             onPlayClick = {},
             onRowLongPressed = {},
             onBookmarksOptionsMenuClicked = {},
+            onSearchTextChanged = {},
             onUpgradeClicked = {},
             openFragment = {},
         )

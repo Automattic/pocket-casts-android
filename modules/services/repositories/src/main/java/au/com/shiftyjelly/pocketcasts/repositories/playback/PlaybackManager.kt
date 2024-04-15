@@ -55,7 +55,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -118,7 +117,6 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
-    private val widgetManager: WidgetManager,
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
@@ -137,7 +135,7 @@ open class PlaybackManager @Inject constructor(
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
-        private const val UPDATE_EVERY = 10
+        private const val UPDATE_EVERY = 5
         private const val UPDATE_TIMER_POLL_TIME: Long = 1000
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
@@ -202,7 +200,6 @@ open class PlaybackManager @Inject constructor(
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         playlistManager = playlistManager,
-        widgetManager = widgetManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,
@@ -219,10 +216,6 @@ open class PlaybackManager @Inject constructor(
 
     @SuppressLint("CheckResult")
     fun setup() {
-        if (!Util.isAutomotive(application)) {
-            widgetManager.updateWidgetFromPlaybackState(this)
-        }
-
         // load an initial playback state
         upNextQueue.setup()
         mediaSessionManager.startObserving()
@@ -449,6 +442,16 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun playNowSuspend(
+        episodeUuid: String,
+        forceStream: Boolean = false,
+        showedStreamWarning: Boolean = false,
+        sourceView: SourceView = SourceView.UNKNOWN,
+    ) {
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
+        playNowSuspend(episode, forceStream, showedStreamWarning, sourceView)
+    }
+
+    suspend fun playNowSuspend(
         episode: BaseEpisode,
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
@@ -544,6 +547,9 @@ open class PlaybackManager @Inject constructor(
             SourceView.WHATS_NEW,
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
+            SourceView.WIDGET_PLAYER_SMALL,
+            SourceView.WIDGET_PLAYER_MEDIUM,
+            SourceView.WIDGET_PLAYER_LARGE,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -552,7 +558,7 @@ open class PlaybackManager @Inject constructor(
             -> {
                 val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.uuid) }
                 if (source != null) {
-                    settings.trackingAutoPlaySource.set(source, needsSync = false)
+                    settings.trackingAutoPlaySource.set(source, updateModifiedAt = false)
                 }
                 source
             }
@@ -768,7 +774,6 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
         }
         castManager.endSession()
-        widgetManager.updateWidgetNotPlaying()
     }
 
     suspend fun hibernatePlayback() {
@@ -991,19 +996,6 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun updatePlaybackStateDeselectedChapterIndices() {
-        launch {
-            playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(
-                    playbackState.copy(
-                        chapters = playbackState.chapters.updateDeselectedState(getCurrentEpisode()),
-                        lastChangeFrom = LastChangeFrom.OnChapterIndicesUpdated.value,
-                    ),
-                )
-            }
-        }
-    }
-
     fun clearUpNextAsync() {
         launch {
             upNextQueue.clearUpNext()
@@ -1216,7 +1208,6 @@ open class PlaybackManager @Inject constructor(
         Timber.i("PlaybackService onPlayerPlaying")
 
         val episode = getCurrentEpisode() ?: return
-        val podcast = findPodcastByEpisode(episode)
 
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, transientLoss = false, lastChangeFrom = LastChangeFrom.OnPlayerPlaying.value))
@@ -1227,8 +1218,6 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
-
-        widgetManager.updateWidget(podcast, true, episode)
     }
 
     fun markPodcastNeedsUpdating(podcastUuid: String) {
@@ -1266,10 +1255,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         cancelUpdateTimer()
-
-        val podcast = if (episode == null) null else findPodcastByEpisode(episode)
-        widgetManager.updateWidget(podcast, false, episode)
-
         setupPauseTimer()
     }
 
@@ -1532,17 +1517,13 @@ open class PlaybackManager @Inject constructor(
 
     private fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
-            val newChapters = episodeMetadata.chapters
-                .updateChaptersTimes(playbackState.durationMs.milliseconds)
-                .updateDeselectedState(getCurrentEpisode())
-            val chapters = maxOf(playbackState.chapters, newChapters) { a, b -> a.size.compareTo(b.size) }
-
-            playbackStateRelay.accept(
-                playbackState.copy(
-                    chapters = chapters,
-                    lastChangeFrom = LastChangeFrom.OnMetadataAvailable.value,
-                ),
-            )
+            launch {
+                chapterManager.updateChapters(
+                    playbackState.episodeUuid,
+                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid),
+                    forceUpdate = false,
+                )
+            }
         }
     }
 
@@ -1552,17 +1533,12 @@ open class PlaybackManager @Inject constructor(
     private fun onEpisodeChanged(episodeUuid: String) {
         observeChaptersJob?.cancel()
         observeChaptersJob = chapterManager.observerChaptersForEpisode(episodeUuid)
-            .onEach { onRemoteChaptersAvailable(it) }
+            .onEach { onChaptersAvailable(it) }
             .launchIn(this)
     }
 
-    private fun onRemoteChaptersAvailable(remoteChapters: Chapters) {
+    private fun onChaptersAvailable(chapters: Chapters) {
         playbackStateRelay.blockingFirst().let { playbackState ->
-            val newChapters = remoteChapters
-                .updateChaptersTimes(playbackState.durationMs.milliseconds)
-                .updateDeselectedState(getCurrentEpisode())
-            val chapters = maxOf(playbackState.chapters, newChapters) { a, b -> a.size.compareTo(b.size) }
-
             playbackStateRelay.accept(playbackState.copy(chapters = chapters))
         }
     }
@@ -1909,8 +1885,6 @@ open class PlaybackManager @Inject constructor(
         player?.setPlaybackEffects(playbackEffects)
 
         episodeManager.updatePlaybackInteractionDate(episode)
-
-        widgetManager.updateWidget(podcast, play, episode)
 
         if (play) {
             if (sameEpisode && currentPositionMs != null) {

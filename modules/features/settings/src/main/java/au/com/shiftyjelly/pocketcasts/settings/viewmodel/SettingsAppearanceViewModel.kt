@@ -108,7 +108,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUpNextDarkTheme(value: Boolean) {
-        settings.useDarkUpNextTheme.set(value, needsSync = true)
+        settings.useDarkUpNextTheme.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
             mapOf("enabled" to value),
@@ -116,7 +116,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateWidgetForDynamicColors(value: Boolean) {
-        settings.useDynamicColorsForWidget.set(value, needsSync = true)
+        settings.useDynamicColorsForWidget.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED,
             mapOf("enabled" to value),
@@ -124,7 +124,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
-        settings.showArtworkOnLockScreen.set(value, needsSync = true)
+        settings.showArtworkOnLockScreen.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
             mapOf("enabled" to value),
@@ -132,7 +132,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEpisodeArtwork(value: Boolean) {
-        settings.useEpisodeArtwork.set(value, needsSync = true)
+        settings.useEpisodeArtwork.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

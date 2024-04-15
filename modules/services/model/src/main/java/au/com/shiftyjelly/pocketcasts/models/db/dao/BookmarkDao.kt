@@ -110,15 +110,27 @@ abstract class BookmarkDao {
 
     // Sorts the array by podcast name, episodes release date, and the bookmarks timestamp
     @Query(
-        """SELECT bookmarks.*, podcasts.title as podcastTitle, podcast_episodes.title as episodeTitle, podcast_episodes.published_date as publishedDate
-            FROM bookmarks
-            LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid
-            LEFT JOIN podcasts ON bookmarks.podcast_uuid = podcasts.uuid
-            WHERE deleted = :deleted
-            ORDER BY
-            CASE WHEN podcasts.title is NULL then 1 else 0 end, UPPER(podcasts.title) ASC, 
-            podcast_episodes.published_date DESC, 
-            bookmarks.time ASC
+        """SELECT 
+              bookmarks.*, 
+              podcasts.title as podcastTitle, 
+              podcast_episodes.title as episodeTitle, 
+              podcast_episodes.published_date as publishedDate 
+            FROM 
+              bookmarks 
+              LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+              LEFT JOIN podcasts ON bookmarks.podcast_uuid = podcasts.uuid 
+            WHERE 
+              deleted = :deleted 
+            ORDER BY 
+              CASE WHEN podcasts.title is NULL then 1 else 0 end, 
+              (CASE
+                  WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
+                  WHEN UPPER(podcasts.title) LIKE 'A %' THEN SUBSTR(UPPER(podcasts.title), 3)
+                  WHEN UPPER(podcasts.title) LIKE 'AN %' THEN SUBSTR(UPPER(podcasts.title), 4)
+                  ELSE UPPER(podcasts.title)
+              END) ASC, 
+              podcast_episodes.published_date DESC, 
+              bookmarks.time ASC
         """,
     )
     abstract fun findAllBookmarksByOrderPodcastAndEpisodeFlow(
@@ -135,6 +147,25 @@ abstract class BookmarkDao {
     )
     abstract suspend fun searchInPodcastByTitle(
         podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
+
+    @Query(
+        """
+        SELECT 
+          bookmarks.* 
+        FROM 
+          bookmarks 
+          LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+        WHERE 
+          (
+            UPPER(bookmarks.title) LIKE UPPER(:title) 
+            OR UPPER(podcast_episodes.title) LIKE UPPER(:title)
+          ) 
+          AND deleted = :deleted""",
+    )
+    abstract suspend fun searchByBookmarkOrEpisodeTitle(
         title: String,
         deleted: Boolean = false,
     ): List<Bookmark>
