@@ -6,6 +6,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.widget.Toast
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -17,6 +19,7 @@ import kotlin.math.sqrt
 class SleepTimerRestartWhenShakingDevice @Inject constructor(
     private val sleepTimer: SleepTimer,
     private var playbackManager: PlaybackManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context,
 ) : SensorEventListener {
 
@@ -49,9 +52,12 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
             }
         }
     }
+
     private fun onDeviceShaken() {
         sleepTimer.restartTimerIfIsRunning onSuccess@{
             playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to SHAKING_PHONE_VALUE))
 
             if (context.isAppForeground()) {
                 Toast.makeText(
@@ -64,7 +70,8 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
     }
 
     companion object {
-        // A higher value for SHAKE_THRESHOLD makes the detection less sensitive
-        private const val SHAKE_THRESHOLD = 30
+        private const val SHAKE_THRESHOLD = 30 // A higher value for SHAKE_THRESHOLD makes the detection less sensitive
+        private const val TIME_KEY = "time"
+        private const val SHAKING_PHONE_VALUE = "shaking_phone"
     }
 }
