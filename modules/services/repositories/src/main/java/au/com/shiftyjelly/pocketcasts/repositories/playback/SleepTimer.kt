@@ -16,8 +16,8 @@ import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
@@ -26,7 +26,7 @@ class SleepTimer @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     companion object {
-        private const val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5
+        private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5.minutes
         private const val TIME_KEY = "time"
         private const val END_OF_EPISODE_VALUE = "end_of_episode"
     }
@@ -36,13 +36,11 @@ class SleepTimer @Inject constructor(
     private var lastTimeSleepTimeHasFinished: Duration? = null
     private var lastEpisodeUuidAutomaticEnded: String? = null
 
-    fun sleepAfter(minutes: Int, onSuccess: () -> Unit) {
-        val time = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            add(Calendar.MINUTE, minutes)
-        }
-        if (createAlarm(time.timeInMillis)) {
-            lastSleepAfterTime = minutes.toDuration(DurationUnit.MINUTES)
+    fun sleepAfter(duration: Duration, onSuccess: () -> Unit) {
+        val sleepAt = System.currentTimeMillis().milliseconds + duration
+
+        if (createAlarm(sleepAt.inWholeMilliseconds)) {
+            lastSleepAfterTime = duration
             cancelAutomaticSleepOnEpisodeEndRestart()
             onSuccess()
         }
@@ -61,23 +59,22 @@ class SleepTimer @Inject constructor(
     }
     fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: () -> Unit) {
         lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
-            val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinished.inWholeMilliseconds
-            val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
+            val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
 
-            if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
+            if (diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
                 onRestartSleepOnEpisodeEnd()
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
-            } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != null && !isSleepTimerRunning) {
+            } else if (diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != null && !isSleepTimerRunning) {
                 lastSleepAfterTime?.let {
-                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it * 60)) // Convert to seconds
-                    sleepAfter(it.inWholeMinutes.toInt(), onRestartSleepAfterTime)
+                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
+                    sleepAfter(it, onRestartSleepAfterTime)
                 }
             }
         }
     }
     fun setEndOfEpisodeUuid(uuid: String) {
         lastEpisodeUuidAutomaticEnded = uuid
-        lastTimeSleepTimeHasFinished = System.currentTimeMillis().toDuration(DurationUnit.MILLISECONDS)
+        lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds
         cancelAutomaticSleepAfterTimeRestart()
     }
 
@@ -98,7 +95,7 @@ class SleepTimer @Inject constructor(
             return try {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
                 sleepTimeMs = timeMs
-                lastTimeSleepTimeHasFinished = timeMs.toDuration(DurationUnit.MILLISECONDS)
+                lastTimeSleepTimeHasFinished = timeMs.milliseconds
                 true
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
