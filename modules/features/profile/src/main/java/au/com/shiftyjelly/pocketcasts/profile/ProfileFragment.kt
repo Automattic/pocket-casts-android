@@ -47,8 +47,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -81,9 +79,7 @@ class ProfileFragment : BaseFragment() {
         SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java),
         SettingsAdapter.Item(LR.string.settings_title_help, IR.drawable.ic_help, HelpFragment::class.java),
     ).apply {
-        if (FeatureFlag.isEnabled(Feature.ACCOUNT_BOOKMARKS)) {
-            add(4, SettingsAdapter.Item(LR.string.bookmarks, IR.drawable.ic_bookmark, BookmarksContainerFragment::class.java))
-        }
+        add(4, SettingsAdapter.Item(LR.string.bookmarks, IR.drawable.ic_bookmark, BookmarksContainerFragment::class.java))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

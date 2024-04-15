@@ -83,14 +83,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    ACCOUNT_BOOKMARKS(
-        key = "account_bookmarks",
-        title = "Account Bookmarks",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(null),
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = true,
-    ),
     ;
 
     companion object {
