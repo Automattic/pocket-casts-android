@@ -25,7 +25,7 @@ abstract class UserSetting<T>(
      * it provides [Instant.EPOCH] plus one millisecond as the modification timestamp.
      */
     fun <U> getSyncSetting(f: (T, Instant) -> U): U {
-        return f(value, modifiedAt ?: fallbackTimestamp)
+        return f(value, modifiedAt ?: DefaultFallbackTimestamp)
     }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
@@ -286,10 +286,10 @@ abstract class UserSetting<T>(
         override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) = Unit
     }
 
-    private companion object {
-        // We use EPOCH +1 millisecond as a default timestamp for updates because initial values of when app is installed are null.
+    companion object {
+        // We use EPOCH +1 second as a default timestamp for updates because initial values of when app is installed are null.
         // This means that if a user syncs settings that were set before we started tracking timestamps
         // they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
-        val fallbackTimestamp: Instant = Instant.EPOCH.plusMillis(1)
+        val DefaultFallbackTimestamp: Instant = Instant.EPOCH.plusSeconds(1)
     }
 }
