@@ -1428,7 +1428,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun sleep(episode: BaseEpisode?) {
-        sleepTimer.sleepTimerWasTriggeredForEndOfEpisode(episode?.uuid)
+        sleepTimer.setEndOfEpisodeUuid(episode?.uuid)
         sleepAfterEpisode = false
 
         withContext(Dispatchers.Main) {
