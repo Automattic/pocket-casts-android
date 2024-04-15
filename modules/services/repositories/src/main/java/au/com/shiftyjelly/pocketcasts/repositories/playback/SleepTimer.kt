@@ -22,37 +22,37 @@ class SleepTimer @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context,
 ) {
-
     companion object {
-        private var sleepTimeMs: Long? = null
-        private var lastSleepAfterTimeInMinutes: Int = 0
-        private var lastTimeHasFinishedInMillis: Long = 0
-        private var lastEpisodeUuidAutomaticEnded: String? = null
         private const val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5
         private const val TIME_KEY = "time"
         private const val END_OF_EPISODE_VALUE = "end_of_episode"
     }
 
-    fun sleepAfter(mins: Int, onSuccess: () -> Unit) {
+    private var sleepTimeMs: Long? = null
+    private var lastSleepAfterTimeInMinutes: Int = 0
+    private var lastTimeHasFinishedInMillis: Long = 0
+    private var lastEpisodeUuidAutomaticEnded: String? = null
+
+    fun sleepAfter(minutes: Int, onSuccess: () -> Unit) {
         val time = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
-            add(Calendar.MINUTE, mins)
+            add(Calendar.MINUTE, minutes)
         }
         if (createAlarm(time.timeInMillis)) {
-            lastSleepAfterTimeInMinutes = mins
+            lastSleepAfterTimeInMinutes = minutes
             cancelAutomaticSleepOnEpisodeEndRestart()
             onSuccess()
         }
     }
 
-    fun addExtraTime(mins: Int) {
+    fun addExtraTime(minutes: Int) {
         val currentTimeMs = sleepTimeMs
         if (currentTimeMs == null || currentTimeMs < 0) {
             return
         }
         val time = Calendar.getInstance().apply {
             timeInMillis = currentTimeMs
-            add(Calendar.MINUTE, mins)
+            add(Calendar.MINUTE, minutes)
         }
         createAlarm(time.timeInMillis)
     }
@@ -109,7 +109,7 @@ class SleepTimer @Inject constructor(
         get() = System.currentTimeMillis() < (sleepTimeMs ?: -1)
 
     fun timeLeftInSecs(): Int? {
-        val sleepTimeMs = SleepTimer.sleepTimeMs ?: return null
+        val sleepTimeMs = sleepTimeMs ?: return null
 
         val timeLeft = sleepTimeMs - System.currentTimeMillis()
         if (timeLeft < 0) {
