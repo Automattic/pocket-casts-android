@@ -129,6 +129,7 @@ open class PlaybackManager @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
     private val chapterManager: ChapterManager,
+    private val sleepTimer: SleepTimer,
     bookmarkFeature: BookmarkFeatureControl,
     private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -1427,6 +1428,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun sleep(episode: BaseEpisode?) {
+        episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
         sleepAfterEpisode = false
 
         withContext(Dispatchers.Main) {
@@ -2046,6 +2048,17 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
+
+        sleepTimer.restartSleepTimerIfApplies(
+            currentEpisodeUuid = episode.uuid,
+            isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
+            onRestartSleepAfterTime = {
+                updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+            },
+            onRestartSleepOnEpisodeEnd = {
+                updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+            },
+        )
 
         trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, sourceView)
     }

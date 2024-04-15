@@ -8,40 +8,76 @@ import android.os.Build
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.text.format.DateUtils
 import android.widget.Toast
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
-class SleepTimer @Inject constructor(@ApplicationContext private val context: Context) {
-
+class SleepTimer @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    @ApplicationContext private val context: Context,
+) {
     companion object {
-        private var sleepTimeMs: Long? = null
+        private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5.minutes
+        private const val TIME_KEY = "time"
+        private const val END_OF_EPISODE_VALUE = "end_of_episode"
     }
 
-    fun sleepAfter(mins: Int, onSuccess: () -> Unit) {
-        val time = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            add(Calendar.MINUTE, mins)
-        }
-        if (createAlarm(time.timeInMillis)) {
+    private var sleepTimeMs: Long? = null
+    private var lastSleepAfterTime: Duration? = null
+    private var lastTimeSleepTimeHasFinished: Duration? = null
+    private var lastEpisodeUuidAutomaticEnded: String? = null
+
+    fun sleepAfter(duration: Duration, onSuccess: () -> Unit) {
+        val sleepAt = System.currentTimeMillis().milliseconds + duration
+
+        if (createAlarm(sleepAt.inWholeMilliseconds)) {
+            lastSleepAfterTime = duration
+            cancelAutomaticSleepOnEpisodeEndRestart()
             onSuccess()
         }
     }
 
-    fun addExtraTime(mins: Int) {
+    fun addExtraTime(minutes: Int) {
         val currentTimeMs = sleepTimeMs
         if (currentTimeMs == null || currentTimeMs < 0) {
             return
         }
         val time = Calendar.getInstance().apply {
             timeInMillis = currentTimeMs
-            add(Calendar.MINUTE, mins)
+            add(Calendar.MINUTE, minutes)
         }
         createAlarm(time.timeInMillis)
+    }
+
+    fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: () -> Unit) {
+        lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
+            val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
+
+            if (diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
+                onRestartSleepOnEpisodeEnd()
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
+            } else if (diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != null && !isSleepTimerRunning) {
+                lastSleepAfterTime?.let {
+                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
+                    sleepAfter(it, onRestartSleepAfterTime)
+                }
+            }
+        }
+    }
+
+    fun setEndOfEpisodeUuid(uuid: String) {
+        lastEpisodeUuidAutomaticEnded = uuid
+        lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds
+        cancelAutomaticSleepAfterTimeRestart()
     }
 
     private fun createAlarm(timeMs: Long): Boolean {
@@ -61,6 +97,7 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
             return try {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
                 sleepTimeMs = timeMs
+                lastTimeSleepTimeHasFinished = timeMs.milliseconds
                 true
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
@@ -71,18 +108,18 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
 
     fun cancelTimer() {
         getAlarmManager().cancel(getSleepIntent())
-        sleepTimeMs = null
+        cleanUpSleepTimer()
     }
 
     val isRunning: Boolean
         get() = System.currentTimeMillis() < (sleepTimeMs ?: -1)
 
     fun timeLeftInSecs(): Int? {
-        val sleepTimeMs = SleepTimer.sleepTimeMs ?: return null
+        val sleepTimeMs = sleepTimeMs ?: return null
 
         val timeLeft = sleepTimeMs - System.currentTimeMillis()
         if (timeLeft < 0) {
-            SleepTimer.sleepTimeMs = null
+            cleanUpSleepTimer()
             return null
         }
         return (timeLeft / DateUtils.SECOND_IN_MILLIS).toInt()
@@ -95,5 +132,19 @@ class SleepTimer @Inject constructor(@ApplicationContext private val context: Co
 
     private fun getAlarmManager(): AlarmManager {
         return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    }
+
+    private fun cleanUpSleepTimer() {
+        sleepTimeMs = null
+        cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnEpisodeEndRestart()
+    }
+
+    private fun cancelAutomaticSleepAfterTimeRestart() {
+        lastSleepAfterTime = null
+    }
+
+    private fun cancelAutomaticSleepOnEpisodeEndRestart() {
+        lastEpisodeUuidAutomaticEnded = null
     }
 }
