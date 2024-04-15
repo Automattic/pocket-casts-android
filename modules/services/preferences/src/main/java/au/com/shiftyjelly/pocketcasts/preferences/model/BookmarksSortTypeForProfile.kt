@@ -26,7 +26,7 @@ enum class BookmarksSortTypeForProfile(
     PODCAST_AND_EPISODE(
         labelId = R.string.podcast_and_episode,
         key = SORT_TYPE_PODCAST_AND_EPISODE,
-        serverId = 4, // Matches the serverId for the same sort type in iOS app
+        serverId = 2,
     ),
     ;
 
