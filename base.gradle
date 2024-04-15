@@ -84,8 +84,15 @@ android {
         arg("skipPrivatePreviews", "true")
     }
 
-    if (project.canSignRelease) {
-        signingConfigs {
+    signingConfigs {
+        debug {
+            storeFile file("${rootDir.path}/debug.keystore")
+            storePassword "debugkey"
+            keyAlias "debugkey"
+            keyPassword "debugkey"
+        }
+
+        if (project.canSignRelease) {
             release {
                 storeFile = project.storeFile
                 storePassword = project.storePassword
@@ -110,6 +117,8 @@ android {
             buildConfigField "String", "WEB_BASE_HOST", "\"pocket-casts-main-development.mystagingwebsite.com\""
             buildConfigField "String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\""
             buildConfigField "String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\""
+
+            signingConfig signingConfigs.debug
         }
 
         debugProd {
@@ -127,6 +136,8 @@ android {
             buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
             buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
             buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
+
+            signingConfig signingConfigs.debug
         }
 
         release {
