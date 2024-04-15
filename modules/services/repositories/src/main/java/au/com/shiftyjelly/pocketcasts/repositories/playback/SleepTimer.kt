@@ -57,6 +57,7 @@ class SleepTimer @Inject constructor(
         }
         createAlarm(time.timeInMillis)
     }
+
     fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: () -> Unit) {
         lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
             val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
@@ -72,6 +73,7 @@ class SleepTimer @Inject constructor(
             }
         }
     }
+
     fun setEndOfEpisodeUuid(uuid: String) {
         lastEpisodeUuidAutomaticEnded = uuid
         lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds
@@ -137,9 +139,11 @@ class SleepTimer @Inject constructor(
         cancelAutomaticSleepAfterTimeRestart()
         cancelAutomaticSleepOnEpisodeEndRestart()
     }
+
     private fun cancelAutomaticSleepAfterTimeRestart() {
         lastSleepAfterTime = null
     }
+
     private fun cancelAutomaticSleepOnEpisodeEndRestart() {
         lastEpisodeUuidAutomaticEnded = null
     }
