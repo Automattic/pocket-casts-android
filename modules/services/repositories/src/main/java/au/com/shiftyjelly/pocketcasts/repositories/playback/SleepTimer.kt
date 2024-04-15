@@ -58,6 +58,12 @@ class SleepTimer @Inject constructor(
         createAlarm(time.timeInMillis)
     }
 
+    fun restartTimerIfIsRunning(onSuccess: () -> Unit) {
+        if (isRunning) {
+            lastSleepAfterTime?.let { sleepAfter(it, onSuccess) }
+        }
+    }
+
     fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: () -> Unit) {
         lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
             val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
