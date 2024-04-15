@@ -75,7 +75,7 @@ class SleepTimer @Inject constructor(
             }
         }
     }
-    fun setEndOfEpisodeUuid(uuid: String?) {
+    fun setEndOfEpisodeUuid(uuid: String) {
         lastEpisodeUuidAutomaticEnded = uuid
         lastTimeSleepTimeHasFinished = System.currentTimeMillis().toDuration(DurationUnit.MILLISECONDS)
         cancelAutomaticSleepAfterTimeRestart()
