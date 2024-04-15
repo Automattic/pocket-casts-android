@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -225,6 +226,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 podcastBookmarksSortType = settings.podcastBookmarksSortType.getSyncSetting { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                profileBookmarksSortType = settings.profileBookmarksSortType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
@@ -547,6 +554,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBookmarksSortType,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForPodcast.fromServerId(it) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "bookmarksSortOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.profileBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForProfile.fromServerId(it) ?: BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST },
                     )
                     "useDarkUpNextTheme" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
