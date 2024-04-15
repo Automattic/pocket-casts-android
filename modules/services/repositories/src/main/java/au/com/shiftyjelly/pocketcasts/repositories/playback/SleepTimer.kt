@@ -15,6 +15,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
@@ -29,8 +32,8 @@ class SleepTimer @Inject constructor(
     }
 
     private var sleepTimeMs: Long? = null
-    private var lastSleepAfterTimeInMinutes: Int? = null
-    private var lastTimeHasFinishedInMillis: Long? = null
+    private var lastSleepAfterTime: Duration? = null
+    private var lastTimeSleepTimeHasFinished: Duration? = null
     private var lastEpisodeUuidAutomaticEnded: String? = null
 
     fun sleepAfter(minutes: Int, onSuccess: () -> Unit) {
@@ -39,7 +42,7 @@ class SleepTimer @Inject constructor(
             add(Calendar.MINUTE, minutes)
         }
         if (createAlarm(time.timeInMillis)) {
-            lastSleepAfterTimeInMinutes = minutes
+            lastSleepAfterTime = minutes.toDuration(DurationUnit.MINUTES)
             cancelAutomaticSleepOnEpisodeEndRestart()
             onSuccess()
         }
@@ -57,24 +60,24 @@ class SleepTimer @Inject constructor(
         createAlarm(time.timeInMillis)
     }
     fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: () -> Unit) {
-        lastTimeHasFinishedInMillis?.let { lastTimeHasFinished ->
-            val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinished
+        lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
+            val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinished.inWholeMilliseconds
             val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
 
             if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
                 onRestartSleepOnEpisodeEnd()
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
-            } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != null && !isSleepTimerRunning) {
-                lastSleepAfterTimeInMinutes?.let {
+            } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != null && !isSleepTimerRunning) {
+                lastSleepAfterTime?.let {
                     analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it * 60)) // Convert to seconds
-                    sleepAfter(it, onRestartSleepAfterTime)
+                    sleepAfter(it.inWholeMinutes.toInt(), onRestartSleepAfterTime)
                 }
             }
         }
     }
     fun setEndOfEpisodeUuid(uuid: String?) {
         lastEpisodeUuidAutomaticEnded = uuid
-        lastTimeHasFinishedInMillis = System.currentTimeMillis()
+        lastTimeSleepTimeHasFinished = System.currentTimeMillis().toDuration(DurationUnit.MILLISECONDS)
         cancelAutomaticSleepAfterTimeRestart()
     }
 
@@ -95,7 +98,7 @@ class SleepTimer @Inject constructor(
             return try {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
                 sleepTimeMs = timeMs
-                lastTimeHasFinishedInMillis = timeMs
+                lastTimeSleepTimeHasFinished = timeMs.toDuration(DurationUnit.MILLISECONDS)
                 true
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
@@ -138,7 +141,7 @@ class SleepTimer @Inject constructor(
         cancelAutomaticSleepOnEpisodeEndRestart()
     }
     private fun cancelAutomaticSleepAfterTimeRestart() {
-        lastSleepAfterTimeInMinutes = null
+        lastSleepAfterTime = null
     }
     private fun cancelAutomaticSleepOnEpisodeEndRestart() {
         lastEpisodeUuidAutomaticEnded = null
