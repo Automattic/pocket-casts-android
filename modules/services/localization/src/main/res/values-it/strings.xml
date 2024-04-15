@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 09:54:04+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="clear_search">Cancella la ricerca</string>
+    <string name="podcast_and_episode">Podcast ed episodio</string>
+    <string name="skip_chapters">Preseleziona i capitoli</string>
+    <string name="settings_use_episode_artwork_details">Alcuni programmi hanno grafiche personalizzate per certi episodi. Abilita questa opzione e Pocket Casts le mostrerà al posto della grafica del programma.</string>
+    <string name="settings_use_episode_artwork">Usa la grafica dell\'episodio</string>
+    <string name="episode_sort_title_z_a">Titolo (Z-A)</string>
+    <string name="episode_sort_title_a_z">Titolo (A-Z)</string>
     <string name="discover_most_popular_in">Più popolare in %s</string>
     <string name="discover_select_categories">Seleziona una categoria</string>
     <string name="discover_all_categories">Tutte le categorie</string>
     <string name="upgrade_to_patron">Esegui l\'aggiornamento a Patron</string>
     <string name="upgrade_to_plus">Esegui l\'aggiornamento a Plus</string>
     <string name="whats_new_got_it_button">Fatto</string>
-    <string name="skip_chapters_patron_prompt">Salta capitoli e altro ancora con Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Salta capitoli e altro ancora con Pocket Casts Plus</string>
+    <string name="skip_chapters_patron_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Seleziona almeno un capitolo</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
     <string name="single_chapter">1 capitolo</string>
     <string name="number_of_chapters">%d capitoli</string>
-    <string name="skip_chapters">Salta capitoli</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 anno di contenuti esclusivi &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">dopo il tuo primo anno</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Pagamento ricorrente il %s</string>

@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 13:54:03+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="clear_search">清除搜尋</string>
+    <string name="podcast_and_episode">Podcast 與節目</string>
+    <string name="skip_chapters">預先選取的章節</string>
+    <string name="settings_use_episode_artwork_details">有些節目會針對特定單集推出自訂封面圖片。 若啟用此選項，Pocket Casts 就會顯示這些封面圖片，而非節目的封面圖片。</string>
+    <string name="settings_use_episode_artwork">使用單集封面圖片</string>
+    <string name="episode_sort_title_z_a">標題 (Z-A)</string>
+    <string name="episode_sort_title_a_z">標題 (A-Z)</string>
     <string name="discover_most_popular_in">在「%s」最受歡迎</string>
     <string name="discover_select_categories">請選取類別</string>
     <string name="discover_all_categories">所有類別</string>
     <string name="upgrade_to_patron">升級至 Patron</string>
     <string name="upgrade_to_plus">升級至 Plus</string>
     <string name="whats_new_got_it_button">知道了</string>
-    <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能跳過章節並享有更多功能</string>
-    <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能跳過章節並享有更多功能</string>
+    <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能預先選取章節並享有更多功能</string>
+    <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能預先選取章節並享有更多功能</string>
     <string name="select_one_chapter_message">請選取至少一章</string>
     <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 個章節 • %2$d 個章節已隱藏</string>
     <string name="single_chapter">1 個章節</string>
     <string name="number_of_chapters">%d 個章節</string>
-    <string name="skip_chapters">略過章節</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 年份的 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 獨家內容</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">首年訂閱後</string>
     <string name="onboarding_plus_recurring_after_intro_offer">於 %s定期付款</string>

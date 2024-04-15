@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 17:54:03+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="clear_search">Zoekopdracht wissen</string>
+    <string name="podcast_and_episode">Podcast en aflevering</string>
+    <string name="skip_chapters">Hoofdstukken voorselecteren</string>
+    <string name="settings_use_episode_artwork_details">Sommige shows hebben apart artwork voor bepaalde afleveringen Als je deze optie inschakelt, zal dit worden weergegeven in plaats van het artwork van de show.</string>
+    <string name="settings_use_episode_artwork">Artwork van afleveringen gebruiken</string>
+    <string name="episode_sort_title_z_a">Titel (Z-A)</string>
+    <string name="episode_sort_title_a_z">Titel (A-Z)</string>
     <string name="discover_most_popular_in">Populairst in %s</string>
     <string name="discover_select_categories">Een categorie selecteren</string>
     <string name="discover_all_categories">Alle categorieën</string>
     <string name="upgrade_to_patron">Upgrade naar Patron</string>
     <string name="upgrade_to_plus">Upgraden naar Plus</string>
     <string name="whats_new_got_it_button">Duidelijk</string>
-    <string name="skip_chapters_patron_prompt">Sla hoofdstukken over en geniet van extra functies met Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Sla hoofdstukken over en geniet van extra functies met Pocket Casts Plus</string>
+    <string name="skip_chapters_patron_prompt">Selecteer hoofdstukken voor en geniet van extra functies met Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Selecteer hoofdstukken voor en geniet van extra functies met Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Please select at least one chapter</string>
     <string name="number_of_chapters_summary_singular">1 hoofdstuk • %d verborgen</string>
     <string name="number_of_chapters_summary_plural">%1$d hoofdstukken • %2$d verborgen</string>
     <string name="single_chapter">1 hoofdstuk</string>
     <string name="number_of_chapters">%d hoofdstukken</string>
-    <string name="skip_chapters">Hoofdstukken overslaan</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 jaar lang exclusieve content van &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">na je eerste jaar</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %s</string>

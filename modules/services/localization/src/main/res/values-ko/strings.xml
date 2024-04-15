@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-26 09:54:03+0000
+Translation-Revision-Date: 2024-04-11 14:10:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="clear_search">검색 지우기</string>
+    <string name="podcast_and_episode">팟캐스트 &amp; 에피소드</string>
+    <string name="skip_chapters">챕터 미리 선택</string>
+    <string name="settings_use_episode_artwork_details">일부 프로그램에는 특정 에피소드에 대한 사용자 정의 아트워크가 있습니다. 이 옵션을 활성화하면 프로그램의 아트워크 대신에 이 아트워크가 Pocket Casts를 통해 표시됩니다.</string>
+    <string name="settings_use_episode_artwork">에피소드 아트워크 사용</string>
+    <string name="episode_sort_title_z_a">제목(Z-A)</string>
+    <string name="episode_sort_title_a_z">제목(A-Z)</string>
     <string name="discover_most_popular_in">%s에서 가장 인기있는</string>
     <string name="discover_select_categories">카테고리 선택</string>
     <string name="discover_all_categories">모든 카테고리</string>
     <string name="upgrade_to_patron">Patron으로 업그레이드</string>
     <string name="upgrade_to_plus">Plus로 업그레이드</string>
     <string name="whats_new_got_it_button">알겠습니다.</string>
-    <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 건너뛰기 등</string>
-    <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 건너뛰기 등</string>
+    <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 미리 선택 등</string>
+    <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 미리 선택 등</string>
     <string name="select_one_chapter_message">챕터를 하나 이상 선택하세요.</string>
     <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>
     <string name="number_of_chapters_summary_plural">%1$d개 챕터 • %2$d개 숨김</string>
     <string name="single_chapter">1개 챕터</string>
     <string name="number_of_chapters">%d개 챕터</string>
-    <string name="skip_chapters">챕터 건너뛰기</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;의 1년 독점 콘텐츠</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">첫해 이후</string>
     <string name="onboarding_plus_recurring_after_intro_offer">반복 결제: %s</string>
