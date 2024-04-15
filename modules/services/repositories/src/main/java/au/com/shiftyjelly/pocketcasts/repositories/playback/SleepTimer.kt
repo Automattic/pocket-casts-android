@@ -30,7 +30,7 @@ class SleepTimer @Inject constructor(
 
     private var sleepTimeMs: Long? = null
     private var lastSleepAfterTimeInMinutes: Int? = null
-    private var lastTimeHasFinishedInMillis: Long = 0
+    private var lastTimeHasFinishedInMillis: Long? = null
     private var lastEpisodeUuidAutomaticEnded: String? = null
 
     fun sleepAfter(minutes: Int, onSuccess: () -> Unit) {
@@ -57,16 +57,18 @@ class SleepTimer @Inject constructor(
         createAlarm(time.timeInMillis)
     }
     fun restartSleepTimerIfApplies(currentEpisodeUuid: String, isSleepTimerRunning: Boolean, onRestartSleepAfterTime: () -> Unit, onRestartSleepOnEpisodeEnd: () -> Unit) {
-        val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinishedInMillis
-        val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
+        lastTimeHasFinishedInMillis?.let { lastTimeHasFinished ->
+            val diffTimeInMillis = System.currentTimeMillis() - lastTimeHasFinished
+            val diffInMinutes = diffTimeInMillis / (1000 * 60) // Convert to minutes
 
-        if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
-            onRestartSleepOnEpisodeEnd()
-            analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
-        } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != null && !isSleepTimerRunning) {
-            lastSleepAfterTimeInMinutes?.let {
-                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it * 60)) // Convert to seconds
-                sleepAfter(it, onRestartSleepAfterTime)
+            if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded) {
+                onRestartSleepOnEpisodeEnd()
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
+            } else if (diffInMinutes < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTimeInMinutes != null && !isSleepTimerRunning) {
+                lastSleepAfterTimeInMinutes?.let {
+                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it * 60)) // Convert to seconds
+                    sleepAfter(it, onRestartSleepAfterTime)
+                }
             }
         }
     }
