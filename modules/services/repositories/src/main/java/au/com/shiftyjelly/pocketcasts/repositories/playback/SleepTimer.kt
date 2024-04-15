@@ -59,7 +59,7 @@ class SleepTimer @Inject constructor(
     }
 
     fun restartTimerIfIsRunning(onSuccess: () -> Unit) {
-        if (isRunning) {
+        if (isSleepAfterTimerRunning) {
             lastSleepAfterTime?.let { sleepAfter(it, onSuccess) }
         }
     }
@@ -117,7 +117,7 @@ class SleepTimer @Inject constructor(
         cleanUpSleepTimer()
     }
 
-    val isRunning: Boolean
+    val isSleepAfterTimerRunning: Boolean
         get() = System.currentTimeMillis() < (sleepTimeMs ?: -1)
 
     fun timeLeftInSecs(): Int? {
