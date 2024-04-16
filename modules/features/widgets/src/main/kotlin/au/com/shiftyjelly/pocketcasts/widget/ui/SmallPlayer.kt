@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -29,6 +29,8 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
         else -> LR.string.pause_episode
     }.let { LocalContext.current.getString(it) }
 
+    val width = LocalSize.current.width
+
     WidgetTheme(state.useDynamicColors) {
         Box(
             contentAlignment = Alignment.Center,
@@ -42,7 +44,7 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
             EpisodeImage(
                 episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
-                size = null,
+                size = width,
                 backgroundColor = if (!state.useDynamicColors) { { it.secondary } } else null,
                 iconColor = if (!state.useDynamicColors) { { it.onSecondary } } else null,
                 onClick = { controlPlayback },
@@ -50,7 +52,7 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
             if (state.episode != null) {
                 PlaybackButton(
                     state.isPlaying,
-                    size = 32.dp,
+                    size = width / 2,
                     backgroundColor = if (!state.useDynamicColors) { { it.surface } } else null,
                     iconColor = if (!state.useDynamicColors) { { it.onSurface } } else null,
                 )
