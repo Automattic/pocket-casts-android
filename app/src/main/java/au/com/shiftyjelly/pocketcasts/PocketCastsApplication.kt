@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -113,6 +114,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var playerWidgetManager: PlayerWidgetManager
 
     @Inject lateinit var upNextDao: UpNextDao
+
+    @Inject lateinit var sleepTimerRestartWhenShakingDevice: SleepTimerRestartWhenShakingDevice
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -260,6 +263,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                 statsManager.initStatsEngine()
 
                 subscriptionManager.connectToGooglePlay(this@PocketCastsApplication)
+
+                sleepTimerRestartWhenShakingDevice.init() // Begin detecting when the device has been shaken to restart the sleep timer.
             }
         }
 

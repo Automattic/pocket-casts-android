@@ -1,6 +1,8 @@
 7.63
 -----
-
+*   New Features
+    *   Sleep timer: Restart timer when shaking phone
+        ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
 
 7.62
 -----

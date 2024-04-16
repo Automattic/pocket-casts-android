@@ -508,7 +508,7 @@ class PlayerViewModel @Inject constructor(
 
     fun updateSleepTimer() {
         val timeLeft = sleepTimer.timeLeftInSecs()
-        if ((sleepTimer.isRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.sleepAfterEpisode) {
+        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.sleepAfterEpisode) {
             isSleepAtEndOfEpisode.postValue(playbackManager.sleepAfterEpisode)
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
         } else {
