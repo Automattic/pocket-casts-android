@@ -34,25 +34,32 @@ class ChapterManagerImpl @Inject constructor(
     ) { episode, dbChapters -> dbChapters.toChapters(episode) }
 
     private fun List<DbChapter>.toChapters(episode: BaseEpisode): Chapters {
-        val chaptersList = withIndex().windowed(size = 2, partialWindows = true) { window ->
-            val index = window[0].index
-            val chapterIndex = window[0].index + 1
-            val firstChapter = window[0].value
-            val secondChapter = window.getOrNull(1)?.value
-
-            val secondEndTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
-            val fixedEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondEndTime } ?: secondEndTime
-
-            Chapter(
-                title = firstChapter.title.orEmpty(),
-                startTime = if (index == 0) Duration.ZERO else firstChapter.startTimeMs.milliseconds,
-                endTime = fixedEndTime,
-                url = firstChapter.url?.toHttpUrlOrNull(),
-                imagePath = firstChapter.imageUrl,
-                index = chapterIndex,
-                selected = chapterIndex !in episode.deselectedChapters,
-            )
-        }
+        val chaptersList = asSequence()
+            .fixChapterTimestamps(episode)
+            .filter { it.duration > Duration.ZERO }
+            .mapIndexed { index, chapter -> chapter.copy(index = index + 1) }
+            .toList()
         return Chapters(chaptersList)
+    }
+
+    private fun Sequence<DbChapter>.fixChapterTimestamps(episode: BaseEpisode) = withIndex().windowed(size = 2, partialWindows = true) { window ->
+        val index = window[0].index
+        val chapterIndex = window[0].index + 1
+        val firstChapter = window[0].value
+        val secondChapter = window.getOrNull(1)?.value
+
+        val newStartTime = if (index == 0) Duration.ZERO else firstChapter.startTimeMs.milliseconds
+        val secondStartTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
+        val newEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondStartTime && it > newStartTime } ?: secondStartTime
+
+        Chapter(
+            title = firstChapter.title.orEmpty(),
+            startTime = newStartTime,
+            endTime = newEndTime,
+            url = firstChapter.url?.toHttpUrlOrNull(),
+            imagePath = firstChapter.imageUrl,
+            index = chapterIndex,
+            selected = chapterIndex !in episode.deselectedChapters,
+        )
     }
 }

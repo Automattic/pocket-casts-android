@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -1105,67 +1106,67 @@ class PodcastSyncProcess(
                     settings = podcastSettings {
                         autoStartFrom = int32Setting {
                             value = int32Value { value = podcast.startFromSecs }
-                            modifiedAt = podcast.startFromModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.startFromModified.toProtobufTimestampOrFallback()
                         }
                         autoSkipLast = int32Setting {
                             value = int32Value { value = podcast.skipLastSecs }
-                            modifiedAt = podcast.skipLastModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.skipLastModified.toProtobufTimestampOrFallback()
                         }
                         addToUpNext = boolSetting {
                             value = boolValue { value = podcast.addToUpNextSyncSetting }
-                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrFallback()
                         }
                         episodesSortOrder = int32Setting {
                             value = int32Value { value = podcast.episodesSortType.serverId }
-                            modifiedAt = podcast.episodesSortTypeModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.episodesSortTypeModified.toProtobufTimestampOrFallback()
                         }
                         addToUpNextPosition = int32Setting {
                             value = int32Value { value = podcast.addToUpNextPositionSyncSetting }
-                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.autoAddToUpNextModified.toProtobufTimestampOrFallback()
                         }
                         playbackEffects = boolSetting {
                             value = boolValue { value = podcast.overrideGlobalEffects }
-                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.overrideGlobalEffectsModified.toProtobufTimestampOrFallback()
                         }
                         playbackSpeed = doubleSetting {
                             value = doubleValue { value = podcast.playbackSpeed }
-                            modifiedAt = podcast.playbackSpeedModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.playbackSpeedModified.toProtobufTimestampOrFallback()
                         }
                         trimSilence = int32Setting {
                             value = int32Value { value = podcast.trimMode.serverId }
-                            modifiedAt = podcast.trimModeModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.trimModeModified.toProtobufTimestampOrFallback()
                         }
                         volumeBoost = boolSetting {
                             value = boolValue { value = podcast.isVolumeBoosted }
-                            modifiedAt = podcast.volumeBoostedModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.volumeBoostedModified.toProtobufTimestampOrFallback()
                         }
                         notification = boolSetting {
                             value = boolValue { value = podcast.isShowNotifications }
-                            modifiedAt = podcast.showNotificationsModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.showNotificationsModified.toProtobufTimestampOrFallback()
                         }
                         autoArchive = boolSetting {
                             value = boolValue { value = podcast.overrideGlobalArchive }
-                            modifiedAt = podcast.overrideGlobalArchiveModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.overrideGlobalArchiveModified.toProtobufTimestampOrFallback()
                         }
                         autoArchivePlayed = int32Setting {
                             value = int32Value { value = podcast.autoArchiveAfterPlaying.serverId }
-                            modifiedAt = podcast.autoArchiveAfterPlayingModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.autoArchiveAfterPlayingModified.toProtobufTimestampOrFallback()
                         }
                         autoArchiveInactive = int32Setting {
                             value = int32Value { value = podcast.autoArchiveInactive.serverId }
-                            modifiedAt = podcast.autoArchiveInactiveModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.autoArchiveInactiveModified.toProtobufTimestampOrFallback()
                         }
                         autoArchiveEpisodeLimit = int32Setting {
                             value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
-                            modifiedAt = podcast.autoArchiveEpisodeLimitModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.autoArchiveEpisodeLimitModified.toProtobufTimestampOrFallback()
                         }
                         episodeGrouping = int32Setting {
                             value = int32Value { value = podcast.grouping.serverId }
-                            modifiedAt = podcast.groupingModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.groupingModified.toProtobufTimestampOrFallback()
                         }
                         showArchived = boolSetting {
                             value = boolValue { value = podcast.showArchived }
-                            modifiedAt = podcast.showArchivedModified.toProtobufTimestampOrEpoch()
+                            modifiedAt = podcast.showArchivedModified.toProtobufTimestampOrFallback()
                         }
                     }
 
@@ -1290,18 +1291,13 @@ private fun Date.toProtobufTimestamp(): Timestamp {
     }
 }
 
-private fun Date?.toProtobufTimestampOrEpoch(): Timestamp {
-    val instant = this?.toInstant() ?: fallbackTimestamp
+private fun Date?.toProtobufTimestampOrFallback(): Timestamp {
+    val instant = this?.toInstant() ?: UserSetting.DefaultFallbackTimestamp
     return timestamp {
         seconds = instant.epochSecond
         nanos = instant.nano
     }
 }
-
-// We use EPOCH +1 millisecond as a default timestamp for updates because initial values of when app is installed are null.
-// This means that if a user syncs settings that were set before we started tracking timestamps
-// they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
-private val fallbackTimestamp: Instant = Instant.EPOCH.plusMillis(1)
 
 private val Podcast.addToUpNextSyncSetting get() = autoAddToUpNext != Podcast.AutoAddUpNext.OFF
 private val Podcast.addToUpNextPositionSyncSetting get() = when (autoAddToUpNext) {

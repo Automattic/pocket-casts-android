@@ -453,4 +453,161 @@ class ChapterManagerImplTest {
             cancel()
         }
     }
+
+    @Test
+    fun `observe chapters with 0 duration`() = runBlocking {
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
+        val dbChapters = listOf(
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 0,
+                endTimeMs = 0,
+                title = "Title 1",
+            ),
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 1,
+                endTimeMs = 1,
+                title = "Title 2",
+            ),
+        )
+
+        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            val expected = listOf(
+                Chapter(
+                    index = 1,
+                    title = "Title 1",
+                    startTime = 0.milliseconds,
+                    endTime = 1.milliseconds,
+                    selected = true,
+                ),
+                Chapter(
+                    index = 2,
+                    title = "Title 2",
+                    startTime = 1.milliseconds,
+                    endTime = 3.milliseconds,
+                    selected = true,
+                ),
+            )
+            assertEquals(Chapters(expected), awaitItem())
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `observe chapters with negative duration`() = runBlocking {
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
+        val dbChapters = listOf(
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 0,
+                endTimeMs = -2,
+                title = "Title 1",
+            ),
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 1,
+                endTimeMs = 1,
+                title = "Title 2",
+            ),
+        )
+
+        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            val expected = listOf(
+                Chapter(
+                    index = 1,
+                    title = "Title 1",
+                    startTime = 0.milliseconds,
+                    endTime = 1.milliseconds,
+                    selected = true,
+                ),
+                Chapter(
+                    index = 2,
+                    title = "Title 2",
+                    startTime = 1.milliseconds,
+                    endTime = 3.milliseconds,
+                    selected = true,
+                ),
+            )
+            assertEquals(Chapters(expected), awaitItem())
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `filter chapters with no duration`() = runBlocking {
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
+        val dbChapters = listOf(
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 0,
+                endTimeMs = 0,
+                title = "Title 1",
+            ),
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 0,
+                endTimeMs = 0,
+                title = "Title 2",
+            ),
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 1,
+                endTimeMs = 1,
+                title = "Title 3",
+            ),
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 2,
+                endTimeMs = 2,
+                title = "Title 4",
+            ),
+            DbChapter(
+                episodeUuid = "id",
+                startTimeMs = 2,
+                endTimeMs = 2,
+                title = "Title 5",
+            ),
+        )
+
+        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            val expected = listOf(
+                Chapter(
+                    index = 1,
+                    title = "Title 2",
+                    startTime = 0.milliseconds,
+                    endTime = 1.milliseconds,
+                    selected = true,
+                ),
+                Chapter(
+                    index = 2,
+                    title = "Title 3",
+                    startTime = 1.milliseconds,
+                    endTime = 2.milliseconds,
+                    selected = true,
+                ),
+                Chapter(
+                    index = 3,
+                    title = "Title 5",
+                    startTime = 2.milliseconds,
+                    endTime = 3.milliseconds,
+                    selected = true,
+                ),
+            )
+            assertEquals(Chapters(expected), awaitItem())
+
+            awaitComplete()
+        }
+    }
 }
